@@ -6290,22 +6290,13 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->People(3).NumberOfPeople = 1.0;
 
     state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
-    state->dataHeatBal->ZoneElectric(1).spacePtrs.allocate(1);
-    state->dataHeatBal->ZoneElectric(1).spacePtrs(1) = 1;
-    state->dataHeatBal->ZoneElectric(1).spaceFracs.allocate(1);
-    state->dataHeatBal->ZoneElectric(1).spaceFracs(1) = 1.0;
+    state->dataHeatBal->ZoneElectric(1).spaceIndex = 1;
     state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
     state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
-    state->dataHeatBal->ZoneElectric(2).spacePtrs.allocate(1);
-    state->dataHeatBal->ZoneElectric(2).spacePtrs(1) = 2;
-    state->dataHeatBal->ZoneElectric(2).spaceFracs.allocate(1);
-    state->dataHeatBal->ZoneElectric(2).spaceFracs(1) = 1.0;
+    state->dataHeatBal->ZoneElectric(2).spaceIndex = 2;
     state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
     state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
-    state->dataHeatBal->ZoneElectric(3).spacePtrs.allocate(1);
-    state->dataHeatBal->ZoneElectric(3).spacePtrs(1) = 3;
-    state->dataHeatBal->ZoneElectric(3).spaceFracs.allocate(1);
-    state->dataHeatBal->ZoneElectric(3).spaceFracs(1) = 1.0;
+    state->dataHeatBal->ZoneElectric(3).spaceIndex = 3;
     state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
@@ -9333,22 +9324,13 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->People(3).NumberOfPeople = 1.0;
 
     state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
-    state->dataHeatBal->ZoneElectric(1).spacePtrs.allocate(1);
-    state->dataHeatBal->ZoneElectric(1).spacePtrs(1) = 1;
-    state->dataHeatBal->ZoneElectric(1).spaceFracs.allocate(1);
-    state->dataHeatBal->ZoneElectric(1).spaceFracs(1) = 1.0;
+    state->dataHeatBal->ZoneElectric(1).spaceIndex = 1;
     state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
     state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
-    state->dataHeatBal->ZoneElectric(2).spacePtrs.allocate(1);
-    state->dataHeatBal->ZoneElectric(2).spacePtrs(1) = 2;
-    state->dataHeatBal->ZoneElectric(2).spaceFracs.allocate(1);
-    state->dataHeatBal->ZoneElectric(2).spaceFracs(1) = 1.0;
+    state->dataHeatBal->ZoneElectric(2).spaceIndex = 2;
     state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
     state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
-    state->dataHeatBal->ZoneElectric(3).spacePtrs.allocate(1);
-    state->dataHeatBal->ZoneElectric(3).spacePtrs(1) = 3;
-    state->dataHeatBal->ZoneElectric(3).spaceFracs.allocate(1);
-    state->dataHeatBal->ZoneElectric(3).spaceFracs(1) = 1.0;
+    state->dataHeatBal->ZoneElectric(3).spaceIndex = 3;
     state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
 
     // zone

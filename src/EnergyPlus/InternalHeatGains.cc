@@ -386,7 +386,7 @@ namespace InternalHeatGains {
                             }
 
                         } else if (peopleMethod == "PEOPLE/AREA") {
-                            if (thisPeople.ZonePtr != 0) {
+                            if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
                                     thisPeople.NumberOfPeople = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
                                     if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
@@ -414,7 +414,7 @@ namespace InternalHeatGains {
                             }
 
                         } else if (peopleMethod == "AREA/PERSON") {
-                            if (thisPeople.ZonePtr != 0) {
+                            if (spaceNum != 0) {
                                 if (IHGNumbers(3) > 0.0) {
                                     thisPeople.NumberOfPeople = state.dataHeatBal->space(spaceNum).floorArea / IHGNumbers(3);
                                     if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
@@ -1146,9 +1146,8 @@ namespace InternalHeatGains {
                                 } else {
                                     ShowSevereError(state,
                                                     std::string(RoutineName) + "Zone floor area is zero when allocating Lights loads to Spaces.");
-                                    ShowContinueError(state,
-                                                      "Occurs for Lights object =" + thisLightsInput.Name +
-                                                          " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
+                                    ShowContinueError(
+                                        state, "Occurs for Lights object =" + AlphaName(1) + " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
                                     ErrorsFound = true;
                                 }
                             }
@@ -1156,12 +1155,12 @@ namespace InternalHeatGains {
                             thisLights.DesignLevel = IHGNumbers(1) * spaceFrac;
                             if (state.dataIPShortCut->lNumericFieldBlanks(1)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + lightsModuleObject + "=\"" + thisLights.Name + "\", specifies " +
+                                                 std::string{RoutineName} + lightsModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(1) +
                                                      ", but that field is blank.  0 Lights will result.");
                             }
                         } else if (lightingLevel == "WATTS/AREA") {
-                            if (thisLights.ZonePtr != 0) {
+                            if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
                                     thisLights.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
                                     if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
@@ -1183,12 +1182,12 @@ namespace InternalHeatGains {
                             }
                             if (state.dataIPShortCut->lNumericFieldBlanks(2)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + lightsModuleObject + "=\"" + thisLights.Name + "\", specifies " +
+                                                 std::string{RoutineName} + lightsModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(2) +
                                                      ", but that field is blank.  0 Lights will result.");
                             }
                         } else if (lightingLevel == "WATTS/PERSON") {
-                            if (thisLights.ZonePtr != 0) {
+                            if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
                                     thisLights.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
                                     if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
@@ -1210,7 +1209,7 @@ namespace InternalHeatGains {
                             }
                             if (state.dataIPShortCut->lNumericFieldBlanks(3)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + lightsModuleObject + "=\"" + thisLights.Name + "\", specifies " +
+                                                 std::string{RoutineName} + lightsModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(3) +
                                                      ", but that field is blank.  0 Lights will result.");
                             }
@@ -1241,7 +1240,7 @@ namespace InternalHeatGains {
                     if (thisLights.FractionConvected < 0.0) {
                         if (Item1 == 1) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + lightsModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
+                                            std::string{RoutineName} + lightsModuleObject + "=\"" + thisLights.Name + "\", Sum of Fractions > 1.0");
                             ErrorsFound = true;
                         }
                     }
@@ -1267,7 +1266,7 @@ namespace InternalHeatGains {
                     } else if (AlphaName(6) != "YES" && AlphaName(6) != "NO") {
                         if (Item1 == 1) {
                             ShowWarningError(state,
-                                             std::string{RoutineName} + lightsModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                             std::string{RoutineName} + lightsModuleObject + "=\"" + thisLightsInput.Name + "\", invalid " +
                                                  state.dataIPShortCut->cAlphaFieldNames(6) + ", value  =" + AlphaName(6));
                             ShowContinueError(state, ".. Return Air Fraction from Plenum will NOT be calculated.");
                         }
@@ -1350,10 +1349,8 @@ namespace InternalHeatGains {
                     }
                 }
             }
-            for (int lightsNum = 1; lightsNum <= state.dataHeatBal->TotLights; ++lightsNum) {
-                int spaceNum = state.dataHeatBal->Lights(lightsNum).spaceIndex;
-                int zoneNum = state.dataHeatBal->Lights(lightsNum).ZonePtr;
-                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                for (int lightsNum = 1; lightsNum <= state.dataHeatBal->TotLights; ++lightsNum) {
                     SetupEMSActuator(state,
                                      "Lights",
                                      state.dataHeatBal->Lights(lightsNum).Name,
@@ -1367,6 +1364,10 @@ namespace InternalHeatGains {
                                              "[W]",
                                              state.dataHeatBal->Lights(lightsNum).DesignLevel);
                 } // EMS
+            }
+            for (int lightsNum = 1; lightsNum <= state.dataHeatBal->TotLights; ++lightsNum) {
+                int spaceNum = state.dataHeatBal->Lights(lightsNum).spaceIndex;
+                int zoneNum = state.dataHeatBal->Lights(lightsNum).ZonePtr;
                 // setup internal gains
                 int returnNodeNum = 0;
                 if ((state.dataHeatBal->Lights(lightsNum).ZoneReturnNum > 0) &&
@@ -1413,7 +1414,7 @@ namespace InternalHeatGains {
                     state, state.dataOutRptPredefined->pdchInLtSchd, liteName, GetScheduleName(state, state.dataHeatBal->Lights(lightsNum).SchedPtr));
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchInLtRetAir, liteName, state.dataHeatBal->Lights(lightsNum).FractionReturnAir, 4);
-            } // Item1 - Number of Spaces per Lights input object
+            } // Item1 - Number of Lights instances
             if (CheckSharedExhaustFlag) {
                 DataZoneEquipment::CheckSharedExhaust(state);
                 Array1D_bool ReturnNodeShared; // zone supply air inlet nodes
@@ -1456,73 +1457,21 @@ namespace InternalHeatGains {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtArea, "Interior Lighting Total", state.dataInternalHeatGains->sumArea);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtPower, "Interior Lighting Total", state.dataInternalHeatGains->sumPower);
 
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            RepVarSet(zoneNum) = true;
-        }
-        state.dataHeatBal->NumZoneElectricStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, elecEqModuleObject);
-        state.dataHeatBal->ZoneElectricObjects.allocate(state.dataHeatBal->NumZoneElectricStatements);
-
-        state.dataHeatBal->TotElecEquip = 0;
-        errFlag = false;
-        for (int Item = 1; Item <= state.dataHeatBal->NumZoneElectricStatements; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     elecEqModuleObject,
-                                                                     Item,
-                                                                     AlphaName,
-                                                                     NumAlpha,
-                                                                     IHGNumbers,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), elecEqModuleObject, ErrorsFound);
-
-            state.dataHeatBal->ZoneElectricObjects(Item).Name = AlphaName(1);
-
-            int Item1 = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
-            int ZLItem = 0;
-            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0)
-                ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->ZoneList);
-            if (Item1 > 0) {
-                state.dataHeatBal->ZoneElectricObjects(Item).StartPtr = state.dataHeatBal->TotElecEquip + 1;
-                ++state.dataHeatBal->TotElecEquip;
-                state.dataHeatBal->ZoneElectricObjects(Item).NumOfZones = 1;
-                state.dataHeatBal->ZoneElectricObjects(Item).ZoneListActive = false;
-                state.dataHeatBal->ZoneElectricObjects(Item).ZoneOrZoneListPtr = Item1;
-            } else if (ZLItem > 0) {
-                state.dataHeatBal->ZoneElectricObjects(Item).StartPtr = state.dataHeatBal->TotElecEquip + 1;
-                state.dataHeatBal->TotElecEquip += state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-                state.dataHeatBal->ZoneElectricObjects(Item).NumOfZones = state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-                state.dataHeatBal->ZoneElectricObjects(Item).ZoneListActive = true;
-                state.dataHeatBal->ZoneElectricObjects(Item).ZoneOrZoneListPtr = ZLItem;
-            } else {
-                ShowSevereError(state,
-                                elecEqModuleObject + "=\"" + AlphaName(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                    AlphaName(2) + "\" not found.");
-                ErrorsFound = true;
-                errFlag = true;
-            }
-        }
-
-        if (errFlag) {
-            ShowSevereError(state, std::string{RoutineName} + "Errors with invalid names in " + elecEqModuleObject + " objects.");
-            ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            state.dataHeatBal->TotElecEquip = 0;
-        }
-
-        state.dataHeatBal->ZoneElectric.allocate(state.dataHeatBal->TotElecEquip);
+        setupIHGZonesAndSpaces(state,
+                               elecEqModuleObject,
+                               state.dataHeatBal->ZoneElectricObjects,
+                               state.dataHeatBal->NumZoneElectricStatements,
+                               state.dataHeatBal->TotElecEquip,
+                               ErrorsFound);
 
         if (state.dataHeatBal->TotElecEquip > 0) {
-            int Loop = 0;
-            for (int Item = 1; Item <= state.dataHeatBal->NumZoneElectricStatements; ++Item) {
-                AlphaName = std::string{};
-                IHGNumbers = 0.0;
+            state.dataHeatBal->ZoneElectric.allocate(state.dataHeatBal->TotElecEquip);
+            int elecEqNum = 0;
+            for (int elecEqInputNum = 1; elecEqInputNum <= state.dataHeatBal->NumZoneElectricStatements; ++elecEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          elecEqModuleObject,
-                                                                         Item,
+                                                                         elecEqInputNum,
                                                                          AlphaName,
                                                                          NumAlpha,
                                                                          IHGNumbers,
@@ -1533,45 +1482,20 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                for (int Item1 = 1; Item1 <= state.dataHeatBal->ZoneElectricObjects(Item).NumOfZones; ++Item1) {
-                    ++Loop;
-                    if (!state.dataHeatBal->ZoneElectricObjects(Item).ZoneListActive) {
-                        state.dataHeatBal->ZoneElectric(Loop).Name = AlphaName(1);
-                        int zoneNum = state.dataHeatBal->ZoneElectricObjects(Item).ZoneOrZoneListPtr;
-                        state.dataHeatBal->ZoneElectric(Loop).ZonePtr = zoneNum;
-                        if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                                state.dataHeatBal->ZoneElectric(Loop).spacePtrs.emplace_back(spaceNum);
-                            }
-                        }
-                    } else {
-                        CheckCreatedZoneItemName(
-                            state,
-                            RoutineName,
-                            elecEqModuleObject,
-                            state.dataHeatBal
-                                ->Zone(state.dataHeatBal->ZoneList(state.dataHeatBal->ZoneElectricObjects(Item).ZoneOrZoneListPtr).Zone(Item1))
-                                .Name,
-                            state.dataHeatBal->ZoneList(state.dataHeatBal->ZoneElectricObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
-                            state.dataHeatBal->ZoneElectricObjects(Item).Name,
-                            state.dataHeatBal->ZoneElectric,
-                            Loop - 1,
-                            state.dataHeatBal->ZoneElectric(Loop).Name,
-                            errFlag);
-                        int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->ZoneElectricObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
-                        state.dataHeatBal->ZoneElectric(Loop).ZonePtr = zoneNum;
-                        if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                                state.dataHeatBal->ZoneElectric(Loop).spacePtrs.emplace_back(spaceNum);
-                            }
-                        }
-                        if (errFlag) ErrorsFound = true;
-                    }
+                auto &thisElecEqInput = state.dataHeatBal->ZoneElectricObjects(elecEqInputNum);
+                for (int Item1 = 1; Item1 <= thisElecEqInput.numOfSpaces; ++Item1) {
+                    ++elecEqNum;
+                    auto &thisZoneElectric = state.dataHeatBal->ZoneElectric(elecEqNum);
+                    int const spaceNum = thisElecEqInput.spaceNums(Item1);
+                    int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                    thisZoneElectric.Name = thisElecEqInput.names(Item1);
+                    thisZoneElectric.spaceIndex = spaceNum;
+                    thisZoneElectric.ZonePtr = zoneNum;
 
-                    state.dataHeatBal->ZoneElectric(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(3));
+                    thisZoneElectric.SchedPtr = GetScheduleIndex(state, AlphaName(3));
                     SchMin = 0.0;
                     SchMax = 0.0;
-                    if (state.dataHeatBal->ZoneElectric(Loop).SchedPtr == 0) {
+                    if (thisZoneElectric.SchedPtr == 0) {
                         if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + elecEqModuleObject + "=\"" + AlphaName(1) + "\", " +
@@ -1583,8 +1507,8 @@ namespace InternalHeatGains {
                         }
                         ErrorsFound = true;
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, state.dataHeatBal->ZoneElectric(Loop).SchedPtr);
-                        SchMax = GetScheduleMaxValue(state, state.dataHeatBal->ZoneElectric(Loop).SchedPtr);
+                        SchMin = GetScheduleMinValue(state, thisZoneElectric.SchedPtr);
+                        SchMax = GetScheduleMaxValue(state, thisZoneElectric.SchedPtr);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (SchMin < 0.0) {
                                 ShowSevereError(state,
@@ -1600,28 +1524,6 @@ namespace InternalHeatGains {
                                                     state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                                 ShowContinueError(state,
                                                   format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
-                                ErrorsFound = true;
-                            }
-                        }
-                    }
-
-                    // Set space load fractions
-                    if (int(state.dataHeatBal->ZoneElectric(Loop).spacePtrs.size()) <= 1) {
-                        state.dataHeatBal->ZoneElectric(Loop).spaceFracs.emplace_back(1.0);
-                    } else {
-                        if (state.dataHeatBal->ZoneElectric(Loop).ZonePtr > 0) {
-                            Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).FloorArea;
-                            if (zoneArea > 0.0) {
-                                for (int const spaceNum : state.dataHeatBal->ZoneElectric(Loop).spacePtrs) {
-                                    Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
-                                    state.dataHeatBal->ZoneElectric(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
-                                }
-                            } else {
-                                ShowSevereError(
-                                    state, std::string(RoutineName) + "Zone floor area is zero when allocating ElectricEquipment loads to Spaces.");
-                                ShowContinueError(state,
-                                                  "Occurs for ElectricEquipment object =" + state.dataHeatBal->ZoneElectricObjects(Item).Name +
-                                                      " in Zone=" + state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name);
                                 ErrorsFound = true;
                             }
                         }
@@ -1631,31 +1533,44 @@ namespace InternalHeatGains {
                     {
                         auto const equipmentLevel(AlphaName(4));
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
-                            state.dataHeatBal->ZoneElectric(Loop).DesignLevel = IHGNumbers(1);
+                            Real64 spaceFrac = 1.0;
+                            if (thisElecEqInput.numOfSpaces > 1) {
+                                Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
+                                if (zoneArea > 0.0) {
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                } else {
+                                    ShowSevereError(state,
+                                                    std::string(RoutineName) +
+                                                        "Zone floor area is zero when allocating ElectricEquipment loads to Spaces.");
+                                    ShowContinueError(state,
+                                                      "Occurs for ElectricEquipment object =" + thisElecEqInput.Name +
+                                                          " in Zone=" + state.dataHeatBal->Zone(thisZoneElectric.ZonePtr).Name);
+                                    ErrorsFound = true;
+                                }
+                            }
+                            thisZoneElectric.DesignLevel = IHGNumbers(1) * spaceFrac;
                             if (state.dataIPShortCut->lNumericFieldBlanks(1)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + elecEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                 std::string{RoutineName} + elecEqModuleObject + "=\"" + thisElecEqInput.Name + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(1) +
                                                      ", but that field is blank.  0 Electric Equipment will result.");
                             }
-
                         } else if (equipmentLevel == "WATTS/AREA") {
-                            if (state.dataHeatBal->ZoneElectric(Loop).ZonePtr != 0) {
+                            if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    state.dataHeatBal->ZoneElectric(Loop).DesignLevel =
-                                        IHGNumbers(2) * state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).FloorArea;
-                                    if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).FloorArea <= 0.0) {
+                                    thisZoneElectric.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
+                                    if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
                                         ShowWarningError(state,
-                                                         std::string{RoutineName} + elecEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
-                                                             state.dataIPShortCut->cNumericFieldNames(2) +
-                                                             ", but Zone Floor Area = 0.  0 Electric Equipment will result.");
+                                                         std::string{RoutineName} + elecEqModuleObject + "=\"" + thisZoneElectric.Name +
+                                                             "\", specifies " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                                             ", but Space Floor Area = 0.  0 Electric Equipment will result.");
                                     }
                                 } else {
                                     ShowSevereError(state,
                                                     format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}",
                                                            RoutineName,
                                                            elecEqModuleObject,
-                                                           AlphaName(1),
+                                                           thisZoneElectric.Name,
                                                            state.dataIPShortCut->cNumericFieldNames(2),
                                                            IHGNumbers(2)));
                                     ErrorsFound = true;
@@ -1663,20 +1578,19 @@ namespace InternalHeatGains {
                             }
                             if (state.dataIPShortCut->lNumericFieldBlanks(2)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + elecEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                 std::string{RoutineName} + elecEqModuleObject + "=\"" + thisElecEqInput.Name + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(2) +
                                                      ", but that field is blank.  0 Electric Equipment will result.");
                             }
 
                         } else if (equipmentLevel == "WATTS/PERSON") {
-                            if (state.dataHeatBal->ZoneElectric(Loop).ZonePtr != 0) {
+                            if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    state.dataHeatBal->ZoneElectric(Loop).DesignLevel =
-                                        IHGNumbers(3) * state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).TotOccupants;
-                                    if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).TotOccupants <= 0.0) {
+                                    thisZoneElectric.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
                                         ShowWarningError(state,
-                                                         std::string{RoutineName} + elecEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
-                                                             state.dataIPShortCut->cNumericFieldNames(2) +
+                                                         std::string{RoutineName} + elecEqModuleObject + "=\"" + thisZoneElectric.Name +
+                                                             "\", specifies " + state.dataIPShortCut->cNumericFieldNames(2) +
                                                              ", but Total Occupants = 0.  0 Electric Equipment will result.");
                                     }
                                 } else {
@@ -1684,7 +1598,7 @@ namespace InternalHeatGains {
                                                     format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}",
                                                            RoutineName,
                                                            elecEqModuleObject,
-                                                           AlphaName(1),
+                                                           thisZoneElectric.Name,
                                                            state.dataIPShortCut->cNumericFieldNames(3),
                                                            IHGNumbers(3)));
                                     ErrorsFound = true;
@@ -1692,7 +1606,7 @@ namespace InternalHeatGains {
                             }
                             if (state.dataIPShortCut->lNumericFieldBlanks(3)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + elecEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                 std::string{RoutineName} + elecEqModuleObject + "=\"" + thisElecEqInput.Name + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(3) +
                                                      ", but that field is blank.  0 Electric Equipment will result.");
                             }
@@ -1700,7 +1614,7 @@ namespace InternalHeatGains {
                         } else {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + elecEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                std::string{RoutineName} + elecEqModuleObject + "=\"" + thisElecEqInput.Name + "\", invalid " +
                                                     state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
                                 ShowContinueError(state, "...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
@@ -1709,313 +1623,68 @@ namespace InternalHeatGains {
                     }
 
                     // Calculate nominal min/max equipment level
-                    state.dataHeatBal->ZoneElectric(Loop).NomMinDesignLevel = state.dataHeatBal->ZoneElectric(Loop).DesignLevel * SchMin;
-                    state.dataHeatBal->ZoneElectric(Loop).NomMaxDesignLevel = state.dataHeatBal->ZoneElectric(Loop).DesignLevel * SchMax;
+                    thisZoneElectric.NomMinDesignLevel = thisZoneElectric.DesignLevel * SchMin;
+                    thisZoneElectric.NomMaxDesignLevel = thisZoneElectric.DesignLevel * SchMax;
 
-                    state.dataHeatBal->ZoneElectric(Loop).FractionLatent = IHGNumbers(4);
-                    state.dataHeatBal->ZoneElectric(Loop).FractionRadiant = IHGNumbers(5);
-                    state.dataHeatBal->ZoneElectric(Loop).FractionLost = IHGNumbers(6);
+                    thisZoneElectric.FractionLatent = IHGNumbers(4);
+                    thisZoneElectric.FractionRadiant = IHGNumbers(5);
+                    thisZoneElectric.FractionLost = IHGNumbers(6);
                     // FractionConvected is a calculated field
-                    state.dataHeatBal->ZoneElectric(Loop).FractionConvected =
-                        1.0 - (state.dataHeatBal->ZoneElectric(Loop).FractionLatent + state.dataHeatBal->ZoneElectric(Loop).FractionRadiant +
-                               state.dataHeatBal->ZoneElectric(Loop).FractionLost);
-                    if (std::abs(state.dataHeatBal->ZoneElectric(Loop).FractionConvected) <= 0.001)
-                        state.dataHeatBal->ZoneElectric(Loop).FractionConvected = 0.0;
-                    if (state.dataHeatBal->ZoneElectric(Loop).FractionConvected < 0.0) {
-                        ShowSevereError(state, std::string{RoutineName} + elecEqModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
+                    thisZoneElectric.FractionConvected =
+                        1.0 - (thisZoneElectric.FractionLatent + thisZoneElectric.FractionRadiant + thisZoneElectric.FractionLost);
+                    if (std::abs(thisZoneElectric.FractionConvected) <= 0.001) thisZoneElectric.FractionConvected = 0.0;
+                    if (thisZoneElectric.FractionConvected < 0.0) {
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + elecEqModuleObject + "=\"" + thisElecEqInput.Name + "\", Sum of Fractions > 1.0");
                         ErrorsFound = true;
                     }
 
                     if (NumAlpha > 4) {
-                        state.dataHeatBal->ZoneElectric(Loop).EndUseSubcategory = AlphaName(5);
+                        thisZoneElectric.EndUseSubcategory = AlphaName(5);
                     } else {
-                        state.dataHeatBal->ZoneElectric(Loop).EndUseSubcategory = "General";
+                        thisZoneElectric.EndUseSubcategory = "General";
                     }
-
-                    if (state.dataHeatBal->ZoneElectric(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
-
-                    // Object report variables
-                    SetupOutputVariable(state,
-                                        "Electric Equipment Electricity Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneElectric(Loop).Power,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneElectric(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Electric Equipment Electricity Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneElectric(Loop).Consumption,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneElectric(Loop).Name,
-                                        _,
-                                        "Electricity",
-                                        "InteriorEquipment",
-                                        state.dataHeatBal->ZoneElectric(Loop).EndUseSubcategory,
-                                        "Building",
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Multiplier,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).ListMultiplier);
-
-                    SetupOutputVariable(state,
-                                        "Electric Equipment Radiant Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneElectric(Loop).RadGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneElectric(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Electric Equipment Radiant Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneElectric(Loop).RadGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneElectric(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Electric Equipment Convective Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneElectric(Loop).ConGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneElectric(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Electric Equipment Convective Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneElectric(Loop).ConGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneElectric(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Electric Equipment Latent Gain Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneElectric(Loop).LatGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneElectric(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Electric Equipment Latent Gain Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneElectric(Loop).LatGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneElectric(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Electric Equipment Lost Heat Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneElectric(Loop).LostEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneElectric(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Electric Equipment Lost Heat Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneElectric(Loop).LostRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneElectric(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Electric Equipment Total Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneElectric(Loop).TotGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneElectric(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Electric Equipment Total Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneElectric(Loop).TotGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneElectric(Loop).Name);
-
-                    // Zone total report variables
-                    if (RepVarSet(state.dataHeatBal->ZoneElectric(Loop).ZonePtr)) {
-                        RepVarSet(state.dataHeatBal->ZoneElectric(Loop).ZonePtr) = false;
-                        SetupOutputVariable(state,
-                                            "Zone Electric Equipment Electricity Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).ElecPower,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Electric Equipment Electricity Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).ElecConsump,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name);
-
-                        SetupOutputVariable(state,
-                                            "Zone Electric Equipment Radiant Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).ElecRadGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Electric Equipment Radiant Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).ElecRadGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Electric Equipment Convective Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).ElecConGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Electric Equipment Convective Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).ElecConGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Electric Equipment Latent Gain Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).ElecLatGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Electric Equipment Latent Gain Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).ElecLatGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Electric Equipment Lost Heat Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).ElecLost,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Electric Equipment Lost Heat Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).ElecLostRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Electric Equipment Total Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).ElecTotGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Electric Equipment Total Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).ElecTotGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(Loop).ZonePtr).Name);
-                    }
-
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator(state,
                                          "ElectricEquipment",
-                                         state.dataHeatBal->ZoneElectric(Loop).Name,
+                                         thisZoneElectric.Name,
                                          "Electricity Rate",
                                          "[W]",
-                                         state.dataHeatBal->ZoneElectric(Loop).EMSZoneEquipOverrideOn,
-                                         state.dataHeatBal->ZoneElectric(Loop).EMSEquipPower);
-                        SetupEMSInternalVariable(state,
-                                                 "Plug and Process Power Design Level",
-                                                 state.dataHeatBal->ZoneElectric(Loop).Name,
-                                                 "[W]",
-                                                 state.dataHeatBal->ZoneElectric(Loop).DesignLevel);
+                                         thisZoneElectric.EMSZoneEquipOverrideOn,
+                                         thisZoneElectric.EMSEquipPower);
+                        SetupEMSInternalVariable(
+                            state, "Plug and Process Power Design Level", thisZoneElectric.Name, "[W]", thisZoneElectric.DesignLevel);
                     } // EMS
-
-                    if (!ErrorsFound)
+                    if (!ErrorsFound) {
                         SetupZoneInternalGain(state,
-                                              state.dataHeatBal->ZoneElectric(Loop).ZonePtr,
+                                              thisZoneElectric.ZonePtr,
                                               "ElectricEquipment",
-                                              state.dataHeatBal->ZoneElectric(Loop).Name,
+                                              thisZoneElectric.Name,
                                               IntGainTypeOf_ElectricEquipment,
-                                              &state.dataHeatBal->ZoneElectric(Loop).ConGainRate,
+                                              &thisZoneElectric.ConGainRate,
                                               nullptr,
-                                              &state.dataHeatBal->ZoneElectric(Loop).RadGainRate,
-                                              &state.dataHeatBal->ZoneElectric(Loop).LatGainRate);
+                                              &thisZoneElectric.RadGainRate,
+                                              &thisZoneElectric.LatGainRate);
+                    }
+                } // for elecEqInputNum.NumOfSpaces
+            }     // for elecEqInputNum
+        }         // TotElecEquip > 0
 
-                } // Item1
-            }     // Item - Number of ZoneElectric objects
-        }         // Check on number of ZoneElectric
-
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            RepVarSet(zoneNum) = true;
-        }
-        state.dataHeatBal->NumZoneGasStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, gasEqModuleObject);
-        state.dataHeatBal->ZoneGasObjects.allocate(state.dataHeatBal->NumZoneGasStatements);
-
-        state.dataHeatBal->TotGasEquip = 0;
-        errFlag = false;
-        for (int Item = 1; Item <= state.dataHeatBal->NumZoneGasStatements; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     gasEqModuleObject,
-                                                                     Item,
-                                                                     AlphaName,
-                                                                     NumAlpha,
-                                                                     IHGNumbers,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), gasEqModuleObject, ErrorsFound);
-
-            state.dataHeatBal->ZoneGasObjects(Item).Name = AlphaName(1);
-
-            int Item1 = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
-            int ZLItem = 0;
-            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0)
-                ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->ZoneList);
-            if (Item1 > 0) {
-                state.dataHeatBal->ZoneGasObjects(Item).StartPtr = state.dataHeatBal->TotGasEquip + 1;
-                ++state.dataHeatBal->TotGasEquip;
-                state.dataHeatBal->ZoneGasObjects(Item).NumOfZones = 1;
-                state.dataHeatBal->ZoneGasObjects(Item).ZoneListActive = false;
-                state.dataHeatBal->ZoneGasObjects(Item).ZoneOrZoneListPtr = Item1;
-            } else if (ZLItem > 0) {
-                state.dataHeatBal->ZoneGasObjects(Item).StartPtr = state.dataHeatBal->TotGasEquip + 1;
-                state.dataHeatBal->TotGasEquip += state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-                state.dataHeatBal->ZoneGasObjects(Item).NumOfZones = state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-                state.dataHeatBal->ZoneGasObjects(Item).ZoneListActive = true;
-                state.dataHeatBal->ZoneGasObjects(Item).ZoneOrZoneListPtr = ZLItem;
-            } else {
-                ShowSevereError(state,
-                                gasEqModuleObject + "=\"" + AlphaName(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                    AlphaName(2) + "\" not found.");
-                ErrorsFound = true;
-                errFlag = true;
-            }
-        }
-
-        if (errFlag) {
-            ShowSevereError(state, std::string{RoutineName} + "Errors with invalid names in " + gasEqModuleObject + " objects.");
-            ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            state.dataHeatBal->TotGasEquip = 0;
-        }
-
-        state.dataHeatBal->ZoneGas.allocate(state.dataHeatBal->TotGasEquip);
+        setupIHGZonesAndSpaces(state,
+                               gasEqModuleObject,
+                               state.dataHeatBal->ZoneGasObjects,
+                               state.dataHeatBal->NumZoneGasStatements,
+                               state.dataHeatBal->TotGasEquip,
+                               ErrorsFound);
 
         if (state.dataHeatBal->TotGasEquip > 0) {
-            int Loop = 0;
-            for (int Item = 1; Item <= state.dataHeatBal->NumZoneGasStatements; ++Item) {
-                AlphaName = std::string{};
-                IHGNumbers = 0.0;
+            state.dataHeatBal->ZoneGas.allocate(state.dataHeatBal->TotGasEquip);
+            int gasEqNum = 0;
+            for (int gasEqInputNum = 1; gasEqInputNum <= state.dataHeatBal->NumZoneGasStatements; ++gasEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          gasEqModuleObject,
-                                                                         Item,
+                                                                         gasEqInputNum,
                                                                          AlphaName,
                                                                          NumAlpha,
                                                                          IHGNumbers,
@@ -2026,65 +1695,40 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                for (int Item1 = 1; Item1 <= state.dataHeatBal->ZoneGasObjects(Item).NumOfZones; ++Item1) {
-                    ++Loop;
-                    if (!state.dataHeatBal->ZoneGasObjects(Item).ZoneListActive) {
-                        state.dataHeatBal->ZoneGas(Loop).Name = AlphaName(1);
-                        int zoneNum = state.dataHeatBal->ZoneGasObjects(Item).ZoneOrZoneListPtr;
-                        state.dataHeatBal->ZoneGas(Loop).ZonePtr = zoneNum;
-                        if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                                state.dataHeatBal->ZoneGas(Loop).spacePtrs.emplace_back(spaceNum);
-                            }
-                        }
-                    } else {
-                        CheckCreatedZoneItemName(
-                            state,
-                            RoutineName,
-                            gasEqModuleObject,
-                            state.dataHeatBal
-                                ->Zone(state.dataHeatBal->ZoneList(state.dataHeatBal->ZoneGasObjects(Item).ZoneOrZoneListPtr).Zone(Item1))
-                                .Name,
-                            state.dataHeatBal->ZoneList(state.dataHeatBal->ZoneGasObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
-                            state.dataHeatBal->ZoneGasObjects(Item).Name,
-                            state.dataHeatBal->ZoneGas,
-                            Loop - 1,
-                            state.dataHeatBal->ZoneGas(Loop).Name,
-                            errFlag);
-                        int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->ZoneGasObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
-                        state.dataHeatBal->ZoneGas(Loop).ZonePtr = zoneNum;
-                        if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                                state.dataHeatBal->ZoneGas(Loop).spacePtrs.emplace_back(spaceNum);
-                            }
-                        }
-                        if (errFlag) ErrorsFound = true;
-                    }
+                auto &thisGasEqInput = state.dataHeatBal->ZoneGasObjects(gasEqInputNum);
+                for (int Item1 = 1; Item1 <= thisGasEqInput.numOfSpaces; ++Item1) {
+                    ++gasEqNum;
+                    auto &thisZoneGas = state.dataHeatBal->ZoneElectric(gasEqNum);
+                    int const spaceNum = thisGasEqInput.spaceNums(Item1);
+                    int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                    thisZoneGas.Name = thisGasEqInput.names(Item1);
+                    thisZoneGas.spaceIndex = spaceNum;
+                    thisZoneGas.ZonePtr = zoneNum;
 
-                    state.dataHeatBal->ZoneGas(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(3));
+                    thisZoneGas.SchedPtr = GetScheduleIndex(state, AlphaName(3));
                     SchMin = 0.0;
                     SchMax = 0.0;
-                    if (state.dataHeatBal->ZoneGas(Loop).SchedPtr == 0) {
+                    if (thisZoneGas.SchedPtr == 0) {
                         if (Item1 == 1) {
                             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + gasEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                std::string{RoutineName} + gasEqModuleObject + "=\"" + thisGasEqInput.Name + "\", " +
                                                     state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
                             } else {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + gasEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                std::string{RoutineName} + gasEqModuleObject + "=\"" + thisGasEqInput.Name + "\", invalid " +
                                                     state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(3));
                             }
                             ErrorsFound = true;
                         }
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, state.dataHeatBal->ZoneGas(Loop).SchedPtr);
-                        SchMax = GetScheduleMaxValue(state, state.dataHeatBal->ZoneGas(Loop).SchedPtr);
+                        SchMin = GetScheduleMinValue(state, thisZoneGas.SchedPtr);
+                        SchMax = GetScheduleMaxValue(state, thisZoneGas.SchedPtr);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (Item1 == 1) {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(state,
-                                                    std::string{RoutineName} + gasEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                    std::string{RoutineName} + gasEqModuleObject + "=\"" + thisGasEqInput.Name + "\", " +
                                                         state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                                     ShowContinueError(state,
                                                       format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
@@ -2094,7 +1738,7 @@ namespace InternalHeatGains {
                             if (Item1 == 1) {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state,
-                                                    std::string{RoutineName} + gasEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                    std::string{RoutineName} + gasEqModuleObject + "=\"" + thisGasEqInput.Name + "\", " +
                                                         state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                                     ShowContinueError(state,
                                                       format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
@@ -2104,58 +1748,47 @@ namespace InternalHeatGains {
                         }
                     }
 
-                    // Set space load fractions
-                    if (int(state.dataHeatBal->ZoneGas(Loop).spacePtrs.size()) <= 1) {
-                        state.dataHeatBal->ZoneGas(Loop).spaceFracs.emplace_back(1.0);
-                    } else {
-                        if (state.dataHeatBal->ZoneGas(Loop).ZonePtr > 0) {
-                            Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).FloorArea;
-                            if (zoneArea > 0.0) {
-                                for (int const spaceNum : state.dataHeatBal->ZoneGas(Loop).spacePtrs) {
-                                    Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
-                                    state.dataHeatBal->ZoneGas(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
-                                }
-                            } else {
-                                ShowSevereError(state,
-                                                std::string(RoutineName) + "Zone floor area is zero when allocating GasEquipment loads to Spaces.");
-                                ShowContinueError(state,
-                                                  "Occurs for GasEquipment object =" + state.dataHeatBal->ZoneGasObjects(Item).Name +
-                                                      " in Zone=" + state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name);
-                                ErrorsFound = true;
-                            }
-                        }
-                    }
-
-                    // equipment design level calculation method.
+                    // Gas equipment design level calculation method.
                     {
                         auto const equipmentLevel(AlphaName(4));
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
-                            state.dataHeatBal->ZoneGas(Loop).DesignLevel = IHGNumbers(1);
+                            Real64 spaceFrac = 1.0;
+                            if (thisGasEqInput.numOfSpaces > 1) {
+                                Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
+                                if (zoneArea > 0.0) {
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                } else {
+                                    ShowSevereError(
+                                        state, std::string(RoutineName) + "Zone floor area is zero when allocating GasEquipment loads to Spaces.");
+                                    ShowContinueError(state,
+                                                      "Occurs for GasEquipment object =" + thisGasEqInput.Name +
+                                                          " in Zone=" + state.dataHeatBal->Zone(thisZoneGas.ZonePtr).Name);
+                                    ErrorsFound = true;
+                                }
+                            }
+                            thisZoneGas.DesignLevel = IHGNumbers(1) * spaceFrac;
                             if (state.dataIPShortCut->lNumericFieldBlanks(1)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + gasEqModuleObject + "=\"" + state.dataHeatBal->ZoneGas(Loop).Name +
-                                                     "\", specifies " + state.dataIPShortCut->cNumericFieldNames(1) +
+                                                 std::string{RoutineName} + gasEqModuleObject + "=\"" + thisGasEqInput.Name + "\", specifies " +
+                                                     state.dataIPShortCut->cNumericFieldNames(1) +
                                                      ", but that field is blank.  0 Gas Equipment will result.");
                             }
-
                         } else if (equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA") {
-                            if (state.dataHeatBal->ZoneGas(Loop).ZonePtr != 0) {
+                            if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    state.dataHeatBal->ZoneGas(Loop).DesignLevel =
-                                        IHGNumbers(2) * state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).FloorArea;
-                                    if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).FloorArea <= 0.0) {
+                                    thisZoneGas.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
+                                    if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
                                         ShowWarningError(state,
-                                                         std::string{RoutineName} + gasEqModuleObject + "=\"" +
-                                                             state.dataHeatBal->ZoneGas(Loop).Name + "\", specifies " +
+                                                         std::string{RoutineName} + gasEqModuleObject + "=\"" + thisZoneGas.Name + "\", specifies " +
                                                              state.dataIPShortCut->cNumericFieldNames(2) +
-                                                             ", but Zone Floor Area = 0.  0 Gas Equipment will result.");
+                                                             ", but Space Floor Area = 0.  0 Gas Equipment will result.");
                                     }
                                 } else {
                                     ShowSevereError(state,
                                                     format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}",
                                                            RoutineName,
                                                            gasEqModuleObject,
-                                                           state.dataHeatBal->ZoneGas(Loop).Name,
+                                                           thisGasEqInput.Name,
                                                            state.dataIPShortCut->cNumericFieldNames(2),
                                                            IHGNumbers(2)));
                                     ErrorsFound = true;
@@ -2163,20 +1796,18 @@ namespace InternalHeatGains {
                             }
                             if (state.dataIPShortCut->lNumericFieldBlanks(2)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + gasEqModuleObject + "=\"" + state.dataHeatBal->ZoneGas(Loop).Name +
-                                                     "\", specifies " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                                 std::string{RoutineName} + gasEqModuleObject + "=\"" + thisGasEqInput.Name + "\", specifies " +
+                                                     state.dataIPShortCut->cNumericFieldNames(2) +
                                                      ", but that field is blank.  0 Gas Equipment will result.");
                             }
 
                         } else if (equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON") {
-                            if (state.dataHeatBal->ZoneGas(Loop).ZonePtr != 0) {
+                            if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    state.dataHeatBal->ZoneGas(Loop).DesignLevel =
-                                        IHGNumbers(3) * state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).TotOccupants;
-                                    if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).TotOccupants <= 0.0) {
+                                    thisZoneGas.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
                                         ShowWarningError(state,
-                                                         std::string{RoutineName} + gasEqModuleObject + "=\"" +
-                                                             state.dataHeatBal->ZoneGas(Loop).Name + "\", specifies " +
+                                                         std::string{RoutineName} + gasEqModuleObject + "=\"" + thisZoneGas.Name + "\", specifies " +
                                                              state.dataIPShortCut->cNumericFieldNames(2) +
                                                              ", but Total Occupants = 0.  0 Gas Equipment will result.");
                                     }
@@ -2185,7 +1816,7 @@ namespace InternalHeatGains {
                                                     format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}",
                                                            RoutineName,
                                                            gasEqModuleObject,
-                                                           state.dataHeatBal->ZoneGas(Loop).Name,
+                                                           thisGasEqInput.Name,
                                                            state.dataIPShortCut->cNumericFieldNames(3),
                                                            IHGNumbers(3)));
                                     ErrorsFound = true;
@@ -2193,15 +1824,15 @@ namespace InternalHeatGains {
                             }
                             if (state.dataIPShortCut->lNumericFieldBlanks(3)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + gasEqModuleObject + "=\"" + state.dataHeatBal->ZoneGas(Loop).Name +
-                                                     "\", specifies " + state.dataIPShortCut->cNumericFieldNames(3) +
+                                                 std::string{RoutineName} + gasEqModuleObject + "=\"" + thisGasEqInput.Name + "\", specifies " +
+                                                     state.dataIPShortCut->cNumericFieldNames(3) +
                                                      ", but that field is blank.  0 Gas Equipment will result.");
                             }
 
                         } else {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + gasEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                std::string{RoutineName} + gasEqModuleObject + "=\"" + thisGasEqInput.Name + "\", invalid " +
                                                     state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
                                 ShowContinueError(state, "...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
@@ -2210,343 +1841,96 @@ namespace InternalHeatGains {
                     }
 
                     // Calculate nominal min/max equipment level
-                    state.dataHeatBal->ZoneGas(Loop).NomMinDesignLevel = state.dataHeatBal->ZoneGas(Loop).DesignLevel * SchMin;
-                    state.dataHeatBal->ZoneGas(Loop).NomMaxDesignLevel = state.dataHeatBal->ZoneGas(Loop).DesignLevel * SchMax;
+                    thisZoneGas.NomMinDesignLevel = thisZoneGas.DesignLevel * SchMin;
+                    thisZoneGas.NomMaxDesignLevel = thisZoneGas.DesignLevel * SchMax;
 
-                    state.dataHeatBal->ZoneGas(Loop).FractionLatent = IHGNumbers(4);
-                    state.dataHeatBal->ZoneGas(Loop).FractionRadiant = IHGNumbers(5);
-                    state.dataHeatBal->ZoneGas(Loop).FractionLost = IHGNumbers(6);
+                    thisZoneGas.FractionLatent = IHGNumbers(4);
+                    thisZoneGas.FractionRadiant = IHGNumbers(5);
+                    thisZoneGas.FractionLost = IHGNumbers(6);
 
                     if ((NumNumber == 7) || (!state.dataIPShortCut->lNumericFieldBlanks(7))) {
-                        state.dataHeatBal->ZoneGas(Loop).CO2RateFactor = IHGNumbers(7);
+                        thisZoneGas.CO2RateFactor = IHGNumbers(7);
                     }
-                    if (state.dataHeatBal->ZoneGas(Loop).CO2RateFactor < 0.0) {
+                    if (thisZoneGas.CO2RateFactor < 0.0) {
                         ShowSevereError(state,
                                         format("{}{}=\"{}\", {} < 0.0, value ={:.2R}",
                                                RoutineName,
                                                gasEqModuleObject,
-                                               AlphaName(1),
+                                               thisGasEqInput.Name,
                                                state.dataIPShortCut->cNumericFieldNames(7),
                                                IHGNumbers(7)));
                         ErrorsFound = true;
                     }
-                    if (state.dataHeatBal->ZoneGas(Loop).CO2RateFactor > 4.0e-7) {
+                    if (thisZoneGas.CO2RateFactor > 4.0e-7) {
                         ShowSevereError(state,
                                         format("{}{}=\"{}\", {} > 4.0E-7, value ={:.2R}",
                                                RoutineName,
                                                gasEqModuleObject,
-                                               AlphaName(1),
+                                               thisGasEqInput.Name,
                                                state.dataIPShortCut->cNumericFieldNames(7),
                                                IHGNumbers(7)));
                         ErrorsFound = true;
                     }
                     // FractionConvected is a calculated field
-                    state.dataHeatBal->ZoneGas(Loop).FractionConvected =
-                        1.0 - (state.dataHeatBal->ZoneGas(Loop).FractionLatent + state.dataHeatBal->ZoneGas(Loop).FractionRadiant +
-                               state.dataHeatBal->ZoneGas(Loop).FractionLost);
-                    if (std::abs(state.dataHeatBal->ZoneGas(Loop).FractionConvected) <= 0.001)
-                        state.dataHeatBal->ZoneGas(Loop).FractionConvected = 0.0;
-                    if (state.dataHeatBal->ZoneGas(Loop).FractionConvected < 0.0) {
+                    thisZoneGas.FractionConvected = 1.0 - (thisZoneGas.FractionLatent + thisZoneGas.FractionRadiant + thisZoneGas.FractionLost);
+                    if (std::abs(thisZoneGas.FractionConvected) <= 0.001) thisZoneGas.FractionConvected = 0.0;
+                    if (thisZoneGas.FractionConvected < 0.0) {
                         if (Item1 == 1) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + gasEqModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
+                            ShowSevereError(
+                                state, std::string{RoutineName} + gasEqModuleObject + "=\"" + thisGasEqInput.Name + "\", Sum of Fractions > 1.0");
                             ErrorsFound = true;
                         }
                     }
 
                     if (NumAlpha > 4) {
-                        state.dataHeatBal->ZoneGas(Loop).EndUseSubcategory = AlphaName(5);
+                        thisZoneGas.EndUseSubcategory = AlphaName(5);
                     } else {
-                        state.dataHeatBal->ZoneGas(Loop).EndUseSubcategory = "General";
-                    }
-
-                    if (state.dataHeatBal->ZoneGas(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
-
-                    // Object report variables
-                    SetupOutputVariable(state,
-                                        "Gas Equipment NaturalGas Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneGas(Loop).Power,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneGas(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Gas Equipment NaturalGas Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneGas(Loop).Consumption,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneGas(Loop).Name,
-                                        _,
-                                        "NaturalGas",
-                                        "InteriorEquipment",
-                                        state.dataHeatBal->ZoneGas(Loop).EndUseSubcategory,
-                                        "Building",
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Multiplier,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).ListMultiplier);
-
-                    SetupOutputVariable(state,
-                                        "Gas Equipment Radiant Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneGas(Loop).RadGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneGas(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Gas Equipment Convective Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneGas(Loop).ConGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneGas(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Gas Equipment Latent Gain Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneGas(Loop).LatGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneGas(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Gas Equipment Lost Heat Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneGas(Loop).LostEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneGas(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Gas Equipment Total Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneGas(Loop).TotGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneGas(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Gas Equipment Radiant Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneGas(Loop).RadGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneGas(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Gas Equipment Convective Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneGas(Loop).ConGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneGas(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Gas Equipment Latent Gain Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneGas(Loop).LatGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneGas(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Gas Equipment Lost Heat Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneGas(Loop).LostRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneGas(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Gas Equipment Total Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneGas(Loop).TotGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneGas(Loop).Name);
-
-                    // Zone total report variables
-                    if (RepVarSet(state.dataHeatBal->ZoneGas(Loop).ZonePtr)) {
-                        RepVarSet(state.dataHeatBal->ZoneGas(Loop).ZonePtr) = false;
-
-                        SetupOutputVariable(state,
-                                            "Zone Gas Equipment NaturalGas Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneGas(Loop).ZonePtr).GasPower,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Gas Equipment NaturalGas Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneGas(Loop).ZonePtr).GasConsump,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name);
-
-                        SetupOutputVariable(state,
-                                            "Zone Gas Equipment Radiant Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneGas(Loop).ZonePtr).GasRadGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Gas Equipment Radiant Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneGas(Loop).ZonePtr).GasRadGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Gas Equipment Convective Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneGas(Loop).ZonePtr).GasConGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Gas Equipment Convective Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneGas(Loop).ZonePtr).GasConGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Gas Equipment Latent Gain Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneGas(Loop).ZonePtr).GasLatGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Gas Equipment Latent Gain Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneGas(Loop).ZonePtr).GasLatGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Gas Equipment Lost Heat Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneGas(Loop).ZonePtr).GasLost,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Gas Equipment Lost Heat Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneGas(Loop).ZonePtr).GasLostRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Gas Equipment Total Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneGas(Loop).ZonePtr).GasTotGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Gas Equipment Total Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneGas(Loop).ZonePtr).GasTotGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(Loop).ZonePtr).Name);
+                        thisZoneGas.EndUseSubcategory = "General";
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator(state,
                                          "GasEquipment",
-                                         state.dataHeatBal->ZoneGas(Loop).Name,
+                                         thisZoneGas.Name,
                                          "NaturalGas Rate",
                                          "[W]",
-                                         state.dataHeatBal->ZoneGas(Loop).EMSZoneEquipOverrideOn,
-                                         state.dataHeatBal->ZoneGas(Loop).EMSEquipPower);
-                        SetupEMSInternalVariable(state,
-                                                 "Gas Process Power Design Level",
-                                                 state.dataHeatBal->ZoneGas(Loop).Name,
-                                                 "[W]",
-                                                 state.dataHeatBal->ZoneGas(Loop).DesignLevel);
+                                         thisZoneGas.EMSZoneEquipOverrideOn,
+                                         thisZoneGas.EMSEquipPower);
+                        SetupEMSInternalVariable(state, "Gas Process Power Design Level", thisZoneGas.Name, "[W]", thisZoneGas.DesignLevel);
                     } // EMS
 
                     if (!ErrorsFound)
                         SetupZoneInternalGain(state,
-                                              state.dataHeatBal->ZoneGas(Loop).ZonePtr,
+                                              thisZoneGas.ZonePtr,
                                               "GasEquipment",
-                                              state.dataHeatBal->ZoneGas(Loop).Name,
+                                              thisZoneGas.Name,
                                               IntGainTypeOf_GasEquipment,
-                                              &state.dataHeatBal->ZoneGas(Loop).ConGainRate,
+                                              &thisZoneGas.ConGainRate,
                                               nullptr,
-                                              &state.dataHeatBal->ZoneGas(Loop).RadGainRate,
-                                              &state.dataHeatBal->ZoneGas(Loop).LatGainRate,
+                                              &thisZoneGas.RadGainRate,
+                                              &thisZoneGas.LatGainRate,
                                               nullptr,
-                                              &state.dataHeatBal->ZoneGas(Loop).CO2GainRate);
+                                              &thisZoneGas.CO2GainRate);
 
-                } // Item1
-            }     // Item - number of gas statements
-        }         // check for number of gas statements
+                } // for gasEqInputNum.NumOfSpaces
+            }     // for gasEqInputNum
+        }         // TotGasEquip > 0
 
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            RepVarSet(zoneNum) = true;
-        }
-        state.dataHeatBal->NumHotWaterEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, hwEqModuleObject);
-        state.dataHeatBal->HotWaterEqObjects.allocate(state.dataHeatBal->NumHotWaterEqStatements);
-
-        state.dataHeatBal->TotHWEquip = 0;
-        errFlag = false;
-        for (int Item = 1; Item <= state.dataHeatBal->NumHotWaterEqStatements; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     hwEqModuleObject,
-                                                                     Item,
-                                                                     AlphaName,
-                                                                     NumAlpha,
-                                                                     IHGNumbers,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), hwEqModuleObject, ErrorsFound);
-
-            state.dataHeatBal->HotWaterEqObjects(Item).Name = AlphaName(1);
-
-            int Item1 = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
-            int ZLItem = 0;
-            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0)
-                ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->ZoneList);
-            if (Item1 > 0) {
-                state.dataHeatBal->HotWaterEqObjects(Item).StartPtr = state.dataHeatBal->TotHWEquip + 1;
-                ++state.dataHeatBal->TotHWEquip;
-                state.dataHeatBal->HotWaterEqObjects(Item).NumOfZones = 1;
-                state.dataHeatBal->HotWaterEqObjects(Item).ZoneListActive = false;
-                state.dataHeatBal->HotWaterEqObjects(Item).ZoneOrZoneListPtr = Item1;
-            } else if (ZLItem > 0) {
-                state.dataHeatBal->HotWaterEqObjects(Item).StartPtr = state.dataHeatBal->TotHWEquip + 1;
-                state.dataHeatBal->TotHWEquip += state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-                state.dataHeatBal->HotWaterEqObjects(Item).NumOfZones = state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-                state.dataHeatBal->HotWaterEqObjects(Item).ZoneListActive = true;
-                state.dataHeatBal->HotWaterEqObjects(Item).ZoneOrZoneListPtr = ZLItem;
-            } else {
-                ShowSevereError(state,
-                                hwEqModuleObject + "=\"" + AlphaName(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                    AlphaName(2) + "\" not found.");
-                ErrorsFound = true;
-                errFlag = true;
-            }
-        }
-
-        if (errFlag) {
-            ShowSevereError(state, std::string{RoutineName} + "Errors with invalid names in " + hwEqModuleObject + " objects.");
-            ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            state.dataHeatBal->TotHWEquip = 0;
-        }
-
-        state.dataHeatBal->ZoneHWEq.allocate(state.dataHeatBal->TotHWEquip);
+        setupIHGZonesAndSpaces(state,
+                               hwEqModuleObject,
+                               state.dataHeatBal->HotWaterEqObjects,
+                               state.dataHeatBal->NumHotWaterEqStatements,
+                               state.dataHeatBal->TotHWEquip,
+                               ErrorsFound);
 
         if (state.dataHeatBal->TotHWEquip > 0) {
-            int Loop = 0;
-            for (int Item = 1; Item <= state.dataHeatBal->NumHotWaterEqStatements; ++Item) {
-                AlphaName = std::string{};
-                IHGNumbers = 0.0;
+            state.dataHeatBal->ZoneHWEq.allocate(state.dataHeatBal->TotHWEquip);
+            int hwEqNum = 0;
+            for (int hwEqInputNum = 1; hwEqInputNum <= state.dataHeatBal->NumHotWaterEqStatements; ++hwEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          hwEqModuleObject,
-                                                                         Item,
+                                                                         hwEqInputNum,
                                                                          AlphaName,
                                                                          NumAlpha,
                                                                          IHGNumbers,
@@ -2557,62 +1941,37 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                for (int Item1 = 1; Item1 <= state.dataHeatBal->HotWaterEqObjects(Item).NumOfZones; ++Item1) {
-                    ++Loop;
-                    if (!state.dataHeatBal->HotWaterEqObjects(Item).ZoneListActive) {
-                        state.dataHeatBal->ZoneHWEq(Loop).Name = AlphaName(1);
-                        int zoneNum = state.dataHeatBal->HotWaterEqObjects(Item).ZoneOrZoneListPtr;
-                        state.dataHeatBal->ZoneHWEq(Loop).ZonePtr = zoneNum;
-                        if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                                state.dataHeatBal->ZoneHWEq(Loop).spacePtrs.emplace_back(spaceNum);
-                            }
-                        }
-                    } else {
-                        CheckCreatedZoneItemName(
-                            state,
-                            RoutineName,
-                            hwEqModuleObject,
-                            state.dataHeatBal
-                                ->Zone(state.dataHeatBal->ZoneList(state.dataHeatBal->HotWaterEqObjects(Item).ZoneOrZoneListPtr).Zone(Item1))
-                                .Name,
-                            state.dataHeatBal->ZoneList(state.dataHeatBal->HotWaterEqObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
-                            state.dataHeatBal->HotWaterEqObjects(Item).Name,
-                            state.dataHeatBal->ZoneHWEq,
-                            Loop - 1,
-                            state.dataHeatBal->ZoneHWEq(Loop).Name,
-                            errFlag);
-                        int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->HotWaterEqObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
-                        state.dataHeatBal->ZoneHWEq(Loop).ZonePtr = zoneNum;
-                        if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                                state.dataHeatBal->ZoneHWEq(Loop).spacePtrs.emplace_back(spaceNum);
-                            }
-                        }
-                        if (errFlag) ErrorsFound = true;
-                    }
+                auto &thisHWEqInput = state.dataHeatBal->HotWaterEqObjects(hwEqInputNum);
+                for (int Item1 = 1; Item1 <= thisHWEqInput.numOfSpaces; ++Item1) {
+                    ++hwEqNum;
+                    auto &thisZoneHWEq = state.dataHeatBal->ZoneHWEq(hwEqNum);
+                    int const spaceNum = thisHWEqInput.spaceNums(Item1);
+                    int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                    thisZoneHWEq.Name = thisHWEqInput.names(Item1);
+                    thisZoneHWEq.spaceIndex = spaceNum;
+                    thisZoneHWEq.ZonePtr = zoneNum;
 
-                    state.dataHeatBal->ZoneHWEq(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(3));
+                    thisZoneHWEq.SchedPtr = GetScheduleIndex(state, AlphaName(3));
                     SchMin = 0.0;
                     SchMax = 0.0;
-                    if (state.dataHeatBal->ZoneHWEq(Loop).SchedPtr == 0) {
+                    if (thisZoneHWEq.SchedPtr == 0) {
                         if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + hwEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                            std::string{RoutineName} + hwEqModuleObject + "=\"" + thisHWEqInput.Name + "\", " +
                                                 state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + hwEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                            std::string{RoutineName} + hwEqModuleObject + "=\"" + thisHWEqInput.Name + "\", invalid " +
                                                 state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(3));
                         }
                         ErrorsFound = true;
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, state.dataHeatBal->ZoneHWEq(Loop).SchedPtr);
-                        SchMax = GetScheduleMaxValue(state, state.dataHeatBal->ZoneHWEq(Loop).SchedPtr);
+                        SchMin = GetScheduleMinValue(state, thisZoneHWEq.SchedPtr);
+                        SchMax = GetScheduleMaxValue(state, thisZoneHWEq.SchedPtr);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (SchMin < 0.0) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + hwEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                std::string{RoutineName} + hwEqModuleObject + "=\"" + thisHWEqInput.Name + "\", " +
                                                     state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                                 ShowContinueError(state,
                                                   format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
@@ -2620,32 +1979,10 @@ namespace InternalHeatGains {
                             }
                             if (SchMax < 0.0) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + hwEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                std::string{RoutineName} + hwEqModuleObject + "=\"" + thisHWEqInput.Name + "\", " +
                                                     state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                                 ShowContinueError(state,
                                                   format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
-                                ErrorsFound = true;
-                            }
-                        }
-                    }
-
-                    // Set space load fractions
-                    if (int(state.dataHeatBal->ZoneHWEq(Loop).spacePtrs.size()) <= 1) {
-                        state.dataHeatBal->ZoneHWEq(Loop).spaceFracs.emplace_back(1.0);
-                    } else {
-                        if (state.dataHeatBal->ZoneHWEq(Loop).ZonePtr > 0) {
-                            Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).FloorArea;
-                            if (zoneArea > 0.0) {
-                                for (int const spaceNum : state.dataHeatBal->ZoneHWEq(Loop).spacePtrs) {
-                                    Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
-                                    state.dataHeatBal->ZoneHWEq(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
-                                }
-                            } else {
-                                ShowSevereError(
-                                    state, std::string(RoutineName) + "Zone floor area is zero when allocating HotWaterEquipment loads to Spaces.");
-                                ShowContinueError(state,
-                                                  "Occurs for HotWaterEquipment object =" + state.dataHeatBal->HotWaterEqObjects(Item).Name +
-                                                      " in Zone=" + state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name);
                                 ErrorsFound = true;
                             }
                         }
@@ -2655,31 +1992,44 @@ namespace InternalHeatGains {
                     {
                         auto const equipmentLevel(AlphaName(4));
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
-                            state.dataHeatBal->ZoneHWEq(Loop).DesignLevel = IHGNumbers(1);
+                            Real64 spaceFrac = 1.0;
+                            if (thisHWEqInput.numOfSpaces > 1) {
+                                Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
+                                if (zoneArea > 0.0) {
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                } else {
+                                    ShowSevereError(state,
+                                                    std::string(RoutineName) +
+                                                        "Zone floor area is zero when allocating HotWaterEquipment loads to Spaces.");
+                                    ShowContinueError(state,
+                                                      "Occurs for HotWaterEquipment object =" + thisHWEqInput.Name +
+                                                          " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
+                                    ErrorsFound = true;
+                                }
+                            }
+                            thisZoneHWEq.DesignLevel = IHGNumbers(1) * spaceFrac;
                             if (state.dataIPShortCut->lNumericFieldBlanks(1)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + hwEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                 std::string{RoutineName} + hwEqModuleObject + "=\"" + thisHWEqInput.Name + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(1) +
                                                      ", but that field is blank.  0 Hot Water Equipment will result.");
                             }
-
                         } else if (equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA") {
-                            if (state.dataHeatBal->ZoneHWEq(Loop).ZonePtr != 0) {
+                            if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    state.dataHeatBal->ZoneHWEq(Loop).DesignLevel =
-                                        IHGNumbers(2) * state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).FloorArea;
-                                    if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).FloorArea <= 0.0) {
+                                    thisZoneHWEq.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
+                                    if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
                                         ShowWarningError(state,
-                                                         std::string{RoutineName} + hwEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                         std::string{RoutineName} + hwEqModuleObject + "=\"" + thisZoneHWEq.Name + "\", specifies " +
                                                              state.dataIPShortCut->cNumericFieldNames(2) +
-                                                             ", but Zone Floor Area = 0.  0 Hot Water Equipment will result.");
+                                                             ", but Space Floor Area = 0.  0 Hot Water Equipment will result.");
                                     }
                                 } else {
                                     ShowSevereError(state,
                                                     format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}",
                                                            RoutineName,
                                                            hwEqModuleObject,
-                                                           AlphaName(1),
+                                                           thisHWEqInput.Name,
                                                            state.dataIPShortCut->cNumericFieldNames(2),
                                                            IHGNumbers(2)));
                                     ErrorsFound = true;
@@ -2687,19 +2037,18 @@ namespace InternalHeatGains {
                             }
                             if (state.dataIPShortCut->lNumericFieldBlanks(2)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + hwEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                 std::string{RoutineName} + hwEqModuleObject + "=\"" + thisHWEqInput.Name + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(2) +
                                                      ", but that field is blank.  0 Hot Water Equipment will result.");
                             }
 
                         } else if (equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON") {
-                            if (state.dataHeatBal->ZoneHWEq(Loop).ZonePtr != 0) {
+                            if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    state.dataHeatBal->ZoneHWEq(Loop).DesignLevel =
-                                        IHGNumbers(3) * state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).TotOccupants;
-                                    if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).TotOccupants <= 0.0) {
+                                    thisZoneHWEq.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
                                         ShowWarningError(state,
-                                                         std::string{RoutineName} + hwEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                         std::string{RoutineName} + hwEqModuleObject + "=\"" + thisZoneHWEq.Name + "\", specifies " +
                                                              state.dataIPShortCut->cNumericFieldNames(2) +
                                                              ", but Total Occupants = 0.  0 Hot Water Equipment will result.");
                                     }
@@ -2708,7 +2057,7 @@ namespace InternalHeatGains {
                                                     format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}",
                                                            RoutineName,
                                                            hwEqModuleObject,
-                                                           AlphaName(1),
+                                                           thisHWEqInput.Name,
                                                            state.dataIPShortCut->cNumericFieldNames(3),
                                                            IHGNumbers(3)));
                                     ErrorsFound = true;
@@ -2716,7 +2065,7 @@ namespace InternalHeatGains {
                             }
                             if (state.dataIPShortCut->lNumericFieldBlanks(3)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + hwEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                 std::string{RoutineName} + hwEqModuleObject + "=\"" + thisHWEqInput.Name + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(3) +
                                                      ", but that field is blank.  0 Hot Water Equipment will result.");
                             }
@@ -2724,7 +2073,7 @@ namespace InternalHeatGains {
                         } else {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + hwEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                std::string{RoutineName} + hwEqModuleObject + "=\"" + thisHWEqInput.Name + "\", invalid " +
                                                     state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
                                 ShowContinueError(state, "...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
@@ -2733,313 +2082,67 @@ namespace InternalHeatGains {
                     }
 
                     // Calculate nominal min/max equipment level
-                    state.dataHeatBal->ZoneHWEq(Loop).NomMinDesignLevel = state.dataHeatBal->ZoneHWEq(Loop).DesignLevel * SchMin;
-                    state.dataHeatBal->ZoneHWEq(Loop).NomMaxDesignLevel = state.dataHeatBal->ZoneHWEq(Loop).DesignLevel * SchMax;
+                    thisZoneHWEq.NomMinDesignLevel = thisZoneHWEq.DesignLevel * SchMin;
+                    thisZoneHWEq.NomMaxDesignLevel = thisZoneHWEq.DesignLevel * SchMax;
 
-                    state.dataHeatBal->ZoneHWEq(Loop).FractionLatent = IHGNumbers(4);
-                    state.dataHeatBal->ZoneHWEq(Loop).FractionRadiant = IHGNumbers(5);
-                    state.dataHeatBal->ZoneHWEq(Loop).FractionLost = IHGNumbers(6);
+                    thisZoneHWEq.FractionLatent = IHGNumbers(4);
+                    thisZoneHWEq.FractionRadiant = IHGNumbers(5);
+                    thisZoneHWEq.FractionLost = IHGNumbers(6);
                     // FractionConvected is a calculated field
-                    state.dataHeatBal->ZoneHWEq(Loop).FractionConvected =
-                        1.0 - (state.dataHeatBal->ZoneHWEq(Loop).FractionLatent + state.dataHeatBal->ZoneHWEq(Loop).FractionRadiant +
-                               state.dataHeatBal->ZoneHWEq(Loop).FractionLost);
-                    if (std::abs(state.dataHeatBal->ZoneHWEq(Loop).FractionConvected) <= 0.001)
-                        state.dataHeatBal->ZoneHWEq(Loop).FractionConvected = 0.0;
-                    if (state.dataHeatBal->ZoneHWEq(Loop).FractionConvected < 0.0) {
-                        ShowSevereError(state, std::string{RoutineName} + hwEqModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
+                    thisZoneHWEq.FractionConvected = 1.0 - (thisZoneHWEq.FractionLatent + thisZoneHWEq.FractionRadiant + thisZoneHWEq.FractionLost);
+                    if (std::abs(thisZoneHWEq.FractionConvected) <= 0.001) thisZoneHWEq.FractionConvected = 0.0;
+                    if (thisZoneHWEq.FractionConvected < 0.0) {
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + hwEqModuleObject + "=\"" + thisHWEqInput.Name + "\", Sum of Fractions > 1.0");
                         ErrorsFound = true;
                     }
 
                     if (NumAlpha > 4) {
-                        state.dataHeatBal->ZoneHWEq(Loop).EndUseSubcategory = AlphaName(5);
+                        thisZoneHWEq.EndUseSubcategory = AlphaName(5);
                     } else {
-                        state.dataHeatBal->ZoneHWEq(Loop).EndUseSubcategory = "General";
-                    }
-
-                    if (state.dataHeatBal->ZoneHWEq(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
-
-                    // Object report variables
-                    SetupOutputVariable(state,
-                                        "Hot Water Equipment District Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Power,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Hot Water Equipment District Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Consumption,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Name,
-                                        _,
-                                        "DistrictHeating",
-                                        "InteriorEquipment",
-                                        state.dataHeatBal->ZoneHWEq(Loop).EndUseSubcategory,
-                                        "Building",
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Multiplier,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).ListMultiplier);
-
-                    SetupOutputVariable(state,
-                                        "Hot Water Equipment Radiant Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneHWEq(Loop).RadGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Hot Water Equipment Radiant Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneHWEq(Loop).RadGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Hot Water Equipment Convective Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneHWEq(Loop).ConGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Hot Water Equipment Convective Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneHWEq(Loop).ConGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Hot Water Equipment Latent Gain Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneHWEq(Loop).LatGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Hot Water Equipment Latent Gain Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneHWEq(Loop).LatGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Hot Water Equipment Lost Heat Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneHWEq(Loop).LostEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Hot Water Equipment Lost Heat Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneHWEq(Loop).LostRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Hot Water Equipment Total Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneHWEq(Loop).TotGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Hot Water Equipment Total Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneHWEq(Loop).TotGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneHWEq(Loop).Name);
-
-                    // Zone total report variables
-                    if (RepVarSet(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr)) {
-                        RepVarSet(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr) = false;
-                        SetupOutputVariable(state,
-                                            "Zone Hot Water Equipment District Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).HWPower,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Hot Water Equipment District Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).HWConsump,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name);
-
-                        SetupOutputVariable(state,
-                                            "Zone Hot Water Equipment Radiant Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).HWRadGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Hot Water Equipment Radiant Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).HWRadGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Hot Water Equipment Convective Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).HWConGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Hot Water Equipment Convective Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).HWConGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Hot Water Equipment Latent Gain Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).HWLatGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Hot Water Equipment Latent Gain Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).HWLatGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Hot Water Equipment Lost Heat Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).HWLost,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Hot Water Equipment Lost Heat Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).HWLostRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Hot Water Equipment Total Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).HWTotGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Hot Water Equipment Total Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).HWTotGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(Loop).ZonePtr).Name);
+                        thisZoneHWEq.EndUseSubcategory = "General";
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator(state,
                                          "HotWaterEquipment",
-                                         state.dataHeatBal->ZoneHWEq(Loop).Name,
+                                         thisZoneHWEq.Name,
                                          "District Heating Power Level",
                                          "[W]",
-                                         state.dataHeatBal->ZoneHWEq(Loop).EMSZoneEquipOverrideOn,
-                                         state.dataHeatBal->ZoneHWEq(Loop).EMSEquipPower);
-                        SetupEMSInternalVariable(state,
-                                                 "Process District Heat Design Level",
-                                                 state.dataHeatBal->ZoneHWEq(Loop).Name,
-                                                 "[W]",
-                                                 state.dataHeatBal->ZoneHWEq(Loop).DesignLevel);
+                                         thisZoneHWEq.EMSZoneEquipOverrideOn,
+                                         thisZoneHWEq.EMSEquipPower);
+                        SetupEMSInternalVariable(state, "Process District Heat Design Level", thisZoneHWEq.Name, "[W]", thisZoneHWEq.DesignLevel);
                     } // EMS
 
                     if (!ErrorsFound)
                         SetupZoneInternalGain(state,
-                                              state.dataHeatBal->ZoneHWEq(Loop).ZonePtr,
+                                              thisZoneHWEq.ZonePtr,
                                               "HotWaterEquipment",
-                                              state.dataHeatBal->ZoneHWEq(Loop).Name,
+                                              thisZoneHWEq.Name,
                                               IntGainTypeOf_HotWaterEquipment,
-                                              &state.dataHeatBal->ZoneHWEq(Loop).ConGainRate,
+                                              &thisZoneHWEq.ConGainRate,
                                               nullptr,
-                                              &state.dataHeatBal->ZoneHWEq(Loop).RadGainRate,
-                                              &state.dataHeatBal->ZoneHWEq(Loop).LatGainRate);
+                                              &thisZoneHWEq.RadGainRate,
+                                              &thisZoneHWEq.LatGainRate);
 
-                } // Item1
-            }     // Item - number of hot water statements
-        }
+                } // for hwEqInputNum.NumOfSpaces
+            }     // for hwEqInputNum
+        }         // TotHWEquip > 0
 
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            RepVarSet(zoneNum) = true;
-        }
-        state.dataHeatBal->NumSteamEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, stmEqModuleObject);
-        state.dataHeatBal->SteamEqObjects.allocate(state.dataHeatBal->NumSteamEqStatements);
-
-        state.dataHeatBal->TotStmEquip = 0;
-        errFlag = false;
-        for (int Item = 1; Item <= state.dataHeatBal->NumSteamEqStatements; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     stmEqModuleObject,
-                                                                     Item,
-                                                                     AlphaName,
-                                                                     NumAlpha,
-                                                                     IHGNumbers,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), stmEqModuleObject, ErrorsFound);
-
-            state.dataHeatBal->SteamEqObjects(Item).Name = AlphaName(1);
-
-            int Item1 = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
-            int ZLItem = 0;
-            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0)
-                ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->ZoneList);
-            if (Item1 > 0) {
-                state.dataHeatBal->SteamEqObjects(Item).StartPtr = state.dataHeatBal->TotStmEquip + 1;
-                ++state.dataHeatBal->TotStmEquip;
-                state.dataHeatBal->SteamEqObjects(Item).NumOfZones = 1;
-                state.dataHeatBal->SteamEqObjects(Item).ZoneListActive = false;
-                state.dataHeatBal->SteamEqObjects(Item).ZoneOrZoneListPtr = Item1;
-            } else if (ZLItem > 0) {
-                state.dataHeatBal->SteamEqObjects(Item).StartPtr = state.dataHeatBal->TotStmEquip + 1;
-                state.dataHeatBal->TotStmEquip += state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-                state.dataHeatBal->SteamEqObjects(Item).NumOfZones = state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-                state.dataHeatBal->SteamEqObjects(Item).ZoneListActive = true;
-                state.dataHeatBal->SteamEqObjects(Item).ZoneOrZoneListPtr = ZLItem;
-            } else {
-                ShowSevereError(state,
-                                stmEqModuleObject + "=\"" + AlphaName(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                    AlphaName(2) + "\" not found.");
-                ErrorsFound = true;
-                errFlag = true;
-            }
-        }
-
-        if (errFlag) {
-            ShowSevereError(state, std::string{RoutineName} + "Errors with invalid names in " + stmEqModuleObject + " objects.");
-            ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            state.dataHeatBal->TotStmEquip = 0;
-        }
-
-        state.dataHeatBal->ZoneSteamEq.allocate(state.dataHeatBal->TotStmEquip);
+        setupIHGZonesAndSpaces(state,
+                               stmEqModuleObject,
+                               state.dataHeatBal->SteamEqObjects,
+                               state.dataHeatBal->NumSteamEqStatements,
+                               state.dataHeatBal->TotStmEquip,
+                               ErrorsFound);
 
         if (state.dataHeatBal->TotStmEquip > 0) {
-            int Loop = 0;
-            for (int Item = 1; Item <= state.dataHeatBal->NumSteamEqStatements; ++Item) {
-                AlphaName = std::string{};
-                IHGNumbers = 0.0;
-
+            state.dataHeatBal->ZoneSteamEq.allocate(state.dataHeatBal->TotStmEquip);
+            int stmEqNum = 0;
+            for (int stmEqInputNum = 1; stmEqInputNum <= state.dataHeatBal->NumSteamEqStatements; ++stmEqInputNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          stmEqModuleObject,
-                                                                         Item,
+                                                                         stmEqInputNum,
                                                                          AlphaName,
                                                                          NumAlpha,
                                                                          IHGNumbers,
@@ -3050,62 +2153,37 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                for (int Item1 = 1; Item1 <= state.dataHeatBal->SteamEqObjects(Item).NumOfZones; ++Item1) {
-                    ++Loop;
-                    if (!state.dataHeatBal->SteamEqObjects(Item).ZoneListActive) {
-                        state.dataHeatBal->ZoneSteamEq(Loop).Name = AlphaName(1);
-                        int zoneNum = state.dataHeatBal->SteamEqObjects(Item).ZoneOrZoneListPtr;
-                        state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr = zoneNum;
-                        if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                                state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs.emplace_back(spaceNum);
-                            }
-                        }
-                    } else {
-                        CheckCreatedZoneItemName(
-                            state,
-                            RoutineName,
-                            stmEqModuleObject,
-                            state.dataHeatBal
-                                ->Zone(state.dataHeatBal->ZoneList(state.dataHeatBal->SteamEqObjects(Item).ZoneOrZoneListPtr).Zone(Item1))
-                                .Name,
-                            state.dataHeatBal->ZoneList(state.dataHeatBal->SteamEqObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
-                            state.dataHeatBal->SteamEqObjects(Item).Name,
-                            state.dataHeatBal->ZoneSteamEq,
-                            Loop - 1,
-                            state.dataHeatBal->ZoneSteamEq(Loop).Name,
-                            errFlag);
-                        int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->SteamEqObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
-                        state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr = zoneNum;
-                        if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                                state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs.emplace_back(spaceNum);
-                            }
-                        }
-                        if (errFlag) ErrorsFound = true;
-                    }
+                auto &thisStmEqInput = state.dataHeatBal->SteamEqObjects(stmEqInputNum);
+                for (int Item1 = 1; Item1 <= thisStmEqInput.numOfSpaces; ++Item1) {
+                    ++stmEqNum;
+                    auto &thisZoneStmEq = state.dataHeatBal->ZoneSteamEq(stmEqNum);
+                    int const spaceNum = thisStmEqInput.spaceNums(Item1);
+                    int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                    thisZoneStmEq.Name = thisStmEqInput.names(Item1);
+                    thisZoneStmEq.spaceIndex = spaceNum;
+                    thisZoneStmEq.ZonePtr = zoneNum;
 
-                    state.dataHeatBal->ZoneSteamEq(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(3));
+                    thisZoneStmEq.SchedPtr = GetScheduleIndex(state, AlphaName(3));
                     SchMin = 0.0;
                     SchMax = 0.0;
-                    if (state.dataHeatBal->ZoneSteamEq(Loop).SchedPtr == 0) {
+                    if (thisZoneStmEq.SchedPtr == 0) {
                         if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + stmEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                            std::string{RoutineName} + stmEqModuleObject + "=\"" + thisStmEqInput.Name + "\", " +
                                                 state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + stmEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                            std::string{RoutineName} + stmEqModuleObject + "=\"" + thisStmEqInput.Name + "\", invalid " +
                                                 state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(3));
                         }
                         ErrorsFound = true;
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, state.dataHeatBal->ZoneSteamEq(Loop).SchedPtr);
-                        SchMax = GetScheduleMaxValue(state, state.dataHeatBal->ZoneSteamEq(Loop).SchedPtr);
+                        SchMin = GetScheduleMinValue(state, thisZoneStmEq.SchedPtr);
+                        SchMax = GetScheduleMaxValue(state, thisZoneStmEq.SchedPtr);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (SchMin < 0.0) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + stmEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                std::string{RoutineName} + stmEqModuleObject + "=\"" + thisStmEqInput.Name + "\", " +
                                                     state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                                 ShowContinueError(state,
                                                   format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
@@ -3113,7 +2191,7 @@ namespace InternalHeatGains {
                             }
                             if (SchMax < 0.0) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + stmEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                std::string{RoutineName} + stmEqModuleObject + "=\"" + thisStmEqInput.Name + "\", " +
                                                     state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                                 ShowContinueError(state,
                                                   format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
@@ -3122,50 +2200,40 @@ namespace InternalHeatGains {
                         }
                     }
 
-                    // Set space load fractions
-                    if (int(state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs.size()) <= 1) {
-                        state.dataHeatBal->ZoneSteamEq(Loop).spaceFracs.emplace_back(1.0);
-                    } else {
-                        if (state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr > 0) {
-                            Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).FloorArea;
-                            if (zoneArea > 0.0) {
-                                for (int const spaceNum : state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs) {
-                                    Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
-                                    state.dataHeatBal->ZoneSteamEq(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
-                                }
-                            } else {
-                                ShowSevereError(state,
-                                                std::string(RoutineName) + "Zone floor area is zero when allocating SteamEquipment loads to Spaces.");
-                                ShowContinueError(state,
-                                                  "Occurs for SteamEquipment object =" + state.dataHeatBal->SteamEqObjects(Item).Name +
-                                                      " in Zone=" + state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name);
-                                ErrorsFound = true;
-                            }
-                        }
-                    }
-
-                    // Hot Water equipment design level calculation method.
+                    // Steam equipment design level calculation method.
                     {
                         auto const equipmentLevel(AlphaName(4));
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
-                            state.dataHeatBal->ZoneSteamEq(Loop).DesignLevel = IHGNumbers(1);
+                            Real64 spaceFrac = 1.0;
+                            if (thisStmEqInput.numOfSpaces > 1) {
+                                Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
+                                if (zoneArea > 0.0) {
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                } else {
+                                    ShowSevereError(
+                                        state, std::string(RoutineName) + "Zone floor area is zero when allocating SteamEquipment loads to Spaces.");
+                                    ShowContinueError(state,
+                                                      "Occurs for SteamEquipment object =" + thisStmEqInput.Name +
+                                                          " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
+                                    ErrorsFound = true;
+                                }
+                            }
+                            thisZoneStmEq.DesignLevel = IHGNumbers(1) * spaceFrac;
                             if (state.dataIPShortCut->lNumericFieldBlanks(1)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + stmEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                 std::string{RoutineName} + hwEqModuleObject + "=\"" + thisStmEqInput.Name + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(1) +
-                                                     ", but that field is blank.  0 Hot Water Equipment will result.");
+                                                     ", but that field is blank.  0 Steam Equipment will result.");
                             }
-
                         } else if (equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA") {
-                            if (state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr != 0) {
+                            if (spaceNum > 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    state.dataHeatBal->ZoneSteamEq(Loop).DesignLevel =
-                                        IHGNumbers(2) * state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).FloorArea;
-                                    if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).FloorArea <= 0.0) {
+                                    thisZoneStmEq.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
+                                    if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
                                         ShowWarningError(state,
-                                                         std::string{RoutineName} + stmEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
-                                                             state.dataIPShortCut->cNumericFieldNames(2) +
-                                                             ", but Zone Floor Area = 0.  0 Hot Water Equipment will result.");
+                                                         std::string{RoutineName} + stmEqModuleObject + "=\"" + thisZoneStmEq.Name +
+                                                             "\", specifies " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                                             ", but Space Floor Area = 0.  0 Steam Equipment will result.");
                                     }
                                 } else {
                                     ShowSevereError(state,
@@ -3180,21 +2248,20 @@ namespace InternalHeatGains {
                             }
                             if (state.dataIPShortCut->lNumericFieldBlanks(2)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + stmEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                 std::string{RoutineName} + stmEqModuleObject + "=\"" + thisStmEqInput.Name + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(2) +
-                                                     ", but that field is blank.  0 Hot Water Equipment will result.");
+                                                     ", but that field is blank.  0 Steam Equipment will result.");
                             }
 
                         } else if (equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON") {
-                            if (state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr != 0) {
+                            if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    state.dataHeatBal->ZoneSteamEq(Loop).DesignLevel =
-                                        IHGNumbers(3) * state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).TotOccupants;
-                                    if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).TotOccupants <= 0.0) {
+                                    thisZoneStmEq.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
                                         ShowWarningError(state,
-                                                         std::string{RoutineName} + stmEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
-                                                             state.dataIPShortCut->cNumericFieldNames(2) +
-                                                             ", but Total Occupants = 0.  0 Hot Water Equipment will result.");
+                                                         std::string{RoutineName} + stmEqModuleObject + "=\"" + thisZoneStmEq.Name +
+                                                             "\", specifies " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                                             ", but Total Occupants = 0.  0 Steam Equipment will result.");
                                     }
                                 } else {
                                     ShowSevereError(state,
@@ -3211,7 +2278,7 @@ namespace InternalHeatGains {
                                 ShowWarningError(state,
                                                  std::string{RoutineName} + stmEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(3) +
-                                                     ", but that field is blank.  0 Hot Water Equipment will result.");
+                                                     ", but that field is blank.  0 Steam Equipment will result.");
                             }
 
                         } else {
@@ -3226,313 +2293,71 @@ namespace InternalHeatGains {
                     }
 
                     // Calculate nominal min/max equipment level
-                    state.dataHeatBal->ZoneSteamEq(Loop).NomMinDesignLevel = state.dataHeatBal->ZoneSteamEq(Loop).DesignLevel * SchMin;
-                    state.dataHeatBal->ZoneSteamEq(Loop).NomMaxDesignLevel = state.dataHeatBal->ZoneSteamEq(Loop).DesignLevel * SchMax;
+                    thisZoneStmEq.NomMinDesignLevel = thisZoneStmEq.DesignLevel * SchMin;
+                    thisZoneStmEq.NomMaxDesignLevel = thisZoneStmEq.DesignLevel * SchMax;
 
-                    state.dataHeatBal->ZoneSteamEq(Loop).FractionLatent = IHGNumbers(4);
-                    state.dataHeatBal->ZoneSteamEq(Loop).FractionRadiant = IHGNumbers(5);
-                    state.dataHeatBal->ZoneSteamEq(Loop).FractionLost = IHGNumbers(6);
+                    thisZoneStmEq.FractionLatent = IHGNumbers(4);
+                    thisZoneStmEq.FractionRadiant = IHGNumbers(5);
+                    thisZoneStmEq.FractionLost = IHGNumbers(6);
                     // FractionConvected is a calculated field
-                    state.dataHeatBal->ZoneSteamEq(Loop).FractionConvected =
-                        1.0 - (state.dataHeatBal->ZoneSteamEq(Loop).FractionLatent + state.dataHeatBal->ZoneSteamEq(Loop).FractionRadiant +
-                               state.dataHeatBal->ZoneSteamEq(Loop).FractionLost);
-                    if (std::abs(state.dataHeatBal->ZoneSteamEq(Loop).FractionConvected) <= 0.001)
-                        state.dataHeatBal->ZoneSteamEq(Loop).FractionConvected = 0.0;
-                    if (state.dataHeatBal->ZoneSteamEq(Loop).FractionConvected < 0.0) {
+                    thisZoneStmEq.FractionConvected =
+                        1.0 - (thisZoneStmEq.FractionLatent + thisZoneStmEq.FractionRadiant + thisZoneStmEq.FractionLost);
+                    if (std::abs(thisZoneStmEq.FractionConvected) <= 0.001) thisZoneStmEq.FractionConvected = 0.0;
+                    if (thisZoneStmEq.FractionConvected < 0.0) {
                         ShowSevereError(state, std::string{RoutineName} + stmEqModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
                         ErrorsFound = true;
                     }
 
                     if (NumAlpha > 4) {
-                        state.dataHeatBal->ZoneSteamEq(Loop).EndUseSubcategory = AlphaName(5);
+                        thisZoneStmEq.EndUseSubcategory = AlphaName(5);
                     } else {
-                        state.dataHeatBal->ZoneSteamEq(Loop).EndUseSubcategory = "General";
+                        thisZoneStmEq.EndUseSubcategory = "General";
                     }
 
-                    if (state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
-
-                    // Object report variables
-                    SetupOutputVariable(state,
-                                        "Steam Equipment District Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Power,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Steam Equipment District Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Consumption,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Name,
-                                        _,
-                                        "DistrictHeating",
-                                        "InteriorEquipment",
-                                        state.dataHeatBal->ZoneSteamEq(Loop).EndUseSubcategory,
-                                        "Building",
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Multiplier,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).ListMultiplier);
-
-                    SetupOutputVariable(state,
-                                        "Steam Equipment Radiant Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).RadGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Steam Equipment Radiant Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).RadGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Steam Equipment Convective Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).ConGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Steam Equipment Convective Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).ConGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Steam Equipment Latent Gain Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).LatGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Steam Equipment Latent Gain Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).LatGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Steam Equipment Lost Heat Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).LostEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Steam Equipment Lost Heat Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).LostRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Steam Equipment Total Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).TotGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Steam Equipment Total Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).TotGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneSteamEq(Loop).Name);
-
-                    // Zone total report variables
-                    if (RepVarSet(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr)) {
-                        RepVarSet(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr) = false;
-                        SetupOutputVariable(state,
-                                            "Zone Steam Equipment District Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).SteamPower,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Steam Equipment District Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).SteamConsump,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name);
-
-                        SetupOutputVariable(state,
-                                            "Zone Steam Equipment Radiant Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).SteamRadGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Steam Equipment Radiant Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).SteamRadGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Steam Equipment Convective Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).SteamConGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Steam Equipment Convective Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).SteamConGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Steam Equipment Latent Gain Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).SteamLatGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Steam Equipment Latent Gain Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).SteamLatGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Steam Equipment Lost Heat Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).SteamLost,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Steam Equipment Lost Heat Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).SteamLostRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Steam Equipment Total Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).SteamTotGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Steam Equipment Total Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).SteamTotGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr).Name);
-                    }
+                    if (thisZoneStmEq.ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator(state,
                                          "SteamEquipment",
-                                         state.dataHeatBal->ZoneSteamEq(Loop).Name,
+                                         thisZoneStmEq.Name,
                                          "District Heating Power Level",
                                          "[W]",
-                                         state.dataHeatBal->ZoneSteamEq(Loop).EMSZoneEquipOverrideOn,
-                                         state.dataHeatBal->ZoneSteamEq(Loop).EMSEquipPower);
-                        SetupEMSInternalVariable(state,
-                                                 "Process Steam District Heat Design Level",
-                                                 state.dataHeatBal->ZoneSteamEq(Loop).Name,
-                                                 "[W]",
-                                                 state.dataHeatBal->ZoneSteamEq(Loop).DesignLevel);
+                                         thisZoneStmEq.EMSZoneEquipOverrideOn,
+                                         thisZoneStmEq.EMSEquipPower);
+                        SetupEMSInternalVariable(
+                            state, "Process Steam District Heat Design Level", thisZoneStmEq.Name, "[W]", thisZoneStmEq.DesignLevel);
                     } // EMS
 
                     if (!ErrorsFound)
                         SetupZoneInternalGain(state,
-                                              state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr,
+                                              thisZoneStmEq.ZonePtr,
                                               "SteamEquipment",
-                                              state.dataHeatBal->ZoneSteamEq(Loop).Name,
+                                              thisZoneStmEq.Name,
                                               IntGainTypeOf_SteamEquipment,
-                                              &state.dataHeatBal->ZoneSteamEq(Loop).ConGainRate,
+                                              &thisZoneStmEq.ConGainRate,
                                               nullptr,
-                                              &state.dataHeatBal->ZoneSteamEq(Loop).RadGainRate,
-                                              &state.dataHeatBal->ZoneSteamEq(Loop).LatGainRate);
+                                              &thisZoneStmEq.RadGainRate,
+                                              &thisZoneStmEq.LatGainRate);
 
-                } // Item1
-            }     // Item - number of hot water statements
-        }
+                } // for stmEqInputNum.NumOfSpaces
+            }     // for stmEqInputNum
+        }         // TotStmEquip > 0
 
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            RepVarSet(zoneNum) = true;
-        }
-        state.dataHeatBal->NumOtherEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, othEqModuleObject);
-        state.dataHeatBal->OtherEqObjects.allocate(state.dataHeatBal->NumOtherEqStatements);
-
-        state.dataHeatBal->TotOthEquip = 0;
-        errFlag = false;
-        for (int Item = 1; Item <= state.dataHeatBal->NumOtherEqStatements; ++Item) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     othEqModuleObject,
-                                                                     Item,
-                                                                     AlphaName,
-                                                                     NumAlpha,
-                                                                     IHGNumbers,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), othEqModuleObject, ErrorsFound);
-
-            state.dataHeatBal->OtherEqObjects(Item).Name = AlphaName(1);
-
-            int Item1 = UtilityRoutines::FindItemInList(AlphaName(3), state.dataHeatBal->Zone);
-            int ZLItem = 0;
-            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0)
-                ZLItem = UtilityRoutines::FindItemInList(AlphaName(3), state.dataHeatBal->ZoneList);
-            if (Item1 > 0) {
-                state.dataHeatBal->OtherEqObjects(Item).StartPtr = state.dataHeatBal->TotOthEquip + 1;
-                ++state.dataHeatBal->TotOthEquip;
-                state.dataHeatBal->OtherEqObjects(Item).NumOfZones = 1;
-                state.dataHeatBal->OtherEqObjects(Item).ZoneListActive = false;
-                state.dataHeatBal->OtherEqObjects(Item).ZoneOrZoneListPtr = Item1;
-            } else if (ZLItem > 0) {
-                state.dataHeatBal->OtherEqObjects(Item).StartPtr = state.dataHeatBal->TotOthEquip + 1;
-                state.dataHeatBal->TotOthEquip += state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-                state.dataHeatBal->OtherEqObjects(Item).NumOfZones = state.dataHeatBal->ZoneList(ZLItem).NumOfZones;
-                state.dataHeatBal->OtherEqObjects(Item).ZoneListActive = true;
-                state.dataHeatBal->OtherEqObjects(Item).ZoneOrZoneListPtr = ZLItem;
-            } else {
-                ShowSevereError(state,
-                                othEqModuleObject + "=\"" + AlphaName(1) + "\" invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
-                                    AlphaName(3) + "\" not found.");
-                ErrorsFound = true;
-                errFlag = true;
-            }
-        }
-
-        if (errFlag) {
-            ShowSevereError(state, std::string{RoutineName} + "Errors with invalid names in " + othEqModuleObject + " objects.");
-            ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            state.dataHeatBal->TotOthEquip = 0;
-        }
-
-        state.dataHeatBal->ZoneOtherEq.allocate(state.dataHeatBal->TotOthEquip);
+        setupIHGZonesAndSpaces(state,
+                               othEqModuleObject,
+                               state.dataHeatBal->OtherEqObjects,
+                               state.dataHeatBal->NumOtherEqStatements,
+                               state.dataHeatBal->TotOthEquip,
+                               ErrorsFound);
 
         if (state.dataHeatBal->TotOthEquip > 0) {
-            int Loop = 0;
-            for (int Item = 1; Item <= state.dataHeatBal->NumOtherEqStatements; ++Item) {
-                AlphaName = std::string{};
-                IHGNumbers = 0.0;
+            state.dataHeatBal->ZoneOtherEq.allocate(state.dataHeatBal->TotOthEquip);
+            int othEqNum = 0;
+            for (int othEqInputNum = 1; othEqInputNum <= state.dataHeatBal->NumOtherEqStatements; ++othEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          othEqModuleObject,
-                                                                         Item,
+                                                                         othEqInputNum,
                                                                          AlphaName,
                                                                          NumAlpha,
                                                                          IHGNumbers,
@@ -3543,102 +2368,58 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                for (int Item1 = 1; Item1 <= state.dataHeatBal->OtherEqObjects(Item).NumOfZones; ++Item1) {
-                    ++Loop;
-                    if (!state.dataHeatBal->OtherEqObjects(Item).ZoneListActive) {
-                        state.dataHeatBal->ZoneOtherEq(Loop).Name = AlphaName(1);
-                        int zoneNum = state.dataHeatBal->OtherEqObjects(Item).ZoneOrZoneListPtr;
-                        state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr = zoneNum;
-                        if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                                state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs.emplace_back(spaceNum);
-                            }
-                        }
-                    } else {
-                        CheckCreatedZoneItemName(
-                            state,
-                            RoutineName,
-                            othEqModuleObject,
-                            state.dataHeatBal
-                                ->Zone(state.dataHeatBal->ZoneList(state.dataHeatBal->OtherEqObjects(Item).ZoneOrZoneListPtr).Zone(Item1))
-                                .Name,
-                            state.dataHeatBal->ZoneList(state.dataHeatBal->OtherEqObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
-                            state.dataHeatBal->OtherEqObjects(Item).Name,
-                            state.dataHeatBal->ZoneOtherEq,
-                            Loop - 1,
-                            state.dataHeatBal->ZoneOtherEq(Loop).Name,
-                            errFlag);
-                        int zoneNum = state.dataHeatBal->ZoneList(state.dataHeatBal->OtherEqObjects(Item).ZoneOrZoneListPtr).Zone(Item1);
-                        state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr = zoneNum;
-                        if (zoneNum > 0) {
-                            for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                                state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs.emplace_back(spaceNum);
-                            }
-                        }
-                        if (errFlag) ErrorsFound = true;
-                    }
+                auto &thisOthEqInput = state.dataHeatBal->OtherEqObjects(othEqInputNum);
+                for (int Item1 = 1; Item1 <= thisOthEqInput.numOfSpaces; ++Item1) {
+                    ++othEqNum;
+                    auto &thisZoneOthEq = state.dataHeatBal->ZoneOtherEq(othEqNum);
+                    int const spaceNum = thisOthEqInput.spaceNums(Item1);
+                    int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                    thisZoneOthEq.Name = thisOthEqInput.names(Item1);
+                    thisZoneOthEq.spaceIndex = spaceNum;
+                    thisZoneOthEq.ZonePtr = zoneNum;
 
                     std::string FuelTypeString("");
                     if (AlphaName(2) == "NONE") {
-                        state.dataHeatBal->ZoneOtherEq(Loop).OtherEquipFuelType = ExteriorEnergyUse::ExteriorFuelUsage::Unknown;
+                        thisZoneOthEq.OtherEquipFuelType = ExteriorEnergyUse::ExteriorFuelUsage::Unknown;
                         FuelTypeString = AlphaName(2);
                     } else {
                         ExteriorEnergyUse::ValidateFuelType(state,
-                                                            state.dataHeatBal->ZoneOtherEq(Loop).OtherEquipFuelType,
+                                                            thisZoneOthEq.OtherEquipFuelType,
                                                             AlphaName(2),
                                                             FuelTypeString,
                                                             othEqModuleObject,
                                                             state.dataIPShortCut->cAlphaFieldNames(2),
                                                             AlphaName(2));
-                        if (state.dataHeatBal->ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::Unknown ||
-                            state.dataHeatBal->ZoneOtherEq(Loop).OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::WaterUse) {
+                        if (thisZoneOthEq.OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::Unknown ||
+                            thisZoneOthEq.OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::WaterUse) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + othEqModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                                 " entered=" + AlphaName(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                                AlphaName(1));
+                                                thisOthEqInput.Name);
                             ErrorsFound = true;
                         }
+                        thisZoneOthEq.otherEquipFuelTypeString = FuelTypeString; // Save for output variable setup later
+                        state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypes.emplace_back(FuelTypeString);
+                        state.dataHeatBal->space(spaceNum).otherEquipFuelTypes.emplace_back(FuelTypeString);
                     }
 
-                    state.dataHeatBal->ZoneOtherEq(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(4));
+                    thisZoneOthEq.SchedPtr = GetScheduleIndex(state, AlphaName(4));
                     SchMin = 0.0;
                     SchMax = 0.0;
-                    if (state.dataHeatBal->ZoneOtherEq(Loop).SchedPtr == 0) {
+                    if (thisZoneOthEq.SchedPtr == 0) {
                         if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + othEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                            std::string{RoutineName} + othEqModuleObject + "=\"" + thisOthEqInput.Name + "\", " +
                                                 state.dataIPShortCut->cAlphaFieldNames(4) + " is required.");
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + othEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                            std::string{RoutineName} + othEqModuleObject + "=\"" + thisOthEqInput.Name + "\", invalid " +
                                                 state.dataIPShortCut->cAlphaFieldNames(4) + " entered=" + AlphaName(4));
                         }
                         ErrorsFound = true;
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, state.dataHeatBal->ZoneOtherEq(Loop).SchedPtr);
-                        SchMax = GetScheduleMaxValue(state, state.dataHeatBal->ZoneOtherEq(Loop).SchedPtr);
-                    }
-
-                    // Set space load fractions
-                    if (int(state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs.size()) <= 1) {
-                        state.dataHeatBal->ZoneOtherEq(Loop).spaceFracs.emplace_back(1.0);
-                    } else {
-                        if (state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr > 0) {
-                            Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).FloorArea;
-                            if (zoneArea > 0.0) {
-                                for (int const spaceNum : state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs) {
-                                    Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
-                                    state.dataHeatBal->ZoneOtherEq(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
-                                }
-                            } else {
-                                ShowSevereError(state,
-                                                std::string(RoutineName) + "Zone floor area is zero when allocating OtherEquipment loads to Spaces.");
-                                ShowContinueError(state,
-                                                  "Occurs for OtherEquipment object =" + state.dataHeatBal->OtherEqObjects(Item).Name +
-                                                      " in Zone=" + state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name);
-                                ErrorsFound = true;
-                            }
-                        }
+                        SchMin = GetScheduleMinValue(state, thisZoneOthEq.SchedPtr);
+                        SchMax = GetScheduleMaxValue(state, thisZoneOthEq.SchedPtr);
                     }
 
                     // equipment design level calculation method.
@@ -3647,25 +2428,37 @@ namespace InternalHeatGains {
                         auto const equipmentLevel(AlphaName(5));
                         if (equipmentLevel == "EQUIPMENTLEVEL") {
                             DesignLevelFieldNumber = 1;
-                            state.dataHeatBal->ZoneOtherEq(Loop).DesignLevel = IHGNumbers(DesignLevelFieldNumber);
+                            Real64 spaceFrac = 1.0;
+                            if (thisOthEqInput.numOfSpaces > 1) {
+                                Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
+                                if (zoneArea > 0.0) {
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                } else {
+                                    ShowSevereError(
+                                        state, std::string(RoutineName) + "Zone floor area is zero when allocating OtherEquipment loads to Spaces.");
+                                    ShowContinueError(state,
+                                                      "Occurs for OtherEquipment object =" + thisOthEqInput.Name +
+                                                          " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
+                                    ErrorsFound = true;
+                                }
+                            }
+                            thisZoneOthEq.DesignLevel = IHGNumbers(1) * spaceFrac;
                             if (state.dataIPShortCut->lNumericFieldBlanks(DesignLevelFieldNumber)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + othEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                 std::string{RoutineName} + othEqModuleObject + "=\"" + thisOthEqInput.Name + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(DesignLevelFieldNumber) +
                                                      ", but that field is blank.  0 Other Equipment will result.");
                             }
 
                         } else if (equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA") {
                             DesignLevelFieldNumber = 2;
-                            if (state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr != 0) {
-                                state.dataHeatBal->ZoneOtherEq(Loop).DesignLevel =
-                                    IHGNumbers(DesignLevelFieldNumber) *
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).FloorArea;
-                                if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).FloorArea <= 0.0) {
+                            if (spaceNum > 0) {
+                                thisZoneOthEq.DesignLevel = IHGNumbers(DesignLevelFieldNumber) * state.dataHeatBal->space(spaceNum).floorArea;
+                                if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
                                     ShowWarningError(state,
-                                                     std::string{RoutineName} + othEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                     std::string{RoutineName} + othEqModuleObject + "=\"" + thisZoneOthEq.Name + "\", specifies " +
                                                          state.dataIPShortCut->cNumericFieldNames(DesignLevelFieldNumber) +
-                                                         ", but Zone Floor Area = 0.  0 Other Equipment will result.");
+                                                         ", but Space Floor Area = 0.  0 Other Equipment will result.");
                                 }
                             }
                             if (state.dataIPShortCut->lNumericFieldBlanks(DesignLevelFieldNumber)) {
@@ -3677,19 +2470,18 @@ namespace InternalHeatGains {
 
                         } else if (equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON") {
                             DesignLevelFieldNumber = 3;
-                            if (state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr != 0) {
-                                state.dataHeatBal->ZoneOtherEq(Loop).DesignLevel =
-                                    IHGNumbers(3) * state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).TotOccupants;
-                                if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).TotOccupants <= 0.0) {
+                            if (thisZoneOthEq.ZonePtr != 0) {
+                                thisZoneOthEq.DesignLevel = IHGNumbers(3) * state.dataHeatBal->Zone(thisZoneOthEq.ZonePtr).TotOccupants;
+                                if (state.dataHeatBal->Zone(thisZoneOthEq.ZonePtr).TotOccupants <= 0.0) {
                                     ShowWarningError(state,
-                                                     std::string{RoutineName} + othEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                     std::string{RoutineName} + othEqModuleObject + "=\"" + thisZoneOthEq.Name + "\", specifies " +
                                                          state.dataIPShortCut->cNumericFieldNames(DesignLevelFieldNumber) +
                                                          ", but Total Occupants = 0.  0 Other Equipment will result.");
                                 }
                             }
                             if (state.dataIPShortCut->lNumericFieldBlanks(DesignLevelFieldNumber)) {
                                 ShowWarningError(state,
-                                                 std::string{RoutineName} + othEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                 std::string{RoutineName} + othEqModuleObject + "=\"" + thisOthEqInput.Name + "\", specifies " +
                                                      state.dataIPShortCut->cNumericFieldNames(DesignLevelFieldNumber) +
                                                      ", but that field is blank.  0 Other Equipment will result.");
                             }
@@ -3697,7 +2489,7 @@ namespace InternalHeatGains {
                         } else {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + othEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                std::string{RoutineName} + othEqModuleObject + "=\"" + thisOthEqInput.Name + "\", invalid " +
                                                     state.dataIPShortCut->cAlphaFieldNames(5) + ", value  =" + AlphaName(5));
                                 ShowContinueError(state, "...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
@@ -3706,302 +2498,106 @@ namespace InternalHeatGains {
                     }
 
                     // Throw an error if the design level is negative and we have a fuel type
-                    if (state.dataHeatBal->ZoneOtherEq(Loop).DesignLevel < 0.0 &&
-                        state.dataHeatBal->ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
+                    if (thisZoneOthEq.DesignLevel < 0.0 && thisZoneOthEq.OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + othEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        std::string{RoutineName} + othEqModuleObject + "=\"" + thisOthEqInput.Name + "\", " +
                                             state.dataIPShortCut->cNumericFieldNames(DesignLevelFieldNumber) + " is not allowed to be negative");
                         ShowContinueError(state, "... when a fuel type of " + FuelTypeString + " is specified.");
                         ErrorsFound = true;
                     }
 
                     // Calculate nominal min/max equipment level
-                    state.dataHeatBal->ZoneOtherEq(Loop).NomMinDesignLevel = state.dataHeatBal->ZoneOtherEq(Loop).DesignLevel * SchMin;
-                    state.dataHeatBal->ZoneOtherEq(Loop).NomMaxDesignLevel = state.dataHeatBal->ZoneOtherEq(Loop).DesignLevel * SchMax;
+                    thisZoneOthEq.NomMinDesignLevel = thisZoneOthEq.DesignLevel * SchMin;
+                    thisZoneOthEq.NomMaxDesignLevel = thisZoneOthEq.DesignLevel * SchMax;
 
-                    state.dataHeatBal->ZoneOtherEq(Loop).FractionLatent = IHGNumbers(4);
-                    state.dataHeatBal->ZoneOtherEq(Loop).FractionRadiant = IHGNumbers(5);
-                    state.dataHeatBal->ZoneOtherEq(Loop).FractionLost = IHGNumbers(6);
+                    thisZoneOthEq.FractionLatent = IHGNumbers(4);
+                    thisZoneOthEq.FractionRadiant = IHGNumbers(5);
+                    thisZoneOthEq.FractionLost = IHGNumbers(6);
 
                     if ((NumNumber == 7) || (!state.dataIPShortCut->lNumericFieldBlanks(7))) {
-                        state.dataHeatBal->ZoneOtherEq(Loop).CO2RateFactor = IHGNumbers(7);
+                        thisZoneOthEq.CO2RateFactor = IHGNumbers(7);
                     }
-                    if (state.dataHeatBal->ZoneOtherEq(Loop).CO2RateFactor < 0.0) {
+                    if (thisZoneOthEq.CO2RateFactor < 0.0) {
                         ShowSevereError(state,
                                         format("{}{}=\"{}\", {} < 0.0, value ={:.2R}",
                                                RoutineName,
                                                othEqModuleObject,
-                                               AlphaName(1),
+                                               thisOthEqInput.Name,
                                                state.dataIPShortCut->cNumericFieldNames(7),
                                                IHGNumbers(7)));
                         ErrorsFound = true;
                     }
-                    if (state.dataHeatBal->ZoneOtherEq(Loop).CO2RateFactor > 4.0e-7) {
+                    if (thisZoneOthEq.CO2RateFactor > 4.0e-7) {
                         ShowSevereError(state,
                                         format("{}{}=\"{}\", {} > 4.0E-7, value ={:.2R}",
                                                RoutineName,
                                                othEqModuleObject,
-                                               AlphaName(1),
+                                               thisOthEqInput.Name,
                                                state.dataIPShortCut->cNumericFieldNames(7),
                                                IHGNumbers(7)));
                         ErrorsFound = true;
                     }
 
                     // FractionConvected is a calculated field
-                    state.dataHeatBal->ZoneOtherEq(Loop).FractionConvected =
-                        1.0 - (state.dataHeatBal->ZoneOtherEq(Loop).FractionLatent + state.dataHeatBal->ZoneOtherEq(Loop).FractionRadiant +
-                               state.dataHeatBal->ZoneOtherEq(Loop).FractionLost);
-                    if (std::abs(state.dataHeatBal->ZoneOtherEq(Loop).FractionConvected) <= 0.001)
-                        state.dataHeatBal->ZoneOtherEq(Loop).FractionConvected = 0.0;
-                    if (state.dataHeatBal->ZoneOtherEq(Loop).FractionConvected < 0.0) {
-                        ShowSevereError(state, std::string{RoutineName} + othEqModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
+                    thisZoneOthEq.FractionConvected =
+                        1.0 - (thisZoneOthEq.FractionLatent + thisZoneOthEq.FractionRadiant + thisZoneOthEq.FractionLost);
+                    if (std::abs(thisZoneOthEq.FractionConvected) <= 0.001) thisZoneOthEq.FractionConvected = 0.0;
+                    if (thisZoneOthEq.FractionConvected < 0.0) {
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + othEqModuleObject + "=\"" + thisOthEqInput.Name + "\", Sum of Fractions > 1.0");
                         ErrorsFound = true;
                     }
 
                     if (NumAlpha > 5) {
-                        state.dataHeatBal->ZoneOtherEq(Loop).EndUseSubcategory = AlphaName(6);
+                        thisZoneOthEq.EndUseSubcategory = AlphaName(6);
                     } else {
-                        state.dataHeatBal->ZoneOtherEq(Loop).EndUseSubcategory = "General";
+                        thisZoneOthEq.EndUseSubcategory = "General";
                     }
 
-                    if (state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
-
-                    // Object report variables
-                    if (state.dataHeatBal->ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
-                        SetupOutputVariable(state,
-                                            "Other Equipment " + FuelTypeString + " Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZoneOtherEq(Loop).Power,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->ZoneOtherEq(Loop).Name);
-                        SetupOutputVariable(state,
-                                            "Other Equipment " + FuelTypeString + " Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZoneOtherEq(Loop).Consumption,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->ZoneOtherEq(Loop).Name,
-                                            _,
-                                            FuelTypeString,
-                                            "InteriorEquipment",
-                                            state.dataHeatBal->ZoneOtherEq(Loop).EndUseSubcategory,
-                                            "Building",
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Multiplier,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).ListMultiplier);
-                    }
-
-                    SetupOutputVariable(state,
-                                        "Other Equipment Radiant Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).RadGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Other Equipment Radiant Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Other Equipment Convective Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).ConGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Other Equipment Convective Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Other Equipment Latent Gain Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).LatGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Other Equipment Latent Gain Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Other Equipment Lost Heat Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).LostEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Other Equipment Lost Heat Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).LostRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Other Equipment Total Heating Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).TotGainEnergy,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).Name);
-                    SetupOutputVariable(state,
-                                        "Other Equipment Total Heating Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).TotGainRate,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneOtherEq(Loop).Name);
-
-                    // Zone total report variables
-                    if (RepVarSet(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr)) {
-                        RepVarSet(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr) = false;
-
-                        if (state.dataHeatBal->ZoneOtherEq(Loop).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
-                            SetupOutputVariable(state,
-                                                "Zone Other Equipment " + FuelTypeString + " Rate",
-                                                OutputProcessor::Unit::W,
-                                                state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).OtherPower,
-                                                OutputProcessor::SOVTimeStepType::Zone,
-                                                OutputProcessor::SOVStoreType::Average,
-                                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name);
-                            SetupOutputVariable(state,
-                                                "Zone Other Equipment " + FuelTypeString + " Energy",
-                                                OutputProcessor::Unit::J,
-                                                state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).OtherConsump,
-                                                OutputProcessor::SOVTimeStepType::Zone,
-                                                OutputProcessor::SOVStoreType::Summed,
-                                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name);
-                        }
-
-                        SetupOutputVariable(state,
-                                            "Zone Other Equipment Radiant Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).OtherRadGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Other Equipment Radiant Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).OtherRadGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Other Equipment Convective Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).OtherConGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Other Equipment Convective Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).OtherConGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Other Equipment Latent Gain Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).OtherLatGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Other Equipment Latent Gain Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).OtherLatGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Other Equipment Lost Heat Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).OtherLost,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Other Equipment Lost Heat Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).OtherLostRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Other Equipment Total Heating Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).OtherTotGain,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Other Equipment Total Heating Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).OtherTotGainRate,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr).Name);
-                    }
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSActuator(state,
                                          "OtherEquipment",
-                                         state.dataHeatBal->ZoneOtherEq(Loop).Name,
+                                         thisZoneOthEq.Name,
                                          "Power Level",
                                          "[W]",
-                                         state.dataHeatBal->ZoneOtherEq(Loop).EMSZoneEquipOverrideOn,
-                                         state.dataHeatBal->ZoneOtherEq(Loop).EMSEquipPower);
-                        SetupEMSInternalVariable(state,
-                                                 "Other Equipment Design Level",
-                                                 state.dataHeatBal->ZoneOtherEq(Loop).Name,
-                                                 "[W]",
-                                                 state.dataHeatBal->ZoneOtherEq(Loop).DesignLevel);
+                                         thisZoneOthEq.EMSZoneEquipOverrideOn,
+                                         thisZoneOthEq.EMSEquipPower);
+                        SetupEMSInternalVariable(state, "Other Equipment Design Level", thisZoneOthEq.Name, "[W]", thisZoneOthEq.DesignLevel);
                     } // EMS
 
                     if (!ErrorsFound)
                         SetupZoneInternalGain(state,
-                                              state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr,
+                                              thisZoneOthEq.ZonePtr,
                                               "OtherEquipment",
-                                              state.dataHeatBal->ZoneOtherEq(Loop).Name,
+                                              thisZoneOthEq.Name,
                                               IntGainTypeOf_OtherEquipment,
-                                              &state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate,
+                                              &thisZoneOthEq.ConGainRate,
                                               nullptr,
-                                              &state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate,
-                                              &state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate);
+                                              &thisZoneOthEq.RadGainRate,
+                                              &thisZoneOthEq.LatGainRate);
 
-                } // Item1
-            }     // Item - number of other equipment statements
-        }
-
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            RepVarSet(zoneNum) = true;
-        }
-        state.dataHeatBal->NumZoneITEqStatements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, itEqModuleObject);
-        errFlag = false;
+                } // for othEqInputNum.NumOfSpaces
+            }     // for othEqInputNum
+        }         // TotOtherEquip > 0
 
         // Note that this object type does not support ZoneList due to node names in input fields
-        state.dataHeatBal->ZoneITEq.allocate(state.dataHeatBal->NumZoneITEqStatements);
+        bool zoneListNotAllowed = true;
+        setupIHGZonesAndSpaces(state,
+                               itEqModuleObject,
+                               state.dataHeatBal->ITEqObjects,
+                               state.dataHeatBal->NumZoneITEqStatements,
+                               state.dataHeatBal->TotOthEquip,
+                               ErrorsFound,
+                               zoneListNotAllowed);
 
-        if (state.dataHeatBal->NumZoneITEqStatements > 0) {
-            for (int Loop = 1; Loop <= state.dataHeatBal->NumZoneITEqStatements; ++Loop) {
-                AlphaName = std::string{};
-                IHGNumbers = 0.0;
+        if (state.dataHeatBal->TotITEquip > 0) {
+            state.dataHeatBal->ZoneITEq.allocate(state.dataHeatBal->TotITEquip);
+            int itEqNum = 0;
+            for (int itEqInputNum = 1; itEqInputNum <= state.dataHeatBal->NumZoneITEqStatements; ++itEqInputNum) {
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          itEqModuleObject,
-                                                                         Loop,
+                                                                         itEqInputNum,
                                                                          AlphaName,
                                                                          NumAlpha,
                                                                          IHGNumbers,
@@ -4012,883 +2608,424 @@ namespace InternalHeatGains {
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
-                state.dataHeatBal->ZoneITEq(Loop).Name = AlphaName(1);
-                int zoneNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
-                state.dataHeatBal->ZoneITEq(Loop).ZonePtr = zoneNum;
-                if (zoneNum > 0) {
-                    for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                        state.dataHeatBal->ZoneITEq(Loop).spacePtrs.emplace_back(spaceNum);
-                    }
-                }
+                auto &thisITEqInput = state.dataHeatBal->ITEqObjects(itEqInputNum);
+                for (int Item1 = 1; Item1 <= thisITEqInput.numOfSpaces; ++Item1) {
+                    ++itEqNum;
+                    auto &thisZoneITEq = state.dataHeatBal->ZoneITEq(itEqNum);
+                    int const spaceNum = thisITEqInput.spaceNums(Item1);
+                    int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                    thisZoneITEq.Name = thisITEqInput.names(Item1);
+                    thisZoneITEq.spaceIndex = spaceNum;
+                    thisZoneITEq.ZonePtr = zoneNum;
 
-                // Set space load fractions
-                if (int(state.dataHeatBal->ZoneITEq(Loop).spacePtrs.size()) <= 1) {
-                    state.dataHeatBal->ZoneITEq(Loop).spaceFracs.emplace_back(1.0);
-                } else {
-                    if (state.dataHeatBal->ZoneITEq(Loop).ZonePtr > 0) {
-                        Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).FloorArea;
-                        if (zoneArea > 0.0) {
-                            for (int const spaceNum : state.dataHeatBal->ZoneITEq(Loop).spacePtrs) {
-                                Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
-                                state.dataHeatBal->ZoneITEq(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
-                            }
+                    // IT equipment design level calculation method.
+                    if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                        thisZoneITEq.FlowControlWithApproachTemps = false;
+                    } else {
+                        if (UtilityRoutines::SameString(AlphaName(3), "FlowFromSystem")) {
+                            thisZoneITEq.FlowControlWithApproachTemps = false;
+                        } else if (UtilityRoutines::SameString(AlphaName(3), "FlowControlWithApproachTemperatures")) {
+                            thisZoneITEq.FlowControlWithApproachTemps = true;
+                            state.dataHeatBal->Zone(thisZoneITEq.ZonePtr).HasAdjustedReturnTempByITE = true;
+                            state.dataHeatBal->Zone(thisZoneITEq.ZonePtr).NoHeatToReturnAir = false;
                         } else {
                             ShowSevereError(state,
-                                            std::string(RoutineName) +
-                                                "Zone floor area is zero when allocating ElectricEquipment:ITE:AirCooled loads to Spaces.");
-                            ShowContinueError(state,
-                                              "Occurs for ElectricEquipment:ITE:AirCooled object =" + state.dataHeatBal->ZoneITEq(Loop).Name +
-                                                  " in Zone=" + state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
+                                            std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) +
+                                                "\": invalid calculation method: " + AlphaName(3));
                             ErrorsFound = true;
                         }
                     }
-                }
 
-                // IT equipment design level calculation method.
-                if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps = false;
-                } else {
-                    if (UtilityRoutines::SameString(AlphaName(3), "FlowFromSystem")) {
-                        state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps = false;
-                    } else if (UtilityRoutines::SameString(AlphaName(3), "FlowControlWithApproachTemperatures")) {
-                        state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps = true;
-                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).HasAdjustedReturnTempByITE = true;
-                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).NoHeatToReturnAir = false;
-                    } else {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) +
-                                            "\": invalid calculation method: " + AlphaName(3));
-                        ErrorsFound = true;
-                    }
-                }
+                    {
+                        auto const equipmentLevel(AlphaName(4));
+                        if (equipmentLevel == "WATTS/UNIT") {
+                            Real64 spaceFrac = 1.0;
+                            if (thisITEqInput.numOfSpaces > 1) {
+                                Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
+                                if (zoneArea > 0.0) {
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                } else {
+                                    ShowSevereError(state,
+                                                    std::string(RoutineName) +
+                                                        "Zone floor area is zero when allocating ElectricEquipment:ITE:AirCooled loads to Spaces.");
+                                    ShowContinueError(state,
+                                                      "Occurs for ElectricEquipment:ITE:AirCooled object =" + thisITEqInput.Name +
+                                                          " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
+                                    ErrorsFound = true;
+                                }
+                            }
+                            thisZoneITEq.DesignTotalPower = IHGNumbers(1) * spaceFrac;
+                            if (state.dataIPShortCut->lNumericFieldBlanks(1)) {
+                                ShowWarningError(state,
+                                                 std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                     state.dataIPShortCut->cNumericFieldNames(1) +
+                                                     ", but that field is blank.  0 IT Equipment will result.");
+                            }
+                            if (state.dataIPShortCut->lNumericFieldBlanks(2)) {
+                                ShowWarningError(state,
+                                                 std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                     state.dataIPShortCut->cNumericFieldNames(2) +
+                                                     ", but that field is blank.  0 IT Equipment will result.");
+                            }
 
-                {
-                    auto const equipmentLevel(AlphaName(4));
-                    if (equipmentLevel == "WATTS/UNIT") {
-                        state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower = IHGNumbers(1) * IHGNumbers(2);
-                        if (state.dataIPShortCut->lNumericFieldBlanks(1)) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
-                                                 state.dataIPShortCut->cNumericFieldNames(1) +
-                                                 ", but that field is blank.  0 IT Equipment will result.");
-                        }
-                        if (state.dataIPShortCut->lNumericFieldBlanks(2)) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
-                                                 state.dataIPShortCut->cNumericFieldNames(2) +
-                                                 ", but that field is blank.  0 IT Equipment will result.");
-                        }
-
-                    } else if (equipmentLevel == "WATTS/AREA") {
-                        if (state.dataHeatBal->ZoneITEq(Loop).ZonePtr != 0) {
-                            if (IHGNumbers(3) >= 0.0) {
-                                state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower =
-                                    IHGNumbers(3) * state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).FloorArea;
-                                if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).FloorArea <= 0.0) {
+                        } else if (equipmentLevel == "WATTS/AREA") {
+                            if (thisZoneITEq.ZonePtr != 0) {
+                                if (IHGNumbers(3) >= 0.0) {
+                                    if (spaceNum > 0) {
+                                        thisZoneITEq.DesignTotalPower = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).floorArea;
+                                        if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
+                                            ShowWarningError(state,
+                                                             std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
+                                                                 state.dataIPShortCut->cNumericFieldNames(3) +
+                                                                 ", but Space Floor Area = 0.  0 IT Equipment will result.");
+                                        }
+                                    } else {
+                                        ShowSevereError(state,
+                                                        format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}",
+                                                               RoutineName,
+                                                               itEqModuleObject,
+                                                               AlphaName(1),
+                                                               state.dataIPShortCut->cNumericFieldNames(3),
+                                                               IHGNumbers(3)));
+                                        ErrorsFound = true;
+                                    }
+                                }
+                                if (state.dataIPShortCut->lNumericFieldBlanks(3)) {
                                     ShowWarningError(state,
                                                      std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                          state.dataIPShortCut->cNumericFieldNames(3) +
-                                                         ", but Zone Floor Area = 0.  0 IT Equipment will result.");
+                                                         ", but that field is blank.  0 IT Equipment will result.");
                                 }
+
                             } else {
                                 ShowSevereError(state,
-                                                format("{}{}=\"{}\", invalid {}, value  [<0.0]={:.3R}",
-                                                       RoutineName,
-                                                       itEqModuleObject,
-                                                       AlphaName(1),
-                                                       state.dataIPShortCut->cNumericFieldNames(3),
-                                                       IHGNumbers(3)));
+                                                std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
+                                ShowContinueError(state, "...Valid values are \"Watts/Unit\" or \"Watts/Area\".");
                                 ErrorsFound = true;
                             }
                         }
-                        if (state.dataIPShortCut->lNumericFieldBlanks(3)) {
+
+                        if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
+                            thisZoneITEq.OperSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                        } else {
+                            thisZoneITEq.OperSchedPtr = GetScheduleIndex(state, AlphaName(5));
+                        }
+                        SchMin = 0.0;
+                        SchMax = 0.0;
+                        if (thisZoneITEq.OperSchedPtr == 0) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                state.dataIPShortCut->cAlphaFieldNames(5) + " entered=" + AlphaName(5));
+                            ErrorsFound = true;
+                        } else { // check min/max on schedule
+                            SchMin = GetScheduleMinValue(state, thisZoneITEq.OperSchedPtr);
+                            SchMax = GetScheduleMaxValue(state, thisZoneITEq.OperSchedPtr);
+                            if (SchMin < 0.0 || SchMax < 0.0) {
+                                if (SchMin < 0.0) {
+                                    ShowSevereError(state,
+                                                    std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                        state.dataIPShortCut->cAlphaFieldNames(5) + ", minimum is < 0.0");
+                                    ShowContinueError(state,
+                                                      format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMin));
+                                    ErrorsFound = true;
+                                }
+                                if (SchMax < 0.0) {
+                                    ShowSevereError(state,
+                                                    std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                        state.dataIPShortCut->cAlphaFieldNames(5) + ", maximum is < 0.0");
+                                    ShowContinueError(state,
+                                                      format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMax));
+                                    ErrorsFound = true;
+                                }
+                            }
+                        }
+
+                        if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
+                            thisZoneITEq.CPULoadSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                        } else {
+                            thisZoneITEq.CPULoadSchedPtr = GetScheduleIndex(state, AlphaName(6));
+                        }
+                        SchMin = 0.0;
+                        SchMax = 0.0;
+                        if (thisZoneITEq.CPULoadSchedPtr == 0) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                state.dataIPShortCut->cAlphaFieldNames(6) + " entered=" + AlphaName(6));
+                            ErrorsFound = true;
+                        } else { // check min/max on schedule
+                            SchMin = GetScheduleMinValue(state, thisZoneITEq.CPULoadSchedPtr);
+                            SchMax = GetScheduleMaxValue(state, thisZoneITEq.CPULoadSchedPtr);
+                            if (SchMin < 0.0 || SchMax < 0.0) {
+                                if (SchMin < 0.0) {
+                                    ShowSevereError(state,
+                                                    std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                        state.dataIPShortCut->cAlphaFieldNames(6) + ", minimum is < 0.0");
+                                    ShowContinueError(state,
+                                                      format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(6), SchMin));
+                                    ErrorsFound = true;
+                                }
+                                if (SchMax < 0.0) {
+                                    ShowSevereError(state,
+                                                    std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                        state.dataIPShortCut->cAlphaFieldNames(6) + ", maximum is < 0.0");
+                                    ShowContinueError(state,
+                                                      format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(6), SchMax));
+                                    ErrorsFound = true;
+                                }
+                            }
+                        }
+
+                        // Calculate nominal min/max equipment level
+                        thisZoneITEq.NomMinDesignLevel = thisZoneITEq.DesignTotalPower * SchMin;
+                        thisZoneITEq.NomMaxDesignLevel = thisZoneITEq.DesignTotalPower * SchMax;
+
+                        thisZoneITEq.DesignFanPowerFrac = IHGNumbers(4);
+                        thisZoneITEq.DesignFanPower = thisZoneITEq.DesignFanPowerFrac * thisZoneITEq.DesignTotalPower;
+                        thisZoneITEq.DesignCPUPower = (1.0 - thisZoneITEq.DesignFanPowerFrac) * thisZoneITEq.DesignTotalPower;
+                        thisZoneITEq.DesignAirVolFlowRate = IHGNumbers(5) * thisZoneITEq.DesignTotalPower;
+                        thisZoneITEq.DesignTAirIn = IHGNumbers(6);
+                        thisZoneITEq.DesignRecircFrac = IHGNumbers(7);
+                        thisZoneITEq.DesignUPSEfficiency = IHGNumbers(8);
+                        thisZoneITEq.UPSLossToZoneFrac = IHGNumbers(9);
+                        thisZoneITEq.SupplyApproachTemp = IHGNumbers(10);
+                        thisZoneITEq.ReturnApproachTemp = IHGNumbers(11);
+
+                        bool hasSupplyApproachTemp = !state.dataIPShortCut->lNumericFieldBlanks(10);
+                        bool hasReturnApproachTemp = !state.dataIPShortCut->lNumericFieldBlanks(11);
+
+                        // Performance curves
+                        thisZoneITEq.CPUPowerFLTCurve = GetCurveIndex(state, AlphaName(7));
+                        if (thisZoneITEq.CPUPowerFLTCurve == 0) {
+                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
+                            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphaName(7));
+                            ErrorsFound = true;
+                        }
+
+                        thisZoneITEq.AirFlowFLTCurve = GetCurveIndex(state, AlphaName(8));
+                        if (thisZoneITEq.AirFlowFLTCurve == 0) {
+                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
+                            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphaName(8));
+                            ErrorsFound = true;
+                        }
+
+                        thisZoneITEq.FanPowerFFCurve = GetCurveIndex(state, AlphaName(9));
+                        if (thisZoneITEq.FanPowerFFCurve == 0) {
+                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
+                            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphaName(9));
+                            ErrorsFound = true;
+                        }
+
+                        if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
+                            // If this field isn't blank, it must point to a valid curve
+                            thisZoneITEq.RecircFLTCurve = GetCurveIndex(state, AlphaName(15));
+                            if (thisZoneITEq.RecircFLTCurve == 0) {
+                                ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
+                                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + '=' + AlphaName(15));
+                                ErrorsFound = true;
+                            }
+                        } else {
+                            // If this curve is left blank, then the curve is assumed to always equal 1.0.
+                            thisZoneITEq.RecircFLTCurve = 0;
+                        }
+
+                        if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
+                            // If this field isn't blank, it must point to a valid curve
+                            thisZoneITEq.UPSEfficFPLRCurve = GetCurveIndex(state, AlphaName(16));
+                            if (thisZoneITEq.UPSEfficFPLRCurve == 0) {
+                                ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
+                                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(16) + '=' + AlphaName(16));
+                                ErrorsFound = true;
+                            }
+                        } else {
+                            // If this curve is left blank, then the curve is assumed to always equal 1.0.
+                            thisZoneITEq.UPSEfficFPLRCurve = 0;
+                        }
+
+                        // Environmental class
+                        if (UtilityRoutines::SameString(AlphaName(10), "None")) {
+                            thisZoneITEq.Class = ITEClassNone;
+                        } else if (UtilityRoutines::SameString(AlphaName(10), "A1")) {
+                            thisZoneITEq.Class = ITEClassA1;
+                        } else if (UtilityRoutines::SameString(AlphaName(10), "A2")) {
+                            thisZoneITEq.Class = ITEClassA2;
+                        } else if (UtilityRoutines::SameString(AlphaName(10), "A3")) {
+                            thisZoneITEq.Class = ITEClassA3;
+                        } else if (UtilityRoutines::SameString(AlphaName(10), "A4")) {
+                            thisZoneITEq.Class = ITEClassA4;
+                        } else if (UtilityRoutines::SameString(AlphaName(10), "B")) {
+                            thisZoneITEq.Class = ITEClassB;
+                        } else if (UtilityRoutines::SameString(AlphaName(10), "C")) {
+                            thisZoneITEq.Class = ITEClassC;
+                        } else {
+                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
+                            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphaName(10));
+                            ShowContinueError(state, "Valid entries are None, A1, A2, A3, A4, B or C.");
+                            ErrorsFound = true;
+                        }
+
+                        // Air and supply inlet connections
+                        if (UtilityRoutines::SameString(AlphaName(11), "AdjustedSupply")) {
+                            thisZoneITEq.AirConnectionType = ITEInletAdjustedSupply;
+                        } else if (UtilityRoutines::SameString(AlphaName(11), "ZoneAirNode")) {
+                            thisZoneITEq.AirConnectionType = ITEInletZoneAirNode;
+                        } else if (UtilityRoutines::SameString(AlphaName(11), "RoomAirModel")) {
+                            // ZoneITEq( Loop ).AirConnectionType = ITEInletRoomAirModel;
                             ShowWarningError(state,
-                                             std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
-                                                 state.dataIPShortCut->cNumericFieldNames(3) +
-                                                 ", but that field is blank.  0 IT Equipment will result.");
-                        }
-
-                    } else {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                            state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
-                        ShowContinueError(state, "...Valid values are \"Watts/Unit\" or \"Watts/Area\".");
-                        ErrorsFound = true;
-                    }
-                }
-
-                if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    state.dataHeatBal->ZoneITEq(Loop).OperSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
-                } else {
-                    state.dataHeatBal->ZoneITEq(Loop).OperSchedPtr = GetScheduleIndex(state, AlphaName(5));
-                }
-                SchMin = 0.0;
-                SchMax = 0.0;
-                if (state.dataHeatBal->ZoneITEq(Loop).OperSchedPtr == 0) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(5) + " entered=" + AlphaName(5));
-                    ErrorsFound = true;
-                } else { // check min/max on schedule
-                    SchMin = GetScheduleMinValue(state, state.dataHeatBal->ZoneITEq(Loop).OperSchedPtr);
-                    SchMax = GetScheduleMaxValue(state, state.dataHeatBal->ZoneITEq(Loop).OperSchedPtr);
-                    if (SchMin < 0.0 || SchMax < 0.0) {
-                        if (SchMin < 0.0) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                state.dataIPShortCut->cAlphaFieldNames(5) + ", minimum is < 0.0");
-                            ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMin));
+                                             std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) +
+                                                 "Air Inlet Connection Type = RoomAirModel is not implemented yet, using ZoneAirNode");
+                            thisZoneITEq.AirConnectionType = ITEInletZoneAirNode;
+                        } else {
+                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
+                            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphaName(11));
+                            ShowContinueError(state, "Valid entries are AdjustedSupply, ZoneAirNode, or RoomAirModel.");
                             ErrorsFound = true;
                         }
-                        if (SchMax < 0.0) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                state.dataIPShortCut->cAlphaFieldNames(5) + ", maximum is < 0.0");
-                            ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMax));
+                        if (state.dataIPShortCut->lAlphaFieldBlanks(14)) {
+                            if (thisZoneITEq.AirConnectionType == ITEInletAdjustedSupply) {
+                                ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
+                                ShowContinueError(state,
+                                                  "For " + state.dataIPShortCut->cAlphaFieldNames(11) + "= AdjustedSupply, " +
+                                                      state.dataIPShortCut->cAlphaFieldNames(14) + " is required, but this field is blank.");
+                                ErrorsFound = true;
+                            } else if (thisZoneITEq.FlowControlWithApproachTemps) {
+                                ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
+                                ShowContinueError(state,
+                                                  "For " + state.dataIPShortCut->cAlphaFieldNames(3) + "= FlowControlWithApproachTemperatures, " +
+                                                      state.dataIPShortCut->cAlphaFieldNames(14) + " is required, but this field is blank.");
+                                ErrorsFound = true;
+                            }
+                        } else {
+                            thisZoneITEq.SupplyAirNodeNum = GetOnlySingleNode(state,
+                                                                              AlphaName(14),
+                                                                              ErrorsFound,
+                                                                              itEqModuleObject,
+                                                                              AlphaName(1),
+                                                                              DataLoopNode::NodeFluidType::Air,
+                                                                              DataLoopNode::NodeConnectionType::Sensor,
+                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              ObjectIsNotParent);
+                        }
+
+                        // check supply air node for matches with zone equipment supply air node
+                        int zoneEqIndex = DataZoneEquipment::GetControlledZoneIndex(state, state.dataHeatBal->Zone(thisZoneITEq.ZonePtr).Name);
+                        auto itStart = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.begin();
+                        auto itEnd = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.end();
+                        auto key = thisZoneITEq.SupplyAirNodeNum;
+                        bool supplyNodeFound = false;
+                        if (std::find(itStart, itEnd, key) != itEnd) {
+                            supplyNodeFound = true;
+                        }
+
+                        if (thisZoneITEq.AirConnectionType == ITEInletAdjustedSupply && !supplyNodeFound) {
+                            // supply air node must match zone equipment supply air node for these conditions
+                            ShowSevereError(state, std::string{RoutineName} + ": ElectricEquipment:ITE:AirCooled " + thisZoneITEq.Name);
+                            ShowContinueError(state, "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
                             ErrorsFound = true;
-                        }
-                    }
-                }
-
-                if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-                    state.dataHeatBal->ZoneITEq(Loop).CPULoadSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
-                } else {
-                    state.dataHeatBal->ZoneITEq(Loop).CPULoadSchedPtr = GetScheduleIndex(state, AlphaName(6));
-                }
-                SchMin = 0.0;
-                SchMax = 0.0;
-                if (state.dataHeatBal->ZoneITEq(Loop).CPULoadSchedPtr == 0) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(6) + " entered=" + AlphaName(6));
-                    ErrorsFound = true;
-                } else { // check min/max on schedule
-                    SchMin = GetScheduleMinValue(state, state.dataHeatBal->ZoneITEq(Loop).CPULoadSchedPtr);
-                    SchMax = GetScheduleMaxValue(state, state.dataHeatBal->ZoneITEq(Loop).CPULoadSchedPtr);
-                    if (SchMin < 0.0 || SchMax < 0.0) {
-                        if (SchMin < 0.0) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                state.dataIPShortCut->cAlphaFieldNames(6) + ", minimum is < 0.0");
-                            ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(6), SchMin));
+                        } else if (thisZoneITEq.FlowControlWithApproachTemps && !supplyNodeFound) {
+                            // supply air node must match zone equipment supply air node for these conditions
+                            ShowSevereError(state, std::string{RoutineName} + ": ElectricEquipment:ITE:AirCooled " + thisZoneITEq.Name);
+                            ShowContinueError(state, "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
                             ErrorsFound = true;
+                        } else if (thisZoneITEq.SupplyAirNodeNum != 0 && !supplyNodeFound) {
+                            // the given supply air node does not match any zone equipment supply air nodes
+                            ShowWarningError(state,
+                                             itEqModuleObject + "name: '" + AlphaName(1) + ". " + "Supply Air Node Name '" + AlphaName(14) +
+                                                 "' does not match any ZoneHVAC:EquipmentConnections objects.");
                         }
-                        if (SchMax < 0.0) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                state.dataIPShortCut->cAlphaFieldNames(6) + ", maximum is < 0.0");
-                            ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(6), SchMax));
-                            ErrorsFound = true;
+
+                        // End-Use subcategories
+                        if (NumAlpha > 16) {
+                            thisZoneITEq.EndUseSubcategoryCPU = AlphaName(17);
+                        } else {
+                            thisZoneITEq.EndUseSubcategoryCPU = "ITE-CPU";
                         }
-                    }
-                }
 
-                // Calculate nominal min/max equipment level
-                state.dataHeatBal->ZoneITEq(Loop).NomMinDesignLevel = state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower * SchMin;
-                state.dataHeatBal->ZoneITEq(Loop).NomMaxDesignLevel = state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower * SchMax;
-
-                state.dataHeatBal->ZoneITEq(Loop).DesignFanPowerFrac = IHGNumbers(4);
-                state.dataHeatBal->ZoneITEq(Loop).DesignFanPower =
-                    state.dataHeatBal->ZoneITEq(Loop).DesignFanPowerFrac * state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower;
-                state.dataHeatBal->ZoneITEq(Loop).DesignCPUPower =
-                    (1.0 - state.dataHeatBal->ZoneITEq(Loop).DesignFanPowerFrac) * state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower;
-                state.dataHeatBal->ZoneITEq(Loop).DesignAirVolFlowRate = IHGNumbers(5) * state.dataHeatBal->ZoneITEq(Loop).DesignTotalPower;
-                state.dataHeatBal->ZoneITEq(Loop).DesignTAirIn = IHGNumbers(6);
-                state.dataHeatBal->ZoneITEq(Loop).DesignRecircFrac = IHGNumbers(7);
-                state.dataHeatBal->ZoneITEq(Loop).DesignUPSEfficiency = IHGNumbers(8);
-                state.dataHeatBal->ZoneITEq(Loop).UPSLossToZoneFrac = IHGNumbers(9);
-                state.dataHeatBal->ZoneITEq(Loop).SupplyApproachTemp = IHGNumbers(10);
-                state.dataHeatBal->ZoneITEq(Loop).ReturnApproachTemp = IHGNumbers(11);
-
-                bool hasSupplyApproachTemp = !state.dataIPShortCut->lNumericFieldBlanks(10);
-                bool hasReturnApproachTemp = !state.dataIPShortCut->lNumericFieldBlanks(11);
-
-                // Performance curves
-                state.dataHeatBal->ZoneITEq(Loop).CPUPowerFLTCurve = GetCurveIndex(state, AlphaName(7));
-                if (state.dataHeatBal->ZoneITEq(Loop).CPUPowerFLTCurve == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphaName(7));
-                    ErrorsFound = true;
-                }
-
-                state.dataHeatBal->ZoneITEq(Loop).AirFlowFLTCurve = GetCurveIndex(state, AlphaName(8));
-                if (state.dataHeatBal->ZoneITEq(Loop).AirFlowFLTCurve == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphaName(8));
-                    ErrorsFound = true;
-                }
-
-                state.dataHeatBal->ZoneITEq(Loop).FanPowerFFCurve = GetCurveIndex(state, AlphaName(9));
-                if (state.dataHeatBal->ZoneITEq(Loop).FanPowerFFCurve == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphaName(9));
-                    ErrorsFound = true;
-                }
-
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                    // If this field isn't blank, it must point to a valid curve
-                    state.dataHeatBal->ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(state, AlphaName(15));
-                    if (state.dataHeatBal->ZoneITEq(Loop).RecircFLTCurve == 0) {
-                        ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                        ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + '=' + AlphaName(15));
-                        ErrorsFound = true;
-                    }
-                } else {
-                    // If this curve is left blank, then the curve is assumed to always equal 1.0.
-                    state.dataHeatBal->ZoneITEq(Loop).RecircFLTCurve = 0;
-                }
-
-                if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
-                    // If this field isn't blank, it must point to a valid curve
-                    state.dataHeatBal->ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(state, AlphaName(16));
-                    if (state.dataHeatBal->ZoneITEq(Loop).UPSEfficFPLRCurve == 0) {
-                        ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                        ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(16) + '=' + AlphaName(16));
-                        ErrorsFound = true;
-                    }
-                } else {
-                    // If this curve is left blank, then the curve is assumed to always equal 1.0.
-                    state.dataHeatBal->ZoneITEq(Loop).UPSEfficFPLRCurve = 0;
-                }
-
-                // Environmental class
-                if (UtilityRoutines::SameString(AlphaName(10), "None")) {
-                    state.dataHeatBal->ZoneITEq(Loop).Class = ITEClassNone;
-                } else if (UtilityRoutines::SameString(AlphaName(10), "A1")) {
-                    state.dataHeatBal->ZoneITEq(Loop).Class = ITEClassA1;
-                } else if (UtilityRoutines::SameString(AlphaName(10), "A2")) {
-                    state.dataHeatBal->ZoneITEq(Loop).Class = ITEClassA2;
-                } else if (UtilityRoutines::SameString(AlphaName(10), "A3")) {
-                    state.dataHeatBal->ZoneITEq(Loop).Class = ITEClassA3;
-                } else if (UtilityRoutines::SameString(AlphaName(10), "A4")) {
-                    state.dataHeatBal->ZoneITEq(Loop).Class = ITEClassA4;
-                } else if (UtilityRoutines::SameString(AlphaName(10), "B")) {
-                    state.dataHeatBal->ZoneITEq(Loop).Class = ITEClassB;
-                } else if (UtilityRoutines::SameString(AlphaName(10), "C")) {
-                    state.dataHeatBal->ZoneITEq(Loop).Class = ITEClassC;
-                } else {
-                    ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
-                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphaName(10));
-                    ShowContinueError(state, "Valid entries are None, A1, A2, A3, A4, B or C.");
-                    ErrorsFound = true;
-                }
-
-                // Air and supply inlet connections
-                if (UtilityRoutines::SameString(AlphaName(11), "AdjustedSupply")) {
-                    state.dataHeatBal->ZoneITEq(Loop).AirConnectionType = ITEInletAdjustedSupply;
-                } else if (UtilityRoutines::SameString(AlphaName(11), "ZoneAirNode")) {
-                    state.dataHeatBal->ZoneITEq(Loop).AirConnectionType = ITEInletZoneAirNode;
-                } else if (UtilityRoutines::SameString(AlphaName(11), "RoomAirModel")) {
-                    // ZoneITEq( Loop ).AirConnectionType = ITEInletRoomAirModel;
-                    ShowWarningError(state,
-                                     std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) +
-                                         "Air Inlet Connection Type = RoomAirModel is not implemented yet, using ZoneAirNode");
-                    state.dataHeatBal->ZoneITEq(Loop).AirConnectionType = ITEInletZoneAirNode;
-                } else {
-                    ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
-                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphaName(11));
-                    ShowContinueError(state, "Valid entries are AdjustedSupply, ZoneAirNode, or RoomAirModel.");
-                    ErrorsFound = true;
-                }
-                if (state.dataIPShortCut->lAlphaFieldBlanks(14)) {
-                    if (state.dataHeatBal->ZoneITEq(Loop).AirConnectionType == ITEInletAdjustedSupply) {
-                        ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
-                        ShowContinueError(state,
-                                          "For " + state.dataIPShortCut->cAlphaFieldNames(11) + "= AdjustedSupply, " +
-                                              state.dataIPShortCut->cAlphaFieldNames(14) + " is required, but this field is blank.");
-                        ErrorsFound = true;
-                    } else if (state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                        ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
-                        ShowContinueError(state,
-                                          "For " + state.dataIPShortCut->cAlphaFieldNames(3) + "= FlowControlWithApproachTemperatures, " +
-                                              state.dataIPShortCut->cAlphaFieldNames(14) + " is required, but this field is blank.");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum = GetOnlySingleNode(state,
-                                                                                           AlphaName(14),
-                                                                                           ErrorsFound,
-                                                                                           itEqModuleObject,
-                                                                                           AlphaName(1),
-                                                                                           DataLoopNode::NodeFluidType::Air,
-                                                                                           DataLoopNode::NodeConnectionType::Sensor,
-                                                                                           NodeInputManager::compFluidStream::Primary,
-                                                                                           ObjectIsNotParent);
-                }
-
-                // check supply air node for matches with zone equipment supply air node
-                int zoneEqIndex =
-                    DataZoneEquipment::GetControlledZoneIndex(state, state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                auto itStart = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.begin();
-                auto itEnd = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.end();
-                auto key = state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum;
-                bool supplyNodeFound = false;
-                if (std::find(itStart, itEnd, key) != itEnd) {
-                    supplyNodeFound = true;
-                }
-
-                if (state.dataHeatBal->ZoneITEq(Loop).AirConnectionType == ITEInletAdjustedSupply && !supplyNodeFound) {
-                    // supply air node must match zone equipment supply air node for these conditions
-                    ShowSevereError(state, std::string{RoutineName} + ": ElectricEquipment:ITE:AirCooled " + state.dataHeatBal->ZoneITEq(Loop).Name);
-                    ShowContinueError(state, "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
-                    ErrorsFound = true;
-                } else if (state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps && !supplyNodeFound) {
-                    // supply air node must match zone equipment supply air node for these conditions
-                    ShowSevereError(state, std::string{RoutineName} + ": ElectricEquipment:ITE:AirCooled " + state.dataHeatBal->ZoneITEq(Loop).Name);
-                    ShowContinueError(state, "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
-                    ErrorsFound = true;
-                } else if (state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum != 0 && !supplyNodeFound) {
-                    // the given supply air node does not match any zone equipment supply air nodes
-                    ShowWarningError(state,
-                                     itEqModuleObject + "name: '" + AlphaName(1) + ". " + "Supply Air Node Name '" + AlphaName(14) +
-                                         "' does not match any ZoneHVAC:EquipmentConnections objects.");
-                }
-
-                // End-Use subcategories
-                if (NumAlpha > 16) {
-                    state.dataHeatBal->ZoneITEq(Loop).EndUseSubcategoryCPU = AlphaName(17);
-                } else {
-                    state.dataHeatBal->ZoneITEq(Loop).EndUseSubcategoryCPU = "ITE-CPU";
-                }
-
-                if (NumAlpha > 17) {
-                    state.dataHeatBal->ZoneITEq(Loop).EndUseSubcategoryFan = AlphaName(18);
-                } else {
-                    state.dataHeatBal->ZoneITEq(Loop).EndUseSubcategoryFan = "ITE-Fans";
-                }
-                if (state.dataHeatBal->ZoneITEq(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
-
-                if (NumAlpha > 18) {
-                    state.dataHeatBal->ZoneITEq(Loop).EndUseSubcategoryUPS = AlphaName(19);
-                } else {
-                    state.dataHeatBal->ZoneITEq(Loop).EndUseSubcategoryUPS = "ITE-UPS";
-                }
-                if (state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                    if (!state.dataIPShortCut->lAlphaFieldBlanks(20)) {
-                        state.dataHeatBal->ZoneITEq(Loop).SupplyApproachTempSch = GetScheduleIndex(state, AlphaName(20));
-                        if (state.dataHeatBal->ZoneITEq(Loop).SupplyApproachTempSch == 0) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                state.dataIPShortCut->cAlphaFieldNames(20) + " entered=" + AlphaName(20));
-                            ErrorsFound = true;
+                        if (NumAlpha > 17) {
+                            thisZoneITEq.EndUseSubcategoryFan = AlphaName(18);
+                        } else {
+                            thisZoneITEq.EndUseSubcategoryFan = "ITE-Fans";
                         }
-                    } else {
-                        if (!hasSupplyApproachTemp) {
-                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                            ShowContinueError(state,
-                                              "For " + state.dataIPShortCut->cAlphaFieldNames(3) + "= FlowControlWithApproachTemperatures, either " +
-                                                  state.dataIPShortCut->cNumericFieldNames(10) + " or " + state.dataIPShortCut->cAlphaFieldNames(20) +
-                                                  " is required, but both are left blank.");
-                            ErrorsFound = true;
+                        if (thisZoneITEq.ZonePtr <= 0) continue; // Error, will be caught and terminated later
+
+                        if (NumAlpha > 18) {
+                            thisZoneITEq.EndUseSubcategoryUPS = AlphaName(19);
+                        } else {
+                            thisZoneITEq.EndUseSubcategoryUPS = "ITE-UPS";
                         }
+                        if (thisZoneITEq.FlowControlWithApproachTemps) {
+                            if (!state.dataIPShortCut->lAlphaFieldBlanks(20)) {
+                                thisZoneITEq.SupplyApproachTempSch = GetScheduleIndex(state, AlphaName(20));
+                                if (thisZoneITEq.SupplyApproachTempSch == 0) {
+                                    ShowSevereError(state,
+                                                    std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                        state.dataIPShortCut->cAlphaFieldNames(20) + " entered=" + AlphaName(20));
+                                    ErrorsFound = true;
+                                }
+                            } else {
+                                if (!hasSupplyApproachTemp) {
+                                    ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
+                                    ShowContinueError(state,
+                                                      "For " + state.dataIPShortCut->cAlphaFieldNames(3) +
+                                                          "= FlowControlWithApproachTemperatures, either " +
+                                                          state.dataIPShortCut->cNumericFieldNames(10) + " or " +
+                                                          state.dataIPShortCut->cAlphaFieldNames(20) + " is required, but both are left blank.");
+                                    ErrorsFound = true;
+                                }
+                            }
+
+                            if (!state.dataIPShortCut->lAlphaFieldBlanks(21)) {
+                                thisZoneITEq.ReturnApproachTempSch = GetScheduleIndex(state, AlphaName(21));
+                                if (thisZoneITEq.ReturnApproachTempSch == 0) {
+                                    ShowSevereError(state,
+                                                    std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                        state.dataIPShortCut->cAlphaFieldNames(20) + " entered=" + AlphaName(20));
+                                    ErrorsFound = true;
+                                }
+                            } else {
+                                if (!hasReturnApproachTemp) {
+                                    ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
+                                    ShowContinueError(state,
+                                                      "For " + state.dataIPShortCut->cAlphaFieldNames(3) +
+                                                          "= FlowControlWithApproachTemperatures, either " +
+                                                          state.dataIPShortCut->cNumericFieldNames(11) + " or " +
+                                                          state.dataIPShortCut->cAlphaFieldNames(21) + " is required, but both are left blank.");
+                                    ErrorsFound = true;
+                                }
+                            }
+                        }
+
+                        if (thisZoneITEq.FlowControlWithApproachTemps) {
+                            Real64 TAirInSizing = 0.0;
+                            // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite
+                            // object
+                            SetPointManager::GetSetPointManagerInputData(state, ErrorsFound);
+                            for (int SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZClSetPtMgrs; ++SetPtMgrNum) {
+                                if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == zoneNum) {
+                                    TAirInSizing = state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp;
+                                }
+                            }
+
+                            thisZoneITEq.SizingTAirIn = max(TAirInSizing, thisZoneITEq.DesignTAirIn);
+                        }
+
+                        // MJW - EMS Not in place yet
+                        // if ( AnyEnergyManagementSystemInModel ) {
+                        // SetupEMSActuator( "ElectricEquipment", ZoneITEq( Loop ).Name, "Electric Power Level", "[W]", ZoneITEq( Loop
+                        // ).EMSZoneEquipOverrideOn, ZoneITEq( Loop ).EMSEquipPower ); SetupEMSInternalVariable( "Plug and Process Power Design
+                        // Level", ZoneITEq( Loop ).Name, "[W]", ZoneITEq( Loop ).DesignTotalPower ); } // EMS
+
+                        if (!ErrorsFound)
+                            SetupZoneInternalGain(state,
+                                                  thisZoneITEq.ZonePtr,
+                                                  "ElectricEquipment:ITE:AirCooled",
+                                                  thisZoneITEq.Name,
+                                                  IntGainTypeOf_ElectricEquipmentITEAirCooled,
+                                                  &thisZoneITEq.ConGainRateToZone);
                     }
-
-                    if (!state.dataIPShortCut->lAlphaFieldBlanks(21)) {
-                        state.dataHeatBal->ZoneITEq(Loop).ReturnApproachTempSch = GetScheduleIndex(state, AlphaName(21));
-                        if (state.dataHeatBal->ZoneITEq(Loop).ReturnApproachTempSch == 0) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                state.dataIPShortCut->cAlphaFieldNames(20) + " entered=" + AlphaName(20));
-                            ErrorsFound = true;
-                        }
-                    } else {
-                        if (!hasReturnApproachTemp) {
-                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                            ShowContinueError(state,
-                                              "For " + state.dataIPShortCut->cAlphaFieldNames(3) + "= FlowControlWithApproachTemperatures, either " +
-                                                  state.dataIPShortCut->cNumericFieldNames(11) + " or " + state.dataIPShortCut->cAlphaFieldNames(21) +
-                                                  " is required, but both are left blank.");
-                            ErrorsFound = true;
-                        }
-                    }
-                }
-
-                if (state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                    Real64 TAirInSizing = 0.0;
-                    // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite object
-                    SetPointManager::GetSetPointManagerInputData(state, ErrorsFound);
-                    for (int SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZClSetPtMgrs; ++SetPtMgrNum) {
-                        if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == Loop) {
-                            TAirInSizing = state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp;
-                        }
-                    }
-
-                    state.dataHeatBal->ZoneITEq(Loop).SizingTAirIn = max(TAirInSizing, state.dataHeatBal->ZoneITEq(Loop).DesignTAirIn);
-                }
-
-                // Object report variables
-                SetupOutputVariable(state,
-                                    "ITE CPU Electricity Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataHeatBal->ZoneITEq(Loop).CPUPower,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Fan Electricity Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataHeatBal->ZoneITEq(Loop).FanPower,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE UPS Electricity Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataHeatBal->ZoneITEq(Loop).UPSPower,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE CPU Electricity Rate at Design Inlet Conditions",
-                                    OutputProcessor::Unit::W,
-                                    state.dataHeatBal->ZoneITEq(Loop).CPUPowerAtDesign,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Fan Electricity Rate at Design Inlet Conditions",
-                                    OutputProcessor::Unit::W,
-                                    state.dataHeatBal->ZoneITEq(Loop).FanPowerAtDesign,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE UPS Heat Gain to Zone Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataHeatBal->ZoneITEq(Loop).UPSGainRateToZone,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Total Heat Gain to Zone Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataHeatBal->ZoneITEq(Loop).ConGainRateToZone,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-
-                SetupOutputVariable(state,
-                                    "ITE CPU Electricity Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZoneITEq(Loop).CPUConsumption,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name,
-                                    _,
-                                    "Electricity",
-                                    "InteriorEquipment",
-                                    state.dataHeatBal->ZoneITEq(Loop).EndUseSubcategoryCPU,
-                                    "Building",
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Multiplier,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ListMultiplier);
-                SetupOutputVariable(state,
-                                    "ITE Fan Electricity Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZoneITEq(Loop).FanConsumption,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name,
-                                    _,
-                                    "Electricity",
-                                    "InteriorEquipment",
-                                    state.dataHeatBal->ZoneITEq(Loop).EndUseSubcategoryFan,
-                                    "Building",
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Multiplier,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ListMultiplier);
-                SetupOutputVariable(state,
-                                    "ITE UPS Electricity Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZoneITEq(Loop).UPSConsumption,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name,
-                                    _,
-                                    "Electricity",
-                                    "InteriorEquipment",
-                                    state.dataHeatBal->ZoneITEq(Loop).EndUseSubcategoryUPS,
-                                    "Building",
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Multiplier,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ListMultiplier);
-                SetupOutputVariable(state,
-                                    "ITE CPU Electricity Energy at Design Inlet Conditions",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZoneITEq(Loop).CPUEnergyAtDesign,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Fan Electricity Energy at Design Inlet Conditions",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZoneITEq(Loop).FanEnergyAtDesign,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE UPS Heat Gain to Zone Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZoneITEq(Loop).UPSGainEnergyToZone,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Total Heat Gain to Zone Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZoneITEq(Loop).ConGainEnergyToZone,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-
-                SetupOutputVariable(state,
-                                    "ITE Standard Density Air Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    state.dataHeatBal->ZoneITEq(Loop).AirVolFlowStdDensity,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Current Density Air Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    state.dataHeatBal->ZoneITEq(Loop).AirVolFlowCurDensity,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    state.dataHeatBal->ZoneITEq(Loop).AirMassFlow,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Dry-Bulb Temperature",
-                                    OutputProcessor::Unit::C,
-                                    state.dataHeatBal->ZoneITEq(Loop).AirInletDryBulbT,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Dewpoint Temperature",
-                                    OutputProcessor::Unit::C,
-                                    state.dataHeatBal->ZoneITEq(Loop).AirInletDewpointT,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Relative Humidity",
-                                    OutputProcessor::Unit::Perc,
-                                    state.dataHeatBal->ZoneITEq(Loop).AirInletRelHum,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Outlet Dry-Bulb Temperature",
-                                    OutputProcessor::Unit::C,
-                                    state.dataHeatBal->ZoneITEq(Loop).AirOutletDryBulbT,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                if (state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum != 0) {
-                    SetupOutputVariable(state,
-                                        "ITE Supply Heat Index",
-                                        OutputProcessor::Unit::None,
-                                        state.dataHeatBal->ZoneITEq(Loop).SHI,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->ZoneITEq(Loop).Name);
-                }
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Operating Range Exceeded Time",
-                                    OutputProcessor::Unit::hr,
-                                    state.dataHeatBal->ZoneITEq(Loop).TimeOutOfOperRange,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time",
-                                    OutputProcessor::Unit::hr,
-                                    state.dataHeatBal->ZoneITEq(Loop).TimeAboveDryBulbT,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time",
-                                    OutputProcessor::Unit::hr,
-                                    state.dataHeatBal->ZoneITEq(Loop).TimeBelowDryBulbT,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Dewpoint Temperature Above Operating Range Time",
-                                    OutputProcessor::Unit::hr,
-                                    state.dataHeatBal->ZoneITEq(Loop).TimeAboveDewpointT,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Dewpoint Temperature Below Operating Range Time",
-                                    OutputProcessor::Unit::hr,
-                                    state.dataHeatBal->ZoneITEq(Loop).TimeBelowDewpointT,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Relative Humidity Above Operating Range Time",
-                                    OutputProcessor::Unit::hr,
-                                    state.dataHeatBal->ZoneITEq(Loop).TimeAboveRH,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Relative Humidity Below Operating Range Time",
-                                    OutputProcessor::Unit::hr,
-                                    state.dataHeatBal->ZoneITEq(Loop).TimeBelowRH,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range",
-                                    OutputProcessor::Unit::deltaC,
-                                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range",
-                                    OutputProcessor::Unit::deltaC,
-                                    state.dataHeatBal->ZoneITEq(Loop).DryBulbTBelowDeltaT,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Dewpoint Temperature Difference Above Operating Range",
-                                    OutputProcessor::Unit::deltaC,
-                                    state.dataHeatBal->ZoneITEq(Loop).DewpointTAboveDeltaT,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Dewpoint Temperature Difference Below Operating Range",
-                                    OutputProcessor::Unit::deltaC,
-                                    state.dataHeatBal->ZoneITEq(Loop).DewpointTBelowDeltaT,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Relative Humidity Difference Above Operating Range",
-                                    OutputProcessor::Unit::Perc,
-                                    state.dataHeatBal->ZoneITEq(Loop).RHAboveDeltaRH,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-                SetupOutputVariable(state,
-                                    "ITE Air Inlet Relative Humidity Difference Below Operating Range",
-                                    OutputProcessor::Unit::Perc,
-                                    state.dataHeatBal->ZoneITEq(Loop).RHBelowDeltaRH,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->ZoneITEq(Loop).Name);
-
-                // Zone total report variables
-                if (RepVarSet(state.dataHeatBal->ZoneITEq(Loop).ZonePtr)) {
-                    RepVarSet(state.dataHeatBal->ZoneITEq(Loop).ZonePtr) = false;
-                    SetupOutputVariable(state,
-                                        "Zone ITE CPU Electricity Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqCPUPower,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Fan Electricity Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqFanPower,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE UPS Electricity Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqUPSPower,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE CPU Electricity Rate at Design Inlet Conditions",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqCPUPowerAtDesign,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Fan Electricity Rate at Design Inlet Conditions",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqFanPowerAtDesign,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE UPS Heat Gain to Zone Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqUPSGainRateToZone,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Total Heat Gain to Zone Rate",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqConGainRateToZone,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Adjusted Return Air Temperature",
-                                        OutputProcessor::Unit::W,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEAdjReturnTemp,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-
-                    SetupOutputVariable(state,
-                                        "Zone ITE CPU Electricity Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqCPUConsumption,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Fan Electricity Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqFanConsumption,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE UPS Electricity Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqUPSConsumption,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE CPU Electricity Energy at Design Inlet Conditions",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqCPUEnergyAtDesign,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Fan Electricity Energy at Design Inlet Conditions",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqFanEnergyAtDesign,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE UPS Heat Gain to Zone Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqUPSGainEnergyToZone,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Total Heat Gain to Zone Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqConGainEnergyToZone,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-
-                    SetupOutputVariable(state,
-                                        "Zone ITE Standard Density Air Volume Flow Rate",
-                                        OutputProcessor::Unit::m3_s,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqAirVolFlowStdDensity,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Air Mass Flow Rate",
-                                        OutputProcessor::Unit::kg_s,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqAirMassFlow,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Average Supply Heat Index",
-                                        OutputProcessor::Unit::None,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqSHI,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Any Air Inlet Operating Range Exceeded Time",
-                                        OutputProcessor::Unit::hr,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqTimeOutOfOperRange,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Any Air Inlet Dry-Bulb Temperature Above Operating Range Time",
-                                        OutputProcessor::Unit::hr,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqTimeAboveDryBulbT,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Any Air Inlet Dry-Bulb Temperature Below Operating Range Time",
-                                        OutputProcessor::Unit::hr,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqTimeBelowDryBulbT,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Any Air Inlet Dewpoint Temperature Above Operating Range Time",
-                                        OutputProcessor::Unit::hr,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqTimeAboveDewpointT,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time",
-                                        OutputProcessor::Unit::hr,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqTimeBelowDewpointT,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time",
-                                        OutputProcessor::Unit::hr,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqTimeAboveRH,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable(state,
-                                        "Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time",
-                                        OutputProcessor::Unit::hr,
-                                        state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).ITEqTimeBelowRH,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Summed,
-                                        state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                }
-
-                // MJW - EMS Not in place yet
-                // if ( AnyEnergyManagementSystemInModel ) {
-                // SetupEMSActuator( "ElectricEquipment", ZoneITEq( Loop ).Name, "Electric Power Level", "[W]", ZoneITEq( Loop
-                // ).EMSZoneEquipOverrideOn, ZoneITEq( Loop ).EMSEquipPower ); SetupEMSInternalVariable( "Plug and Process Power Design Level",
-                // ZoneITEq( Loop ).Name, "[W]", ZoneITEq( Loop ).DesignTotalPower ); } // EMS
-
-                if (!ErrorsFound)
-                    SetupZoneInternalGain(state,
-                                          state.dataHeatBal->ZoneITEq(Loop).ZonePtr,
-                                          "ElectricEquipment:ITE:AirCooled",
-                                          state.dataHeatBal->ZoneITEq(Loop).Name,
-                                          IntGainTypeOf_ElectricEquipmentITEAirCooled,
-                                          &state.dataHeatBal->ZoneITEq(Loop).ConGainRateToZone);
-
-            } // Item - Number of ZoneITEq objects
-            for (int Loop = 1; Loop <= state.dataHeatBal->NumZoneITEqStatements; ++Loop) {
+                } // for itEqInputNum.NumOfSpaces
+            }     // for itEqInputNum
+            for (int Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
                 if (state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).HasAdjustedReturnTempByITE &&
                     (!state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps)) {
                     ShowSevereError(state,
@@ -4898,282 +3035,129 @@ namespace InternalHeatGains {
                     ErrorsFound = true;
                 }
             }
-        } // Check on number of ZoneITEq
+        } // TotITEquip > 0
 
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            RepVarSet(zoneNum) = true;
-        }
-        state.dataHeatBal->TotBBHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, bbModuleObject);
-        state.dataHeatBal->ZoneBBHeat.allocate(state.dataHeatBal->TotBBHeat);
+        setupIHGZonesAndSpaces(state,
+                               bbModuleObject,
+                               state.dataHeatBal->ZoneElectricObjects,
+                               state.dataHeatBal->NumZoneBBHeatStatements,
+                               state.dataHeatBal->TotBBHeat,
+                               ErrorsFound);
 
-        for (int Loop = 1; Loop <= state.dataHeatBal->TotBBHeat; ++Loop) {
-            AlphaName = "";
-            IHGNumbers = 0.0;
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     bbModuleObject,
-                                                                     Loop,
-                                                                     AlphaName,
-                                                                     NumAlpha,
-                                                                     IHGNumbers,
-                                                                     NumNumber,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), bbModuleObject, ErrorsFound);
+        if (state.dataHeatBal->TotBBHeat > 0) {
+            state.dataHeatBal->ZoneBBHeat.allocate(state.dataHeatBal->TotBBHeat);
+            int bbHeatNum = 0;
+            for (int bbHeatInputNum = 1; bbHeatInputNum <= state.dataHeatBal->NumZoneElectricStatements; ++bbHeatInputNum) {
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         bbModuleObject,
+                                                                         bbHeatInputNum,
+                                                                         AlphaName,
+                                                                         NumAlpha,
+                                                                         IHGNumbers,
+                                                                         NumNumber,
+                                                                         IOStat,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
-            state.dataHeatBal->ZoneBBHeat(Loop).Name = AlphaName(1);
+                auto &thisBBHeatInput = state.dataHeatBal->ZoneBBHeatObjects(bbHeatInputNum);
+                for (int Item1 = 1; Item1 <= thisBBHeatInput.numOfSpaces; ++Item1) {
+                    ++bbHeatNum;
+                    auto &thisZoneBBHeat = state.dataHeatBal->ZoneBBHeat(bbHeatNum);
+                    int const spaceNum = thisBBHeatInput.spaceNums(Item1);
+                    int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
+                    thisZoneBBHeat.Name = thisBBHeatInput.names(Item1);
+                    thisZoneBBHeat.spaceIndex = spaceNum;
+                    thisZoneBBHeat.ZonePtr = zoneNum;
 
-            int zoneNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
-            state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr = zoneNum;
-            if (state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr == 0) {
-                ShowSevereError(state,
-                                std::string{RoutineName} + bbModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                    state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
-                ErrorsFound = true;
-            } else {
-                for (int const spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                    state.dataHeatBal->ZoneBBHeat(Loop).spacePtrs.emplace_back(spaceNum);
-                }
-
-                // Set space load fractions
-                if (int(state.dataHeatBal->ZoneBBHeat(Loop).spacePtrs.size()) <= 1) {
-                    state.dataHeatBal->ZoneBBHeat(Loop).spaceFracs.emplace_back(1.0);
-                } else {
-                    Real64 const zoneArea = state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).FloorArea;
-                    if (zoneArea > 0.0) {
-                        for (int const spaceNum : state.dataHeatBal->ZoneBBHeat(Loop).spacePtrs) {
-                            Real64 const spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
-                            state.dataHeatBal->ZoneBBHeat(Loop).spaceFracs.emplace_back(spaceArea / zoneArea);
+                    thisZoneBBHeat.SchedPtr = GetScheduleIndex(state, AlphaName(3));
+                    if (thisZoneBBHeat.SchedPtr == 0) {
+                        if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + bbModuleObject + "=\"" + thisBBHeatInput.Name + "\", " +
+                                                state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
+                        } else {
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + bbModuleObject + "=\"" + thisBBHeatInput.Name + "\", invalid " +
+                                                state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(3));
                         }
+                        ErrorsFound = true;
+                    } else { // check min/max on schedule
+                        SchMin = GetScheduleMinValue(state, thisZoneBBHeat.SchedPtr);
+                        SchMax = GetScheduleMaxValue(state, thisZoneBBHeat.SchedPtr);
+                        if (SchMin < 0.0 || SchMax < 0.0) {
+                            if (SchMin < 0.0) {
+                                ShowSevereError(state,
+                                                std::string{RoutineName} + bbModuleObject + "=\"" + thisBBHeatInput.Name + "\", " +
+                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
+                                ShowContinueError(state,
+                                                  format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                                ErrorsFound = true;
+                            }
+                            if (SchMax < 0.0) {
+                                ShowSevereError(state,
+                                                std::string{RoutineName} + bbModuleObject + "=\"" + thisBBHeatInput.Name + "\", " +
+                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
+                                ShowContinueError(state,
+                                                  format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                                ErrorsFound = true;
+                            }
+                        }
+                    }
+
+                    if (NumAlpha > 3) {
+                        thisZoneBBHeat.EndUseSubcategory = AlphaName(4);
                     } else {
+                        thisZoneBBHeat.EndUseSubcategory = "General";
+                    }
+
+                    thisZoneBBHeat.CapatLowTemperature = IHGNumbers(1);
+                    thisZoneBBHeat.LowTemperature = IHGNumbers(2);
+                    thisZoneBBHeat.CapatHighTemperature = IHGNumbers(3);
+                    thisZoneBBHeat.HighTemperature = IHGNumbers(4);
+                    thisZoneBBHeat.FractionRadiant = IHGNumbers(5);
+                    thisZoneBBHeat.FractionConvected = 1.0 - thisZoneBBHeat.FractionRadiant;
+                    if (thisZoneBBHeat.FractionConvected < 0.0) {
                         ShowSevereError(state,
-                                        std::string(RoutineName) +
-                                            "Zone floor area is zero when allocating ZoneBaseboard:OutdoorTemperatureControlled loads to Spaces.");
-                        ShowContinueError(
-                            state,
-                            "Occurs for ZoneBaseboard:OutdoorTemperatureControlled object =" + state.dataHeatBal->ZoneBBHeat(Loop).Name +
-                                " in Zone=" + state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).Name);
+                                        std::string{RoutineName} + bbModuleObject + "=\"" + thisBBHeatInput.Name + "\", Sum of Fractions > 1.0");
                         ErrorsFound = true;
                     }
-                }
-            }
 
-            state.dataHeatBal->ZoneBBHeat(Loop).SchedPtr = GetScheduleIndex(state, AlphaName(3));
-            if (state.dataHeatBal->ZoneBBHeat(Loop).SchedPtr == 0) {
-                if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + bbModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
-                } else {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + bbModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + " entered=" + AlphaName(3));
-                }
-                ErrorsFound = true;
-            } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(state, state.dataHeatBal->ZoneBBHeat(Loop).SchedPtr);
-                SchMax = GetScheduleMaxValue(state, state.dataHeatBal->ZoneBBHeat(Loop).SchedPtr);
-                if (SchMin < 0.0 || SchMax < 0.0) {
-                    if (SchMin < 0.0) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + bbModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                            state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
-                        ErrorsFound = true;
-                    }
-                    if (SchMax < 0.0) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + bbModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                            state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
-                        ErrorsFound = true;
-                    }
-                }
-            }
+                    if (thisZoneBBHeat.ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
-            if (NumAlpha > 3) {
-                state.dataHeatBal->ZoneBBHeat(Loop).EndUseSubcategory = AlphaName(4);
-            } else {
-                state.dataHeatBal->ZoneBBHeat(Loop).EndUseSubcategory = "General";
-            }
-
-            state.dataHeatBal->ZoneBBHeat(Loop).CapatLowTemperature = IHGNumbers(1);
-            state.dataHeatBal->ZoneBBHeat(Loop).LowTemperature = IHGNumbers(2);
-            state.dataHeatBal->ZoneBBHeat(Loop).CapatHighTemperature = IHGNumbers(3);
-            state.dataHeatBal->ZoneBBHeat(Loop).HighTemperature = IHGNumbers(4);
-            state.dataHeatBal->ZoneBBHeat(Loop).FractionRadiant = IHGNumbers(5);
-            state.dataHeatBal->ZoneBBHeat(Loop).FractionConvected = 1.0 - state.dataHeatBal->ZoneBBHeat(Loop).FractionRadiant;
-            if (state.dataHeatBal->ZoneBBHeat(Loop).FractionConvected < 0.0) {
-                ShowSevereError(state, std::string{RoutineName} + bbModuleObject + "=\"" + AlphaName(1) + "\", Sum of Fractions > 1.0");
-                ErrorsFound = true;
-            }
-
-            if (state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
-
-            // Object report variables
-            SetupOutputVariable(state,
-                                "Baseboard Electricity Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneBBHeat(Loop).Power,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->ZoneBBHeat(Loop).Name);
-            SetupOutputVariable(state,
-                                "Baseboard Electricity Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneBBHeat(Loop).Consumption,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->ZoneBBHeat(Loop).Name,
-                                _,
-                                "Electricity",
-                                "InteriorEquipment",
-                                state.dataHeatBal->ZoneBBHeat(Loop).EndUseSubcategory,
-                                "Building",
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).Name,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).Multiplier,
-                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).ListMultiplier);
-
-            SetupOutputVariable(state,
-                                "Baseboard Radiant Heating Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneBBHeat(Loop).RadGainEnergy,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->ZoneBBHeat(Loop).Name);
-            SetupOutputVariable(state,
-                                "Baseboard Radiant Heating Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneBBHeat(Loop).RadGainRate,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->ZoneBBHeat(Loop).Name);
-            SetupOutputVariable(state,
-                                "Baseboard Convective Heating Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneBBHeat(Loop).ConGainEnergy,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->ZoneBBHeat(Loop).Name);
-            SetupOutputVariable(state,
-                                "Baseboard Convective Heating Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneBBHeat(Loop).ConGainRate,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->ZoneBBHeat(Loop).Name);
-            SetupOutputVariable(state,
-                                "Baseboard Total Heating Energy",
-                                OutputProcessor::Unit::J,
-                                state.dataHeatBal->ZoneBBHeat(Loop).TotGainEnergy,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
-                                state.dataHeatBal->ZoneBBHeat(Loop).Name);
-            SetupOutputVariable(state,
-                                "Baseboard Total Heating Rate",
-                                OutputProcessor::Unit::W,
-                                state.dataHeatBal->ZoneBBHeat(Loop).TotGainRate,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataHeatBal->ZoneBBHeat(Loop).Name);
-
-            // Zone total report variables
-            if (RepVarSet(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr)) {
-                RepVarSet(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr) = false;
-                SetupOutputVariable(state,
-                                    "Zone Baseboard Electricity Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).BaseHeatPower,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Baseboard Electricity Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).BaseHeatElecCons,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).Name);
-
-                SetupOutputVariable(state,
-                                    "Zone Baseboard Radiant Heating Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).BaseHeatRadGain,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Baseboard Radiant Heating Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).BaseHeatRadGainRate,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Baseboard Convective Heating Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).BaseHeatConGain,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Baseboard Convective Heating Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).BaseHeatConGainRate,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Baseboard Total Heating Energy",
-                                    OutputProcessor::Unit::J,
-                                    state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).BaseHeatTotGain,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable(state,
-                                    "Zone Baseboard Total Heating Rate",
-                                    OutputProcessor::Unit::W,
-                                    state.dataHeatBal->ZnRpt(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).BaseHeatTotGainRate,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr).Name);
-            }
-
-            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator(state,
-                                 "ZoneBaseboard:OutdoorTemperatureControlled",
-                                 state.dataHeatBal->ZoneBBHeat(Loop).Name,
-                                 "Power Level",
-                                 "[W]",
-                                 state.dataHeatBal->ZoneBBHeat(Loop).EMSZoneBaseboardOverrideOn,
-                                 state.dataHeatBal->ZoneBBHeat(Loop).EMSZoneBaseboardPower);
-                SetupEMSInternalVariable(state,
-                                         "Simple Zone Baseboard Capacity At Low Temperature",
-                                         state.dataHeatBal->ZoneBBHeat(Loop).Name,
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                        SetupEMSActuator(state,
+                                         "ZoneBaseboard:OutdoorTemperatureControlled",
+                                         thisZoneBBHeat.Name,
+                                         "Power Level",
                                          "[W]",
-                                         state.dataHeatBal->ZoneBBHeat(Loop).CapatLowTemperature);
-                SetupEMSInternalVariable(state,
-                                         "Simple Zone Baseboard Capacity At High Temperature",
-                                         state.dataHeatBal->ZoneBBHeat(Loop).Name,
-                                         "[W]",
-                                         state.dataHeatBal->ZoneBBHeat(Loop).CapatHighTemperature);
-            } // EMS
+                                         thisZoneBBHeat.EMSZoneBaseboardOverrideOn,
+                                         thisZoneBBHeat.EMSZoneBaseboardPower);
+                        SetupEMSInternalVariable(state,
+                                                 "Simple Zone Baseboard Capacity At Low Temperature",
+                                                 thisZoneBBHeat.Name,
+                                                 "[W]",
+                                                 thisZoneBBHeat.CapatLowTemperature);
+                        SetupEMSInternalVariable(state,
+                                                 "Simple Zone Baseboard Capacity At High Temperature",
+                                                 thisZoneBBHeat.Name,
+                                                 "[W]",
+                                                 thisZoneBBHeat.CapatHighTemperature);
+                    } // EMS
 
-            SetupZoneInternalGain(state,
-                                  state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr,
-                                  "ZoneBaseboard:OutdoorTemperatureControlled",
-                                  state.dataHeatBal->ZoneBBHeat(Loop).Name,
-                                  IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
-                                  &state.dataHeatBal->ZoneBBHeat(Loop).ConGainRate,
-                                  nullptr,
-                                  &state.dataHeatBal->ZoneBBHeat(Loop).RadGainRate);
-        }
+                    SetupZoneInternalGain(state,
+                                          thisZoneBBHeat.ZonePtr,
+                                          "ZoneBaseboard:OutdoorTemperatureControlled",
+                                          thisZoneBBHeat.Name,
+                                          IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
+                                          &thisZoneBBHeat.ConGainRate,
+                                          nullptr,
+                                          &thisZoneBBHeat.RadGainRate);
+                } // for bbHeatInputNum.NumOfSpaces
+            }     // for bbHeatInputNum
+        }         // TotBBHeat > 0
 
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            RepVarSet(zoneNum) = true;
-        }
         state.dataHeatBal->TotCO2Gen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, contamSSModuleObject);
         state.dataHeatBal->ZoneCO2Gen.allocate(state.dataHeatBal->TotCO2Gen);
 
@@ -5307,7 +3291,7 @@ namespace InternalHeatGains {
                 if (state.dataHeatBal->ZoneElectric(Loop1).ZonePtr != Loop) continue;
                 ElecTot += state.dataHeatBal->ZoneElectric(Loop1).DesignLevel;
             }
-            for (Loop1 = 1; Loop1 <= state.dataHeatBal->NumZoneITEqStatements; ++Loop1) {
+            for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotITEquip; ++Loop1) {
                 if (state.dataHeatBal->ZoneITEq(Loop1).ZonePtr != Loop) continue;
                 ElecTot += state.dataHeatBal->ZoneITEq(Loop1).DesignTotalPower;
             }
@@ -5715,7 +3699,7 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R}\n", state.dataHeatBal->ZoneOtherEq(Loop).NomMaxDesignLevel);
         }
 
-        for (int Loop = 1; Loop <= state.dataHeatBal->NumZoneITEqStatements; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
             if (Loop == 1) {
                 print(state.files.eio,
                       Format_723,
@@ -5798,7 +3782,8 @@ namespace InternalHeatGains {
                                 EPVector<DataHeatBalance::GlobalInternalGainMiscObject> &inputObjects,
                                 int &numInputObjects,
                                 int &numGainInstances,
-                                bool &errors)
+                                bool &errors,
+                                const bool zoneListNotAllowed)
     {
         constexpr std::string_view routineName = "setupIHGZonesAndSpaces: ";
         bool localErrFlag = false;
@@ -5822,7 +3807,13 @@ namespace InternalHeatGains {
                 ++counter;
                 int objNum = ip->getIDFObjNum(state, objectType, counter);
                 inputObjects(objNum).Name = thisObjectName;
-                std::string areaName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_or_zonelist_or_space_or_spacelist_name");
+                std::string areaFieldName;
+                if (zoneListNotAllowed) {
+                    areaFieldName = "zone_or_space_name";
+                } else {
+                    areaFieldName = "zone_or_zonelist_or_space_or_spacelist_name";
+                }
+                std::string areaName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, areaFieldName);
 
                 int zoneNum = UtilityRoutines::FindItemInList(areaName, state.dataHeatBal->Zone);
                 if (zoneNum > 0) {
@@ -5857,39 +3848,53 @@ namespace InternalHeatGains {
                 }
                 int zoneListNum = UtilityRoutines::FindItemInList(areaName, state.dataHeatBal->ZoneList);
                 if (zoneListNum > 0) {
-                    inputObjects(objNum).StartPtr = numGainInstances + 1;
-                    int numSpaces = 0;
-                    for (int const listZoneIdx : state.dataHeatBal->ZoneList(zoneListNum).Zone) {
-                        numSpaces += state.dataHeatBal->Zone(listZoneIdx).numSpaces;
-                        for (int const spaceNum : state.dataHeatBal->Zone(listZoneIdx).spaceIndexes) {
-                            inputObjects(objNum).spaceNums.emplace_back(spaceNum);
-                            inputObjects(objNum).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' + inputObjects(objNum).Name);
+                    if (zoneListNotAllowed) {
+                        ShowSevereError(
+                            state, objectType + "=\"" + thisObjectName + "\" ZoneList Name=\"" + areaName + "\" not allowed for " + objectType + ".");
+                        errors = true;
+                        localErrFlag = true;
+                    } else {
+
+                        inputObjects(objNum).StartPtr = numGainInstances + 1;
+                        int numSpaces = 0;
+                        for (int const listZoneIdx : state.dataHeatBal->ZoneList(zoneListNum).Zone) {
+                            numSpaces += state.dataHeatBal->Zone(listZoneIdx).numSpaces;
+                            for (int const spaceNum : state.dataHeatBal->Zone(listZoneIdx).spaceIndexes) {
+                                inputObjects(objNum).spaceNums.emplace_back(spaceNum);
+                                inputObjects(objNum).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' + inputObjects(objNum).Name);
+                            }
                         }
+                        numGainInstances += numSpaces;
+                        inputObjects(objNum).numOfSpaces = numSpaces;
+                        inputObjects(objNum).NumOfZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
+                        inputObjects(objNum).ZoneListActive = true;
+                        inputObjects(objNum).ZoneOrZoneListPtr = zoneListNum;
                     }
-                    numGainInstances += numSpaces;
-                    inputObjects(objNum).numOfSpaces = numSpaces;
-                    inputObjects(objNum).NumOfZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
-                    inputObjects(objNum).ZoneListActive = true;
-                    inputObjects(objNum).ZoneOrZoneListPtr = zoneListNum;
                     continue;
                 }
                 int spaceListNum = UtilityRoutines::FindItemInList(areaName, state.dataHeatBal->spaceList);
                 if (spaceListNum > 0) {
-                    inputObjects(objNum).StartPtr = numGainInstances + 1;
-                    int numSpaces = state.dataHeatBal->spaceList(spaceListNum).numOfSpaces;
-                    numGainInstances += numSpaces;
-                    inputObjects(objNum).numOfSpaces = numSpaces;
-                    inputObjects(objNum).spaceListActive = true;
-                    inputObjects(objNum).spaceOrSpaceListPtr = spaceListNum;
-                    for (int const spaceNum : state.dataHeatBal->spaceList(spaceListNum).spaces) {
-                        inputObjects(objNum).spaceNums.emplace_back(spaceNum);
-                        inputObjects(objNum).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' + inputObjects(objNum).Name);
+                    if (zoneListNotAllowed) {
+                        ShowSevereError(state,
+                                        objectType + "=\"" + thisObjectName + "\" SpaceList Name=\"" + areaName + "\" not allowed for " + objectType +
+                                            ".");
+                        errors = true;
+                        localErrFlag = true;
+                    } else {
+                        inputObjects(objNum).StartPtr = numGainInstances + 1;
+                        int numSpaces = state.dataHeatBal->spaceList(spaceListNum).numOfSpaces;
+                        numGainInstances += numSpaces;
+                        inputObjects(objNum).numOfSpaces = numSpaces;
+                        inputObjects(objNum).spaceListActive = true;
+                        inputObjects(objNum).spaceOrSpaceListPtr = spaceListNum;
+                        for (int const spaceNum : state.dataHeatBal->spaceList(spaceListNum).spaces) {
+                            inputObjects(objNum).spaceNums.emplace_back(spaceNum);
+                            inputObjects(objNum).names.emplace_back(state.dataHeatBal->space(spaceNum).Name + ' ' + inputObjects(objNum).Name);
+                        }
                     }
                     continue;
                 }
-                ShowSevereError(state,
-                                objectType + "=\"" + thisObjectName + "\" invalid Zone or ZoneList or Space or SpaceList Name=\"" + areaName +
-                                    "\" not found.");
+                ShowSevereError(state, objectType + "=\"" + thisObjectName + "\" invalid " + areaFieldName + "=\"" + areaName + "\" not found.");
                 errors = true;
                 localErrFlag = true;
             }
@@ -6051,6 +4056,7 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->space(spaceNum).Name);
         }
 
+        // Add zone and space outputs only where the particular type of equipment is actually present
         Array1D_bool addZoneOutputs;
         addZoneOutputs.dimension(state.dataGlobal->NumOfZones, false);
         Array1D_bool addSpaceOutputs;
@@ -6234,9 +4240,9 @@ namespace InternalHeatGains {
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(zoneNum).Name);
-                // Reset zone output flag
-                addZoneOutputs(zoneNum) = false;
             }
+            // Reset zone output flag
+            addZoneOutputs(zoneNum) = false;
         }
 
         // Space total report variables
@@ -6319,9 +4325,9 @@ namespace InternalHeatGains {
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->space(spaceNum).Name);
-                // Reset space output flag
-                addSpaceOutputs(spaceNum) = false;
             }
+            // Reset space output flag
+            addSpaceOutputs(spaceNum) = false;
         }
 
         for (int lightsNum = 1; lightsNum <= state.dataHeatBal->TotLights; ++lightsNum) {
@@ -6515,9 +4521,9 @@ namespace InternalHeatGains {
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(zoneNum).Name);
-                // Reset zone output flag
-                addZoneOutputs(zoneNum) = false;
             }
+            // Reset zone output flag
+            addZoneOutputs(zoneNum) = false;
         }
 
         // Space total report variables
@@ -6607,9 +4613,2345 @@ namespace InternalHeatGains {
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->space(spaceNum).Name);
-                // Reset space output flag
-                addSpaceOutputs(spaceNum) = false;
             }
+            // Reset space output flag
+            addSpaceOutputs(spaceNum) = false;
+        }
+        for (int elecEqNum = 1; elecEqNum <= state.dataHeatBal->TotElecEquip; ++elecEqNum) {
+            // Set flags for zone and space total report variables
+            addZoneOutputs(state.dataHeatBal->ZoneElectric(elecEqNum).ZonePtr) = true;
+            addSpaceOutputs(state.dataHeatBal->ZoneElectric(elecEqNum).spaceIndex) = true;
+            // Object report variables
+            SetupOutputVariable(state,
+                                "Electric Equipment Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Power,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Name);
+            SetupOutputVariable(state,
+                                "Electric Equipment Electricity Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Consumption,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Name,
+                                _,
+                                "Electricity",
+                                "InteriorEquipment",
+                                state.dataHeatBal->ZoneElectric(elecEqNum).EndUseSubcategory,
+                                "Building",
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(elecEqNum).ZonePtr).Name,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(elecEqNum).ZonePtr).Multiplier,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(elecEqNum).ZonePtr).ListMultiplier,
+                                _,
+                                _,
+                                state.dataHeatBal->space(state.dataHeatBal->ZoneElectric(elecEqNum).spaceIndex).spaceType);
+
+            SetupOutputVariable(state,
+                                "Electric Equipment Radiant Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).RadGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Name);
+            SetupOutputVariable(state,
+                                "Electric Equipment Radiant Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).RadGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Name);
+            SetupOutputVariable(state,
+                                "Electric Equipment Convective Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).ConGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Name);
+            SetupOutputVariable(state,
+                                "Electric Equipment Convective Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).ConGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Name);
+            SetupOutputVariable(state,
+                                "Electric Equipment Latent Gain Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).LatGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Name);
+            SetupOutputVariable(state,
+                                "Electric Equipment Latent Gain Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).LatGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Name);
+            SetupOutputVariable(state,
+                                "Electric Equipment Lost Heat Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).LostEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Name);
+            SetupOutputVariable(state,
+                                "Electric Equipment Lost Heat Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).LostRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Name);
+            SetupOutputVariable(state,
+                                "Electric Equipment Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).TotGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Name);
+            SetupOutputVariable(state,
+                                "Electric Equipment Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).TotGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneElectric(elecEqNum).Name);
+        }
+
+        // Zone total report variables
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            if (addZoneOutputs(zoneNum)) {
+                SetupOutputVariable(state,
+                                    "Zone Electric Equipment Electricity Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ElecPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Electric Equipment Electricity Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ElecConsump,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Zone Electric Equipment Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ElecRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Electric Equipment Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ElecRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Electric Equipment Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ElecConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Electric Equipment Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ElecConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Electric Equipment Latent Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ElecLatGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Electric Equipment Latent Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ElecLatGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Electric Equipment Lost Heat Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ElecLost,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Electric Equipment Lost Heat Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ElecLostRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Electric Equipment Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ElecTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Electric Equipment Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ElecTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+            }
+            // Reset zone output flag
+            addZoneOutputs(zoneNum) = false;
+        }
+
+        // space total report variables
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+            if (addSpaceOutputs(spaceNum)) {
+                SetupOutputVariable(state,
+                                    "Space Electric Equipment Electricity Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ElecPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Electric Equipment Electricity Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ElecConsump,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Space Electric Equipment Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ElecRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Electric Equipment Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ElecRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Electric Equipment Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ElecConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Electric Equipment Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ElecConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Electric Equipment Latent Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ElecLatGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Electric Equipment Latent Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ElecLatGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Electric Equipment Lost Heat Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ElecLost,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Electric Equipment Lost Heat Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ElecLostRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Electric Equipment Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ElecTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Electric Equipment Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ElecTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+            }
+            // Reset space output flag
+            addSpaceOutputs(spaceNum) = false;
+        }
+        // Object report variables
+        for (int gasEqNum = 1; gasEqNum <= state.dataHeatBal->TotGasEquip; ++gasEqNum) {
+            // Set flags for zone and space total report variables
+            addZoneOutputs(state.dataHeatBal->ZoneGas(gasEqNum).ZonePtr) = true;
+            addSpaceOutputs(state.dataHeatBal->ZoneGas(gasEqNum).spaceIndex) = true;
+            SetupOutputVariable(state,
+                                "Gas Equipment NaturalGas Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Power,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Name);
+            SetupOutputVariable(state,
+                                "Gas Equipment NaturalGas Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Consumption,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Name,
+                                _,
+                                "NaturalGas",
+                                "InteriorEquipment",
+                                state.dataHeatBal->ZoneGas(gasEqNum).EndUseSubcategory,
+                                "Building",
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(gasEqNum).ZonePtr).Name,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(gasEqNum).ZonePtr).Multiplier,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(gasEqNum).ZonePtr).ListMultiplier,
+                                _,
+                                _,
+                                state.dataHeatBal->space(state.dataHeatBal->ZoneGas(gasEqNum).spaceIndex).spaceType);
+
+            SetupOutputVariable(state,
+                                "Gas Equipment Radiant Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneGas(gasEqNum).RadGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Name);
+            SetupOutputVariable(state,
+                                "Gas Equipment Convective Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneGas(gasEqNum).ConGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Name);
+            SetupOutputVariable(state,
+                                "Gas Equipment Latent Gain Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneGas(gasEqNum).LatGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Name);
+            SetupOutputVariable(state,
+                                "Gas Equipment Lost Heat Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneGas(gasEqNum).LostEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Name);
+            SetupOutputVariable(state,
+                                "Gas Equipment Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneGas(gasEqNum).TotGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Name);
+            SetupOutputVariable(state,
+                                "Gas Equipment Radiant Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneGas(gasEqNum).RadGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Name);
+            SetupOutputVariable(state,
+                                "Gas Equipment Convective Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneGas(gasEqNum).ConGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Name);
+            SetupOutputVariable(state,
+                                "Gas Equipment Latent Gain Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneGas(gasEqNum).LatGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Name);
+            SetupOutputVariable(state,
+                                "Gas Equipment Lost Heat Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneGas(gasEqNum).LostRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Name);
+            SetupOutputVariable(state,
+                                "Gas Equipment Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneGas(gasEqNum).TotGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneGas(gasEqNum).Name);
+        }
+
+        // Zone total report variables
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            if (addZoneOutputs(zoneNum)) {
+
+                SetupOutputVariable(state,
+                                    "Zone Gas Equipment NaturalGas Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).GasPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Gas Equipment NaturalGas Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).GasConsump,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Zone Gas Equipment Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).GasRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Gas Equipment Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).GasRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Gas Equipment Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).GasConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Gas Equipment Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).GasConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Gas Equipment Latent Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).GasLatGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Gas Equipment Latent Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).GasLatGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Gas Equipment Lost Heat Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).GasLost,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Gas Equipment Lost Heat Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).GasLostRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Gas Equipment Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).GasTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Gas Equipment Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).GasTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+            }
+            // Reset zone output flag
+            addZoneOutputs(zoneNum) = false;
+        }
+
+        // Space total report variables
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+            if (addSpaceOutputs(spaceNum)) {
+
+                SetupOutputVariable(state,
+                                    "Space Gas Equipment NaturalGas Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).GasPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Gas Equipment NaturalGas Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).GasConsump,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Space Gas Equipment Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).GasRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Gas Equipment Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).GasRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Gas Equipment Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).GasConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Gas Equipment Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).GasConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Gas Equipment Latent Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).GasLatGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Gas Equipment Latent Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).GasLatGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Gas Equipment Lost Heat Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).GasLost,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Gas Equipment Lost Heat Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).GasLostRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Gas Equipment Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).GasTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Gas Equipment Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).GasTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+            }
+            // Reset space output flag
+            addSpaceOutputs(spaceNum) = false;
+        }
+
+        // Object report variables
+        for (int hwEqNum = 1; hwEqNum <= state.dataHeatBal->TotHWEquip; ++hwEqNum) {
+            // Set flags for zone and space total report variables
+            addZoneOutputs(state.dataHeatBal->ZoneHWEq(hwEqNum).ZonePtr) = true;
+            addSpaceOutputs(state.dataHeatBal->ZoneHWEq(hwEqNum).spaceIndex) = true;
+            SetupOutputVariable(state,
+                                "Hot Water Equipment District Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Power,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Name);
+            SetupOutputVariable(state,
+                                "Hot Water Equipment District Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Consumption,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Name,
+                                _,
+                                "DistrictHeating",
+                                "InteriorEquipment",
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).EndUseSubcategory,
+                                "Building",
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(hwEqNum).ZonePtr).Name,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(hwEqNum).ZonePtr).Multiplier,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(hwEqNum).ZonePtr).ListMultiplier,
+                                _,
+                                _,
+                                state.dataHeatBal->space(state.dataHeatBal->ZoneHWEq(hwEqNum).spaceIndex).spaceType);
+
+            SetupOutputVariable(state,
+                                "Hot Water Equipment Radiant Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).RadGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Name);
+            SetupOutputVariable(state,
+                                "Hot Water Equipment Radiant Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).RadGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Name);
+            SetupOutputVariable(state,
+                                "Hot Water Equipment Convective Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).ConGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Name);
+            SetupOutputVariable(state,
+                                "Hot Water Equipment Convective Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).ConGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Name);
+            SetupOutputVariable(state,
+                                "Hot Water Equipment Latent Gain Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).LatGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Name);
+            SetupOutputVariable(state,
+                                "Hot Water Equipment Latent Gain Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).LatGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Name);
+            SetupOutputVariable(state,
+                                "Hot Water Equipment Lost Heat Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).LostEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Name);
+            SetupOutputVariable(state,
+                                "Hot Water Equipment Lost Heat Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).LostRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Name);
+            SetupOutputVariable(state,
+                                "Hot Water Equipment Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).TotGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Name);
+            SetupOutputVariable(state,
+                                "Hot Water Equipment Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).TotGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneHWEq(hwEqNum).Name);
+        }
+
+        // Zone total report variables
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            if (addZoneOutputs(zoneNum)) {
+                SetupOutputVariable(state,
+                                    "Zone Hot Water Equipment District Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).HWPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Hot Water Equipment District Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).HWConsump,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Zone Hot Water Equipment Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).HWRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Hot Water Equipment Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).HWRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Hot Water Equipment Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).HWConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Hot Water Equipment Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).HWConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Hot Water Equipment Latent Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).HWLatGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Hot Water Equipment Latent Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).HWLatGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Hot Water Equipment Lost Heat Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).HWLost,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Hot Water Equipment Lost Heat Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).HWLostRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Hot Water Equipment Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).HWTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Hot Water Equipment Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).HWTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+            }
+            // Reset zone output flag
+            addZoneOutputs(zoneNum) = false;
+        }
+
+        // Space total report variables
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+            if (addSpaceOutputs(spaceNum)) {
+                SetupOutputVariable(state,
+                                    "Space Hot Water Equipment District Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).HWPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Hot Water Equipment District Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).HWConsump,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Space Hot Water Equipment Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).HWRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Hot Water Equipment Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).HWRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Hot Water Equipment Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).HWConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Hot Water Equipment Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).HWConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Hot Water Equipment Latent Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).HWLatGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Hot Water Equipment Latent Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).HWLatGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Hot Water Equipment Lost Heat Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).HWLost,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Hot Water Equipment Lost Heat Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).HWLostRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Hot Water Equipment Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).HWTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Hot Water Equipment Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).HWTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+            }
+            // Reset space output flag
+            addSpaceOutputs(spaceNum) = false;
+        }
+
+        // Object report variables
+        for (int stmEqNum = 1; stmEqNum <= state.dataHeatBal->TotStmEquip; ++stmEqNum) {
+            // Set flags for zone and space total report variables
+            addZoneOutputs(state.dataHeatBal->ZoneSteamEq(stmEqNum).ZonePtr) = true;
+            addSpaceOutputs(state.dataHeatBal->ZoneSteamEq(stmEqNum).spaceIndex) = true;
+            SetupOutputVariable(state,
+                                "Steam Equipment District Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Power,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Name);
+            SetupOutputVariable(state,
+                                "Steam Equipment District Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Consumption,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Name,
+                                _,
+                                "DistrictHeating",
+                                "InteriorEquipment",
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).EndUseSubcategory,
+                                "Building",
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(stmEqNum).ZonePtr).Name,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(stmEqNum).ZonePtr).Multiplier,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(stmEqNum).ZonePtr).ListMultiplier,
+                                _,
+                                _,
+                                state.dataHeatBal->space(state.dataHeatBal->ZoneSteamEq(stmEqNum).spaceIndex).spaceType);
+
+            SetupOutputVariable(state,
+                                "Steam Equipment Radiant Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).RadGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Name);
+            SetupOutputVariable(state,
+                                "Steam Equipment Radiant Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).RadGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Name);
+            SetupOutputVariable(state,
+                                "Steam Equipment Convective Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).ConGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Name);
+            SetupOutputVariable(state,
+                                "Steam Equipment Convective Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).ConGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Name);
+            SetupOutputVariable(state,
+                                "Steam Equipment Latent Gain Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).LatGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Name);
+            SetupOutputVariable(state,
+                                "Steam Equipment Latent Gain Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).LatGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Name);
+            SetupOutputVariable(state,
+                                "Steam Equipment Lost Heat Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).LostEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Name);
+            SetupOutputVariable(state,
+                                "Steam Equipment Lost Heat Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).LostRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Name);
+            SetupOutputVariable(state,
+                                "Steam Equipment Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).TotGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Name);
+            SetupOutputVariable(state,
+                                "Steam Equipment Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).TotGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneSteamEq(stmEqNum).Name);
+        }
+
+        // Zone total report variables
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            if (addZoneOutputs(zoneNum)) {
+                SetupOutputVariable(state,
+                                    "Zone Steam Equipment District Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).SteamPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Steam Equipment District Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).SteamConsump,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Zone Steam Equipment Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).SteamRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Steam Equipment Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).SteamRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Steam Equipment Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).SteamConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Steam Equipment Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).SteamConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Steam Equipment Latent Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).SteamLatGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Steam Equipment Latent Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).SteamLatGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Steam Equipment Lost Heat Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).SteamLost,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Steam Equipment Lost Heat Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).SteamLostRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Steam Equipment Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).SteamTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Steam Equipment Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).SteamTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+            }
+            // Reset zone output flag
+            addZoneOutputs(zoneNum) = false;
+        }
+
+        // Space total report variables
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+            if (addSpaceOutputs(spaceNum)) {
+                SetupOutputVariable(state,
+                                    "Space Steam Equipment District Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).SteamPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Steam Equipment District Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).SteamConsump,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Space Steam Equipment Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).SteamRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Steam Equipment Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).SteamRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Steam Equipment Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).SteamConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Steam Equipment Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).SteamConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Steam Equipment Latent Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).SteamLatGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Steam Equipment Latent Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).SteamLatGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Steam Equipment Lost Heat Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).SteamLost,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Steam Equipment Lost Heat Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).SteamLostRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Steam Equipment Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).SteamTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Steam Equipment Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).SteamTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+            }
+            // Reset space output flag
+            addSpaceOutputs(spaceNum) = false;
+        }
+
+        // Object report variables
+        for (int othEqNum = 1; othEqNum <= state.dataHeatBal->TotOthEquip; ++othEqNum) {
+            // Set flags for zone and space total report variables
+            addZoneOutputs(state.dataHeatBal->ZoneOtherEq(othEqNum).ZonePtr) = true;
+            addSpaceOutputs(state.dataHeatBal->ZoneOtherEq(othEqNum).spaceIndex) = true;
+            if (state.dataHeatBal->ZoneOtherEq(othEqNum).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
+                std::string fuelTypeString = state.dataHeatBal->ZoneOtherEq(othEqNum).otherEquipFuelTypeString;
+                SetupOutputVariable(state,
+                                    "Other Equipment " + fuelTypeString + " Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZoneOtherEq(othEqNum).Power,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->ZoneOtherEq(othEqNum).Name);
+                SetupOutputVariable(state,
+                                    "Other Equipment " + fuelTypeString + " Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZoneOtherEq(othEqNum).Consumption,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->ZoneOtherEq(othEqNum).Name,
+                                    _,
+                                    fuelTypeString,
+                                    "InteriorEquipment",
+                                    state.dataHeatBal->ZoneOtherEq(othEqNum).EndUseSubcategory,
+                                    "Building",
+                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(othEqNum).ZonePtr).Name,
+                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(othEqNum).ZonePtr).Multiplier,
+                                    state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(othEqNum).ZonePtr).ListMultiplier,
+                                    _,
+                                    _,
+                                    state.dataHeatBal->space(state.dataHeatBal->ZoneOtherEq(othEqNum).spaceIndex).spaceType);
+            }
+
+            SetupOutputVariable(state,
+                                "Other Equipment Radiant Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).RadGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).Name);
+            SetupOutputVariable(state,
+                                "Other Equipment Radiant Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).RadGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).Name);
+            SetupOutputVariable(state,
+                                "Other Equipment Convective Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).ConGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).Name);
+            SetupOutputVariable(state,
+                                "Other Equipment Convective Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).ConGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).Name);
+            SetupOutputVariable(state,
+                                "Other Equipment Latent Gain Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).LatGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).Name);
+            SetupOutputVariable(state,
+                                "Other Equipment Latent Gain Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).LatGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).Name);
+            SetupOutputVariable(state,
+                                "Other Equipment Lost Heat Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).LostEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).Name);
+            SetupOutputVariable(state,
+                                "Other Equipment Lost Heat Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).LostRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).Name);
+            SetupOutputVariable(state,
+                                "Other Equipment Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).TotGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).Name);
+            SetupOutputVariable(state,
+                                "Other Equipment Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).TotGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneOtherEq(othEqNum).Name);
+        }
+
+        // Zone total report variables
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            if (addZoneOutputs(zoneNum)) {
+                bool firstFuelType = true;
+                for (std::string fuelTypeString : state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypes) {
+                    if (firstFuelType) {
+
+                        SetupOutputVariable(state,
+                                            "Zone Other Equipment " + fuelTypeString + " Rate",
+                                            OutputProcessor::Unit::W,
+                                            state.dataHeatBal->ZnRpt(zoneNum).OtherPower,
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            state.dataHeatBal->Zone(zoneNum).Name);
+                        SetupOutputVariable(state,
+                                            "Zone Other Equipment " + fuelTypeString + " Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->ZnRpt(zoneNum).OtherConsump,
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            state.dataHeatBal->Zone(zoneNum).Name);
+                        firstFuelType = false;
+                    } else {
+                        ShowWarningError(state,
+                                         "setupIHGOutputs: Output variables=Zone Other Equipment " + fuelTypeString +
+                                             " Rate and Energy are not available.");
+                        ShowContinueError(state, "Only the first Other Equipment fuel type used in a zone is reported.");
+                    }
+                }
+
+                SetupOutputVariable(state,
+                                    "Zone Other Equipment Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).OtherRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Other Equipment Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).OtherRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Other Equipment Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).OtherConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Other Equipment Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).OtherConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Other Equipment Latent Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).OtherLatGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Other Equipment Latent Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).OtherLatGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Other Equipment Lost Heat Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).OtherLost,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Other Equipment Lost Heat Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).OtherLostRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Other Equipment Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).OtherTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Other Equipment Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).OtherTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+            }
+            // Reset zone output flag
+            addZoneOutputs(zoneNum) = false;
+        }
+
+        // Space total report variables
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+            if (addSpaceOutputs(spaceNum)) {
+                bool firstFuelType = true;
+                for (std::string fuelTypeString : state.dataHeatBal->space(spaceNum).otherEquipFuelTypes) {
+                    if (firstFuelType) {
+
+                        SetupOutputVariable(state,
+                                            "Space Other Equipment " + fuelTypeString + " Rate",
+                                            OutputProcessor::Unit::W,
+                                            state.dataHeatBal->spaceRpt(spaceNum).OtherPower,
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            state.dataHeatBal->space(spaceNum).Name);
+                        SetupOutputVariable(state,
+                                            "Space Other Equipment " + fuelTypeString + " Energy",
+                                            OutputProcessor::Unit::J,
+                                            state.dataHeatBal->spaceRpt(spaceNum).OtherConsump,
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::Summed,
+                                            state.dataHeatBal->space(spaceNum).Name);
+                        firstFuelType = false;
+                    } else {
+                        ShowWarningError(state,
+                                         "setupIHGOutputs: Output variables=Space Other Equipment " + fuelTypeString +
+                                             " Rate and Energy are not available.");
+                        ShowContinueError(state, "Only the first Other Equipment fuel type used in a space is reported.");
+                    }
+                }
+
+                SetupOutputVariable(state,
+                                    "Space Other Equipment Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).OtherRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Other Equipment Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).OtherRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Other Equipment Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).OtherConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Other Equipment Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).OtherConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Other Equipment Latent Gain Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).OtherLatGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Other Equipment Latent Gain Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).OtherLatGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Other Equipment Lost Heat Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).OtherLost,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Other Equipment Lost Heat Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).OtherLostRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Other Equipment Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).OtherTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Other Equipment Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).OtherTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+            }
+            // Reset space output flag
+            addSpaceOutputs(spaceNum) = false;
+        }
+        // Object report variables
+        for (int itEqNum = 1; itEqNum <= state.dataHeatBal->TotITEquip; ++itEqNum) {
+            // Set flags for zone and space total report variables
+            addZoneOutputs(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr) = true;
+            addSpaceOutputs(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex) = true;
+            SetupOutputVariable(state,
+                                "ITE CPU Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneITEq(itEqNum).CPUPower,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Fan Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneITEq(itEqNum).FanPower,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE UPS Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneITEq(itEqNum).UPSPower,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE CPU Electricity Rate at Design Inlet Conditions",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneITEq(itEqNum).CPUPowerAtDesign,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Fan Electricity Rate at Design Inlet Conditions",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneITEq(itEqNum).FanPowerAtDesign,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE UPS Heat Gain to Zone Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneITEq(itEqNum).UPSGainRateToZone,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Total Heat Gain to Zone Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneITEq(itEqNum).ConGainRateToZone,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+
+            SetupOutputVariable(state,
+                                "ITE CPU Electricity Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneITEq(itEqNum).CPUConsumption,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name,
+                                _,
+                                "Electricity",
+                                "InteriorEquipment",
+                                state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryCPU,
+                                "Building",
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
+                                _,
+                                _,
+                                state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
+
+            SetupOutputVariable(state,
+                                "ITE Fan Electricity Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneITEq(itEqNum).FanConsumption,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name,
+                                _,
+                                "Electricity",
+                                "InteriorEquipment",
+                                state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryFan,
+                                "Building",
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
+                                _,
+                                _,
+                                state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
+            SetupOutputVariable(state,
+                                "ITE UPS Electricity Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneITEq(itEqNum).UPSConsumption,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name,
+                                _,
+                                "Electricity",
+                                "InteriorEquipment",
+                                state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryUPS,
+                                "Building",
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
+                                _,
+                                _,
+                                state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
+            SetupOutputVariable(state,
+                                "ITE CPU Electricity Energy at Design Inlet Conditions",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneITEq(itEqNum).CPUEnergyAtDesign,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Fan Electricity Energy at Design Inlet Conditions",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneITEq(itEqNum).FanEnergyAtDesign,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE UPS Heat Gain to Zone Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneITEq(itEqNum).UPSGainEnergyToZone,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Total Heat Gain to Zone Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneITEq(itEqNum).ConGainEnergyToZone,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+
+            SetupOutputVariable(state,
+                                "ITE Standard Density Air Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                state.dataHeatBal->ZoneITEq(itEqNum).AirVolFlowStdDensity,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Current Density Air Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                state.dataHeatBal->ZoneITEq(itEqNum).AirVolFlowCurDensity,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                state.dataHeatBal->ZoneITEq(itEqNum).AirMassFlow,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Dry-Bulb Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataHeatBal->ZoneITEq(itEqNum).AirInletDryBulbT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Dewpoint Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataHeatBal->ZoneITEq(itEqNum).AirInletDewpointT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Relative Humidity",
+                                OutputProcessor::Unit::Perc,
+                                state.dataHeatBal->ZoneITEq(itEqNum).AirInletRelHum,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Outlet Dry-Bulb Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataHeatBal->ZoneITEq(itEqNum).AirOutletDryBulbT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            if (state.dataHeatBal->ZoneITEq(itEqNum).SupplyAirNodeNum != 0) {
+                SetupOutputVariable(state,
+                                    "ITE Supply Heat Index",
+                                    OutputProcessor::Unit::None,
+                                    state.dataHeatBal->ZoneITEq(itEqNum).SHI,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            }
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Operating Range Exceeded Time",
+                                OutputProcessor::Unit::hr,
+                                state.dataHeatBal->ZoneITEq(itEqNum).TimeOutOfOperRange,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time",
+                                OutputProcessor::Unit::hr,
+                                state.dataHeatBal->ZoneITEq(itEqNum).TimeAboveDryBulbT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time",
+                                OutputProcessor::Unit::hr,
+                                state.dataHeatBal->ZoneITEq(itEqNum).TimeBelowDryBulbT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Dewpoint Temperature Above Operating Range Time",
+                                OutputProcessor::Unit::hr,
+                                state.dataHeatBal->ZoneITEq(itEqNum).TimeAboveDewpointT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Dewpoint Temperature Below Operating Range Time",
+                                OutputProcessor::Unit::hr,
+                                state.dataHeatBal->ZoneITEq(itEqNum).TimeBelowDewpointT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Relative Humidity Above Operating Range Time",
+                                OutputProcessor::Unit::hr,
+                                state.dataHeatBal->ZoneITEq(itEqNum).TimeAboveRH,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Relative Humidity Below Operating Range Time",
+                                OutputProcessor::Unit::hr,
+                                state.dataHeatBal->ZoneITEq(itEqNum).TimeBelowRH,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range",
+                                OutputProcessor::Unit::deltaC,
+                                state.dataHeatBal->ZoneITEq(itEqNum).DryBulbTAboveDeltaT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range",
+                                OutputProcessor::Unit::deltaC,
+                                state.dataHeatBal->ZoneITEq(itEqNum).DryBulbTBelowDeltaT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Dewpoint Temperature Difference Above Operating Range",
+                                OutputProcessor::Unit::deltaC,
+                                state.dataHeatBal->ZoneITEq(itEqNum).DewpointTAboveDeltaT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Dewpoint Temperature Difference Below Operating Range",
+                                OutputProcessor::Unit::deltaC,
+                                state.dataHeatBal->ZoneITEq(itEqNum).DewpointTBelowDeltaT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Relative Humidity Difference Above Operating Range",
+                                OutputProcessor::Unit::Perc,
+                                state.dataHeatBal->ZoneITEq(itEqNum).RHAboveDeltaRH,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+            SetupOutputVariable(state,
+                                "ITE Air Inlet Relative Humidity Difference Below Operating Range",
+                                OutputProcessor::Unit::Perc,
+                                state.dataHeatBal->ZoneITEq(itEqNum).RHBelowDeltaRH,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneITEq(itEqNum).Name);
+        }
+
+        // Zone total report variables
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            if (addZoneOutputs(zoneNum)) {
+                SetupOutputVariable(state,
+                                    "Zone ITE CPU Electricity Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqCPUPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Fan Electricity Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqFanPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE UPS Electricity Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqUPSPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE CPU Electricity Rate at Design Inlet Conditions",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqCPUPowerAtDesign,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Fan Electricity Rate at Design Inlet Conditions",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqFanPowerAtDesign,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE UPS Heat Gain to Zone Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqUPSGainRateToZone,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Total Heat Gain to Zone Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqConGainRateToZone,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Adjusted Return Air Temperature",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEAdjReturnTemp,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Zone ITE CPU Electricity Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqCPUConsumption,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Fan Electricity Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqFanConsumption,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE UPS Electricity Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqUPSConsumption,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE CPU Electricity Energy at Design Inlet Conditions",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqCPUEnergyAtDesign,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Fan Electricity Energy at Design Inlet Conditions",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqFanEnergyAtDesign,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE UPS Heat Gain to Zone Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqUPSGainEnergyToZone,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Total Heat Gain to Zone Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqConGainEnergyToZone,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Zone ITE Standard Density Air Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqAirVolFlowStdDensity,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Air Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqAirMassFlow,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Average Supply Heat Index",
+                                    OutputProcessor::Unit::None,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqSHI,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Any Air Inlet Operating Range Exceeded Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqTimeOutOfOperRange,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Any Air Inlet Dry-Bulb Temperature Above Operating Range Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqTimeAboveDryBulbT,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Any Air Inlet Dry-Bulb Temperature Below Operating Range Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqTimeBelowDryBulbT,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Any Air Inlet Dewpoint Temperature Above Operating Range Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqTimeAboveDewpointT,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqTimeBelowDewpointT,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqTimeAboveRH,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->ZnRpt(zoneNum).ITEqTimeBelowRH,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+            }
+            // Reset zone output flag
+            addZoneOutputs(zoneNum) = false;
+        }
+
+        // Space total report variables
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+            if (addSpaceOutputs(spaceNum)) {
+                SetupOutputVariable(state,
+                                    "Space ITE CPU Electricity Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Fan Electricity Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqFanPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE UPS Electricity Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE CPU Electricity Rate at Design Inlet Conditions",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUPowerAtDesign,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Fan Electricity Rate at Design Inlet Conditions",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqFanPowerAtDesign,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE UPS Heat Gain to Zone Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSGainRateToZone,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Total Heat Gain to Zone Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqConGainRateToZone,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Adjusted Return Air Temperature",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEAdjReturnTemp,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Space ITE CPU Electricity Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUConsumption,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Fan Electricity Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqFanConsumption,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE UPS Electricity Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSConsumption,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE CPU Electricity Energy at Design Inlet Conditions",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUEnergyAtDesign,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Fan Electricity Energy at Design Inlet Conditions",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqFanEnergyAtDesign,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE UPS Heat Gain to Zone Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSGainEnergyToZone,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Total Heat Gain to Zone Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqConGainEnergyToZone,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Space ITE Standard Density Air Volume Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqAirVolFlowStdDensity,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Air Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqAirMassFlow,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Average Supply Heat Index",
+                                    OutputProcessor::Unit::None,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqSHI,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Any Air Inlet Operating Range Exceeded Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Any Air Inlet Dry-Bulb Temperature Above Operating Range Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDryBulbT,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Any Air Inlet Dry-Bulb Temperature Below Operating Range Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDryBulbT,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Any Air Inlet Dewpoint Temperature Above Operating Range Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDewpointT,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDewpointT,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Any Air Inlet Relative Humidity Above Operating Range Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveRH,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space ITE Any Air Inlet Relative Humidity Below Operating Range Time",
+                                    OutputProcessor::Unit::hr,
+                                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowRH,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+            }
+            // Reset space output flag
+            addSpaceOutputs(spaceNum) = false;
+        }
+
+        // Object report variables
+        for (int bbHeatNum = 1; bbHeatNum <= state.dataHeatBal->TotGasEquip; ++bbHeatNum) {
+            // Set flags for zone and space total report variables
+            addZoneOutputs(state.dataHeatBal->ZoneBBHeat(bbHeatNum).ZonePtr) = true;
+            addSpaceOutputs(state.dataHeatBal->ZoneBBHeat(bbHeatNum).spaceIndex) = true;
+            SetupOutputVariable(state,
+                                "Baseboard Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).Power,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).Name);
+            SetupOutputVariable(state,
+                                "Baseboard Electricity Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).Consumption,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).Name,
+                                _,
+                                "Electricity",
+                                "InteriorEquipment",
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).EndUseSubcategory,
+                                "Building",
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(bbHeatNum).ZonePtr).Name,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(bbHeatNum).ZonePtr).Multiplier,
+                                state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(bbHeatNum).ZonePtr).ListMultiplier,
+                                _,
+                                _,
+                                state.dataHeatBal->space(state.dataHeatBal->ZoneBBHeat(bbHeatNum).spaceIndex).spaceType);
+
+            SetupOutputVariable(state,
+                                "Baseboard Radiant Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).RadGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).Name);
+            SetupOutputVariable(state,
+                                "Baseboard Radiant Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).RadGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).Name);
+            SetupOutputVariable(state,
+                                "Baseboard Convective Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).ConGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).Name);
+            SetupOutputVariable(state,
+                                "Baseboard Convective Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).ConGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).Name);
+            SetupOutputVariable(state,
+                                "Baseboard Total Heating Energy",
+                                OutputProcessor::Unit::J,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).TotGainEnergy,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).Name);
+            SetupOutputVariable(state,
+                                "Baseboard Total Heating Rate",
+                                OutputProcessor::Unit::W,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).TotGainRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataHeatBal->ZoneBBHeat(bbHeatNum).Name);
+        }
+
+        // Zone total report variables
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            if (addZoneOutputs(zoneNum)) {
+                SetupOutputVariable(state,
+                                    "Zone Baseboard Electricity Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).BaseHeatPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Baseboard Electricity Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).BaseHeatElecCons,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Zone Baseboard Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).BaseHeatRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Baseboard Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).BaseHeatRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Baseboard Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).BaseHeatConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Baseboard Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).BaseHeatConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Baseboard Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->ZnRpt(zoneNum).BaseHeatTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+                SetupOutputVariable(state,
+                                    "Zone Baseboard Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->ZnRpt(zoneNum).BaseHeatTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->Zone(zoneNum).Name);
+            }
+            // Reset zone output flag
+            addZoneOutputs(zoneNum) = false;
+        }
+
+        // Space total report variables
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+            if (addSpaceOutputs(spaceNum)) {
+                SetupOutputVariable(state,
+                                    "Space Baseboard Electricity Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).BaseHeatPower,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Baseboard Electricity Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).BaseHeatElecCons,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+
+                SetupOutputVariable(state,
+                                    "Space Baseboard Radiant Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).BaseHeatRadGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Baseboard Radiant Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).BaseHeatRadGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Baseboard Convective Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).BaseHeatConGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Baseboard Convective Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).BaseHeatConGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Baseboard Total Heating Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataHeatBal->spaceRpt(spaceNum).BaseHeatTotGain,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    state.dataHeatBal->space(spaceNum).Name);
+                SetupOutputVariable(state,
+                                    "Space Baseboard Total Heating Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataHeatBal->spaceRpt(spaceNum).BaseHeatTotGainRate,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    state.dataHeatBal->space(spaceNum).Name);
+            }
+            // Reset space output flag
+            addSpaceOutputs(spaceNum) = false;
         }
     }
 
@@ -6928,14 +7270,11 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QEELAT += state.dataHeatBal->ZoneElectric(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QEELost += state.dataHeatBal->ZoneElectric(Loop).LostRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->ZoneElectric(Loop).spacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->ZoneElectric(Loop).spacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->ZoneElectric(Loop).spaceFracs(index);
-                state.dataHeatBal->spaceIntGain(spaceNum).QEERAD += state.dataHeatBal->ZoneElectric(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QEECON += state.dataHeatBal->ZoneElectric(Loop).ConGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QEELAT += state.dataHeatBal->ZoneElectric(Loop).LatGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QEELost += state.dataHeatBal->ZoneElectric(Loop).LostRate * spaceFrac;
-            }
+            int spaceNum = state.dataHeatBal->ZoneElectric(Loop).spaceIndex;
+            state.dataHeatBal->spaceIntGain(spaceNum).QEERAD += state.dataHeatBal->ZoneElectric(Loop).RadGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QEECON += state.dataHeatBal->ZoneElectric(Loop).ConGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QEELAT += state.dataHeatBal->ZoneElectric(Loop).LatGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QEELost += state.dataHeatBal->ZoneElectric(Loop).LostRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotGasEquip; ++Loop) {
@@ -6959,14 +7298,11 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QGELAT += state.dataHeatBal->ZoneGas(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QGELost += state.dataHeatBal->ZoneGas(Loop).LostRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->ZoneGas(Loop).spacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->ZoneGas(Loop).spacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->ZoneGas(Loop).spaceFracs(index);
-                state.dataHeatBal->spaceIntGain(spaceNum).QGERAD += state.dataHeatBal->ZoneGas(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QGECON += state.dataHeatBal->ZoneGas(Loop).ConGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QGELAT += state.dataHeatBal->ZoneGas(Loop).LatGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QGELost += state.dataHeatBal->ZoneGas(Loop).LostRate * spaceFrac;
-            }
+            int spaceNum = state.dataHeatBal->ZoneGas(Loop).spaceIndex;
+            state.dataHeatBal->spaceIntGain(spaceNum).QGERAD += state.dataHeatBal->ZoneGas(Loop).RadGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QGECON += state.dataHeatBal->ZoneGas(Loop).ConGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QGELAT += state.dataHeatBal->ZoneGas(Loop).LatGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QGELost += state.dataHeatBal->ZoneGas(Loop).LostRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotOthEquip; ++Loop) {
@@ -6988,14 +7324,11 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QOELAT += state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QOELost += state.dataHeatBal->ZoneOtherEq(Loop).LostRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->ZoneOtherEq(Loop).spacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->ZoneOtherEq(Loop).spaceFracs(index);
-                state.dataHeatBal->spaceIntGain(spaceNum).QOERAD += state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QOECON += state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QOELAT += state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QOELost += state.dataHeatBal->ZoneOtherEq(Loop).LostRate * spaceFrac;
-            }
+            int spaceNum = state.dataHeatBal->ZoneOtherEq(Loop).spaceIndex;
+            state.dataHeatBal->spaceIntGain(spaceNum).QOERAD += state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QOECON += state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QOELAT += state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QOELost += state.dataHeatBal->ZoneOtherEq(Loop).LostRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotHWEquip; ++Loop) {
@@ -7018,14 +7351,11 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QHWLAT += state.dataHeatBal->ZoneHWEq(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QHWLost += state.dataHeatBal->ZoneHWEq(Loop).LostRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->ZoneHWEq(Loop).spacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->ZoneHWEq(Loop).spacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->ZoneHWEq(Loop).spaceFracs(index);
-                state.dataHeatBal->spaceIntGain(spaceNum).QHWRAD += state.dataHeatBal->ZoneHWEq(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QHWCON += state.dataHeatBal->ZoneHWEq(Loop).ConGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QHWLAT += state.dataHeatBal->ZoneHWEq(Loop).LatGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QHWLost += state.dataHeatBal->ZoneHWEq(Loop).LostRate * spaceFrac;
-            }
+            int spaceNum = state.dataHeatBal->ZoneHWEq(Loop).spaceIndex;
+            state.dataHeatBal->spaceIntGain(spaceNum).QHWRAD += state.dataHeatBal->ZoneHWEq(Loop).RadGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QHWCON += state.dataHeatBal->ZoneHWEq(Loop).ConGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QHWLAT += state.dataHeatBal->ZoneHWEq(Loop).LatGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QHWLost += state.dataHeatBal->ZoneHWEq(Loop).LostRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotStmEquip; ++Loop) {
@@ -7048,14 +7378,11 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QSELAT += state.dataHeatBal->ZoneSteamEq(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QSELost += state.dataHeatBal->ZoneSteamEq(Loop).LostRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->ZoneSteamEq(Loop).spacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->ZoneSteamEq(Loop).spaceFracs(index);
-                state.dataHeatBal->spaceIntGain(spaceNum).QSERAD += state.dataHeatBal->ZoneSteamEq(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QSECON += state.dataHeatBal->ZoneSteamEq(Loop).ConGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QSELAT += state.dataHeatBal->ZoneSteamEq(Loop).LatGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QSELost += state.dataHeatBal->ZoneSteamEq(Loop).LostRate * spaceFrac;
-            }
+            int spaceNum = state.dataHeatBal->ZoneSteamEq(Loop).spaceIndex;
+            state.dataHeatBal->spaceIntGain(spaceNum).QSERAD += state.dataHeatBal->ZoneSteamEq(Loop).RadGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QSECON += state.dataHeatBal->ZoneSteamEq(Loop).ConGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QSELAT += state.dataHeatBal->ZoneSteamEq(Loop).LatGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QSELost += state.dataHeatBal->ZoneSteamEq(Loop).LostRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotBBHeat; ++Loop) {
@@ -7085,12 +7412,9 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QBBRAD += state.dataHeatBal->ZoneBBHeat(Loop).RadGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QBBCON += state.dataHeatBal->ZoneBBHeat(Loop).ConGainRate;
 
-            for (int index = 1; index <= int(state.dataHeatBal->ZoneBBHeat(Loop).spacePtrs.size()); ++index) {
-                int spaceNum = state.dataHeatBal->ZoneBBHeat(Loop).spacePtrs(index);
-                Real64 spaceFrac = state.dataHeatBal->ZoneBBHeat(Loop).spaceFracs(index);
-                state.dataHeatBal->spaceIntGain(spaceNum).QBBRAD += state.dataHeatBal->ZoneBBHeat(Loop).RadGainRate * spaceFrac;
-                state.dataHeatBal->spaceIntGain(spaceNum).QBBCON += state.dataHeatBal->ZoneBBHeat(Loop).ConGainRate * spaceFrac;
-            }
+            int spaceNum = state.dataHeatBal->ZoneBBHeat(Loop).spaceIndex;
+            state.dataHeatBal->spaceIntGain(spaceNum).QBBRAD += state.dataHeatBal->ZoneBBHeat(Loop).RadGainRate;
+            state.dataHeatBal->spaceIntGain(spaceNum).QBBCON += state.dataHeatBal->ZoneBBHeat(Loop).ConGainRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotCO2Gen; ++Loop) {
@@ -7100,7 +7424,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZnRpt(NZ).CO2Rate += state.dataHeatBal->ZoneCO2Gen(Loop).CO2GainRate;
         }
 
-        if (state.dataHeatBal->NumZoneITEqStatements > 0) CalcZoneITEq(state);
+        if (state.dataHeatBal->TotITEquip > 0) CalcZoneITEq(state);
 
         CalcWaterThermalTankZoneGains(state);
         PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain(state);
@@ -7261,7 +7585,7 @@ namespace InternalHeatGains {
 
         //  Zero out time step variables
         // Object report variables
-        for (Loop = 1; Loop <= state.dataHeatBal->NumZoneITEqStatements; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
             state.dataHeatBal->ZoneITEq(Loop).CPUPower = 0.0;
             state.dataHeatBal->ZoneITEq(Loop).FanPower = 0.0;
             state.dataHeatBal->ZoneITEq(Loop).UPSPower = 0.0;
@@ -7335,7 +7659,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZnRpt(Loop).SumToutMinusTSup = 0.0;
         } // Zone init loop
 
-        for (Loop = 1; Loop <= state.dataHeatBal->NumZoneITEqStatements; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
             // Get schedules
             NZ = state.dataHeatBal->ZoneITEq(Loop).ZonePtr;
             OperSchedFrac = GetCurrentScheduleValue(state, state.dataHeatBal->ZoneITEq(Loop).OperSchedPtr);
@@ -7575,7 +7899,7 @@ namespace InternalHeatGains {
         } // ZoneITEq calc loop
 
         // Zone-level sensible heat index
-        for (Loop = 1; Loop <= state.dataHeatBal->NumZoneITEqStatements; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
             int ZN = state.dataHeatBal->ZoneITEq(Loop).ZonePtr;
             if (state.dataHeatBal->ZnRpt(NZ).SumToutMinusTSup != 0.0) {
                 state.dataHeatBal->ZnRpt(ZN).ITEqSHI = state.dataHeatBal->ZnRpt(NZ).SumTinMinusTSup / state.dataHeatBal->ZnRpt(NZ).SumToutMinusTSup;

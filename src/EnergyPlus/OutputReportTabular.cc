@@ -9665,9 +9665,6 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
         }
     }
 
-    constexpr int bySpaceType = 2;
-
-    int numEndUses = state.dataGlobalConst->iEndUse.size();
     int numSubCatOrTypes = 0;
     int numRows = 0;
     if (tableType == endUseSubTableType::bySubCategory) {
@@ -9682,7 +9679,7 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
         needOtherRow(i) = false; // set array to all false assuming no other rows are needed
     }
     for (int iResource = 1; iResource <= 13; ++iResource) {
-        for (int jEndUse = 1; jEndUse <= numEndUses; ++jEndUse) {
+        for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
             if (tableType == endUseSubTableType::bySubCategory) {
                 numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
             } else if (tableType == endUseSubTableType::bySpaceType) {
@@ -9707,7 +9704,7 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
         }
     }
 
-    for (int jEndUse = 1; jEndUse <= numEndUses; ++jEndUse) {
+    for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
         if (tableType == endUseSubTableType::bySubCategory) {
             numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
         } else if (tableType == endUseSubTableType::bySpaceType) {
@@ -9738,7 +9735,7 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
 
     // Build row head and subcategories columns
     int i = 1;
-    for (size_t jEndUse = 1; jEndUse <= numEndUses; ++jEndUse) {
+    for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
         if (tableType == endUseSubTableType::bySubCategory) {
             numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
         } else if (tableType == endUseSubTableType::bySpaceType) {
@@ -9771,7 +9768,7 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
 
     for (int iResource = 1; iResource <= 13; ++iResource) {
         i = 1;
-        for (size_t jEndUse = 1; jEndUse <= numEndUses; ++jEndUse) {
+        for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
             if (tableType == endUseSubTableType::bySubCategory) {
                 numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
             } else if (tableType == endUseSubTableType::bySpaceType) {
@@ -12043,57 +12040,45 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
     }
     for (int iElecEquip = 1; iElecEquip <= state.dataHeatBal->TotElecEquip; ++iElecEquip) {
         auto curElecEquip = state.dataHeatBal->ZoneElectric(iElecEquip);
-        for (int iSpace = 1; iSpace <= int(curElecEquip.spacePtrs.size()); ++iSpace) {
-            int const spaceNum = curElecEquip.spacePtrs(iSpace);
-            Real64 const elecEquip = curElecEquip.DesignLevel * curElecEquip.spaceFracs(iSpace);
-            spaceTotPlugProcess(spaceNum) += elecEquip;
-            spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += elecEquip;
-        }
+        int const spaceNum = curElecEquip.spaceIndex;
+        Real64 const elecEquip = curElecEquip.DesignLevel;
+        spaceTotPlugProcess(spaceNum) += elecEquip;
+        spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += elecEquip;
     }
     for (int iGasEquip = 1; iGasEquip <= state.dataHeatBal->TotGasEquip; ++iGasEquip) {
         auto curGasEquip = state.dataHeatBal->ZoneGas(iGasEquip);
-        for (int iSpace = 1; iSpace <= int(curGasEquip.spacePtrs.size()); ++iSpace) {
-            int const spaceNum = curGasEquip.spacePtrs(iSpace);
-            Real64 const gasEquip = curGasEquip.DesignLevel * curGasEquip.spaceFracs(iSpace);
-            spaceTotPlugProcess(spaceNum) += gasEquip;
-            spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += gasEquip;
-        }
+        int const spaceNum = curGasEquip.spaceIndex;
+        Real64 const gasEquip = curGasEquip.DesignLevel;
+        spaceTotPlugProcess(spaceNum) += gasEquip;
+        spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += gasEquip;
     }
     for (int iOthEquip = 1; iOthEquip <= state.dataHeatBal->TotOthEquip; ++iOthEquip) {
         auto curOthEquip = state.dataHeatBal->ZoneOtherEq(iOthEquip);
-        for (int iSpace = 1; iSpace <= int(curOthEquip.spacePtrs.size()); ++iSpace) {
-            int const spaceNum = curOthEquip.spacePtrs(iSpace);
-            Real64 const othEquip = curOthEquip.DesignLevel * curOthEquip.spaceFracs(iSpace);
-            spaceTotPlugProcess(spaceNum) += othEquip;
-            spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += othEquip;
-        }
+        int const spaceNum = curOthEquip.spaceIndex;
+        Real64 const othEquip = curOthEquip.DesignLevel;
+        spaceTotPlugProcess(spaceNum) += othEquip;
+        spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += othEquip;
     }
     for (int iHWEquip = 1; iHWEquip <= state.dataHeatBal->TotHWEquip; ++iHWEquip) {
         auto curHWEquip = state.dataHeatBal->ZoneHWEq(iHWEquip);
-        for (int iSpace = 1; iSpace <= int(curHWEquip.spacePtrs.size()); ++iSpace) {
-            int const spaceNum = curHWEquip.spacePtrs(iSpace);
-            Real64 const hwEquip = curHWEquip.DesignLevel * curHWEquip.spaceFracs(iSpace);
-            spaceTotPlugProcess(spaceNum) += hwEquip;
-            spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += hwEquip;
-        }
+        int const spaceNum = curHWEquip.spaceIndex;
+        Real64 const hwEquip = curHWEquip.DesignLevel;
+        spaceTotPlugProcess(spaceNum) += hwEquip;
+        spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += hwEquip;
     }
     for (int iSteamEquip = 1; iSteamEquip <= state.dataHeatBal->TotStmEquip; ++iSteamEquip) {
         auto curSteamEquip = state.dataHeatBal->ZoneSteamEq(iSteamEquip);
-        for (int iSpace = 1; iSpace <= int(curSteamEquip.spacePtrs.size()); ++iSpace) {
-            int const spaceNum = curSteamEquip.spacePtrs(iSpace);
-            Real64 const steamEquip = curSteamEquip.DesignLevel * curSteamEquip.spaceFracs(iSpace);
-            spaceTotPlugProcess(spaceNum) += steamEquip;
-            spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += steamEquip;
-        }
+        int const spaceNum = curSteamEquip.spaceIndex;
+        Real64 const steamEquip = curSteamEquip.DesignLevel;
+        spaceTotPlugProcess(spaceNum) += steamEquip;
+        spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += steamEquip;
     }
-    for (int iITEquip = 1; iITEquip <= state.dataHeatBal->NumZoneITEqStatements; ++iITEquip) {
+    for (int iITEquip = 1; iITEquip <= state.dataHeatBal->TotITEquip; ++iITEquip) {
         auto curITEquip = state.dataHeatBal->ZoneITEq(iITEquip);
-        for (int iSpace = 1; iSpace <= int(curITEquip.spacePtrs.size()); ++iSpace) {
-            int const spaceNum = curITEquip.spacePtrs(iSpace);
-            Real64 const itEquip = curITEquip.DesignTotalPower * curITEquip.spaceFracs(iSpace);
-            spaceTotPlugProcess(spaceNum) += itEquip;
-            spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += itEquip;
-        }
+        int const spaceNum = curITEquip.spaceIndex;
+        Real64 const itEquip = curITEquip.DesignTotalPower;
+        spaceTotPlugProcess(spaceNum) += itEquip;
+        spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += itEquip;
     }
 
     // re-use existing zone total variables

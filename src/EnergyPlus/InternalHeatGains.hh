@@ -73,7 +73,8 @@ namespace InternalHeatGains {
                                 EPVector<DataHeatBalance::GlobalInternalGainMiscObject> &inputObjects,
                                 int &numInputObjects,
                                 int &numGainInstances,
-                                bool &errors);
+                                bool &errors,
+                                const bool zoneListNotAllowed = false);
 
     void setupIHGOutputs(EnergyPlusData &state);
 
