@@ -682,31 +682,9 @@ namespace OutputProcessor {
                                bool &ErrorsFound                            // true if errors found during subroutine
     );
 
-    void UpdateMeterValues(EnergyPlusData &state,
-                           Real64 TimeStepValue,       // Value of this variable at the current time step.
-                           int NumOnMeters,            // Number of meters this variable is "on".
-                           const Array1D_int &OnMeters // Which meters this variable is on (index values)
-    );
-
-    void UpdateMeterValues(EnergyPlusData &state,
-                           Real64 TimeStepValue,             // Value of this variable at the current time step.
-                           int NumOnMeters,                  // Number of meters this variable is "on".
-                           const Array1D_int &OnMeters,      // Which meters this variable is on (index values)
-                           int NumOnCustomMeters,            // Number of custom meters this variable is "on".
-                           const Array1D_int &OnCustomMeters // Which custom meters this variable is on (index values)
-    );
-
     void UpdateMeters(EnergyPlusData &state, int TimeStamp); // Current TimeStamp (for max/min)
 
     void ResetAccumulationWhenWarmupComplete(EnergyPlusData &state);
-
-    void SetMinMax(Real64 TestValue,    // Candidate new value
-                   int TimeStamp,       // TimeStamp to be stored if applicable
-                   Real64 &CurMaxValue, // Current Maximum Value
-                   int &CurMaxValDate,  // Current Maximum Value Date Stamp
-                   Real64 &CurMinValue, // Current Minimum Value
-                   int &CurMinValDate   // Current Minimum Value Date Stamp
-    );
 
     void ReportTSMeters(EnergyPlusData &state,
                         Real64 StartMinute,      // Start Minute for TimeStep
