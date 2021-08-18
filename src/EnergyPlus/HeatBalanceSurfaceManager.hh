@@ -94,12 +94,6 @@ namespace HeatBalanceSurfaceManager {
 
     void GatherForPredefinedReport(EnergyPlusData &state);
 
-    // methods specifically for helping in NFRC assembly calculations
-    // Tarcog::ISO15099::Environments getOutdoorUvalueNfrc();
-    std::shared_ptr<Tarcog::ISO15099::COutdoorEnvironment> getOutdoorUvalueNfrc();
-    std::shared_ptr<Tarcog::ISO15099::CIndoorEnvironment> getIndoorUvalueNfrc();
-
-
     void AllocateSurfaceHeatBalArrays(EnergyPlusData &state);
 
     void InitThermalAndFluxHistories(EnergyPlusData &state);

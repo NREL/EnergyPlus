@@ -258,6 +258,112 @@ namespace WindowManager {
         }
     }
 
+     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state, int const surfNum, double &uvalue, double &shgc, double &vt)
+    {
+
+        auto &surface(state.dataSurface->Surface(surfNum));
+
+        auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum);
+        Real64 HextConvCoeff = 0.0;
+        auto aSystem = aFactory.getTarcogSystemForReporting(state, HextConvCoeff);
+
+
+        if (false) {
+            Tarcog::ISO15099::WindowSingleVision m_Window;
+
+            // ======================= just a test by using an existing WCE unit test to make sure the scope will work
+
+            /////////////////////////////////////////////////////////
+            /// Outdoor
+            /////////////////////////////////////////////////////////
+            const auto airTemperature{305.15}; // Kelvins
+            const auto airSpeed{2.75};         // meters per second
+            const auto tSky{305.15};           // Kelvins
+            const auto solarRadiation{783.0};
+
+             auto Outdoor = Tarcog::ISO15099::Environments::outdoor(
+                 airTemperature, airSpeed, solarRadiation, tSky, Tarcog::ISO15099::SkyModel::AllSpecified);
+             Outdoor->setHCoeffModel(Tarcog::ISO15099::BoundaryConditionsCoeffModel::CalculateH);
+ 
+            /////////////////////////////////////////////////////////
+            /// Indoor
+            /////////////////////////////////////////////////////////
+
+            const auto roomTemperature{297.15};
+            const auto Indoor = Tarcog::ISO15099::Environments::indoor(roomTemperature);
+
+            /////////////////////////////////////////////////////////
+            // IGU
+            /////////////////////////////////////////////////////////
+            const auto solidLayerThickness1{0.00318}; // [m]
+            const auto solidLayerConductance1{1.0};
+            const auto tIR1{0.0};
+            const auto frontEmissivity1{0.84};
+            const auto backEmissivity1{0.046578168869};
+
+            const auto layer1 =
+                Tarcog::ISO15099::Layers::solid(solidLayerThickness1, solidLayerConductance1, frontEmissivity1, tIR1, backEmissivity1, tIR1);
+            layer1->setSolarAbsorptance(0.194422408938, solarRadiation);
+
+            const auto gapThickness{0.0127};
+            auto gap{Tarcog::ISO15099::Layers::gap(gapThickness)};
+
+            const auto solidLayerThickness2{0.005715}; // [m]
+            const auto solidLayerConductance2{1.0};
+
+            const auto layer2 = Tarcog::ISO15099::Layers::solid(solidLayerThickness2, solidLayerConductance2);
+            layer2->setSolarAbsorptance(0.054760526866, solarRadiation);
+
+            const auto iguWidth{1.0};
+            const auto iguHeight{1.0};
+            Tarcog::ISO15099::CIGU aIGU(iguWidth, iguHeight);
+            aIGU.addLayers({layer1, gap, layer2});
+
+            /////////////////////////////////////////////////////////
+            // System
+            /////////////////////////////////////////////////////////
+            const auto igu{std::make_shared<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor)};
+
+            /////////////////////////////////////////////////////////
+            /// Frames
+            /////////////////////////////////////////////////////////
+
+            double uValue{2.134059};
+            const double edgeUValue{2.251039};
+            const double projectedFrameDimension{0.050813};
+            const double wettedLength{0.05633282};
+            const double absorptance{0.3};
+
+            Tarcog::ISO15099::FrameData frameData{uValue, edgeUValue, projectedFrameDimension, wettedLength, absorptance};
+
+            const auto windowWidth{1.2};
+            const auto windowHeight{1.5};
+            const auto tVis{0.6385};
+            const auto tSol{0.371589958668};
+
+            m_Window = Tarcog::ISO15099::WindowSingleVision(windowWidth, windowHeight, tVis, tSol, igu);
+
+            m_Window.setFrameTop(frameData);
+            m_Window.setFrameBottom(frameData);
+            m_Window.setFrameLeft(frameData);
+            m_Window.setFrameRight(frameData);
+
+            const auto UValue{m_Window.uValue()};
+            const auto SHGC{m_Window.shgc()};
+            const auto VtRep{m_Window.vt()};
+            // ======================= end of a test by using an existing WCE unit test to make sure the scope will work 
+            vt = m_Window.uValue();
+            shgc = m_Window.shgc();
+            uvalue = m_Window.vt();
+        } else {
+            vt = -1.;
+            shgc = -1.;
+            uvalue = -1.;
+        }
+         
+         
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////
     //  CWCEHeatTransferFactory
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -315,6 +421,35 @@ namespace WindowManager {
         }
 
         auto aSystem = std::make_shared<Tarcog::ISO15099::CSingleSystem>(aIGU, Indoor, Outdoor);
+
+        return aSystem;
+    }
+
+    std::shared_ptr<Tarcog::ISO15099::CSystem> CWCEHeatTransferFactory::getTarcogSystemForReporting(EnergyPlusData &state,
+                                                                                                    Real64 const t_HextConvCoeff)
+    {
+        auto Indoor = getIndoorUvalueNfrc();
+        auto Outdoor = getOutdoorUvalueNfrc();
+        auto aIGU = getIGU();
+
+        // pick-up all layers and put them in IGU (this includes gap layers as well)
+        for (auto i = 0; i < m_TotLay; ++i) {
+            auto aLayer = getIGULayer(state, i + 1);
+            assert(aLayer != nullptr);
+            // IDF for "standard" windows do not insert gas between glass and shade. Tarcog needs that gas
+            // and it will be created here
+            if (m_ShadePosition == ShadePosition::Interior && i == m_TotLay - 1) {
+                auto aAirLayer = getShadeToGlassLayer(state, i + 1);
+                aIGU.addLayer(aAirLayer);
+            }
+            aIGU.addLayer(aLayer);
+            if (m_ShadePosition == ShadePosition::Exterior && i == 0) {
+                auto aAirLayer = getShadeToGlassLayer(state, i + 1);
+                aIGU.addLayer(aAirLayer);
+            }
+        }
+
+        auto aSystem = std::make_shared<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor);
 
         return aSystem;
     }
@@ -681,6 +816,26 @@ namespace WindowManager {
     bool CWCEHeatTransferFactory::isInteriorShade() const
     {
         return m_InteriorBSDFShade;
+    }
+
+    std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getOutdoorUvalueNfrc()
+    {
+        const auto airTemperature{-18.0 + DataGlobalConstants::KelvinConv}; // Kelvins
+        const auto airSpeed{5.5};                                           // meters per second
+        const auto tSky{-18.0 + DataGlobalConstants::KelvinConv};           // Kelvins
+        const auto solarRadiation{0};
+
+        auto Outdoor =
+            Tarcog::ISO15099::Environments::outdoor(airTemperature, airSpeed, solarRadiation, tSky, Tarcog::ISO15099::SkyModel::AllSpecified);
+        Outdoor->setHCoeffModel(Tarcog::ISO15099::BoundaryConditionsCoeffModel::CalculateH);
+        return Outdoor;
+    }
+
+    std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getIndoorUvalueNfrc()
+    {
+        const auto roomTemperature{21 + DataGlobalConstants::KelvinConv};
+        const auto Indoor = Tarcog::ISO15099::Environments::indoor(roomTemperature);
+        return Indoor;
     }
 
 

@@ -66,6 +66,7 @@ namespace ISO15099 {
     class CEnvironment;
     class CIGU;
     class CSingleSystem;
+    class CSystem;
 } // namespace ISO15099
 } // namespace Tarcog
 
@@ -97,6 +98,8 @@ namespace WindowManager {
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     );
 
+    void GetWindowAssemblyNfrcForReport(EnergyPlusData &state, int const surfNum, double &uvalue, double &shgc, double &vt);
+
     // Class that is used to create layers for Windows-CalcEngine
     class CWCEHeatTransferFactory
     {
@@ -109,6 +112,9 @@ namespace WindowManager {
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoor(EnergyPlusData &state) const;
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoor(EnergyPlusData &state, Real64 const t_Hext) const;
         Tarcog::ISO15099::CIGU getIGU() const;
+
+        // for assembly windoww reporting
+        std::shared_ptr<Tarcog::ISO15099::CSystem> getTarcogSystemForReporting(EnergyPlusData &state, Real64 const t_HextConvCoeff);
 
         // This special case of interior shade is necessary only because of strange calculation of heat flow on interior side
         // It probably needs to be removed since calculation is no different from any other case. It is left over from
@@ -148,6 +154,10 @@ namespace WindowManager {
         Gases::CGas getGas(Material::MaterialProperties const &material) const;
         static Gases::CGas getAir();
         Material::MaterialProperties *getLayerMaterial(EnergyPlusData &state, int const t_Index) const;
+
+        // methods specifically for helping in NFRC assembly calculations
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoorUvalueNfrc();
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoorUvalueNfrc();
     };
 } // namespace WindowManager
 
