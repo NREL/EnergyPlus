@@ -74,11 +74,12 @@ set(RE2_BUILD_TESTING
     OFF
     CACHE BOOL "" FORCE)
 
-if(OPENGL_FOUND)
-  set(BUILD_PENUMBRA_TESTING
-      ${BUILD_TESTING}
-      CACHE BOOL "" FORCE)
-endif()
+# Don't force Penumbra testing just because OpenGL is found, allow the developer to set it to ON or OFF as they want
+#if(OPENGL_FOUND)
+#  set(BUILD_PENUMBRA_TESTING
+#      ${BUILD_TESTING}
+#      CACHE BOOL "" FORCE)
+#endif()
 
 # We don't want to enable the global warnings for any of the third party projects
 link_libraries(project_options)
@@ -124,8 +125,8 @@ add_subdirectory(re2)
 set_target_properties(re2 PROPERTIES FOLDER ThirdParty/re2)
 add_subdirectory(fmt-6.1.2)
 set_target_properties(fmt PROPERTIES FOLDER ThirdParty/fmt)
-add_subdirectory(cpgfunctionEP-0.4)
-set_target_properties(cpgfunctionEP PROPERTIES FOLDER ThirdParty/cpgfunctionEP-0.4)
+add_subdirectory(cpgfunctionEP-0.5)
+set_target_properties(cpgfunctionEP PROPERTIES FOLDER ThirdParty/cpgfunctionEP-0.5)
 
 # Kiva
 include(cmake/kiva.cmake)

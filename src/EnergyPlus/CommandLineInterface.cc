@@ -45,6 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// C++ Headers
+#include <thread>
+
 // CLI Headers
 #include <ezOptionParser.hpp>
 
@@ -68,7 +71,7 @@ namespace CommandLineInterface {
     {
         typedef std::string::size_type size_type;
 
-        // Expand long-name options using "=" sign into two arguments
+        // Expand long-name options using "=" sign in to two arguments
         // and expand multiple short options into separate arguments
         std::vector<std::string> arguments;
 
@@ -149,6 +152,8 @@ namespace CommandLineInterface {
 
         opt.add("", false, 0, 0, "Display version information", "-v", "--version");
 
+        opt.add("1", false, 1, 0, "Multi-thread with N threads; 1 thread with no arg.", "-j", "--jobs");
+
         opt.add("in.epw", false, 1, 0, "Weather file path (default: in.epw in current directory)", "-w", "--weather");
 
         opt.add("", false, 0, 0, "Run ExpandObjects prior to simulation", "-x", "--expandobjects");
@@ -209,6 +214,18 @@ namespace CommandLineInterface {
         state.dataGlobal->outputEpJSONConversionOnly = opt.isSet("--convert-only");
 
         bool eplusRunningViaAPI = state.dataGlobal->eplusRunningViaAPI;
+
+        opt.get("-j")->getInt(state.dataGlobal->numThread);
+
+        if (state.dataGlobal->numThread == 0) {
+            DisplayString(state, "Invalid value for -j arg. Defaulting to 1.");
+            state.dataGlobal->numThread = 1;
+        } else if (state.dataGlobal->numThread > (int)std::thread::hardware_concurrency()) {
+            DisplayString(state,
+                          fmt::format("Invalid value for -j arg. Value exceeds num available. Defaulting to num available. -j {}",
+                                      (int)std::thread::hardware_concurrency()));
+            state.dataGlobal->numThread = (int)std::thread::hardware_concurrency();
+        }
 
         // Process standard arguments
         if (opt.isSet("-h")) {
@@ -529,7 +546,7 @@ namespace CommandLineInterface {
             }
         }
 
-        // This is a place holder in case there are required options in the future
+        // This is a placeholder in case there are required options in the future
         if (!opt.gotRequired(badOptions)) {
             for (size_type i = 0; i < badOptions.size(); ++i) {
                 DisplayString(state, "ERROR: Missing required option " + badOptions[i]);
