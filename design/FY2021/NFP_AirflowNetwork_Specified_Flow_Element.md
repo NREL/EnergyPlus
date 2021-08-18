@@ -33,10 +33,15 @@ The constant flow with specified flow will return 1, and the Jacobian values are
 ## Approach ##
 This feature will be added through the execution of these subtasks:
 
-  * Create a new airflow element SpecifiedFlowRate
+  * Create two new airflow elements SpecifiedVolumeFlow and SpecifiedMassFlow 
   * Create a new input object AirflowNetwork:MultiZone:SpecifiedFlowRate
   * Create necessary inputs to allow users to incorporate this element into models
   * Create unit tests and documentation
+
+Adding two elements will avoid the need for explicit logic to differentiate the specified mass flow and specified volume flow objects.
+Resolution of which `calculate` to use will still take place at runtime, so this choice is more about maintainabilty than it is about
+performance. Lots of logic in the calculation function makes them much harder to maintain, this will make the `calculuate` functions
+somewhat cleaner and easy to understand.
 
 ## Testing/Validation/Data Sources ##
 Unit test will be added to ensure numerical values are calculated properly.
