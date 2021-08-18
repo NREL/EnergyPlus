@@ -245,7 +245,7 @@ namespace DataHeatBalance {
 
     extern Array1D_string const ZoneIntGainDeviceTypes;
     extern Array1D_string const ccZoneIntGainDeviceTypes;
-    //constexpr std::array<std::string_view, static_cast<int>(IntGainTypeOf::NUM)> const ZoneIntGainDeviceTypes = {
+    // constexpr std::array<std::string_view, static_cast<int>(IntGainTypeOf::NUM)> const ZoneIntGainDeviceTypes = {
     //    "PEOPLE",
     //    "LIGHTS",
     //    "ELECTRICEQUIPMENT",
@@ -300,7 +300,7 @@ namespace DataHeatBalance {
     //    "COIL:HEATING:DX:MULTISPEED",
     //    "ELECTRICLOADCENTER:STORAGE:CONVERTER",
     //    "FAN:SYSTEMMODEL"};
-    //constexpr std::array<std::string_view, static_cast<int>(IntGainTypeOf::NUM)> const ccZoneIntGainDeviceTypes = {
+    // constexpr std::array<std::string_view, static_cast<int>(IntGainTypeOf::NUM)> const ccZoneIntGainDeviceTypes = {
     //    "People",
     //    "Lights",
     //    "ElectricEquipment",
@@ -1306,7 +1306,7 @@ namespace DataHeatBalance {
         // Members
         std::string CompObjectType;         // device object class name
         std::string CompObjectName;         // device user unique name
-        int CompTypeOfNum;                  // type of internal gain device identifier
+        IntGainTypeOf CompTypeOfNum;        // type of internal gain device identifier
         Real64 *PtrConvectGainRate;         // POINTER to value of convection heat gain rate for device, watts
         Real64 ConvectGainRate;             // current timestep value of convection heat gain rate for device, watts
         Real64 *PtrReturnAirConvGainRate;   // POINTER to value of return air convection heat gain rate for device, W
@@ -1325,10 +1325,10 @@ namespace DataHeatBalance {
 
         // Default Constructor
         GenericComponentZoneIntGainStruct()
-            : CompTypeOfNum(0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0), PtrReturnAirConvGainRate(nullptr), ReturnAirConvGainRate(0.0),
-              PtrRadiantGainRate(nullptr), RadiantGainRate(0.0), PtrLatentGainRate(nullptr), LatentGainRate(0.0), PtrReturnAirLatentGainRate(nullptr),
-              ReturnAirLatentGainRate(0.0), PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0), PtrGenericContamGainRate(nullptr),
-              GenericContamGainRate(0.0), ReturnAirNodeNum(0)
+            : CompTypeOfNum(IntGainTypeOf::Unassigned), PtrConvectGainRate(nullptr), ConvectGainRate(0.0), PtrReturnAirConvGainRate(nullptr),
+              ReturnAirConvGainRate(0.0), PtrRadiantGainRate(nullptr), RadiantGainRate(0.0), PtrLatentGainRate(nullptr), LatentGainRate(0.0),
+              PtrReturnAirLatentGainRate(nullptr), ReturnAirLatentGainRate(0.0), PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0),
+              PtrGenericContamGainRate(nullptr), GenericContamGainRate(0.0), ReturnAirNodeNum(0)
         {
         }
     };
