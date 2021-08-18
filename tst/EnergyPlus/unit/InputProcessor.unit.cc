@@ -1568,12 +1568,17 @@ TEST_F(InputProcessorFixture, validate_idf_parametric_ght_HVACtemplate)
                                             ",                        !- Constant Heating Setpoint {C}",
                                             "Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name",
                                             ";                        !- Constant Cooling Setpoint {C}"}));
-    EXPECT_FALSE(process_idf(idf, false));
-    std::string const error_string = delimited_string({
-        "   ** Severe  ** Line: 1 You must run the Parametric Preprocessor for \"Parametric:Logic\"",
-        "   ** Severe  ** Line: 11 You must run the ExpandObjects program for \"GroundHeatTransfer:Control\"",
-        "   ** Severe  ** Line: 15 You must run the ExpandObjects program for \"HVACTemplate:Thermostat\"",
-    });
+    EXPECT_TRUE(process_idf(idf, false));
+    bool unsupportedFound = state->dataInputProcessing->inputProcessor->checkForUnsupportedObjects(*state);
+    EXPECT_TRUE(unsupportedFound);
+
+    std::string const error_string =
+        delimited_string({"   ** Severe  ** HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ExpandObjects program on this input.",
+                          "   ** Severe  ** GroundHeatTransfer:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ExpandObjects program on this input.",
+                          "   ** Severe  ** Parametric:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ParametricPreprocesor program on this input."});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
@@ -1590,24 +1595,16 @@ TEST_F(InputProcessorFixture, validate_epJSON_parametric_ght_HVACtemplate)
     state->dataInputProcessing->inputProcessor->epJSON = root;
     state->dataGlobal->isEpJSON = true;
     state->dataInputProcessing->inputProcessor->initializeMaps();
-    state->dataInputProcessing->inputProcessor->reportOrphanRecordObjects(*state);
-    std::string const error_string = delimited_string({
-        "   ** Severe  ** GroundHeatTransfer:* objects found.  These objects are not supported directly by EnergyPlus.",
-        "   **   ~~~   ** You must run the ExpandObjects program to process these objects.",
-        "   **   ~~~   **  -- Object type: GroundHeatTransfer:Control",
-        "   **   ~~~   **  -- Object name: GHT Control",
-        "   ** Severe  ** HVACTemplate:* objects found.  These objects are not supported directly by EnergyPlus.",
-        "   **   ~~~   ** You must run the ExpandObjects program to process these objects.",
-        "   **   ~~~   **  -- Object type: HVACTemplate:Plant:Boiler",
-        "   **   ~~~   **  -- Object name: Main Boiler",
-        "   ** Severe  ** Parametric:* objects found.  These objects are not supported directly by EnergyPlus.",
-        "   **   ~~~   ** You must run the Parametric Preprocessor to process these objects.",
-        "   **   ~~~   **  -- Object type: Parametric:Logic",
-        "   **   ~~~   **  -- Object name: Main",
-        "   ************* There are 3 unused objects in input.",
-        "   ************* Use Output:Diagnostics,DisplayUnusedObjects; to see them.",
+    bool unsupportedFound = state->dataInputProcessing->inputProcessor->checkForUnsupportedObjects(*state);
+    EXPECT_TRUE(unsupportedFound);
 
-    });
+    std::string const error_string =
+        delimited_string({"   ** Severe  ** HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ExpandObjects program on this input.",
+                          "   ** Severe  ** GroundHeatTransfer:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ExpandObjects program on this input.",
+                          "   ** Severe  ** Parametric:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ParametricPreprocesor program on this input."});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }

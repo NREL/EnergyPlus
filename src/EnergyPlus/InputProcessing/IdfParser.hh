@@ -67,7 +67,7 @@ public:
 
     json decode(std::string const &idf, json const &schema);
 
-    json decode(std::string const &idf, json const &schema, bool &success, bool const convertHVACTemplate = false);
+    json decode(std::string const &idf, json const &schema, bool &success);
 
     std::string encode(json const &root, json const &schema);
 
@@ -103,7 +103,7 @@ private:
 
     void decrement_both_index(size_t &index, size_t &line_index);
 
-    json parse_idf(std::string const &idf, size_t &index, bool &success, json const &schema, bool const convertHVACTemplate = false);
+    json parse_idf(std::string const &idf, size_t &index, bool &success, json const &schema);
 
     json parse_object(std::string const &idf, size_t &index, bool &success, json const &schema_loc, json const &obj_loc, int idfObjectCount);
 

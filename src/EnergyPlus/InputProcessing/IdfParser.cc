@@ -67,7 +67,7 @@ json IdfParser::decode(std::string const &idf, json const &schema)
     return decode(idf, schema, success);
 }
 
-json IdfParser::decode(std::string const &idf, json const &schema, bool &success, bool const convertHVACTemplate)
+json IdfParser::decode(std::string const &idf, json const &schema, bool &success)
 {
     success = true;
     cur_line_num = 1;
@@ -80,7 +80,7 @@ json IdfParser::decode(std::string const &idf, json const &schema, bool &success
     }
 
     size_t index = 0;
-    return parse_idf(idf, index, success, schema, convertHVACTemplate);
+    return parse_idf(idf, index, success, schema);
 }
 
 std::string IdfParser::encode(json const &root, json const &schema)
@@ -181,7 +181,7 @@ bool IdfParser::hasErrors()
     return !errors_.empty();
 }
 
-json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, json const &schema, bool const convertHVACTemplate)
+json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, json const &schema)
 {
     json root;
     Token token;
@@ -228,21 +228,6 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 while (token != Token::SEMICOLON && token != Token::END)
                     token = next_token(idf, index);
                 continue;
-            } else if (obj_name.find("Parametric:") != std::string::npos) {
-                errors_.emplace_back(fmt::format("Line: {} You must run the Parametric Preprocessor for \"{}\"", cur_line_num, obj_name));
-                while (token != Token::SEMICOLON && token != Token::END)
-                    token = next_token(idf, index);
-                continue;
-            } else if (obj_name.find("GroundHeatTransfer:") != std::string::npos) {
-                errors_.emplace_back(fmt::format("Line: {} You must run the ExpandObjects program for \"{}\"", cur_line_num, obj_name));
-                while (token != Token::SEMICOLON && token != Token::END)
-                    token = next_token(idf, index);
-                continue;
-            } else if ((obj_name.find("HVACTemplate") != std::string::npos) && !convertHVACTemplate) {
-                errors_.emplace_back(fmt::format("Line: {} You must run the ExpandObjects program for \"{}\"", cur_line_num, obj_name));
-                while (token != Token::SEMICOLON && token != Token::END)
-                    token = next_token(idf, index);
-                continue;
             }
 
             bool object_success = true;
@@ -253,11 +238,11 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 auto found_index = idf.find_first_of('\n', beginning_of_line_index);
                 std::string line;
                 if (found_index != std::string::npos) {
-                    line = idf.substr(beginning_of_line_index, found_index - beginning_of_line_index);
+                    line = idf.substr(beginning_of_line_index, found_index - beginning_of_line_index - 1);
                 }
                 errors_.emplace_back(fmt::format("Line: {} Index: {}", cur_line_num, index_into_cur_line) + " - Error parsing \"" + obj_name +
                                      "\". Error in following line.");
-                errors_.emplace_back("~~~ " + line);
+                errors_.emplace_back(fmt::format("~~~ {}", line));
                 success = false;
                 continue;
             }
