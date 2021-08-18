@@ -2436,6 +2436,7 @@ namespace WaterToAirHeatPumpSimple {
         Real64 ratioVS;               // Ratio of the water flow rate to the rated conditions
         Real64 CpWater;               // Specific heat of water [J/kg_C]
         Real64 CpAir;                 // Specific heat of air [J/kg_C]
+        Real64 LoadSideMassFlowRate;  // Load Side Full Load Mass Flow Rate [kg/s]
         Real64 ReportingConstant;
 
         bool LatDegradModelSimFlag;      // Latent degradation model simulation flag
@@ -2472,7 +2473,16 @@ namespace WaterToAirHeatPumpSimple {
         Twet_Rated = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Twet_Rated;
         Gamma_Rated = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Gamma_Rated;
 
-        state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate;
+        if (CyclingScheme == ContFanCycCoil) {
+            LoadSideMassFlowRate = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate;
+        } else {
+            // default to cycling fan, cycling compressor, full load air flow
+            if (PartLoadRatio > 0.0) {
+                LoadSideMassFlowRate = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate / PartLoadRatio;
+            } else {
+                LoadSideMassFlowRate = 0.0;
+            }
+        }
         state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate;
         state.dataWaterToAirHeatPumpSimple->SourceSideInletTemp = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterTemp;
         state.dataWaterToAirHeatPumpSimple->SourceSideInletEnth = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletWaterEnthalpy;
@@ -2483,7 +2493,7 @@ namespace WaterToAirHeatPumpSimple {
                                         RoutineNameSourceSideInletTemp);
 
         // Check for flows, do not perform simulation if no flow in load side or source side.
-        if (state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate <= 0.0 || state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate <= 0.0) {
+        if (state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate <= 0.0 || LoadSideMassFlowRate <= 0.0) {
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SimFlag = false;
             return;
         } else {
@@ -2537,12 +2547,11 @@ namespace WaterToAirHeatPumpSimple {
             ratioTDB = ((state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref);
             ratioTWB = ((state.dataWaterToAirHeatPumpSimple->LoadSideInletWBTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref);
             ratioTS = ((state.dataWaterToAirHeatPumpSimple->SourceSideInletTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref);
-            ratioVL = (state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate /
-                       (AirVolFlowRateRated * PsyRhoAirFnPbTdbW(state,
-                                                                state.dataEnvrn->StdBaroPress,
-                                                                state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp,
-                                                                state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat,
-                                                                RoutineName)));
+            ratioVL = (LoadSideMassFlowRate / (AirVolFlowRateRated * PsyRhoAirFnPbTdbW(state,
+                                                                                       state.dataEnvrn->StdBaroPress,
+                                                                                       state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp,
+                                                                                       state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat,
+                                                                                       RoutineName)));
 
             if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate > 0.0) {
                 ratioVS = (state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate) /
@@ -2604,11 +2613,9 @@ namespace WaterToAirHeatPumpSimple {
 
         // calculate coil outlet state variables
         state.dataWaterToAirHeatPumpSimple->LoadSideOutletEnth =
-            state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth -
-            state.dataWaterToAirHeatPumpSimple->QLoadTotal / (state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate / PartLoadRatio);
+            state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth - state.dataWaterToAirHeatPumpSimple->QLoadTotal / LoadSideMassFlowRate;
         state.dataWaterToAirHeatPumpSimple->LoadSideOutletDBTemp =
-            state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp -
-            state.dataWaterToAirHeatPumpSimple->QSensible / (state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate / PartLoadRatio * CpAir);
+            state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp - state.dataWaterToAirHeatPumpSimple->QSensible / (LoadSideMassFlowRate * CpAir);
         state.dataWaterToAirHeatPumpSimple->LoadSideOutletHumRat = PsyWFnTdbH(
             state, state.dataWaterToAirHeatPumpSimple->LoadSideOutletDBTemp, state.dataWaterToAirHeatPumpSimple->LoadSideOutletEnth, RoutineName);
         // Actual outlet conditions are "average" for time step
@@ -2623,13 +2630,11 @@ namespace WaterToAirHeatPumpSimple {
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirDBTemp =
                 PsyTdbFnHW(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirEnthalpy,
                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirHumRat);
-            state.dataWaterToAirHeatPumpSimple->PLRCorrLoadSideMdot = state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate / PartLoadRatio;
         } else {
             // default to cycling fan, cycling compressor
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirEnthalpy = state.dataWaterToAirHeatPumpSimple->LoadSideOutletEnth;
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirHumRat = state.dataWaterToAirHeatPumpSimple->LoadSideOutletHumRat;
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirDBTemp = state.dataWaterToAirHeatPumpSimple->LoadSideOutletDBTemp;
-            state.dataWaterToAirHeatPumpSimple->PLRCorrLoadSideMdot = state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate;
         }
 
         // scale heat transfer rates to PLR and power to RTF
@@ -2674,7 +2679,6 @@ namespace WaterToAirHeatPumpSimple {
         }
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RunFrac = RuntimeFrac;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).PartLoadRatio = PartLoadRatio;
-        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate = state.dataWaterToAirHeatPumpSimple->PLRCorrLoadSideMdot;
 
         if ((state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterCyclingMode) == WaterCycling) {
             // plant can lock flow at coil water inlet node, use design flow multiplied by PLR to calculate water mass flow rate
@@ -2788,6 +2792,7 @@ namespace WaterToAirHeatPumpSimple {
         Real64 ratioVS;               // Ratio of the source side flow rate to the rated conditions
         Real64 CpWater;               // Specific heat of water [J/kg_C]
         Real64 CpAir;                 // Specific heat of air [J/kg_C]
+        Real64 LoadSideMassFlowRate;  // Load Side Full Load Mass Flow Rate [kg/s]
         Real64 ReportingConstant;
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
@@ -2796,8 +2801,16 @@ namespace WaterToAirHeatPumpSimple {
         HeatPowerRated = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedPowerHeat;
         AirVolFlowRateRated = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate;
         WaterVolFlowRateRated = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate;
-
-        state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate;
+        if (CyclingScheme == ContFanCycCoil) {
+            LoadSideMassFlowRate = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate;
+        } else {
+            // default to cycling fan, cycling compressor, full load air flow
+            if (PartLoadRatio > 0.0) {
+                LoadSideMassFlowRate = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate / PartLoadRatio;
+            } else {
+                LoadSideMassFlowRate = 0.0;
+            }
+        }
         state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletAirDBTemp;
         state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletAirHumRat;
 
@@ -2818,7 +2831,7 @@ namespace WaterToAirHeatPumpSimple {
                                         RoutineNameSourceSideInletTemp);
 
         // Check for flows, do not perform simulation if no flow in load side or source side.
-        if (state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate <= 0.0 || state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate <= 0.0) {
+        if (state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate <= 0.0 || LoadSideMassFlowRate <= 0.0) {
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SimFlag = false;
             return;
         } else {
@@ -2832,12 +2845,11 @@ namespace WaterToAirHeatPumpSimple {
 
         ratioTDB = ((state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref);
         ratioTS = ((state.dataWaterToAirHeatPumpSimple->SourceSideInletTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref);
-        ratioVL = (state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate /
-                   (AirVolFlowRateRated * PsyRhoAirFnPbTdbW(state,
-                                                            state.dataEnvrn->StdBaroPress,
-                                                            state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp,
-                                                            state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat,
-                                                            RoutineName)));
+        ratioVL = (LoadSideMassFlowRate / (AirVolFlowRateRated * PsyRhoAirFnPbTdbW(state,
+                                                                                   state.dataEnvrn->StdBaroPress,
+                                                                                   state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp,
+                                                                                   state.dataWaterToAirHeatPumpSimple->LoadSideInletHumRat,
+                                                                                   RoutineName)));
         if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate > 0.0) {
             ratioVS = (state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate) /
                       (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate);
@@ -2855,11 +2867,9 @@ namespace WaterToAirHeatPumpSimple {
 
         // calculate coil outlet state variables
         state.dataWaterToAirHeatPumpSimple->LoadSideOutletEnth =
-            state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth +
-            state.dataWaterToAirHeatPumpSimple->QLoadTotal / (state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate / PartLoadRatio);
+            state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth + state.dataWaterToAirHeatPumpSimple->QLoadTotal / LoadSideMassFlowRate;
         state.dataWaterToAirHeatPumpSimple->LoadSideOutletDBTemp =
-            state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp +
-            state.dataWaterToAirHeatPumpSimple->QSensible / (state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate / PartLoadRatio * CpAir);
+            state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp + state.dataWaterToAirHeatPumpSimple->QSensible / (LoadSideMassFlowRate * CpAir);
         state.dataWaterToAirHeatPumpSimple->LoadSideOutletHumRat = PsyWFnTdbH(
             state, state.dataWaterToAirHeatPumpSimple->LoadSideOutletDBTemp, state.dataWaterToAirHeatPumpSimple->LoadSideOutletEnth, RoutineName);
 
@@ -2875,13 +2885,11 @@ namespace WaterToAirHeatPumpSimple {
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirDBTemp =
                 PsyTdbFnHW(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirEnthalpy,
                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirHumRat);
-            state.dataWaterToAirHeatPumpSimple->PLRCorrLoadSideMdot = state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate / PartLoadRatio;
         } else {
             // default to cycling fan, cycling compressor
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirEnthalpy = state.dataWaterToAirHeatPumpSimple->LoadSideOutletEnth;
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirHumRat = state.dataWaterToAirHeatPumpSimple->LoadSideOutletHumRat;
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirDBTemp = state.dataWaterToAirHeatPumpSimple->LoadSideOutletDBTemp;
-            state.dataWaterToAirHeatPumpSimple->PLRCorrLoadSideMdot = state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate;
         }
 
         // scale heat transfer rates to PLR and power to RTF
@@ -2914,7 +2922,6 @@ namespace WaterToAirHeatPumpSimple {
         }
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RunFrac = RuntimeFrac;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).PartLoadRatio = PartLoadRatio;
-        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate = state.dataWaterToAirHeatPumpSimple->PLRCorrLoadSideMdot;
 
         if ((state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterCyclingMode) == WaterCycling) {
             // plant can lock flow at coil water inlet node, use design flow multiplied by PLR to calculate water mass flow rate
