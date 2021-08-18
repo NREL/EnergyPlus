@@ -928,6 +928,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     EXPECT_EQ(F(7, 4), 0.0);
 
     // two roofs with azimuths of 0 and 90 (>10 degrees), should see each other and result in a view factor
+    // this goes against common sense and why we might want to change to comparing surface normals instead of azimuth/tilt
     EXPECT_GT(F(4, 8), 0.0);
     EXPECT_GT(F(8, 4), 0.0);
 }
