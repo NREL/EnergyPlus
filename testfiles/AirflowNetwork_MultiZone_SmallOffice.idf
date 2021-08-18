@@ -3089,6 +3089,10 @@
 
   Output:Variable,Zn003:Wall002:Win001,AFN Linkage Node 2 to Node 1 Volume Flow Rate,timestep;
 
+  Output:Variable,ZN003:WALL001,AFN Linkage Node 1 to Node 2 Mass Flow Rate,timestep;
+
+  Output:Variable,ZN003:WALL001,AFN Linkage Node 2 to Node 1 Mass Flow Rate,timestep;
+
   Output:Variable,*,Heating Coil NaturalGas Rate,timestep,ReportSch;
 
   Output:Variable,*,Cooling Coil Electricity Rate,timestep,ReportSch;
