@@ -5302,3 +5302,37 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarningNumberOfNodes_ExpectedWarning)
 
     EXPECT_TRUE(compare_err_stream(error_string));
 }
+
+TEST_F(EnergyPlusFixture, PlantMassFlowRatesFuncTest)
+{
+
+    // Test for #8844: Make sure very small values are zeroed out to avoid underflow.
+    state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
+    state->dataWaterThermalTanks->WaterThermalTank.allocate(1);
+    state->dataLoopNodes->Node.allocate(1);
+
+    auto &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
+
+    state->dataLoopNodes->Node(1).MassFlowRate = 1.0e-23;
+    int inNodeNum = 1;
+    int plantLoopSide = DataPlant::DemandSupply_No;
+    Real64 outletTemp = 23.0;
+    Real64 deadbandTemp = 21.0;
+    Real64 setPtTemp = 25.0;
+    Real64 result;
+    Real64 expected = 0.0;
+    Real64 answerTolerance = 1.0e-25;
+    Tank.UseSideAvailSchedNum = -1;
+
+    result = Tank.PlantMassFlowRatesFunc(*state,
+                                         inNodeNum,
+                                         false,
+                                         EnergyPlus::WaterThermalTanks::SideEnum::Use,
+                                         plantLoopSide,
+                                         false,
+                                         DataBranchAirLoopPlant::ControlTypeEnum::Bypass,
+                                         outletTemp,
+                                         deadbandTemp,
+                                         setPtTemp);
+    EXPECT_NEAR(result, expected, answerTolerance);
+}
