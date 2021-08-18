@@ -1369,6 +1369,11 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                         if (MinPriAirFlowFracDes > 1.0 && IsMaxPriFlowAutoSize) {
                             state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow *= MinPriAirFlowFracDes;
                             MinPriAirFlowFracDes = 1.0;
+                            ShowWarningError(state,
+                                             "SingleDuctSystem:SizeSys: Autosized maximum air flow rate for " +
+                                                 state.dataPowerInductionUnits->PIU(PIUNum).Name +
+                                                 " was increased to meet the zone primary air flow determined according to the ASHRAE Standard 62.1 "
+                                                 "Simplified Procedure.");
                         } else if (MinPriAirFlowFracDes > 1.0) {
                             ShowWarningError(state,
                                              "SingleDuctSystem:SizeSys: Maximum primary air flow rate for " +

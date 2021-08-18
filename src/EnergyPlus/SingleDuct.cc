@@ -3101,6 +3101,10 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                     if (MinAirFlowFracDes > 1.0 && IsMaxFlowAutoSize) {
                         this->MaxAirVolFlowRate *= MinAirFlowFracDes;
                         MinAirFlowFracDes = 1.0;
+                        ShowWarningError(state,
+                                         "SingleDuctSystem:SizeSys: Autosized maximum air flow rate for " + this->SysName +
+                                             " was increased to meet the zone primary air flow determined according to the ASHRAE Standard 62.1 "
+                                             "Simplified Procedure.");
                     } else if (MinAirFlowFracDes > 1.0) {
                         ShowWarningError(state, "SingleDuctSystem:SizeSys: Maximum air flow rate for " + this->SysName + " is potentially too low.");
                         ShowContinueError(
@@ -3194,6 +3198,10 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                     // adjust maximum flow rate
                     if (FixedMinAirDes > this->MaxAirVolFlowRate && IsMaxFlowAutoSize) {
                         this->MaxAirVolFlowRate = FixedMinAirDes;
+                        ShowWarningError(state,
+                                         "SingleDuctSystem:SizeSys: Autosized maximum air flow rate for " + this->SysName +
+                                             " was increased to meet the zone primary air flow determined according to the ASHRAE Standard 62.1 "
+                                             "Simplified Procedure.");
                     } else if (FixedMinAirDes > this->MaxAirVolFlowRate) {
                         ShowWarningError(state, "SingleDuctSystem:SizeSys: Maximum air flow rate for " + this->SysName + " is potentially too low.");
                         ShowContinueError(
