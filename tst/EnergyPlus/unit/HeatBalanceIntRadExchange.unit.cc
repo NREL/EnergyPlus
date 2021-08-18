@@ -753,7 +753,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     int ZoneNum;       // Zone number being fixed
 
     // number of surfaces
-    N = 8;
+    N = 9;
     A.allocate(N);
     F.allocate(N, N);
 
@@ -780,6 +780,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(6) = 6;
     state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(7) = 7;
     state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(8) = 8;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(9) = 9;
     state->dataSurface->Surface.allocate(N);
 
     // wall
@@ -798,22 +799,26 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     state->dataSurface->Surface(4).Class = DataSurfaces::SurfaceClass::Roof;
     state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(4) = 0;
     state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(4) = 0;
-    // additional floor with different tilt and azimuth
+    // additional floor with different tilt
     state->dataSurface->Surface(5).Class = DataSurfaces::SurfaceClass::Floor;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(5) = 90;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(5) = 0;
     state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(5) = 270;
     // additional wall with slight difference in azimuth (<10 degrees)
     state->dataSurface->Surface(6).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(6) = 358;
     state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(6) = 90;
-    // ceiling/roof with slight difference in tilt (<10 degrees)
+    // ceiling/roof with slight difference in azimuth (<10 degrees)
     state->dataSurface->Surface(7).Class = DataSurfaces::SurfaceClass::Roof;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(7) = 0;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(7) = 5;
-    // internal mass
-    state->dataSurface->Surface(8).Class = DataSurfaces::SurfaceClass::IntMass;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(8) = 0;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(7) = 5;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(7) = 0;
+    // ceiling/roof with large difference in azimuth
+    state->dataSurface->Surface(8).Class = DataSurfaces::SurfaceClass::Roof;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(8) = 90;
     state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(8) = 0;
+    // internal mass
+    state->dataSurface->Surface(9).Class = DataSurfaces::SurfaceClass::IntMass;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(9) = 0;
+    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(9) = 0;
 
     CalcApproximateViewFactors(*state,
                                N,
@@ -832,39 +837,63 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     EXPECT_EQ(F(6, 6), 0.0);
     EXPECT_EQ(F(7, 7), 0.0);
     EXPECT_EQ(F(8, 8), 0.0);
+    EXPECT_EQ(F(9, 9), 0.0);
 
-    // two floors should NOT see each other, even with difference azimuths (0 and 90) and tilts (180 and 270), no view factor
+    // two floors should NOT see each other, even with different tilts (180 and 270), no view factor
     EXPECT_EQ(F(3, 5), 0.0);
     EXPECT_EQ(F(5, 3), 0.0);
 
-    // all surfaces see internal mass (7)
-    EXPECT_GT(F(8, 1), 0.0);
-    EXPECT_GT(F(8, 2), 0.0);
-    EXPECT_GT(F(8, 3), 0.0);
-    EXPECT_GT(F(8, 4), 0.0);
-    EXPECT_GT(F(8, 5), 0.0);
-    EXPECT_GT(F(8, 6), 0.0);
-    EXPECT_GT(F(8, 7), 0.0);
+    // all surfaces see internal mass
+    EXPECT_GT(F(9, 1), 0.0);
+    EXPECT_GT(F(9, 2), 0.0);
+    EXPECT_GT(F(9, 3), 0.0);
+    EXPECT_GT(F(9, 4), 0.0);
+    EXPECT_GT(F(9, 5), 0.0);
+    EXPECT_GT(F(9, 6), 0.0);
+    EXPECT_GT(F(9, 7), 0.0);
+    EXPECT_GT(F(1, 9), 0.0);
+    EXPECT_GT(F(2, 9), 0.0);
+    EXPECT_GT(F(3, 9), 0.0);
+    EXPECT_GT(F(4, 9), 0.0);
+    EXPECT_GT(F(5, 9), 0.0);
+    EXPECT_GT(F(6, 9), 0.0);
+    EXPECT_GT(F(7, 9), 0.0);
 
-    // all non-floor surfaces see floors (3 and 5)
+    // all non-floor surfaces see floors
     EXPECT_GT(F(3, 1), 0.0);
     EXPECT_GT(F(3, 2), 0.0);
     EXPECT_GT(F(3, 4), 0.0);
     EXPECT_GT(F(3, 6), 0.0);
     EXPECT_GT(F(3, 7), 0.0);
-    EXPECT_GT(F(3, 8), 0.0);
+    EXPECT_GT(F(3, 9), 0.0);
+    EXPECT_GT(F(1, 3), 0.0);
+    EXPECT_GT(F(2, 3), 0.0);
+    EXPECT_GT(F(4, 3), 0.0);
+    EXPECT_GT(F(6, 3), 0.0);
+    EXPECT_GT(F(7, 3), 0.0);
+    EXPECT_GT(F(9, 3), 0.0);
     EXPECT_GT(F(5, 1), 0.0);
     EXPECT_GT(F(5, 2), 0.0);
     EXPECT_GT(F(5, 4), 0.0);
     EXPECT_GT(F(5, 6), 0.0);
     EXPECT_GT(F(5, 7), 0.0);
-    EXPECT_GT(F(5, 8), 0.0);
+    EXPECT_GT(F(5, 9), 0.0);
+    EXPECT_GT(F(1, 5), 0.0);
+    EXPECT_GT(F(2, 5), 0.0);
+    EXPECT_GT(F(4, 5), 0.0);
+    EXPECT_GT(F(6, 5), 0.0);
+    EXPECT_GT(F(7, 5), 0.0);
+    EXPECT_GT(F(9, 5), 0.0);
 
     // all floors see ceilings/roofs and result in a view factor
     EXPECT_GT(F(4, 3), 0.0);
     EXPECT_GT(F(4, 5), 0.0);
+    EXPECT_GT(F(3, 4), 0.0);
+    EXPECT_GT(F(5, 4), 0.0);
     EXPECT_GT(F(7, 3), 0.0);
     EXPECT_GT(F(7, 5), 0.0);
+    EXPECT_GT(F(3, 7), 0.0);
+    EXPECT_GT(F(5, 7), 0.0);
 
     // two walls should see each other and result in a view factor
     EXPECT_GT(F(1, 2), 0.0);
@@ -873,19 +902,33 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     // ceiling/roof and wall should see each other and result in a view factor
     EXPECT_GT(F(1, 4), 0.0);
     EXPECT_GT(F(2, 4), 0.0);
+    EXPECT_GT(F(6, 4), 0.0);
     EXPECT_GT(F(4, 1), 0.0);
     EXPECT_GT(F(4, 2), 0.0);
+    EXPECT_GT(F(4, 6), 0.0);
     EXPECT_GT(F(1, 7), 0.0);
     EXPECT_GT(F(2, 7), 0.0);
+    EXPECT_GT(F(6, 7), 0.0);
     EXPECT_GT(F(7, 1), 0.0);
     EXPECT_GT(F(7, 2), 0.0);
+    EXPECT_GT(F(7, 6), 0.0);
+    EXPECT_GT(F(1, 8), 0.0);
+    EXPECT_GT(F(2, 8), 0.0);
+    EXPECT_GT(F(6, 8), 0.0);
+    EXPECT_GT(F(8, 1), 0.0);
+    EXPECT_GT(F(8, 2), 0.0);
+    EXPECT_GT(F(8, 6), 0.0);
 
     // two walls with azimuths of 0 and 358 (<10 degrees), should NOT see each other, no view factor
     EXPECT_EQ(F(1, 6), 0.0);
     EXPECT_EQ(F(6, 1), 0.0);
 
-    // two roofs with tilts of 0 and 5 (<10 degrees), should NOT see each other, no view factor
+    // two roofs with azimuths of 0 and 5 (<10 degrees), should NOT see each other, no view factor
     EXPECT_EQ(F(4, 7), 0.0);
     EXPECT_EQ(F(7, 4), 0.0);
+
+    // two roofs with azimuths of 0 and 90 (>10 degrees), should see each other and result in a view factor
+    EXPECT_GT(F(4, 8), 0.0);
+    EXPECT_GT(F(8, 4), 0.0);
 }
 } // namespace EnergyPlus

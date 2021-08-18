@@ -1418,9 +1418,9 @@ namespace HeatBalanceIntRadExchange {
                 // Floors always see ceilings/roofs
                 // All other surfaces whose tilt or facing angle differences are greater than 10 degrees see each other
                 if ((state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::IntMass) ||
+                    (state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::IntMass) ||
                     (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor) ||
-                    (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Roof &&
-                     state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::Floor) ||
+                    (state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::Floor) ||
                     (std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit && std::abs(Azimuth(i) - Azimuth(j)) < 360.0 - SameAngleLimit) ||
                     (std::abs(Tilt(i) - Tilt(j)) > SameAngleLimit)) {
                     ZoneArea(i) += A(j);
@@ -1454,9 +1454,9 @@ namespace HeatBalanceIntRadExchange {
                 // Floors always see ceilings/roofs
                 // All other surfaces whose tilt or facing angle differences are greater than 10 degrees see each other
                 if ((state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::IntMass) ||
+                    (state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::IntMass) ||
                     (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Floor) ||
-                    (state.dataSurface->Surface(SPtr(j)).Class == SurfaceClass::Roof &&
-                     state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::Floor) ||
+                    (state.dataSurface->Surface(SPtr(i)).Class == SurfaceClass::Floor) ||
                     (std::abs(Azimuth(i) - Azimuth(j)) > SameAngleLimit && std::abs(Azimuth(i) - Azimuth(j)) < 360.0 - SameAngleLimit) ||
                     (std::abs(Tilt(i) - Tilt(j)) > SameAngleLimit)) {
                     // avoid a divide by zero if there are no other surfaces in the zone that can be seen
