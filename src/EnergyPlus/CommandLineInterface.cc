@@ -152,7 +152,7 @@ namespace CommandLineInterface {
 
         opt.add("", false, 0, 0, "Display version information", "-v", "--version");
 
-        opt.add("1", false, 1, 0, "Multi-thread with N threads; 1 thread with no arg.", "-j", "--jobs");
+        opt.add("1", false, 1, 0, "Multi-thread with N threads; 1 thread with no arg. (Currently only for G-Function generation)", "-j", "--jobs");
 
         opt.add("in.epw", false, 1, 0, "Weather file path (default: in.epw in current directory)", "-w", "--weather");
 
