@@ -851,6 +851,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     EXPECT_GT(F(9, 5), 0.0);
     EXPECT_GT(F(9, 6), 0.0);
     EXPECT_GT(F(9, 7), 0.0);
+    EXPECT_GT(F(9, 8), 0.0);
     EXPECT_GT(F(1, 9), 0.0);
     EXPECT_GT(F(2, 9), 0.0);
     EXPECT_GT(F(3, 9), 0.0);
@@ -858,6 +859,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     EXPECT_GT(F(5, 9), 0.0);
     EXPECT_GT(F(6, 9), 0.0);
     EXPECT_GT(F(7, 9), 0.0);
+    EXPECT_GT(F(8, 9), 0.0);
 
     // all non-floor surfaces see floors
     EXPECT_GT(F(3, 1), 0.0);
@@ -865,24 +867,28 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     EXPECT_GT(F(3, 4), 0.0);
     EXPECT_GT(F(3, 6), 0.0);
     EXPECT_GT(F(3, 7), 0.0);
+    EXPECT_GT(F(3, 8), 0.0);
     EXPECT_GT(F(3, 9), 0.0);
     EXPECT_GT(F(1, 3), 0.0);
     EXPECT_GT(F(2, 3), 0.0);
     EXPECT_GT(F(4, 3), 0.0);
     EXPECT_GT(F(6, 3), 0.0);
     EXPECT_GT(F(7, 3), 0.0);
+    EXPECT_GT(F(8, 3), 0.0);
     EXPECT_GT(F(9, 3), 0.0);
     EXPECT_GT(F(5, 1), 0.0);
     EXPECT_GT(F(5, 2), 0.0);
     EXPECT_GT(F(5, 4), 0.0);
     EXPECT_GT(F(5, 6), 0.0);
     EXPECT_GT(F(5, 7), 0.0);
+    EXPECT_GT(F(5, 8), 0.0);
     EXPECT_GT(F(5, 9), 0.0);
     EXPECT_GT(F(1, 5), 0.0);
     EXPECT_GT(F(2, 5), 0.0);
     EXPECT_GT(F(4, 5), 0.0);
     EXPECT_GT(F(6, 5), 0.0);
     EXPECT_GT(F(7, 5), 0.0);
+    EXPECT_GT(F(8, 5), 0.0);
     EXPECT_GT(F(9, 5), 0.0);
 
     // all floors see ceilings/roofs and result in a view factor
@@ -898,6 +904,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     // two walls should see each other and result in a view factor
     EXPECT_GT(F(1, 2), 0.0);
     EXPECT_GT(F(2, 1), 0.0);
+    EXPECT_GT(F(2, 6), 0.0);
+    EXPECT_GT(F(6, 2), 0.0);
 
     // ceiling/roof and wall should see each other and result in a view factor
     EXPECT_GT(F(1, 4), 0.0);
@@ -931,5 +939,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     // this goes against common sense and why we might want to change to comparing surface normals instead of azimuth/tilt
     EXPECT_GT(F(4, 8), 0.0);
     EXPECT_GT(F(8, 4), 0.0);
+    EXPECT_GT(F(7, 8), 0.0);
+    EXPECT_GT(F(8, 7), 0.0);
 }
 } // namespace EnergyPlus
