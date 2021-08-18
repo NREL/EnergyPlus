@@ -447,6 +447,15 @@ PluginManager::PluginManager(EnergyPlusData &state)
     // so add the executable directory here
     PluginManager::addToPythonPath(state, sanitizedProgramDir, false);
 
+    // add EP-Launch input file directory if present
+    std::string epin_path;
+    get_environment_variable("epin", epin_path);
+    fs::path epin_parent_path = FileSystem::getParentDirectoryPath(fs::path(epin_path));
+    if (FileSystem::pathExists(epin_parent_path)) {
+        fs::path sanitizedEnvInputDir = PluginManager::sanitizedPath(epin_parent_path);
+        PluginManager::addToPythonPath(state, sanitizedEnvInputDir, false);
+    }
+
     // Read all the additional search paths next
     std::string const sPaths = "PythonPlugin:SearchPaths";
     int searchPaths = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, sPaths);
