@@ -124,7 +124,8 @@ namespace AirflowNetwork {
         RVD = 18, // Reheat VAV terminal damper
         OAF = 19, // Distribution system OA
         REL = 20, // Distribution system relief air
-        CMF = 21  // Specified flow component
+        SMF = 21, // Specified mass flow component
+        SVF = 22, // Specified volume flow component
     };
 
     enum class ComponentType
@@ -149,7 +150,8 @@ namespace AirflowNetwork {
         RVD,     // Reheat VAV terminal damper
         OAF,     // Distribution system OA
         REL,     // Distribution system relief air
-        CMF      // Specified flow component
+        SMF,     // Specified mass flow component
+        SVF      // Specified volume flow component
     };
 
     // EPlus component Type
@@ -599,7 +601,7 @@ namespace AirflowNetwork {
 
         virtual ComponentType type()
         {
-            return ComponentType::CMF;
+            return ComponentType::SMF;
         }
     };
 
@@ -627,7 +629,7 @@ namespace AirflowNetwork {
 
         virtual ComponentType type()
         {
-            return ComponentType::CMF;
+            return ComponentType::SVF;
         }
     };
 

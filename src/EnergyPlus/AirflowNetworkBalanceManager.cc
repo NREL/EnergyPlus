@@ -1128,7 +1128,9 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // *** Read AirflowNetwork simulation specified flow components
-        CurrentModuleObject = "AirflowNetwork:SpecifiedFlow";
+        CurrentModuleObject = "AirflowNetwork:MultiZone:SpecifiedFlowRate";
+        state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSFR =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
         instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             int i_mass = 0; // Temporary workaround that increasingly looks like the long term solution
@@ -1141,7 +1143,7 @@ namespace AirflowNetworkBalanceManager {
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
-                Real64 flow_rate{fields.at("air_flow_rate")};
+                Real64 flow_rate{fields.at("air_flow_value")};
                 bool is_mass_flow = true;
                 if (fields.find("air_flow_units") != fields.end()) {
                     if (fields.at("air_flow_units") != "kg/s") {
@@ -4527,7 +4529,8 @@ namespace AirflowNetworkBalanceManager {
             state.dataAirflowNetworkBalanceManager->DisSysNumOfCPDs + state.dataAirflowNetworkBalanceManager->DisSysNumOfCoils +
             state.dataAirflowNetworkBalanceManager->DisSysNumOfTermUnits + state.dataAirflowNetwork->AirflowNetworkNumOfExhFan +
             state.dataAirflowNetworkBalanceManager->DisSysNumOfHXs + state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfHorOpenings +
-            state.dataAirflowNetworkBalanceManager->NumOfOAFans + state.dataAirflowNetworkBalanceManager->NumOfReliefFans;
+            state.dataAirflowNetworkBalanceManager->NumOfOAFans + state.dataAirflowNetworkBalanceManager->NumOfReliefFans +
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSFR;
         state.dataAirflowNetwork->AirflowNetworkCompData.allocate(state.dataAirflowNetwork->AirflowNetworkNumOfComps);
 
         for (int i = 1; i <= state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfDetOpenings; ++i) { // Detailed opening component
@@ -4771,6 +4774,37 @@ namespace AirflowNetworkBalanceManager {
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusCompName = "";
             state.dataAirflowNetwork->AirflowNetworkCompData(i).EPlusType = "";
             state.dataAirflowNetwork->AirflowNetworkCompData(i).CompNum = i;
+        }
+
+        // This is also a bit of a hack to keep things working, this needs to be removed ASAP
+        j += state.dataAirflowNetworkBalanceManager->NumOfReliefFans;
+        int ii = 1 + j;
+        int type_i = 1;
+        for (auto &el : state.dataAirflowNetwork->SpecifiedMassFlowData) {
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).Name = el.name;
+            solver.compnum[el.name] = ii;
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).CompTypeNum = iComponentTypeNum::SMF;
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).TypeNum = type_i;
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).EPlusName = "";
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).EPlusCompName = "";
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).EPlusType = "";
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).CompNum = ii;
+            ++ii;
+            ++type_i;
+        }
+
+        type_i = 1;
+        for (auto &el : state.dataAirflowNetwork->SpecifiedVolumeFlowData) {
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).Name = el.name;
+            solver.compnum[el.name] = ii;
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).CompTypeNum = iComponentTypeNum::SVF;
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).TypeNum = type_i;
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).EPlusName = "";
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).EPlusCompName = "";
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).EPlusType = "";
+            state.dataAirflowNetwork->AirflowNetworkCompData(ii).CompNum = ii;
+            ++ii;
+            ++type_i;
         }
 
         // Assign linkage data

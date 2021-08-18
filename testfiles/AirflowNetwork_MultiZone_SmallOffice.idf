@@ -1903,7 +1903,7 @@
 
   AirflowNetwork:MultiZone:Surface,
     Zn003:Wall001,           !- Surface Name
-    CR-1,                    !- Leakage Component Name
+    SF-1,                    !- Leakage Component Name
     WFacade,                 !- External Node Name
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
@@ -1994,6 +1994,11 @@
     CR-1,                    !- Name
     0.01,                    !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
     0.667;                   !- Air Mass Flow Exponent {dimensionless}
+
+  AirflowNetwork:MultiZone:SpecifiedFlowRate,
+    SF-1,                    !- Name
+    0.06,                    !- Air Flow Value
+    kg/s;                    !- Air Flow Units
 
   AirflowNetwork:MultiZone:Surface:Crack,
     CRcri,                   !- Name
