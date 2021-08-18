@@ -1655,7 +1655,10 @@ void InitZoneContSetPoints(EnergyPlusData &state)
             if (state.dataHybridModel->FlagHybridModel_PC) {
                 SumAllInternalCO2GainsExceptPeople(state, Loop, state.dataContaminantBalance->ZoneCO2GainExceptPeople(Loop));
             }
-            SumInternalCO2GainsByTypes(state, Loop, Array1D_int(1, IntGainTypeOf_People), state.dataContaminantBalance->ZoneCO2GainFromPeople(Loop));
+            SumInternalCO2GainsByTypes(state,
+                                       Loop,
+                                       Array1D<DataHeatBalance::IntGainTypeOf>(1, DataHeatBalance::IntGainTypeOf::People),
+                                       state.dataContaminantBalance->ZoneCO2GainFromPeople(Loop));
         }
     }
 

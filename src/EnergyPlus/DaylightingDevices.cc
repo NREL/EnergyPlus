@@ -185,9 +185,6 @@ namespace DaylightingDevices {
         // METHODOLOGY EMPLOYED:
         // Daylighting and thermal variables are calculated.  BeamTrans/COSAngle table is calculated.
 
-        // Using/Aliasing
-        using DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;   // TDD pipe object number
         int StoredNum; // Stored TDD pipe object number
@@ -308,7 +305,7 @@ namespace DaylightingDevices {
                                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum),
                                           "DaylightingDevice:Tubular",
                                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name,
-                                          IntGainTypeOf_DaylightingDeviceTubular,
+                                          DataHeatBalance::IntGainTypeOf::DaylightingDeviceTubular,
                                           &state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
 
                 } // TZoneNum

@@ -259,7 +259,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices = 1;
     state->dataHeatBal->ZoneIntGain(ZoneNum).Device.allocate(state->dataHeatBal->ZoneIntGain(1).NumberOfDevices);
     state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).CompObjectName = "PEOPLE";
-    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).CompTypeOfNum = IntGainTypeOf_People;
+    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).CompTypeOfNum = DataHeatBalance::IntGainTypeOf::People;
     state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).ConvectGainRate = 300.0;
     state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).LatentGainRate = 200.0;
 

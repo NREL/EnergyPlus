@@ -415,16 +415,8 @@ namespace DataHeatBalance {
         FanSystemModel,
         NUM
     };
-    constexpr int IntGainTypeOf_People(1);
-    constexpr int IntGainTypeOf_Lights(2);
-    constexpr int IntGainTypeOf_ElectricEquipment(3);
-    constexpr int IntGainTypeOf_GasEquipment(4);
-    constexpr int IntGainTypeOf_HotWaterEquipment(5);
-    constexpr int IntGainTypeOf_SteamEquipment(6);
-    constexpr int IntGainTypeOf_OtherEquipment(7);
-    constexpr int IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled(8);
-    constexpr int IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide(9);
-    constexpr int IntGainTypeOf_WaterUseEquipment(10);
+
+
     constexpr int IntGainTypeOf_DaylightingDeviceTubular(11);
     constexpr int IntGainTypeOf_WaterHeaterMixed(12);
     constexpr int IntGainTypeOf_WaterHeaterStratified(13);
