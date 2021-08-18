@@ -74,11 +74,12 @@ set(RE2_BUILD_TESTING
     OFF
     CACHE BOOL "" FORCE)
 
-if(OPENGL_FOUND)
-  set(BUILD_PENUMBRA_TESTING
-      ${BUILD_TESTING}
-      CACHE BOOL "" FORCE)
-endif()
+# Don't force Penumbra testing just because OpenGL is found, allow the developer to set it to ON or OFF as they want
+#if(OPENGL_FOUND)
+#  set(BUILD_PENUMBRA_TESTING
+#      ${BUILD_TESTING}
+#      CACHE BOOL "" FORCE)
+#endif()
 
 # We don't want to enable the global warnings for any of the third party projects
 link_libraries(project_options)
