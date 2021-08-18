@@ -104,7 +104,8 @@ The Airflow Network input objects are:
   \textbf{\hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface}} object indicates whether a heat transfer surface (wall, window, etc.) has a crack or opening and references an object in the list below that gives the air flow characteristics of that crack, opening, or zone exhaust fan. The \hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface} object can also be used to specify individual ventilation control for openable exterior and interior windows and doors.
 \begin{itemize}
 \item \textbf{\hyperref[airflownetworkmultizonesurfacecrack]{AirflowNetwork:MultiZone:Surface:Crack}
-\item \hyperref[airflownetworkmultizonesurfaceeffectiveleakagearea]{AirflowNetwork:Multi-Zone:Surface:EffectiveLeakageArea}
+\item \hyperref[airflownetworkmultizonesurfaceeffectiveleakagearea]{AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea}
+\item \hyperref[airflownetworkmultizonespecifiedflow]{AirflowNetwork:MultiZone:SpecifiedFlowRate}
 \item \hyperref[airflownetworkmultizonecomponentsimpleopening]{AirflowNetwork:MultiZone:Component:SimpleOpening}
 \item \hyperref[airflownetworkmultizonecomponentdetailedopening]{AirflowNetwork:Multi-Zone:Component:DetailedOpening}
 \item \hyperref[airflownetworkmultizonecomponenthorizontalopening]{AirflowNetwork:MultiZone:Component:HorizontalOpening}
@@ -576,6 +577,8 @@ The AirflowNetwork:MultiZone:Surface object specifies the properties of a surfac
 \item
   \hyperref[airflownetworkmultizonesurfaceeffectiveleakagearea]{AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea}
 \item
+  \hyperref[airflownetworkmultizonespecifiedflow]{AirflowNetwork:MultiZone:SpecifiedFlowRate}
+\item
   \hyperref[airflownetworkmultizonecomponentdetailedopening]{AirflowNetwork:MultiZone:Component:DetailedOpening}
 \item
   \hyperref[airflownetworkmultizonecomponenthorizontalopening]{AirflowNetwork:MultiZone:Component:HorizontalOpening}
@@ -995,6 +998,46 @@ AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
   1.00,                 !- Discharge coefficient {dimensionless}
   4.0,                  !- Reference pressure difference {Pa}
   0.65;                 !- Air mass flow exponent {dimensionless}
+\end{lstlisting}
+
+\subsection{AirflowNetwork:MultiZone:SpecifiedFlowRate}\label{airflownetworkmultizonespecifiedflow}
+
+The specified flow object is used to specify flow through a surface. The object has three fields
+and will cause the mass flow $\dot m$ to be set appropriately as 
+
+\begin{equation}
+\dot m = F
+\end{equation}
+
+when the mass flow rate $F$ is specified or as 
+
+\begin{equation}
+\dot m = \rho Q
+\end{equation}
+
+when the volume flow rate $Q$ is specified.
+
+\subsubsection{Inputs}\label{inputs-sf}
+
+\paragraph{Field: Name}\label{field-sf-name}
+
+This is a name for this object. It is referenced by an \hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface} object.
+
+\paragraph{Field: Air Flow Value}\label{field-sf-air-flow-value}
+
+This numeric field is used to input the flow rate $F$ or $Q$. The units of the value are determined by the following field.
+
+\paragraph{Field: Discharge Coefficient}\label{field-sf-air-flow-units}
+
+This choice field determines the units of the air flow value. Two options are available, ``kg/s'' and ``m3/s''.
+
+An IDF example is shown below:
+
+\begin{lstlisting}
+AirflowNetwork:MultiZone:SpecifiedFlowRate,
+  SpecMassFlow,         !- Name of specified flow component
+  0.0001,               !- Air flow rate
+  kg/s;                 !- Air flow units
 \end{lstlisting}
 
 \subsection{AirflowNetwork:MultiZone:Component:DetailedOpening}\label{airflownetworkmultizonecomponentdetailedopening}

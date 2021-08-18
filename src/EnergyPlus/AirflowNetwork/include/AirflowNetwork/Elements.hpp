@@ -574,11 +574,11 @@ namespace AirflowNetwork {
             return ComponentType::HOP;
         }
     };
-    
+
     struct SpecifiedMassFlow : public AirflowElement // Specified mass flow element
     {
         // Members
-        Real64 mass_flow;  // Mass Flow [kg/s]
+        Real64 mass_flow; // Mass Flow [kg/s]
 
         // Default Constructor
         SpecifiedMassFlow() : mass_flow(0.0)
@@ -586,15 +586,15 @@ namespace AirflowNetwork {
         }
 
         int calculate([[maybe_unused]] EnergyPlusData &state,
-                      [[maybe_unused]] bool const LFLAG,        // Initialization flag.If = 1, use laminar relationship
-                      [[maybe_unused]] Real64 const PDROP,      // Total pressure drop across a component (P1 - P2) [Pa]
-                      [[maybe_unused]] int const i,             // Linkage number
-                      const Real64 multiplier, // Element multiplier
-                      const Real64 control,    // Element control signal
+                      [[maybe_unused]] bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      [[maybe_unused]] Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      [[maybe_unused]] int const i,                // Linkage number
+                      const Real64 multiplier,                     // Element multiplier
+                      const Real64 control,                        // Element control signal
                       [[maybe_unused]] const AirProperties &propN, // Node 1 properties
                       [[maybe_unused]] const AirProperties &propM, // Node 2 properties
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+                      std::array<Real64, 2> &F,                    // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF                    // Partial derivative:  DF/DP
         );
 
         virtual ComponentType type()
@@ -614,15 +614,15 @@ namespace AirflowNetwork {
         }
 
         int calculate([[maybe_unused]] EnergyPlusData &state,
-                      [[maybe_unused]] bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                      [[maybe_unused]] Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                      [[maybe_unused]] int const i,                // Linkage number
-                      const Real64 multiplier,                     // Element multiplier
-                      const Real64 control,                        // Element control signal
-                      const AirProperties &propN, // Node 1 properties
-                      const AirProperties &propM, // Node 2 properties
-                      std::array<Real64, 2> &F,                    // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                    // Partial derivative:  DF/DP
+                      [[maybe_unused]] bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+                      [[maybe_unused]] Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+                      [[maybe_unused]] int const i,        // Linkage number
+                      const Real64 multiplier,             // Element multiplier
+                      const Real64 control,                // Element control signal
+                      const AirProperties &propN,          // Node 1 properties
+                      const AirProperties &propM,          // Node 2 properties
+                      std::array<Real64, 2> &F,            // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF            // Partial derivative:  DF/DP
         );
 
         virtual ComponentType type()
@@ -1744,6 +1744,8 @@ struct AirflowNetworkData : BaseGlobalStruct
     Array1D<AirflowNetwork::HorizontalOpening> MultizoneCompHorOpeningData;
     Array1D<AirflowNetwork::SurfaceCrack> MultizoneSurfaceCrackData;
     Array1D<AirflowNetwork::EffectiveLeakageArea> MultizoneSurfaceELAData;
+    Array1D<AirflowNetwork::SpecifiedMassFlow> SpecifiedMassFlowData;
+    Array1D<AirflowNetwork::SpecifiedVolumeFlow> SpecifiedVolumeFlowData;
     Array1D<AirflowNetwork::MultizoneExternalNodeProp> MultizoneExternalNodeData;
     Array1D<AirflowNetwork::DeltaCpProp> DeltaCp;
     Array1D<AirflowNetwork::DeltaCpProp> EPDeltaCP;
@@ -1806,6 +1808,8 @@ struct AirflowNetworkData : BaseGlobalStruct
         this->MultizoneCompSimpleOpeningData.clear();
         this->MultizoneCompHorOpeningData.clear();
         this->MultizoneSurfaceCrackData.clear();
+        this->SpecifiedMassFlowData.clear();
+        this->SpecifiedVolumeFlowData.clear();
         this->MultizoneSurfaceELAData.clear();
         this->MultizoneExternalNodeData.clear();
         this->DeltaCp.clear();

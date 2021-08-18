@@ -1120,7 +1120,6 @@ namespace AirflowNetworkBalanceManager {
                     solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneSurfaceELAData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + thisObjectName);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -1128,54 +1127,48 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        // *** Read AirflowNetwork simulation specified flow component
+        // *** Read AirflowNetwork simulation specified flow components
         CurrentModuleObject = "AirflowNetwork:SpecifiedFlow";
-        //state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurELA =
-        //    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
         instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
-            //int i = 1; // Temporary workaround
-            //state.dataAirflowNetwork->MultizoneSurfaceELAData.allocate(
-            //    state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurELA); // Temporary workaround
-            //auto &instancesValue = instances.value();
-            //for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-            //    auto const &fields = instance.value();
-            //    auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-            //    state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+            int i_mass = 0; // Temporary workaround that increasingly looks like the long term solution
+            int i_vol = 0;
+            auto &instancesValue = instances.value();
 
-            //    Real64 ela{fields.at("effective_leakage_area")};
-            //    Real64 cd{1.0};
-            //    if (fields.find("discharge_coefficient") != fields.end()) {
-            //        cd = fields.at("discharge_coefficient");
-            //    }
-            //    Real64 dp{4.0};
-            //    if (fields.find("reference_pressure_difference") != fields.end()) {
-            //        dp = fields.at("reference_pressure_difference");
-            //    }
-            //    Real64 expnt{0.65};
-            //    if (fields.find("air_mass_flow_exponent") != fields.end()) {
-            //        expnt = fields.at("air_mass_flow_exponent");
-            //    }
+            instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
-            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).name = thisObjectName; // Name of surface effective leakage area component
-            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).ELA = ela;             // Effective leakage area
-            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).DischCoeff = cd;       // Discharge coefficient
-            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).RefDeltaP = dp;        // Reference pressure difference
-            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).FlowExpo = expnt;      // Air Mass Flow exponent
-            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).TestDeltaP = 0.0;      // Testing pressure difference
-            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).TestDisCoef = 0.0;     // Testing Discharge coefficient
+                Real64 flow_rate{fields.at("air_flow_rate")};
+                bool is_mass_flow = true;
+                if (fields.find("air_flow_units") != fields.end()) {
+                    if (fields.at("air_flow_units") != "kg/s") {
+                        is_mass_flow = false;
+                    }
+                }
 
-            //    // Add the element to the lookup table, check for name overlaps
-            //    if (solver.elements.find(thisObjectName) == solver.elements.end()) {
-            //        solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneSurfaceELAData(i); // Yet another workaround
-            //    } else {
-            //        ShowSevereError(state, RoutineName + "Duplicated airflow element names are found = " + thisObjectName);
-            //        // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
-            //        success = false;
-            //    }
+                // Check for name overlaps
+                if (solver.elements.find(thisObjectName) != solver.elements.end()) {
+                    ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + thisObjectName);
+                    success = false;
+                }
 
-            //    ++i;
-            //}
+                if (is_mass_flow) {
+                    state.dataAirflowNetwork->SpecifiedMassFlowData.emplace_back();
+                    state.dataAirflowNetwork->SpecifiedMassFlowData[i_mass].name = thisObjectName;
+                    state.dataAirflowNetwork->SpecifiedMassFlowData[i_mass].mass_flow = flow_rate;
+                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->SpecifiedMassFlowData[i_mass]; // Yet another workaround
+                    ++i_mass;
+                } else {
+                    state.dataAirflowNetwork->SpecifiedVolumeFlowData.emplace_back();
+                    state.dataAirflowNetwork->SpecifiedVolumeFlowData[i_vol].name = thisObjectName;
+                    state.dataAirflowNetwork->SpecifiedVolumeFlowData[i_vol].volume_flow = flow_rate;
+                    solver.elements[thisObjectName] = &state.dataAirflowNetwork->SpecifiedVolumeFlowData[i_vol]; // Yet another workaround
+                    ++i_vol;
+                }
+            }
         }
 
         // Read AirflowNetwork Distribution system component: duct leakage
