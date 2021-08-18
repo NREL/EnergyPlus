@@ -145,21 +145,24 @@ bool checkForUnsupportedObjects(json const &epJSON, bool convertHVACTemplate)
                                                                       "HVACTemplate:Plant:Boiler:ObjectReference",
                                                                       "HVACTemplate:Plant:MixedWaterLoop"};
 
-    // For EnergyPlus, there is no option to convert or allow these objects
     bool objectFound = false;
     std::string objectType;
-    for (size_t count = 0; count < hvacTemplateObjects.size(); ++count) {
-        objectType = hvacTemplateObjects[count];
-        auto it = epJSON.find(objectType);
-        if (it != epJSON.end()) {
-            objectFound = true;
-            break;
+
+    // For ConvertInputFormat, skip this unless -n option is present to not allow conversion of HVACTemplate objects
+    if (!convertHVACTemplate) {
+        for (size_t count = 0; count < hvacTemplateObjects.size(); ++count) {
+            objectType = hvacTemplateObjects[count];
+            auto it = epJSON.find(objectType);
+            if (it != epJSON.end()) {
+                objectFound = true;
+                break;
+            }
         }
-    }
-    if (objectFound && !convertHVACTemplate) {
-        displayMessage("HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.");
-        displayMessage("You must run the ExpandObjects program on this input.");
-        errorsFound = true;
+        if (objectFound) {
+            displayMessage("HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.");
+            displayMessage("You must run the ExpandObjects program on this input.");
+            errorsFound = true;
+        }
     }
 
     constexpr std::array<std::string_view, 26> groundHTObjects = {"GroundHeatTransfer:Control",
