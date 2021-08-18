@@ -101,41 +101,26 @@ Based on the above justifications, we propose to add film coefficient adjustment
 
 The simple window model in EnergyPlus is accessed through the WindowMaterial:SimpleGlazingSystem input object and converts the simple indices into an equivalent single layer window. Once the model generates the properties for the layer, the program reuses the bulk of the layer-by-layer model for subsequent calculations. In this model, user input window U-values include interior and exterior surface heat transfer coefficients. The resistance of the bare window product, or glass-to-glass resistance is augmented by these film coefficients so that,
 
-U =  1/(1/h<sub>(i,w)</sub>  + R<sub>(l,w)</sub>  + 1/h<sub>(o,w)</sub>) &nbsp;&nbsp; Eq. (8)
+U =  1/(1/(hOutRad+hcout) + Rbare + 1/(hInRad+hcin)) &nbsp;&nbsp; Eq. (8)
 
 Where,
 
-h<sub>i,w</sub> is the interior film coefficient under standard winter conditions in units of m<sup>2</sup>·K/W, h<sub>o,w</sub> is the exterior film coefficient under standard winter conditions in units of m<sup>2</sup>·K/W, and R<sub>l, w</sub> is the resistance of the bare window under winter conditions (without the film coefficients) in units of m<sup>2</sup>·K/W. 
+hcout is the exterior film coefficient under standard winter conditions in units of W/m<sup>2</sup>·K. 
+hcin is the interior film coefficient under standard winter conditions in units of W/m<sup>2</sup>·K.
+hOutRad is the radiative conductance of outside airfilm in units of W/m<sup>2</sup>·K.
+hInRad is the radiative conductance of inside airfilm in units of W/m<sup>2</sup>·K.
+Rbare is the nominal center-of-glass resistance without air films in units of m<sup>2</sup>·K/W.
 
-In the current implementation, because the window model in EnergyPlus is for flat geometry, the model is not necessarily applicable to low-performance projecting products, such as single-pane windows with uninsulated aluminum frame. The model cannot support glazing systems with a U higher than 7.0 because the thermal resistance of the film coefficients alone can provide this level of performance and none of the various resistances can be negative.
+In the current implementation, because the window model in EnergyPlus is for flat geometry, the model is not necessarily applicable to low-performance projecting products, such as single-pane windows with uninsulated aluminum frame. The model cannot support glazing systems with a U higher than 6.0 because the thermal resistance of the film coefficients alone can provide this level of performance and none of the various resistances can be negative.
 
-In order to remove this restriction to model glazing systems with high conductive frames, we will introduce the concept of film coefficient adjustment ratio to h<sub>i, w</sub> and h<sub>o, w</sub>. For U input higher than 7.0, the original h<sub>i, w</sub>, origin and h<sub>o, w</sub>, origin will be calculated using U<sub>0</sub> = 7.0, and adjusted film coefficient adjustment ratio α to both inside and outside can be calculated as α= U/U<sub>0</sub>.
+![inputU_nominalU](inputU_nominalU.png)
+<p style="text-align: center;"> Figure 4. Comparison of input U and computed nominal U (nominal conductance in winter) before applying the adjustment ratio. </p>
 
-αU<sub>0</sub>  =  1/(1/αh<sub>i,w</sub>   + R<sub>l,w</sub>/α  + 1/αh<sub>o,w</sub>) &nbsp;&nbsp; Eq. (9)
+In order to remove this restriction to model glazing systems with high conductive frames, we will introduce the concept of film coefficient adjustment ratio to hcout, hcin, hOutRad, hInRad. The adjustment ratio α to both inside and outside can be calculated as α= U<sub>input</sub>/U.
 
-Based on Equation (9), during the simulation, when final hin and hout are calculated for window objects using simple window models, these factors will be applied back to adjust hin and hout as αhin and αhout, accordingly. Since the derived R<sub>l,w</sub> is neglectable when U > 7.0, we don’t apply the α back to the window glazing layer.
-We will also add the fields **Inside Face Convective Coefficient Adjustment Ratio** and **Outside Face Convective Coefficient Adjustment Ratio** to **SurfaceProperty:ConvectionCoefficients** and **SurfaceProperty:ConvectionCoefficients:MultipleSurface**. Users are allowed to input the film coefficient adjustment ratios to manually adjust the calculated coefficients.
+αU =  1/(1/α(hOutRad+hcout) + αRbare + 1/α(hInRad+hcin)) &nbsp;&nbsp; Eq. (9)
 
-```
-SurfaceProperty:ConvectionCoefficients,
-  …
-  N10, \field Convective Coefficient 1 Adjustment Ratio
-       \type real
-       \note this parameter is to adjust the calculated convective coefficient on the outside face
-       \note only applicable to exterior windows
-       \default 1.0
-       \minimum 0.0
-       \units dimensionless
-  N11; \field Convective Coefficient 2 Adjustment Ratio
-       \type real
-       \note this parameter is to adjust the calculated convective coefficient on the inside face
-       \note only applicable to exterior windows
-       \default 1.0
-       \minimum 0.0
-       \units dimensionless
-```
-
-When these fields are not assigned, the default values are 1.0, or the calculated ratio when WindowMaterial:SimpleGlazingSystem is assigned to some surface and the U-Factor is greater than 7.0.
+Based on Equation (9), during the simulation, when final hcout, hcin, hOutRad, and hInRad are calculated for window objects using simple window models, these factors will be applied back to adjust hcout, hcin, hOutRad, hInRad as αhcout, αhcin, αhOutRad, and αhInRad, accordingly. Since the derived Rbare is neglectable when U > 7.0, we don’t apply the α back to the window glazing layer.
 
 ## Testing/Validation/Data Source(s): ##
 
