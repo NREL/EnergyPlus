@@ -399,11 +399,11 @@ Except for \({C_{s - min,i}}\) above, all other variables are already available 
 The Simplified Procedure (SP) introduced in ASHRAE Standard 62.1-2019 provides an alternative way to determine the ventilation efficiency of a system (\({E_v}\)). The efficiency is calculated using equation \ref{eqn:ev-high-d} when the occupant diversity, \({D}\), is less than 0.6 and equation \ref{eqn:ev-low-d} otherwise. \({E_v}\) is then used in the same manner as in the VRP to determine the system design outdoor air intake.
 
 \begin{equation}\label{eqn:ev-high-d}
-{E_{v}} = 0.88 {D} + 0.22
+{E_{v}} = 0.88 {D} + 0.22 \text{ for } D < 0.60
 \end{equation}
 
 \begin{equation}\label{eqn:ev-low-d}
-{E_{v}} = 0.75
+{E_{v}} = 0.75 \text{ for } D \geq 0.60
 \end{equation}
 
 \subsubsection{Zone Minimum Air Flow}\label{sp-zone-minimum-air-flow}

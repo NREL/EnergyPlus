@@ -1457,6 +1457,10 @@ void GetOAControllerInputs(EnergyPlusData &state)
                 } else if ((SELECT_CASE_var ==
                             "STANDARD62.1VENTILATIONRATEPROCEDURE")) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
                     thisVentilationMechanical.SystemOAMethod = SOAM_VRP;
+                } else if ((SELECT_CASE_var ==
+                            "STANDARD62.1VENTILATIONRATEPROCEDUREWITHLIMIT")) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
+                                                                                // capped at the design outdoor air flow rate
+                    thisVentilationMechanical.SystemOAMethod = SOAM_VRPL;
                 } else if ((SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURE")) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
                     thisVentilationMechanical.SystemOAMethod = SOAM_IAQP;
                     if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
@@ -1978,6 +1982,8 @@ void GetOAControllerInputs(EnergyPlusData &state)
                 print(state.files.eio, "ZoneSum,");
             } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRP) {
                 print(state.files.eio, "Standard62.1VentilationRateProcedure,");
+            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRPL) {
+                print(state.files.eio, "Standard62.1VentilationRateProcedureWithLimit,");
             } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQP) {
                 print(state.files.eio, "IndoorAirQualityProcedure,");
             } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlSchOcc) {
@@ -2907,6 +2913,16 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 // If difference is tiny, reset silently
                 thisOAController.MaxOA = DesSupplyVolFlowRate;
             }
+
+            // Check if system has a Sizing:System object and a sizing run has been done
+            bool SizingDesRunThisAirSys = false;
+            CheckThisAirSystemForSizing(state, AirLoopNum, SizingDesRunThisAirSys);
+
+            // Get design outdoor air flow rate
+            if (SizingDesRunThisAirSys && thisOAController.VentMechObjectNum > 0) {
+                state.dataMixedAir->VentilationMechanical(thisOAController.VentMechObjectNum).SysDesOA =
+                    state.dataSize->FinalSysSizing(AirLoopNum).DesOutAirVolFlow;
+            }
         }
 
         OAControllerMySizeFlag(OAControllerNum) = false;
@@ -3747,15 +3763,6 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
             SysSA = curAirLoopFlow.SupFlow;
         }
 
-        // Check if system has a Sizing:System object and a sizing run has been done
-        bool SizingDesRunThisAirSys = false;
-        CheckThisAirSystemForSizing(state, AirLoopNum, SizingDesRunThisAirSys);
-
-        // Get design outdoor air flow rate
-        if (SizingDesRunThisAirSys) {
-            state.dataMixedAir->VentilationMechanical(this->VentMechObjectNum).SysDesOA = state.dataSize->FinalSysSizing(AirLoopNum).DesOutAirVolFlow;
-        }
-
         state.dataMixedAir->VentilationMechanical(this->VentMechObjectNum).CalcMechVentController(state, SysSA, MechVentOAMassFlow);
         MechVentOutsideAirMinFrac = MechVentOAMassFlow / curAirLoopFlow.DesSupply;
         if (curAirLoopFlow.FanPLR > 0.0) {
@@ -4131,7 +4138,8 @@ void VentilationMechanicalProps::CalcMechVentController(
 
             // get system supply air flow rate
             if (this->SystemOAMethod == SOAM_VRP || this->SystemOAMethod == SOAM_ProportionalControlSchOcc ||
-                this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
+                this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate ||
+                this->SystemOAMethod == SOAM_VRPL) {
 
                 // System supply air flow rate is always greater than or equal the system outdoor air flow rate
                 if ((SysSA > 0.0) && (SysSA < (SysOAuc * state.dataEnvrn->StdRhoAir))) SysSA = SysOAuc * state.dataEnvrn->StdRhoAir;
@@ -4231,7 +4239,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                     }
 
                     // Calc zone supply OA flow rate
-                    if (this->SystemOAMethod == SOAM_VRP) {
+                    if (this->SystemOAMethod == SOAM_VRP || this->SystemOAMethod == SOAM_VRPL) {
                         // the VRP case
                         ZoneOA = ZoneOABZ / ZoneEz;
 
@@ -4518,7 +4526,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                     // only for VRP system OA method
                     curZoneSysEnergyDemand.SupplyAirAdjustFactor = 1.0;
 
-                    if (this->SystemOAMethod == SOAM_VRP) {
+                    if (this->SystemOAMethod == SOAM_VRP || this->SystemOAMethod == SOAM_VRPL) {
                         if (ZoneOAFrac > this->ZoneMaxOAFraction) {
                             if (this->ZoneMaxOAFraction > 0.0) {
                                 curZoneSysEnergyDemand.SupplyAirAdjustFactor = ZoneOAFrac / this->ZoneMaxOAFraction;
@@ -4563,7 +4571,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                 if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc ||
                     this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
                     SysOA = SysOA / SysEv;
-                } else if (this->SystemOAMethod == SOAM_VRP && this->SysDesOA > 0.0) {
+                } else if (this->SystemOAMethod == SOAM_VRPL && this->SysDesOA > 0.0) {
                     // Limit system OA to design OA minimum flow rate, as per ASHRAE Guideline 36-2018 Section 5.16.3.1
                     // If no system sizing run is done (i.e. no Sizing:System) the design outdoor air flow rate is not known
                     SysOA = min(SysOAuc / SysEv, this->SysDesOA);

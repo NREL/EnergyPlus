@@ -142,6 +142,7 @@ namespace DataSizing {
     // System Outdoor Air Method
     constexpr int SOAM_ZoneSum(1); // Sum the outdoor air flow rates of all zones
     constexpr int SOAM_VRP(2);     // Use ASHRAE Standard 62.1-2007 to calculate the system level outdoor air flow rates
+    constexpr int SOAM_VRPL(10);   // Use ASHRAE Standard 62.1-2007 to calculate the system level outdoor air flow rates
     constexpr int SOAM_SP(9);      // Use the ASHRAE Standard 62.1 Simplified Procedure to calculate the system level outdoor air flow rates
     //  considering the zone air distribution effectiveness and the system ventilation efficiency
     constexpr int SOAM_IAQP(3); // Use ASHRAE Standard 62.1-2007 IAQP to calculate the system level outdoor air flow rates
