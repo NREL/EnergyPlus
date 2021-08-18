@@ -3164,8 +3164,9 @@ TEST_F(EnergyPlusFixture, WindowManger_AdjRatioWindowTempNominalTest)
     // compare the adjustment ratio before and after adjustment
     EXPECT_EQ(AfaceNoAdj(2, 1), state->dataWindowManager->Aface(2, 1));
     EXPECT_EQ(AfaceNoAdj(1, 2), state->dataWindowManager->Aface(1, 2));
-    EXPECT_NEAR((state->dataWindowManager->Aface(1, 1) - AfaceNoAdj(1, 1)) / state->dataWindowManager->hcout, adjRatioNonDefault - 1.0, 0.001);
-    EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / state->dataWindowManager->hcin, adjRatioNonDefault - 1.0, 0.01);
+    // fixme: adjust the following for the changed hr(i)
+    EXPECT_NEAR((state->dataWindowManager->Aface(1, 1) - AfaceNoAdj(1, 1)) / (state->dataWindowManager->hcout + hr(1)), adjRatioNonDefault - 1.0, 0.001);
+    EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / (state->dataWindowManager->hcin + hr(2)), adjRatioNonDefault - 1.0, 0.01);
     EXPECT_NEAR((state->dataWindowManager->Bface(1) - BfaceNoAdj(1)) / (state->dataWindowManager->hcout * state->dataWindowManager->tout),
                 adjRatioNonDefault - 1.0,
                 0.001);
@@ -3214,11 +3215,11 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
     Real64 RhoGlIR1 = 0.0;
     Real64 RhoGlIR2 = 0.0;
     Real64 hcv = 1.0;
-    Real64 TGapNew = 0.0;
+    Real64 TGapNew = 0.5;
     Real64 TAirflowGapNew = 0.0;
     Real64 hcvAirflowGap = 0.0;
     Array1A<Real64> hcvBG = 1.0;
-    Array1A<Real64> TGapNewBG = 0.0;
+    Array1A<Real64> TGapNewBG = 0.5;
     Array1A<Real64> AbsRadShadeFace = state->dataWindowManager->AbsRadShadeFace;
     auto &Aface = state->dataWindowManager->Aface;
     auto &Bface = state->dataWindowManager->Bface;
@@ -3297,10 +3298,10 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
     // Without shading case
     EXPECT_EQ(AfaceNoAdj(2, 1), state->dataWindowManager->Aface(2, 1));
     EXPECT_EQ(AfaceNoAdj(1, 2), state->dataWindowManager->Aface(1, 2));
-    EXPECT_NEAR((state->dataWindowManager->Aface(1, 1) - AfaceNoAdj(1, 1)) / state->dataWindowManager->hcout,
+    EXPECT_NEAR((state->dataWindowManager->Aface(1, 1) - AfaceNoAdj(1, 1)) / (state->dataWindowManager->hcout + hr(1)),
                 state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) - 1.0,
                 0.001);
-    EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / state->dataWindowManager->hcin,
+    EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / (state->dataWindowManager->hcin + hr(2)),
                 state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum) - 1.0,
                 0.01);
     EXPECT_NEAR((state->dataWindowManager->Bface(1) - BfaceNoAdj(1)) / (state->dataWindowManager->hcout * state->dataWindowManager->tout),
@@ -3310,7 +3311,7 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
                 state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum) - 1.0,
                 0.001);
 
-    // With-external shading case
+    // With external shading case
     DataSurfaces::WinShadingType const ShadeFlagOn = DataSurfaces::WinShadingType::ExtShade;
 
     if (DataSurfaces::ANY_SHADE_SCREEN(ShadeFlagOn) || DataSurfaces::ANY_BLIND(ShadeFlagOn)) {
@@ -3395,21 +3396,21 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
     // compare the before and after adjusted coefficient matrices
     // With external-shading case
     EXPECT_EQ(AfaceNoAdj(1, 2), state->dataWindowManager->Aface(1, 2));
-    EXPECT_EQ(AfaceNoAdj(1, 1), state->dataWindowManager->Aface(1, 1));
+    EXPECT_EQ(AfaceNoAdj(3, 3), state->dataWindowManager->Aface(3, 3));
     EXPECT_EQ(AfaceNoAdj(4, 1), state->dataWindowManager->Aface(4, 1));
     EXPECT_EQ(AfaceNoAdj(4, 3), state->dataWindowManager->Aface(4, 3));
     EXPECT_EQ(AfaceNoAdj(1, 4), state->dataWindowManager->Aface(1, 4));
     EXPECT_EQ(AfaceNoAdj(3, 4), state->dataWindowManager->Aface(3, 4));
     EXPECT_EQ(AfaceNoAdj(4, 4), state->dataWindowManager->Aface(4, 4));
-    EXPECT_NEAR((state->dataWindowManager->Aface(3, 3) - AfaceNoAdj(3, 3)) / state->dataWindowManager->hcout,
+    EXPECT_NEAR((state->dataWindowManager->Aface(1, 1) - AfaceNoAdj(1, 1)) / (hr(1) * (1 - RhoShIR2) / ShGlReflFacIR + hcv),
                 state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) - 1.0,
                 0.001);
-    EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / state->dataWindowManager->hcin,
+    EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / (state->dataWindowManager->hcin + hr(2)),
                 state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum) - 1.0,
                 0.01);
-    EXPECT_EQ(state->dataWindowManager->Bface(1), BfaceNoAdj(1));
+    EXPECT_EQ(state->dataWindowManager->Bface(3), BfaceNoAdj(3));
     EXPECT_EQ(state->dataWindowManager->Bface(4), BfaceNoAdj(4));
-    EXPECT_NEAR((state->dataWindowManager->Bface(3) - BfaceNoAdj(3)) / (state->dataWindowManager->hcout * state->dataWindowManager->tout),
+    EXPECT_NEAR((state->dataWindowManager->Bface(1) - BfaceNoAdj(1)) / (hcv * TGapNew),
                 state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) - 1.0,
                 0.001);
     EXPECT_NEAR((state->dataWindowManager->Bface(2) - BfaceNoAdj(2)) / (state->dataWindowManager->hcin * state->dataWindowManager->tin),
