@@ -167,6 +167,7 @@ namespace PVWatts {
 
         ssc_module_t m_pvwattsModule;
         ssc_data_t m_pvwattsData;
+        Real64 m_NumTimeStepsToday;
 
     public:
         static std::unique_ptr<PVWattsGenerator> createFromIdfObj(EnergyPlusData &state, int objNum);

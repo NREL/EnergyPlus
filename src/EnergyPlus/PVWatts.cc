@@ -89,7 +89,7 @@ namespace PVWatts {
                                        Real64 groundCoverageRatio)
         : m_moduleType(moduleType), m_arrayType(arrayType), m_geometryType(geometryType), m_DCtoACRatio(1.1), m_inverterEfficiency(0.96),
           m_outputDCPower(1000.0), m_cellTemperature(-9999), m_planeOfArrayIrradiance(-9999), m_shadedPercent(0.0),
-          m_pvwattsModule(ssc_module_create("pvwattsv5_1ts")), m_pvwattsData(ssc_data_create())
+          m_pvwattsModule(ssc_module_create("pvwattsv5_1ts")), m_pvwattsData(ssc_data_create()), m_NumTimeStepsToday(0.0)
 
     {
 
@@ -389,7 +389,10 @@ namespace PVWatts {
         auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
         // We only run this once for each zone time step.
-        if (!state.dataGlobal->BeginTimeStepFlag) {
+        const int NumTimeStepsToday_loc = state.dataGlobal->HourOfDay * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+        if (m_NumTimeStepsToday != NumTimeStepsToday_loc) {
+            m_NumTimeStepsToday = NumTimeStepsToday_loc;
+        } else {
             m_outputDCEnergy = m_outputDCPower * TimeStepSys * DataGlobalConstants::SecInHour;
             m_outputACEnergy = m_outputACPower * TimeStepSys * DataGlobalConstants::SecInHour;
             return;
