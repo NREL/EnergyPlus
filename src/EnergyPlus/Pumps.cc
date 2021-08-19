@@ -227,11 +227,6 @@ void GetPumpInput(EnergyPlusData &state)
     using BranchNodeConnections::TestCompSet;
     using CurveManager::GetCurveIndex;
     using CurveManager::GetCurveMinMaxValues;
-    using DataHeatBalance::IntGainTypeOf_Pump_Cond;
-    using DataHeatBalance::IntGainTypeOf_Pump_ConSpeed;
-    using DataHeatBalance::IntGainTypeOf_Pump_VarSpeed;
-    using DataHeatBalance::IntGainTypeOf_PumpBank_ConSpeed;
-    using DataHeatBalance::IntGainTypeOf_PumpBank_VarSpeed;
     using DataPlant::TypeOf_PumpBankConstantSpeed;
     using DataPlant::TypeOf_PumpBankVariableSpeed;
     using DataPlant::TypeOf_PumpCondensate;
@@ -1367,7 +1362,7 @@ void GetPumpInput(EnergyPlusData &state)
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
                                           "Pump:VariableSpeed",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
-                                          IntGainTypeOf_Pump_VarSpeed,
+                                          DataHeatBalance::IntGainTypeOf::Pump_VarSpeed,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
                                           nullptr,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate);
@@ -1376,7 +1371,7 @@ void GetPumpInput(EnergyPlusData &state)
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
                                           "Pump:ConstantSpeed",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
-                                          IntGainTypeOf_Pump_ConSpeed,
+                                          DataHeatBalance::IntGainTypeOf::Pump_ConSpeed,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
                                           nullptr,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate);
@@ -1385,7 +1380,7 @@ void GetPumpInput(EnergyPlusData &state)
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
                                           "Pump:VariableSpeed:Condensate",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
-                                          IntGainTypeOf_Pump_Cond,
+                                          DataHeatBalance::IntGainTypeOf::Pump_Cond,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
                                           nullptr,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate);
@@ -1394,7 +1389,7 @@ void GetPumpInput(EnergyPlusData &state)
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
                                           "HeaderedPumps:VariableSpeed",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
-                                          IntGainTypeOf_PumpBank_VarSpeed,
+                                          DataHeatBalance::IntGainTypeOf::PumpBank_VarSpeed,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
                                           nullptr,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate);
@@ -1403,7 +1398,7 @@ void GetPumpInput(EnergyPlusData &state)
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
                                           "HeaderedPumps:ConstantSpeed",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
-                                          IntGainTypeOf_PumpBank_ConSpeed,
+                                          DataHeatBalance::IntGainTypeOf::PumpBank_ConSpeed,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
                                           nullptr,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate);

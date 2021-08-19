@@ -745,11 +745,6 @@ void GetDXCoils(EnergyPlusData &state)
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
     using CurveManager::SetCurveOutputMinMaxValues;
-    using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilMultiSpeed;
-    using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilSingleSpeed;
-    using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilTwoSpeed;
-    using DataHeatBalance::IntGainTypeOf_SecHeatingDXCoilMultiSpeed;
-    using DataHeatBalance::IntGainTypeOf_SecHeatingDXCoilSingleSpeed;
     using DataSizing::AutoSize;
     using EMSManager::ManageEMS;
 
@@ -1423,7 +1418,7 @@ void GetDXCoils(EnergyPlusData &state)
                                       state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                       "Coil:Cooling:DX:SingleSpeed",
                                       state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                      IntGainTypeOf_SecCoolingDXCoilSingleSpeed,
+                                      DataHeatBalance::IntGainTypeOf::SecCoolingDXCoilSingleSpeed,
                                       &state.dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
                 state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
             } else {
@@ -2460,7 +2455,7 @@ void GetDXCoils(EnergyPlusData &state)
                                       state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                       "Coil:Heating:DX:SingleSpeed",
                                       state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                      IntGainTypeOf_SecHeatingDXCoilSingleSpeed,
+                                      DataHeatBalance::IntGainTypeOf::SecHeatingDXCoilSingleSpeed,
                                       &state.dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate,
                                       nullptr,
                                       nullptr,
@@ -3114,7 +3109,7 @@ void GetDXCoils(EnergyPlusData &state)
                                       state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                       "Coil:Cooling:DX:TwoSpeed",
                                       state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                      IntGainTypeOf_SecCoolingDXCoilTwoSpeed,
+                                      DataHeatBalance::IntGainTypeOf::SecCoolingDXCoilTwoSpeed,
                                       &state.dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
                 state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
             } else {
@@ -4628,7 +4623,7 @@ void GetDXCoils(EnergyPlusData &state)
                                       state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                       "Coil:Cooling:DX:MultiSpeed",
                                       state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                      IntGainTypeOf_SecCoolingDXCoilMultiSpeed,
+                                      DataHeatBalance::IntGainTypeOf::SecCoolingDXCoilMultiSpeed,
                                       &state.dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
                 state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
             } else {
@@ -5126,7 +5121,7 @@ void GetDXCoils(EnergyPlusData &state)
                                       state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                       "Coil:Heating:DX:MultiSpeed",
                                       state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                      IntGainTypeOf_SecHeatingDXCoilMultiSpeed,
+                                      DataHeatBalance::IntGainTypeOf::SecHeatingDXCoilMultiSpeed,
                                       &state.dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate,
                                       nullptr,
                                       nullptr,

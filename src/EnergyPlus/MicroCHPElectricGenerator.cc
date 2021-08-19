@@ -671,7 +671,7 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                               this->ZoneID,
                               "Generator:MicroCHP",
                               this->Name,
-                              DataHeatBalance::IntGainTypeOf_GeneratorMicroCHP,
+                              DataHeatBalance::IntGainTypeOf::GeneratorMicroCHP,
                               &this->A42Model.SkinLossConvect,
                               nullptr,
                               &this->A42Model.SkinLossRadiat);

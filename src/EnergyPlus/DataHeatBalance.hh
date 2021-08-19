@@ -416,52 +416,6 @@ namespace DataHeatBalance {
         NUM
     };
 
-
-    constexpr int IntGainTypeOf_DaylightingDeviceTubular(11);
-    constexpr int IntGainTypeOf_WaterHeaterMixed(12);
-    constexpr int IntGainTypeOf_WaterHeaterStratified(13);
-    constexpr int IntGainTypeOf_ThermalStorageChilledWaterMixed(14);
-    constexpr int IntGainTypeOf_ThermalStorageChilledWaterStratified(15);
-    constexpr int IntGainTypeOf_GeneratorFuelCell(16);
-    constexpr int IntGainTypeOf_GeneratorMicroCHP(17);
-    constexpr int IntGainTypeOf_ElectricLoadCenterTransformer(18);
-    constexpr int IntGainTypeOf_ElectricLoadCenterInverterSimple(19);
-    constexpr int IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower(20);
-    constexpr int IntGainTypeOf_ElectricLoadCenterInverterLookUpTable(21);
-    constexpr int IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery(22);
-    constexpr int IntGainTypeOf_ElectricLoadCenterStorageBattery(23);
-    constexpr int IntGainTypeOf_ElectricLoadCenterStorageSimple(24);
-    constexpr int IntGainTypeOf_PipeIndoor(25);
-    constexpr int IntGainTypeOf_RefrigerationCase(26);
-    constexpr int IntGainTypeOf_RefrigerationCompressorRack(27);
-    constexpr int IntGainTypeOf_RefrigerationSystemAirCooledCondenser(28);
-    constexpr int IntGainTypeOf_RefrigerationTransSysAirCooledGasCooler(29);
-    constexpr int IntGainTypeOf_RefrigerationSystemSuctionPipe(30);
-    constexpr int IntGainTypeOf_RefrigerationTransSysSuctionPipeMT(31);
-    constexpr int IntGainTypeOf_RefrigerationTransSysSuctionPipeLT(32);
-    constexpr int IntGainTypeOf_RefrigerationSecondaryReceiver(33);
-    constexpr int IntGainTypeOf_RefrigerationSecondaryPipe(34);
-    constexpr int IntGainTypeOf_RefrigerationWalkIn(35);
-    constexpr int IntGainTypeOf_Pump_VarSpeed(36);
-    constexpr int IntGainTypeOf_Pump_ConSpeed(37);
-    constexpr int IntGainTypeOf_Pump_Cond(38);
-    constexpr int IntGainTypeOf_PumpBank_VarSpeed(39);
-    constexpr int IntGainTypeOf_PumpBank_ConSpeed(40);
-    constexpr int IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam(41);
-    constexpr int IntGainTypeOf_PlantComponentUserDefined(42);
-    constexpr int IntGainTypeOf_CoilUserDefined(43);
-    constexpr int IntGainTypeOf_ZoneHVACForcedAirUserDefined(44);
-    constexpr int IntGainTypeOf_AirTerminalUserDefined(45);
-    constexpr int IntGainTypeOf_PackagedTESCoilTank(46);
-    constexpr int IntGainTypeOf_ElectricEquipmentITEAirCooled(47);
-    constexpr int IntGainTypeOf_SecCoolingDXCoilSingleSpeed(48);
-    constexpr int IntGainTypeOf_SecHeatingDXCoilSingleSpeed(49);
-    constexpr int IntGainTypeOf_SecCoolingDXCoilTwoSpeed(50);
-    constexpr int IntGainTypeOf_SecCoolingDXCoilMultiSpeed(51);
-    constexpr int IntGainTypeOf_SecHeatingDXCoilMultiSpeed(52);
-    constexpr int IntGainTypeOf_ElectricLoadCenterConverter(53);
-    constexpr int IntGainTypeOf_FanSystemModel(54);
-
     // Parameters for checking surface heat transfer models
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
