@@ -49,7 +49,7 @@ namespace gt::segments {
             nq = jcc::interpolation::interp1d(drilling_depth,
                                               drilling_depths[0],
                                               ideal_segment_lengths[0]);
-        } else if(heights[0] < height < heights[n1]) {
+        } else if(heights[0] < height && height < heights[n1]) {
             // do bilinear interpolation
             // find the lower and upper height values
             bool finished = false;

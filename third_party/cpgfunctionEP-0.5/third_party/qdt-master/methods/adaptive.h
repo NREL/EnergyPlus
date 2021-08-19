@@ -376,7 +376,7 @@ public:
 template<typename BM>
 Adaptive<BM> adaptive(const BM& bm)
 {
-	return Adaptive<BM>(bm, 1.e-5, 1.e-10);
+	return Adaptive<BM>(bm, 1.e-5f, 1.e-10f);
 }	
 
 template<typename BM>

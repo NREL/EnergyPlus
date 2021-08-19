@@ -9,7 +9,7 @@ void jcc::decomposition(vector<vector<double> > &A, int &n, vector<int> &indx,
                    double &d) {
     const double TINY = 1.0e-20;  // a small number
     int i, imax, j, k;
-    double big, dum, sum, temp;
+    double big, dum, sum;
 
     vector<double> vv(n); // vv stores the implicit scaling of each row
     d = 1.0; // No row interchanges yet
