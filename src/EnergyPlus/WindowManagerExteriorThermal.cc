@@ -357,7 +357,7 @@ namespace WindowManager {
             // films from ISO 15099 Section 8.2.2 Winter conditions
             double hExtConvCoeff = 20.0;
             double hIntConvCoeff = 3.6;
-            auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, hExtConvCoeff);
+            auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, hExtConvCoeff, false);
 
             const double frameUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.FrameConductance, hIntConvCoeff, hExtConvCoeff);
             const double centerOfGlassUvalue = insulGlassUnit->getUValue();
@@ -447,10 +447,11 @@ namespace WindowManager {
     }
 
     std::shared_ptr<Tarcog::ISO15099::CSystem> CWCEHeatTransferFactory::getTarcogSystemForReporting(EnergyPlusData &state,
-                                                                                                    Real64 const t_HextConvCoeff)
+                                                                                                    Real64 const t_HextConvCoeff, 
+                                                                                                    bool const useSummerConditions)
     {
-        auto Indoor = getIndoorUvalueNfrc();
-        auto Outdoor = getOutdoorUvalueNfrc();
+        auto Indoor = getIndoorUvalueNfrc(useSummerConditions);
+        auto Outdoor = getOutdoorUvalueNfrc(useSummerConditions);
         auto aIGU = getIGU();
 
         // pick-up all layers and put them in IGU (this includes gap layers as well)
@@ -839,7 +840,7 @@ namespace WindowManager {
         return m_InteriorBSDFShade;
     }
 
-    std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getOutdoorUvalueNfrc()
+    std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getOutdoorUvalueNfrc(bool const useSummerConditions)
     {
         const auto airTemperature{-18.0 + DataGlobalConstants::KelvinConv}; // Kelvins
         const auto airSpeed{5.5};                                           // meters per second
@@ -852,7 +853,7 @@ namespace WindowManager {
         return Outdoor;
     }
 
-    std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getIndoorUvalueNfrc()
+    std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getIndoorUvalueNfrc(bool const useSummerConditions)
     {
         const auto roomTemperature{21 + DataGlobalConstants::KelvinConv};
         const auto Indoor = Tarcog::ISO15099::Environments::indoor(roomTemperature);

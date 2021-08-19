@@ -117,7 +117,8 @@ namespace WindowManager {
         Tarcog::ISO15099::CIGU getIGU() const;
 
         // for assembly windoww reporting
-        std::shared_ptr<Tarcog::ISO15099::CSystem> getTarcogSystemForReporting(EnergyPlusData &state, Real64 const t_HextConvCoeff);
+        std::shared_ptr<Tarcog::ISO15099::CSystem> getTarcogSystemForReporting(EnergyPlusData &state, 
+            Real64 const t_HextConvCoeff, bool const useSummerConditions);
 
         // This special case of interior shade is necessary only because of strange calculation of heat flow on interior side
         // It probably needs to be removed since calculation is no different from any other case. It is left over from
@@ -160,8 +161,8 @@ namespace WindowManager {
         Material::MaterialProperties *getLayerMaterial(EnergyPlusData &state, int const t_Index) const;
 
         // methods specifically for helping in NFRC assembly calculations
-        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoorUvalueNfrc();
-        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoorUvalueNfrc();
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoorUvalueNfrc(bool const useSummerConditions);
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoorUvalueNfrc(bool const useSummerConditions);
 
     };
 } // namespace WindowManager
