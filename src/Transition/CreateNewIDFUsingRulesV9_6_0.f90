@@ -409,6 +409,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with G, insert the rules here
 
+          CASE('GROUNDHEATEXCHANGER:SYSTEM')
+              CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+              nodiff=.false.
+              OutArgs(1:9)=InArgs(1:9)
+              IF (CurArgs .gt. 9) THEN
+                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
+                  IF (InArgs(9) .eq. '') THEN
+                      OutArgs(10)='UHFCALC'
+                  ENDIF
+                  CurArgs=CurArgs+1
+              ENDIF
+
               ! If your original object starts with H, insert the rules here
 
               ! If your original object starts with I, insert the rules here

@@ -1383,6 +1383,7 @@ void GetAirPathData(EnergyPlusData &state)
                 WaterCoilNodeNum =
                     GetCoilWaterInletNode(state, GetOACompType(state, OASysNum, OACompNum), GetOACompName(state, OASysNum, OACompNum), ErrorsFound);
                 CheckCoilWaterInletNode(state, WaterCoilNodeNum, NodeNotFound);
+                UnitarySystems::isWaterCoilHeatRecoveryType(state, WaterCoilNodeNum, NodeNotFound);
                 if (NodeNotFound) {
                     ErrorsFound = true;
                     ShowSevereError(state,
