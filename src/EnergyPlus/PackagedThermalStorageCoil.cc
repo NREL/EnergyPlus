@@ -187,7 +187,6 @@ void GetTESCoilInput(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
-    using DataHeatBalance::IntGainTypeOf_PackagedTESCoilTank;
     using DataZoneEquipment::FindControlledZoneIndexFromSystemNodeNumberForZone;
     using FluidProperties::CheckFluidPropertyName;
     using FluidProperties::FindGlycol;
@@ -386,7 +385,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                                   ZoneIndexTrial,
                                   "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                   state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
-                                  IntGainTypeOf_PackagedTESCoilTank,
+                                  DataHeatBalance::IntGainTypeOf::PackagedTESCoilTank,
                                   &state.dataPackagedThermalStorageCoil->TESCoil(item).QdotAmbient);
         }
 
