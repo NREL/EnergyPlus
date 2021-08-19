@@ -168,6 +168,7 @@ struct DataGlobal : BaseGlobalStruct
     int FDnumIterYears = 0;
     bool printConsoleOutput = true;
     bool installRootOverride = false;
+    int numThread = 1;
 
     void clear_state() override
     {
@@ -273,6 +274,7 @@ struct DataGlobal : BaseGlobalStruct
         this->FDnumIterYears = 0;
         this->printConsoleOutput = true;
         this->installRootOverride = false;
+        this->numThread = 1;
     }
 };
 
