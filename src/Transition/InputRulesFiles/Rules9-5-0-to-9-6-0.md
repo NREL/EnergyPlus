@@ -31,6 +31,15 @@ Field 4 has been eliminated/deleted and not replace with anything else.
 
 See [8884](https://github.com/NREL/EnergyPlus/pull/8884)
 
+# Object Change: PerformancePrecisionTradeoffs
+Summary: A new override option including cubic spline interpolations in replacement of original psychrometric function PsyTsatFnPb was added as Mode06 in this object. The previous options for the override mode of the object including Mode06 and Mode07 in version 9.5 were switched to Mode07 and Mode08 in version 9.6, respectively.
+
+Fields 1-2 remains the same.
+Fields 3 has been updated by adding a new override mode option. 
+Fields 4-5 remains the same.
+
+See [8946](https://github.com/NREL/EnergyPlus/pull/8946)
+
 # Object Change: GroundHeatExchanger:System
 
 Summary: A new field was added to specify the method used to compute the g-function values. 
@@ -38,3 +47,4 @@ Summary: A new field was added to specify the method used to compute the g-funct
 Fields 1-9 remain the same.
 New Field F10 (A7) g-Function Calculation Method. Leave blank or assign a value of 'UHFcalc' or 'UBHWTcalc'. Default value is 'UHFcalc'.
 Remaining fields remain the same and are shifted.
+
