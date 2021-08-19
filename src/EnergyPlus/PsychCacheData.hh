@@ -100,7 +100,7 @@ constexpr Int64 psatcache_mask = psatcache_size - 1;
 #endif
 #ifdef EP_cache_PsyTsatFnPb
 constexpr int tsatcache_size = 1024 * 1024;
-constexpr int tsatprecision_bits = 24;
+constexpr int tsatprecision_bits = 24; // 20
 constexpr Int64 tsatcache_mask = tsatcache_size - 1;
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
