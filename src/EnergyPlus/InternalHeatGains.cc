@@ -1700,7 +1700,7 @@ namespace InternalHeatGains {
                 auto &thisGasEqInput = state.dataHeatBal->ZoneGasObjects(gasEqInputNum);
                 for (int Item1 = 1; Item1 <= thisGasEqInput.numOfSpaces; ++Item1) {
                     ++gasEqNum;
-                    auto &thisZoneGas = state.dataHeatBal->ZoneElectric(gasEqNum);
+                    auto &thisZoneGas = state.dataHeatBal->ZoneGas(gasEqNum);
                     int const spaceNum = thisGasEqInput.spaceNums(Item1);
                     int const zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
                     thisZoneGas.Name = thisGasEqInput.names(Item1);
@@ -2592,7 +2592,7 @@ namespace InternalHeatGains {
                                itEqModuleObject,
                                state.dataHeatBal->ITEqObjects,
                                state.dataHeatBal->NumZoneITEqStatements,
-                               state.dataHeatBal->TotOthEquip,
+                               state.dataHeatBal->TotITEquip,
                                ErrorsFound,
                                zoneListNotAllowed);
 
@@ -3046,7 +3046,7 @@ namespace InternalHeatGains {
 
         setupIHGZonesAndSpaces(state,
                                bbModuleObject,
-                               state.dataHeatBal->ZoneElectricObjects,
+                               state.dataHeatBal->ZoneBBHeatObjects,
                                state.dataHeatBal->NumZoneBBHeatStatements,
                                state.dataHeatBal->TotBBHeat,
                                ErrorsFound);
@@ -6759,7 +6759,7 @@ namespace InternalHeatGains {
         }
 
         // Object report variables
-        for (int bbHeatNum = 1; bbHeatNum <= state.dataHeatBal->TotGasEquip; ++bbHeatNum) {
+        for (int bbHeatNum = 1; bbHeatNum <= state.dataHeatBal->TotBBHeat; ++bbHeatNum) {
             // Set flags for zone and space total report variables
             addZoneOutputs(state.dataHeatBal->ZoneBBHeat(bbHeatNum).ZonePtr) = true;
             addSpaceOutputs(state.dataHeatBal->ZoneBBHeat(bbHeatNum).spaceIndex) = true;
