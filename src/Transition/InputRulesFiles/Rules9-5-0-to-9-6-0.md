@@ -24,9 +24,17 @@ See [8466](https://github.com/NREL/EnergyPlus/pull/8466)
 
 # Object Change: AirLoopHVAC:OutdoorAirSystem
 
-Summary: The fourth field (Availability Manager name) was being ignored by EnergyPlus other than to verify that it was a valid availability manager (if it wasn’t blank).  It was not a required input and E+ wasn’t doing anything with it.  It was decided to remove this field to avoid any confusion.
+Summary: The fourth field (Availability Manager name) was being ignored by EnergyPlus other than to verify that it was a valid availability manager (if it wasn't blank).  It was not a required input and E+ wasn't doing anything with it.  It was decided to remove this field to avoid any confusion.
 
 Field 1-3 remain the same.
 Field 4 has been eliminated/deleted and not replace with anything else.
 
 See [8884](https://github.com/NREL/EnergyPlus/pull/8884)
+
+# Object Change: GroundHeatExchanger:System
+
+Summary: A new field was added to specify the method used to compute the g-function values. 
+
+Fields 1-9 remain the same.
+New Field F10 (A7) g-Function Calculation Method. Leave blank or assign a value of 'UHFcalc' or 'UBHWTcalc'. Default value is 'UHFcalc'.
+Remaining fields remain the same and are shifted.

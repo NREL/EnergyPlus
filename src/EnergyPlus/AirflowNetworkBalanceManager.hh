@@ -244,6 +244,7 @@ struct AirflowNetworkBalanceManagerData : BaseGlobalStruct
     int AirflowNetworkNumOfHorOpenings = 0;
     int AirflowNetworkNumOfSurCracks = 0;
     int AirflowNetworkNumOfSurELA = 0;
+    int AirflowNetworkNumOfSFR = 0;
     int AirflowNetworkNumOfExtNode = 0;
     int AirflowNetworkNumOfOutAirNode = 0;
     int AirflowNetworkNumOfSingleSideZones = 0; // Total number of zones with advanced single sided wind pressure coefficient calculation
@@ -336,6 +337,7 @@ struct AirflowNetworkBalanceManagerData : BaseGlobalStruct
         this->AirflowNetworkNumOfHorOpenings = 0;
         this->AirflowNetworkNumOfSurCracks = 0;
         this->AirflowNetworkNumOfSurELA = 0;
+        this->AirflowNetworkNumOfSFR = 0;
         this->AirflowNetworkNumOfExtNode = 0;
         this->AirflowNetworkNumOfOutAirNode = 0;
         this->AirflowNetworkNumOfSingleSideZones = 0;
