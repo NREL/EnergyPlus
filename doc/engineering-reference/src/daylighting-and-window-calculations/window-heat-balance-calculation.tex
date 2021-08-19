@@ -80,7 +80,7 @@ The four equations for double-glazing are as follows. The equations for single g
 \label{eq:GlazingFace4HeatBalEquation}
 \end{equation}
 
-Note that the coefficient adjustment ratio, \({r_o}\) and \({r_i}\), accounts for highly conductive simple glazing exterior windows. These adjustment ratios remain 1 for other cases.
+Note that the coefficient adjustment ratio, \({r_o}\) and \({r_i}\), accounts for highly conductive simple glazing exterior windows. For simple-glazing windows, these adjustment ratios are computed as a ratio between the input U and the initially computed nominal (or effective) U in function CalcNominalWindowCond. They remain 1 for other cases.
 
 \subsubsection{Absorbed Radiation}\label{absorbed-radiation}
 
@@ -200,7 +200,7 @@ The equations are solved as follows:
 {E_o}{\varepsilon_1} - {r_o}{h_{r,1}}{\theta_1} + {k_1}\left( {{\theta_2} - {\theta_1}} \right) + {r_o}{h_o}\left( {{T_o} - {\theta_1}} \right) + {S_1} = 0
 \end{equation}
 
-Note that the coefficient adjustment ratio, \({r_o}\), accounts for highly conductive simple glazing exterior windows. This adjustment ratio remains 1 for other cases.
+Note that the coefficient adjustment ratio, \({r_o}\), accounts for highly conductive simple glazing exterior windows. For simple-glazing windows, this adjustment ratio is computed as a ratio between the input U and the initially computed nominal (or effective) U in function CalcNominalWindowCond. It remains 1 for other cases.
 
 2)~~~~Write the equations in the matrix form \(A\theta = B\)
 
@@ -1051,7 +1051,7 @@ where
 
 \emph{S\(_{sh,2}\)} = solar radiation plus short-wave radiation from lights plus IR radiation from lights and zone equipment absorbed by the zone-side face of the shading layer (W/m\(^{2}\)K).
 
-Note that the coefficient adjustment ratio, \({r_i}\), accounts for highly conductive simple glazing exterior windows. This adjustment ratios remains 1 for other cases.
+Note that the coefficient adjustment ratio, \({r_i}\), accounts for highly conductive simple glazing exterior windows. For simple-glazing windows, this adjustment ratio is computed as a ratio between the input U and the initially computed nominal (or effective) U in function CalcNominalWindowCond. It remains 1 for other cases.
 
 \subsection{Solving for Gap Airflow and Temperature}\label{solving-for-gap-airflow-and-temperature}
 
