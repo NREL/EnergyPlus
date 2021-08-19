@@ -438,15 +438,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with R, insert the rules here
 
               ! If your original object starts with S, insert the rules here
-			  CASE('PERFORMANCEPRECISIONTRADEOFFS')
+              CASE('PERFORMANCEPRECISIONTRADEOFFS')
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                   nodiff=.false.
                   OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                   IF (MakeUPPERCase(InArgs(3)) == "MODE06") THEN
-                  OutArgs(3)='Mode07'
-			      ELSEIF (MakeUPPERCase(InArgs(3)) == "MODE07") THEN
-                  OutArgs(3)='Mode08'
-			      ELSE
+                    OutArgs(3)='Mode07'
+                  ELSEIF (MakeUPPERCase(InArgs(3)) == "MODE07") THEN
+                    OutArgs(3)='Mode08'
                   END IF
               ! If your original object starts with T, insert the rules here
 
