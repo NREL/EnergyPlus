@@ -39,7 +39,7 @@ add_simulation_test(IDF_FILE 4ZoneWithShading_Simple_1.idf EPW_FILE USA_CO_Golde
 add_simulation_test(IDF_FILE 4ZoneWithShading_Simple_2.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooled.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooledConvCoef.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
-add_simulation_test(IDF_FILE 5ZoneAirCooledWithSimpleSpaces.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+add_simulation_test(IDF_FILE 5ZoneAirCooledWithSpaces.idf PW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooledDemandLimiting.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooledDemandLimiting_FixedRateVentilation.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 5ZoneAirCooledDemandLimiting_ReductionRatioVentilation.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
