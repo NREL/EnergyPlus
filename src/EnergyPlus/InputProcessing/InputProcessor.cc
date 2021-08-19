@@ -102,7 +102,7 @@ static std::string const BlankString;
 
 using json = nlohmann::json;
 
-InputProcessor::InputProcessor() : idf_parser(std::unique_ptr<IdfParser>(new IdfParser())), data(std::unique_ptr<DataStorage>(new DataStorage()))
+InputProcessor::InputProcessor() : idf_parser(std::make_unique<IdfParser>()), data(std::make_unique<DataStorage>())
 {
     auto const embeddedEpJSONSchema = EmbeddedEpJSONSchema::embeddedEpJSONSchema();
     schema = json::from_cbor(embeddedEpJSONSchema.first, embeddedEpJSONSchema.second);
@@ -112,17 +112,17 @@ InputProcessor::InputProcessor() : idf_parser(std::unique_ptr<IdfParser>(new Idf
     for (auto it = loc.begin(); it != loc.end(); ++it) {
         caseInsensitiveObjectMap.emplace(convertToUpper(it.key()), it.key());
     }
-    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
-    data = std::unique_ptr<DataStorage>(new DataStorage());
+    idf_parser = std::make_unique<IdfParser>();
+    data = std::make_unique<DataStorage>();
     epJSON = json::object();
     //    objectCacheMap.clear();
     //    unusedInputs.clear();
-    validation = std::unique_ptr<Validation>(new Validation(&schema));
+    validation = std::make_unique<Validation>(&schema);
 }
 
 std::unique_ptr<InputProcessor> InputProcessor::factory()
 {
-    auto ret = std::unique_ptr<InputProcessor>(new InputProcessor());
+    auto ret = std::make_unique<InputProcessor>();
     return ret;
 }
 
@@ -181,12 +181,12 @@ json const &InputProcessor::getPatternProperties(EnergyPlusData &state, json con
 // Functions
 
 // void InputProcessor::clear_state() {
-//    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
-//    data = std::unique_ptr<DataStorage>(new DataStorage());
+//    idf_parser = std::make_unique<IdfParser>();
+//    data = std::make_unique<DataStorage>();
 //    epJSON = json::object();
 //    objectCacheMap.clear();
 //    unusedInputs.clear();
-//    validation = std::unique_ptr<Validation>(new Validation(&schema));
+//    validation = std::make_unique<Validation>(&schema);
 //}
 
 std::vector<std::string> const &InputProcessor::validationErrors()

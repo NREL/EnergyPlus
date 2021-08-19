@@ -111,8 +111,8 @@ std::ostream::pos_type InputFile::position() const noexcept
 
 void InputFile::open(bool, bool)
 {
-    is = std::unique_ptr<std::istream>(new std::fstream(filePath.c_str(), std::ios_base::in | std::ios_base::binary));
     is->imbue(std::locale("C"));
+    is = std::make_unique<std::fstream>(filePath.c_str(), std::ios_base::in | std::ios_base::binary);
 }
 
 std::string InputFile::error_state_to_string() const
@@ -213,7 +213,7 @@ void InputOutputFile::del()
 
 void InputOutputFile::open_as_stringstream()
 {
-    os = std::unique_ptr<std::iostream>(new std::stringstream());
+    os = std::make_unique<std::stringstream>();
 }
 
 void InputOutputFile::flush()
@@ -252,12 +252,12 @@ void InputOutputFile::open(const bool forAppend, bool output_to_file)
         }
     }();
     if (!output_to_file) {
-        os = std::unique_ptr<std::iostream>(new std::iostream(nullptr));
         os->imbue(std::locale("C"));
+        os = std::make_unique<std::iostream>(nullptr);
         print_to_dev_null = true;
     } else {
-        os = std::unique_ptr<std::iostream>(new std::fstream(filePath.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
         os->imbue(std::locale("C"));
+        os = std::make_unique<std::fstream>(filePath.c_str(), std::ios_base::in | std::ios_base::out | appendMode);
         print_to_dev_null = false;
     }
 }

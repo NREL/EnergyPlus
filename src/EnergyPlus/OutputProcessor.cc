@@ -8718,7 +8718,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
 
 int initErrorFile(EnergyPlusData &state)
 {
-    state.files.err_stream = std::unique_ptr<std::ostream>(new std::ofstream(state.files.outputErrFilePath));
+    state.files.err_stream = std::make_unique<std::ofstream>(state.files.outputErrFilePath);
     if (state.files.err_stream->bad()) {
         DisplayString(state, "ERROR: Could not open file " + state.files.outputErrFilePath.string() + " for output (write).");
         return EXIT_FAILURE;

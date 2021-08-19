@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ headers
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 
@@ -133,13 +134,13 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                 }
             }
         }
-        std::shared_ptr<std::ofstream> errorStream =
+        auto errorStream =
             std::make_shared<std::ofstream>(state.dataStrGlobals->outputSqliteErrFilePath, std::ofstream::out | std::ofstream::trunc);
-        return std::unique_ptr<SQLite>(new SQLite(errorStream,
-                                                  state.dataStrGlobals->outputSqlFilePath,
-                                                  state.dataStrGlobals->outputSqliteErrFilePath,
-                                                  writeOutputToSQLite,
-                                                  writeTabularDataToSQLite));
+        return std::make_unique<SQLite>(errorStream,
+                                        state.dataStrGlobals->outputSqlFilePath,
+                                        state.dataStrGlobals->outputSqliteErrFilePath,
+                                        writeOutputToSQLite,
+                                        writeTabularDataToSQLite);
     } catch (const std::runtime_error &error) {
         ShowFatalError(state, error.what());
         return nullptr;
@@ -2107,88 +2108,88 @@ void SQLite::createSQLiteEnvironmentPeriodRecord(const int curEnvirNum,
 
 void SQLite::addScheduleData(int const number, std::string const &name, std::string const &type, double const minValue, double const maxValue)
 {
-    schedules.push_back(std::unique_ptr<Schedule>(new Schedule(m_errorStream, m_db, number, name, type, minValue, maxValue)));
+    schedules.push_back(std::make_unique<Schedule>(m_errorStream, m_db, number, name, type, minValue, maxValue));
 }
 
 void SQLite::addZoneData(int const number, DataHeatBalance::ZoneData const &zoneData)
 {
-    zones.push_back(std::unique_ptr<Zone>(new Zone(m_errorStream, m_db, number, zoneData)));
+    zones.push_back(std::make_unique<Zone>(m_errorStream, m_db, number, zoneData));
 }
 
 void SQLite::addZoneListData(int const number, DataHeatBalance::ZoneListData const &zoneListData)
 {
-    zoneLists.push_back(std::unique_ptr<ZoneList>(new ZoneList(m_errorStream, m_db, number, zoneListData)));
+    zoneLists.push_back(std::make_unique<ZoneList>(m_errorStream, m_db, number, zoneListData));
 }
 
 void SQLite::addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string const &surfaceClass)
 {
-    surfaces.push_back(std::unique_ptr<Surface>(new Surface(m_errorStream, m_db, number, surfaceData, surfaceClass)));
+    surfaces.push_back(std::make_unique<Surface>(m_errorStream, m_db, number, surfaceData, surfaceClass));
 }
 
 void SQLite::addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData const &zoneGroupData)
 {
-    zoneGroups.push_back(std::unique_ptr<ZoneGroup>(new ZoneGroup(m_errorStream, m_db, number, zoneGroupData)));
+    zoneGroups.push_back(std::make_unique<ZoneGroup>(m_errorStream, m_db, number, zoneGroupData));
 }
 
 void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialProperties const &materialData)
 {
-    materials.push_back(std::unique_ptr<Material>(new Material(m_errorStream, m_db, number, materialData)));
+    materials.push_back(std::make_unique<Material>(m_errorStream, m_db, number, materialData));
 }
 void SQLite::addConstructionData(int const number,
                                  EnergyPlus::Construction::ConstructionProps const &constructionData,
                                  double const &constructionUValue)
 {
-    constructions.push_back(std::unique_ptr<Construction>(new Construction(m_errorStream, m_db, number, constructionData, constructionUValue)));
+    constructions.push_back(std::make_unique<Construction>(m_errorStream, m_db, number, constructionData, constructionUValue));
 }
 void SQLite::addNominalLightingData(int const number, DataHeatBalance::LightsData const &nominalLightingData)
 {
-    nominalLightings.push_back(std::unique_ptr<NominalLighting>(new NominalLighting(m_errorStream, m_db, number, nominalLightingData)));
+    nominalLightings.push_back(std::make_unique<NominalLighting>(m_errorStream, m_db, number, nominalLightingData));
 }
 void SQLite::addNominalPeopleData(int const number, DataHeatBalance::PeopleData const &nominalPeopleData)
 {
-    nominalPeoples.push_back(std::unique_ptr<NominalPeople>(new NominalPeople(m_errorStream, m_db, number, nominalPeopleData)));
+    nominalPeoples.push_back(std::make_unique<NominalPeople>(m_errorStream, m_db, number, nominalPeopleData));
 }
 void SQLite::addNominalElectricEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalElectricEquipmentData)
 {
     nominalElectricEquipments.push_back(
-        std::unique_ptr<NominalElectricEquipment>(new NominalElectricEquipment(m_errorStream, m_db, number, nominalElectricEquipmentData)));
+        std::make_unique<NominalElectricEquipment>(m_errorStream, m_db, number, nominalElectricEquipmentData));
 }
 void SQLite::addNominalGasEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalGasEquipmentData)
 {
     nominalGasEquipments.push_back(
-        std::unique_ptr<NominalGasEquipment>(new NominalGasEquipment(m_errorStream, m_db, number, nominalGasEquipmentData)));
+        std::make_unique<NominalGasEquipment>(m_errorStream, m_db, number, nominalGasEquipmentData));
 }
 void SQLite::addNominalSteamEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalSteamEquipmentData)
 {
     nominalSteamEquipments.push_back(
-        std::unique_ptr<NominalSteamEquipment>(new NominalSteamEquipment(m_errorStream, m_db, number, nominalSteamEquipmentData)));
+        std::make_unique<NominalSteamEquipment>(m_errorStream, m_db, number, nominalSteamEquipmentData));
 }
 void SQLite::addNominalHotWaterEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalHotWaterEquipmentData)
 {
     nominalHotWaterEquipments.push_back(
-        std::unique_ptr<NominalHotWaterEquipment>(new NominalHotWaterEquipment(m_errorStream, m_db, number, nominalHotWaterEquipmentData)));
+        std::make_unique<NominalHotWaterEquipment>(m_errorStream, m_db, number, nominalHotWaterEquipmentData));
 }
 void SQLite::addNominalOtherEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalOtherEquipmentData)
 {
     nominalOtherEquipments.push_back(
-        std::unique_ptr<NominalOtherEquipment>(new NominalOtherEquipment(m_errorStream, m_db, number, nominalOtherEquipmentData)));
+        std::make_unique<NominalOtherEquipment>(m_errorStream, m_db, number, nominalOtherEquipmentData));
 }
 void SQLite::addNominalBaseboardData(int const number, DataHeatBalance::BBHeatData const &nominalBaseboardData)
 {
     nominalBaseboardHeats.push_back(
-        std::unique_ptr<NominalBaseboardHeat>(new NominalBaseboardHeat(m_errorStream, m_db, number, nominalBaseboardData)));
+        std::make_unique<NominalBaseboardHeat>(m_errorStream, m_db, number, nominalBaseboardData));
 }
 void SQLite::addInfiltrationData(int const number, DataHeatBalance::InfiltrationData const &infiltrationData)
 {
-    infiltrations.push_back(std::unique_ptr<Infiltration>(new Infiltration(m_errorStream, m_db, number, infiltrationData)));
+    infiltrations.push_back(std::make_unique<Infiltration>(m_errorStream, m_db, number, infiltrationData));
 }
 void SQLite::addVentilationData(int const number, DataHeatBalance::VentilationData const &ventilationData)
 {
-    ventilations.push_back(std::unique_ptr<Ventilation>(new Ventilation(m_errorStream, m_db, number, ventilationData)));
+    ventilations.push_back(std::make_unique<Ventilation>(m_errorStream, m_db, number, ventilationData));
 }
 void SQLite::addRoomAirModelData(int const number, DataRoomAirModel::AirModelData const &roomAirModelData)
 {
-    roomAirModels.push_back(std::unique_ptr<RoomAirModel>(new RoomAirModel(m_errorStream, m_db, number, roomAirModelData)));
+    roomAirModels.push_back(std::make_unique<RoomAirModel>(m_errorStream, m_db, number, roomAirModelData));
 }
 
 bool SQLite::ZoneGroup::insertIntoSQLite(sqlite3_stmt *insertStmt)

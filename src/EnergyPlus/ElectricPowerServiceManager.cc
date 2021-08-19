@@ -297,7 +297,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                 if (powerOutTransformerObj_ == nullptr) {
                     ++numPowerOutTransformers_;
                     powerOutTransformerName_ = state.dataIPShortCut->cAlphaArgs(1);
-                    powerOutTransformerObj_ = std::unique_ptr<ElectricTransformer>(new ElectricTransformer(state, powerOutTransformerName_));
+                    powerOutTransformerObj_ = std::make_unique<ElectricTransformer>(state, powerOutTransformerName_);
 
                 } else {
                     ShowWarningError(state,
@@ -307,7 +307,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
         }
         if (foundInFromGridTransformer) {
             // call transformer constructor
-            facilityPowerInTransformerObj_ = std::unique_ptr<ElectricTransformer>(new ElectricTransformer(state, facilityPowerInTransformerName_));
+            facilityPowerInTransformerObj_ = std::make_unique<ElectricTransformer>(state, facilityPowerInTransformerName_);
         }
     } // if transformers
 
@@ -1032,7 +1032,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
     if (!errorsFound && inverterPresent) {
         // call inverter constructor
-        inverterObj = std::unique_ptr<DCtoACInverter>(new DCtoACInverter(state, inverterName));
+        inverterObj = std::make_unique<DCtoACInverter>(state, inverterName);
 
         // Make sure only Generator::PVWatts are used with Inverter:PVWatts
         // Add up the total DC capacity and pass it to the inverter.
@@ -1061,7 +1061,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
     if (!errorsFound && storagePresent_) {
         // call storage constructor
-        storageObj = std::unique_ptr<ElectricStorage>(new ElectricStorage(state, storageName_));
+        storageObj = std::make_unique<ElectricStorage>(state, storageName_);
     }
 
     if (!errorsFound && transformerPresent_) {
@@ -1085,7 +1085,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3),
                                             "LoadCenterPowerConditioning")) { // this is the right kind of transformer
-                transformerObj = std::unique_ptr<ElectricTransformer>(new ElectricTransformer(state, transformerName_));
+                transformerObj = std::make_unique<ElectricTransformer>(state, transformerName_);
             } else {
                 ShowWarningError(state,
                                  "Transformer named " + transformerName_ + " associated with the load center named " + name_ + " should have " +
@@ -1099,7 +1099,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
     if (!errorsFound && converterPresent_) {
         // call AC to DC converter constructor
-        converterObj = std::unique_ptr<ACtoDCConverter>(new ACtoDCConverter(state, converterName_));
+        converterObj = std::make_unique<ACtoDCConverter>(state, converterName_);
     }
 
     // Setup general output variables for reporting in the electric load center
@@ -3564,8 +3564,8 @@ ElectricStorage::ElectricStorage( // main constructor
                                                 20.0 // Picking a temperature for now, will reset before each run.
                                                 ),
                                   nullptr));
-                ssc_lastBatteryState_ = std::unique_ptr<battery_state>(new battery_state(ssc_battery_->get_state()));
-                ssc_initBatteryState_ = std::unique_ptr<battery_state>(new battery_state(ssc_battery_->get_state()));
+                ssc_lastBatteryState_ = std::make_unique<battery_state>(ssc_battery_->get_state());
+                ssc_initBatteryState_ = std::make_unique<battery_state>(ssc_battery_->get_state());
             }
 
             break;

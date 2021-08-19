@@ -110,10 +110,10 @@ void EnergyPlusFixture::SetUp()
     state->files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
 
     m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    m_redirect_cout = std::unique_ptr<RedirectCout>(new RedirectCout(m_cout_buffer));
+    m_redirect_cout = std::make_unique<RedirectCout>(m_cout_buffer);
 
     m_cerr_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    m_redirect_cerr = std::unique_ptr<RedirectCerr>(new RedirectCerr(m_cerr_buffer));
+    m_redirect_cerr = std::make_unique<RedirectCerr>(m_cerr_buffer);
 
     state->dataUtilityRoutines->outputErrorHeader = false;
 
@@ -375,7 +375,7 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
 //
 //    std::unique_ptr<std::istream> idd_stream;
 //    if (!idd.empty()) {
-//        idd_stream = std::unique_ptr<std::istringstream>(new std::istringstream(idd));
+//        idd_stream = std::make_unique<std::istringstream>(idd);
 //    } else {
 //        static auto const exeDirectoryPath = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
 //        static auto idd_location = exeDirectoryPath / "Energy+.schema.epJSON";
@@ -394,7 +394,7 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
 //            return errors_found;
 //        }
 //
-//        idd_stream = std::unique_ptr<std::ifstream>(new std::ifstream(idd_location, std::ios_base::in | std::ios_base::binary));
+//        idd_stream = std::make_unique<std::ifstream>(idd_location, std::ios_base::in | std::ios_base::binary);
 //    }
 //
 //    if (!idd_stream->good()) {

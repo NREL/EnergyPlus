@@ -149,8 +149,8 @@ void cleanEPJSON(json &epjson)
 
 bool processInput(std::string const &inputFilePath, json const &schema, OutputTypes outputType, fs::path outputDirPath, std::string &outputTypeStr)
 {
-    auto validation(std::unique_ptr<Validation>(new Validation(&schema)));
-    auto idf_parser(std::unique_ptr<IdfParser>(new IdfParser()));
+    auto validation(std::make_unique<Validation>(&schema));
+    auto idf_parser(std::make_unique<IdfParser>());
     json epJSON;
 
     auto const inputFilePathNameOnly = EnergyPlus::FileSystem::removeFileExtension(EnergyPlus::FileSystem::getFileName(inputFilePath));
