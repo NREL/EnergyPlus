@@ -696,13 +696,52 @@ input object shown above in IDF format is shown below in epJSON format:
     }
 }
 \end{verbatim}
+
+
+\subsection*{Converting between IDF and epJSON}
+
 While the IDF and epJSON file formats are quite different, they contain
 the same information, and either may be used. In general, if producing
 EnergyPlus input files using a programming language, the epJSON format
 might make more sense while, at this point, if producing IDF files
-using a GUI, they are likely to use the IDF format. EnergyPlus, when
+using a GUI, they are likely to use the IDF format. 
+
+EnergyPlus, when
 used on the command line, can convert from IDF to epJSON and from
 epJSON to IDF using the -c or -{}-convert option.
+
+There is also a separate conversion utility ConvertInputFormat.exe in the root EnergyPlus folder.
+It takes the name of an IDF or epJSON input file (with extension) as an argument. For additional options,
+type 
+\begin{verbatim}
+ConvertInputFormat --help.
+\end{verbatim}
+when in the EnergyPlus folder. This will give the following display
+of options:
+\begin{verbatim}
+Usage: ConvertInputFormat [OPTIONS] input_file [input_file ..]
+Options:
+  -f, --format ARG                 Output format.
+                                   Default means IDF->epJSON or epJSON->IDF
+                                   Select one (case insensitive):
+                                   default,idf,epjson,json,cbor,msgpack,ubjson,bson
+  -h,   -help,   --help, --usage   Display usage instructions.
+  -i, --input ARG                  Text file with list of input files to convert
+                                   (newline delimited)
+  -j ARG                           Number of threads
+  -n, --noHVACTemplate             Do not convert HVACTemplate objects.
+  -o, --output ARG                 Output directory. Will use input file
+                                   location by default.
+  -v, --version                    Display version information
+Example: ConvertInputFormat in.idf
+\end{verbatim}
+
+On Windows, you can also drag a file (IDF or epJSON) onto ConvertInputFormat.exe.
+Note that ConvertInputFormat is version-specific and will not convert an epJSON file that is not the same version.
+
+There are three groups of special input objects which are preprocessor commands: GroundHeatTransfer:*,
+HVACTemplate:* Parametric:*. ConverInputFormat converts HVACTemplate objects.  EnergyPlus does not convert any of these.
+
 
 \section{Creating and Editing Input Files}
 
