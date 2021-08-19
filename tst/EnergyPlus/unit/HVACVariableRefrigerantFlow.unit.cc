@@ -4925,7 +4925,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 
     // Additional tests for fuel type input
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFTUNum).FuelType, "Electricity");
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFTUNum).FuelTypeNum, DataGlobalConstants::ResourceType::Electricity);
+    EXPECT_TRUE(compare_enums(state->dataHVACVarRefFlow->VRF(VRFTUNum).FuelTypeNum, DataGlobalConstants::ResourceType::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
@@ -14525,7 +14525,7 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_EQ(1.00, maxEIRfLowPLRXInput);               // getinput checks this
     EXPECT_GT(thisHeatEIRFPLR.Var1Min, thisVRF.MinPLR); // expect warning message
     EXPECT_EQ(thisVRF.FuelType, "Electricity"); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
-    EXPECT_EQ(thisVRF.FuelTypeNum, DataGlobalConstants::ResourceType::Electricity); // Check fuel type input that uses
+    EXPECT_TRUE(compare_enums(thisVRF.FuelTypeNum, DataGlobalConstants::ResourceType::Electricity)); // Check fuel type input that uses
                                                                                     // UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
 }
 

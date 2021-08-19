@@ -638,7 +638,7 @@ TEST_F(InputProcessorFixture, parse_latin1_json)
     json &epJSON = getEpJSON();
 
     auto it = epJSON.find("Construction");
-    ASSERT_NE(it, epJSON.end());
+    ASSERT_TRUE(it !=epJSON.end());
     auto iit = it->begin();
     EXPECT_EQ("1\xB0piano", iit.key());
 }
@@ -1961,31 +1961,31 @@ TEST_F(InputProcessorFixture, look_ahead)
     size_t index = 0;
     IdfParser::Token token = look_ahead(test_input, index);
     EXPECT_EQ(0ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     index = 2;
     token = look_ahead(test_input, index);
     EXPECT_EQ(2ul, index);
-    EXPECT_EQ(IdfParser::Token::COMMA, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::COMMA, token));
     index = 3;
     token = look_ahead(test_input, index);
     EXPECT_EQ(3ul, index);
-    EXPECT_EQ(IdfParser::Token::EXCLAMATION, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::EXCLAMATION, token));
     index = 5;
     token = look_ahead(test_input, index);
     EXPECT_EQ(5ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     index = 7;
     token = look_ahead(test_input, index);
     EXPECT_EQ(7ul, index);
-    EXPECT_EQ(IdfParser::Token::SEMICOLON, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::SEMICOLON, token));
     index = 9;
     token = look_ahead(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     index = test_input.size();
     token = look_ahead(test_input, index);
     EXPECT_EQ(test_input.size(), index);
-    EXPECT_EQ(IdfParser::Token::END, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::END, token));
 }
 
 TEST_F(InputProcessorFixture, next_token)
@@ -1995,26 +1995,26 @@ TEST_F(InputProcessorFixture, next_token)
     std::string const test_input("B , ! t ; `");
     IdfParser::Token token = next_token(test_input, index);
     EXPECT_EQ(1ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     token = next_token(test_input, index);
     EXPECT_EQ(3ul, index);
-    EXPECT_EQ(IdfParser::Token::COMMA, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::COMMA, token));
     token = next_token(test_input, index);
     EXPECT_EQ(5ul, index);
-    EXPECT_EQ(IdfParser::Token::EXCLAMATION, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::EXCLAMATION, token));
     token = next_token(test_input, index);
     EXPECT_EQ(7ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     token = next_token(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_EQ(IdfParser::Token::SEMICOLON, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::SEMICOLON, token));
     token = next_token(test_input, index);
     EXPECT_EQ(11ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     index = test_input.size();
     token = next_token(test_input, index);
     EXPECT_EQ(test_input.size(), index);
-    EXPECT_EQ(IdfParser::Token::END, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::END, token));
 }
 
 TEST_F(InputProcessorFixture, getObjectItem_json1)

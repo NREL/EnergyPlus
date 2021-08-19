@@ -20182,12 +20182,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
                                                     state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}));
     EXPECT_GT(GetIndex, 0);
     EXPECT_EQ(GetIndex, state->dataAirflowNetwork->MultizoneSurfaceData(1).VentingSchNum);
-    EXPECT_EQ(state->dataAirflowNetwork->MultizoneSurfaceData(1).VentSurfCtrNum, AirflowNetwork::VentControlType::Temp);
+    EXPECT_TRUE(compare_enums(state->dataAirflowNetwork->MultizoneSurfaceData(1).VentSurfCtrNum, AirflowNetwork::VentControlType::Temp));
 
     // MultizoneSurfaceData(2) is connected to an air boundary surface
     // venting schedule should be zero and venting method should be Constant
     EXPECT_EQ(0, state->dataAirflowNetwork->MultizoneSurfaceData(2).VentingSchNum);
-    EXPECT_EQ(state->dataAirflowNetwork->MultizoneSurfaceData(2).VentSurfCtrNum, AirflowNetwork::VentControlType::Const);
+    EXPECT_TRUE(compare_enums(state->dataAirflowNetwork->MultizoneSurfaceData(2).VentSurfCtrNum, AirflowNetwork::VentControlType::Const));
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportZoneERV)
@@ -21164,7 +21164,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestDefaultBehaviourOfSimulationControl
     EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.BldgType, "LOWRISE");
     EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.InitType, "ZERONODEPRESSURES");
     EXPECT_FALSE(state->dataAirflowNetwork->AirflowNetworkSimu.TExtHeightDep);
-    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.solver, AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU);
+    EXPECT_TRUE(compare_enums(state->dataAirflowNetwork->AirflowNetworkSimu.solver, AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU));
     //// Use default values for numerical fields
     EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.MaxIteration, 500);
     EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.RelTol, 1.0E-4, 0.00001);

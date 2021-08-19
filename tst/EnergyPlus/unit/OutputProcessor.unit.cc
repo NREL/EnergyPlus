@@ -1273,7 +1273,7 @@ namespace OutputProcessor {
             {OutputProcessor::SOVTimeStepType::Plant, OutputProcessor::TimeStepType::TimeStepSystem}};
 
         for (auto const &indexGroup : resource_map) {
-            EXPECT_EQ(indexGroup.second, ValidateTimeStepType(*state, indexGroup.first));
+            EXPECT_TRUE(compare_enums(indexGroup.second, ValidateTimeStepType(*state, indexGroup.first)));
         }
     }
 
@@ -1296,7 +1296,7 @@ namespace OutputProcessor {
                                                                                  {OutputProcessor::SOVStoreType::Summed, StoreType::Summed}};
 
         for (auto const &variableType : resource_map) {
-            EXPECT_EQ(variableType.second, validateVariableType(*state, variableType.first));
+            EXPECT_TRUE(compare_enums(variableType.second, validateVariableType(*state, variableType.first)));
         }
     }
 
@@ -1313,43 +1313,43 @@ namespace OutputProcessor {
         bool errorFound = false;
 
         DetermineMeterIPUnits(*state, ipUnits, "ELEC", OutputProcessor::Unit::J, errorFound);
-        EXPECT_EQ(RT_IPUnits::Electricity, ipUnits);
+        EXPECT_TRUE(compare_enums(RT_IPUnits::Electricity, ipUnits));
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "GAS", OutputProcessor::Unit::J, errorFound);
-        EXPECT_EQ(RT_IPUnits::Gas, ipUnits);
+        EXPECT_TRUE(compare_enums(RT_IPUnits::Gas, ipUnits));
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "COOL", OutputProcessor::Unit::J, errorFound);
-        EXPECT_EQ(RT_IPUnits::Cooling, ipUnits);
+        EXPECT_TRUE(compare_enums(RT_IPUnits::Cooling, ipUnits));
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "WATER", OutputProcessor::Unit::m3, errorFound);
-        EXPECT_EQ(RT_IPUnits::Water, ipUnits);
+        EXPECT_TRUE(compare_enums(RT_IPUnits::Water, ipUnits));
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "OTHER", OutputProcessor::Unit::m3, errorFound);
-        EXPECT_EQ(RT_IPUnits::OtherM3, ipUnits);
+        EXPECT_TRUE(compare_enums(RT_IPUnits::OtherM3, ipUnits));
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "OTHER", OutputProcessor::Unit::kg, errorFound);
-        EXPECT_EQ(RT_IPUnits::OtherKG, ipUnits);
+        EXPECT_TRUE(compare_enums(RT_IPUnits::OtherKG, ipUnits));
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "OTHER", OutputProcessor::Unit::L, errorFound);
-        EXPECT_EQ(RT_IPUnits::OtherL, ipUnits);
+        EXPECT_TRUE(compare_enums(RT_IPUnits::OtherL, ipUnits));
         EXPECT_FALSE(errorFound);
 
         state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
         ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
         DetermineMeterIPUnits(*state, ipUnits, "UNKONWN", OutputProcessor::Unit::unknown, errorFound); // was "badunits"
-        EXPECT_EQ(RT_IPUnits::OtherJ, ipUnits);
+        EXPECT_TRUE(compare_enums(RT_IPUnits::OtherJ, ipUnits));
         EXPECT_TRUE(errorFound);
 
         ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
         DetermineMeterIPUnits(*state, ipUnits, "ELEC", OutputProcessor::Unit::unknown, errorFound); // was "kWh"
-        EXPECT_EQ(RT_IPUnits::Electricity, ipUnits);
+        EXPECT_TRUE(compare_enums(RT_IPUnits::Electricity, ipUnits));
         EXPECT_TRUE(errorFound);
 
         auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
@@ -2708,7 +2708,7 @@ namespace OutputProcessor {
         EXPECT_EQ(endUse, state->dataOutputProcessor->EnergyMeters(1).EndUse);
         EXPECT_EQ(endUseSub, state->dataOutputProcessor->EnergyMeters(1).EndUseSub);
         EXPECT_EQ(group, state->dataOutputProcessor->EnergyMeters(1).Group);
-        EXPECT_EQ(units, state->dataOutputProcessor->EnergyMeters(1).Units);
+        EXPECT_TRUE(compare_enums(units, state->dataOutputProcessor->EnergyMeters(1).Units));
         EXPECT_EQ(1, state->dataOutputProcessor->EnergyMeters(1).TSRptNum);
         EXPECT_EQ(2, state->dataOutputProcessor->EnergyMeters(1).HRRptNum);
         EXPECT_EQ(3, state->dataOutputProcessor->EnergyMeters(1).DYRptNum);
@@ -3054,35 +3054,35 @@ namespace OutputProcessor {
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(1).VarName);
-        EXPECT_EQ(ReportingFrequency::TimeStep, state->dataOutputProcessor->ReqRepVars(1).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::TimeStep, state->dataOutputProcessor->ReqRepVars(1).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(1).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(1).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(2).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(2).VarName);
-        EXPECT_EQ(ReportingFrequency::Hourly, state->dataOutputProcessor->ReqRepVars(2).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Hourly, state->dataOutputProcessor->ReqRepVars(2).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(2).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(2).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(2).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(3).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(3).VarName);
-        EXPECT_EQ(ReportingFrequency::Daily, state->dataOutputProcessor->ReqRepVars(3).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Daily, state->dataOutputProcessor->ReqRepVars(3).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(3).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(3).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(3).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(4).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(4).VarName);
-        EXPECT_EQ(ReportingFrequency::Monthly, state->dataOutputProcessor->ReqRepVars(4).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Monthly, state->dataOutputProcessor->ReqRepVars(4).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(4).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(4).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(4).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(5).VarName);
-        EXPECT_EQ(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(5).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(5).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(5).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(5).Used);
@@ -3113,35 +3113,35 @@ namespace OutputProcessor {
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(1).VarName);
-        EXPECT_EQ(ReportingFrequency::TimeStep, state->dataOutputProcessor->ReqRepVars(1).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::TimeStep, state->dataOutputProcessor->ReqRepVars(1).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(1).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(1).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(2).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(2).VarName);
-        EXPECT_EQ(ReportingFrequency::Hourly, state->dataOutputProcessor->ReqRepVars(2).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Hourly, state->dataOutputProcessor->ReqRepVars(2).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(2).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(2).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(2).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(3).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(3).VarName);
-        EXPECT_EQ(ReportingFrequency::Daily, state->dataOutputProcessor->ReqRepVars(3).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Daily, state->dataOutputProcessor->ReqRepVars(3).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(3).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(3).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(3).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(4).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(4).VarName);
-        EXPECT_EQ(ReportingFrequency::Monthly, state->dataOutputProcessor->ReqRepVars(4).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Monthly, state->dataOutputProcessor->ReqRepVars(4).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(4).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(4).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(4).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(5).VarName);
-        EXPECT_EQ(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(5).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(5).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(5).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(5).Used);
@@ -3360,35 +3360,35 @@ namespace OutputProcessor {
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(1).VarName);
-        EXPECT_EQ(ReportingFrequency::TimeStep, state->dataOutputProcessor->ReqRepVars(1).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::TimeStep, state->dataOutputProcessor->ReqRepVars(1).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(1).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(1).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(2).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(2).VarName);
-        EXPECT_EQ(ReportingFrequency::Hourly, state->dataOutputProcessor->ReqRepVars(2).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Hourly, state->dataOutputProcessor->ReqRepVars(2).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(2).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(2).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(2).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(3).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(3).VarName);
-        EXPECT_EQ(ReportingFrequency::Daily, state->dataOutputProcessor->ReqRepVars(3).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Daily, state->dataOutputProcessor->ReqRepVars(3).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(3).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(3).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(3).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(4).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(4).VarName);
-        EXPECT_EQ(ReportingFrequency::Monthly, state->dataOutputProcessor->ReqRepVars(4).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Monthly, state->dataOutputProcessor->ReqRepVars(4).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(4).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(4).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(4).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(5).VarName);
-        EXPECT_EQ(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(5).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(5).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(5).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).SchedName);
         EXPECT_FALSE(state->dataOutputProcessor->ReqRepVars(5).Used);
@@ -3410,7 +3410,7 @@ namespace OutputProcessor {
 
         for (auto const &option : valid_options) {
             report_freq = determineFrequency(*state, option.first);
-            EXPECT_EQ(option.second, report_freq);
+            EXPECT_TRUE(compare_enums(option.second, report_freq));
         }
     }
 
@@ -3455,37 +3455,37 @@ namespace OutputProcessor {
                                 VariableType::Real,
                                 OutputProcessor::Unit::Perc);
 
-        EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType);
-        EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(1).storeType);
-        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).variableType);
+        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType));
+        EXPECT_TRUE(compare_enums(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(1).storeType));
+        EXPECT_TRUE(compare_enums(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).variableType));
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(1).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(1).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->DDVariableTypes(1).VarNameOnly);
-        EXPECT_EQ(OutputProcessor::Unit::C, state->dataOutputProcessor->DDVariableTypes(1).units);
+        EXPECT_TRUE(compare_enums(OutputProcessor::Unit::C, state->dataOutputProcessor->DDVariableTypes(1).units));
 
-        EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(2).timeStepType);
-        EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(2).storeType);
-        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(2).variableType);
+        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(2).timeStepType));
+        EXPECT_TRUE(compare_enums(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(2).storeType));
+        EXPECT_TRUE(compare_enums(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(2).variableType));
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(2).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(2).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Wetbulb Temperature", state->dataOutputProcessor->DDVariableTypes(2).VarNameOnly);
-        EXPECT_EQ(OutputProcessor::Unit::C, state->dataOutputProcessor->DDVariableTypes(2).units);
+        EXPECT_TRUE(compare_enums(OutputProcessor::Unit::C, state->dataOutputProcessor->DDVariableTypes(2).units));
 
-        EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(3).timeStepType);
-        EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(3).storeType);
-        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(3).variableType);
+        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(3).timeStepType));
+        EXPECT_TRUE(compare_enums(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(3).storeType));
+        EXPECT_TRUE(compare_enums(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(3).variableType));
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(3).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(3).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Humidity Ratio", state->dataOutputProcessor->DDVariableTypes(3).VarNameOnly);
-        EXPECT_EQ(OutputProcessor::Unit::kgWater_kgDryAir, state->dataOutputProcessor->DDVariableTypes(3).units);
+        EXPECT_TRUE(compare_enums(OutputProcessor::Unit::kgWater_kgDryAir, state->dataOutputProcessor->DDVariableTypes(3).units));
 
-        EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(4).timeStepType);
-        EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(4).storeType);
-        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(4).variableType);
+        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(4).timeStepType));
+        EXPECT_TRUE(compare_enums(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(4).storeType));
+        EXPECT_TRUE(compare_enums(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(4).variableType));
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(4).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(4).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Relative Humidity", state->dataOutputProcessor->DDVariableTypes(4).VarNameOnly);
-        EXPECT_EQ(OutputProcessor::Unit::Perc, state->dataOutputProcessor->DDVariableTypes(4).units);
+        EXPECT_TRUE(compare_enums(OutputProcessor::Unit::Perc, state->dataOutputProcessor->DDVariableTypes(4).units));
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_setupOutputVariable)
@@ -3515,14 +3515,14 @@ namespace OutputProcessor {
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(1).VarName);
-        EXPECT_EQ(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(1).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(1).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(1).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).SchedName);
         EXPECT_EQ(true, state->dataOutputProcessor->ReqRepVars(1).Used);
 
-        EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType);
-        EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(1).storeType);
-        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).variableType);
+        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType));
+        EXPECT_TRUE(compare_enums(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(1).storeType));
+        EXPECT_TRUE(compare_enums(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).variableType));
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(1).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(1).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->DDVariableTypes(1).VarNameOnly);
@@ -3947,35 +3947,35 @@ namespace OutputProcessor {
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(1).VarName);
-        EXPECT_EQ(ReportingFrequency::TimeStep, state->dataOutputProcessor->ReqRepVars(1).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::TimeStep, state->dataOutputProcessor->ReqRepVars(1).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(1).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).SchedName);
         EXPECT_EQ(true, state->dataOutputProcessor->ReqRepVars(1).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(2).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(2).VarName);
-        EXPECT_EQ(ReportingFrequency::Hourly, state->dataOutputProcessor->ReqRepVars(2).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Hourly, state->dataOutputProcessor->ReqRepVars(2).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(2).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(2).SchedName);
         EXPECT_EQ(true, state->dataOutputProcessor->ReqRepVars(2).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(3).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(3).VarName);
-        EXPECT_EQ(ReportingFrequency::Daily, state->dataOutputProcessor->ReqRepVars(3).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Daily, state->dataOutputProcessor->ReqRepVars(3).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(3).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(3).SchedName);
         EXPECT_EQ(true, state->dataOutputProcessor->ReqRepVars(3).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(4).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(4).VarName);
-        EXPECT_EQ(ReportingFrequency::Monthly, state->dataOutputProcessor->ReqRepVars(4).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Monthly, state->dataOutputProcessor->ReqRepVars(4).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(4).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(4).SchedName);
         EXPECT_EQ(true, state->dataOutputProcessor->ReqRepVars(4).Used);
 
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).Key);
         EXPECT_EQ("SITE OUTDOOR AIR DRYBULB TEMPERATURE", state->dataOutputProcessor->ReqRepVars(5).VarName);
-        EXPECT_EQ(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(5).frequency);
+        EXPECT_TRUE(compare_enums(ReportingFrequency::Simulation, state->dataOutputProcessor->ReqRepVars(5).frequency));
         EXPECT_EQ(0, state->dataOutputProcessor->ReqRepVars(5).SchedPtr);
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(5).SchedName);
         EXPECT_EQ(true, state->dataOutputProcessor->ReqRepVars(5).Used);
@@ -5666,13 +5666,13 @@ namespace OutputProcessor {
     TEST_F(EnergyPlusFixture, OutputProcessor_unitStringToEnum)
     {
 
-        EXPECT_EQ(OutputProcessor::Unit::J, unitStringToEnum("J"));
-        EXPECT_EQ(OutputProcessor::Unit::J, unitStringToEnum("j"));
+        EXPECT_TRUE(compare_enums(OutputProcessor::Unit::J, unitStringToEnum("J")));
+        EXPECT_TRUE(compare_enums(OutputProcessor::Unit::J, unitStringToEnum("j")));
 
-        EXPECT_EQ(OutputProcessor::Unit::kgWater_kgDryAir, unitStringToEnum("kgWater/kgDryAir"));
-        EXPECT_EQ(OutputProcessor::Unit::kgWater_s, unitStringToEnum("kgWater/s"));
+        EXPECT_TRUE(compare_enums(OutputProcessor::Unit::kgWater_kgDryAir, unitStringToEnum("kgWater/kgDryAir")));
+        EXPECT_TRUE(compare_enums(OutputProcessor::Unit::kgWater_s, unitStringToEnum("kgWater/s")));
 
-        EXPECT_EQ(OutputProcessor::Unit::unknown, unitStringToEnum("junk"));
+        EXPECT_TRUE(compare_enums(OutputProcessor::Unit::unknown, unitStringToEnum("junk")));
     }
 
     TEST_F(EnergyPlusFixture, OutputProcessor_unitEnumToString)

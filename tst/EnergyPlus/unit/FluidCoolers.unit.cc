@@ -324,7 +324,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test5)
     // test input error check, if the nominal capacity specified and UA value is not zero, then it does not fatal out
     bool testResult = thisFluidCooler.validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
-    EXPECT_EQ(thisFluidCooler.PerformanceInputMethod_Num, PerfInputMethod::NOMINAL_CAPACITY);
+    EXPECT_TRUE(compare_enums(thisFluidCooler.PerformanceInputMethod_Num, PerfInputMethod::NOMINAL_CAPACITY));
     // UA value is reset to zero if nominal capacity is specified and input method is "NOMINAL_CAPACITY"
     EXPECT_EQ(thisFluidCooler.HighSpeedFluidCoolerUA, 0.0);
 }

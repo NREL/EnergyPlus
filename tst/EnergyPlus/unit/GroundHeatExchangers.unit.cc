@@ -811,7 +811,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Response_Factors_
     EXPECT_EQ(true, thisGLHE.on);
     EXPECT_EQ(2.423, thisGLHE.soil.k);
     EXPECT_EQ(2.343E6, thisGLHE.soil.rhoCp);
-    EXPECT_EQ(GetResponseFactor(*state, thisRF->name), thisGLHE.myRespFactors);
+    EXPECT_EQ(GetResponseFactor(*state, thisRF->name).get(), thisGLHE.myRespFactors.get());
     EXPECT_EQ(0.109982, thisGLHE.bhDiameter);
     EXPECT_EQ(0.109982 / 2, thisGLHE.bhRadius);
     EXPECT_EQ(100, thisGLHE.bhLength);
@@ -881,7 +881,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Array_IDF_Check)
     EXPECT_EQ(true, thisGLHE.on);
     EXPECT_EQ(2.423, thisGLHE.soil.k);
     EXPECT_EQ(2.343E6, thisGLHE.soil.rhoCp);
-    EXPECT_EQ(GetResponseFactor(*state, thisArray->name), thisGLHE.myRespFactors);
+    EXPECT_EQ(GetResponseFactor(*state, thisArray->name).get(), thisGLHE.myRespFactors.get());
     EXPECT_EQ(0.109982, thisGLHE.bhDiameter);
     EXPECT_EQ(0.109982 / 2, thisGLHE.bhRadius);
     EXPECT_EQ(100, thisGLHE.bhLength);

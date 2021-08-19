@@ -794,7 +794,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_TRUE(has_err_output(true));
 
     auto &generatorController = state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0];
-    EXPECT_EQ(GeneratorType::FuelCell, generatorController->compGenTypeOf_Num);
+    EXPECT_TRUE(compare_enums(GeneratorType::FuelCell, generatorController->compGenTypeOf_Num));
     EXPECT_EQ("GENERATOR FUEL CELL 1", generatorController->name);
     EXPECT_EQ("GENERATOR:FUELCELL", generatorController->typeOfName);
 
@@ -830,7 +830,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     auto fCPM = thisFC->FCPM;
     EXPECT_EQ(fCPM.Name, thisFC->NameFCPM);
     // Annex42 = Direct
-    EXPECT_EQ(DataGenerators::CurveMode::Direct, fCPM.EffMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::CurveMode::Direct, fCPM.EffMode));
     ASSERT_GT(fCPM.EffCurveID, 0);
     EXPECT_EQ("POWER MODULE EFFICIENCY CURVE", state->dataCurveManager->PerfCurve(fCPM.EffCurveID).Name);
     EXPECT_EQ(1.0, fCPM.NomEff);
@@ -856,7 +856,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_EQ(0.0, fCPM.ANC0);
     EXPECT_EQ(0.0, fCPM.ANC1);
 
-    EXPECT_EQ(DataGenerators::SkinLoss::ConstantRate, fCPM.SkinLossMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::SkinLoss::ConstantRate, fCPM.SkinLossMode));
 
     EXPECT_EQ("THERMAL ZONE 1", fCPM.ZoneName);
     EXPECT_EQ(1, fCPM.ZoneID);
@@ -882,7 +882,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     ASSERT_GT(airSup.BlowerPowerCurveID, 0);
     EXPECT_EQ("BLOWER POWER CURVE", state->dataCurveManager->PerfCurve(airSup.BlowerPowerCurveID).Name);
     EXPECT_EQ(1.0, airSup.BlowerHeatLossFactor);
-    EXPECT_EQ(DataGenerators::AirSupRateMode::ConstantStoicsAirRat, airSup.AirSupRateMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::AirSupRateMode::ConstantStoicsAirRat, airSup.AirSupRateMode));
 
     // Note: as mentionned in the IO/ref, Stoics ratio is the input + 1.0
     EXPECT_EQ(2.0, airSup.Stoics);
@@ -892,9 +892,9 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_EQ(0.00283, airSup.AirTempCoeff);
     EXPECT_EQ(0, airSup.AirFuncNdotCurveID);
 
-    EXPECT_EQ(DataGenerators::RecoverMode::NoRecoveryOnAirIntake, airSup.IntakeRecoveryMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::RecoverMode::NoRecoveryOnAirIntake, airSup.IntakeRecoveryMode));
 
-    EXPECT_EQ(DataGenerators::ConstituentMode::RegularAir, airSup.ConstituentMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::ConstituentMode::RegularAir, airSup.ConstituentMode));
     // Regular air has 5 constituents
     EXPECT_EQ(5, airSup.NumConstituents);
 
@@ -916,7 +916,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
 
     EXPECT_EQ(0, waterSup.NodeNum);
 
-    EXPECT_EQ(DataGenerators::WaterTemperatureMode::WaterInReformSchedule, waterSup.WaterTempMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::WaterTemperatureMode::WaterInReformSchedule, waterSup.WaterTempMode));
 
     ASSERT_GT(waterSup.SchedNum, 0);
 
@@ -929,7 +929,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_EQ(0.0, auxilHeat.ANC1);
     EXPECT_EQ(0.5, auxilHeat.UASkin);
 
-    EXPECT_EQ(DataGenerators::LossDestination::AirInletForFC, auxilHeat.SkinLossDestination);
+    EXPECT_TRUE(compare_enums(DataGenerators::LossDestination::AirInletForFC, auxilHeat.SkinLossDestination));
 
     EXPECT_EQ(0, auxilHeat.ZoneID);
     EXPECT_TRUE(auxilHeat.ZoneName.empty());
@@ -955,7 +955,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_EQ("GENERATOR FUEL CELL EXHAUST GAS TO WATER HEAT EXCHANGER 1 EXHAUST OUTLET AIR NODE", exhaustHX.ExhaustOutNodeName);
     EXPECT_GT(exhaustHX.ExhaustOutNode, 0);
 
-    EXPECT_EQ(DataGenerators::ExhaustGasHX::Condensing, thisFC->ExhaustHX.HXmodelMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::ExhaustGasHX::Condensing, thisFC->ExhaustHX.HXmodelMode));
 
     EXPECT_EQ(83.1, exhaustHX.hxs0);
     EXPECT_EQ(4798.0, exhaustHX.hxs1);
@@ -980,7 +980,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_EQ("GENERATOR FUEL CELL ELECTRICAL STORAGE 1", thisFC->NameElecStorage);
     auto elecStorage = thisFC->ElecStorage;
     EXPECT_EQ(elecStorage.Name, thisFC->NameElecStorage);
-    EXPECT_EQ(DataGenerators::ElectricalStorage::SimpleEffConstraints, elecStorage.StorageModelMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::ElectricalStorage::SimpleEffConstraints, elecStorage.StorageModelMode));
     EXPECT_EQ(1.0, elecStorage.EnergeticEfficCharge);
     EXPECT_EQ(1.0, elecStorage.EnergeticEfficDischarge);
     EXPECT_EQ(0.0, elecStorage.NominalEnergyCapacity);
@@ -991,7 +991,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     // Inverter
     EXPECT_EQ("GENERATOR FUEL CELL INVERTER 1", thisFC->NameInverter);
     auto inverter = thisFC->Inverter;
-    EXPECT_EQ(DataGenerators::InverterEfficiencyMode::Constant, inverter.EffMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::InverterEfficiencyMode::Constant, inverter.EffMode));
     EXPECT_EQ(1.0, inverter.ConstEff);
     ASSERT_GT(inverter.EffQuadraticCurveID, 0);
     EXPECT_EQ("EFFICIENCY FUNCTION OF DC POWER CURVE", state->dataCurveManager->PerfCurve(inverter.EffQuadraticCurveID).Name);
@@ -1735,7 +1735,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     EXPECT_TRUE(simulation_err);
 
     auto &generatorController = state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0];
-    EXPECT_EQ(GeneratorType::FuelCell, generatorController->compGenTypeOf_Num);
+    EXPECT_TRUE(compare_enums(GeneratorType::FuelCell, generatorController->compGenTypeOf_Num));
     EXPECT_EQ("GENERATOR FUEL CELL 1", generatorController->name);
     EXPECT_EQ("GENERATOR:FUELCELL", generatorController->typeOfName);
 
@@ -1771,7 +1771,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     auto fCPM = thisFC->FCPM;
     EXPECT_EQ(fCPM.Name, thisFC->NameFCPM);
     // Annex42 = Direct
-    EXPECT_EQ(DataGenerators::CurveMode::Direct, fCPM.EffMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::CurveMode::Direct, fCPM.EffMode));
     ASSERT_GT(fCPM.EffCurveID, 0);
     EXPECT_EQ("POWER MODULE EFFICIENCY CURVE", state->dataCurveManager->PerfCurve(fCPM.EffCurveID).Name);
     EXPECT_EQ(1.0, fCPM.NomEff);
@@ -1797,7 +1797,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     EXPECT_EQ(0.0, fCPM.ANC0);
     EXPECT_EQ(0.0, fCPM.ANC1);
 
-    EXPECT_EQ(DataGenerators::SkinLoss::ConstantRate, fCPM.SkinLossMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::SkinLoss::ConstantRate, fCPM.SkinLossMode));
 
     EXPECT_EQ("THERMAL ZONE 1", fCPM.ZoneName);
     EXPECT_EQ(1, fCPM.ZoneID);
@@ -1823,7 +1823,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     ASSERT_GT(airSup.BlowerPowerCurveID, 0);
     EXPECT_EQ("BLOWER POWER CURVE", state->dataCurveManager->PerfCurve(airSup.BlowerPowerCurveID).Name);
     EXPECT_EQ(1.0, airSup.BlowerHeatLossFactor);
-    EXPECT_EQ(DataGenerators::AirSupRateMode::QuadraticFuncofPel, airSup.AirSupRateMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::AirSupRateMode::QuadraticFuncofPel, airSup.AirSupRateMode));
 
     // Note: as mentionned in the IO/ref, Stoics ratio is the input + 1.0
     EXPECT_EQ(2.0, airSup.Stoics);
@@ -1833,9 +1833,9 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     EXPECT_EQ(0.00283, airSup.AirTempCoeff);
     EXPECT_EQ(0, airSup.AirFuncNdotCurveID);
 
-    EXPECT_EQ(DataGenerators::RecoverMode::NoRecoveryOnAirIntake, airSup.IntakeRecoveryMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::RecoverMode::NoRecoveryOnAirIntake, airSup.IntakeRecoveryMode));
 
-    EXPECT_EQ(DataGenerators::ConstituentMode::RegularAir, airSup.ConstituentMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::ConstituentMode::RegularAir, airSup.ConstituentMode));
     // Regular air has 5 constituents
     EXPECT_EQ(5, airSup.NumConstituents);
 
@@ -1857,7 +1857,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
 
     EXPECT_EQ(0, waterSup.NodeNum);
 
-    EXPECT_EQ(DataGenerators::WaterTemperatureMode::WaterInReformSchedule, waterSup.WaterTempMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::WaterTemperatureMode::WaterInReformSchedule, waterSup.WaterTempMode));
 
     ASSERT_GT(waterSup.SchedNum, 0);
 
@@ -1870,7 +1870,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     EXPECT_EQ(0.0, auxilHeat.ANC1);
     EXPECT_EQ(0.5, auxilHeat.UASkin);
 
-    EXPECT_EQ(DataGenerators::LossDestination::AirInletForFC, auxilHeat.SkinLossDestination);
+    EXPECT_TRUE(compare_enums(DataGenerators::LossDestination::AirInletForFC, auxilHeat.SkinLossDestination));
 
     EXPECT_EQ(0, auxilHeat.ZoneID);
     EXPECT_TRUE(auxilHeat.ZoneName.empty());
@@ -1896,7 +1896,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     EXPECT_EQ("GENERATOR FUEL CELL EXHAUST GAS TO WATER HEAT EXCHANGER 1 EXHAUST OUTLET AIR NODE", exhaustHX.ExhaustOutNodeName);
     EXPECT_GT(exhaustHX.ExhaustOutNode, 0);
 
-    EXPECT_EQ(DataGenerators::ExhaustGasHX::Condensing, thisFC->ExhaustHX.HXmodelMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::ExhaustGasHX::Condensing, thisFC->ExhaustHX.HXmodelMode));
 
     EXPECT_EQ(83.1, exhaustHX.hxs0);
     EXPECT_EQ(4798.0, exhaustHX.hxs1);
@@ -1921,7 +1921,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     EXPECT_EQ("GENERATOR FUEL CELL ELECTRICAL STORAGE 1", thisFC->NameElecStorage);
     auto elecStorage = thisFC->ElecStorage;
     EXPECT_EQ(elecStorage.Name, thisFC->NameElecStorage);
-    EXPECT_EQ(DataGenerators::ElectricalStorage::SimpleEffConstraints, elecStorage.StorageModelMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::ElectricalStorage::SimpleEffConstraints, elecStorage.StorageModelMode));
     EXPECT_EQ(1.0, elecStorage.EnergeticEfficCharge);
     EXPECT_EQ(1.0, elecStorage.EnergeticEfficDischarge);
     EXPECT_EQ(0.0, elecStorage.NominalEnergyCapacity);
@@ -1932,7 +1932,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     // Inverter
     EXPECT_EQ("GENERATOR FUEL CELL INVERTER 1", thisFC->NameInverter);
     auto inverter = thisFC->Inverter;
-    EXPECT_EQ(DataGenerators::InverterEfficiencyMode::Constant, inverter.EffMode);
+    EXPECT_TRUE(compare_enums(DataGenerators::InverterEfficiencyMode::Constant, inverter.EffMode));
     EXPECT_EQ(1.0, inverter.ConstEff);
     ASSERT_GT(inverter.EffQuadraticCurveID, 0);
     EXPECT_EQ("EFFICIENCY FUNCTION OF DC POWER CURVE", state->dataCurveManager->PerfCurve(inverter.EffQuadraticCurveID).Name);

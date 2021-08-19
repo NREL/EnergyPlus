@@ -6673,7 +6673,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
 
     EXPECT_EQ(state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).coolingCoil_TypeNum, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
 
-    EXPECT_EQ(state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide, Selection::Yes);
+    EXPECT_TRUE(compare_enums(state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilUpstreamOfProcessSide, Selection::Yes));
 
     CompName = state->dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).Name;
     CompIndex = state->dataDesiccantDehumidifiers->NumGenericDesicDehums;

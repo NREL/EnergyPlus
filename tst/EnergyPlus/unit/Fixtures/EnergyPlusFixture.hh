@@ -63,6 +63,12 @@
 
 namespace EnergyPlus {
 
+template<typename T, typename = typename std::enable_if_t<std::is_enum_v<T>, T>>
+constexpr std::ostream& operator<<(std::ostream& stream, T e)
+{
+    return stream << static_cast<typename std::underlying_type_t<T>>(e);
+}
+
 struct EnergyPlusData;
 
 // This is a helper struct to redirect std::cout. This makes sure std::cout is redirected back and
@@ -119,6 +125,20 @@ protected:
     // Now this does not need to be manually entered for every unit test as well as it will automatically be updated as the
     // unit test names change.
     void show_message();
+
+    // This will compare two enums and convert them to their underlying_type. Without this function or operator<<
+    // overload, googletest will not properly link since it can't implicitly convert to underlying_type anymore
+    template<typename T, typename = typename std::enable_if_t<std::is_enum_v<T>, T>>
+    constexpr bool compare_enums(T const expected, T const actual, bool const expect_eq = true)
+    {
+        const bool is_valid = (expected == actual);
+        if (expect_eq) {
+            EXPECT_EQ(static_cast<typename std::underlying_type_t<T>>(expected), static_cast<typename std::underlying_type_t<T>>(actual));
+        } else {
+            EXPECT_NE(static_cast<typename std::underlying_type_t<T>>(expected), static_cast<typename std::underlying_type_t<T>>(actual));
+        }
+        return is_valid;
+    }
 
     // This will compare either a STL container or ObjexxFCL container
     // Pass a container you want to compare against an expected container. You can pass in an existing

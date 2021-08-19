@@ -387,7 +387,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -430,7 +430,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -483,7 +483,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
     // for calculation method CorrelationFromWeatherFile these two parameters are ignored
     EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -590,7 +590,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     Real64 TauB = state->dataWeatherManager->DesDayInput(EnvrnNum).TauB;
     Real64 TauD = state->dataWeatherManager->DesDayInput(EnvrnNum).TauD;
     // check tau values
-    EXPECT_EQ(DesignDaySolarModel::ASHRAE_Tau2017, state->dataWeatherManager->DesDayInput(EnvrnNum).SolarModel);
+    EXPECT_TRUE(compare_enums(DesignDaySolarModel::ASHRAE_Tau2017, state->dataWeatherManager->DesDayInput(EnvrnNum).SolarModel));
     EXPECT_EQ(0.325, TauB);
     EXPECT_EQ(2.461, TauD);
     // calc expected values for environment 1
@@ -693,7 +693,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(1, state->dataWeatherManager->NumOfEnvrn);
-    EXPECT_EQ(state->dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::DesignDay);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::DesignDay));
 }
 
 // Test for https://github.com/NREL/EnergyPlus/issues/7550
@@ -768,7 +768,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     ASSERT_FALSE(ErrorsFound);
 
     WeatherManager::SetUpDesignDay(*state, 1);
-    EXPECT_EQ(state->dataWeatherManager->DesDayInput(1).HumIndType, DDHumIndType::Enthalpy);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->DesDayInput(1).HumIndType, DDHumIndType::Enthalpy));
     EXPECT_EQ(state->dataWeatherManager->DesDayInput(1).HumIndValue, 90500.0);
 
     unsigned n_RH_not100 = 0;
