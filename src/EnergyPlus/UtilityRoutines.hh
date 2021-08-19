@@ -137,14 +137,6 @@ template <typename T> inline T pow7(T const &x)
 
 bool env_var_on(std::string const &env_var_str);
 
-class FatalError : public std::runtime_error
-{
-public:
-    FatalError(std::string const &msg) : runtime_error(msg)
-    {
-    }
-};
-
 using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
 void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);

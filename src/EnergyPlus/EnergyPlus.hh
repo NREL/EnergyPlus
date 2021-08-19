@@ -55,8 +55,17 @@
 // C++ Headers
 #include <cassert>
 #include <cstdint> // C++11
+#include <stdexcept>
 
 #include <EnergyPlus/api/TypeDefs.h>
+
+namespace EnergyPlus {
+    class FatalError : public std::runtime_error
+    {
+    public:
+        FatalError(std::string const &msg) : runtime_error(msg) {}
+    };
+}
 
 // macro to guarantee array sizing in debug builds
 #define EP_SIZE_CHECK(array, min_size)                                                                                                               \
