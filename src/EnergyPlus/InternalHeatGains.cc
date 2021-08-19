@@ -976,17 +976,18 @@ namespace InternalHeatGains {
 
                 // setup internal gains
                 if (!ErrorsFound) {
-                    SetupZoneInternalGain(state,
-                                          state.dataHeatBal->People(peopleNum).ZonePtr,
-                                          "People",
-                                          state.dataHeatBal->People(peopleNum).Name,
-                                          IntGainTypeOf_People,
-                                          &state.dataHeatBal->People(peopleNum).ConGainRate,
-                                          nullptr,
-                                          &state.dataHeatBal->People(peopleNum).RadGainRate,
-                                          &state.dataHeatBal->People(peopleNum).LatGainRate,
-                                          nullptr,
-                                          &state.dataHeatBal->People(peopleNum).CO2GainRate);
+                    SetupSpaceInternalGain(state,
+                                           state.dataHeatBal->People(peopleNum).spaceIndex,
+                                           1.0,
+                                           "People",
+                                           state.dataHeatBal->People(peopleNum).Name,
+                                           IntGainTypeOf_People,
+                                           &state.dataHeatBal->People(peopleNum).ConGainRate,
+                                           nullptr,
+                                           &state.dataHeatBal->People(peopleNum).RadGainRate,
+                                           &state.dataHeatBal->People(peopleNum).LatGainRate,
+                                           nullptr,
+                                           &state.dataHeatBal->People(peopleNum).CO2GainRate);
                 }
             }
 
@@ -1375,19 +1376,20 @@ namespace InternalHeatGains {
                     returnNodeNum = state.dataZoneEquip->ZoneEquipConfig(zoneNum).ReturnNode(state.dataHeatBal->Lights(lightsNum).ZoneReturnNum);
                 }
                 if (!ErrorsFound) {
-                    SetupZoneInternalGain(state,
-                                          state.dataHeatBal->Lights(lightsNum).ZonePtr,
-                                          "Lights",
-                                          state.dataHeatBal->Lights(lightsNum).Name,
-                                          IntGainTypeOf_Lights,
-                                          &state.dataHeatBal->Lights(lightsNum).ConGainRate,
-                                          &state.dataHeatBal->Lights(lightsNum).RetAirGainRate,
-                                          &state.dataHeatBal->Lights(lightsNum).RadGainRate,
-                                          nullptr,
-                                          nullptr,
-                                          nullptr,
-                                          nullptr,
-                                          returnNodeNum);
+                    SetupSpaceInternalGain(state,
+                                           state.dataHeatBal->Lights(lightsNum).spaceIndex,
+                                           1.0,
+                                           "Lights",
+                                           state.dataHeatBal->Lights(lightsNum).Name,
+                                           IntGainTypeOf_Lights,
+                                           &state.dataHeatBal->Lights(lightsNum).ConGainRate,
+                                           &state.dataHeatBal->Lights(lightsNum).RetAirGainRate,
+                                           &state.dataHeatBal->Lights(lightsNum).RadGainRate,
+                                           nullptr,
+                                           nullptr,
+                                           nullptr,
+                                           nullptr,
+                                           returnNodeNum);
                 }
 
                 if (state.dataHeatBal->Lights(lightsNum).FractionReturnAir > 0)
@@ -1656,15 +1658,16 @@ namespace InternalHeatGains {
                             state, "Plug and Process Power Design Level", thisZoneElectric.Name, "[W]", thisZoneElectric.DesignLevel);
                     } // EMS
                     if (!ErrorsFound) {
-                        SetupZoneInternalGain(state,
-                                              thisZoneElectric.ZonePtr,
-                                              "ElectricEquipment",
-                                              thisZoneElectric.Name,
-                                              IntGainTypeOf_ElectricEquipment,
-                                              &thisZoneElectric.ConGainRate,
-                                              nullptr,
-                                              &thisZoneElectric.RadGainRate,
-                                              &thisZoneElectric.LatGainRate);
+                        SetupSpaceInternalGain(state,
+                                               thisZoneElectric.spaceIndex,
+                                               1.0,
+                                               "ElectricEquipment",
+                                               thisZoneElectric.Name,
+                                               IntGainTypeOf_ElectricEquipment,
+                                               &thisZoneElectric.ConGainRate,
+                                               nullptr,
+                                               &thisZoneElectric.RadGainRate,
+                                               &thisZoneElectric.LatGainRate);
                     }
                 } // for elecEqInputNum.NumOfSpaces
             }     // for elecEqInputNum
@@ -1900,17 +1903,18 @@ namespace InternalHeatGains {
                     } // EMS
 
                     if (!ErrorsFound)
-                        SetupZoneInternalGain(state,
-                                              thisZoneGas.ZonePtr,
-                                              "GasEquipment",
-                                              thisZoneGas.Name,
-                                              IntGainTypeOf_GasEquipment,
-                                              &thisZoneGas.ConGainRate,
-                                              nullptr,
-                                              &thisZoneGas.RadGainRate,
-                                              &thisZoneGas.LatGainRate,
-                                              nullptr,
-                                              &thisZoneGas.CO2GainRate);
+                        SetupSpaceInternalGain(state,
+                                               thisZoneGas.spaceIndex,
+                                               1.0,
+                                               "GasEquipment",
+                                               thisZoneGas.Name,
+                                               IntGainTypeOf_GasEquipment,
+                                               &thisZoneGas.ConGainRate,
+                                               nullptr,
+                                               &thisZoneGas.RadGainRate,
+                                               &thisZoneGas.LatGainRate,
+                                               nullptr,
+                                               &thisZoneGas.CO2GainRate);
 
                 } // for gasEqInputNum.NumOfSpaces
             }     // for gasEqInputNum
@@ -2115,15 +2119,16 @@ namespace InternalHeatGains {
                     } // EMS
 
                     if (!ErrorsFound)
-                        SetupZoneInternalGain(state,
-                                              thisZoneHWEq.ZonePtr,
-                                              "HotWaterEquipment",
-                                              thisZoneHWEq.Name,
-                                              IntGainTypeOf_HotWaterEquipment,
-                                              &thisZoneHWEq.ConGainRate,
-                                              nullptr,
-                                              &thisZoneHWEq.RadGainRate,
-                                              &thisZoneHWEq.LatGainRate);
+                        SetupSpaceInternalGain(state,
+                                               thisZoneHWEq.spaceIndex,
+                                               1.0,
+                                               "HotWaterEquipment",
+                                               thisZoneHWEq.Name,
+                                               IntGainTypeOf_HotWaterEquipment,
+                                               &thisZoneHWEq.ConGainRate,
+                                               nullptr,
+                                               &thisZoneHWEq.RadGainRate,
+                                               &thisZoneHWEq.LatGainRate);
 
                 } // for hwEqInputNum.NumOfSpaces
             }     // for hwEqInputNum
@@ -2329,15 +2334,16 @@ namespace InternalHeatGains {
                     } // EMS
 
                     if (!ErrorsFound)
-                        SetupZoneInternalGain(state,
-                                              thisZoneStmEq.ZonePtr,
-                                              "SteamEquipment",
-                                              thisZoneStmEq.Name,
-                                              IntGainTypeOf_SteamEquipment,
-                                              &thisZoneStmEq.ConGainRate,
-                                              nullptr,
-                                              &thisZoneStmEq.RadGainRate,
-                                              &thisZoneStmEq.LatGainRate);
+                        SetupSpaceInternalGain(state,
+                                               thisZoneStmEq.spaceIndex,
+                                               1.0,
+                                               "SteamEquipment",
+                                               thisZoneStmEq.Name,
+                                               IntGainTypeOf_SteamEquipment,
+                                               &thisZoneStmEq.ConGainRate,
+                                               nullptr,
+                                               &thisZoneStmEq.RadGainRate,
+                                               &thisZoneStmEq.LatGainRate);
 
                 } // for stmEqInputNum.NumOfSpaces
             }     // for stmEqInputNum
@@ -2566,15 +2572,16 @@ namespace InternalHeatGains {
                     } // EMS
 
                     if (!ErrorsFound)
-                        SetupZoneInternalGain(state,
-                                              thisZoneOthEq.ZonePtr,
-                                              "OtherEquipment",
-                                              thisZoneOthEq.Name,
-                                              IntGainTypeOf_OtherEquipment,
-                                              &thisZoneOthEq.ConGainRate,
-                                              nullptr,
-                                              &thisZoneOthEq.RadGainRate,
-                                              &thisZoneOthEq.LatGainRate);
+                        SetupSpaceInternalGain(state,
+                                               thisZoneOthEq.spaceIndex,
+                                               1.0,
+                                               "OtherEquipment",
+                                               thisZoneOthEq.Name,
+                                               IntGainTypeOf_OtherEquipment,
+                                               &thisZoneOthEq.ConGainRate,
+                                               nullptr,
+                                               &thisZoneOthEq.RadGainRate,
+                                               &thisZoneOthEq.LatGainRate);
 
                 } // for othEqInputNum.NumOfSpaces
             }     // for othEqInputNum
@@ -3016,12 +3023,13 @@ namespace InternalHeatGains {
                         // Level", ZoneITEq( Loop ).Name, "[W]", ZoneITEq( Loop ).DesignTotalPower ); } // EMS
 
                         if (!ErrorsFound)
-                            SetupZoneInternalGain(state,
-                                                  thisZoneITEq.ZonePtr,
-                                                  "ElectricEquipment:ITE:AirCooled",
-                                                  thisZoneITEq.Name,
-                                                  IntGainTypeOf_ElectricEquipmentITEAirCooled,
-                                                  &thisZoneITEq.ConGainRateToZone);
+                            SetupSpaceInternalGain(state,
+                                                   thisZoneITEq.spaceIndex,
+                                                   1.0,
+                                                   "ElectricEquipment:ITE:AirCooled",
+                                                   thisZoneITEq.Name,
+                                                   IntGainTypeOf_ElectricEquipmentITEAirCooled,
+                                                   &thisZoneITEq.ConGainRateToZone);
                     }
                 } // for itEqInputNum.NumOfSpaces
             }     // for itEqInputNum
@@ -3146,14 +3154,15 @@ namespace InternalHeatGains {
                                                  thisZoneBBHeat.CapatHighTemperature);
                     } // EMS
 
-                    SetupZoneInternalGain(state,
-                                          thisZoneBBHeat.ZonePtr,
-                                          "ZoneBaseboard:OutdoorTemperatureControlled",
-                                          thisZoneBBHeat.Name,
-                                          IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
-                                          &thisZoneBBHeat.ConGainRate,
-                                          nullptr,
-                                          &thisZoneBBHeat.RadGainRate);
+                    SetupSpaceInternalGain(state,
+                                           thisZoneBBHeat.spaceIndex,
+                                           1.0,
+                                           "ZoneBaseboard:OutdoorTemperatureControlled",
+                                           thisZoneBBHeat.Name,
+                                           IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
+                                           &thisZoneBBHeat.ConGainRate,
+                                           nullptr,
+                                           &thisZoneBBHeat.RadGainRate);
                 } // for bbHeatInputNum.NumOfSpaces
             }     // for bbHeatInputNum
         }         // TotBBHeat > 0
@@ -6616,13 +6625,14 @@ namespace InternalHeatGains {
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->space(spaceNum).Name);
-                SetupOutputVariable(state,
-                                    "Space ITE Adjusted Return Air Temperature",
-                                    OutputProcessor::Unit::W,
-                                    state.dataHeatBal->spaceRpt(spaceNum).ITEAdjReturnTemp,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataHeatBal->space(spaceNum).Name);
+                // Not applicable for space until space has it's own air temeratures
+                // SetupOutputVariable(state,
+                //                    "Space ITE Adjusted Return Air Temperature",
+                //                    OutputProcessor::Unit::W,
+                //                    state.dataHeatBal->spaceRpt(spaceNum).ITEAdjReturnTemp,
+                //                    OutputProcessor::SOVTimeStepType::Zone,
+                //                    OutputProcessor::SOVStoreType::Average,
+                //                    state.dataHeatBal->space(spaceNum).Name);
 
                 SetupOutputVariable(state,
                                     "Space ITE CPU Electricity Energy",
@@ -7089,6 +7099,16 @@ namespace InternalHeatGains {
             e.CO2Rate = 0.0;
         }
 
+        for (auto &e : state.dataHeatBal->spaceRpt) {
+            e.LtsPower = 0.0;
+            e.ElecPower = 0.0;
+            e.GasPower = 0.0;
+            e.HWPower = 0.0;
+            e.SteamPower = 0.0;
+            e.BaseHeatPower = 0.0;
+            e.CO2Rate = 0.0;
+        }
+
         for (auto &e : state.dataHeatBal->ZonePreDefRep) {
             e.NumOcc = 0.0;
         }
@@ -7239,6 +7259,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QLTTOT += state.dataHeatBal->Lights(Loop).TotGainRate;
 
             int spaceNum = state.dataHeatBal->Lights(Loop).spaceIndex;
+            state.dataHeatBal->spaceRpt(spaceNum).LtsPower += state.dataHeatBal->Lights(Loop).Power;
             state.dataHeatBal->spaceIntGain(spaceNum).QLTRAD += state.dataHeatBal->Lights(Loop).RadGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QLTSW += state.dataHeatBal->Lights(Loop).VisGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QLTCON += state.dataHeatBal->Lights(Loop).ConGainRate;
@@ -7271,6 +7292,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QEELost += state.dataHeatBal->ZoneElectric(Loop).LostRate;
 
             int spaceNum = state.dataHeatBal->ZoneElectric(Loop).spaceIndex;
+            state.dataHeatBal->spaceRpt(spaceNum).ElecPower += state.dataHeatBal->ZoneElectric(Loop).Power;
             state.dataHeatBal->spaceIntGain(spaceNum).QEERAD += state.dataHeatBal->ZoneElectric(Loop).RadGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QEECON += state.dataHeatBal->ZoneElectric(Loop).ConGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QEELAT += state.dataHeatBal->ZoneElectric(Loop).LatGainRate;
@@ -7299,6 +7321,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QGELost += state.dataHeatBal->ZoneGas(Loop).LostRate;
 
             int spaceNum = state.dataHeatBal->ZoneGas(Loop).spaceIndex;
+            state.dataHeatBal->spaceRpt(spaceNum).GasPower += state.dataHeatBal->ZoneGas(Loop).Power;
             state.dataHeatBal->spaceIntGain(spaceNum).QGERAD += state.dataHeatBal->ZoneGas(Loop).RadGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QGECON += state.dataHeatBal->ZoneGas(Loop).ConGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QGELAT += state.dataHeatBal->ZoneGas(Loop).LatGainRate;
@@ -7319,12 +7342,14 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneOtherEq(Loop).TotGainRate = Q - state.dataHeatBal->ZoneOtherEq(Loop).LostRate;
 
             int NZ = state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr;
+            state.dataHeatBal->ZnRpt(NZ).OtherPower += state.dataHeatBal->ZoneOtherEq(Loop).Power;
             state.dataHeatBal->ZoneIntGain(NZ).QOERAD += state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QOECON += state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QOELAT += state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QOELost += state.dataHeatBal->ZoneOtherEq(Loop).LostRate;
 
             int spaceNum = state.dataHeatBal->ZoneOtherEq(Loop).spaceIndex;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherPower += state.dataHeatBal->ZoneOtherEq(Loop).Power;
             state.dataHeatBal->spaceIntGain(spaceNum).QOERAD += state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QOECON += state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QOELAT += state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate;
@@ -7352,6 +7377,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QHWLost += state.dataHeatBal->ZoneHWEq(Loop).LostRate;
 
             int spaceNum = state.dataHeatBal->ZoneHWEq(Loop).spaceIndex;
+            state.dataHeatBal->spaceRpt(spaceNum).HWPower += state.dataHeatBal->ZoneHWEq(Loop).Power;
             state.dataHeatBal->spaceIntGain(spaceNum).QHWRAD += state.dataHeatBal->ZoneHWEq(Loop).RadGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QHWCON += state.dataHeatBal->ZoneHWEq(Loop).ConGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QHWLAT += state.dataHeatBal->ZoneHWEq(Loop).LatGainRate;
@@ -7379,6 +7405,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QSELost += state.dataHeatBal->ZoneSteamEq(Loop).LostRate;
 
             int spaceNum = state.dataHeatBal->ZoneSteamEq(Loop).spaceIndex;
+            state.dataHeatBal->spaceRpt(spaceNum).SteamPower += state.dataHeatBal->ZoneSteamEq(Loop).Power;
             state.dataHeatBal->spaceIntGain(spaceNum).QSERAD += state.dataHeatBal->ZoneSteamEq(Loop).RadGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QSECON += state.dataHeatBal->ZoneSteamEq(Loop).ConGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QSELAT += state.dataHeatBal->ZoneSteamEq(Loop).LatGainRate;
@@ -7413,6 +7440,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QBBCON += state.dataHeatBal->ZoneBBHeat(Loop).ConGainRate;
 
             int spaceNum = state.dataHeatBal->ZoneBBHeat(Loop).spaceIndex;
+            state.dataHeatBal->spaceRpt(spaceNum).BaseHeatPower += state.dataHeatBal->ZoneBBHeat(Loop).Power;
             state.dataHeatBal->spaceIntGain(spaceNum).QBBRAD += state.dataHeatBal->ZoneBBHeat(Loop).RadGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QBBCON += state.dataHeatBal->ZoneBBHeat(Loop).ConGainRate;
         }
@@ -7659,9 +7687,44 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZnRpt(Loop).SumToutMinusTSup = 0.0;
         } // Zone init loop
 
+        // Space total report variables
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUPower = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqFanPower = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSPower = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUPowerAtDesign = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqFanPowerAtDesign = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSGainRateToZone = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqConGainRateToZone = 0.0;
+
+            state.dataHeatBal->spaceRpt(spaceNum).ITEAdjReturnTemp = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUConsumption = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqFanConsumption = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSConsumption = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUEnergyAtDesign = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqFanEnergyAtDesign = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSGainEnergyToZone = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqConGainEnergyToZone = 0.0;
+
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqAirVolFlowStdDensity = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqAirMassFlow = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqSHI = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDryBulbT = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDryBulbT = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDewpointT = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDewpointT = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveRH = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowRH = 0.0;
+
+            state.dataHeatBal->spaceRpt(spaceNum).SumTinMinusTSup = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).SumToutMinusTSup = 0.0;
+        } // Space init spaceNum
+
         for (Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
             // Get schedules
             NZ = state.dataHeatBal->ZoneITEq(Loop).ZonePtr;
+            int spaceNum = state.dataHeatBal->ZoneITEq(Loop).spaceIndex;
             OperSchedFrac = GetCurrentScheduleValue(state, state.dataHeatBal->ZoneITEq(Loop).OperSchedPtr);
             CPULoadSchedFrac = GetCurrentScheduleValue(state, state.dataHeatBal->ZoneITEq(Loop).CPULoadSchedPtr);
 
@@ -7816,6 +7879,14 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZnRpt(NZ).ITEqUPSGainRateToZone += state.dataHeatBal->ZoneITEq(Loop).UPSGainRateToZone;
             state.dataHeatBal->ZnRpt(NZ).ITEqConGainRateToZone += state.dataHeatBal->ZoneITEq(Loop).ConGainRateToZone;
 
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUPower += state.dataHeatBal->ZoneITEq(Loop).CPUPower;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqFanPower += state.dataHeatBal->ZoneITEq(Loop).FanPower;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSPower += state.dataHeatBal->ZoneITEq(Loop).UPSPower;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUPowerAtDesign += state.dataHeatBal->ZoneITEq(Loop).CPUPowerAtDesign;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqFanPowerAtDesign += state.dataHeatBal->ZoneITEq(Loop).FanPowerAtDesign;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSGainRateToZone += state.dataHeatBal->ZoneITEq(Loop).UPSGainRateToZone;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqConGainRateToZone += state.dataHeatBal->ZoneITEq(Loop).ConGainRateToZone;
+
             state.dataHeatBal->ZoneITEq(Loop).CPUConsumption = CPUPower * state.dataGlobal->TimeStepZoneSec;
             state.dataHeatBal->ZoneITEq(Loop).FanConsumption = FanPower * state.dataGlobal->TimeStepZoneSec;
             state.dataHeatBal->ZoneITEq(Loop).UPSConsumption = UPSPower * state.dataGlobal->TimeStepZoneSec;
@@ -7835,6 +7906,14 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZnRpt(NZ).ITEqUPSGainEnergyToZone += state.dataHeatBal->ZoneITEq(Loop).UPSGainEnergyToZone;
             state.dataHeatBal->ZnRpt(NZ).ITEqConGainEnergyToZone += state.dataHeatBal->ZoneITEq(Loop).ConGainEnergyToZone;
 
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUConsumption += state.dataHeatBal->ZoneITEq(Loop).CPUConsumption;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqFanConsumption += state.dataHeatBal->ZoneITEq(Loop).FanConsumption;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSConsumption += state.dataHeatBal->ZoneITEq(Loop).UPSConsumption;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqCPUEnergyAtDesign += state.dataHeatBal->ZoneITEq(Loop).CPUEnergyAtDesign;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqFanEnergyAtDesign += state.dataHeatBal->ZoneITEq(Loop).FanEnergyAtDesign;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqUPSGainEnergyToZone += state.dataHeatBal->ZoneITEq(Loop).UPSGainEnergyToZone;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqConGainEnergyToZone += state.dataHeatBal->ZoneITEq(Loop).ConGainEnergyToZone;
+
             state.dataHeatBal->ZoneITEq(Loop).AirVolFlowStdDensity = AirMassFlowRate * state.dataEnvrn->StdRhoAir;
             state.dataHeatBal->ZoneITEq(Loop).AirVolFlowCurDensity = AirVolFlowRate;
             state.dataHeatBal->ZoneITEq(Loop).AirMassFlow = AirMassFlowRate;
@@ -7849,6 +7928,11 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZnRpt(NZ).SumTinMinusTSup += (TAirIn - TSupply) * AirVolFlowRate;
             state.dataHeatBal->ZnRpt(NZ).SumToutMinusTSup += (TAirOut - TSupply) * AirVolFlowRate;
 
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqAirVolFlowStdDensity += state.dataHeatBal->ZoneITEq(Loop).AirVolFlowStdDensity;
+            state.dataHeatBal->spaceRpt(spaceNum).ITEqAirMassFlow += state.dataHeatBal->ZoneITEq(Loop).AirMassFlow;
+            state.dataHeatBal->spaceRpt(spaceNum).SumTinMinusTSup += (TAirIn - TSupply) * AirVolFlowRate;
+            state.dataHeatBal->spaceRpt(spaceNum).SumToutMinusTSup += (TAirOut - TSupply) * AirVolFlowRate;
+
             // Check environmental class operating range limits (defined as parameters in this subroutine)
             EnvClass = state.dataHeatBal->ZoneITEq(Loop).Class;
             if (EnvClass > 0) {
@@ -7858,6 +7942,8 @@ namespace InternalHeatGains {
                     state.dataHeatBal->ZoneITEq(Loop).DryBulbTAboveDeltaT = TAirIn - DBMax(EnvClass);
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDryBulbT = state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
                 if (TAirIn < DBMin(EnvClass)) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
@@ -7865,6 +7951,8 @@ namespace InternalHeatGains {
                     state.dataHeatBal->ZoneITEq(Loop).DryBulbTBelowDeltaT = TAirIn - DBMin(EnvClass);
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDryBulbT = state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
                 if (TDPAirIn > DPMax(EnvClass)) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveDewpointT = state.dataGlobal->TimeStepZone;
@@ -7872,6 +7960,8 @@ namespace InternalHeatGains {
                     state.dataHeatBal->ZoneITEq(Loop).DewpointTAboveDeltaT = TDPAirIn - DPMax(EnvClass);
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeAboveDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveDewpointT = state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
                 if (TDPAirIn < DPMin(EnvClass)) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeBelowDewpointT = state.dataGlobal->TimeStepZone;
@@ -7879,6 +7969,8 @@ namespace InternalHeatGains {
                     state.dataHeatBal->ZoneITEq(Loop).DewpointTBelowDeltaT = TDPAirIn - DPMin(EnvClass);
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeBelowDewpointT = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowDewpointT = state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
                 if (RHAirIn > RHMax(EnvClass)) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeAboveRH = state.dataGlobal->TimeStepZone;
@@ -7886,6 +7978,8 @@ namespace InternalHeatGains {
                     state.dataHeatBal->ZoneITEq(Loop).RHAboveDeltaRH = RHAirIn - RHMax(EnvClass);
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeAboveRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeAboveRH = state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
                 if (RHAirIn < RHMin(EnvClass)) {
                     state.dataHeatBal->ZoneITEq(Loop).TimeBelowRH = state.dataGlobal->TimeStepZone;
@@ -7893,16 +7987,23 @@ namespace InternalHeatGains {
                     state.dataHeatBal->ZoneITEq(Loop).RHBelowDeltaRH = RHAirIn - RHMin(EnvClass);
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeBelowRH = state.dataGlobal->TimeStepZone;
                     state.dataHeatBal->ZnRpt(NZ).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeBelowRH = state.dataGlobal->TimeStepZone;
+                    state.dataHeatBal->spaceRpt(spaceNum).ITEqTimeOutOfOperRange = state.dataGlobal->TimeStepZone;
                 }
             }
 
         } // ZoneITEq calc loop
 
-        // Zone-level sensible heat index
+        // Zone and space-level sensible heat index
         for (Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
             int ZN = state.dataHeatBal->ZoneITEq(Loop).ZonePtr;
-            if (state.dataHeatBal->ZnRpt(NZ).SumToutMinusTSup != 0.0) {
-                state.dataHeatBal->ZnRpt(ZN).ITEqSHI = state.dataHeatBal->ZnRpt(NZ).SumTinMinusTSup / state.dataHeatBal->ZnRpt(NZ).SumToutMinusTSup;
+            int spaceNum = state.dataHeatBal->ZoneITEq(Loop).spaceIndex;
+            if (state.dataHeatBal->ZnRpt(ZN).SumToutMinusTSup != 0.0) {
+                state.dataHeatBal->ZnRpt(ZN).ITEqSHI = state.dataHeatBal->ZnRpt(ZN).SumTinMinusTSup / state.dataHeatBal->ZnRpt(ZN).SumToutMinusTSup;
+            }
+            if (state.dataHeatBal->spaceRpt(spaceNum).SumToutMinusTSup != 0.0) {
+                state.dataHeatBal->spaceRpt(spaceNum).ITEqSHI =
+                    state.dataHeatBal->spaceRpt(spaceNum).SumTinMinusTSup / state.dataHeatBal->spaceRpt(spaceNum).SumToutMinusTSup;
             }
         }
 
@@ -8630,12 +8731,10 @@ namespace InternalHeatGains {
 
         // TODO MJW: This could be refactored to avoid duplicate code, but for now . . . .
         if (spaceIndex > 0) {
-            if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices == 0) {
-                for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
-                    for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
-                        if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
-                            tmpSumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).ConvectGainRate;
-                        }
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
+                for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                        tmpSumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).ConvectGainRate;
                     }
                 }
             }
@@ -8768,12 +8867,10 @@ namespace InternalHeatGains {
 
         // TODO MJW: This could be refactored to avoid duplicate code, but for now . . . .
         if (spaceIndex > 0) {
-            if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices == 0) {
-                for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
-                    for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
-                        if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
-                            tmpSumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).RadiantGainRate;
-                        }
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
+                for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                        tmpSumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).RadiantGainRate;
                     }
                 }
             }
@@ -8862,12 +8959,10 @@ namespace InternalHeatGains {
 
         // TODO MJW: This could be refactored to avoid duplicate code, but for now . . . .
         if (spaceIndex > 0) {
-            if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices == 0) {
-                for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
-                    for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
-                        if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
-                            tmpSumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).LatentGainRate;
-                        }
+            for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
+                for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompTypeOfNum == GainTypeARR(TypeNum)) {
+                        tmpSumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).LatentGainRate;
                     }
                 }
             }
