@@ -1555,7 +1555,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles_two_objects)
     }
 }
 
-TEST_F(InputProcessorFixture, validate_epJSON_parametric_template)
+TEST_F(InputProcessorFixture, validate_idf_parametric_ght_HVACtemplate)
 {
     std::string const idf(delimited_string({"Parametric:Logic,",
                                             "Main,                    !- Name",
@@ -1568,17 +1568,53 @@ TEST_F(InputProcessorFixture, validate_epJSON_parametric_template)
                                             "$width = $depth * $aspectRatio,  !- Parametric Logic Line 7",
                                             "$height = 4.0;           !- Parametric Logic Line 8"
                                             "",
+                                            "GroundHeatTransfer:Control,",
+                                            "GHT Control, !- Name",
+                                            "Yes,         !- Run Basement Preprocessor",
+                                            "No;          !- Run Slab Preprocessor",
                                             "HVACTemplate:Thermostat,",
                                             "All Zones,               !- Name",
                                             "Htg-SetP-Sch,            !- Heating Setpoint Schedule Name",
                                             ",                        !- Constant Heating Setpoint {C}",
                                             "Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name",
                                             ";                        !- Constant Cooling Setpoint {C}"}));
-    EXPECT_FALSE(process_idf(idf, false));
-    std::string const error_string = delimited_string({
-        "   ** Severe  ** Line: 1 You must run Parametric Preprocessor for \"Parametric:Logic\"",
-        "   ** Severe  ** Line: 11 You must run the ExpandObjects program for \"HVACTemplate:Thermostat\"",
-    });
+    EXPECT_TRUE(process_idf(idf, false));
+    bool unsupportedFound = state->dataInputProcessing->inputProcessor->checkForUnsupportedObjects(*state);
+    EXPECT_TRUE(unsupportedFound);
+
+    std::string const error_string =
+        delimited_string({"   ** Severe  ** HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ExpandObjects program on this input.",
+                          "   ** Severe  ** GroundHeatTransfer:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ExpandObjects program on this input.",
+                          "   ** Severe  ** Parametric:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ParametricPreprocesor program on this input."});
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(InputProcessorFixture, validate_epJSON_parametric_ght_HVACtemplate)
+{
+    json root = {
+        {"Parametric:Logic", {{"Main", {"lines", {{{"parametric_logic_line", "PARAMETER $bldgArea"}, {"parametric_logic_line", "$depth"}}}}}}},
+        {"GroundHeatTransfer:Control", {{"GHT Control", {{"run_basement_preprocessor", "Yes"}, {"run_slab_preprocessor", "No"}}}}},
+        {"HVACTemplate:Plant:Boiler",
+         {{"Main Boiler",
+           {{"boiler_type", "HotWaterBoiler"}, {"capacity", "Autosize"}, {"efficiency", 0.8}, {"fuel_type", "NaturalGas"}, {"priority", "1"}}}}}};
+
+    state->dataInputProcessing->inputProcessor->epJSON = root;
+    state->dataGlobal->isEpJSON = true;
+    state->dataInputProcessing->inputProcessor->initializeMaps();
+    bool unsupportedFound = state->dataInputProcessing->inputProcessor->checkForUnsupportedObjects(*state);
+    EXPECT_TRUE(unsupportedFound);
+
+    std::string const error_string =
+        delimited_string({"   ** Severe  ** HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ExpandObjects program on this input.",
+                          "   ** Severe  ** GroundHeatTransfer:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ExpandObjects program on this input.",
+                          "   ** Severe  ** Parametric:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ParametricPreprocesor program on this input."});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }

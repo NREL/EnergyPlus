@@ -6100,6 +6100,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         if (state.dataHeatBal->Infiltration(j).QuadratureSum) {
             state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Infiltration(j).OABalancePtr).InfMassFlowRate += MCpI_temp / CpAir;
         } else {
+            state.dataHeatBal->Infiltration(j).MCpI_temp = MCpI_temp;
             state.dataHeatBalFanSys->MCPI(NZ) += MCpI_temp;
             state.dataHeatBalFanSys->OAMFL(NZ) += MCpI_temp / CpAir;
             state.dataHeatBalFanSys->MCPTI(NZ) += MCpI_temp * TempExt;
