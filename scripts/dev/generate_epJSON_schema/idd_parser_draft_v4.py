@@ -152,7 +152,7 @@ class Data:
 
 
 def parse_idd(data):
-    root = {'$schema': "https://json-schema.org/draft-07/schema#", 'properties': {}}
+    root = {'$schema': "http://json-schema.org/draft-04/schema#", 'properties': {}}
     data.file_size = len(data.file)
     current_group_name = '**ungrouped**'
 
@@ -504,17 +504,15 @@ def parse_field(data, token):
 
         elif token == TOKEN_MAX or token == TOKEN_MAX_EXCLUSIVE:
             next_token(data)
+            root['maximum'] = parse_number(data)
             if token == TOKEN_MAX_EXCLUSIVE:
-                root['exclusiveMaximum'] = parse_number(data)
-            else:
-                root['maximum'] = parse_number(data)
+                root['exclusiveMaximum'] = True
 
         elif token == TOKEN_MIN or token == TOKEN_MIN_EXCLUSIVE:
             next_token(data)
+            root['minimum'] = parse_number(data)
             if token == TOKEN_MIN_EXCLUSIVE:
-                root['exclusiveMinimum'] = parse_number(data)
-            else:
-                root['minimum'] = parse_number(data)
+                root['exclusiveMinimum'] = True
 
         elif token == TOKEN_BEGIN_EXTENSIBLE:
             next_token(data)
