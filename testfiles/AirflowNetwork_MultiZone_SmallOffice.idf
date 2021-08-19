@@ -1903,7 +1903,7 @@
 
   AirflowNetwork:MultiZone:Surface,
     Zn003:Wall001,           !- Surface Name
-    CR-1,                    !- Leakage Component Name
+    SF-1,                    !- Leakage Component Name
     WFacade,                 !- External Node Name
     1.0;                     !- Window/Door Opening Factor, or Crack Factor {dimensionless}
 
@@ -1994,6 +1994,11 @@
     CR-1,                    !- Name
     0.01,                    !- Air Mass Flow Coefficient at Reference Conditions {kg/s}
     0.667;                   !- Air Mass Flow Exponent {dimensionless}
+
+  AirflowNetwork:MultiZone:SpecifiedFlowRate,
+    SF-1,                    !- Name
+    0.06,                    !- Air Flow Value
+    kg/s;                    !- Air Flow Units
 
   AirflowNetwork:MultiZone:Surface:Crack,
     CRcri,                   !- Name
@@ -3083,6 +3088,10 @@
   Output:Variable,Zn003:Wall002:Win001,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;
 
   Output:Variable,Zn003:Wall002:Win001,AFN Linkage Node 2 to Node 1 Volume Flow Rate,timestep;
+
+  Output:Variable,ZN003:WALL001,AFN Linkage Node 1 to Node 2 Mass Flow Rate,timestep;
+
+  Output:Variable,ZN003:WALL001,AFN Linkage Node 2 to Node 1 Mass Flow Rate,timestep;
 
   Output:Variable,*,Heating Coil NaturalGas Rate,timestep,ReportSch;
 
