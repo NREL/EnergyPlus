@@ -434,10 +434,10 @@ namespace DaylightingManager {
                               Real64 const PHSKY);
 
     void ProfileAngle(EnergyPlusData &state,
-                      int const SurfNum,                // Surface number
-                      Vector3<Real64> const &CosDirSun, // Solar direction cosines
-                      int const HorOrVert,              // If HORIZONTAL, calculates ProfileAngHor
-                      Real64 &ProfileAng                // Solar profile angle (radians).
+                      int const SurfNum,                                      // Surface number
+                      Vector3<Real64> const &CosDirSun,                       // Solar direction cosines
+                      DataWindowEquivalentLayer::Orientation const HorOrVert, // If HORIZONTAL, calculates ProfileAngHor
+                      Real64 &ProfileAng                                      // Solar profile angle (radians).
     );
 
     void DayltgClosestObstruction(EnergyPlusData &state,
@@ -481,8 +481,7 @@ namespace DaylightingManager {
                                std::string const &mapName,
                                std::string const &environmentName,
                                int const ZoneNum,
-                               std::string const &refPt1,
-                               std::string const &refPt2,
+                               std::string const &refPts,
                                Real64 const zcoord);
 
 } // namespace DaylightingManager
@@ -701,7 +700,6 @@ struct DaylightingManagerData : BaseGlobalStruct
     Array1D_bool FirstTimeMaps;
     Array1D_bool EnvrnPrint;
     Array1D_string SavedMnDy;
-    Array2D_string RefPts;
     Array1D<Real64> XValue;
     Array1D<Real64> YValue;
     Array2D<Real64> IllumValue;
@@ -864,7 +862,6 @@ struct DaylightingManagerData : BaseGlobalStruct
         this->FirstTimeMaps.clear();
         this->EnvrnPrint.clear();
         this->SavedMnDy.clear();
-        this->RefPts.clear();
         this->XValue.clear();
         this->YValue.clear();
         this->IllumValue.clear();

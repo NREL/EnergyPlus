@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -180,23 +181,23 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,         // Area available for venting the gap [m2]
                                   Real64 const Cv,               // Oriface coefficient for volume-based discharge, wind-driven [--]
-                                  Real64 const Cd,               // oriface coefficient for discharge,  bouyancy-driven [--]
+                                  Real64 const Cd,               // oriface coefficient for discharge,  buoyancy-driven [--]
                                   Real64 const HdeltaNPL,        // Height difference from neutral pressure level [m]
                                   Real64 const SolAbs,           // solar absorptivity of baffle [--]
                                   Real64 const AbsExt,           // thermal absorptance/emittance of baffle material [--]
                                   Real64 const Tilt,             // Tilt of gap [Degrees]
                                   Real64 const AspRat,           // aspect ratio of gap  Height/gap [--]
                                   Real64 const GapThick,         // Thickness of air space between baffle and underlying heat transfer surface
-                                  int const Roughness,           // Roughness index (1-6), see DataHeatBalance parameters
-                                  Real64 const QdotSource,       // Source/sink term, e.g. electricity exported from solar cell [W]
-                                  Real64 &TsBaffle,              // Temperature of baffle (both sides) use lagged value on input [C]
-                                  Real64 &TaGap,                 // Temperature of air gap (assumed mixed) use lagged value on input [C]
+                                  DataSurfaces::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
+                                  Real64 const QdotSource,                        // Source/sink term, e.g. electricity exported from solar cell [W]
+                                  Real64 &TsBaffle,                               // Temperature of baffle (both sides) use lagged value on input [C]
+                                  Real64 &TaGap, // Temperature of air gap (assumed mixed) use lagged value on input [C]
                                   Optional<Real64> HcGapRpt = _,
                                   Optional<Real64> HrGapRpt = _,
                                   Optional<Real64> IscRpt = _,
                                   Optional<Real64> MdotVentRpt = _,
                                   Optional<Real64> VdotWindRpt = _,
-                                  Optional<Real64> VdotBouyRpt = _);
+                                  Optional<Real64> VdotBuoyRpt = _);
 
 //****************************************************************************
 

@@ -26122,26 +26122,22 @@
   AirLoopHVAC:OutdoorAirSystem,
     SAC_FrontOffice OA System,  !- Name
     SAC_FrontOffice OA System Controllers,  !- Controller List Name
-    SAC_FrontOffice OA System Equipment,  !- Outdoor Air Equipment List Name
-    SAC_FrontOffice Availability Managers;  !- Availability Manager List Name
+    SAC_FrontOffice OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SAC_FrontLounge OA System,  !- Name
     SAC_FrontLounge OA System Controllers,  !- Controller List Name
-    SAC_FrontLounge OA System Equipment,  !- Outdoor Air Equipment List Name
-    SAC_FrontLounge Availability Managers;  !- Availability Manager List Name
+    SAC_FrontLounge OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SAC_MeetingRoom OA System,  !- Name
     SAC_MeetingRoom OA System Controllers,  !- Controller List Name
-    SAC_MeetingRoom OA System Equipment,  !- Outdoor Air Equipment List Name
-    SAC_MeetingRoom Availability Managers;  !- Availability Manager List Name
+    SAC_MeetingRoom OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     SAC_Exc_EmpLge_RestRm OA System,  !- Name
     SAC_Exc_EmpLge_RestRm OA System Controllers,  !- Controller List Name
-    SAC_Exc_EmpLge_RestRm OA System Equipment,  !- Outdoor Air Equipment List Name
-    SAC_Exc_EmpLge_RestRm Availability Managers;  !- Availability Manager List Name
+    SAC_Exc_EmpLge_RestRm OA System Equipment;  !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 

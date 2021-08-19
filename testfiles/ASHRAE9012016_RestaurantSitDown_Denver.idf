@@ -4958,14 +4958,12 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_1:1_OA,           !- Name
     PSZ-AC_1:1_OA_Controllers,  !- Controller List Name
-    PSZ-AC_1:1_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_1:1 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_1:1_OA_Equipment; !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_2:2_OA,           !- Name
     PSZ-AC_2:2_OA_Controllers,  !- Controller List Name
-    PSZ-AC_2:2_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_2:2 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_2:2_OA_Equipment; !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 
