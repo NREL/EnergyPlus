@@ -324,6 +324,15 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
             }
         }
     }
+
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (int SurfNum = Zone(ZoneNum).WindowSurfaceFirst; SurfNum <= Zone(ZoneNum).WindowSurfaceLast; ++SurfNum) {
+            if (Surface(SurfNum).ExtBoundCond != ExternalEnvironment) {
+                state.dataHeatBalSurf->SurfHConvInt(SurfNum) =
+                    state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum);
+            }
+        }
+    }
 }
 
 void InitExteriorConvectionCoeff(EnergyPlusData &state,
@@ -605,6 +614,8 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(hConst);
         }
     }
+
+    HExt = HExt * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum);
 
     if (TSurf == TSky || algoNum == ConvectionConstants::HcExt_ASHRAESimple) {
         HSky = 0.0;

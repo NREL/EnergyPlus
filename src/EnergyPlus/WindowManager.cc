@@ -3354,18 +3354,18 @@ namespace WindowManager {
 
         if (nglasslayer == 1) {
             Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
-                       state.dataWindowManager->hcout * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) * state.dataWindowManager->tout +
+                       state.dataWindowManager->hcout * state.dataWindowManager->tout +
                        state.dataWindowManager->AbsRadGlassFace(1);
             Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) +
-                       state.dataWindowManager->hcin * state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum) * state.dataWindowManager->tin +
+                       state.dataWindowManager->hcin * state.dataWindowManager->tin +
                        state.dataWindowManager->AbsRadGlassFace(2);
 
             Aface(1, 1) =
-                hr(1) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum);
+                hr(1) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout;
             Aface(2, 1) = -state.dataWindowManager->scon(1);
             Aface(1, 2) = -state.dataWindowManager->scon(1);
             Aface(2, 2) =
-                hr(2) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum);
+                hr(2) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin;
 
             if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 // interior shade, single pane
@@ -5338,7 +5338,7 @@ namespace WindowManager {
             // Interaction with shade or blind, if one of these is present, is ignored. See below for
             // separate calculation of shade/blind temperature.
 
-            rguess(1) = 1.0 / ((state.dataWindowManager->hcout + hrad) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum));
+            rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum));
             rguess(state.dataWindowManager->nglface + 1) =
                 1.0 / ((state.dataWindowManager->hcin + hrad) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum));
 
