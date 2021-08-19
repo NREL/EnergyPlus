@@ -258,15 +258,9 @@ namespace WindowManager {
         }
     }
 
-     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state, int const surfNum, double &uvalue, double &shgc, double &vt)
+     void GetWindowAssemblyNfrcForReport(
+        EnergyPlusData &state, int const surfNum, double windowWidth, double windowHeight, double &uvalue, double &shgc, double &vt)
     {
-
-        auto &surface(state.dataSurface->Surface(surfNum));
-
-        auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum);
-        Real64 HextConvCoeff = 0.0;
-        auto aSystem = aFactory.getTarcogSystemForReporting(state, HextConvCoeff);
-
 
         if (false) {
             Tarcog::ISO15099::WindowSingleVision m_Window;
@@ -356,12 +350,39 @@ namespace WindowManager {
             shgc = m_Window.shgc();
             uvalue = m_Window.vt();
         } else {
-            vt = -1.;
-            shgc = -1.;
-            uvalue = -1.;
+            auto &surface(state.dataSurface->Surface(surfNum));
+            auto frameDivider(state.dataSurface->FrameDivider(state.dataSurface->Surface(surfNum).FrameDivider));
+
+            auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum);
+            // films from ISO 15099 Section 8.2.2 Winter conditions
+            double hExtConvCoeff = 20.0;
+            double hIntConvCoeff = 3.6;
+            auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, hExtConvCoeff);
+
+            const double frameUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.FrameConductance, hIntConvCoeff, hExtConvCoeff);
+            const double centerOfGlassUvalue = insulGlassUnit->getUValue();
+            const double edgeUValue{centerOfGlassUvalue * frameDivider.FrEdgeToCenterGlCondRatio}; //not sure about this
+
+            const double projectedFrameDimension{frameDivider.FrameWidth};
+            const double wettedLength{projectedFrameDimension + frameDivider.FrameProjectionIn};
+            const double absorptance{frameDivider.FrameSolAbsorp};
+
+            Tarcog::ISO15099::FrameData frameData{frameUvalue, edgeUValue, projectedFrameDimension, wettedLength, absorptance};
+
+            const auto tVis{0.6385};
+            const auto tSol{0.371589958668};
+
+            auto window = Tarcog::ISO15099::WindowSingleVision(windowWidth, windowHeight, tVis, tSol, insulGlassUnit);
+
+            window.setFrameTop(frameData);
+            window.setFrameBottom(frameData);
+            window.setFrameLeft(frameData);
+            window.setFrameRight(frameData);
+
+            vt = window.uValue();
+            shgc = window.shgc();
+            uvalue = window.vt();
         }
-         
-         
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -838,6 +859,18 @@ namespace WindowManager {
         return Indoor;
     }
 
+    double CWCEHeatTransferFactory::overallUfactorFromFilmsAndCond(double conductance, double insideFilm, double outsideFilm)
+    {
+        double rOverall(0.); 
+        double uFactor(0.);
+        if (insideFilm + outsideFilm != 0.) {
+            rOverall = 1 / insideFilm + conductance + 1 / outsideFilm;
+        } 
+        if (rOverall != 0.) {
+            uFactor = 1 / rOverall;
+        } 
+        return uFactor;
+    }
 
 
 } // namespace WindowManager

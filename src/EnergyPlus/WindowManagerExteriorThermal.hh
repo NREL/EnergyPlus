@@ -90,6 +90,8 @@ namespace WindowManager {
         Between
     };
 
+
+
     // Routine that calculates heat transfer balance by using Windows-CalcEngine routines
     void CalcWindowHeatBalanceExternalRoutines(EnergyPlusData &state,
                                                int const SurfNum,          // Surface number
@@ -98,7 +100,8 @@ namespace WindowManager {
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     );
 
-    void GetWindowAssemblyNfrcForReport(EnergyPlusData &state, int const surfNum, double &uvalue, double &shgc, double &vt);
+    void GetWindowAssemblyNfrcForReport(
+        EnergyPlusData &state, int const surfNum, double windowWidth, double windowHeight, double &uvalue, double &shgc, double &vt);
 
     // Class that is used to create layers for Windows-CalcEngine
     class CWCEHeatTransferFactory
@@ -120,6 +123,7 @@ namespace WindowManager {
         // It probably needs to be removed since calculation is no different from any other case. It is left over from
         // old EnergyPlus code and it needs to be checked.
         bool isInteriorShade() const;
+        double overallUfactorFromFilmsAndCond(double conductance, double insideFilm, double outsideFilm);
 
     private:
         DataSurfaces::SurfaceData m_Surface;
@@ -158,6 +162,7 @@ namespace WindowManager {
         // methods specifically for helping in NFRC assembly calculations
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoorUvalueNfrc();
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoorUvalueNfrc();
+
     };
 } // namespace WindowManager
 

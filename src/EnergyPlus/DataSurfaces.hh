@@ -788,7 +788,6 @@ namespace DataSurfaces {
     };
 
     constexpr std::array<std::string_view, static_cast<int>(NfrcProductOptions::Num)> NfrcProductName = {
-//    constexpr gsl::span<std::string_view> NfrcProductName = {
         "CasementDouble", "CasementSingle",   "DualAction",
         "Fixed",          "Garage",           "Greenhouse",
         "HingedEscape",   "HorizontalSlider", "Jal",
@@ -797,6 +796,31 @@ namespace DataSurfaces {
         "CurtainWall",    "SpandrelPanel",    "SideHingedDoor",
         "DoorTransom",    "TropicalAwning",   "TubularDaylightingDevice",
         "VerticalSlider"};
+
+    constexpr std::array<double, static_cast<int>(NfrcProductOptions::Num)> NfrcWidth = {
+        // width in meters from Table 4-3 of NFRC 100-2020
+        1.200, 0.600, 1.200, //  CasementDouble,  CasementSingle,    DualAction,
+        1.200, 2.134, 1.500, //  Fixed,           Garage,            Greenhouse,
+        1.500, 1.500, 1.200, //  HingedEscape,    HorizontalSlider,  Jal,
+        1.200, 1.500, 1.500, //  Pivoted,         ProjectingSingle,  ProjectingDual,
+        0.600, 1.200, 2.000, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
+        2.000, 2.000, 1.920, //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
+        2.000, 1.500, 0.350, //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
+        1.200                //  VerticalSlider,
+    };
+
+    constexpr std::array<double, static_cast<int>(NfrcProductOptions::Num)> NfrcHeight = {
+        // height in meters from Table 4-3 of NFRC 100-2020
+        1.500, 1.500, 1.500, //  CasementDouble,  CasementSingle,    DualAction,
+        1.500, 2.134, 1.200, //  Fixed,           Garage,            Greenhouse,
+        1.200, 1.200, 1.500, //  HingedEscape,    HorizontalSlider,  Jal,
+        1.500, 1.200, 0.600, //  Pivoted,         ProjectingSingle,  ProjectingDual,
+        2.090, 1.200, 2.000, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
+        2.000, 1.200, 2.090, //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
+        0.600, 1.200, 0.350, //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
+        1.500                //  VerticalSlider,
+    };
+
 
     struct FrameDividerProperties
     {
