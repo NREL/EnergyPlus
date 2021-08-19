@@ -229,7 +229,6 @@ namespace InternalHeatGains {
         Real64 SchMin;
         Real64 SchMax;
         std::string liteName;
-        bool errFlag;
 
         // Formats
         static constexpr fmt::string_view Format_720(" Zone Internal Gains Nominal, {},{:.2R},{:.1R},");
