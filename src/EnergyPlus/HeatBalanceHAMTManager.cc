@@ -930,9 +930,9 @@ namespace HeatBalanceHAMTManager {
         }
 
         // Reset surface virtual cell origins and volumes. Initialize report variables.
-        static constexpr fmt::string_view Format_1966("! <HAMT cells>, Surface Name, Construction Name, Cell Numbers\n");
+        static constexpr std::string_view Format_1966("! <HAMT cells>, Surface Name, Construction Name, Cell Numbers\n");
         print(state.files.eio, Format_1966);
-        static constexpr fmt::string_view Format_1965("! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) \n");
+        static constexpr std::string_view Format_1965("! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) \n");
         print(state.files.eio, Format_1965);
         // cCurrentModuleObject='MaterialProperty:HeatAndMoistureTransfer:*'
         for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
@@ -1042,12 +1042,12 @@ namespace HeatBalanceHAMTManager {
         ScanForReports(state, "Constructions", DoReport, "Constructions");
         if (DoReport) {
 
-            static constexpr fmt::string_view Format_108("! <Material Nominal Resistance>, Material Name,  Nominal R\n");
+            static constexpr std::string_view Format_108("! <Material Nominal Resistance>, Material Name,  Nominal R\n");
             print(state.files.eio, Format_108);
 
             for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
 
-                static constexpr fmt::string_view Format_111("Material Nominal Resistance,{},{:.4R}\n");
+                static constexpr std::string_view Format_111("Material Nominal Resistance,{},{:.4R}\n");
                 print(state.files.eio, Format_111, state.dataMaterial->Material(MaterNum).Name, state.dataHeatBal->NominalR(MaterNum));
             }
         }

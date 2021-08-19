@@ -1101,7 +1101,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
             wallSurfaceString += "," + state.dataSurface->Surface(wl).Name;
         }
 
-        static constexpr fmt::string_view fmt = "{},{},{},{},{:.2R},{:.2R},{:.2R},{},{}{}\n";
+        static constexpr std::string_view fmt = "{},{},{},{},{:.2R},{:.2R},{:.2R},{},{}{}\n";
         print(state.files.eio,
               fmt,
               foundationInputs[state.dataSurface->Surface(kv.floorSurface).OSCPtr].name,
