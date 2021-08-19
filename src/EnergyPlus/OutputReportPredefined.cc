@@ -259,8 +259,10 @@ namespace OutputReportPredefined {
         s->pdstMech = newPreDefSubTable(state, s->pdrEquip, "Central Plant");
 
         s->pdchMechType = newPreDefColumn(state, s->pdstMech, "Type");
-        s->pdchMechNomCap = newPreDefColumn(state, s->pdstMech, "Nominal Capacity [W]");
-        s->pdchMechNomEff = newPreDefColumn(state, s->pdstMech, "Nominal Efficiency [W/W]");
+        s->pdchMechNomCap = newPreDefColumn(state, s->pdstMech, "Reference Capacity [W]");
+        s->pdchMechNomEff = newPreDefColumn(state, s->pdstMech, "Reference Efficiency [W/W]");
+        s->pdchMechRatCap = newPreDefColumn(state, s->pdstMech, "Rated Capacity [W]");
+        s->pdchMechRatEff = newPreDefColumn(state, s->pdstMech, "Rated Efficiency [W/W]");
         // Note: We don't want any of these to convert.
         // The Btu/W-h isn't going to convert anyways, and the W/W will convert to W/W since it has "SI" in the string as a hint
         s->pdchMechIPLVSI = newPreDefColumn(state, s->pdstMech, "IPLV in SI Units [W/W]");
