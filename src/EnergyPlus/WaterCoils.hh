@@ -86,7 +86,7 @@ namespace WaterCoils {
         std::string Name;                 // Name of the WaterCoil
         std::string WaterCoilTypeA;       // Type of WaterCoil ie. Heating or Cooling
         std::string WaterCoilModelA;      // Type of WaterCoil ie. Simple, Detailed, etc.
-        int WaterCoilType;                // Type of WaterCoil ie. Heating or Cooling
+        DataPlant::PlantEquipmentType WaterCoilType;                // Type of WaterCoil ie. Heating or Cooling
         iCoilModel WaterCoilModel;        // Type of WaterCoil ie. Simple, Detailed, etc.
         std::string Schedule;             // WaterCoil Operation Schedule
         int SchedPtr;                     // Pointer to the correct schedule
@@ -223,7 +223,7 @@ namespace WaterCoils {
 
         // Default Constructor
         WaterCoilEquipConditions()
-            : WaterCoilType(0), WaterCoilModel(iCoilModel::Unassigned), SchedPtr(0), RequestingAutoSize(false), InletAirMassFlowRate(0.0),
+        : WaterCoilType(DataPlant::PlantEquipmentType::Invalid), WaterCoilModel(iCoilModel::Unassigned), SchedPtr(0), RequestingAutoSize(false), InletAirMassFlowRate(0.0),
               OutletAirMassFlowRate(0.0), InletAirTemp(0.0), OutletAirTemp(0.0), InletAirHumRat(0.0), OutletAirHumRat(0.0), InletAirEnthalpy(0.0),
               OutletAirEnthalpy(0.0), TotWaterCoilLoad(0.0), SenWaterCoilLoad(0.0), TotWaterHeatingCoilEnergy(0.0), TotWaterCoolingCoilEnergy(0.0),
               SenWaterCoolingCoilEnergy(0.0), DesWaterHeatingCoilRate(0.0), TotWaterHeatingCoilRate(0.0), DesWaterCoolingCoilRate(0.0),

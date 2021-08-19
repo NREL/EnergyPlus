@@ -156,7 +156,7 @@ namespace FanCoilUnits {
         CCoil CCoilType_Num;        // Numeric equivalent for type of cooling coil
         std::string CCoilPlantName; // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
         std::string CCoilPlantType; // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
-        int CCoilPlantTypeOfNum;
+        DataPlant::PlantEquipmentType CCoilPlantTypeOf;
         int ControlCompTypeNum;
         int CompErrIndex;
         Real64 MaxColdWaterVolFlow; // m3/s
@@ -168,7 +168,7 @@ namespace FanCoilUnits {
         std::string HCoilType; // type of heating coil:
         // 'Coil:Heating:Water' or
         HCoil HCoilType_Num; // Numeric equivalent for type of cooling coil
-        int HCoilPlantTypeOfNum;
+        DataPlant::PlantEquipmentType HCoilPlantTypeOf{DataPlant::PlantEquipmentType::Invalid};
         Real64 MaxHotWaterVolFlow;    // m3/s
         Real64 MinHotWaterVolFlow;    // m3/s
         Real64 MinHotWaterFlow;       // kg/s
@@ -254,7 +254,7 @@ namespace FanCoilUnits {
               MaxIterIndexH(0), BadMassFlowLimIndexH(0), MaxIterIndexC(0), BadMassFlowLimIndexC(0), FanAirVolFlow(0.0), MaxAirVolFlow(0.0),
               MaxAirMassFlow(0.0), LowSpeedRatio(0.0), MedSpeedRatio(0.0), SpeedFanRatSel(0.0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), AirInNode(0),
               AirOutNode(0), OutsideAirNode(0), AirReliefNode(0), MixedAirNode(0), OAMixIndex(0), FanIndex(0), CCoilName_Index(0),
-              CCoilType_Num(CCoil::Unassigned), CCoilPlantTypeOfNum(0), ControlCompTypeNum(0), CompErrIndex(0), MaxColdWaterVolFlow(0.0),
+              CCoilType_Num(CCoil::Unassigned), CCoilPlantTypeOf(DataPlant::PlantEquipmentType::Invalid), ControlCompTypeNum(0), CompErrIndex(0), MaxColdWaterVolFlow(0.0),
               MinColdWaterVolFlow(0.0), MinColdWaterFlow(0.0), ColdControlOffset(0.0), HCoilName_Index(0), HCoilType_Num(HCoil::Unassigned),
               MaxHotWaterVolFlow(0.0), MinHotWaterVolFlow(0.0), MinHotWaterFlow(0.0), HotControlOffset(0.0), DesignHeatingCapacity(0.0),
               AvailStatus(0), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), HVACSizingIndex(0), SpeedRatio(0.0),

@@ -480,7 +480,7 @@ namespace FaultsManager {
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
 
-                        if (state.dataPlantChillers->ElectricChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
+                        if (state.dataPlantChillers->ElectricChiller(ChillerNum).CondenserType != DataPlant::nCondenserType::WaterCooled) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(
                                 state,
@@ -511,7 +511,7 @@ namespace FaultsManager {
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
 
-                        if (state.dataChillerElectricEIR->ElectricEIRChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
+                        if (state.dataChillerElectricEIR->ElectricEIRChiller(ChillerNum).CondenserType != DataPlant::nCondenserType::WaterCooled) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(
                                 state,
@@ -544,7 +544,7 @@ namespace FaultsManager {
                     } else {
 
                         if (state.dataChillerReformulatedEIR->ElecReformEIRChiller(ChillerNum).CondenserType !=
-                            DataPlant::CondenserType::WaterCooled) {
+                            DataPlant::nCondenserType::WaterCooled) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(
                                 state,
@@ -575,7 +575,7 @@ namespace FaultsManager {
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
 
-                        if (state.dataPlantChillers->ConstCOPChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
+                        if (state.dataPlantChillers->ConstCOPChiller(ChillerNum).CondenserType != DataPlant::nCondenserType::WaterCooled) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(
                                 state,
@@ -606,7 +606,7 @@ namespace FaultsManager {
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
 
-                        if (state.dataPlantChillers->EngineDrivenChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
+                        if (state.dataPlantChillers->EngineDrivenChiller(ChillerNum).CondenserType != DataPlant::nCondenserType::WaterCooled) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(
                                 state,
@@ -637,7 +637,7 @@ namespace FaultsManager {
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
 
-                        if (state.dataPlantChillers->GTChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
+                        if (state.dataPlantChillers->GTChiller(ChillerNum).CondenserType != DataPlant::nCondenserType::WaterCooled) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(
                                 state,
@@ -1750,8 +1750,8 @@ namespace FaultsManager {
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Coil is found: check if the right type
-                    if ((state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterSimpleHeating) ||
-                        (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling)) {
+                    if ((state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
+                        (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling)) {
                         // Link the Coil with the fault model
                         state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag = true;
                         state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex = jFault_FoulingCoil;
@@ -1770,7 +1770,7 @@ namespace FaultsManager {
 
                         // Coil:Cooling:Water doesn't report UA because it's not variable,
                         // but here, it's useful since we do change it via fouling, so report it
-                        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) {
+                        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
                             SetupOutputVariable(state,
                                                 "Cooling Coil Total U Factor Times Area Value",
                                                 OutputProcessor::Unit::W_K,

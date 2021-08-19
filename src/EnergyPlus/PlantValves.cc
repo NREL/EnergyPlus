@@ -285,7 +285,7 @@ namespace PlantValves {
                 errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        DataPlant::TypeOf_ValveTempering,
+                                                        static_cast<int>(DataPlant::PlantEquipmentType::ValveTempering),
                                                         this->LoopNum,
                                                         this->LoopSideNum,
                                                         this->BranchNum,
@@ -317,7 +317,7 @@ namespace PlantValves {
                             branchCtr++;
                             for (auto &thisComp : thisBranch.Comp) {
 
-                                if ((thisComp.TypeOf_Num == DataPlant::TypeOf_ValveTempering) && (thisComp.Name == this->Name)) { // we found it.
+                                if ((thisComp.TypeOf_enum == DataPlant::PlantEquipmentType::ValveTempering) && (thisComp.Name == this->Name)) { // we found it.
 
                                     // is branch control type 'Active'
                                     if (thisBranch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active) IsBranchActive = true;

@@ -1792,8 +1792,6 @@ namespace DesiccantDehumidifiers {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using SteamCoils::SimulateSteamCoilComponents;
         auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
-        using DataPlant::TypeOf_CoilSteamAirHeating;
-        using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataSizing::AutoSize;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSatDensityRefrig;
@@ -1840,7 +1838,7 @@ namespace DesiccantDehumidifiers {
                     ErrorFlag = false;
                     ScanPlantLoopsForObject(state,
                                             DesicDehum(DesicDehumNum).RegenCoilName,
-                                            TypeOf_CoilWaterSimpleHeating,
+                                            static_cast<int>(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating),
                                             DesicDehum(DesicDehumNum).LoopNum,
                                             DesicDehum(DesicDehumNum).LoopSide,
                                             DesicDehum(DesicDehumNum).BranchNum,
@@ -1872,7 +1870,7 @@ namespace DesiccantDehumidifiers {
                     ErrorFlag = false;
                     ScanPlantLoopsForObject(state,
                                             DesicDehum(DesicDehumNum).RegenCoilName,
-                                            TypeOf_CoilSteamAirHeating,
+                                            static_cast<int>(DataPlant::PlantEquipmentType::CoilSteamAirHeating),
                                             DesicDehum(DesicDehumNum).LoopNum,
                                             DesicDehum(DesicDehumNum).LoopSide,
                                             DesicDehum(DesicDehumNum).BranchNum,

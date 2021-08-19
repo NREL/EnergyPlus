@@ -502,7 +502,7 @@ namespace AirLoopHVACDOAS {
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
-                                                                DataPlant::TypeOf_CoilWaterCooling,
+                                                                static_cast<int>(DataPlant::PlantEquipmentType::CoilWaterCooling),
                                                                 thisDOAS.CWLoopNum,
                                                                 thisDOAS.CWLoopSide,
                                                                 thisDOAS.CWBranchNum,
@@ -535,7 +535,7 @@ namespace AirLoopHVACDOAS {
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
-                                                                DataPlant::TypeOf_CoilWaterSimpleHeating,
+                                                                static_cast<int>(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating),
                                                                 thisDOAS.HWLoopNum,
                                                                 thisDOAS.HWLoopSide,
                                                                 thisDOAS.HWBranchNum,
@@ -575,7 +575,7 @@ namespace AirLoopHVACDOAS {
                         }
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
-                                                                DataPlant::TypeOf_CoilWaterDetailedFlatCooling,
+                                                                static_cast<int>(DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling),
                                                                 thisDOAS.CWLoopNum,
                                                                 thisDOAS.CWLoopSide,
                                                                 thisDOAS.CWBranchNum,

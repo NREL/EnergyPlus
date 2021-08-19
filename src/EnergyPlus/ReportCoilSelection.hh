@@ -97,7 +97,7 @@ public:                                  // data
     std::string userNameforHVACsystem; // this coil is an HVAC system named by the user.
     int zoneHVACTypeNum;               // store type num if zoneHVAC
     int zoneHVACIndex;                 // store component index for zone HVAC
-    int typeof_Coil; // type of coil, e.g., TypeOf_CoilWaterSimpleHeating, TypeOf_CoilWaterDetailedFlatCooling, TypeOf_CoilWaterCooling
+    int typeof_Coil; // type of coil, e.g., PlantEquipmentType::CoilWaterSimpleHeating, PlantEquipmentType::CoilWaterDetailedFlatCooling, PlantEquipmentType::CoilWaterCooling
 
     int coilSizingMethodConcurrence;             // 1 = noncoincident, 2 = coincident
     std::string coilSizingMethodConcurrenceName; // string name of sizing method for concurrence

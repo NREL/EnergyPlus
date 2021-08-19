@@ -60,6 +60,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
 // SSC Headers
@@ -549,7 +550,7 @@ public:                              // data // might make this class a friend o
     std::string name;                // user identifier
     std::string typeOfName;          // equipment type
     GeneratorType compGenTypeOf_Num; // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
-    int compPlantTypeOf_Num;         // numeric designator for plant component, in DataPlant
+    DataPlant::PlantEquipmentType compPlantTypeOf{DataPlant::PlantEquipmentType::Invalid};         // numeric designator for plant component, in DataPlant
     std::string compPlantName;       // name of plant component if heat recovery
     GeneratorType generatorType;
     int generatorIndex;              // index in generator model data struct

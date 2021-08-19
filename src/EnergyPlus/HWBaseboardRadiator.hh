@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -69,7 +70,7 @@ namespace HWBaseboardRadiator {
     {
         // Members
         std::string EquipID;
-        int EquipType;
+        DataPlant::PlantEquipmentType EquipType;
         std::string designObjectName; // Design Object
         int DesignObjectPtr;
         std::string Schedule;
@@ -125,7 +126,7 @@ namespace HWBaseboardRadiator {
 
         // Default Constructor
         HWBaseboardParams()
-            : EquipType(0), DesignObjectPtr(0), ZonePtr(0), SchedPtr(0), WaterInletNode(0), WaterOutletNode(0), TotSurfToDistrib(0),
+        : EquipType(DataPlant::PlantEquipmentType::Invalid), DesignObjectPtr(0), ZonePtr(0), SchedPtr(0), WaterInletNode(0), WaterOutletNode(0), TotSurfToDistrib(0),
               ControlCompTypeNum(0), CompErrIndex(0), AirMassFlowRate(0.0), AirMassFlowRateStd(0.0), WaterTempAvg(0.0), RatedCapacity(0.0), UA(0.0),
               WaterMassFlowRate(0.0), WaterMassFlowRateMax(0.0), WaterMassFlowRateStd(0.0), WaterVolFlowRateMax(0.0), WaterInletTempStd(0.0),
               WaterInletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletTempStd(0.0), WaterOutletTemp(0.0), WaterOutletEnthalpy(0.0),

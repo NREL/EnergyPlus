@@ -70,7 +70,7 @@ namespace ChillerElectricEIR {
         // Members
         std::string Name;                       // User identifier
         int TypeNum;                            // plant loop type identifier
-        DataPlant::CondenserType CondenserType; // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
+        DataPlant::nCondenserType CondenserType; // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
         Real64 RefCap;                          // Reference capacity of chiller [W]
         bool RefCapWasAutoSized;                // reference capacity was autosized on input
         Real64 RefCOP;                          // Reference coefficient of performance [W/W]
@@ -200,7 +200,7 @@ namespace ChillerElectricEIR {
 
         // Default Constructor
         ElectricEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::CondenserType::Unassigned), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0),
+            : TypeNum(0), CondenserType(DataPlant::nCondenserType::Unassigned), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0),
               FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false),
               EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false), EvapMassFlowRate(0.0), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
               CondVolFlowRateWasAutoSized(false), CondMassFlowRate(0.0), CondMassFlowRateMax(0.0), CondenserFanPowerRatio(0.0),

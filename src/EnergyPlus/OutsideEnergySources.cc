@@ -95,7 +95,7 @@ PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, int obj
     }
     // Now look for this particular pipe in the list
     for (auto &source : state.dataOutsideEnergySrcs->EnergySource) {
-        if (source.EnergyType == objectType && source.Name == objectName) {
+        if (source.EnergyType == static_cast<DataPlant::PlantEquipmentType>(objectType) && source.Name == objectName) {
             return &source;
         }
     }
@@ -163,20 +163,20 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
 
         std::string reportVarPrefix;
         std::string nodeNames;
-        int typeOf;
+        DataPlant::PlantEquipmentType typeOf;
         int thisIndex;
         if (EnergySourceNum <= NumDistrictUnitsHeat) {
             state.dataIPShortCut->cCurrentModuleObject = "DistrictHeating";
             reportVarPrefix = "District Heating ";
             nodeNames = "Hot Water Nodes";
-            typeOf = DataPlant::TypeOf_PurchHotWater;
+            typeOf = DataPlant::PlantEquipmentType::PurchHotWater;
             heatIndex++;
             thisIndex = heatIndex;
         } else {
             state.dataIPShortCut->cCurrentModuleObject = "DistrictCooling";
             reportVarPrefix = "District Cooling ";
             nodeNames = "Chilled Water Nodes";
-            typeOf = DataPlant::TypeOf_PurchChilledWater;
+            typeOf = DataPlant::PlantEquipmentType::PurchChilledWater;
             coolIndex++;
             thisIndex = coolIndex;
         }
@@ -336,7 +336,7 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
 
     // Type name string variable to collapse the sizing for cooling and heating into one block
     std::string typeName;
-    if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
+    if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
         typeName = "Cooling";
     } else { // Heating
         typeName = "Heating";
@@ -430,9 +430,9 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
         MyLoad = sign(CurrentCap, MyLoad);
     }
 
-    if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
+    if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
         if (MyLoad > 0.0) MyLoad = 0.0;
-    } else if (this->EnergyType == DataPlant::TypeOf_PurchHotWater) {
+    } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchHotWater) {
         if (MyLoad < 0.0) MyLoad = 0.0;
     }
 
@@ -464,7 +464,7 @@ void OutsideEnergySourceSpecs::oneTimeInit(EnergyPlusData &state)
         // Locate the unit on the plant loops for later usage
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(
-            state, this->Name, this->EnergyType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+            state, this->Name, static_cast<int>(this->EnergyType), this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
         if (errFlag) {
             ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
         }
@@ -484,12 +484,12 @@ void OutsideEnergySourceSpecs::oneTimeInit(EnergyPlusData &state)
         std::string hotOrChilled = "Hot ";
         std::string reportVarPrefix = "District Heating ";
         std::string heatingOrCooling = "Heating";
-        std::string typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchHotWater);
-        if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
+        std::string typeName = DataPlant::ccSimPlantEquipTypes(static_cast<int>(DataPlant::PlantEquipmentType::PurchHotWater));
+        if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
             hotOrChilled = "Chilled ";
             reportVarPrefix = "District Cooling ";
             heatingOrCooling = "Cooling";
-            typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchChilledWater);
+            typeName = DataPlant::ccSimPlantEquipTypes(static_cast<int>(DataPlant::PlantEquipmentType::PurchChilledWater));
         }
 
         SetupOutputVariable(state,

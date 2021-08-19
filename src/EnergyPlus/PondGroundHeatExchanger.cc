@@ -890,7 +890,7 @@ void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_GrndHtExchgPond,
+                                                static_cast<int>(DataPlant::PlantEquipmentType::GrndHtExchgPond),
                                                 this->LoopNum,
                                                 this->LoopSideNum,
                                                 this->BranchNum,

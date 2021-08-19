@@ -1975,7 +1975,7 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
         errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_Generator_MicroTurbine,
+                                                static_cast<int>(DataPlant::PlantEquipmentType::Generator_MicroTurbine),
                                                 this->HRLoopNum,
                                                 this->HRLoopSideNum,
                                                 this->HRBranchNum,

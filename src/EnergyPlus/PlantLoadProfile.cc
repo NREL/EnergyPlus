@@ -87,7 +87,7 @@ namespace EnergyPlus::PlantLoadProfile {
 // manager (see NonZoneEquipmentManager.cc).
 
 // Using/Aliasing
-using DataPlant::TypeOf_PlantLoadProfile;
+
 using PlantUtilities::InitComponentNodes;
 using PlantUtilities::ScanPlantLoopsForObject;
 using PlantUtilities::SetComponentFlowRate;
@@ -373,7 +373,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataPlantLoadProfile->PlantProfile(ProfileNum).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant
+            state.dataPlantLoadProfile->PlantProfile(ProfileNum).TypeNum = PlantEquipmentType::PlantLoadProfile; // parameter assigned in DataPlant
 
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).InletNode = GetOnlySingleNode(state,
                                                                                                state.dataIPShortCut->cAlphaArgs(2),

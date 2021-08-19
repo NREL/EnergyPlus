@@ -315,7 +315,7 @@ namespace BoilerSteam {
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_Boiler_Steam,
+                                                static_cast<int>(DataPlant::PlantEquipmentType::Boiler_Steam),
                                                 this->LoopNum,
                                                 this->LoopSideNum,
                                                 this->BranchNum,

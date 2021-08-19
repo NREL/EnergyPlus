@@ -235,7 +235,7 @@ namespace PhotovoltaicThermalCollectors {
                 continue;
 
             state.dataPhotovoltaicThermalCollector->PVT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataPhotovoltaicThermalCollector->PVT(Item).TypeNum = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
+            state.dataPhotovoltaicThermalCollector->PVT(Item).TypeNum = DataPlant::PlantEquipmentType::PVTSolarCollectorFlatPlate;
 
             state.dataPhotovoltaicThermalCollector->PVT(Item).SurfNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);

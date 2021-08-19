@@ -125,7 +125,7 @@ void GshpPeCoolingSpecs::simulate(
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             this->SourceLoopNum,
                                                             this->SourceLoopSideNum,
-                                                            DataPlant::TypeOf_HPWaterEFCooling,
+                                                            static_cast<int>(DataPlant::PlantEquipmentType::HPWaterEFCooling),
                                                             this->SourceSideInletNodeNum,
                                                             this->SourceSideOutletNodeNum,
                                                             this->QSource,
@@ -156,7 +156,7 @@ void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_HPWaterPECooling,
+                                                static_cast<int>(DataPlant::PlantEquipmentType::HPWaterPECooling),
                                                 this->SourceLoopNum,
                                                 this->SourceLoopSideNum,
                                                 this->SourceBranchNum,
@@ -169,7 +169,7 @@ void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
                                                 _);
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_HPWaterPECooling,
+                                                static_cast<int>(DataPlant::PlantEquipmentType::HPWaterPECooling),
                                                 this->LoadLoopNum,
                                                 this->LoadLoopSideNum,
                                                 this->LoadBranchNum,
@@ -185,7 +185,7 @@ void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
         }
 
         PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->LoadLoopNum, this->LoadLoopSideNum, this->SourceLoopNum, this->SourceLoopSideNum, this->WWHPPlantTypeOfNum, true);
+            state, this->LoadLoopNum, this->LoadLoopSideNum, this->SourceLoopNum, this->SourceLoopSideNum, static_cast<int>(this->WWHPPlantTypeOfNum), true);
         this->plantScanFlag = false;
     }
 }
@@ -206,7 +206,6 @@ void GetGshpInput(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
-    using DataPlant::TypeOf_HPWaterPECooling;
     using FluidProperties::FindRefrigerant;
     using NodeInputManager::GetOnlySingleNode;
     using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -238,7 +237,7 @@ void GetGshpInput(EnergyPlusData &state)
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name = AlphArray(1);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).WWHPPlantTypeOfNum = TypeOf_HPWaterPECooling;
+        state.dataHPWaterToWaterClg->GSHP(GSHPNum).WWHPPlantTypeOfNum = DataPlant::PlantEquipmentType::HPWaterPECooling;
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).COP = NumArray(1);
         if (NumArray(1) == 0.0) {

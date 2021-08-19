@@ -72,7 +72,7 @@ namespace FluidCoolers {
         // Members
         std::string Name;            // User identifier
         std::string FluidCoolerType; // Type of fluid cooler
-        int FluidCoolerType_Num;
+        DataPlant::PlantEquipmentType FluidCoolerType_enum;
         PerfInputMethod PerformanceInputMethod_Num;
         bool Available;                               // need an array of logicals--load identifiers of available equipment
         bool ON;                                      // Simulate the machine at it's operating part load ratio
@@ -144,7 +144,7 @@ namespace FluidCoolers {
 
         // Default Constructor
         FluidCoolerspecs()
-            : FluidCoolerType_Num(0), PerformanceInputMethod_Num(PerfInputMethod::NOMINAL_CAPACITY), Available(true), ON(true),
+        : FluidCoolerType_enum(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PerfInputMethod::NOMINAL_CAPACITY), Available(true), ON(true),
               DesignWaterFlowRate(0.0), DesignWaterFlowRateWasAutoSized(false), DesWaterMassFlowRate(0.0), HighSpeedAirFlowRate(0.0),
               HighSpeedAirFlowRateWasAutoSized(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false), HighSpeedFluidCoolerUA(0.0),
               HighSpeedFluidCoolerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0), LowSpeedAirFlowRateWasAutoSized(false),

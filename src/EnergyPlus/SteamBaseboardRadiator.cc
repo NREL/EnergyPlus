@@ -105,7 +105,7 @@ namespace SteamBaseboardRadiator {
 
     using DataHVACGlobals::SmallLoad;
     using DataLoopNode::ObjectIsNotParent;
-    using DataPlant::TypeOf_Baseboard_Rad_Conv_Steam;
+
     using DataZoneEquipment::CheckZoneEquipmentList;
 
     static constexpr std::string_view fluidNameSteam("STEAM");
@@ -199,7 +199,7 @@ namespace SteamBaseboardRadiator {
                 {
                     auto const SELECT_CASE_var(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType);
 
-                    if (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam) { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
+                    if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam) { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
                         ControlCompOutput(state,
                                           state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
                                           state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
@@ -519,7 +519,7 @@ namespace SteamBaseboardRadiator {
 
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID = state.dataIPShortCut->cAlphaArgs(1); // Name of the baseboard
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType =
-                TypeOf_Baseboard_Rad_Conv_Steam; //'ZoneHVAC:Baseboard:RadiantConvective:Steam'
+                PlantEquipmentType::Baseboard_Rad_Conv_Steam; //'ZoneHVAC:Baseboard:RadiantConvective:Steam'
 
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).designObjectName =
                 state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
@@ -1682,7 +1682,7 @@ namespace SteamBaseboardRadiator {
 
         // Using/Aliasing
         using DataPlant::ccSimPlantEquipTypes;
-        using DataPlant::TypeOf_Baseboard_Rad_Conv_Steam;
+
 
         using PlantUtilities::PullCompInterconnectTrigger;
 
@@ -1717,7 +1717,7 @@ namespace SteamBaseboardRadiator {
                                           BaseboardName,
                                           state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID));
                 }
-                if (BaseboardTypeNum != TypeOf_Baseboard_Rad_Conv_Steam) {
+                if (BaseboardTypeNum != PlantEquipmentType::Baseboard_Rad_Conv_Steam) {
                     ShowFatalError(state,
                                    format("UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed={}, baseboard name={}, stored baseboard "
                                           "Name for that index={}",

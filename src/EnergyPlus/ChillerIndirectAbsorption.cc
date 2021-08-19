@@ -141,7 +141,7 @@ void IndirectAbsorberSpecs::simulate(
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             calledFromLocation.loopNum,
                                                             calledFromLocation.loopSideNum,
-                                                            DataPlant::TypeOf_Chiller_Indirect_Absorption,
+                                                            static_cast<int>(DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption),
                                                             this->CondInletNodeNum,
                                                             this->CondOutletNodeNum,
                                                             this->Report.QCond,
@@ -155,7 +155,7 @@ void IndirectAbsorberSpecs::simulate(
         PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide(state,
                                                                     calledFromLocation.loopNum,
                                                                     calledFromLocation.loopSideNum,
-                                                                    DataPlant::TypeOf_Chiller_Indirect_Absorption,
+                                                                    static_cast<int>(DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption),
                                                                     this->GeneratorInletNodeNum,
                                                                     this->GeneratorOutletNodeNum,
                                                                     this->GenHeatSourceType,
@@ -803,7 +803,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
-                                            DataPlant::TypeOf_Chiller_Indirect_Absorption,
+                                            static_cast<int>(DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption),
                                             this->CWLoopNum,
                                             this->CWLoopSideNum,
                                             this->CWBranchNum,
@@ -817,7 +817,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
 
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
-                                            DataPlant::TypeOf_Chiller_Indirect_Absorption,
+                                            static_cast<int>(DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption),
                                             this->CDLoopNum,
                                             this->CDLoopSideNum,
                                             this->CDBranchNum,
@@ -829,12 +829,12 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->CondInletNodeNum,
                                             _);
     PlantUtilities::InterConnectTwoPlantLoopSides(
-        state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_Indirect_Absorption, true);
+        state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, static_cast<int>(DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption), true);
 
     if (this->GeneratorInletNodeNum > 0) {
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_Chiller_Indirect_Absorption,
+                                                static_cast<int>(DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption),
                                                 this->GenLoopNum,
                                                 this->GenLoopSideNum,
                                                 this->GenBranchNum,
@@ -846,12 +846,12 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->GeneratorInletNodeNum,
                                                 _);
         PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSideNum, this->GenLoopNum, this->GenCompNum, DataPlant::TypeOf_Chiller_Indirect_Absorption, true);
+            state, this->CWLoopNum, this->CWLoopSideNum, this->GenLoopNum, this->GenCompNum, static_cast<int>(DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption), true);
     }
 
     if ((this->CondInletNodeNum > 0) && (this->GeneratorInletNodeNum > 0)) {
         PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CDLoopNum, this->CDLoopSideNum, this->GenLoopNum, this->GenCompNum, DataPlant::TypeOf_Chiller_Indirect_Absorption, false);
+            state, this->CDLoopNum, this->CDLoopSideNum, this->GenLoopNum, this->GenCompNum, static_cast<int>(DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption), false);
     }
     if (errFlag) {
         ShowFatalError(state, "InitIndirectAbsorpChiller: Program terminated due to previous condition(s).");

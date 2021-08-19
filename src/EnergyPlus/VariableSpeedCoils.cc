@@ -94,8 +94,8 @@ namespace VariableSpeedCoils {
     using namespace Psychrometrics;
     using namespace DataSizing;
     using namespace DataHVACGlobals;
-    using DataPlant::TypeOf_CoilVSWAHPCoolingEquationFit;
-    using DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
+
+
     using DXCoils::AdjustCBF;
     using DXCoils::CalcCBF;
 
@@ -3816,10 +3816,10 @@ namespace VariableSpeedCoils {
                 // switch from coil type numbers in DataHVACGlobals, to coil type numbers in plant.
                 int plantTypeOfNum(0);
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
-                    plantTypeOfNum = DataPlant::TypeOf_CoilVSWAHPCoolingEquationFit;
+                    plantTypeOfNum = DataPlant::PlantEquipmentType::CoilVSWAHPCoolingEquationFit;
                 } else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum ==
                            DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) {
-                    plantTypeOfNum = DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
+                    plantTypeOfNum = DataPlant::PlantEquipmentType::CoilVSWAHPHeatingEquationFit;
                 }
                 errFlag = false;
                 ScanPlantLoopsForObject(state,

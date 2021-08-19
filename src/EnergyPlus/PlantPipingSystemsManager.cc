@@ -2108,9 +2108,9 @@ namespace PlantPipingSystemsManager {
 
             int TypeToLookFor;
             if (thisCircuit->IsActuallyPartOfAHorizontalTrench) {
-                TypeToLookFor = DataPlant::TypeOf_GrndHtExchgHorizTrench;
+                TypeToLookFor = DataPlant::PlantEquipmentType::GrndHtExchgHorizTrench;
             } else {
-                TypeToLookFor = DataPlant::TypeOf_PipingSystemPipeCircuit;
+                TypeToLookFor = DataPlant::PlantEquipmentType::PipingSystemPipeCircuit;
             }
 
             bool errFlag = false;

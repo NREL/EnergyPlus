@@ -104,7 +104,7 @@ namespace EvaporativeFluidCoolers {
         // Members
         std::string Name;                // User identifier
         std::string EvapFluidCoolerType; // Type of evaporative fluid cooler
-        int TypeOf_Num;
+        DataPlant::PlantEquipmentType TypeOf_enum;
         std::string PerformanceInputMethod;
         PIM PerformanceInputMethod_Num;
         bool Available;                               // need an array of logicals--load identifiers of available equipment
@@ -223,7 +223,7 @@ namespace EvaporativeFluidCoolers {
 
         // Default Constructor
         EvapFluidCoolerSpecs()
-            : TypeOf_Num(0), PerformanceInputMethod_Num(PIM::StandardDesignCapacity), Available(true), ON(true), DesignWaterFlowRate(0.0),
+        : TypeOf_enum(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PIM::StandardDesignCapacity), Available(true), ON(true), DesignWaterFlowRate(0.0),
               DesignWaterFlowRateWasAutoSized(false), DesignSprayWaterFlowRate(0.0), DesWaterMassFlowRate(0.0), HighSpeedAirFlowRate(0.0),
               HighSpeedAirFlowRateWasAutoSized(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false), HighSpeedEvapFluidCoolerUA(0.0),
               HighSpeedEvapFluidCoolerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0), LowSpeedAirFlowRateWasAutoSized(false),

@@ -9807,7 +9807,7 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     Condenser(RefCondLoop).Name,
-                                                    DataPlant::TypeOf_RefrigSystemWaterCondenser,
+                                                    static_cast<int>(DataPlant::PlantEquipmentType::RefrigSystemWaterCondenser),
                                                     Condenser(RefCondLoop).PlantLoopNum,
                                                     Condenser(RefCondLoop).PlantLoopSideNum,
                                                     Condenser(RefCondLoop).PlantBranchNum,
@@ -9841,7 +9841,7 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     RefrigRack(RefCompRackLoop).Name,
-                                                    DataPlant::TypeOf_RefrigerationWaterCoolRack,
+                                                    static_cast<int>(DataPlant::PlantEquipmentType::RefrigerationWaterCoolRack),
                                                     RefrigRack(RefCompRackLoop).PlantLoopNum,
                                                     RefrigRack(RefCompRackLoop).PlantLoopSideNum,
                                                     RefrigRack(RefCompRackLoop).PlantBranchNum,

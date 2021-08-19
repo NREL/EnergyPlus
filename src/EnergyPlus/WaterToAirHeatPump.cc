@@ -97,8 +97,8 @@ namespace WaterToAirHeatPump {
     using namespace DataLoopNode;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
-    using DataPlant::TypeOf_CoilWAHPCoolingParamEst;
-    using DataPlant::TypeOf_CoilWAHPHeatingParamEst;
+
+
 
     static constexpr std::string_view fluidNameWater("WATER");
 
@@ -173,14 +173,14 @@ namespace WaterToAirHeatPump {
         }
         // Calculate the Correct Water to Air HP Model with the current HPNum
 
-        if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingParamEst) {
+        if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == PlantEquipmentType::CoilWAHPCoolingParamEst) {
             InitWatertoAirHP(
                 state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
             CalcWatertoAirHPCooling(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
-        } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingParamEst) {
+        } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == PlantEquipmentType::CoilWAHPHeatingParamEst) {
             InitWatertoAirHP(
                 state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
             CalcWatertoAirHPHeating(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
@@ -298,7 +298,7 @@ namespace WaterToAirHeatPump {
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name = AlphArray(1);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WatertoAirHPType = "COOLING";
-            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum = TypeOf_CoilWAHPCoolingParamEst;
+            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum = PlantEquipmentType::CoilWAHPCoolingParamEst;
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Refrigerant = AlphArray(3);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterVolFlowRate = NumArray(1);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CoolingCapacity = NumArray(2);
@@ -491,7 +491,7 @@ namespace WaterToAirHeatPump {
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name = AlphArray(1);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WatertoAirHPType = "HEATING";
-            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum = TypeOf_CoilWAHPHeatingParamEst;
+            state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum = PlantEquipmentType::CoilWAHPHeatingParamEst;
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Refrigerant = AlphArray(3);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterVolFlowRate = NumArray(1);
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HeatingCapacity = NumArray(2);
@@ -650,7 +650,7 @@ namespace WaterToAirHeatPump {
 
         for (HPNum = 1; HPNum <= state.dataWaterToAirHeatPump->NumWatertoAirHPs; ++HPNum) {
 
-            if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingParamEst) {
+            if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == PlantEquipmentType::CoilWAHPCoolingParamEst) {
                 // COOLING COIL: Setup Report variables for the Heat Pump
                 SetupOutputVariable(state,
                                     "Cooling Coil Electricity Rate",
@@ -764,7 +764,7 @@ namespace WaterToAirHeatPump {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
-            } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingParamEst) {
+            } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == PlantEquipmentType::CoilWAHPHeatingParamEst) {
                 // HEATING COIL Setup Report variables for the Heat Pump
                 SetupOutputVariable(state,
                                     "Heating Coil Electricity Rate",

@@ -177,7 +177,7 @@ void GasAbsorberSpecs::simulate(
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->CDLoopNum,
                                                                 this->CDLoopSideNum,
-                                                                DataPlant::TypeOf_Chiller_DFAbsorption,
+                                                                static_cast<int>(DataPlant::PlantEquipmentType::Chiller_DFAbsorption),
                                                                 this->CondReturnNodeNum,
                                                                 this->CondSupplyNodeNum,
                                                                 this->TowerLoad,
@@ -839,7 +839,7 @@ void GasAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
-                                            DataPlant::TypeOf_Chiller_DFAbsorption,
+                                            static_cast<int>(DataPlant::PlantEquipmentType::Chiller_DFAbsorption),
                                             this->CWLoopNum,
                                             this->CWLoopSideNum,
                                             this->CWBranchNum,
@@ -856,7 +856,7 @@ void GasAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
 
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
-                                            DataPlant::TypeOf_Chiller_DFAbsorption,
+                                            static_cast<int>(DataPlant::PlantEquipmentType::Chiller_DFAbsorption),
                                             this->HWLoopNum,
                                             this->HWLoopSideNum,
                                             this->HWBranchNum,
@@ -874,7 +874,7 @@ void GasAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
     if (this->isWaterCooled) {
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_Chiller_DFAbsorption,
+                                                static_cast<int>(DataPlant::PlantEquipmentType::Chiller_DFAbsorption),
                                                 this->CDLoopNum,
                                                 this->CDLoopSideNum,
                                                 this->CDBranchNum,
@@ -889,13 +889,13 @@ void GasAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
             ShowFatalError(state, "InitGasAbsorber: Program terminated due to previous condition(s).");
         }
         PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_DFAbsorption, true);
+            state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, static_cast<int>(DataPlant::PlantEquipmentType::Chiller_DFAbsorption), true);
         PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->HWLoopNum, this->HWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_DFAbsorption, true);
+            state, this->HWLoopNum, this->HWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, static_cast<int>(DataPlant::PlantEquipmentType::Chiller_DFAbsorption), true);
     }
 
     PlantUtilities::InterConnectTwoPlantLoopSides(
-        state, this->CWLoopNum, this->CWLoopSideNum, this->HWLoopNum, this->HWLoopSideNum, DataPlant::TypeOf_Chiller_DFAbsorption, true);
+        state, this->CWLoopNum, this->CWLoopSideNum, this->HWLoopNum, this->HWLoopSideNum, static_cast<int>(DataPlant::PlantEquipmentType::Chiller_DFAbsorption), true);
 
     // check if outlet node of chilled water side has a setpoint.
     if ((state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&

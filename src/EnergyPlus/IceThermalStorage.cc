@@ -1332,7 +1332,7 @@ namespace IceThermalStorage {
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    DataPlant::TypeOf_TS_IceDetailed,
+                                                    static_cast<int>(DataPlant::PlantEquipmentType::TS_IceDetailed),
                                                     this->PlantLoopNum,
                                                     this->PlantLoopSideNum,
                                                     this->PlantBranchNum,
@@ -1415,7 +1415,7 @@ namespace IceThermalStorage {
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    DataPlant::TypeOf_TS_IceSimple,
+                                                    static_cast<int>(DataPlant::PlantEquipmentType::TS_IceSimple),
                                                     this->LoopNum,
                                                     this->LoopSideNum,
                                                     this->BranchNum,

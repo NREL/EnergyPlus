@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -88,7 +89,7 @@ namespace CoolingPanelSimple {
     {
         // Members
         std::string EquipID;
-        int EquipType;
+        DataPlant::PlantEquipmentType EquipType;
         std::string Schedule;
         Array1D_string SurfaceName;
         Array1D_int SurfacePtr;
@@ -144,7 +145,7 @@ namespace CoolingPanelSimple {
 
         // Default Constructor
         CoolingPanelParams()
-            : EquipType(0), ZonePtr(0), SchedPtr(0), WaterInletNode(0), WaterOutletNode(0), TotSurfToDistrib(0), ControlCompTypeNum(0),
+        : EquipType(DataPlant::PlantEquipmentType::Invalid), ZonePtr(0), SchedPtr(0), WaterInletNode(0), WaterOutletNode(0), TotSurfToDistrib(0), ControlCompTypeNum(0),
               CompErrIndex(0), ControlType(Control::Unassigned), ColdSetptSchedPtr(0), CondCtrlType(CondCtrl::NONE), CondDewPtDeltaT(0.0),
               CondErrIndex(0), ColdThrottlRange(0.0), RatedWaterTemp(0.0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0), UA(0.0), Offset(0.0),
               WaterMassFlowRate(0.0), WaterMassFlowRateMax(0.0), RatedWaterFlowRate(0.0), WaterVolFlowRateMax(0.0), WaterInletTempStd(0.0),

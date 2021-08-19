@@ -1429,7 +1429,7 @@ namespace SurfaceGroundHeatExchanger {
     }
     void SurfaceGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
     {
-        using DataPlant::TypeOf_GrndHtExchgSurface;
+
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -1446,7 +1446,7 @@ namespace SurfaceGroundHeatExchanger {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     this->Name,
-                                    TypeOf_GrndHtExchgSurface,
+                                    PlantEquipmentType::GrndHtExchgSurface,
                                     this->LoopNum,
                                     this->LoopSideNum,
                                     this->BranchNum,

@@ -207,7 +207,7 @@ void GetBoilerInput(EnergyPlusData &state)
                                             state.dataIPShortCut->cCurrentModuleObject + " Name");
         auto &thisBoiler = state.dataBoilers->Boiler(BoilerNum);
         thisBoiler.Name = state.dataIPShortCut->cAlphaArgs(1);
-        thisBoiler.TypeNum = DataPlant::TypeOf_Boiler_Simple;
+        thisBoiler.TypeNum = DataPlant::PlantEquipmentType::Boiler_Simple;
 
         // Validate fuel type input
         bool FuelTypeError(false);
@@ -474,7 +474,7 @@ void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
-                                            DataPlant::TypeOf_Boiler_Simple,
+                                            static_cast<int>(DataPlant::PlantEquipmentType::Boiler_Simple),
                                             this->LoopNum,
                                             this->LoopSideNum,
                                             this->BranchNum,

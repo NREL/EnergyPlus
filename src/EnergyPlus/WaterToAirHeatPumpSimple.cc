@@ -125,8 +125,8 @@ namespace WaterToAirHeatPumpSimple {
     using DataHVACGlobals::WaterConstant;
     using DataHVACGlobals::WaterConstantOnDemand;
     using DataHVACGlobals::WaterCycling;
-    using DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
-    using DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
+
+
 
     void SimWatertoAirHPSimple(EnergyPlusData &state,
                                std::string_view CompName,     // Coil Name
@@ -211,7 +211,7 @@ namespace WaterToAirHeatPumpSimple {
             OnOffAirFlowRatio = 1.0;
         }
 
-        if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingEquationFit) {
+        if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == PlantEquipmentType::CoilWAHPCoolingEquationFit) {
             // Cooling mode
             InitSimpleWatertoAirHP(state,
                                    HPNum,
@@ -225,7 +225,7 @@ namespace WaterToAirHeatPumpSimple {
                                    FirstHVACIteration);
             CalcHPCoolingSimple(state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
-        } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingEquationFit) {
+        } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == PlantEquipmentType::CoilWAHPHeatingEquationFit) {
             // Heating mode
             InitSimpleWatertoAirHP(state,
                                    HPNum,
@@ -357,7 +357,7 @@ namespace WaterToAirHeatPumpSimple {
             VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name = AlphArray(1);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType = "COOLING";
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum = TypeOf_CoilWAHPCoolingEquationFit;
+            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum = PlantEquipmentType::CoilWAHPCoolingEquationFit;
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate = NumArray(1);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate = NumArray(2);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal = NumArray(3);
@@ -553,7 +553,7 @@ namespace WaterToAirHeatPumpSimple {
 
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name = AlphArray(1);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType = "HEATING";
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum = TypeOf_CoilWAHPHeatingEquationFit;
+            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum = PlantEquipmentType::CoilWAHPHeatingEquationFit;
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate = NumArray(1);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate = NumArray(2);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapHeat = NumArray(3);
@@ -692,7 +692,7 @@ namespace WaterToAirHeatPumpSimple {
 
         for (HPNum = 1; HPNum <= state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs; ++HPNum) {
 
-            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingEquationFit) {
+            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == PlantEquipmentType::CoilWAHPCoolingEquationFit) {
                 // COOLING COIL  Setup Report variables for the Heat Pump
                 SetupOutputVariable(state,
                                     "Cooling Coil Electricity Rate",
@@ -801,7 +801,7 @@ namespace WaterToAirHeatPumpSimple {
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
 
-            } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingEquationFit) {
+            } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == PlantEquipmentType::CoilWAHPHeatingEquationFit) {
                 // HEATING COIL Setup Report variables for the Heat Pump
                 SetupOutputVariable(state,
                                     "Heating Coil Electricity Rate",
@@ -995,7 +995,7 @@ namespace WaterToAirHeatPumpSimple {
 
         if (FirstHVACIteration) {
             if (state.dataWaterToAirHeatPumpSimple->SimpleHPTimeStepFlag(HPNum)) {
-                if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingEquationFit) {
+                if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == PlantEquipmentType::CoilWAHPCoolingEquationFit) {
                     if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CompanionHeatingCoilNum > 0) {
                         if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterFlowMode) {
                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LastOperatingMode = Cooling;
@@ -1046,7 +1046,7 @@ namespace WaterToAirHeatPumpSimple {
             }
         } else {
             state.dataWaterToAirHeatPumpSimple->SimpleHPTimeStepFlag(HPNum) = true;
-            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingEquationFit) {
+            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == PlantEquipmentType::CoilWAHPCoolingEquationFit) {
                 if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CompanionHeatingCoilNum > 0)
                     state.dataWaterToAirHeatPumpSimple->SimpleHPTimeStepFlag(
                         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CompanionHeatingCoilNum) = true;
@@ -1174,7 +1174,7 @@ namespace WaterToAirHeatPumpSimple {
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterMassFlowRate = 0.0;
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate = 0.0;
             if ((state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterCyclingMode) == WaterConstant) {
-                if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingEquationFit) {
+                if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == PlantEquipmentType::CoilWAHPCoolingEquationFit) {
                     if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CompanionHeatingCoilNum > 0) {
                         if (state.dataWaterToAirHeatPumpSimple
                                 ->SimpleWatertoAirHP(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CompanionHeatingCoilNum)
@@ -1192,7 +1192,7 @@ namespace WaterToAirHeatPumpSimple {
                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate;
                         }
                     }
-                } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingEquationFit) {
+                } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == PlantEquipmentType::CoilWAHPHeatingEquationFit) {
                     // It's a heating coil
                     if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CompanionCoolingCoilNum > 0) {
                         if (state.dataWaterToAirHeatPumpSimple

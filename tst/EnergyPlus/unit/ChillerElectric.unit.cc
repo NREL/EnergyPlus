@@ -128,7 +128,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantChillers->ElectricChiller(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::TypeOf_Chiller_Electric;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).EvapInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).EvapOutletNodeNum;
 
@@ -138,7 +138,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     state->dataPlnt->PlantLoop(2).PlantSizNum = 2;
     state->dataPlnt->PlantLoop(2).FluidName = "WATER";
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantChillers->ElectricChiller(1).Name;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::TypeOf_Chiller_Electric;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).CondInletNodeNum;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).CondOutletNodeNum;
 
@@ -255,7 +255,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantChillers->ElectricChiller(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::TypeOf_Chiller_Electric;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).EvapInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).EvapOutletNodeNum;
 
@@ -265,7 +265,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     state->dataPlnt->PlantLoop(2).PlantSizNum = 2;
     state->dataPlnt->PlantLoop(2).FluidName = "WATER";
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantChillers->ElectricChiller(1).Name;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_Electric;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::TypeOf_Chiller_Electric;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).CondInletNodeNum;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).CondOutletNodeNum;
 

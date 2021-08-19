@@ -186,7 +186,7 @@ void GetPipeInput(EnergyPlusData &state)
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataPipes->LocalPipeUniqueNames, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         state.dataPipes->LocalPipe(PipeNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipes->LocalPipe(PipeNum).TypeOf = DataPlant::TypeOf_Pipe;
+        state.dataPipes->LocalPipe(PipeNum).TypeOf = DataPlant::PlantEquipmentType::Pipe;
 
         state.dataPipes->LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),
@@ -230,7 +230,7 @@ void GetPipeInput(EnergyPlusData &state)
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataPipes->LocalPipeUniqueNames, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         state.dataPipes->LocalPipe(PipeNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipes->LocalPipe(PipeNum).TypeOf = DataPlant::TypeOf_PipeSteam;
+        state.dataPipes->LocalPipe(PipeNum).TypeOf = DataPlant::PlantEquipmentType::PipeSteam;
         state.dataPipes->LocalPipe(PipeNum).InletNodeNum = GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),
                                                                              ErrorsFound,

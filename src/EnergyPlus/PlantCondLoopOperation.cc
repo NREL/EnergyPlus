@@ -3265,9 +3265,9 @@ void TurnOnPlantLoopPipes(EnergyPlusData &state, int const LoopNum, int const Lo
         for (MachineOnLoopNum = 1; MachineOnLoopNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents;
              ++MachineOnLoopNum) {
             {
-                auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnLoopNum).TypeOf_Num);
-                if ((SELECT_CASE_var == TypeOf_Pipe) || (SELECT_CASE_var == TypeOf_PipeInterior) || (SELECT_CASE_var == TypeOf_PipeExterior) ||
-                    (SELECT_CASE_var == TypeOf_PipeUnderground)) {
+                auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnLoopNum).TypeOf_enum);
+                if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::Pipe) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeInterior) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeExterior) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::ValveTempering)) {
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnLoopNum).ON = true;
                 } else {
                     // Don't do anything
@@ -3456,7 +3456,7 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
                 for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     ActuatorName =
                         "Plant Component " +
-                        ccSimPlantEquipTypes(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).TypeOf_Num);
+                        ccSimPlantEquipTypes(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).TypeOf_enum);
                     UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name;
                     ActuatorType = "On/Off Supervisory";
                     SetupEMSActuator(state,
@@ -3563,9 +3563,9 @@ void ActivateEMSControls(
 
             // Check lower/upper temperature limit for chillers
             {
-                auto const SELECT_CASE_var(this_comp.TypeOf_Num);
-                if ((SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) || (SELECT_CASE_var == TypeOf_Chiller_Electric) ||
-                    (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR)) {
+                auto const SELECT_CASE_var(this_comp.TypeOf_enum);
+                if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_Electric) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR)) {
 
                     //- Retrieve data from the plant loop data structure
                     CurMassFlowRate = state.dataLoopNodes->Node(this_comp.NodeNumIn).MassFlowRate;

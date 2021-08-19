@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
 
@@ -505,7 +506,7 @@ namespace FuelCellElectricGenerator {
     {
         // Members
         // from input data and nested types for subsystems
-        int TypeOf;
+        DataPlant::PlantEquipmentType TypeOf;
         std::string Name;                    // user identifier
         std::string NameFCPM;                // name of FC Power Module
         FCPowerModuleStruct FCPM;            // data for Power Module
@@ -547,7 +548,7 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCDataStruct()
-            : TypeOf(0), FuelSupNum(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0),
+        : TypeOf(DataPlant::PlantEquipmentType::Invalid), FuelSupNum(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0),
               DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true),
               SolverErr_Type1_Iter(0), SolverErr_Type1_IterIndex(0), SolverErr_Type2_Iter(0), SolverErr_Type2_IterIndex(0)
         {

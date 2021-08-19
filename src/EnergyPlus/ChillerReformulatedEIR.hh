@@ -80,7 +80,7 @@ namespace ChillerReformulatedEIR {
         std::string CAPFTName;                  // CAPFT curve name
         std::string EIRFTName;                  // EIRFT curve name
         std::string EIRFPLRName;                // EIRPLR curve name
-        DataPlant::CondenserType CondenserType; // Type of Condenser. Water Cooled is the only available option for now
+        DataPlant::nCondenserType CondenserType; // Type of Condenser. Water Cooled is the only available option for now
         PLR PartLoadCurveType;                  // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift
         Real64 RefCap;                          // Reference capacity of the chiller [W]
         bool RefCapWasAutoSized;                // reference capacity was autosized on input
@@ -222,7 +222,7 @@ namespace ChillerReformulatedEIR {
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::CondenserType::Unassigned), PartLoadCurveType(PLR::Unassigned), RefCap(0.0),
+            : TypeNum(0), CondenserType(DataPlant::nCondenserType::Unassigned), PartLoadCurveType(PLR::Unassigned), RefCap(0.0),
               RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
               CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0), CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0),

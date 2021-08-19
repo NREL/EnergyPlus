@@ -225,8 +225,8 @@ namespace UnitHeater {
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
-        using DataPlant::TypeOf_CoilSteamAirHeating;
-        using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
+
         using DataSizing::AutoSize;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanIndex;
@@ -462,10 +462,10 @@ namespace UnitHeater {
                 auto const SELECT_CASE_var(Alphas(7));
                 if (SELECT_CASE_var == "COIL:HEATING:WATER") {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType = state.dataUnitHeaters->WaterHeatingCoil;
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum = PlantEquipmentType::CoilWaterSimpleHeating;
                 } else if (SELECT_CASE_var == "COIL:HEATING:STEAM") {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType = state.dataUnitHeaters->SteamCoil;
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum = PlantEquipmentType::CoilSteamAirHeating;
                 } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC") {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType = state.dataUnitHeaters->ElectricCoil;
                 } else if (SELECT_CASE_var == "COIL:HEATING:FUEL") {
@@ -748,8 +748,8 @@ namespace UnitHeater {
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-        using DataPlant::TypeOf_CoilSteamAirHeating;
-        using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
+
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::UnitHeater_Num;
         using FluidProperties::GetDensityGlycol;
@@ -798,8 +798,8 @@ namespace UnitHeater {
         }
 
         if (state.dataUnitHeaters->MyPlantScanFlag(UnitHeatNum) && allocated(state.dataPlnt->PlantLoop)) {
-            if ((state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
-                (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
+            if ((state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == PlantEquipmentType::CoilWaterSimpleHeating) ||
+                (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == PlantEquipmentType::CoilSteamAirHeating)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,

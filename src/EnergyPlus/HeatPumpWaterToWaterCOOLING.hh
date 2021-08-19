@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
 
@@ -68,7 +69,7 @@ namespace HeatPumpWaterToWaterCOOLING {
     {
         // Members
         std::string Name; // user identifier
-        int WWHPPlantTypeOfNum;
+        DataPlant::PlantEquipmentType WWHPPlantTypeOfNum;
         bool Available;                  // need an array of logicals--load identifiers of available equipment
         bool ON;                         // simulate the machine at it's operating part load ratio
         Real64 COP;                      // Coefficient of Performance of the machine
@@ -129,7 +130,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
         // Default Constructor
         GshpPeCoolingSpecs()
-            : WWHPPlantTypeOfNum(0), Available(false), ON(false), COP(0.0), NomCap(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),
+        : WWHPPlantTypeOfNum(DataPlant::PlantEquipmentType::Invalid), Available(false), ON(false), COP(0.0), NomCap(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),
               OptPartLoadRat(0.0), LoadSideVolFlowRate(0.0), LoadSideDesignMassFlow(0.0), SourceSideVolFlowRate(0.0), SourceSideDesignMassFlow(0.0),
               SourceSideInletNodeNum(0), SourceSideOutletNodeNum(0), LoadSideInletNodeNum(0), LoadSideOutletNodeNum(0), SourceSideUACoeff(0.0),
               LoadSideUACoeff(0.0), CompPistonDisp(0.0), CompClearanceFactor(0.0), CompSucPressDrop(0.0), SuperheatTemp(0.0), PowerLosses(0.0),

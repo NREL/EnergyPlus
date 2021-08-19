@@ -717,7 +717,7 @@ void GetControllerInput(EnergyPlusData &state)
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
             ShowContinueError(state, "...the actuator node must also be a water inlet node of a water coil");
         } else { // Node found, check type and action
-            if (iNodeType == DataPlant::TypeOf_CoilWaterCooling) {
+            if (iNodeType == static_cast<int>(DataPlant::PlantEquipmentType::CoilWaterCooling)) {
                 if (ControllerProps(Num).Action == ControllerAction::NoAction) {
                     ControllerProps(Num).Action = ControllerAction::ReverseAction;
                 } else if (ControllerProps(Num).Action == ControllerAction::NormalAction) {
@@ -726,7 +726,7 @@ void GetControllerInput(EnergyPlusData &state)
                     ShowContinueError(state, "...overriding user input action with Reverse Action.");
                     ControllerProps(Num).Action = ControllerAction::ReverseAction;
                 }
-            } else if (iNodeType == DataPlant::TypeOf_CoilWaterSimpleHeating) {
+            } else if (iNodeType == static_cast<int>(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating)) {
                 if (ControllerProps(Num).Action == ControllerAction::NoAction) {
                     ControllerProps(Num).Action = ControllerAction::NormalAction;
                 } else if (ControllerProps(Num).Action == ControllerAction::ReverseAction) {

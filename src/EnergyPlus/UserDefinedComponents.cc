@@ -2432,7 +2432,7 @@ namespace UserDefinedComponents {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        DataPlant::TypeOf_CoilUserDefined,
+                                                        static_cast<int>(DataPlant::PlantEquipmentType::CoilUserDefined),
                                                         this->Loop.LoopNum,
                                                         this->Loop.LoopSideNum,
                                                         this->Loop.BranchNum,
@@ -2508,7 +2508,7 @@ namespace UserDefinedComponents {
                     bool errFlag = false;
                     PlantUtilities::ScanPlantLoopsForObject(state,
                                                             this->Name,
-                                                            DataPlant::TypeOf_ZoneHVACAirUserDefined,
+                                                            static_cast<int>(DataPlant::PlantEquipmentType::ZoneHVACAirUserDefined),
                                                             this->Loop(loop).LoopNum,
                                                             this->Loop(loop).LoopSideNum,
                                                             this->Loop(loop).BranchNum,
@@ -2599,7 +2599,7 @@ namespace UserDefinedComponents {
                     bool errFlag = false;
                     PlantUtilities::ScanPlantLoopsForObject(state,
                                                             this->Name,
-                                                            DataPlant::TypeOf_AirTerminalUserDefined,
+                                                            static_cast<int>(DataPlant::PlantEquipmentType::AirTerminalUserDefined),
                                                             this->Loop(loop).LoopNum,
                                                             this->Loop(loop).LoopSideNum,
                                                             this->Loop(loop).BranchNum,
@@ -2746,7 +2746,7 @@ namespace UserDefinedComponents {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        DataPlant::TypeOf_PlantComponentUserDefined,
+                                                        static_cast<int>(DataPlant::PlantEquipmentType::PlantComponentUserDefined),
                                                         this->Loop(ConnectionNum).LoopNum,
                                                         this->Loop(ConnectionNum).LoopSideNum,
                                                         this->Loop(ConnectionNum).BranchNum,

@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -132,7 +133,7 @@ namespace OutdoorAirUnit {
         int CoilAirOutletNode;
         int CoilWaterInletNode;
         int CoilWaterOutletNode;
-        int CoilPlantTypeOfNum;
+        DataPlant::PlantEquipmentType CoilPlantTypeOfNum;
         int LoopNum;
         int LoopSideNum;
         int BranchNum;
@@ -148,7 +149,7 @@ namespace OutdoorAirUnit {
         // Default Constructor
         OAEquipList()
             : ComponentType_Num(CompType::Unassigned), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0),
-              CoilWaterOutletNode(0), CoilPlantTypeOfNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0),
+            CoilWaterOutletNode(0), CoilPlantTypeOfNum(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0),
               MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0), MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
         {
         }

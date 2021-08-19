@@ -160,7 +160,7 @@ namespace StandardRatings {
                          int const ChillerType,                        // Type of Chiller - EIR or Reformulated EIR
                          Real64 const RefCap,                          // Reference capacity of chiller [W]
                          Real64 const RefCOP,                          // Reference coefficient of performance [W/W]
-                         DataPlant::CondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
+                         DataPlant::nCondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
                          int const CapFTempCurveIndex,                 // Index for the total cooling capacity modifier curve
                          int const EIRFTempCurveIndex,                 // Index for the energy input ratio modifier curve
                          int const EIRFPLRCurveIndex,                  // Index for the EIR vs part-load ratio curve
@@ -186,7 +186,7 @@ namespace StandardRatings {
     void CheckCurveLimitsForIPLV(EnergyPlusData &state,
                                  std::string const &ChillerName,               // Name of Chiller
                                  int const ChillerType,                        // Type of Chiller - EIR or ReformulatedEIR
-                                 DataPlant::CondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
+                                 DataPlant::nCondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
                                  int const CapFTempCurveIndex,                 // Index for the total cooling capacity modifier curve
                                  int const EIRFTempCurveIndex                  // Index for the energy input ratio modifier curve
     );

@@ -1823,9 +1823,6 @@ namespace HVACMultiSpeedHeatPump {
         // temperatures float in the deadband, additional iterations are required to converge on mass flow rate.
 
         // Using/Aliasing
-        using DataPlant::TypeOf_CoilSteamAirHeating;
-        using DataPlant::TypeOf_CoilWaterSimpleHeating;
-        using DataPlant::TypeOf_MultiSpeedHeatPumpRecovery;
         using DataSizing::AutoSize;
         using Fans::GetFanIndex;
         using Fans::GetFanVolFlow;
@@ -1893,7 +1890,7 @@ namespace HVACMultiSpeedHeatPump {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).Name,
-                                        TypeOf_MultiSpeedHeatPumpRecovery,
+                                        static_cast<int>(DataPlant::PlantEquipmentType::MultiSpeedHeatPumpRecovery),
                                         MSHeatPump(MSHeatPumpNum).HRLoopNum,
                                         MSHeatPump(MSHeatPumpNum).HRLoopSideNum,
                                         MSHeatPump(MSHeatPumpNum).HRBranchNum,
@@ -1916,7 +1913,7 @@ namespace HVACMultiSpeedHeatPump {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).HeatCoilName,
-                                        TypeOf_CoilWaterSimpleHeating,
+                                        static_cast<int>(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating),
                                         MSHeatPump(MSHeatPumpNum).LoopNum,
                                         MSHeatPump(MSHeatPumpNum).LoopSide,
                                         MSHeatPump(MSHeatPumpNum).BranchNum,
@@ -1954,7 +1951,7 @@ namespace HVACMultiSpeedHeatPump {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).HeatCoilName,
-                                        TypeOf_CoilSteamAirHeating,
+                                        static_cast<int>(DataPlant::PlantEquipmentType::CoilSteamAirHeating),
                                         MSHeatPump(MSHeatPumpNum).LoopNum,
                                         MSHeatPump(MSHeatPumpNum).LoopSide,
                                         MSHeatPump(MSHeatPumpNum).BranchNum,
@@ -1988,7 +1985,7 @@ namespace HVACMultiSpeedHeatPump {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
-                                        TypeOf_CoilWaterSimpleHeating,
+                                        static_cast<int>(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating),
                                         MSHeatPump(MSHeatPumpNum).SuppLoopNum,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopSide,
                                         MSHeatPump(MSHeatPumpNum).SuppBranchNum,
@@ -2026,7 +2023,7 @@ namespace HVACMultiSpeedHeatPump {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
-                                        TypeOf_CoilSteamAirHeating,
+                                        static_cast<int>(DataPlant::PlantEquipmentType::CoilSteamAirHeating),
                                         MSHeatPump(MSHeatPumpNum).SuppLoopNum,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopSide,
                                         MSHeatPump(MSHeatPumpNum).SuppBranchNum,

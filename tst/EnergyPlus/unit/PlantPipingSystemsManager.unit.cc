@@ -1735,7 +1735,7 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_PipingSystemPipeCircuit;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_enum = DataPlant::TypeOf_PipingSystemPipeCircuit;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "MY PIPE CIRCUIT";
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
 

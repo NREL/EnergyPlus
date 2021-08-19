@@ -509,7 +509,6 @@ namespace HVACCooledBeam {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataPlant::TypeOf_CooledBeamAirTerminal;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
@@ -539,7 +538,7 @@ namespace HVACCooledBeam {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     CoolBeam(CBNum).Name,
-                                    TypeOf_CooledBeamAirTerminal,
+                                    static_cast<int>(DataPlant::PlantEquipmentType::CooledBeamAirTerminal),
                                     CoolBeam(CBNum).CWLoopNum,
                                     CoolBeam(CBNum).CWLoopSideNum,
                                     CoolBeam(CBNum).CWBranchNum,

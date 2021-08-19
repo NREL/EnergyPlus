@@ -76,7 +76,7 @@ namespace OutsideEnergySources {
         int OutletNodeNum = 0;           // Node number on the inlet side of the plant
         Real64 EnergyTransfer = 0.0;     // cooling energy provided in time step
         Real64 EnergyRate = 0.0;         // cooling power
-        int EnergyType = 0;              // flag for district heating OR cooling
+        DataPlant::PlantEquipmentType EnergyType{DataPlant::PlantEquipmentType::Invalid};              // flag for district heating OR cooling
         // loop topology variables
         int LoopNum = 0;
         int LoopSideNum = 0;

@@ -131,7 +131,7 @@ namespace SolarCollectors {
         std::string OSCMName;     // OtherSideConditionsModel
         int VentCavIndex;         // index of ventilated cavity object
         TankTypeEnum ICSType_Num; // ICS collector type number
-        int TypeNum;              // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant
+        int TypeNum;              // Plant Side Connection: 'TypeOf_enum' assigned in DataPlant
         int WLoopNum;             // Water plant loop index number
         int WLoopSideNum;         // Water plant loop side index
         int WLoopBranchNum;       // Water plant loop branch index

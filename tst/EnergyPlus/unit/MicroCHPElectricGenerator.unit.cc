@@ -291,10 +291,10 @@ TEST_F(EnergyPlusFixture, MicroCHPTest_InitGeneratorDynamics)
     auto &MicroCHP1(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1));
     auto &MicroCHP2(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(2).Comp(1));
     MicroCHP1.TypeOf = "GENERATOR:MICROCHP";
-    MicroCHP1.TypeOf_Num = DataPlant::TypeOf_Generator_MicroCHP;
+    MicroCHP1.TypeOf_enum = DataPlant::TypeOf_Generator_MicroCHP;
     MicroCHP1.Name = "MICROCOGEN1";
     MicroCHP2.TypeOf = "GENERATOR:MICROCHP";
-    MicroCHP2.TypeOf_Num = DataPlant::TypeOf_Generator_MicroCHP;
+    MicroCHP2.TypeOf_enum = DataPlant::TypeOf_Generator_MicroCHP;
     MicroCHP2.Name = "MICROCOGEN2";
     MicroCHP1.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(*state, "MICROCOGEN1");
     MicroCHP2.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(*state, "MICROCOGEN2");

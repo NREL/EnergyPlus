@@ -77,7 +77,7 @@ namespace PlantChillers {
         // temperature at the chiller condenser side inlet
         Real64 TempRiseCoef;                    // (GT ADJTC(2)) correction factor for off ChillDesign oper.
         Real64 TempDesEvapOut;                  // C - (GT ADJTC(3)The design primary loop fluid
-        DataPlant::CondenserType CondenserType; // Type of Condenser - Air or Water Cooled
+        DataPlant::nCondenserType CondenserType; // Type of Condenser - Air or Water Cooled
         Real64 NomCap;                          // design nominal capacity of chiller
         bool NomCapWasAutoSized;                // true if NomCap was autosize on input
         Real64 COP;                             // COP
@@ -150,7 +150,7 @@ namespace PlantChillers {
         // Default Constructor
         BaseChillerSpecs()
             : MinPartLoadRat(0.0), MaxPartLoadRat(1.0), OptPartLoadRat(1.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
-              CondenserType(DataPlant::CondenserType::WaterCooled), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0),
+              CondenserType(DataPlant::nCondenserType::WaterCooled), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0),
               FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false),
               EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0), EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false),

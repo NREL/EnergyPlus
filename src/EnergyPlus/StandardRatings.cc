@@ -214,7 +214,7 @@ namespace StandardRatings {
                          int const ChillerType,                        // Type of Chiller - EIR or Reformulated EIR
                          Real64 const RefCap,                          // Reference capacity of chiller [W]
                          Real64 const RefCOP,                          // Reference coefficient of performance [W/W]
-                         DataPlant::CondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
+                         DataPlant::nCondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
                          int const CapFTempCurveIndex,                 // Index for the total cooling capacity modifier curve
                          int const EIRFTempCurveIndex,                 // Index for the energy input ratio modifier curve
                          int const EIRFPLRCurveIndex,                  // Index for the EIR vs part-load ratio curve
@@ -252,8 +252,8 @@ namespace StandardRatings {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::GetCurveName;
-        using DataPlant::TypeOf_Chiller_ElectricEIR;
-        using DataPlant::TypeOf_Chiller_ElectricReformEIR;
+
+
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -336,7 +336,7 @@ namespace StandardRatings {
 
         // IPLV calculations:
         for (RedCapNum = 1; RedCapNum <= NumOfReducedCap; ++RedCapNum) {
-            if (CondenserType == DataPlant::CondenserType::WaterCooled) {
+            if (CondenserType == DataPlant::nCondenserType::WaterCooled) {
                 // get the entering water temperature for the reduced capacity test conditions
                 if (ReducedPLR(RedCapNum) > 0.50) {
                     EnteringWaterTempReduced = 8.0 + 22.0 * ReducedPLR(RedCapNum);
@@ -344,7 +344,7 @@ namespace StandardRatings {
                     EnteringWaterTempReduced = 19.0;
                 }
                 CondenserInletTemp = EnteringWaterTempReduced;
-            } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
+            } else if (CondenserType == DataPlant::nCondenserType::AirCooled) {
                 // get the outdoor air dry bulb temperature for the reduced capacity test conditions
                 if (ReducedPLR(RedCapNum) > 0.3125) {
                     EnteringAirDryBulbTempReduced = 3.0 + 32.0 * ReducedPLR(RedCapNum);
@@ -361,7 +361,7 @@ namespace StandardRatings {
             {
                 auto const SELECT_CASE_var(ChillerType);
 
-                if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
+                if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
                     // Get capacity curve info with respect to CW setpoint and entering condenser temps
                     ChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
@@ -376,7 +376,7 @@ namespace StandardRatings {
                         PartLoadRatio = MinUnloadRat;
                     }
 
-                } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
+                } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
                     Cp = GetSpecificHeatGlycol(state,
                                                state.dataPlnt->PlantLoop(CondLoopNum).FluidName,
                                                EnteringWaterTempReduced,
@@ -453,10 +453,10 @@ namespace StandardRatings {
             } else {
                 {
                     auto const SELECT_CASE_var(ChillerType);
-                    if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
+                    if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
                         ShowWarningError(state,
                                          "Chiller:Electric:EIR = " + ChillerName + ":  Integrated Part Load Value (IPLV) cannot be calculated.");
-                    } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
+                    } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
 
                         ShowWarningError(state,
                                          "Chiller:Electric:ReformulatedEIR = " + ChillerName +
@@ -605,8 +605,8 @@ namespace StandardRatings {
 
         // Using/Aliasing
         using namespace OutputReportPredefined;
-        using DataPlant::TypeOf_Chiller_ElectricEIR;
-        using DataPlant::TypeOf_Chiller_ElectricReformEIR;
+
+
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &StandardRatingsMyOneTimeFlag = state.dataHVACGlobal->StandardRatingsMyOneTimeFlag;
@@ -623,12 +623,12 @@ namespace StandardRatings {
         {
             static constexpr fmt::string_view Format_991(" Chiller Standard Rating Information, {}, {}, {:.2R}, {:.2R}\n");
             auto const SELECT_CASE_var(ChillerType);
-            if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
+            if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
 
                 print(state.files.eio, Format_991, "Chiller:Electric:EIR", ChillerName, IPLVValueSI, IPLVValueIP);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, ChillerName, "Chiller:Electric:EIR");
 
-            } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
+            } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
 
                 print(state.files.eio, Format_991, "Chiller:Electric:ReformulatedEIR", ChillerName, IPLVValueSI, IPLVValueIP);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, ChillerName, "Chiller:Electric:ReformulatedEIR");
@@ -643,7 +643,7 @@ namespace StandardRatings {
     void CheckCurveLimitsForIPLV(EnergyPlusData &state,
                                  std::string const &ChillerName,               // Name of Chiller
                                  int const ChillerType,                        // Type of Chiller - EIR or ReformulatedEIR
-                                 DataPlant::CondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
+                                 DataPlant::nCondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
                                  int const CapFTempCurveIndex,                 // Index for the total cooling capacity modifier curve
                                  int const EIRFTempCurveIndex                  // Index for the energy input ratio modifier curve
     )
@@ -662,8 +662,8 @@ namespace StandardRatings {
         // Using/Aliasing
         using CurveManager::GetCurveMinMaxValues;
         using CurveManager::GetCurveName;
-        using DataPlant::TypeOf_Chiller_ElectricEIR;
-        using DataPlant::TypeOf_Chiller_ElectricReformEIR;
+
+
 
         // Following parameters are taken from AHRI 551/591,2011 Table 3
         Real64 const HighEWTemp(30.0);       // Entering water temp in degrees C at full load capacity (85F)
@@ -698,10 +698,10 @@ namespace StandardRatings {
             state, CapFTempCurveIndex, CapacityLWTempMin, CapacityLWTempMax, CapacityEnteringCondTempMin, CapacityEnteringCondTempMax);
         GetCurveMinMaxValues(state, EIRFTempCurveIndex, EIRLWTempMin, EIRLWTempMax, EIREnteringCondTempMin, EIREnteringCondTempMax);
 
-        if (CondenserType == DataPlant::CondenserType::WaterCooled) {
+        if (CondenserType == DataPlant::nCondenserType::WaterCooled) {
             HighCondenserEnteringTempLimit = HighEWTemp;
             LowCondenserEnteringTempLimit = LowEWTemp;
-        } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
+        } else if (CondenserType == DataPlant::nCondenserType::AirCooled) {
             HighCondenserEnteringTempLimit = OAHighEDBTemp;
             LowCondenserEnteringTempLimit = OAHighEDBTemp;
         } else { // Evaporatively Cooled Condenser
@@ -726,12 +726,12 @@ namespace StandardRatings {
                 {
                     auto const SELECT_CASE_var(ChillerType);
 
-                    if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
+                    if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
 
                         ShowWarningError(state,
                                          "Chiller:Electric:EIR = " + ChillerName +
                                              ":  Integrated Part Load Value (IPLV) calculated is not at the AHRI test condition.");
-                    } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
+                    } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
 
                         ShowWarningError(state,
                                          "Chiller:Electric:ReformulatedEIR = " + ChillerName +

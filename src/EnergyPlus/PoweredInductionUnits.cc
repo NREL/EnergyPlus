@@ -235,8 +235,8 @@ void GetPIUs(EnergyPlusData &state)
     // Using/Aliasing
     using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
-    using DataPlant::TypeOf_CoilSteamAirHeating;
-    using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
+
     using FluidProperties::FindRefrigerant;
     using NodeInputManager::GetOnlySingleNode;
     using SteamCoils::GetCoilSteamInletNode;
@@ -320,12 +320,12 @@ void GetPIUs(EnergyPlusData &state)
         state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = state.dataIPShortCut->cAlphaArgs(9); // type (key) of heating coil
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:WATER")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::SimpleHeating;
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = PlantEquipmentType::CoilWaterSimpleHeating;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:FUEL")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::Gas;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:STEAM")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::SteamAirHeating;
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = PlantEquipmentType::CoilSteamAirHeating;
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex == 0) {
                 ShowSevereError(state, std::string{RoutineName} + "Steam Properties for " + state.dataIPShortCut->cAlphaArgs(1) + " not found.");
@@ -558,12 +558,12 @@ void GetPIUs(EnergyPlusData &state)
         state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = state.dataIPShortCut->cAlphaArgs(9); // type (key) of heating coil
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:WATER")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::SimpleHeating;
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = PlantEquipmentType::CoilWaterSimpleHeating;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:FUEL")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::Gas;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:STEAM")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::SteamAirHeating;
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = PlantEquipmentType::CoilSteamAirHeating;
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex == 0) {
                 ShowSevereError(state, std::string{RoutineName} + "Steam Properties for " + state.dataIPShortCut->cAlphaArgs(1) + " not found.");
@@ -834,8 +834,8 @@ void InitPIU(EnergyPlusData &state,
     // Uses the status flags to trigger initializations.
 
     // Using/Aliasing
-    using DataPlant::TypeOf_CoilSteamAirHeating;
-    using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
+
     using DataZoneEquipment::CheckZoneEquipmentList;
     using PlantUtilities::InitComponentNodes;
     using PlantUtilities::ScanPlantLoopsForObject;
@@ -869,8 +869,8 @@ void InitPIU(EnergyPlusData &state,
     }
 
     if (MyPlantScanFlag(PIUNum) && allocated(state.dataPlnt->PlantLoop)) {
-        if ((state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
-            (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
+        if ((state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum == PlantEquipmentType::CoilWaterSimpleHeating) ||
+            (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum == PlantEquipmentType::CoilSteamAirHeating)) {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataPowerInductionUnits->PIU(PIUNum).HCoil,

@@ -110,7 +110,7 @@ namespace PipeHeatTransfer {
         std::string OutletNode;      // outlet node name
         int InletNodeNum;            // inlet node number
         int OutletNodeNum;           // outlet node number
-        int TypeOf;                  // Type of pipe
+        DataPlant::PlantEquipmentType TypeOf;                  // Type of pipe
         // derived data
         int ConstructionNum; // construction ref number
         iEnvrnPtr EnvironmentPtr;
@@ -197,7 +197,7 @@ namespace PipeHeatTransfer {
 
         // Default Constructor
         PipeHTData()
-            : Length(0.0), PipeID(0.0), InletNodeNum(0), OutletNodeNum(0), TypeOf(0), ConstructionNum(0), EnvironmentPtr(iEnvrnPtr::None),
+            : Length(0.0), PipeID(0.0), InletNodeNum(0), OutletNodeNum(0), TypeOf(DataPlant::PlantEquipmentType::Invalid), ConstructionNum(0), EnvironmentPtr(iEnvrnPtr::None),
               EnvrSchedPtr(0), EnvrVelSchedPtr(0), EnvrZonePtr(0), EnvrAirNodeNum(0), NumSections(0), FluidSpecHeat(0.0), FluidDensity(0.0),
               MaxFlowRate(0.0), InsideArea(0.0), OutsideArea(0.0), SectionArea(0.0), PipeHeatCapacity(0.0), PipeOD(0.0), PipeCp(0.0),
               PipeDensity(0.0), PipeConductivity(0.0), InsulationOD(0.0), InsulationCp(0.0), InsulationDensity(0.0), InsulationConductivity(0.0),

@@ -92,6 +92,108 @@ enum OpSchemeType
     ThermalEnergyStorageSchemeType = 17 // Scheme Type for Simplified Thermal Energy Storage operation
 };
 
+
+enum class PlantEquipmentType {
+    Invalid = -1,
+    Other = 0,
+    Boiler_Simple = 1,
+    Boiler_Steam = 2,
+    Chiller_Absorption = 3,           // older BLAST absorption chiller
+    Chiller_Indirect_Absorption = 4,  // revised absorption chiller
+    Chiller_CombTurbine = 5,
+    Chiller_ConstCOP = 6,
+    Chiller_DFAbsorption = 7,
+    Chiller_Electric = 8,  // basic BLAST Chiller
+    Chiller_ElectricEIR = 9,
+    Chiller_ElectricReformEIR = 10,
+    Chiller_EngineDriven = 11,
+    CoolingTower_SingleSpd = 12,
+    CoolingTower_TwoSpd = 13,
+    CoolingTower_VarSpd = 14,
+    Generator_FCExhaust = 15,
+    HeatPumpWtrHeaterPumped = 16,
+    HPWaterEFCooling = 17,
+    HPWaterEFHeating = 18,
+    HPWaterPECooling = 19,
+    HPWaterPEHeating = 20,
+    Pipe = 21,
+    PipeSteam = 22,
+    PipeExterior = 23,
+    PipeInterior = 24,
+    PipeUnderground = 25,
+    PurchChilledWater = 26,
+    PurchHotWater = 27,
+    TS_IceDetailed = 28,
+    TS_IceSimple = 29,
+    ValveTempering = 30,
+    WtrHeaterMixed = 31,
+    WtrHeaterStratified = 32,
+    PumpVariableSpeed = 33,
+    PumpConstantSpeed = 34,
+    PumpCondensate = 35,
+    PumpBankVariableSpeed = 36,
+    PumpBankConstantSpeed = 37,
+    WaterUseConnection = 38,
+    CoilWaterCooling = 39,              // demand side component
+    CoilWaterDetailedFlatCooling = 40,  // demand side component
+    CoilWaterSimpleHeating = 41,        // demand side component
+    CoilSteamAirHeating = 42,           // demand side component
+    SolarCollectorFlatPlate = 43,       // demand side component
+    PlantLoadProfile = 44,              // demand side component
+    GrndHtExchgSystem = 45,
+    GrndHtExchgSurface = 46,
+    GrndHtExchgPond = 47,
+    Generator_MicroTurbine = 48,  // newer FSEC turbine
+    Generator_ICEngine = 49,
+    Generator_CTurbine = 50,  // older BLAST turbine
+    Generator_MicroCHP = 51,
+    Generator_FCStackCooler = 52,
+    FluidCooler_SingleSpd = 53,
+    FluidCooler_TwoSpd = 54,
+    EvapFluidCooler_SingleSpd = 55,
+    EvapFluidCooler_TwoSpd = 56,
+    ChilledWaterTankMixed = 57,
+    ChilledWaterTankStratified = 58,
+    PVTSolarCollectorFlatPlate = 59,
+    Baseboard_Conv_Water = 60,
+    Baseboard_Rad_Conv_Steam = 61,
+    Baseboard_Rad_Conv_Water = 62,
+    LowTempRadiant_VarFlow = 63,
+    LowTempRadiant_ConstFlow = 64,
+    CooledBeamAirTerminal = 65,
+    CoilWAHPHeatingEquationFit = 66,
+    CoilWAHPCoolingEquationFit = 67,
+    CoilWAHPHeatingParamEst = 68,
+    CoilWAHPCoolingParamEst = 69,
+    RefrigSystemWaterCondenser = 70,
+    RefrigerationWaterCoolRack = 71,
+    MultiSpeedHeatPumpRecovery = 72,
+    Chiller_ExhFiredAbsorption = 73,
+    PipingSystemPipeCircuit = 74,
+    SolarCollectorICS = 75,
+    CoilVSWAHPHeatingEquationFit = 76,
+    CoilVSWAHPCoolingEquationFit = 77,
+    PlantComponentUserDefined = 78,
+    CoilUserDefined = 79,
+    ZoneHVACAirUserDefined = 80,
+    AirTerminalUserDefined = 81,
+    HeatPumpVRF = 82,
+    GrndHtExchgHorizTrench = 83,
+    FluidToFluidPlantHtExchg = 84,
+    WaterSource = 85,
+    CentralGroundSourceHeatPump = 86,
+    UnitarySysRecovery = 87,
+    PackagedTESCoolingCoil = 88,
+    CoolingTower_VarSpdMerkel = 89,
+    SwimmingPool_Indoor = 90,
+    GrndHtExchgSlinky = 91,
+    HeatPumpWtrHeaterWrapped = 92,
+    FourPipeBeamAirTerminal = 93,
+    CoolingPanel_Simple = 94,
+    HeatPumpEIRCooling = 95,
+    HeatPumpEIRHeating = 96
+};
+
 // Parameters for component character wrt how load gets met (or not)
 //  used in %HowLoadServed to facilitate load dispatch logic
 int const HowMet_Unknown(50);                              // not yet set
@@ -121,7 +223,7 @@ enum class FlowMode
     LeavingSetpointModulated,
 };
 
-enum class CondenserType
+enum class nCondenserType
 {
     Unassigned,
     AirCooled,

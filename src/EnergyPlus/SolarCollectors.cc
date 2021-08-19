@@ -305,7 +305,7 @@ namespace SolarCollectors {
                     state, state.dataSolarCollectors->UniqueCollectorNames, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
                 state.dataSolarCollectors->Collector(CollectorNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                 state.dataSolarCollectors->Collector(CollectorNum).TypeNum =
-                    DataPlant::TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant
+                    DataPlant::PlantEquipmentType::SolarCollectorFlatPlate; // parameter assigned in DataPlant
 
                 // Get parameters object
                 int ParametersNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
@@ -547,7 +547,7 @@ namespace SolarCollectors {
                                                          state.dataIPShortCut->cAlphaFieldNames(1),
                                                          ErrorsFound);
                 state.dataSolarCollectors->Collector(CollectorNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-                state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorICS; // parameter assigned in DataPlant
+                state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::PlantEquipmentType::SolarCollectorICS; // parameter assigned in DataPlant
 
                 state.dataSolarCollectors->Collector(CollectorNum).InitICS = true;
 
@@ -717,7 +717,7 @@ namespace SolarCollectors {
 
     void CollectorData::setupOutputVars(EnergyPlusData &state)
     {
-        if (this->TypeNum == DataPlant::TypeOf_SolarCollectorFlatPlate) {
+        if (this->TypeNum == DataPlant::PlantEquipmentType::SolarCollectorFlatPlate) {
             // Setup report variables
             SetupOutputVariable(state,
                                 "Solar Collector Incident Angle Modifier",
@@ -771,7 +771,7 @@ namespace SolarCollectors {
                                 "HeatProduced",
                                 _,
                                 "Plant");
-        } else if (this->TypeNum == DataPlant::TypeOf_SolarCollectorICS) {
+        } else if (this->TypeNum == DataPlant::PlantEquipmentType::SolarCollectorICS) {
 
             SetupOutputVariable(state,
                                 "Solar Collector Transmittance Absorptance Product",
@@ -889,9 +889,9 @@ namespace SolarCollectors {
         {
             auto const SELECT_CASE_var(this->TypeNum);
             // Select and CALL models based on collector type
-            if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorFlatPlate) {
+            if (SELECT_CASE_var == DataPlant::PlantEquipmentType::SolarCollectorFlatPlate) {
                 this->CalcSolarCollector(state);
-            } else if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorICS) {
+            } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::SolarCollectorICS) {
                 this->CalcICSSolarCollector(state);
             } else {
                 assert(false); // LCOV_EXCL_LINE

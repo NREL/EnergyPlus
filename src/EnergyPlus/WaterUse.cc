@@ -1619,7 +1619,7 @@ namespace WaterUse {
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    DataPlant::TypeOf_WaterUseConnection,
+                                                    static_cast<int>(DataPlant::PlantEquipmentType::WaterUseConnection),
                                                     this->PlantLoopNum,
                                                     this->PlantLoopSide,
                                                     this->PlantLoopBranchNum,

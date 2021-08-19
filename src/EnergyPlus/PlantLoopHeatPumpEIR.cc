@@ -294,8 +294,8 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
     // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
-    if ((this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling && currentLoad >= 0.0) ||
-        (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating && currentLoad <= 0.0)) {
+    if ((this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRCooling && currentLoad >= 0.0) ||
+        (this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating && currentLoad <= 0.0)) {
         this->resetReportingVariables();
         return;
     }
@@ -441,7 +441,7 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
 
     std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
     Real64 loadSideInitTemp = DataGlobalConstants::CWInitConvTemp;
-    if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
+    if (this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
         loadSideInitTemp = DataGlobalConstants::HWInitConvTemp;
     }
 
@@ -622,7 +622,7 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
 
     std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
     Real64 sourceSideInitTemp = DataGlobalConstants::HWInitConvTemp;
-    if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
+    if (this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
         sourceSideInitTemp = DataGlobalConstants::CWInitConvTemp;
     }
 
@@ -732,7 +732,7 @@ void EIRPlantLoopHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
     // need to update these to better values later
     Real64 sourceSideInitTemp = 20;
     Real64 sourceSideHumRat = 0.0;
-    if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
+    if (this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
         // same here; update later
         sourceSideInitTemp = 20;
     }
@@ -856,13 +856,13 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
         }
     };
     std::vector<ClassType> classesToInput = {ClassType{"HeatPump:PlantLoop:EIR:Cooling",
-                                                       DataPlant::TypeOf_HeatPumpEIRCooling,
+                                                       DataPlant::PlantEquipmentType::HeatPumpEIRCooling,
                                                        "Chilled Water Nodes",
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add},
                                              ClassType{"HeatPump:PlantLoop:EIR:Heating",
-                                                       DataPlant::TypeOf_HeatPumpEIRHeating,
+                                                       DataPlant::PlantEquipmentType::HeatPumpEIRHeating,
                                                        "Hot Water Nodes",
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
@@ -1160,7 +1160,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
-        if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
+        if (this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
             SetupOutputVariable(state,
                                 "Heat Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -1173,7 +1173,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                 "Cooling",
                                 "Heat Pump",
                                 "Plant");
-        } else if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
+        } else if (this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
             SetupOutputVariable(state,
                                 "Heat Pump Electricity Energy",
                                 OutputProcessor::Unit::J,

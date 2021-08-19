@@ -828,7 +828,7 @@ namespace CTElectricGenerator {
                 errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        DataPlant::TypeOf_Generator_CTurbine,
+                                                        static_cast<int>(DataPlant::PlantEquipmentType::Generator_CTurbine),
                                                         this->HRLoopNum,
                                                         this->HRLoopSideNum,
                                                         this->HRBranchNum,

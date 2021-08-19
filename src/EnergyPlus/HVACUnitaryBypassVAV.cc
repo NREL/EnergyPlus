@@ -1485,7 +1485,7 @@ namespace HVACUnitaryBypassVAV {
                     ErrorFlag = false;
                     PlantUtilities::ScanPlantLoopsForObject(state,
                                                             CBVAV(CBVAVNum).HeatCoilName,
-                                                            DataPlant::TypeOf_CoilWaterSimpleHeating,
+                                                            static_cast<int>(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating),
                                                             CBVAV(CBVAVNum).LoopNum,
                                                             CBVAV(CBVAVNum).LoopSide,
                                                             CBVAV(CBVAVNum).BranchNum,
@@ -1519,7 +1519,7 @@ namespace HVACUnitaryBypassVAV {
                     ErrorFlag = false;
                     PlantUtilities::ScanPlantLoopsForObject(state,
                                                             CBVAV(CBVAVNum).HeatCoilName,
-                                                            DataPlant::TypeOf_CoilSteamAirHeating,
+                                                            static_cast<int>(DataPlant::PlantEquipmentType::CoilSteamAirHeating),
                                                             CBVAV(CBVAVNum).LoopNum,
                                                             CBVAV(CBVAVNum).LoopSide,
                                                             CBVAV(CBVAVNum).BranchNum,

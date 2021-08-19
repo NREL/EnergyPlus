@@ -232,11 +232,11 @@ void GetPumpInput(EnergyPlusData &state)
     using DataHeatBalance::IntGainTypeOf_Pump_VarSpeed;
     using DataHeatBalance::IntGainTypeOf_PumpBank_ConSpeed;
     using DataHeatBalance::IntGainTypeOf_PumpBank_VarSpeed;
-    using DataPlant::TypeOf_PumpBankConstantSpeed;
-    using DataPlant::TypeOf_PumpBankVariableSpeed;
-    using DataPlant::TypeOf_PumpCondensate;
-    using DataPlant::TypeOf_PumpConstantSpeed;
-    using DataPlant::TypeOf_PumpVariableSpeed;
+
+
+
+
+
     using DataSizing::AutoSize;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSatDensityRefrig;
@@ -315,7 +315,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPumps->PumpEquip(PumpNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPumps->PumpEquip(PumpNum).pumpType = PumpType::VarSpeed; //'Pump:VariableSpeed'
-        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpVariableSpeed;
+        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = PlantEquipmentType::PumpVariableSpeed;
 
         state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),
@@ -566,7 +566,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPumps->PumpEquip(PumpNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPumps->PumpEquip(PumpNum).pumpType = PumpType::ConSpeed; //'Pump:ConstantSpeed'
-        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpConstantSpeed;
+        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = PlantEquipmentType::PumpConstantSpeed;
 
         state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),
@@ -739,7 +739,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPumps->PumpEquip(PumpNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPumps->PumpEquip(PumpNum).pumpType = PumpType::Cond; //'Pump:VariableSpeed:Condensate'
-        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpCondensate;
+        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = PlantEquipmentType::PumpCondensate;
 
         state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),
@@ -880,7 +880,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPumps->PumpEquip(PumpNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPumps->PumpEquip(PumpNum).pumpType = PumpType::Bank_VarSpeed; //'HeaderedPumps:VariableSpeed'
-        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpBankVariableSpeed;
+        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = PlantEquipmentType::PumpBankVariableSpeed;
 
         state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),
@@ -1040,7 +1040,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPumps->PumpEquip(PumpNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPumps->PumpEquip(PumpNum).pumpType = PumpType::Bank_ConSpeed; //'HeaderedPumps:ConstantSpeed'
-        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = TypeOf_PumpBankConstantSpeed;
+        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = PlantEquipmentType::PumpBankConstantSpeed;
 
         state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),

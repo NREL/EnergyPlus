@@ -1131,7 +1131,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
     state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
@@ -1716,7 +1716,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
     state->dataPlnt->PlantLoop(2).FluidName = "WATER";
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::TypeOf_CoilWaterCooling;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
     state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
@@ -1726,7 +1726,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::TypeOf_CoilWaterSimpleHeating;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;

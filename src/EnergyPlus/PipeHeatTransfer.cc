@@ -113,9 +113,9 @@ namespace EnergyPlus::PipeHeatTransfer {
 
 // Using/Aliasing
 using namespace GroundTemperatureManager;
-using DataPlant::TypeOf_PipeExterior;
-using DataPlant::TypeOf_PipeInterior;
-using DataPlant::TypeOf_PipeUnderground;
+
+
+
 
 // Functions
 
@@ -262,7 +262,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                  state.dataIPShortCut->cAlphaFieldNames(1),
                                                  ErrorsFound);
         state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipeHT->PipeHT(Item).TypeOf = TypeOf_PipeInterior;
+        state.dataPipeHT->PipeHT(Item).TypeOf = DataPlant::PlantEquipmentType::PipeInterior;
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
@@ -417,7 +417,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                  state.dataIPShortCut->cAlphaFieldNames(1),
                                                  ErrorsFound);
         state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipeHT->PipeHT(Item).TypeOf = TypeOf_PipeExterior;
+        state.dataPipeHT->PipeHT(Item).TypeOf = DataPlant::PlantEquipmentType::PipeExterior;
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
@@ -554,7 +554,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                  state.dataIPShortCut->cAlphaFieldNames(1),
                                                  ErrorsFound);
         state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipeHT->PipeHT(Item).TypeOf = TypeOf_PipeUnderground;
+        state.dataPipeHT->PipeHT(Item).TypeOf = DataPlant::PlantEquipmentType::ValveTempering;
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
@@ -1888,7 +1888,7 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
     {
         auto const SELECT_CASE_var(this->TypeOf);
 
-        if (SELECT_CASE_var == TypeOf_PipeInterior) {
+        if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeInterior) {
 
             {
                 auto const SELECT_CASE_var1(this->EnvironmentPtr);
@@ -1902,7 +1902,7 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
                 }
             }
 
-        } else if (SELECT_CASE_var == TypeOf_PipeExterior) {
+        } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeExterior) {
 
             {
                 auto const SELECT_CASE_var1(this->EnvironmentPtr);

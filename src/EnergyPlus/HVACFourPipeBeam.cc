@@ -559,7 +559,6 @@ namespace FourPipeBeam {
     {
 
         // Using
-        using DataPlant::TypeOf_FourPipeBeamAirTerminal;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -575,7 +574,7 @@ namespace FourPipeBeam {
             if (this->beamCoolingPresent) {
                 ScanPlantLoopsForObject(state,
                                         this->name,
-                                        TypeOf_FourPipeBeamAirTerminal,
+                                        static_cast<int>(DataPlant::PlantEquipmentType::FourPipeBeamAirTerminal),
                                         this->cWLocation.loopNum,
                                         this->cWLocation.loopSideNum,
                                         this->cWLocation.branchNum,
@@ -593,7 +592,7 @@ namespace FourPipeBeam {
             if (this->beamHeatingPresent) {
                 ScanPlantLoopsForObject(state,
                                         this->name,
-                                        TypeOf_FourPipeBeamAirTerminal,
+                                        static_cast<int>(DataPlant::PlantEquipmentType::FourPipeBeamAirTerminal),
                                         this->hWLocation.loopNum,
                                         this->hWLocation.loopSideNum,
                                         this->hWLocation.branchNum,

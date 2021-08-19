@@ -435,7 +435,7 @@ TEST_F(EnergyPlusFixture, Initialization)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -443,7 +443,7 @@ TEST_F(EnergyPlusFixture, Initialization)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
@@ -591,10 +591,10 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
     auto &loop2demandComponent2 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    loop2demandComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop2demandComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop2demandComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -777,10 +777,10 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
     auto &loop2demandComponent2 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    loop2demandComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop2demandComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop2demandComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -906,10 +906,10 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
     auto &loop2demandComponent2 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    loop2demandComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop2demandComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop2demandComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -1015,8 +1015,8 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop2demandComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -1104,8 +1104,8 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop2demandComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -1171,7 +1171,7 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -1249,7 +1249,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -1257,7 +1257,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
@@ -1399,10 +1399,10 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     auto &PLHPPlantDemandSideComp = state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1);
     auto &extraPLHPPlantSupplySideComp = state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp(1);
     auto &extraPLHPPlantDemandSideComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantSupplySideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    PLHPPlantDemandSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    extraPLHPPlantSupplySideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
-    extraPLHPPlantDemandSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantSupplySideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantDemandSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    extraPLHPPlantSupplySideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    extraPLHPPlantDemandSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -1500,7 +1500,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
@@ -1509,7 +1509,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
@@ -1634,7 +1634,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
@@ -1643,7 +1643,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
@@ -1863,7 +1863,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
 
     // the init call expects a "from" calling point
@@ -1980,7 +1980,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
 
     // the init call expects a "from" calling point
@@ -2195,7 +2195,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
@@ -2357,8 +2357,8 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop1supplyComponent2.Name = thisCoolingPLHP->name;
@@ -2517,8 +2517,8 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop1supplyComponent2.Name = thisCoolingPLHP->name;
@@ -2654,7 +2654,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideLoop = state->dataPlnt->PlantLoop(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -2663,7 +2663,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
 
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -2751,7 +2751,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
@@ -2760,7 +2760,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
@@ -2852,7 +2852,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
@@ -2861,7 +2861,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
@@ -2952,7 +2952,7 @@ TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLocation = PlantLocation(1, 2, 1, 1);

@@ -4326,37 +4326,37 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // Air- and Evap-cooled chiller
     auto &ElectricChiller(state.dataPlantChillers->ElectricChiller);
     for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumElectricChillers; ++iChiller) {
-        if (ElectricChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
+        if (ElectricChiller(iChiller).CondenserType != DataPlant::nCondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
         }
     }
     auto &EngineDrivenChiller(state.dataPlantChillers->EngineDrivenChiller);
     for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumEngineDrivenChillers; ++iChiller) {
-        if (EngineDrivenChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
+        if (EngineDrivenChiller(iChiller).CondenserType != DataPlant::nCondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += EngineDrivenChiller(iChiller).CondenserEnergy;
         }
     }
     auto &GTChiller(state.dataPlantChillers->GTChiller);
     for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumGTChillers; ++iChiller) {
-        if (GTChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
+        if (GTChiller(iChiller).CondenserType != DataPlant::nCondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += GTChiller(iChiller).CondenserEnergy;
         }
     }
     auto &ConstCOPChiller(state.dataPlantChillers->ConstCOPChiller);
     for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumConstCOPChillers; ++iChiller) {
-        if (ConstCOPChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
+        if (ConstCOPChiller(iChiller).CondenserType != DataPlant::nCondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += ConstCOPChiller(iChiller).CondenserEnergy;
         }
     }
     auto &ElectricEIRChiller(state.dataChillerElectricEIR->ElectricEIRChiller);
     for (int iChiller = 1; iChiller <= state.dataChillerElectricEIR->NumElectricEIRChillers; ++iChiller) {
-        if (ElectricEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
+        if (ElectricEIRChiller(iChiller).CondenserType != DataPlant::nCondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
         }
     }
     auto &ElecReformEIRChiller(state.dataChillerReformulatedEIR->ElecReformEIRChiller);
     for (int iChiller = 1; iChiller <= state.dataChillerReformulatedEIR->NumElecReformEIRChillers; ++iChiller) {
-        if (ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
+        if (ElecReformEIRChiller(iChiller).CondenserType != DataPlant::nCondenserType::WaterCooled) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElecReformEIRChiller(iChiller).CondEnergy;
         }
     }
