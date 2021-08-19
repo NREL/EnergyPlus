@@ -997,6 +997,7 @@
     2.5,                     !- Ground Thermal Conductivity {W/m-K}
     2.5E+06,                 !- Ground Thermal Heat Capacity {J/m3-K}
     ,                        !- GHE:Vertical:ResponseFactors Object Name
+    UHFcalc,                 !- g-Function Calculation Method
     GHE-Array;               !- GHE:Vertical:Array Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: GROUNDHEATEXCHANGER:VERTICAL:PROPERTIES ===========

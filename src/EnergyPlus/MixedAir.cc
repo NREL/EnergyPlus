@@ -480,18 +480,35 @@ void SimOAComponent(EnergyPlusData &state,
             // get water coil and controller data if not called previously
             if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
             // iterate on OA sys controller and water coil at the same time
-            SolveWaterCoilController(state,
-                                     FirstHVACIteration,
-                                     AirLoopNum,
-                                     CompName,
-                                     CompIndex,
-                                     state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
-                                     state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
-                                     false);
-            // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-            state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+            if (!state.dataWaterCoils->WaterCoil(CompIndex).heatRecoveryCoil) {
+                SolveWaterCoilController(state,
+                                         FirstHVACIteration,
+                                         AirLoopNum,
+                                         CompName,
+                                         CompIndex,
+                                         state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
+                                         state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
+                                         false);
+                // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+                state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+            } else {
+                WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
+            }
+        } else {
+            // This is not working as intended ... don't want to include the HR coil in sizing.
+            // But if the water coil is called to get this index, then the controller is called to set the
+            // controller index and the simulation sizes the controller before the cooling coil.
+            // Pushing this aspect forward to a follow up issue where the
+            // controller index call is moved out of water coils getInput.
+            // if (CompIndex == 0) {
+            //    bool errFound = false;
+            //    CompIndex = WaterCoils::GetWaterCoilIndex(state, CompType, CompName, errFound);
+            //    if (errFound) ShowFatalError(state, "SimOAComponent: Program terminates for preceding reason.");
+            // }
+            // if (!state.dataWaterCoils->WaterCoil(CompIndex).heatRecoveryCoil) OACoolingCoil = true;
+            // should not include heat recovery coils in sizing since heat transfer at peak cooling is minimal.
+            OACoolingCoil = true;
         }
-        OACoolingCoil = true;
     } else if (CompTypeNum == SimAirServingZones::CompType::WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
         if (Sim) {
             // get water coil and controller data if not called previously
