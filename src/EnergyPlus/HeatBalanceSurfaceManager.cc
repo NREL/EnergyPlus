@@ -4753,6 +4753,28 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
 // Beginning of Record Keeping subroutines for the HB Module
 // *****************************************************************************
 
+void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate)
+{
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        if (present(ZoneToResimulate) && (zoneNum != ZoneToResimulate)) continue;
+        int const firstSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+        int const lastSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
+        for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+            if (state.dataSurface->Surface(surfNum).ExtSolar) { // WindowManager's definition of ZoneWinHeatGain/Loss
+                state.dataHeatBal->ZoneWinHeatGain(zoneNum) += state.dataSurface->SurfWinHeatGain(surfNum);
+            }
+        }
+        // Update zone window heat gain reports (these intermediate values are also used for Sensible Heat Gain Summary in GatherHeatGainReport)
+        if (state.dataHeatBal->ZoneWinHeatGain(zoneNum) >= 0.0) {
+            state.dataHeatBal->ZoneWinHeatGainRep(zoneNum) = state.dataHeatBal->ZoneWinHeatGain(zoneNum);
+            state.dataHeatBal->ZoneWinHeatGainRepEnergy(zoneNum) = state.dataHeatBal->ZoneWinHeatGainRep(zoneNum) * state.dataGlobal->TimeStepZoneSec;
+        } else {
+            state.dataHeatBal->ZoneWinHeatLossRep(zoneNum) = -state.dataHeatBal->ZoneWinHeatGain(zoneNum);
+            state.dataHeatBal->ZoneWinHeatLossRepEnergy(zoneNum) = state.dataHeatBal->ZoneWinHeatLossRep(zoneNum) * state.dataGlobal->TimeStepZoneSec;
+        }
+    }
+}
+
 void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state)
 {
 
@@ -5615,10 +5637,6 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                     state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatGain = state.dataSurface->SurfWinHeatGainRep(surfNum);
                     state.dataDaylightingDevicesData->TDDPipe(pipeNum).HeatLoss = state.dataSurface->SurfWinHeatLossRep(surfNum);
                 }
-                if (Surface(surfNum).ExtSolar) { // WindowManager's definition of ZoneWinHeatGain/Loss
-                    int zoneNum = Surface(surfNum).Zone;
-                    state.dataHeatBal->ZoneWinHeatGain(zoneNum) += state.dataSurface->SurfWinHeatGain(surfNum);
-                }
             }
         }
     }
@@ -5767,14 +5785,6 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                 state.dataHeatBal->ZoneOpaqSurfExtFaceCondLossRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
         }
 
-        // Zone Window Heat Gains
-        if (state.dataHeatBal->ZoneWinHeatGain(ZoneNum) >= 0.0) {
-            state.dataHeatBal->ZoneWinHeatGainRep(ZoneNum) = state.dataHeatBal->ZoneWinHeatGain(ZoneNum);
-            state.dataHeatBal->ZoneWinHeatGainRepEnergy(ZoneNum) = state.dataHeatBal->ZoneWinHeatGainRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
-        } else {
-            state.dataHeatBal->ZoneWinHeatLossRep(ZoneNum) = -state.dataHeatBal->ZoneWinHeatGain(ZoneNum);
-            state.dataHeatBal->ZoneWinHeatLossRepEnergy(ZoneNum) = state.dataHeatBal->ZoneWinHeatLossRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
-        }
     } // loop over zones
 }
 
@@ -6601,6 +6611,8 @@ void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
         // Cannot use CalcHeatBalanceInsideSurf2CTFOnly because resimulated zone includes adjacent interzone surfaces
         CalcHeatBalanceInsideSurf2(state, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
     }
+    CalculateZoneMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
+    UpdateIntermediateSurfaceHeatBalanceResults(state, ZoneToResimulate);
 }
 
 void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
@@ -7458,8 +7470,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
             }
         }
     }
-
-    CalculateZoneMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
 }
 
 void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
@@ -8064,8 +8074,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         }
 
     } // ...end of main inside heat balance iteration loop (ends when Converged)
-
-    CalculateZoneMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
 }
 
 void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, int const SurfNum, ZoneData &zone, int WarmupSurfTemp)

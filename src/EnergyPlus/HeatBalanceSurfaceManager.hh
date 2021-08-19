@@ -123,6 +123,8 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
+    void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _);
+
     void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state);
 
     void UpdateThermalHistories(EnergyPlusData &state);
