@@ -506,7 +506,7 @@ No variables are reported for this compound object. However, outputs are provide
 
 \subsection{CoilSystem:Cooling:Water}\label{coilsystemcoolingwater}
 
-The \hyperref[coilsystemcoolingwater]{CoilSystem:Cooling:Water} object is a coil system wrapper for water cooling coils. Valid water cooling coils are: \hyperref[coilcoolingwater]{Coil:Cooling:Water}, \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry} and \hyperref[coilsystemcoolingwaterheatexchangerassisted]{CoilSystem:Cooling:Water:HeatExchangerAssisted}. This coil system allows users to model the three water cooling coils in airloop main and outdoor air branches. Also this object is designed to model water-side economizers for free pre-cooling when the water-side of the coil is placed on the demand side a condenser loop. As a water-side economizer the \textit{CoilSystem:Cooling:Water} object is placed upstream of packaged DX systems or chilled water main cooling coils. The coil system as a water-side economizer provides free pre-cooling when the condition is favorable. Any remaining system cooling load not met by the water side economizer is provided either by a DX or chilled water cooling coil placed downstream of the water-side economizer coil. The \textit{CoilSystem:Cooling:Water} object does not require \textit{Controller:WaterCoil} and relies on a built-in controller. This coil system uses setpoint based control that varies coil entering water (fluid) mass flow rate to meet user specified temperature or humidity setpoint. 
+The \hyperref[coilsystemcoolingwater]{CoilSystem:Cooling:Water} object is a coil system wrapper for water cooling coils. Valid water cooling coils are: \hyperref[coilcoolingwater]{Coil:Cooling:Water}, \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry} and \hyperref[coilsystemcoolingwaterheatexchangerassisted]{CoilSystem:Cooling:Water:HeatExchangerAssisted}. This coil system allows users to model the three water cooling coils in airloop main and outdoor air branches. Also this object is designed to model water-side economizers for free pre-cooling when the water-side of the coil is placed on the demand side a condenser loop. As a water-side economizer the \textit{CoilSystem:Cooling:Water} object is placed upstream of packaged DX systems or chilled water main cooling coils. The coil system as a water-side economizer provides free pre-cooling when the condition is favorable. Any remaining system cooling load not met by the water side economizer is provided either by a DX or chilled water cooling coil placed downstream of the water-side economizer coil. The \textit{CoilSystem:Cooling:Water} object does not require \textit{Controller:WaterCoil} and relies on a built-in controller. This coil system uses setpoint based control that varies coil entering water (fluid) mass flow rate to meet user specified temperature or humidity setpoint.\par
 
 Figure~\ref{fig:water-side-economizer-coil-system-upstream-of-packaged-dx-system} below shows packaged DX system serving multiple zones and a coil system water cooling object placed upstream of the packaged system. The water-side of the coil system is connected to the demand side of a condenser or plant loop. This coil system configuration provides free pre-cooling when the condition is favorable to operate and there is cooling or dehumidification demand. In this configuration the packaged DX system can be \textit{AirloopHVAC:UnitarySystem} object.
 
@@ -523,6 +523,26 @@ Figure~\ref{fig:water-side-economizer-coil-system-in-outdoor-air-system} below s
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image142.png}
 \caption{Water Side Economizer Coil System In Outdoor Air System \protect \label{fig:water-side-economizer-coil-system-in-outdoor-air-system}}
 \end{figure}
+
+
+\subsubsection{Water Side Economizer Mode}\label{water-side-economizer-mode}
+
+The coil system cooling object to operate the coil entering water (fluid) temperature must be less than the coil entering air temperature minus the user specified temperature offset value. The second requirement is that the coil system entering air temperature must be greater than the coil system air outlet node (control node) setpoint temperature, i.e., there has to be a cooling or dehumidification demand. Built in coil system controller strives to meet either temperature or humidity ratio setpoint at the coil system air outlet node by varying the cold water (fluid) mass flow rate.
+
+\subsubsection{Wrap Around Water Coil Heat Recovery Mode}\label{wrap-around-water-coil-heat-recovery-mode}
+
+This coil system may also be used to model a wrap-around water coil heat recovery system where a water coil system object is in one air stream (e.g., the outdoor air stream) while another cooling coil object is in a seperate air stream (e.g., exhaust air stream). The two water coils are connected in series on the demand side of a plant loop where the CoilSystem:Cooling:Water object is upstream of the Coil:Cooling:Water object. For wrap-around heat recovery coils, the supply side of the plant will typically have only a pump to circulate the water.\par
+
+The CoilSystemCooling:Water object is the main controller for the heat recovery loop. Neither this object or other coils in the heat recovery loop require an external controller (Ref: \hyperref[controllerwatercoil]{Controller:WaterCoil}). Do not specify a controller for this object or the associated water coil elsewhere in the input. This object checks that the water coil entering water (fluid) temperature to coil entering air temperature absolute difference is greater than the user specified temperature offset, otherwise the system is disabled. The water loop temperature entering the coil system's coil will be maintained between the entering air temperatures of the water coils (e.g., midway between the outdoor air temperature and exhaust air temperature if the coils are used in the outdoor air system). The coil system will be disabled if the plant loop water temperature falls below the minimum allowed heat recovery loop water temperature (Ref. field \hyperref[field-minimum-water-loop-temperature-for-heat-recovery]{Minimum Water Loop Temperature For Heat Recover}). Figure~\ref{fig:wrap-around-water-coil-heat-recovery-system-in-outdoor-air-system} shows a wrap-around heat recovery coil system in the outdoor air and relief air streams of the outdoor air system.
+
+\textbf{Note - although a \hyperref[plantloop]{PlantLoop} temperature setpoint node name and associated set point manager is required, that set point will not be used.} 
+
+\begin{figure}[hbtp] % fig 143
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/CoilSystemWater_HeatRecovery.png}
+\caption{Wrap-Around Water Coil Heat Recovery System In Outdoor Air System \protect \label{fig:wrap-around-water-coil-heat-recovery-system-in-outdoor-air-system}}
+\end{figure}
+
 
 \subsubsection{Inputs}\label{inputs}
 
@@ -590,6 +610,18 @@ This alpha field specifies if the coil will operate to meet a latent load calcul
 \paragraph{Field: Minimum Air To Water Temperature Offset [deltaC]}\label{field-minimum-air-to-water-temperature-offset}
 
 The coil system will turn ON as required when coil entering air temperature is above coil entering water temperature by more than the amount of this offset [deltaC]. To model a waterside economizer connected to condenser loop increase offset as desired. Default is 0.
+
+\paragraph{Field: Economizer Lockout}\label{field-economizer-lockout-1007}
+
+When Yes is selected or this field is left blank the coil system will be disabled when the air loop ecomomizer flag is active. Default is Yes.
+
+\paragraph{Field: Minimum Water Loop Temperature For Heat Recovery [C]}\label{field-minimum-water-loop-temperature-for-heat-recovery}
+
+The coil system will be disabled if the plant loop water temperature is below the minimum allowed loop water temperature [deltaC]. To avoid freezing the plant fluid set this value higher than the plant fluid freeze point. Default is 0.
+
+\paragraph{Field: Companion Coil Used For Heat Recovery}\label{field-companion-coil-used-for-heat-recovery}
+
+When simulating a wrap-around heat recovery loop, enter the name of the water coil connected to this coil system. If a name is entered in this field the coil system is assumed to be used in a wrap-around heat recovery loop. In this case, the water coil named here should be downstream of the coil system connected on the demand side of a plant loop with only a circulation pump connected to the plant loop supply side. The only coil type allowed is \hyperref[coilcoolingwater]{Coil:Cooling:Water}.
 
 
 Following is an example input for a coil system cooling water.
