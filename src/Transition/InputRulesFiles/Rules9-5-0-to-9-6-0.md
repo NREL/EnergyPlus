@@ -67,6 +67,10 @@ Summary:
 
 * Field name "zone_name" was changed to "zone_or_space_name".
 
+**For ZoneBaseboard:OutdoorTemperatureControlled:**
+
+* Field name "zone_name" was changed to "zone_or_zonelist_or_space_or_spacelist_name".
+
 **For BuildingSurface:Detailed, Wall:Detailed, RoofCeiling:Detailed, Floor:Detailed, Wall:Exterior, Wall:Adiabatic,
 Wall:Underground, Wall:Interzone, Roof, Ceiling:Adiabatic, Ceiling:Adiabatic, Floor:GroundContact, Floor:Adiabatic,
 and Floor:Interzone:**
@@ -106,6 +110,11 @@ default spaces will be created with the same names as the zone names.
 
 * No transition required. 
 * Field name "Zone Name" changed to "Zone or Space Name".
+
+**For ZoneBaseboard:OutdoorTemperatureControlled:**
+
+* No transition required. 
+* Field name "Zone Name" changed to "Zone or ZoneList or Space or SpaceList Name".
 
 **For BuildingSurface:Detailed:**
 
