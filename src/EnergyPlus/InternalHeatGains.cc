@@ -2660,7 +2660,7 @@ namespace InternalHeatGains {
                                     ErrorsFound = true;
                                 }
                             }
-                            thisZoneITEq.DesignTotalPower = IHGNumbers(1) * spaceFrac;
+                            thisZoneITEq.DesignTotalPower = IHGNumbers(1) * IHGNumbers(2) * spaceFrac;
                             if (state.dataIPShortCut->lNumericFieldBlanks(1)) {
                                 ShowWarningError(state,
                                                  std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
@@ -3054,7 +3054,7 @@ namespace InternalHeatGains {
         if (state.dataHeatBal->TotBBHeat > 0) {
             state.dataHeatBal->ZoneBBHeat.allocate(state.dataHeatBal->TotBBHeat);
             int bbHeatNum = 0;
-            for (int bbHeatInputNum = 1; bbHeatInputNum <= state.dataHeatBal->NumZoneElectricStatements; ++bbHeatInputNum) {
+            for (int bbHeatInputNum = 1; bbHeatInputNum <= state.dataHeatBal->NumZoneBBHeatStatements; ++bbHeatInputNum) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          bbModuleObject,
                                                                          bbHeatInputNum,
