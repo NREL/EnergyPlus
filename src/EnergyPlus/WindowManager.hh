@@ -640,7 +640,6 @@ struct WindowManagerData : BaseGlobalStruct
     Array1D_int indx = Array1D_int(10);              // Vector of row permutations in LU decomposition
     Array2D<Real64> Aface = Array2D<Real64>(10, 10); // Coefficient in equation Aface*thetas = Bface
     Array1D<Real64> Bface = Array1D<Real64>(10);     // Coefficient in equation Aface*thetas = Bface
-    Array1D<Real64> hrprev = Array1D<Real64>(10);    // Value of hr from previous iteration
     Array1D<Real64> TGapNewBG = Array1D<Real64>(2);  // For between-glass shade/blind, average gas temp in gaps on either
     //  side of shade/blind (K)
     Array1D<Real64> hcvBG = Array1D<Real64>(2); // For between-glass shade/blind, convection coefficient from gap glass or
