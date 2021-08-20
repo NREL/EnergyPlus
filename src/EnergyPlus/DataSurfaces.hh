@@ -566,8 +566,10 @@ namespace DataSurfaces {
         Real64 Tilt;             // Angle (deg) between the ground outward normal and the surface outward normal
         Real64 Height;           // Height of the surface (m)
         int Zone;                // Interior environment or zone the surface is a part of
+        int EnclIndex;           // Pointer to enclosure this surface belongs to
         int TAirRef;             // Flag for reference air temperature
         int ExtZone;             // For an "interzone" surface, this is the adjacent ZONE number (not adjacent SURFACE number).
+        int ExtEnclIndex;        // For an "interzone" surface, this is the adjacent ENCLOSURE number
         bool ExtSolar;           // True if the "outside" of the surface is exposed to solar
         bool ExtWind;            // True if the "outside" of the surface is exposed to wind
         Real64 ViewFactorGround; // View factor to the ground from the exterior of the surface for diffuse solar radiation
@@ -614,8 +616,10 @@ namespace DataSurfaces {
                     hash<Real64>()(Tilt),
                     hash<Real64>()(Height),
                     hash<int>()(Zone),
+                    hash<int>()(EnclIndex),
                     hash<int>()(TAirRef),
                     hash<int>()(ExtZone),
+                    hash<int>()(ExtEnclIndex),
                     hash<bool>()(ExtSolar),
                     hash<bool>()(ExtWind),
                     hash<Real64>()(ViewFactorGround),
@@ -654,8 +658,9 @@ namespace DataSurfaces {
         bool operator==(const SurfaceCalcHashKey &other) const
         {
             return (Construction == other.Construction && Azimuth == other.Azimuth && Tilt == other.Tilt && Height == other.Height &&
-                    Zone == other.Zone && ExtZone == other.ExtZone && ExtSolar == other.ExtSolar && ExtWind == other.ExtWind &&
-                    ViewFactorGround == other.ViewFactorGround && ViewFactorSky == other.ViewFactorSky &&
+                    Zone == other.Zone && EnclIndex == other.EnclIndex && ExtZone == other.ExtZone && ExtEnclIndex == other.ExtEnclIndex &&
+                    ExtSolar == other.ExtSolar && ExtWind == other.ExtWind && ViewFactorGround == other.ViewFactorGround &&
+                    ViewFactorSky == other.ViewFactorSky &&
 
                     HeatTransferAlgorithm == other.HeatTransferAlgorithm && IntConvCoeff == other.IntConvCoeff &&
                     ExtConvCoeff == other.ExtConvCoeff && OSCPtr == other.OSCPtr && OSCMPtr == other.OSCMPtr &&

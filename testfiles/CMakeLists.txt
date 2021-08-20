@@ -386,6 +386,7 @@ add_simulation_test(IDF_FILE PackagedTerminalAirConditionerVSAS.idf EPW_FILE USA
 add_simulation_test(IDF_FILE PackagedTerminalHeatPump.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE PackagedTerminalHeatPumpVSAS.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE PassiveTrombeWall.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE PerformancePrecision_ASHRAE9012016_SchoolSecondary_Denver.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE PipeHeatTransfer_Outair.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE PipeHeatTransfer_Schedule.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE PipeHeatTransfer_Underground.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
