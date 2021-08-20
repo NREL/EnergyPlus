@@ -3838,7 +3838,6 @@ namespace WindowManager {
         auto &indx = state.dataWindowManager->indx;
         auto &Aface = state.dataWindowManager->Aface;
         auto &Bface = state.dataWindowManager->Bface;
-        auto &hrprev = state.dataWindowManager->hrprev;
         auto &TGapNewBG = state.dataWindowManager->TGapNewBG;
         auto &hcvBG = state.dataWindowManager->hcvBG;
         auto &AbsRadShadeFace = state.dataWindowManager->AbsRadShadeFace;
@@ -3936,18 +3935,11 @@ namespace WindowManager {
         while (iter < MaxIterations && errtemp > errtemptol) {
 
             for (i = 1; i <= state.dataWindowManager->nglfacep; ++i) {
-                // todo - hr to be adjusted
                 hr(i) = state.dataWindowManager->emis(i) * state.dataWindowManager->sigma * pow_3(state.dataWindowManager->thetas(i));
                 // Following line is redundant since thetas is being relaxed;
                 // removed by FCW, 3/4/03
                 //! fw if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
-                hrprev(i) = hr(i);
             }
-            // adjusted outermost and innermost hRad here as conv coeff ratio is calculated based on Hc_total = Hc_Rad + Hc_Conv)
-            //            hr(1) *= state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum);
-            //            hrprev(1) = hr(1);
-            //            hr(state.dataWindowManager->nglface) *= state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum);
-            //            hrprev(state.dataWindowManager->nglface) = hr(state.dataWindowManager->nglface);
 
             // call for new interior film coeff (since it is temperature dependent) if using Detailed inside coef model
             if (((state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == 0) &&
@@ -7256,11 +7248,10 @@ namespace WindowManager {
         Real64 const errtemptol(0.02); // Tolerance on errtemp for convergence
         static constexpr std::string_view RoutineName("WindowTempsForNominalCond");
 
-        int i;                      // Counter
-        Array1D<Real64> hr(10);     // Radiative conductance (W/m2-K)
-        Array1D<Real64> hrprev(10); // Value of hr from previous iteration
-        Real64 hcinprev;            // Value of hcin from previous iteration
-        Real64 d;                   // +1 if number of row interchanges is even,
+        int i;                  // Counter
+        Array1D<Real64> hr(10); // Radiative conductance (W/m2-K)
+        Real64 hcinprev;        // Value of hcin from previous iteration
+        Real64 d;               // +1 if number of row interchanges is even,
         // -1 if odd (in LU decomposition)
         Array1D_int indx(10);          // Vector of row permutations in LU decomposition
         Array2D<Real64> Aface(10, 10); // Coefficient in equation Aface*thetas = Bface
@@ -7297,13 +7288,10 @@ namespace WindowManager {
             for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
                 hr(i) = state.dataWindowManager->emis(i) * state.dataWindowManager->sigma * pow_3(state.dataWindowManager->thetas(i));
                 //! fw 3/4/03 if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
-                hrprev(i) = hr(i);
             }
             // adjusted outermost and innermost hRad here as conv coeff ratio is calculated based on Hc_total = Hc_Rad + Hc_Conv)
             //            hr(1) *= state.dataHeatBal->CoeffAdjRatio(ConstrNum);
-            //            hrprev(1) = hr(1);
             //            hr(state.dataWindowManager->nglface) *= state.dataHeatBal->CoeffAdjRatio(ConstrNum);
-            //            hrprev(state.dataWindowManager->nglface) = hr(state.dataWindowManager->nglface);
 
             Aface = 0.0;
             Bface = 0.0;
