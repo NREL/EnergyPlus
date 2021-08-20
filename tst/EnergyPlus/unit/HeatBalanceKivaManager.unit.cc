@@ -260,6 +260,299 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobalConstants::KelvinConv, 0.001);
 }
 
+TEST_F(EnergyPlusFixture, HeatBalanceKiva_setupKivaInstances_ThermalComfort)
+{
+
+    // Unit test for Issue #8353 - Thermal Comfort thermostat controls failure due to Kiva slab foundation object interference
+
+    // Create Kiva foundation and set parameters
+    Kiva::Foundation fnd;
+
+    fnd.reductionStrategy = Kiva::Foundation::RS_AP;
+
+    Kiva::Material concrete(1.95, 2400.0, 900.0);
+
+    Kiva::Layer tempLayer;
+    tempLayer.thickness = 0.10;
+    tempLayer.material = concrete;
+
+    fnd.slab.interior.emissivity = 0.8;
+    fnd.slab.layers.push_back(tempLayer);
+
+    tempLayer.thickness = 0.2;
+    tempLayer.material = concrete;
+
+    fnd.wall.layers.push_back(tempLayer);
+
+    fnd.wall.heightAboveGrade = 0.1;
+    fnd.wall.depthBelowSlab = 0.2;
+    fnd.wall.interior.emissivity = 0.8;
+    fnd.wall.exterior.emissivity = 0.8;
+    fnd.wall.interior.absorptivity = 0.8;
+    fnd.wall.exterior.absorptivity = 0.8;
+
+    fnd.foundationDepth = 0.0;
+    fnd.numericalScheme = Kiva::Foundation::NS_ADI;
+
+    fnd.polygon.outer().push_back(Kiva::Point(-6.0, -6.0));
+    fnd.polygon.outer().push_back(Kiva::Point(-6.0, 6.0));
+    fnd.polygon.outer().push_back(Kiva::Point(6.0, 6.0));
+    fnd.polygon.outer().push_back(Kiva::Point(6.0, -6.0));
+
+    // Create Kiva weather data
+    HeatBalanceKivaManager::KivaWeatherData kivaweather;
+    kivaweather.annualAverageDrybulbTemp = 10.0;
+    kivaweather.intervalsPerHour = 1;
+    kivaweather.dryBulb = {10.0};
+    kivaweather.windSpeed = {0.0};
+    kivaweather.skyEmissivity = {0.0};
+
+    HeatBalanceKivaManager::KivaManager km;
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  Core_bottom,             !- Name",
+        "  0.0000,                  !- Direction of Relative North {deg}",
+        "  0.0000,                  !- X Origin {m}",
+        "  0.0000,                  !- Y Origin {m}",
+        "  0.0000,                  !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  ,                        !- Ceiling Height {m}",
+        "  ,                        !- Volume {m3}",
+        "  autocalculate,           !- Floor Area {m2}",
+        "  ,                        !- Zone Inside Convection Algorithm",
+        "  ,                        !- Zone Outside Convection Algorithm",
+        "  Yes;                     !- Part of Total Floor Area",
+        " ",
+        "People,",
+        "  Core_bottom People,      !- Name",
+        "  Core_bottom,             !- Zone or ZoneList Name",
+        "  Core_bottom Occupancy,   !- Number of People Schedule Name",
+        "  People,                  !- Number of People Calculation Method",
+        "  4,                       !- Number of People",
+        "  ,                        !- People per Zone Floor Area",
+        "  ,                        !- Zone Floor Area per Person",
+        "  0.9,                     !- Fraction Radiant",
+        "  0.1,                     !- Sensible Heat Fraction",
+        "  Core_bottom Activity,    !- Activity Level Schedule Name",
+        "  3.82e-08,                !- Carbon Dioxide Generation Rate",
+        "  Yes,                     !- Enable ASHRAE 55 Comfort Warnings",
+        "  ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "  ,                        !- Surface NameAngle Factor List Name",
+        "  Work Eff Sched,          !- Work Efficiency Schedule Name",
+        "  ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
+        "  ,                        !- Clothing Insulation Calculation Method Schedule Name",
+        "  Clothing Schedule,       !- Clothing Insulation Schedule Name",
+        "  Air Velocity Schedule,   !- Air Velocity Schedule Name",
+        "  Fanger;                  !- Thermal Comfort Model 1 Type",
+        " ",
+        "Schedule:Compact,",
+        "  Core_bottom Occupancy,   !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: Alldays,            !- Field 2",
+        "  Until: 07:00,            !- Field 3",
+        "  0,                       !- Field 4",
+        "  Until: 21:00,            !- Field 13",
+        "  1,                       !- Field 14",
+        "  Until: 24:00,            !- Field 15",
+        "  0;                       !- Field 16",
+        " ",
+        "Schedule:Compact,",
+        "  Core_bottom Activity,    !- Name",
+        "  Activity Level,          !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: Alldays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  166;                     !- Field 4",
+        " ",
+        "Schedule:Compact,",
+        "  Work Eff Sched,          !- Name",
+        "  Dimensionless,           !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  0;                       !- Field 4",
+        " ",
+        "Schedule:Compact,",
+        "  Clothing Schedule,       !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  0.5;                     !- Field 4",
+        " ",
+        "Schedule:Compact,",
+        "  Air Velocity Schedule,   !- Name",
+        "  Velocity,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  0.129999995231628;       !- Field 4",
+        " ",
+        "ZoneControl:Thermostat,",
+        "  Core_bottom Thermostat,  !- Name",
+        "  Core_bottom,             !- Zone or ZoneList Name",
+        "  Dual Zone Control Type Sched,  !- Control Type Schedule Name",
+        "  ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
+        "  Core_bottom DualSPSched; !- Control 1 Name",
+        " ",
+        "ZoneControl:Thermostat:ThermalComfort,",
+        "  Core_bottom Comfort,     !- Name",
+        "  Core_bottom,             !- Zone or ZoneList Name",
+        "  SpecificObject,          !- Averaging Method",
+        "  Core_bottom People,      !- Specific People Name",
+        "  0,                       !- Minimum DryBulb Temperature Setpoint",
+        "  50,                      !- Maximum DryBulb Temperature Setpoint",
+        "  Comfort Control,         !- Thermal Comfort Control Type Schedule Name",
+        "  ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating,    !- Thermal Comfort Control 1 Object Type",
+        "  Single Htg PMV,          !- Thermal Comfort Control 1 Name",
+        "  ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling,    !- Thermal Comfort Control 2 Object Type",
+        "  Single Cooling PMV;      !- Thermal Comfort Control 2 Name,",
+        " ",
+        "Schedule:Compact,",
+        "  Comfort Control,          !- Name",
+        "  Control Type,             !- Schedule Type Limits Name",
+        "  Through: 5/31,            !- Field 1",
+        "  For: AllDays,             !- Field 2",
+        "  Until: 24:00,             !- Field 3",
+        "  1,                        !- Field 4",
+        "  Through: 8/31,            !- Field 5",
+        "  For: AllDays,             !- Field 6",
+        "  Until: 24:00,             !- Field 7",
+        "  2,                        !- Field 8",
+        "  Through: 12/31,           !- Field 9",
+        "  For: AllDays,             !- Field 10",
+        "  Until: 24:00,             !- Field 11",
+        "  1;                        !- Field 12",
+        " ",
+        "THERMOSTATSETPOINT:THERMALCOMFORT:FANGER:SINGLEHEATING,",
+        "  Single Htg PMV,          !- Name",
+        "  Single Htg PMV;          !- Fanger Thermal Comfort Schedule Name",
+        " ",
+        "THERMOSTATSETPOINT:THERMALCOMFORT:FANGER:SINGLECOOLING,",
+        "  Single Cooling PMV,      !- Name",
+        "  Single Cooling PMV;      !- Fanger Thermal Comfort Schedule Name",
+        " ",
+        "Schedule:Constant,",
+        "  Dual Zone Control Type Sched,  !- Name",
+        "  Control Type,            !- Schedule Type Limits Name",
+        "  4;                       !- Field 1",
+        " ",
+        "ThermostatSetpoint:DualSetpoint,",
+        "  Core_bottom DualSPSched, !- Name",
+        "  HTGSETP_SCH,             !- Heating Setpoint Temperature Schedule Name",
+        "  CLGSETP_SCH;             !- Cooling Setpoint Temperature Schedule Name",
+        " ",
+        "Schedule:Constant,",
+        "  CLGSETP_SCH,             !- Name",
+        "  Temperature,             !- Schedule Type Limits Name",
+        "  24.0;                    !- Field 1",
+        " ",
+        "Schedule:Constant,",
+        "  HTGSETP_SCH,             !- Name",
+        "  Temperature,             !- Schedule Type Limits Name",
+        "  20.0;                    !- Field 1",
+        " ",
+        "Schedule:Compact,",
+        "  Single Htg PMV,          !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 6:00,             !- Field 3",
+        "  -0.5,                    !- Field 4",
+        "  Until: 23:00,            !- Field 5",
+        "  -0.2,                    !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  -0.5;                    !- Field 8",
+        " ",
+        "Schedule:Compact,",
+        "  Single Cooling PMV,      !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 6:00,             !- Field 3",
+        "  0.5,                     !- Field 4",
+        "  Until: 23:00,            !- Field 5",
+        "  0.2,                     !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  0.5;                     !- Field 8",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Fraction,                 !- Name",
+        "  0,                        !- Lower Limit Value",
+        "  1,                        !- Upper Limit Value",
+        "  Continuous,               !- Numeric Type",
+        "  Dimensionless;            !- Unit Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Temperature,              !- Name",
+        "  -60,                      !- Lower Limit Value",
+        "  200,                      !- Upper Limit Value",
+        "  Continuous,               !- Numeric Type",
+        "  Temperature;              !- Unit Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Control Type,             !- Name",
+        "  0,                        !- Lower Limit Value",
+        "  4,                        !- Upper Limit Value",
+        "  Discrete,                 !- Numeric Type",
+        "  Dimensionless;            !- Unit Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  On/Off,                   !- Name",
+        "  0,                        !- Lower Limit Value",
+        "  1,                        !- Upper Limit Value",
+        "  Discrete,                 !- Numeric Type",
+        "  Dimensionless;            !- Unit Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Any Number,               !- Name",
+        "  ,                         !- Lower Limit Value",
+        "  ,                         !- Upper Limit Value",
+        "  Continuous;               !- Numeric Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Velocity,                 !- Name",
+        "  ,                         !- Lower Limit Value",
+        "  ,                         !- Upper Limit Value",
+        "  Continuous,               !- Numeric Type",
+        "  Velocity;                 !- Unit Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Activity Level,           !- Name",
+        "  0,                        !- Lower Limit Value",
+        "  ,                         !- Upper Limit Value",
+        "  Continuous,               !- Numeric Type",
+        "  ActivityLevel;            !- Unit Type",
+        " ",
+        "ScheduleTypeLimits,",
+        "  Dimensionless,            !- Name",
+        "  -1,                       !- Lower Limit Value",
+        "  1,                        !- Upper Limit Value",
+        "  Continuous;               !- Numeric Type",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false); // If errors detected in input
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    state->dataEnvrn->DayOfYear_Schedule = 1;      // must initialize this to get schedules initialized
+    state->dataEnvrn->DayOfWeek = 1;               // must initialize this to get schedules initialized
+    state->dataGlobal->HourOfDay = 1;              // must initialize this to get schedules initialized
+    state->dataGlobal->TimeStep = 1;               // must initialize this to get schedules initialized
+    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/HeatBalanceKivaManagerOSkyTest.epw";
+    km.setupKivaInstances(*state);
+    EXPECT_FALSE(has_err_output());
+}
+
 TEST_F(EnergyPlusFixture, OpaqueSkyCover_InterpretWeatherMissingOpaqueSkyCover)
 {
 
