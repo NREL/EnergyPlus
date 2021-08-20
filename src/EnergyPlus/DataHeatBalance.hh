@@ -896,24 +896,41 @@ namespace DataHeatBalance {
         Real64 BasicStackCoefficient; // "Cs" Stack coefficient
         Real64 BasicWindCoefficient;  // "Cw" wind coefficient
         // Flow Coefficient, AIM-2, Walker and Wilson terms
-        Real64 FlowCoefficient;      // "c" Flow coefficient
-        Real64 AIM2StackCoefficient; // "Cs" stack coefficient
-        Real64 AIM2WindCoefficient;  // "Cw" wind coefficient
-        Real64 PressureExponent;     // "n" pressure power law exponent
-        Real64 ShelterFactor;        // "s" shelter factor
-        bool EMSOverrideOn;          // if true then EMS is requesting to override
-        Real64 EMSAirFlowRateValue;  // value EMS is setting for air flow rate
-        bool QuadratureSum;          // If quadrature sum of zone air balance method is used
-        int OABalancePtr;            // A pointer to ZoneAirBalance If quadrature is true
-        Real64 VolumeFlowRate;       // infiltration air volume flow rate
-        Real64 MassFlowRate;         // infiltration air mass flow rate
+        Real64 FlowCoefficient;       // "c" Flow coefficient
+        Real64 AIM2StackCoefficient;  // "Cs" stack coefficient
+        Real64 AIM2WindCoefficient;   // "Cw" wind coefficient
+        Real64 PressureExponent;      // "n" pressure power law exponent
+        Real64 ShelterFactor;         // "s" shelter factor
+        bool EMSOverrideOn;           // if true then EMS is requesting to override
+        Real64 EMSAirFlowRateValue;   // value EMS is setting for air flow rate
+        bool QuadratureSum;           // If quadrature sum of zone air balance method is used
+        int OABalancePtr;             // A pointer to ZoneAirBalance If quadrature is true
+        Real64 VolumeFlowRate;        // infiltration air volume flow rate
+        Real64 MassFlowRate;          // infiltration air mass flow rate
+        Real64 MCpI_temp;             // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
+        Real64 InfilHeatGain;         // Heat Gain {J} due to infiltration
+        Real64 InfilHeatLoss;         // Heat Loss {J} due to infiltration
+        Real64 InfilLatentGain;       // Latent Gain {J} due to infiltration
+        Real64 InfilLatentLoss;       // Latent Loss {J} due to infiltration
+        Real64 InfilTotalGain;        // Total Gain {J} due to infiltration (sensible+latent)
+        Real64 InfilTotalLoss;        // Total Loss {J} due to infiltration (sensible+latent)
+        Real64 InfilVolumeCurDensity; // Volume of Air {m3} due to infiltration at current zone air density
+        Real64 InfilVolumeStdDensity; // Volume of Air {m3} due to infiltration at standard density (adjusted for elevation)
+        Real64 InfilVdotCurDensity;   // Volume flow rate of Air {m3/s} due to infiltration at current zone air density
+        Real64 InfilVdotStdDensity;   // Volume flow rate of Air {m3/s} due to infiltration standard density (adjusted elevation)
+        Real64 InfilMdot;             // Mass flow rate {kg/s} due to infiltration for reporting
+        Real64 InfilMass;             // Mass of Air {kg} due to infiltration
+        Real64 InfilAirChangeRate;    // Infiltration air change rate {ach}
 
         // Default Constructor
         InfiltrationData()
             : ZonePtr(0), SchedPtr(0), ModelType(0), DesignLevel(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0),
               VelocitySQTermCoef(0.0), LeakageArea(0.0), BasicStackCoefficient(0.0), BasicWindCoefficient(0.0), FlowCoefficient(0.0),
               AIM2StackCoefficient(0.0), AIM2WindCoefficient(0.0), PressureExponent(0.0), ShelterFactor(0.0), EMSOverrideOn(false),
-              EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0), MassFlowRate(0.0)
+              EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0), MassFlowRate(0.0), MCpI_temp(0.0),
+              InfilHeatGain(0.0), InfilHeatLoss(0.0), InfilLatentGain(0.0), InfilLatentLoss(0.0), InfilTotalGain(0.0), InfilTotalLoss(0.0),
+              InfilVolumeCurDensity(0.0), InfilVolumeStdDensity(0.0), InfilVdotCurDensity(0.0), InfilVdotStdDensity(0.0), InfilMdot(0.0),
+              InfilMass(0.0), InfilAirChangeRate(0.0)
         {
         }
     };
