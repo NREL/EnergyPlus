@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -650,6 +651,12 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 {
     Kiva::setMessageCallback(kivaErrorCallback, nullptr);
     bool ErrorsFound = false;
+
+    // Need to process People objects before getting air setpoints for thermal comfort calculations
+    if (state.dataInternalHeatGains->GetInternalHeatGainsInputFlag) {
+        InternalHeatGains::GetInternalHeatGainsInput(state);
+        state.dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
+    }
 
     if (state.dataZoneCtrls->GetZoneAirStatsInputFlag) {
         ZoneTempPredictorCorrector::GetZoneAirSetPoints(state);
