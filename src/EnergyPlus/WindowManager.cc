@@ -3940,9 +3940,6 @@ namespace WindowManager {
                 // removed by FCW, 3/4/03
                 //! fw if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
             }
-            // todo - adjusted outermost and innermost hRad here as conv coeff ratio is calculated based on Hc_total = Hc_Rad + Hc_Conv
-            //            hr(1) *= state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum);
-            //            hr(state.dataWindowManager->nglface) *= state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum);
 
             // call for new interior film coeff (since it is temperature dependent) if using Detailed inside coef model
             if (((state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == 0) &&
