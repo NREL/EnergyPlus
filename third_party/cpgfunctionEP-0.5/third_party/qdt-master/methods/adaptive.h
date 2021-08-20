@@ -2,6 +2,7 @@
 #define _QDT_ADAPTIVE_H_
 
 #include "../common/method.h"
+#include <algorithm>
 #include <cmath>
 #include <type_traits>
 
