@@ -3158,7 +3158,6 @@ namespace WindowManager {
     //****************************************************************************
 
     void GetHeatBalanceEqCoefMatrixSimple(EnergyPlusData &state,
-                                          Real64 const adjRatio,     // Convective and radiative coefficient adjustment ratio
                                           int const nglasslayer,     // Number of glass layers
                                           Array1D<Real64> const &hr, // Radiative conductance (W/m2-K)
                                           Array1A<Real64> &hgap,     // Gap gas conductive conductance (W/m2-K)
@@ -3173,14 +3172,14 @@ namespace WindowManager {
 
         if (nglasslayer == 1) {
             Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
-                       state.dataWindowManager->hcout * adjRatio * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace(1);
+                       state.dataWindowManager->hcout * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace(1);
             Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) +
-                       state.dataWindowManager->hcin * adjRatio * state.dataWindowManager->tin + state.dataWindowManager->AbsRadGlassFace(2);
+                       state.dataWindowManager->hcin * state.dataWindowManager->tin + state.dataWindowManager->AbsRadGlassFace(2);
 
-            Aface(1, 1) = hr(1) * adjRatio + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * adjRatio;
+            Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout;
             Aface(2, 1) = -state.dataWindowManager->scon(1);
             Aface(1, 2) = -state.dataWindowManager->scon(1);
-            Aface(2, 2) = hr(2) * adjRatio + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * adjRatio;
+            Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin;
 
         } else if (nglasslayer == 2) {
             WindowGasConductance(state, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, con, pr, gr);
@@ -3944,6 +3943,11 @@ namespace WindowManager {
                 //! fw if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
                 hrprev(i) = hr(i);
             }
+            // adjusted outermost and innermost hRad here as conv coeff ratio is calculated based on Hc_total = Hc_Rad + Hc_Conv)
+            //            hr(1) *= state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum);
+            //            hrprev(1) = hr(1);
+            //            hr(state.dataWindowManager->nglface) *= state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum);
+            //            hrprev(state.dataWindowManager->nglface) = hr(state.dataWindowManager->nglface);
 
             // call for new interior film coeff (since it is temperature dependent) if using Detailed inside coef model
             if (((state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == 0) &&
@@ -7182,7 +7186,7 @@ namespace WindowManager {
         if ((WinterSummerFlag == 1)) {
             if (inputU > 0) {
                 state.dataHeatBal->CoeffAdjRatio(ConstrNum) = inputU / NominalConductance;
-                NominalConductance = NominalConductance * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+                NominalConductance = inputU;
             }
         }
         // EPTeam - again -- believe that is enforced in input //Autodesk But this routine is not self-protecting: Add as an assert
@@ -7291,12 +7295,15 @@ namespace WindowManager {
 
         while (iter < MaxIterations && errtemp > errtemptol) {
             for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
-
-                // todo - hr to be adjusted
                 hr(i) = state.dataWindowManager->emis(i) * state.dataWindowManager->sigma * pow_3(state.dataWindowManager->thetas(i));
                 //! fw 3/4/03 if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
                 hrprev(i) = hr(i);
             }
+            // adjusted outermost and innermost hRad here as conv coeff ratio is calculated based on Hc_total = Hc_Rad + Hc_Conv)
+            //            hr(1) *= state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+            //            hrprev(1) = hr(1);
+            //            hr(state.dataWindowManager->nglface) *= state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+            //            hrprev(state.dataWindowManager->nglface) = hr(state.dataWindowManager->nglface);
 
             Aface = 0.0;
             Bface = 0.0;
@@ -7336,8 +7343,7 @@ namespace WindowManager {
             ++iter;
 
             auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
-            Real64 adjRatio = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
-            GetHeatBalanceEqCoefMatrixSimple(state, adjRatio, SELECT_CASE_var, hr, hgap, Aface, Bface);
+            GetHeatBalanceEqCoefMatrixSimple(state, SELECT_CASE_var, hr, hgap, Aface, Bface);
 
             LUdecomposition(state, Aface, state.dataWindowManager->nglface, indx,
                             d); // Note that these routines change Aface;

@@ -576,6 +576,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
     state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
 
+    // todo
     state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
     state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.allocate(3);
     state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0;
@@ -2852,62 +2853,6 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     EXPECT_NEAR(-24.9342, state->dataHeatBalSurf->QHeatEmiReport(surfNum2), 3);
 }
 
-TEST_F(EnergyPlusFixture, WindowManager_updateQdotConvRadOutRepTest)
-{
-    state->dataHeatBalSurf->QdotConvOutRep.allocate(1);
-    state->dataHeatBalSurf->QdotConvOutRepPerArea.allocate(1);
-    state->dataHeatBalSurf->QConvOutReport.allocate(1);
-    state->dataHeatBalSurf->QdotRadOutRep.allocate(1);
-    state->dataHeatBalSurf->QdotRadOutRepPerArea.allocate(1);
-    state->dataHeatBalSurf->QRadOutReport.allocate(1);
-    state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs.allocate(1);
-    state->dataHeatBalSurf->QAirExtReport.allocate(1);
-    state->dataHeatBalSurf->QHeatEmiReport.allocate(1);
-
-    int SurfNum = 1;
-    Real64 Tsout = 255.2;
-    state->dataSurface->Surface.allocate(1);
-    state->dataSurface->Surface(SurfNum).Area = 10.0;
-    state->dataWindowManager->hcout = 4.7;
-    state->dataWindowManager->tout = 257.6;
-    state->dataGlobal->TimeStepZoneSec = 900.0;
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(1);
-    Real64 adjRatioDefault = 1.0;
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) = adjRatioDefault;
-    Real64 rad_out_per_area = -11.1;
-    Real64 rad_out_air_per_area = -11.1;
-
-    // compute reporting values with the default adjustment ratio, 1.0
-    updateQdotConvOutRep(*state, SurfNum, Tsout);
-    updateQdotRadOutRepHeatEmi(*state, SurfNum, Tsout, rad_out_per_area, rad_out_air_per_area);
-
-    // gather the reporting values using the default adjustment ratio
-    Real64 QdotConvOutRepOld = state->dataHeatBalSurf->QdotConvOutRep(SurfNum);
-    Real64 QdotConvOutRepPerAreaOld = state->dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum);
-    Real64 QConvOutReportOld = state->dataHeatBalSurf->QConvOutReport(SurfNum);
-    Real64 QdotRadOutRepOld = state->dataHeatBalSurf->QdotRadOutRep(SurfNum);
-    Real64 QdotRadOutRepPerAreaOld = state->dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum);
-    Real64 QRadOutReportOld = state->dataHeatBalSurf->QRadOutReport(SurfNum);
-    Real64 QAirExtReportOld = state->dataHeatBalSurf->QAirExtReport(SurfNum);
-    Real64 QHeatEmiReportOld = state->dataHeatBalSurf->QHeatEmiReport(SurfNum);
-
-    // compute the reporting values with a non-default adjustment ratio, 1.3 here
-    Real64 adjRatioNonDefault = 1.3;
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) = adjRatioNonDefault;
-    updateQdotConvOutRep(*state, SurfNum, Tsout);
-    updateQdotRadOutRepHeatEmi(*state, SurfNum, Tsout, rad_out_per_area, rad_out_air_per_area);
-
-    // compare whether the reporting values are correctly adjusted
-    EXPECT_NEAR(QdotConvOutRepOld * adjRatioNonDefault, state->dataHeatBalSurf->QdotConvOutRep(SurfNum), 0.001);
-    EXPECT_NEAR(QdotConvOutRepPerAreaOld * adjRatioNonDefault, state->dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum), 0.001);
-    EXPECT_NEAR(QConvOutReportOld * adjRatioNonDefault, state->dataHeatBalSurf->QConvOutReport(SurfNum), 0.001);
-    EXPECT_NEAR(QdotRadOutRepOld * adjRatioNonDefault, state->dataHeatBalSurf->QdotRadOutRep(SurfNum), 0.001);
-    EXPECT_NEAR(QdotRadOutRepPerAreaOld * adjRatioNonDefault, state->dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum), 0.001);
-    EXPECT_NEAR(QRadOutReportOld * adjRatioNonDefault, state->dataHeatBalSurf->QRadOutReport(SurfNum), 0.001);
-    EXPECT_NEAR(QAirExtReportOld * adjRatioNonDefault, state->dataHeatBalSurf->QAirExtReport(SurfNum), 0.001);
-    EXPECT_NEAR(QHeatEmiReportOld * adjRatioNonDefault, state->dataHeatBalSurf->QHeatEmiReport(SurfNum), 0.001);
-}
-
 TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
 {
 
@@ -3121,59 +3066,6 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
         // expect adjustment ratio equal to 1
         EXPECT_EQ(state->dataHeatBal->CoeffAdjRatio(ConstrNum), 1.0);
     }
-}
-
-TEST_F(EnergyPlusFixture, WindowManger_AdjRatioWindowTempNominalTest)
-{
-    state->dataWindowManager->ngllayer = 1;
-    state->dataWindowManager->nglface = 2 * state->dataWindowManager->ngllayer;
-
-    state->dataWindowManager->emis(1) = 0.84;
-    state->dataWindowManager->emis(2) = 0.84;
-    state->dataWindowManager->hcout = 4.7;
-    state->dataWindowManager->hcin = 0.83;
-    state->dataWindowManager->scon(1) = 142.4;
-    state->dataWindowManager->tout = 257.6;
-    state->dataWindowManager->tin = 294.0;
-    state->dataWindowManager->sigma = 0.0;
-    state->dataWindowManager->Outir = state->dataWindowManager->sigma * pow_4(state->dataWindowManager->tout);
-    state->dataWindowManager->Rmir = 424.0;
-    state->dataWindowManager->AbsRadGlassFace(1) = 0.0;
-    state->dataWindowManager->AbsRadGlassFace(2) = 0.0;
-    state->dataWindowManager->hr(1) = 0.95;
-    state->dataWindowManager->hr(2) = 0.95;
-
-    auto &Aface = state->dataWindowManager->Aface;
-    auto &Bface = state->dataWindowManager->Bface;
-    Array2D<Real64> AfaceNoAdj;
-    Array1D<Real64> BfaceNoAdj;
-    Array1D<Real64> hr = state->dataWindowManager->hr;
-    Array1A<Real64> hgap = state->dataWindowManager->hgap;
-
-    // compute heat balance equation coefficient with default adjustment ratio
-    Real64 adjRatioDefault = 1.0;
-    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, adjRatioDefault, 1, hr, hgap, Aface, Bface);
-
-    AfaceNoAdj = Aface;
-    BfaceNoAdj = Bface;
-
-    // compute heat balance equation coefficient with non-default adjustment ratio, 1.5
-    Real64 adjRatioNonDefault = 1.5;
-    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, adjRatioNonDefault, 1, hr, hgap, Aface, Bface);
-
-    // compare the adjustment ratio before and after adjustment
-    EXPECT_EQ(AfaceNoAdj(2, 1), state->dataWindowManager->Aface(2, 1));
-    EXPECT_EQ(AfaceNoAdj(1, 2), state->dataWindowManager->Aface(1, 2));
-    // fixme: adjust the following for the changed hr(i)
-    EXPECT_NEAR((state->dataWindowManager->Aface(1, 1) - AfaceNoAdj(1, 1)) / (state->dataWindowManager->hcout + hr(1)), adjRatioNonDefault - 1.0, 0.001);
-    EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / (state->dataWindowManager->hcin + hr(2)), adjRatioNonDefault - 1.0, 0.01);
-    EXPECT_NEAR((state->dataWindowManager->Bface(1) - BfaceNoAdj(1)) / (state->dataWindowManager->hcout * state->dataWindowManager->tout),
-                adjRatioNonDefault - 1.0,
-                0.001);
-    EXPECT_NEAR((state->dataWindowManager->Bface(2) - BfaceNoAdj(2)) / (state->dataWindowManager->hcin * state->dataWindowManager->tin),
-                adjRatioNonDefault - 1.0,
-                0.001);
-    // fixme: integrate in the tests for other branches if there's already some in existing test cases for WindowTempsForNominalCond
 }
 
 TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)

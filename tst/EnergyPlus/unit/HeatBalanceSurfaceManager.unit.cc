@@ -1325,6 +1325,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
 
     // Set up
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
+
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
@@ -1895,6 +1898,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
 
     // Set up
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
+
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
@@ -2474,6 +2480,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = -0.1;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 0.1;
+
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.dimension(6, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(6, 1.0);
 
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
