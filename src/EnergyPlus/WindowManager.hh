@@ -387,6 +387,15 @@ namespace WindowManager {
                                int &errFlag                // Error flag
     );
 
+    void EvalNominalWindowCond(EnergyPlusData &state,
+                               int const AbsBeamShadeNorm,        // Shade solar absorptance at normal incidence
+                               Array1D<Real64> const AbsBeamNorm, // Beam absorptance at normal incidence for each glass layer
+                               Array1D<Real64> const hgap,        // Conductive gap conductance [W/m2-K]
+                               Real64 &NominalConductance,        // Nominal center-of-glass conductance, including air films
+                               Real64 &SHGC,                      // Nominal center-of-glass solar heat gain coefficient for
+                               Real64 &TSolNorm                   // Overall beam solar transmittance at normal incidence
+    );
+
     //****************************************************************************
 
     void WindowTempsForNominalCond(EnergyPlusData &state,

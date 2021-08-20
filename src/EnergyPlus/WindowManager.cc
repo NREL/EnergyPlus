@@ -6722,14 +6722,14 @@ namespace WindowManager {
         int ICoeff;      // Gas property coefficient index
 
         Real64 BeamSolarInc; // Incident beam radiation at zero angle of incidence (W/m2)
-        Real64 hOutRad;      // Radiative conductance of outside and inside airfilm [W/m2-K]
-        Real64 hInRad;
-        Real64 rOut; // Combined radiative and conductive outside and inside film
-        Real64 rIn;
+                             //        Real64 hOutRad;      // Radiative conductance of outside and inside airfilm [W/m2-K]
+                             //        Real64 hInRad;
+                             //        Real64 rOut; // Combined radiative and conductive outside and inside film
+                             //        Real64 rIn;
         //   resistance [m2-K/W]
         Array1D<Real64> hgap(5);        // Conductive gap conductance [W/m2-K]
-        Array1D<Real64> hGapTot(5);     // Combined radiative and conductive gap conductance [W/m2-K]
-        Real64 Rbare;                   // Nominal center-of-glass resistance without air films [m2-K/W]
+                                        //        Array1D<Real64> hGapTot(5);     // Combined radiative and conductive gap conductance [W/m2-K]
+                                        //        Real64 Rbare;                   // Nominal center-of-glass resistance without air films [m2-K/W]
         WinShadingType ShadeFlag;       // Shading flag
         Real64 ShadeRes;                // Thermal resistance of shade
         int MatOutside;                 // Material number of outside layer of construction
@@ -6784,8 +6784,8 @@ namespace WindowManager {
         Real64 AGlDiffBack; // Back diffuse solar absorptance of a glass layer
 
         // Autodesk:Uninit Initialize variables used uninitialized
-        Rbare = 0.0; // Autodesk:Uninit Force default initialization
-
+        //        Rbare = 0.0; // Autodesk:Uninit Force default initialization
+        NominalConductance = 0.0;
         errFlag = 0;
         TotLay = state.dataConstruction->Construct(ConstrNum).TotLayers;
         TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
@@ -7094,93 +7094,28 @@ namespace WindowManager {
 
         WindowTempsForNominalCond(state, ConstrNum, hgap);
 
-        // Get center-of-glass conductance and solar heat gain coefficient
-        // including inside and outside air films
-
-        hOutRad = state.dataWindowManager->emis(1) * state.dataWindowManager->sigma * 0.5 *
-                  pow_3(state.dataWindowManager->tout + state.dataWindowManager->thetas(1));
-        rOut = 1.0 / (hOutRad + state.dataWindowManager->hcout);
-        hInRad = state.dataWindowManager->emis(state.dataWindowManager->nglface) * state.dataWindowManager->sigma * 0.5 *
-                 pow_3(state.dataWindowManager->tin + state.dataWindowManager->thetas(state.dataWindowManager->nglface));
-        rIn = 1.0 / (hInRad + state.dataWindowManager->hcin);
-
         if (!ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) AbsBeamShadeNorm = 0.0;
 
-        {
-            auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
-
-            if (SELECT_CASE_var == 1) {
-                Rbare = 1.0 / state.dataWindowManager->scon(1);
-                state.dataWindowManager->Rtot = rOut + Rbare + rIn;
-                SHGC = AbsBeamNorm(1) * (rOut + (0.5 / state.dataWindowManager->scon(1))) /
-                       state.dataWindowManager->Rtot; // BG changed for CR7682 (solar absorbed in middle of layer)
-                SHGC += AbsBeamShadeNorm;
-                SHGC += TSolNorm;
-
-            } else if (SELECT_CASE_var == 2) {
-                hGapTot(1) = hgap(1) + std::abs(state.dataWindowManager->A23) * 0.5 *
-                                           pow_3(state.dataWindowManager->thetas(2) + state.dataWindowManager->thetas(3));
-                Rbare = 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon(2);
-                state.dataWindowManager->Rtot = rOut + Rbare + rIn;
-                SHGC = AbsBeamNorm(1) * (rOut + 0.5 / state.dataWindowManager->scon(1)) / state.dataWindowManager->Rtot +
-                       AbsBeamNorm(2) * (rOut + 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 0.5 / state.dataWindowManager->scon(2)) /
-                           state.dataWindowManager->Rtot; // CR7682
-                SHGC += AbsBeamShadeNorm;
-                SHGC += TSolNorm;
-
-            } else if (SELECT_CASE_var == 3) {
-                hGapTot(1) = hgap(1) + std::abs(state.dataWindowManager->A23) * 0.5 *
-                                           pow_3(state.dataWindowManager->thetas(2) + state.dataWindowManager->thetas(3));
-                hGapTot(2) = hgap(2) + std::abs(state.dataWindowManager->A45) * 0.5 *
-                                           pow_3(state.dataWindowManager->thetas(4) + state.dataWindowManager->thetas(5));
-                Rbare = 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon(2) + 1.0 / hGapTot(2) +
-                        1.0 / state.dataWindowManager->scon(3);
-                state.dataWindowManager->Rtot = rOut + Rbare + rIn;
-                SHGC = AbsBeamNorm(1) * (rOut + 0.5 / state.dataWindowManager->scon(1)) / state.dataWindowManager->Rtot +
-                       AbsBeamNorm(2) * (rOut + 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 0.5 / state.dataWindowManager->scon(2)) /
-                           state.dataWindowManager->Rtot +
-                       AbsBeamNorm(3) *
-                           (rOut + 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon(2) +
-                            1.0 / hGapTot(2) + 0.5 / state.dataWindowManager->scon(3)) /
-                           state.dataWindowManager->Rtot;
-                SHGC += AbsBeamShadeNorm;
-                SHGC += TSolNorm;
-
-            } else if (SELECT_CASE_var == 4) {
-                hGapTot(1) = hgap(1) + std::abs(state.dataWindowManager->A23) * 0.5 *
-                                           pow_3(state.dataWindowManager->thetas(2) + state.dataWindowManager->thetas(3));
-                hGapTot(2) = hgap(2) + std::abs(state.dataWindowManager->A45) * 0.5 *
-                                           pow_3(state.dataWindowManager->thetas(4) + state.dataWindowManager->thetas(5));
-                hGapTot(3) = hgap(3) + std::abs(state.dataWindowManager->A67) * 0.5 *
-                                           pow_3(state.dataWindowManager->thetas(6) + state.dataWindowManager->thetas(7));
-                Rbare = 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon(2) + 1.0 / hGapTot(2) +
-                        1.0 / state.dataWindowManager->scon(3) + 1.0 / hGapTot(3) + 1.0 / state.dataWindowManager->scon(4);
-                state.dataWindowManager->Rtot = rOut + Rbare + rIn;
-                SHGC = AbsBeamNorm(1) * (rOut + 0.5 / state.dataWindowManager->scon(1)) / state.dataWindowManager->Rtot +
-                       AbsBeamNorm(2) * (rOut + 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 0.5 / state.dataWindowManager->scon(2)) /
-                           state.dataWindowManager->Rtot +
-                       AbsBeamNorm(3) *
-                           (rOut + 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon(2) +
-                            1.0 / hGapTot(2) + 0.5 / state.dataWindowManager->scon(3)) /
-                           state.dataWindowManager->Rtot +
-                       AbsBeamNorm(4) *
-                           (rOut + 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon(2) +
-                            1.0 / hGapTot(2) + 1.0 / state.dataWindowManager->scon(3) + 1.0 / hGapTot(3) + 0.5 / state.dataWindowManager->scon(4)) /
-                           state.dataWindowManager->Rtot; // CR7682
-                SHGC += AbsBeamShadeNorm;
-                SHGC += TSolNorm;
-            }
-        }
-
-        NominalConductance = 1.0 / (rOut + Rbare + rIn);
+        // Get center-of-glass conductance and solar heat gain coefficient
+        // including inside and outside air films
         Real64 inputU = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
-        // only compute adjustment ratio when there is valid user input U
-        if ((WinterSummerFlag == 1)) {
-            if (inputU > 0) {
-                state.dataHeatBal->CoeffAdjRatio(ConstrNum) = inputU / NominalConductance;
-                NominalConductance = inputU;
+
+        if (WinterSummerFlag == 1 && inputU > 0) {
+            Real64 CoeffAdjRatio = 1;
+            Real64 hcinRated = state.dataWindowManager->hcin;
+            while (inputU - NominalConductance > 0.01) {
+                state.dataWindowManager->hcout *= CoeffAdjRatio;
+                state.dataWindowManager->hcin *= CoeffAdjRatio;
+                EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
+                // only compute adjustment ratio when there is valid user input U
+                CoeffAdjRatio = inputU / NominalConductance;
             }
+            // For each iteration, hcin / hcinRated == hcout / hcoutRated
+            state.dataHeatBal->CoeffAdjRatio(ConstrNum) = state.dataWindowManager->hcin / hcinRated;
+        } else {
+            EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
         }
+
         // EPTeam - again -- believe that is enforced in input //Autodesk But this routine is not self-protecting: Add as an assert
 
         // init the surface convective and radiative adjustment ratio
@@ -7197,6 +7132,90 @@ namespace WindowManager {
         }
     }
 
+    void EvalNominalWindowCond(EnergyPlusData &state,
+                               int const AbsBeamShadeNorm,        // Shade solar absorptance at normal incidence
+                               Array1D<Real64> const AbsBeamNorm, // Beam absorptance at normal incidence for each glass layer
+                               Array1D<Real64> const hgap,        // Conductive gap conductance [W/m2-K]
+                               Real64 &NominalConductance,        // Nominal center-of-glass conductance, including air films
+                               Real64 &SHGC,                      // Nominal center-of-glass solar heat gain coefficient for
+                               Real64 &TSolNorm                   // Overall beam solar transmittance at normal incidence
+    )
+    {
+        Array1D<Real64> hGapTot(5); // Combined radiative and conductive gap conductance [W/m2-K]
+
+        Real64 hOutRad = state.dataWindowManager->emis(1) * state.dataWindowManager->sigma * 0.5 *
+                         pow_3(state.dataWindowManager->tout + state.dataWindowManager->thetas(1));
+        Real64 rOut = 1.0 / (hOutRad + state.dataWindowManager->hcout);
+        Real64 hInRad = state.dataWindowManager->emis(state.dataWindowManager->nglface) * state.dataWindowManager->sigma * 0.5 *
+                        pow_3(state.dataWindowManager->tin + state.dataWindowManager->thetas(state.dataWindowManager->nglface));
+        Real64 rIn = 1.0 / (hInRad + state.dataWindowManager->hcin);
+        Real64 Rbare = 0;
+
+        auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
+
+        if (SELECT_CASE_var == 1) {
+            Rbare = 1.0 / state.dataWindowManager->scon(1);
+            state.dataWindowManager->Rtot = rOut + Rbare + rIn;
+            SHGC = AbsBeamNorm(1) * (rOut + (0.5 / state.dataWindowManager->scon(1))) /
+                   state.dataWindowManager->Rtot; // BG changed for CR7682 (solar absorbed in middle of layer)
+            SHGC += AbsBeamShadeNorm;
+            SHGC += TSolNorm;
+
+        } else if (SELECT_CASE_var == 2) {
+            hGapTot(1) = hgap(1) + std::abs(state.dataWindowManager->A23) * 0.5 *
+                                       pow_3(state.dataWindowManager->thetas(2) + state.dataWindowManager->thetas(3));
+            Rbare = 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon(2);
+            state.dataWindowManager->Rtot = rOut + Rbare + rIn;
+            SHGC = AbsBeamNorm(1) * (rOut + 0.5 / state.dataWindowManager->scon(1)) / state.dataWindowManager->Rtot +
+                   AbsBeamNorm(2) * (rOut + 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 0.5 / state.dataWindowManager->scon(2)) /
+                       state.dataWindowManager->Rtot; // CR7682
+            SHGC += AbsBeamShadeNorm;
+            SHGC += TSolNorm;
+
+        } else if (SELECT_CASE_var == 3) {
+            hGapTot(1) = hgap(1) + std::abs(state.dataWindowManager->A23) * 0.5 *
+                                       pow_3(state.dataWindowManager->thetas(2) + state.dataWindowManager->thetas(3));
+            hGapTot(2) = hgap(2) + std::abs(state.dataWindowManager->A45) * 0.5 *
+                                       pow_3(state.dataWindowManager->thetas(4) + state.dataWindowManager->thetas(5));
+            Rbare = 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon(2) + 1.0 / hGapTot(2) +
+                    1.0 / state.dataWindowManager->scon(3);
+            state.dataWindowManager->Rtot = rOut + Rbare + rIn;
+            SHGC = AbsBeamNorm(1) * (rOut + 0.5 / state.dataWindowManager->scon(1)) / state.dataWindowManager->Rtot +
+                   AbsBeamNorm(2) * (rOut + 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 0.5 / state.dataWindowManager->scon(2)) /
+                       state.dataWindowManager->Rtot +
+                   AbsBeamNorm(3) *
+                       (rOut + 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon(2) + 1.0 / hGapTot(2) +
+                        0.5 / state.dataWindowManager->scon(3)) /
+                       state.dataWindowManager->Rtot;
+            SHGC += AbsBeamShadeNorm;
+            SHGC += TSolNorm;
+
+        } else if (SELECT_CASE_var == 4) {
+            hGapTot(1) = hgap(1) + std::abs(state.dataWindowManager->A23) * 0.5 *
+                                       pow_3(state.dataWindowManager->thetas(2) + state.dataWindowManager->thetas(3));
+            hGapTot(2) = hgap(2) + std::abs(state.dataWindowManager->A45) * 0.5 *
+                                       pow_3(state.dataWindowManager->thetas(4) + state.dataWindowManager->thetas(5));
+            hGapTot(3) = hgap(3) + std::abs(state.dataWindowManager->A67) * 0.5 *
+                                       pow_3(state.dataWindowManager->thetas(6) + state.dataWindowManager->thetas(7));
+            Rbare = 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon(2) + 1.0 / hGapTot(2) +
+                    1.0 / state.dataWindowManager->scon(3) + 1.0 / hGapTot(3) + 1.0 / state.dataWindowManager->scon(4);
+            state.dataWindowManager->Rtot = rOut + Rbare + rIn;
+            SHGC = AbsBeamNorm(1) * (rOut + 0.5 / state.dataWindowManager->scon(1)) / state.dataWindowManager->Rtot +
+                   AbsBeamNorm(2) * (rOut + 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 0.5 / state.dataWindowManager->scon(2)) /
+                       state.dataWindowManager->Rtot +
+                   AbsBeamNorm(3) *
+                       (rOut + 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon(2) + 1.0 / hGapTot(2) +
+                        0.5 / state.dataWindowManager->scon(3)) /
+                       state.dataWindowManager->Rtot +
+                   AbsBeamNorm(4) *
+                       (rOut + 1.0 / state.dataWindowManager->scon(1) + 1.0 / hGapTot(1) + 1.0 / state.dataWindowManager->scon(2) + 1.0 / hGapTot(2) +
+                        1.0 / state.dataWindowManager->scon(3) + 1.0 / hGapTot(3) + 0.5 / state.dataWindowManager->scon(4)) /
+                       state.dataWindowManager->Rtot; // CR7682
+            SHGC += AbsBeamShadeNorm;
+            SHGC += TSolNorm;
+        }
+        NominalConductance = 1.0 / (rOut + Rbare + rIn);
+    }
     //****************************************************************************
 
     void WindowTempsForNominalCond(EnergyPlusData &state,

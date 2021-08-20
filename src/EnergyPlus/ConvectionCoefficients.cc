@@ -4104,11 +4104,13 @@ void CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
     // EMS override point (Violates Standard 15099?  throw warning? scary.
     if (state.dataSurface->SurfEMSOverrideIntConvCoef(SurfNum))
         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
+    else
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) *= state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum);
 
     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
     if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
-    state.dataHeatBalSurf->SurfHConvInt(SurfNum) *= state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum);
+
 }
 
 void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
