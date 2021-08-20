@@ -955,13 +955,14 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                         std::string_view NFRCname = DataSurfaces::NfrcProductName[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                         const auto windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                         const auto windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        const auto vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
 
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemNfrcType, surfName, NFRCname);
 
                         double uValueRep{0.1};
                         double shgcRep{0.1};
                         double vtRep{0.1};
-                        GetWindowAssemblyNfrcForReport(state, iSurf, windowWidth, windowHeight, uValueRep, shgcRep, vtRep);
+                        GetWindowAssemblyNfrcForReport(state, iSurf, windowWidth, windowHeight, vision, uValueRep, shgcRep, vtRep);
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemUfact, surfName, uValueRep, 3);
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemSHGC, surfName, shgcRep, 3);
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAssemVisTr, surfName, vtRep, 3);

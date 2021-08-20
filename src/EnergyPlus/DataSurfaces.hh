@@ -821,6 +821,26 @@ namespace DataSurfaces {
         1.500                //  VerticalSlider,
     };
 
+    enum class NfrcVisionType : int
+    {
+        Unassigned = -1,
+        Single,
+        DualVertical,
+        DualHorizontal,
+        Num
+    };
+
+    constexpr std::array<NfrcVisionType, static_cast<int>(NfrcProductOptions::Num)> NfrcVision = {
+        NfrcVisionType::DualHorizontal, NfrcVisionType::Single,         NfrcVisionType::DualVertical,   //  CasementDouble,  CasementSingle,    DualAction,
+        NfrcVisionType::Single,         NfrcVisionType::Single,         NfrcVisionType::Single,         //  Fixed,           Garage,            Greenhouse,
+        NfrcVisionType::Single,         NfrcVisionType::DualHorizontal, NfrcVisionType::Single,         //  HingedEscape,    HorizontalSlider,  Jal,
+        NfrcVisionType::Single,         NfrcVisionType::Single,         NfrcVisionType::DualHorizontal, //  Pivoted,         ProjectingSingle,  ProjectingDual,
+        NfrcVisionType::Single,         NfrcVisionType::Single,         NfrcVisionType::DualHorizontal, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
+        NfrcVisionType::Single,         NfrcVisionType::Single,         NfrcVisionType::Single,         //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
+        NfrcVisionType::Single,         NfrcVisionType::Single,         NfrcVisionType::Single,         //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
+        NfrcVisionType::DualVertical                                                                    //  VerticalSlider
+    };
+
 
     struct FrameDividerProperties
     {

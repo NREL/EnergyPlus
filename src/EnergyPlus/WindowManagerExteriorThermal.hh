@@ -100,8 +100,14 @@ namespace WindowManager {
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     );
 
-    void GetWindowAssemblyNfrcForReport(
-        EnergyPlusData &state, int const surfNum, double windowWidth, double windowHeight, double &uvalue, double &shgc, double &vt);
+    void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
+                                        int const surfNum,
+                                        double windowWidth,
+                                        double windowHeight,
+                                        EnergyPlus::DataSurfaces::NfrcVisionType vision,
+                                        double &uvalue,
+                                        double &shgc,
+                                        double &vt);
 
     // Class that is used to create layers for Windows-CalcEngine
     class CWCEHeatTransferFactory

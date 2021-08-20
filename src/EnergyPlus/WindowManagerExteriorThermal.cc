@@ -56,6 +56,8 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+
 
 // Windows library headers
 #include <WCETarcog.hpp>
@@ -258,8 +260,14 @@ namespace WindowManager {
         }
     }
 
-     void GetWindowAssemblyNfrcForReport(
-        EnergyPlusData &state, int const surfNum, double windowWidth, double windowHeight, double &uvalue, double &shgc, double &vt)
+     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
+                                        int const surfNum,
+                                        double windowWidth,
+                                        double windowHeight,
+                                        EnergyPlus::DataSurfaces::NfrcVisionType vision,
+                                        double &uvalue,
+                                        double &shgc,
+                                        double &vt)
     {
         auto &surface(state.dataSurface->Surface(surfNum));
         auto frameDivider(state.dataSurface->FrameDivider(state.dataSurface->Surface(surfNum).FrameDivider));
@@ -290,18 +298,66 @@ namespace WindowManager {
             const auto tVis{0.6385};
             const auto tSol{0.371589958668};
 
-            auto window = Tarcog::ISO15099::WindowSingleVision(windowWidth, windowHeight, tVis, tSol, insulGlassUnit);
+            if (vision == EnergyPlus::DataSurfaces::NfrcVisionType::Single) {
+                auto window = Tarcog::ISO15099::WindowSingleVision(windowWidth, windowHeight, tVis, tSol, insulGlassUnit);
+                window.setFrameTop(frameData);
+                window.setFrameBottom(frameData);
+                window.setFrameLeft(frameData);
+                window.setFrameRight(frameData);
 
-            window.setFrameTop(frameData);
-            window.setFrameBottom(frameData);
-            window.setFrameLeft(frameData);
-            window.setFrameRight(frameData);
+                if (isSummer) {
+                    vt = window.uValue();
+                    shgc = window.shgc();
+                } else {
+                    uvalue = window.vt();
+                }
+            } else if (vision == EnergyPlus::DataSurfaces::NfrcVisionType::Single) {
+                auto window =
+                    Tarcog::ISO15099::DualVisionHorizontal(windowWidth, windowHeight, tVis, tSol, insulGlassUnit, tVis, tSol, insulGlassUnit);
+                window.setFrameLeft(frameData);
+                window.setFrameRight(frameData);
+                window.setFrameBottomLeft(frameData);
+                window.setFrameBottomRight(frameData);
+                window.setFrameTopLeft(frameData);
+                window.setFrameTopRight(frameData);
+                window.setFrameMeetingRail(frameData);
 
-            if (isSummer) {
-                vt = window.uValue();
-                shgc = window.shgc();
+                if (isSummer) {
+                    vt = window.uValue();
+                    shgc = window.shgc();
+                } else {
+                    uvalue = window.vt();
+                }
+            } else if (vision == EnergyPlus::DataSurfaces::NfrcVisionType::Single) {
+                auto window = 
+                    Tarcog::ISO15099::DualVisionVertical(windowWidth, windowHeight, tVis, tSol, insulGlassUnit, tVis, tSol, insulGlassUnit);
+                window.setFrameTop(frameData);
+                window.setFrameBottom(frameData);
+                window.setFrameTopLeft(frameData);
+                window.setFrameTopRight(frameData);
+                window.setFrameBottomLeft(frameData);
+                window.setFrameBottomRight(frameData);
+                window.setFrameMeetingRail(frameData);
+
+                if (isSummer) {
+                    vt = window.uValue();
+                    shgc = window.shgc();
+                } else {
+                    uvalue = window.vt();
+                }
             } else {
-                uvalue = window.vt();
+                auto window = Tarcog::ISO15099::WindowSingleVision(windowWidth, windowHeight, tVis, tSol, insulGlassUnit);
+                window.setFrameTop(frameData);
+                window.setFrameBottom(frameData);
+                window.setFrameLeft(frameData);
+                window.setFrameRight(frameData);
+
+                if (isSummer) {
+                    vt = window.uValue();
+                    shgc = window.shgc();
+                } else {
+                    uvalue = window.vt();
+                }
             }
         }
     }
