@@ -481,8 +481,7 @@ namespace DaylightingManager {
                                std::string const &mapName,
                                std::string const &environmentName,
                                int const ZoneNum,
-                               std::string const &refPt1,
-                               std::string const &refPt2,
+                               std::string const &refPts,
                                Real64 const zcoord);
 
 } // namespace DaylightingManager
@@ -701,7 +700,6 @@ struct DaylightingManagerData : BaseGlobalStruct
     Array1D_bool FirstTimeMaps;
     Array1D_bool EnvrnPrint;
     Array1D_string SavedMnDy;
-    Array2D_string RefPts;
     Array1D<Real64> XValue;
     Array1D<Real64> YValue;
     Array2D<Real64> IllumValue;
@@ -864,7 +862,6 @@ struct DaylightingManagerData : BaseGlobalStruct
         this->FirstTimeMaps.clear();
         this->EnvrnPrint.clear();
         this->SavedMnDy.clear();
-        this->RefPts.clear();
         this->XValue.clear();
         this->YValue.clear();
         this->IllumValue.clear();

@@ -384,6 +384,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                 CurArgs = CurArgs + 1
 
               ! If your original object starts with A, insert the rules here
+              CASE('AIRFLOWNETWORK:MULTIZONE:REFERENCECRACKCONDITIONS')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                  IF (InArgs(2) == Blank) THEN
+                  OutArgs(2)="20.0"
+                  END IF
+
+
               CASE('AIRLOOPHVAC:OUTDOORAIRSYSTEM')
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                   nodiff=.false.
@@ -391,7 +400,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   CurArgs = CurArgs - 1
 
               ! If your original object starts with C, insert the rules here
-              
+
               ! If your original object starts with D, insert the rules here
 
               ! If your original object starts with E, insert the rules here
@@ -399,6 +408,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with F, insert the rules here
 
               ! If your original object starts with G, insert the rules here
+
+          CASE('GROUNDHEATEXCHANGER:SYSTEM')
+              CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+              nodiff=.false.
+              OutArgs(1:9)=InArgs(1:9)
+              IF (CurArgs .gt. 9) THEN
+                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
+                  IF (InArgs(9) .eq. '') THEN
+                      OutArgs(10)='UHFCALC'
+                  ENDIF
+                  CurArgs=CurArgs+1
+              ENDIF
 
               ! If your original object starts with H, insert the rules here
 
@@ -417,7 +438,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with R, insert the rules here
 
               ! If your original object starts with S, insert the rules here
-
+              CASE('PERFORMANCEPRECISIONTRADEOFFS')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                  IF (MakeUPPERCase(InArgs(3)) == "MODE06") THEN
+                    OutArgs(3)='Mode07'
+                  ELSEIF (MakeUPPERCase(InArgs(3)) == "MODE07") THEN
+                    OutArgs(3)='Mode08'
+                  END IF
               ! If your original object starts with T, insert the rules here
 
               ! If your original object starts with U, insert the rules here

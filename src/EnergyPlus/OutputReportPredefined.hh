@@ -215,6 +215,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchMechType = 0;
     int pdchMechNomCap = 0;
     int pdchMechNomEff = 0;
+    int pdchMechRatCap = 0;
+    int pdchMechRatEff = 0;
     int pdchMechIPLVSI = 0;
     int pdchMechIPLVIP = 0;
 
