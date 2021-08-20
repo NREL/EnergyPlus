@@ -4110,7 +4110,6 @@ void CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
     if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
-
 }
 
 void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
