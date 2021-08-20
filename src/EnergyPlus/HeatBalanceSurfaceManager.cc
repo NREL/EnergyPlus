@@ -5676,7 +5676,7 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-            auto &surface(state.dataSurface->Surface(surfNum));
+            // auto &surface(state.dataSurface->Surface(surfNum));
             // Window heat gain/loss
             if (state.dataSurface->SurfWinHeatGain(surfNum) >= 0.0) {
                 state.dataSurface->SurfWinHeatGainRep(surfNum) = state.dataSurface->SurfWinHeatGain(surfNum);
