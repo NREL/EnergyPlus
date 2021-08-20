@@ -2174,7 +2174,7 @@ namespace HeatBalFiniteDiffManager {
 
         // Set the internal conditions to local variables
         Real64 const NetLWRadToSurfFD(
-            state.dataHeatBalSurf->SurfNetLWRadToSurf(Surf)); // Net interior long wavelength radiation to surface from other surfaces
+            state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(Surf)); // Net interior long wavelength radiation to surface from other surfaces
         Real64 const QRadSWInFD(state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(Surf)); // Short wave radiation absorbed on inside of opaque surface
         Real64 const QHtRadSysSurfFD(state.dataHeatBalFanSys->QHTRadSysSurf(
             Surf)); // Current radiant heat flux at a surface due to the presence of high temperature radiant heaters
@@ -2186,7 +2186,7 @@ namespace HeatBalFiniteDiffManager {
             Surf)); // Current radiant heat flux at a surface due to the presence of electric baseboard heaters
         Real64 const QCoolingPanelSurfFD(
             state.dataHeatBalFanSys->QCoolingPanelSurf(Surf)); // Current radiant heat flux at a surface due to the presence of simple cooling panels
-        Real64 const QRadThermInFD(state.dataHeatBal->SurfQRadThermInAbs(Surf)); // Thermal radiation absorbed on inside surfaces
+        Real64 const QRadThermInFD(state.dataHeatBal->SurfQdotRadIntGainsInPerArea(Surf)); // Thermal radiation absorbed on inside surfaces
 
         // Boundary Conditions from Simulation for Interior
         Real64 hconvi(state.dataMstBal->HConvInFD(Surf));

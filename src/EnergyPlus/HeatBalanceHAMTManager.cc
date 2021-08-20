@@ -1181,10 +1181,10 @@ namespace HeatBalanceHAMTManager {
         cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).htc = state.dataMstBal->HConvInFD(sid);
 
         cells(Intcell(sid)).Qadds = state.dataSurface->Surface(sid).Area *
-                                    (state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(sid) + state.dataHeatBalSurf->SurfNetLWRadToSurf(sid) +
+                                    (state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(sid) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(sid) +
                                      state.dataHeatBalFanSys->QHTRadSysSurf(sid) + state.dataHeatBalFanSys->QCoolingPanelSurf(sid) +
                                      state.dataHeatBalFanSys->QHWBaseboardSurf(sid) + state.dataHeatBalFanSys->QSteamBaseboardSurf(sid) +
-                                     state.dataHeatBalFanSys->QElecBaseboardSurf(sid) + state.dataHeatBal->SurfQRadThermInAbs(sid) +
+                                     state.dataHeatBalFanSys->QElecBaseboardSurf(sid) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(sid) +
                                      state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(sid));
         // Check, Is this per unit area or for the whole wall.
         //    cells(Intcell(sid))%Qadds=QRadSWInAbs(sid)+NetLWRadToSurf(sid)+QHtRadSysSurf(sid)+QRadThermInAbs(sid)

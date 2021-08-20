@@ -5264,7 +5264,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == ConvectionConstants::HcInt_FohannoPolidoriVerticalWall) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                Real64 QdotConvection = -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum);
+                Real64 QdotConvection = -state.dataHeatBalSurf->SurfQdotConvInPerArea(SurfNum);
                 Real64 WallHeight = state.dataSurface->SurfIntConvZoneWallHeight(SurfNum);
                 HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                     return CalcFohannoPolidoriVerticalWall(Tsurf - Tamb,
@@ -5278,7 +5278,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
                                                             (Tsurface - Tzone),
                                                             state.dataSurface->SurfIntConvZoneWallHeight(SurfNum),
                                                             Tsurface,
-                                                            -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum),
+                                                            -state.dataHeatBalSurf->SurfQdotConvInPerArea(SurfNum),
                                                             SurfNum);
             }
             state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
@@ -5366,7 +5366,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
     Kiva::ConvectionAlgorithm HnFn(KIVA_CONST_CONV(0.0));
 
     auto &Surface(state.dataSurface->Surface);
-    auto &QdotConvOutRepPerArea(state.dataHeatBalSurf->QdotConvOutRepPerArea);
+    auto &QdotConvOutRepPerArea(state.dataHeatBalSurf->SurfQdotConvOutPerArea);
     auto &TH(state.dataHeatBalSurf->TH);
 
     // first call Hn models

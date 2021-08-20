@@ -822,7 +822,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
             outir = state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNumAdj) +
                     state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNumAdj) + state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNumAdj) +
                     state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNumAdj) + state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNumAdj) +
-                    state.dataHeatBal->SurfQRadThermInAbs(SurfNumAdj);
+                    state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNumAdj);
 
         } else { // Exterior window (ExtBoundCond = 0)
                  // Calculate LWR from surrounding surfaces if defined for an exterior window
@@ -876,7 +876,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) +
            state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) + state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) +
            state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum) +
-           state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
+           state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum);
     TRMIN = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
 
     NL = state.dataWindowEquivLayer->CFS(EQLNum).NL;
