@@ -386,18 +386,21 @@ EnergyPlus's normal process of running the detailed layer-by-layer model, with t
 
 The simplified window model does not reuse all aspects of the detailed layer-by-layer model, in that the angular solar transmission properties use a different model when the simple window model is in effect. If the user takes the material properties of an equivalent glazing layer from the simple window model and then re-enters them into just the detailed model, then the performance will not be the same because of the angular transmission model will have changed. It is not proper use of the model to re-enter the equivalent layer's properties and expect the exact level of performance.
 
-There may not be exact agreement between the performance indices echoed out and
+There may not be an exact agreement between the performance indices echoed out and
 those input in the model. This is expected with the model and the result of a
-number of factors. For example, when there is conflict between the SHGC and the
-U that are not physical and compromises need to be made. In versions up till
+number of factors. For example, when there is a conflict between the SHGC and the
+U that are not physical and compromises need to be made. In the versions up till
 9.5.0, the reported U value is limited to no higher than about 5.8W/m\(^{2}\)\(\cdot\)K
 when input is allowed to go up to U-7 W/m\(^{2}\)\(\cdot\)K. In later versions,
-this mis-match of the input and the reported U-factors among exterior windows
+this mismatch of the input and the reported U-factors among exterior windows
 are resolved with the application of an adjustment ratio. The adjustment ratio
-is computed as a ratio between the input U and the initially computed nominal (or
-effective) U in function CalcNominalWindowCond. In general, the simple window
-model is intended to generate a physically-reasonable glazing that approximates
-the input entered as well as possible. But the model is not always be able to
+is computed iteratively. In each iteration, the nominal (or effective) U is
+re-evaluated, and the adjustment ratio at the current iteration is computed as
+a ratio between the input U and nominal U at the current iteration. The iterative
+process stops when the input U and the nominal U is close enough (with a less than
+0.01 W/m\(^{2}\)\(\cdot\)K difference). In general, the simple window
+model is intended to generate a physically reasonable glazing that approximates
+the input entered as well as possible. But the model is not always able to
 do exactly what is specified when the specifications are not physical.
 
 \subsubsection{References}\label{references-054}
