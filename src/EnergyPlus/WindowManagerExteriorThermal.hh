@@ -118,7 +118,7 @@ namespace WindowManager {
 
         // for assembly windoww reporting
         std::shared_ptr<Tarcog::ISO15099::CSystem> getTarcogSystemForReporting(EnergyPlusData &state, 
-            Real64 const t_HextConvCoeff, bool const useSummerConditions);
+            bool const useSummerConditions);
 
         // This special case of interior shade is necessary only because of strange calculation of heat flow on interior side
         // It probably needs to be removed since calculation is no different from any other case. It is left over from

@@ -357,31 +357,42 @@ namespace WindowManager {
             // films from ISO 15099 Section 8.2.2 Winter conditions
             double hExtConvCoeff = 20.0;
             double hIntConvCoeff = 3.6;
-            auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, hExtConvCoeff, false);
 
-            const double frameUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.FrameConductance, hIntConvCoeff, hExtConvCoeff);
-            const double centerOfGlassUvalue = insulGlassUnit->getUValue();
-            const double edgeUValue{centerOfGlassUvalue * frameDivider.FrEdgeToCenterGlCondRatio}; //not sure about this
+            for (bool isSummer : {false, true}) {
+                if (isSummer) {
+                    // films from ISO 15099 Section 8.2.3 Summer conditions
+                    hExtConvCoeff = 8.0;
+                    hIntConvCoeff = 2.5;
+                }
+                auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, isSummer);
 
-            const double projectedFrameDimension{frameDivider.FrameWidth};
-            const double wettedLength{projectedFrameDimension + frameDivider.FrameProjectionIn};
-            const double absorptance{frameDivider.FrameSolAbsorp};
+                const double frameUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.FrameConductance, hIntConvCoeff, hExtConvCoeff);
+                const double centerOfGlassUvalue = insulGlassUnit->getUValue();
+                const double edgeUValue{centerOfGlassUvalue * frameDivider.FrEdgeToCenterGlCondRatio}; // not sure about this
 
-            Tarcog::ISO15099::FrameData frameData{frameUvalue, edgeUValue, projectedFrameDimension, wettedLength, absorptance};
+                const double projectedFrameDimension{frameDivider.FrameWidth};
+                const double wettedLength{projectedFrameDimension + frameDivider.FrameProjectionIn};
+                const double absorptance{frameDivider.FrameSolAbsorp};
 
-            const auto tVis{0.6385};
-            const auto tSol{0.371589958668};
+                Tarcog::ISO15099::FrameData frameData{frameUvalue, edgeUValue, projectedFrameDimension, wettedLength, absorptance};
 
-            auto window = Tarcog::ISO15099::WindowSingleVision(windowWidth, windowHeight, tVis, tSol, insulGlassUnit);
+                const auto tVis{0.6385};
+                const auto tSol{0.371589958668};
 
-            window.setFrameTop(frameData);
-            window.setFrameBottom(frameData);
-            window.setFrameLeft(frameData);
-            window.setFrameRight(frameData);
+                auto window = Tarcog::ISO15099::WindowSingleVision(windowWidth, windowHeight, tVis, tSol, insulGlassUnit);
 
-            vt = window.uValue();
-            shgc = window.shgc();
-            uvalue = window.vt();
+                window.setFrameTop(frameData);
+                window.setFrameBottom(frameData);
+                window.setFrameLeft(frameData);
+                window.setFrameRight(frameData);
+
+                if (isSummer) {
+                    vt = window.uValue();
+                    shgc = window.shgc();
+                } else {
+                    uvalue = window.vt();
+                }
+            }
         }
     }
 
@@ -447,7 +458,6 @@ namespace WindowManager {
     }
 
     std::shared_ptr<Tarcog::ISO15099::CSystem> CWCEHeatTransferFactory::getTarcogSystemForReporting(EnergyPlusData &state,
-                                                                                                    Real64 const t_HextConvCoeff, 
                                                                                                     bool const useSummerConditions)
     {
         auto Indoor = getIndoorUvalueNfrc(useSummerConditions);
@@ -842,11 +852,18 @@ namespace WindowManager {
 
     std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getOutdoorUvalueNfrc(bool const useSummerConditions)
     {
-        const auto airTemperature{-18.0 + DataGlobalConstants::KelvinConv}; // Kelvins
-        const auto airSpeed{5.5};                                           // meters per second
-        const auto tSky{-18.0 + DataGlobalConstants::KelvinConv};           // Kelvins
-        const auto solarRadiation{0};
-
+        // NFRC 100 Section 4.3.1
+        auto airTemperature{-18.0 + DataGlobalConstants::KelvinConv}; // Kelvins
+        auto airSpeed{5.5};                                           // meters per second
+        auto tSky{-18.0 + DataGlobalConstants::KelvinConv};           // Kelvins
+        auto solarRadiation{0.};                                       // W/m2
+        if (useSummerConditions) {
+            // NFRC 200 Section 4.3.1
+            airTemperature = 32.0 + DataGlobalConstants::KelvinConv;
+            airSpeed = 2.75;
+            tSky = 32.0 + DataGlobalConstants::KelvinConv;
+            solarRadiation = 783.;
+        }
         auto Outdoor =
             Tarcog::ISO15099::Environments::outdoor(airTemperature, airSpeed, solarRadiation, tSky, Tarcog::ISO15099::SkyModel::AllSpecified);
         Outdoor->setHCoeffModel(Tarcog::ISO15099::BoundaryConditionsCoeffModel::CalculateH);
@@ -855,8 +872,13 @@ namespace WindowManager {
 
     std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getIndoorUvalueNfrc(bool const useSummerConditions)
     {
-        const auto roomTemperature{21 + DataGlobalConstants::KelvinConv};
-        const auto Indoor = Tarcog::ISO15099::Environments::indoor(roomTemperature);
+        // NFRC 100 Section 4.3.1
+        auto roomTemperature{21. + DataGlobalConstants::KelvinConv};
+        if (useSummerConditions) {
+            // NFRC 200 Section 4.3.1
+            roomTemperature = 24. + DataGlobalConstants::KelvinConv;
+        }
+        auto Indoor = Tarcog::ISO15099::Environments::indoor(roomTemperature);
         return Indoor;
     }
 
