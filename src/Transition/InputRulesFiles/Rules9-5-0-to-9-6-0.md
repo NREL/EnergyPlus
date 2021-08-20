@@ -2,7 +2,6 @@ Input Changes version 9.5.0 to 9.6.0
 =============
 
 This file documents the structural changes on the input of EnergyPlus that could affect interfaces, etc.
-This was previously an Excel workbook that made for very difficult version control, especially during busy times around code freezes.
 
 # Object Change: AirflowNetwork:MultiZone:ReferenceCrackConditions 
 
@@ -55,47 +54,95 @@ See [PR#8708](https://github.com/NREL/EnergyPlus/pull/8708)
 Summary: 
 
 1. A new field for Space Name was added after Zone Name to all surface objects. 
-2. For all internal gains objects, the "Zone or ZoneList Name" field name was changed to "Zone or ZoneList or Space or SpaceList Name".
+2. ZoneProperty:UserViewFactors:BySurfaceName is by Space instead of Zone.
+3. For all internal gains objects, the "Zone or ZoneList Name" field name was changed to "Zone or ZoneList or Space or SpaceList Name".
+4. Daylighting controls may reference a Zone or Space.
 
 ## epJSON transition rules
 **For People, Lights, ElectricEquipment, GasEquipment, HotWaterEquipment, SteamEquipment, and OtherEquipment:**
 
-Field name: "zone_or_zonelist_name" was changed to "zone_or_zonelist_or_space_or_spacelist_name".
+* Field name "zone_or_zonelist_name" was changed to "zone_or_zonelist_or_space_or_spacelist_name".
+
+**For ElectricEquipment:ITE:AirCooled:**
+
+* Field name "zone_name" was changed to "zone_or_space_name".
 
 **For BuildingSurface:Detailed, Wall:Detailed, RoofCeiling:Detailed, Floor:Detailed, Wall:Exterior, Wall:Adiabatic,
 Wall:Underground, Wall:Interzone, Roof, Ceiling:Adiabatic, Ceiling:Adiabatic, Floor:GroundContact, Floor:Adiabatic,
 and Floor:Interzone:**
 
-No transition required. A new optional field "space_name" was added.
+* No transition required. 
+* A new optional field "space_name" was added.
 
 **For InternalMass:**
 
-No transition required. A new optional field "space_or_spacelist_name" was added.
+* No transition required. 
+* A new optional field "space_or_spacelist_name" was added.
+
+**For ZoneProperty:UserViewFactors:BySurfaceName:**
+
+* Field name "zone_or_zonelist_name" was changed to "space_or_spacelist_name".
+* The contents of this field do not need to change, because pre-v9.6 input files have no Spaces, so
+default spaces will be created with the same names as the zone names. 
+
+**For Daylighting:Controls:**
+
+* Field name "zone_name" was changed to "zone_or_space_name".
+* In array "control_data", field name "fraction_of_zone_controlled_by_reference_point" was changed to 
+"fraction_of_lights_controlled_by_reference_point".
+
+**For Daylighting:ReferencePoint:**
+
+* Field name "zone_name" was changed to "zone_or_space_name".
+
 
 ## idf transition rules
 **For People, Lights, ElectricEquipment, GasEquipment, HotWaterEquipment, SteamEquipment, and OtherEquipment:**
 
-No transition required. Field name "Zone or ZoneList Name" changed to "Zone or ZoneList or Space or SpaceList Name".
+* No transition required. 
+* Field name "Zone or ZoneList Name" changed to "Zone or ZoneList or Space or SpaceList Name".
+
+**For ElectricEquipment:ITE:AirCooled:**
+
+* No transition required. 
+* Field name "Zone Name" changed to "Zone or Space Name".
 
 **For BuildingSurface:Detailed:**
 
-Fields 1-4 remain the same.
-Insert new Field 5 (A5) "Space Name". This field is optional and may be left blank.
-Remaining fields remain the same and are shifted by one.
+* Fields 1-4 remain the same.
+* Insert new Field 5 (A5) "Space Name". This field is optional and may be left blank.
+* Remaining fields remain the same and are shifted by one.
 
 **For Wall:Detailed, RoofCeiling:Detailed, Floor:Detailed, Wall:Exterior, Wall:Adiabatic,
 Wall:Underground, Wall:Interzone, Roof, Ceiling:Adiabatic, Ceiling:Adiabatic, Floor:GroundContact, Floor:Adiabatic,
 and Floor:Interzone:**
 
-Fields 1-3 remain the same.
-Insert new Field 4 (A4) "Space Name". This field is optional and may be left blank.
-Remaining fields remain the same and are shifted by one.
+* Fields 1-3 remain the same.
+* Insert new Field 4 (A4) "Space Name". This field is optional and may be left blank.
+* Remaining fields remain the same and are shifted by one.
 
 **For InternalMass:**
 
-Fields 1-3 remain the same.
-Insert new Field 4 (A4) "Space or SpaceList Name". This field is optional and may be left blank.
-Remaining fields remain the same and are shifted by one.
+* Fields 1-3 remain the same.
+* Insert new Field 4 (A4) "Space or SpaceList Name". This field is optional and may be left blank.
+* Remaining fields remain the same and are shifted by one.
 
+**For ZoneProperty:UserViewFactors:BySurfaceName:**
+
+* No transition required. 
+* Field name "Zone or ZoneList Name" changed to "Space or SpaceList Name".
+* The contents of this field do no need to change, because pre-v9.6 input files have no Spaces, so
+default spaces will be created with the same names as the zone names. 
+
+**For Daylighting:Controls:**
+
+* No transition required. 
+* Field name "Zone Name" was changed to "Zone or Space Name".
+* Field names "Fraction of Zone Controlled by Reference Point n" were changed to "Fraction of Lights Controlled by Reference Point n".
+
+**For Daylighting:ReferencePoint:**
+
+* No transition required. 
+* Field name "Zone Name" was changed to "Zone or Space Name".
 
 See [PR#8394](https://github.com/NREL/EnergyPlus/pull/8394)

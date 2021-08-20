@@ -25,6 +25,8 @@
     * Add clarifications from May 19 conference call
  - Revised, June 7, 2021
     * Add design section
+ - Revised, August 19, 2021
+    * Leave ZoneInfiltration and ZoneVentilation as-is (reference Zone, not Space).
     
 ## Table of Contents ##
 
@@ -89,7 +91,7 @@ New Space object (and related objects) with minimal changes to current inputs.
  * Internal gains reference Zone or ZoneList, *Space or Spacelist*.
    * Gains specified at the Zone level will be applied proportionally by floor area to all Spaces in the Zone
    * Gains specified at the Space level will be applied to the Space in addition to any gains specified at the Zone level
- * ZoneInfiltration:* and ZoneVentilation:* reference Zone or ZoneList, *Space or Spacelist*.
+ * ZoneInfiltration:* and ZoneVentilation:* reference Zone or ZoneList, ~*Space or Spacelist*~ (19 Aug).
  * Daylighting controls will reference a Zone *or Space*. (Daylighting reference points see all windows in an enclosure).
 
  * Thermostats remain as-is and continue to reference a Zone or ZoneList.
