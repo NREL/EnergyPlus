@@ -13,3 +13,15 @@ The header of the map file was changed from only allowing two reference points t
 “ RefPt1=(2.50:2.00:0.80), RefPt2=(2.50:18.00:0.80), RefPt3=(2.50:18.00:0.50)”
 
 [PR#8889](https://github.com/NREL/EnergyPlus/pull/8889) changed the output format in both the MAP file and the SQL output.
+
+### Table Output Column Headings Changed for Central Plant:
+
+ Modified Existing Column Headings:
+ (a) "Nominal Capacity [W]" to "Reference Capacity [W]"
+ (b) "Nominal Efficiency [W/W]" to "Reference Efficiency [W/W]"
+
+ Added Two New Variables (Added Two New Column Headings):
+ (a) "Rated Capacity [W]"
+ (b) "Rated Efficiency [W/W]"
+ 
+See [8192](https://github.com/NREL/EnergyPlus/pull/8959/)
