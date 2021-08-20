@@ -267,9 +267,9 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP.allocate(2);
     state->dataWaterToAirHeatPumpSimple->NumWatertoAirHPs = 2;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).Name = "WATERCOOLINGCOIL";
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPPlantTypeOfNum = DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WAHPPlantTypeOfNum = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).Name = "WATERHEATINGCOIL";
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WAHPPlantTypeOfNum = DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WAHPPlantTypeOfNum = DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
     state->dataWaterToAirHeatPumpSimple->SimpleHPTimeStepFlag.allocate(2);
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).AirInletNodeNum = 1;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).AirOutletNodeNum = 3;
@@ -311,9 +311,9 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataPlnt->PlantLoop(2).FluidName = "WATER";
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
 
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "WATERCOOLINGCOIL";
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = "WATERHEATINGCOIL";
 
     state->dataHeatBal->HeatReclaimSimple_WAHPCoil.allocate(2);

@@ -548,7 +548,7 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "comp_name";
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::TypeOf_Boiler_Simple;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::PlantEquipmentType::Boiler_Simple;
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 0; // just skip the supply side search
 
     int loopNum = 0, loopSideNum = 0, branchNum = 0, compNum = 0;
@@ -556,7 +556,7 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
 
     // test simple searching first
     PlantUtilities::ScanPlantLoopsForObject(
-        *state, "comp_name", DataPlant::TypeOf_Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
+        *state, "comp_name", DataPlant::PlantEquipmentType::Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
     EXPECT_EQ(1, loopNum);
     EXPECT_EQ(1, loopSideNum);
     EXPECT_EQ(1, branchNum);
@@ -565,6 +565,6 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
 
     // then test to make sure errorFlag is passed by reference
     PlantUtilities::ScanPlantLoopsForObject(
-        *state, "comp_name_not_here", DataPlant::TypeOf_Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
+        *state, "comp_name_not_here", DataPlant::PlantEquipmentType::Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
     EXPECT_TRUE(errorFlag);
 }

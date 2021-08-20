@@ -219,8 +219,6 @@ namespace HVACSingleDuctInduc {
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataSizing;
 
-
-
         using MixerComponent::GetZoneMixerIndex;
         using WaterCoils::GetCoilWaterInletNode;
 
@@ -514,8 +512,6 @@ namespace HVACSingleDuctInduc {
 
         // Using/Aliasing
 
-
-
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
@@ -558,9 +554,9 @@ namespace HVACSingleDuctInduc {
         if (state.dataHVACSingleDuctInduc->MyPlantScanFlag(IUNum) && allocated(state.dataPlnt->PlantLoop)) {
             if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil_PlantTypeNum == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
                 errFlag = false;
-               ScanPlantLoopsForObject( state,
- state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil,
- state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil_PlantTypeNum,
+                ScanPlantLoopsForObject(state,
+                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil,
+                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil_PlantTypeNum,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWLoopNum,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWLoopSide,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWBranchNum,
@@ -580,9 +576,9 @@ namespace HVACSingleDuctInduc {
             if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil_PlantTypeNum == DataPlant::PlantEquipmentType::CoilWaterCooling ||
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil_PlantTypeNum == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) {
                 errFlag = false;
-               ScanPlantLoopsForObject( state,
- state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
- state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil_PlantTypeNum,
+                ScanPlantLoopsForObject(state,
+                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil,
+                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).CCoil_PlantTypeNum,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWLoopNum,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWLoopSide,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWBranchNum,

@@ -58,6 +58,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -352,9 +353,9 @@ namespace CondenserLoopTowers {
 
         // Default Constructor
         CoolingTower()
-        : TowerType_Num(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PIM::Unassigned), Available(true), ON(true), DesignWaterFlowRate(0.0),
-              DesignWaterFlowRateWasAutoSized(false), DesignWaterFlowPerUnitNomCap(0.0), DesWaterMassFlowRate(0.0), DesWaterMassFlowRatePerCell(0.0),
-              HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false), DesignAirFlowPerUnitNomCap(0.0),
+            : TowerType_Num(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PIM::Unassigned), Available(true), ON(true),
+              DesignWaterFlowRate(0.0), DesignWaterFlowRateWasAutoSized(false), DesignWaterFlowPerUnitNomCap(0.0), DesWaterMassFlowRate(0.0),
+              DesWaterMassFlowRatePerCell(0.0), HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false), DesignAirFlowPerUnitNomCap(0.0),
               DefaultedDesignAirFlowScalingFactor(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false),
               DesignFanPowerPerUnitNomCap(0.0), HighSpeedTowerUA(0.0), HighSpeedTowerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0),
               LowSpeedAirFlowRateWasAutoSized(false), LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0),

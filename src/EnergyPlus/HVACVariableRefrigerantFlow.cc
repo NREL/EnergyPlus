@@ -205,9 +205,9 @@ void SimulateVRF(EnergyPlusData &state,
         (state.dataHVACVarRefFlow->VRF(VRFCondenser).checkPlantCondTypeOneTime)) {
         // scan for loop connection data
         bool errFlag = false;
-       PlantUtilities::ScanPlantLoopsForObject( state,
- state.dataHVACVarRefFlow->VRF(VRFCondenser).Name,
- state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFPlantTypeOfNum,
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                state.dataHVACVarRefFlow->VRF(VRFCondenser).Name,
+                                                state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFPlantTypeOfNum,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceLoopNum,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceLoopSideNum,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceBranchNum,
@@ -5997,9 +5997,9 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
             // hot water supplemental heating coil
             errFlag = false;
-           PlantUtilities::ScanPlantLoopsForObject( state,
- state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName,
- PlantEquipmentType::CoilWaterSimpleHeating,
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName,
+                                                    PlantEquipmentType::CoilWaterSimpleHeating,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
@@ -6045,9 +6045,9 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
             // steam supplemental heating coil
             errFlag = false;
-           PlantUtilities::ScanPlantLoopsForObject( state,
- state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName,
- PlantEquipmentType::CoilSteamAirHeating,
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName,
+                                                    PlantEquipmentType::CoilSteamAirHeating,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
@@ -12361,7 +12361,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                                 ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                             }
                             ShowRecurringWarningErrorAtEnd(state,
-                                                           ccSimPlantEquipTypes(static_cast<int>(PlantEquipmentType::HeatPumpVRF)) + " \"" + this->Name +
+                                                           ccSimPlantEquipTypes(static_cast<int>(PlantEquipmentType::HeatPumpVRF)) + " \"" +
+                                                               this->Name +
                                                                "\": Defrost Energy Input Ratio Modifier curve (function of temperature) output "
                                                                "is negative warning continues...",
                                                            this->DefrostHeatErrorIndex,

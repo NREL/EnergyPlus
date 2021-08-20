@@ -2430,9 +2430,9 @@ namespace UserDefinedComponents {
         if (this->myOneTimeFlag) {
             if (this->PlantIsConnected) {
                 bool errFlag = false;
-               PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::CoilUserDefined,
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        DataPlant::PlantEquipmentType::CoilUserDefined,
                                                         this->Loop.LoopNum,
                                                         this->Loop.LoopSideNum,
                                                         this->Loop.BranchNum,
@@ -2506,9 +2506,9 @@ namespace UserDefinedComponents {
             if (this->NumPlantConnections > 0) {
                 for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
                     bool errFlag = false;
-                   PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::ZoneHVACAirUserDefined,
+                    PlantUtilities::ScanPlantLoopsForObject(state,
+                                                            this->Name,
+                                                            DataPlant::PlantEquipmentType::ZoneHVACAirUserDefined,
                                                             this->Loop(loop).LoopNum,
                                                             this->Loop(loop).LoopSideNum,
                                                             this->Loop(loop).BranchNum,
@@ -2597,9 +2597,9 @@ namespace UserDefinedComponents {
             if (this->NumPlantConnections > 0) {
                 for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
                     bool errFlag = false;
-                   PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::AirTerminalUserDefined,
+                    PlantUtilities::ScanPlantLoopsForObject(state,
+                                                            this->Name,
+                                                            DataPlant::PlantEquipmentType::AirTerminalUserDefined,
                                                             this->Loop(loop).LoopNum,
                                                             this->Loop(loop).LoopSideNum,
                                                             this->Loop(loop).BranchNum,
@@ -2744,9 +2744,9 @@ namespace UserDefinedComponents {
             // locate the connections to the plant loops
             for (int ConnectionNum = 1; ConnectionNum <= this->NumPlantConnections; ++ConnectionNum) {
                 bool errFlag = false;
-               PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::PlantComponentUserDefined,
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        DataPlant::PlantEquipmentType::PlantComponentUserDefined,
                                                         this->Loop(ConnectionNum).LoopNum,
                                                         this->Loop(ConnectionNum).LoopSideNum,
                                                         this->Loop(ConnectionNum).BranchNum,

@@ -122,8 +122,6 @@ namespace EnergyPlus::WaterCoils {
 using namespace DataLoopNode;
 using namespace DataHVACGlobals;
 
-
-
 using FluidProperties::GetDensityGlycol;
 using FluidProperties::GetSpecificHeatGlycol;
 using Psychrometrics::PsyCpAirFnW;
@@ -1099,7 +1097,8 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
                 if (state.dataWaterCoils->WaterCoil(tempCoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
                     CoilTypeNum = SimAirServingZones::CompType::WaterCoil_Cooling;
                     CompType = cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater);
-                } else if (state.dataWaterCoils->WaterCoil(tempCoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) {
+                } else if (state.dataWaterCoils->WaterCoil(tempCoilNum).WaterCoilType ==
+                           DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) {
                     CoilTypeNum = SimAirServingZones::CompType::WaterCoil_DetailedCool;
                     CompType = cAllCoilTypes(DataHVACGlobals::Coil_CoolingWaterDetailed);
                 } else if (state.dataWaterCoils->WaterCoil(tempCoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
@@ -6376,9 +6375,9 @@ Real64 GetWaterCoilDesAirFlow(EnergyPlusData &state,
 }
 
 void CheckActuatorNode(EnergyPlusData &state,
-                       int const ActuatorNodeNum, // input actuator node number
-                       DataPlant::PlantEquipmentType &iNodeType,            // Cooling or Heating or 0
-                       bool &NodeNotFound         // true if matching water inlet node not found
+                       int const ActuatorNodeNum,                // input actuator node number
+                       DataPlant::PlantEquipmentType &iNodeType, // Cooling or Heating or 0
+                       bool &NodeNotFound                        // true if matching water inlet node not found
 )
 {
 

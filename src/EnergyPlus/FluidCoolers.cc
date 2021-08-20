@@ -765,9 +765,9 @@ void FluidCoolerspecs::oneTimeInit(EnergyPlusData &state)
         this->setupOutputVars(state);
         bool ErrorsFound = false;
         // Locate the tower on the plant loops for later usage
-       PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- this->FluidCoolerType_enum,
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                this->FluidCoolerType_enum,
                                                 this->LoopNum,
                                                 this->LoopSideNum,
                                                 this->BranchNum,
@@ -1411,7 +1411,8 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
         }
     }
 
-    if (this->PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY && this->FluidCoolerType_enum == DataPlant::PlantEquipmentType::FluidCooler_TwoSpd) {
+    if (this->PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY &&
+        this->FluidCoolerType_enum == DataPlant::PlantEquipmentType::FluidCooler_TwoSpd) {
         if (this->FluidCoolerLowSpeedNomCapWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
             this->FluidCoolerLowSpeedNomCap = this->FluidCoolerLowSpeedNomCapSizingFactor * this->FluidCoolerNominalCapacity;
             if (state.dataPlnt->PlantFinalSizesOkayToReport) {

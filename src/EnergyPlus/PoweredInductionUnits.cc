@@ -236,7 +236,6 @@ void GetPIUs(EnergyPlusData &state)
     using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
 
-
     using FluidProperties::FindRefrigerant;
     using NodeInputManager::GetOnlySingleNode;
     using SteamCoils::GetCoilSteamInletNode;
@@ -834,7 +833,6 @@ void InitPIU(EnergyPlusData &state,
     // Uses the status flags to trigger initializations.
 
     // Using/Aliasing
-
 
     using DataZoneEquipment::CheckZoneEquipmentList;
     using PlantUtilities::InitComponentNodes;

@@ -1171,9 +1171,9 @@ namespace FanCoilUnits {
         if (state.dataFanCoilUnits->MyPlantScanFlag(FanCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
-               ScanPlantLoopsForObject( state,
- FanCoil(FanCoilNum).HCoilName,
- FanCoil(FanCoilNum).HCoilPlantTypeOf,
+                ScanPlantLoopsForObject(state,
+                                        FanCoil(FanCoilNum).HCoilName,
+                                        FanCoil(FanCoilNum).HCoilPlantTypeOf,
                                         FanCoil(FanCoilNum).HeatCoilLoopNum,
                                         FanCoil(FanCoilNum).HeatCoilLoopSide,
                                         FanCoil(FanCoilNum).HeatCoilBranchNum,
@@ -1204,9 +1204,9 @@ namespace FanCoilUnits {
 
             if ((FanCoil(FanCoilNum).CCoilPlantTypeOf == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
                 (FanCoil(FanCoilNum).CCoilPlantTypeOf == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
-               ScanPlantLoopsForObject( state,
- FanCoil(FanCoilNum).CCoilPlantName,
- FanCoil(FanCoilNum).CCoilPlantTypeOf,
+                ScanPlantLoopsForObject(state,
+                                        FanCoil(FanCoilNum).CCoilPlantName,
+                                        FanCoil(FanCoilNum).CCoilPlantTypeOf,
                                         FanCoil(FanCoilNum).CoolCoilLoopNum,
                                         FanCoil(FanCoilNum).CoolCoilLoopSide,
                                         FanCoil(FanCoilNum).CoolCoilBranchNum,

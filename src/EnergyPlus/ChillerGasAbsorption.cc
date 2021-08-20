@@ -837,9 +837,9 @@ void GasAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
 {
     // Locate the chillers on the plant loops for later usage
     bool errFlag = false;
-   PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
+    PlantUtilities::ScanPlantLoopsForObject(state,
+                                            this->Name,
+                                            DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                             this->CWLoopNum,
                                             this->CWLoopSideNum,
                                             this->CWBranchNum,
@@ -854,9 +854,9 @@ void GasAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
         ShowFatalError(state, "InitGasAbsorber: Program terminated due to previous condition(s).");
     }
 
-   PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
+    PlantUtilities::ScanPlantLoopsForObject(state,
+                                            this->Name,
+                                            DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                             this->HWLoopNum,
                                             this->HWLoopSideNum,
                                             this->HWBranchNum,
@@ -872,9 +872,9 @@ void GasAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
     }
 
     if (this->isWaterCooled) {
-       PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                                 this->CDLoopNum,
                                                 this->CDLoopSideNum,
                                                 this->CDBranchNum,
@@ -888,10 +888,20 @@ void GasAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
         if (errFlag) {
             ShowFatalError(state, "InitGasAbsorber: Program terminated due to previous condition(s).");
         }
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::PlantEquipmentType::Chiller_DFAbsorption, true);
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->HWLoopNum, this->HWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::PlantEquipmentType::Chiller_DFAbsorption, true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                      this->CWLoopNum,
+                                                      this->CWLoopSideNum,
+                                                      this->CDLoopNum,
+                                                      this->CDLoopSideNum,
+                                                      DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
+                                                      true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                      this->HWLoopNum,
+                                                      this->HWLoopSideNum,
+                                                      this->CDLoopNum,
+                                                      this->CDLoopSideNum,
+                                                      DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
+                                                      true);
     }
 
     PlantUtilities::InterConnectTwoPlantLoopSides(

@@ -283,9 +283,9 @@ namespace PlantValves {
                 // Search thru PlantLoop Data Structure to check some things.
                 // Locate the component on the plant loops for later usage
                 errFlag = false;
-               PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::ValveTempering,
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        DataPlant::PlantEquipmentType::ValveTempering,
                                                         this->LoopNum,
                                                         this->LoopSideNum,
                                                         this->BranchNum,
@@ -317,7 +317,8 @@ namespace PlantValves {
                             branchCtr++;
                             for (auto &thisComp : thisBranch.Comp) {
 
-                                if ((thisComp.TypeOf_enum == DataPlant::PlantEquipmentType::ValveTempering) && (thisComp.Name == this->Name)) { // we found it.
+                                if ((thisComp.TypeOf_enum == DataPlant::PlantEquipmentType::ValveTempering) &&
+                                    (thisComp.Name == this->Name)) { // we found it.
 
                                     // is branch control type 'Active'
                                     if (thisBranch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active) IsBranchActive = true;

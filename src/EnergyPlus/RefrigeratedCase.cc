@@ -9805,9 +9805,9 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
             if (Condenser(RefCondLoop).CondenserType != DataHeatBalance::RefrigCondenserType::Water) continue;
 
             bool errFlag = false;
-           PlantUtilities::ScanPlantLoopsForObject( state,
- Condenser(RefCondLoop).Name,
- DataPlant::PlantEquipmentType::RefrigSystemWaterCondenser,
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    Condenser(RefCondLoop).Name,
+                                                    DataPlant::PlantEquipmentType::RefrigSystemWaterCondenser,
                                                     Condenser(RefCondLoop).PlantLoopNum,
                                                     Condenser(RefCondLoop).PlantLoopSideNum,
                                                     Condenser(RefCondLoop).PlantBranchNum,
@@ -9839,9 +9839,9 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
             if (RefrigRack(RefCompRackLoop).CondenserType != DataHeatBalance::RefrigCondenserType::Water) continue;
 
             bool errFlag = false;
-           PlantUtilities::ScanPlantLoopsForObject( state,
- RefrigRack(RefCompRackLoop).Name,
- DataPlant::PlantEquipmentType::RefrigerationWaterCoolRack,
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    RefrigRack(RefCompRackLoop).Name,
+                                                    DataPlant::PlantEquipmentType::RefrigerationWaterCoolRack,
                                                     RefrigRack(RefCompRackLoop).PlantLoopNum,
                                                     RefrigRack(RefCompRackLoop).PlantLoopSideNum,
                                                     RefrigRack(RefCompRackLoop).PlantBranchNum,

@@ -68,18 +68,18 @@ namespace ChillerElectricEIR {
     struct ElectricEIRChillerSpecs : PlantComponent
     {
         // Members
-        std::string Name;                       // User identifier
-        int TypeNum;                            // plant loop type identifier
+        std::string Name;                        // User identifier
+        int TypeNum;                             // plant loop type identifier
         DataPlant::nCondenserType CondenserType; // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
-        Real64 RefCap;                          // Reference capacity of chiller [W]
-        bool RefCapWasAutoSized;                // reference capacity was autosized on input
-        Real64 RefCOP;                          // Reference coefficient of performance [W/W]
-        DataPlant::FlowMode FlowMode;           // one of 3 modes for component flow during operation
-        bool ModulatedFlowSetToLoop;            // True if the setpoint is missing at the outlet node
-        bool ModulatedFlowErrDone;              // true if setpoint warning issued
-        bool HRSPErrDone;                       // TRUE if set point warning issued for heat recovery loop
-        Real64 EvapVolFlowRate;                 // Reference water volumetric flow rate through the evaporator [m3/s]
-        bool EvapVolFlowRateWasAutoSized;       // true if previous was autosize input
+        Real64 RefCap;                           // Reference capacity of chiller [W]
+        bool RefCapWasAutoSized;                 // reference capacity was autosized on input
+        Real64 RefCOP;                           // Reference coefficient of performance [W/W]
+        DataPlant::FlowMode FlowMode;            // one of 3 modes for component flow during operation
+        bool ModulatedFlowSetToLoop;             // True if the setpoint is missing at the outlet node
+        bool ModulatedFlowErrDone;               // true if setpoint warning issued
+        bool HRSPErrDone;                        // TRUE if set point warning issued for heat recovery loop
+        Real64 EvapVolFlowRate;                  // Reference water volumetric flow rate through the evaporator [m3/s]
+        bool EvapVolFlowRateWasAutoSized;        // true if previous was autosize input
         Real64 EvapMassFlowRate;
         Real64 EvapMassFlowRateMax;       // Reference water mass flow rate through evaporator [kg/s]
         Real64 CondVolFlowRate;           // Reference water volumetric flow rate through the condenser [m3/s]

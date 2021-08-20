@@ -257,11 +257,11 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     // create 2 components on a single branch to simulate water flow control for entire branch
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = 41; // Coil:Heating:Water
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating; // Coil:Heating:Water
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "Zone1FanCoilHeatingCoil";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 2;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).TypeOf_enum = 21; // Pipe:Adiabatic
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).TypeOf_enum = DataPlant::PlantEquipmentType::Pipe; // Pipe:Adiabatic
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;
@@ -421,11 +421,11 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     // create 2 components on a single branch to simulate water flow control for entire branch
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = 41; // Coil:Heating:Water
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating; // Coil:Heating:Water
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "Zone1FanCoilHeatingCoil";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 2;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).TypeOf_enum = 21; // Pipe:Adiabatic
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).TypeOf_enum = DataPlant::PlantEquipmentType::Pipe; // Pipe:Adiabatic
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;

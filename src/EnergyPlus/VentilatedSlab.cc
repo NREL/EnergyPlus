@@ -231,9 +231,6 @@ namespace VentilatedSlab {
         using namespace DataLoopNode;
         using namespace DataSurfaceLists;
 
-
-
-
         using FluidProperties::FindRefrigerant;
         using OutAirNodeManager::CheckAndAddAirNodeNumber;
 
@@ -1129,7 +1126,8 @@ namespace VentilatedSlab {
                                 state.dataVentilatedSlab->VentSlab(Item).CCoil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilWaterCooling;
                             } else if (UtilityRoutines::SameString(state.dataVentilatedSlab->VentSlab(Item).CCoilPlantType,
                                                                    "Coil:Cooling:Water:DetailedGeometry")) {
-                                state.dataVentilatedSlab->VentSlab(Item).CCoil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
+                                state.dataVentilatedSlab->VentSlab(Item).CCoil_PlantTypeNum =
+                                    DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                             } else {
                                 ShowSevereError(state,
                                                 "GetVentilatedSlabInput: " + CurrentModuleObject + "=\"" +
@@ -1469,9 +1467,6 @@ namespace VentilatedSlab {
 
         // Using/Aliasing
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-
-
-
 
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::VentilatedSlab_Num;

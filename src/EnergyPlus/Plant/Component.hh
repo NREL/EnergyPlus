@@ -65,7 +65,7 @@ namespace DataPlant {
     {
         // Members
         std::string TypeOf;                               // The 'keyWord' identifying  component type
-        DataPlant::PlantEquipmentType TypeOf_enum;                                   // Reference the "TypeOf" parameters in DataPlant
+        DataPlant::PlantEquipmentType TypeOf_enum;        // Reference the "TypeOf" parameters in DataPlant
         std::string Name;                                 // Component name
         int CompNum;                                      // Component ID number
         DataBranchAirLoopPlant::ControlTypeEnum FlowCtrl; // flow control for splitter/mixer (ACTIVE/PASSIVE/BYPASS)
@@ -105,12 +105,12 @@ namespace DataPlant {
 
         // Default Constructor
         CompData()
-        : TypeOf_enum(DataPlant::PlantEquipmentType::Invalid), CompNum(0), FlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown), FlowPriority(LoopFlowStatus_Unknown), ON(false),
-              Available(false), NodeNumIn(0), NodeNumOut(0), MyLoad(0.0), MaxLoad(0.0), MinLoad(0.0), OptLoad(0.0), SizFac(0.0),
-              CurOpSchemeType(UnknownStatusOpSchemeType), NumOpSchemes(0), CurCompLevelOpNum(0), EquipDemand(0.0), EMSLoadOverrideOn(false),
-              EMSLoadOverrideValue(0.0), HowLoadServed(HowMet_Unknown), MinOutletTemp(0.0), MaxOutletTemp(0.0), FreeCoolCntrlShutDown(false),
-              FreeCoolCntrlMinCntrlTemp(0.0), FreeCoolCntrlMode(DataPlant::iFreeCoolControlMode::Unassigned), FreeCoolCntrlNodeNum(0),
-              IndexInLoopSidePumps(0), TempDesCondIn(0.0), TempDesEvapOut(0.0), compPtr(nullptr)
+            : TypeOf_enum(DataPlant::PlantEquipmentType::Invalid), CompNum(0), FlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown),
+              FlowPriority(LoopFlowStatus_Unknown), ON(false), Available(false), NodeNumIn(0), NodeNumOut(0), MyLoad(0.0), MaxLoad(0.0), MinLoad(0.0),
+              OptLoad(0.0), SizFac(0.0), CurOpSchemeType(UnknownStatusOpSchemeType), NumOpSchemes(0), CurCompLevelOpNum(0), EquipDemand(0.0),
+              EMSLoadOverrideOn(false), EMSLoadOverrideValue(0.0), HowLoadServed(HowMet_Unknown), MinOutletTemp(0.0), MaxOutletTemp(0.0),
+              FreeCoolCntrlShutDown(false), FreeCoolCntrlMinCntrlTemp(0.0), FreeCoolCntrlMode(DataPlant::iFreeCoolControlMode::Unassigned),
+              FreeCoolCntrlNodeNum(0), IndexInLoopSidePumps(0), TempDesCondIn(0.0), TempDesEvapOut(0.0), compPtr(nullptr)
         {
         }
 

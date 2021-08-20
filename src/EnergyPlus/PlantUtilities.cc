@@ -980,15 +980,15 @@ void PullCompInterconnectTrigger(EnergyPlusData &state,
 }
 
 void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
-                                         int const LoopNum,                    // component's loop index
-                                         int const LoopSide,                   // component's loop side number
+                                         int const LoopNum,                       // component's loop index
+                                         int const LoopSide,                      // component's loop side number
                                          DataPlant::PlantEquipmentType TypeOfNum, // Component's type index
-                                         int const InletNodeNum,               // Component's inlet node pointer
-                                         int const OutletNodeNum,              // Component's outlet node pointer
-                                         Real64 const ModelCondenserHeatRate,  // model's heat rejection rate at condenser (W)
-                                         Real64 const ModelInletTemp,          // model's inlet temperature (C)
-                                         Real64 const ModelOutletTemp,         // model's outlet temperature (C)
-                                         Real64 const ModelMassFlowRate,       // model's condenser water mass flow rate (kg/s)
+                                         int const InletNodeNum,                  // Component's inlet node pointer
+                                         int const OutletNodeNum,                 // Component's outlet node pointer
+                                         Real64 const ModelCondenserHeatRate,     // model's heat rejection rate at condenser (W)
+                                         Real64 const ModelInletTemp,             // model's inlet temperature (C)
+                                         Real64 const ModelOutletTemp,            // model's outlet temperature (C)
+                                         Real64 const ModelMassFlowRate,          // model's condenser water mass flow rate (kg/s)
                                          bool const FirstHVACIteration)
 {
 
@@ -1067,15 +1067,15 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
 }
 
 void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
-                                     int const LoopNum,                    // component's loop index
-                                     int const LoopSide,                   // component's loop side number
+                                     int const LoopNum,                       // component's loop index
+                                     int const LoopSide,                      // component's loop side number
                                      DataPlant::PlantEquipmentType TypeOfNum, // Component's type index
-                                     int const InletNodeNum,               // Component's inlet node pointer
-                                     int const OutletNodeNum,              // Component's outlet node pointer
-                                     Real64 const ModelRecoveryHeatRate,   // model's heat rejection rate at recovery (W)
-                                     Real64 const ModelInletTemp,          // model's inlet temperature (C)
-                                     Real64 const ModelOutletTemp,         // model's outlet temperature (C)
-                                     Real64 const ModelMassFlowRate,       // model's condenser water mass flow rate (kg/s)
+                                     int const InletNodeNum,                  // Component's inlet node pointer
+                                     int const OutletNodeNum,                 // Component's outlet node pointer
+                                     Real64 const ModelRecoveryHeatRate,      // model's heat rejection rate at recovery (W)
+                                     Real64 const ModelInletTemp,             // model's inlet temperature (C)
+                                     Real64 const ModelOutletTemp,            // model's outlet temperature (C)
+                                     Real64 const ModelMassFlowRate,          // model's condenser water mass flow rate (kg/s)
                                      bool const FirstHVACIteration)
 {
 
@@ -1736,13 +1736,14 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
         if (static_cast<int>(CompType) >= 1 && static_cast<int>(CompType) <= DataPlant::NumSimPlantEquipTypes) {
             if (!present(SingleLoopSearch)) {
                 ShowSevereError(state,
-                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(CompType)) + " called \"" + std::string{CompName} +
-                                    "\" was not found on any plant loops.");
+                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(CompType)) + " called \"" +
+                                    std::string{CompName} + "\" was not found on any plant loops.");
                 AuditBranches(state, true, DataPlant::ccSimPlantEquipTypes(static_cast<int>(CompType)), CompName);
             } else {
                 ShowSevereError(state,
-                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(CompType)) + " called \"" + std::string{CompName} +
-                                    "\" was not found on plant loop=\"" + state.dataPlnt->PlantLoop(SingleLoopSearch).Name + "\".");
+                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(CompType)) + " called \"" +
+                                    std::string{CompName} + "\" was not found on plant loop=\"" + state.dataPlnt->PlantLoop(SingleLoopSearch).Name +
+                                    "\".");
             }
             if (present(InletNodeNumber)) {
                 if (FoundCompName) {

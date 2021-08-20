@@ -888,9 +888,9 @@ void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
     if (this->MyFlag) {
         // Locate the hx on the plant loops for later usage
         bool errFlag = false;
-       PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::GrndHtExchgPond,
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::PlantEquipmentType::GrndHtExchgPond,
                                                 this->LoopNum,
                                                 this->LoopSideNum,
                                                 this->BranchNum,

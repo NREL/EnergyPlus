@@ -71,20 +71,20 @@ namespace WaterToAirHeatPumpSimple {
     struct SimpleWatertoAirHPConditions
     {
         // Members
-        std::string Name;             // Name of the Water to Air Heat pump
-        std::string WatertoAirHPType; // Type of WatertoAirHP ie. Heating or Cooling
-        DataPlant::PlantEquipmentType WAHPPlantTypeOfNum;       // type of component in plant
-        bool SimFlag;                 // Heat Pump Simulation Flag
-        Real64 AirVolFlowRate;        // Air Volumetric Flow Rate[m3/s]
-        Real64 AirMassFlowRate;       // Air Mass Flow Rate[kg/s]
-        Real64 InletAirDBTemp;        // Inlet Air Dry Bulb Temperature [C]
-        Real64 InletAirHumRat;        // Inlet Air Humidity Ratio [kg/kg]
-        Real64 InletAirEnthalpy;      // Inlet Air Enthalpy [J/kg]
-        Real64 OutletAirDBTemp;       // Outlet Air Dry Bulb Temperature [C]
-        Real64 OutletAirHumRat;       // Outlet Air Humidity Ratio [kg/kg]
-        Real64 OutletAirEnthalpy;     // Outlet Air Enthalpy [J/kg]
-        Real64 WaterVolFlowRate;      // Water Volumetric Flow Rate [m3/s]
-        Real64 WaterMassFlowRate;     // Water Mass Flow Rate [kg/s]
+        std::string Name;                                 // Name of the Water to Air Heat pump
+        std::string WatertoAirHPType;                     // Type of WatertoAirHP ie. Heating or Cooling
+        DataPlant::PlantEquipmentType WAHPPlantTypeOfNum; // type of component in plant
+        bool SimFlag;                                     // Heat Pump Simulation Flag
+        Real64 AirVolFlowRate;                            // Air Volumetric Flow Rate[m3/s]
+        Real64 AirMassFlowRate;                           // Air Mass Flow Rate[kg/s]
+        Real64 InletAirDBTemp;                            // Inlet Air Dry Bulb Temperature [C]
+        Real64 InletAirHumRat;                            // Inlet Air Humidity Ratio [kg/kg]
+        Real64 InletAirEnthalpy;                          // Inlet Air Enthalpy [J/kg]
+        Real64 OutletAirDBTemp;                           // Outlet Air Dry Bulb Temperature [C]
+        Real64 OutletAirHumRat;                           // Outlet Air Humidity Ratio [kg/kg]
+        Real64 OutletAirEnthalpy;                         // Outlet Air Enthalpy [J/kg]
+        Real64 WaterVolFlowRate;                          // Water Volumetric Flow Rate [m3/s]
+        Real64 WaterMassFlowRate;                         // Water Mass Flow Rate [kg/s]
         Real64 DesignWaterMassFlowRate;
         Real64 InletWaterTemp;        // Inlet Water Temperature [C]
         Real64 InletWaterEnthalpy;    // Inlet Water Enthalpy [J/kg]
@@ -146,17 +146,17 @@ namespace WaterToAirHeatPumpSimple {
         bool reportCoilFinalSizes;    // one time report of sizes to coil report
         // Default Constructor
         SimpleWatertoAirHPConditions()
-        : WAHPPlantTypeOfNum(DataPlant::PlantEquipmentType::Invalid), SimFlag(false), AirVolFlowRate(0.0), AirMassFlowRate(0.0), InletAirDBTemp(0.0), InletAirHumRat(0.0),
-              InletAirEnthalpy(0.0), OutletAirDBTemp(0.0), OutletAirHumRat(0.0), OutletAirEnthalpy(0.0), WaterVolFlowRate(0.0),
-              WaterMassFlowRate(0.0), DesignWaterMassFlowRate(0.0), InletWaterTemp(0.0), InletWaterEnthalpy(0.0), OutletWaterTemp(0.0),
-              OutletWaterEnthalpy(0.0), Power(0.0), QLoadTotal(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0), Energy(0.0), EnergyLoadTotal(0.0),
-              EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), COP(0.0), RunFrac(0.0), PartLoadRatio(0.0), RatedWaterVolFlowRate(0.0),
-              RatedAirVolFlowRate(0.0), RatedCapHeat(0.0), RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolTotal(0.0), RatedCapCoolSens(0.0),
-              RatedPowerCool(0.0), RatedCOPCool(0.0), HeatCapCurveIndex(0), HeatPowCurveIndex(0), TotalCoolCapCurveIndex(0), SensCoolCapCurveIndex(0),
-              CoolPowCurveIndex(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), LoopNum(0), LoopSide(0),
-              BranchNum(0), CompNum(0), WaterCyclingMode(0), LastOperatingMode(WaterCycling), WaterFlowMode(false), CompanionCoolingCoilNum(0),
-              CompanionHeatingCoilNum(0), Twet_Rated(0.0), Gamma_Rated(0.0), MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0), FanDelayTime(0.0),
-              reportCoilFinalSizes(true)
+            : WAHPPlantTypeOfNum(DataPlant::PlantEquipmentType::Invalid), SimFlag(false), AirVolFlowRate(0.0), AirMassFlowRate(0.0),
+              InletAirDBTemp(0.0), InletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirDBTemp(0.0), OutletAirHumRat(0.0), OutletAirEnthalpy(0.0),
+              WaterVolFlowRate(0.0), WaterMassFlowRate(0.0), DesignWaterMassFlowRate(0.0), InletWaterTemp(0.0), InletWaterEnthalpy(0.0),
+              OutletWaterTemp(0.0), OutletWaterEnthalpy(0.0), Power(0.0), QLoadTotal(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0), Energy(0.0),
+              EnergyLoadTotal(0.0), EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), COP(0.0), RunFrac(0.0), PartLoadRatio(0.0),
+              RatedWaterVolFlowRate(0.0), RatedAirVolFlowRate(0.0), RatedCapHeat(0.0), RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolTotal(0.0),
+              RatedCapCoolSens(0.0), RatedPowerCool(0.0), RatedCOPCool(0.0), HeatCapCurveIndex(0), HeatPowCurveIndex(0), TotalCoolCapCurveIndex(0),
+              SensCoolCapCurveIndex(0), CoolPowCurveIndex(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
+              LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), WaterCyclingMode(0), LastOperatingMode(WaterCycling), WaterFlowMode(false),
+              CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), Twet_Rated(0.0), Gamma_Rated(0.0), MaxONOFFCyclesperHour(0.0),
+              HPTimeConstant(0.0), FanDelayTime(0.0), reportCoilFinalSizes(true)
         {
         }
     };

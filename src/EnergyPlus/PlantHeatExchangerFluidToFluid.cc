@@ -2264,9 +2264,9 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
     if (this->MyFlag) {
         // locate the main two connections to the plant loops
         bool errFlag = false;
-       PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg,
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg,
                                                 this->DemandSideLoop.loopNum,
                                                 this->DemandSideLoop.loopSideNum,
                                                 this->DemandSideLoop.branchNum,
@@ -2288,9 +2288,9 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             errFlag = true;
         }
 
-       PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg,
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg,
                                                 this->SupplySideLoop.loopNum,
                                                 this->SupplySideLoop.loopSideNum,
                                                 this->SupplySideLoop.branchNum,

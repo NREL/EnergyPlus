@@ -1920,7 +1920,6 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
 
-
         using DataSizing::AutoSize;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
@@ -2051,9 +2050,9 @@ namespace LowTempRadiantSystem {
             if (state.dataLowTempRadSys->MyPlantScanFlagHydr(RadSysNum) && allocated(state.dataPlnt->PlantLoop)) {
                 errFlag = false;
                 if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode > 0) {
-                   ScanPlantLoopsForObject( state,
- state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
- DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow,
+                    ScanPlantLoopsForObject(state,
+                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopSide,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWBranchNum,
@@ -2069,9 +2068,9 @@ namespace LowTempRadiantSystem {
                     }
                 }
                 if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode > 0) {
-                   ScanPlantLoopsForObject( state,
- state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
- DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow,
+                    ScanPlantLoopsForObject(state,
+                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWLoopNum,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWLoopSide,
                                             state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWBranchNum,
@@ -2096,9 +2095,9 @@ namespace LowTempRadiantSystem {
             if (state.dataLowTempRadSys->MyPlantScanFlagCFlo(RadSysNum) && allocated(state.dataPlnt->PlantLoop)) {
                 errFlag = false;
                 if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode > 0) {
-                   ScanPlantLoopsForObject( state,
- state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
- DataPlant::PlantEquipmentType::LowTempRadiant_ConstFlow,
+                    ScanPlantLoopsForObject(state,
+                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_ConstFlow,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopSide,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWBranchNum,
@@ -2114,9 +2113,9 @@ namespace LowTempRadiantSystem {
                     }
                 }
                 if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode > 0) {
-                   ScanPlantLoopsForObject( state,
- state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
- DataPlant::PlantEquipmentType::LowTempRadiant_ConstFlow,
+                    ScanPlantLoopsForObject(state,
+                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
+                                            DataPlant::PlantEquipmentType::LowTempRadiant_ConstFlow,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWLoopNum,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWLoopSide,
                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWBranchNum,

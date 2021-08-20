@@ -149,7 +149,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
 
     HWBaseboard(1).DesignObjectPtr = 1;
     HWBaseboard(1).EquipID = "HWRadiativeConvectiveBB";
-    HWBaseboard(1).EquipType = TypeOf_Baseboard_Rad_Conv_Water;
+    HWBaseboard(1).EquipType = DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water;
     HWBaseboard(1).ZonePtr = 1;
     HWBaseboard(1).AirInletTemp = 21.0;
     HWBaseboard(1).WaterInletTemp = 82.;

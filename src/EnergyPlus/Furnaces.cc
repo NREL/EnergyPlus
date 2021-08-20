@@ -5381,9 +5381,9 @@ namespace Furnaces {
                 if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWater) {
 
                     errFlag = false;
-                   ScanPlantLoopsForObject( state,
- state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
- DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
+                    ScanPlantLoopsForObject(state,
+                                            state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
+                                            DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
                                             state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
@@ -5410,9 +5410,9 @@ namespace Furnaces {
                 } else if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingSteam) {
 
                     errFlag = false;
-                   ScanPlantLoopsForObject( state,
- state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
- DataPlant::PlantEquipmentType::CoilSteamAirHeating,
+                    ScanPlantLoopsForObject(state,
+                                            state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
+                                            DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
                                             state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
@@ -5455,9 +5455,9 @@ namespace Furnaces {
 
                 if (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                     errFlag = false;
-                   ScanPlantLoopsForObject( state,
- state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
- DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
+                    ScanPlantLoopsForObject(state,
+                                            state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
+                                            DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
                                             state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
@@ -5483,9 +5483,9 @@ namespace Furnaces {
                     }
                 } else if (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                     errFlag = false;
-                   ScanPlantLoopsForObject( state,
- state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
- DataPlant::PlantEquipmentType::CoilSteamAirHeating,
+                    ScanPlantLoopsForObject(state,
+                                            state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
+                                            DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
                                             state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
                                             state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,

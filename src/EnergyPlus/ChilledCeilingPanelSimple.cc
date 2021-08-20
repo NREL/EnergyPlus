@@ -301,8 +301,8 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         }
 
         auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
-        ThisCP.EquipID = state.dataIPShortCut->cAlphaArgs(1); // Name of this simple cooling panel
-        ThisCP.EquipType = DataPlant::PlantEquipmentType::CoolingPanel_Simple;        //'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
+        ThisCP.EquipID = state.dataIPShortCut->cAlphaArgs(1);                  // Name of this simple cooling panel
+        ThisCP.EquipType = DataPlant::PlantEquipmentType::CoolingPanel_Simple; //'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
 
         // Get schedule
         ThisCP.Schedule = state.dataIPShortCut->cAlphaArgs(2);
@@ -818,9 +818,9 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     if (state.dataChilledCeilingPanelSimple->SetLoopIndexFlag(CoolingPanelNum)) {
         if (allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
-           ScanPlantLoopsForObject( state,
- ThisCP.EquipID,
- ThisCP.EquipType,
+            ScanPlantLoopsForObject(state,
+                                    ThisCP.EquipID,
+                                    ThisCP.EquipType,
                                     ThisCP.LoopNum,
                                     ThisCP.LoopSideNum,
                                     ThisCP.BranchNum,

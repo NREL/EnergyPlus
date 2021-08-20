@@ -132,8 +132,9 @@ namespace SurfaceGroundHeatExchanger {
     int const SurfCond_Ground(1);
     int const SurfCond_Exposed(2);
 
-    PlantComponent *
-    SurfaceGroundHeatExchangerData::factory(EnergyPlusData &state, [[maybe_unused]] DataPlant::PlantEquipmentType objectType, std::string const objectName)
+    PlantComponent *SurfaceGroundHeatExchangerData::factory(EnergyPlusData &state,
+                                                            [[maybe_unused]] DataPlant::PlantEquipmentType objectType,
+                                                            std::string const objectName)
     {
         if (state.dataSurfaceGroundHeatExchangers->GetInputFlag) {
             GetSurfaceGroundHeatExchanger(state);

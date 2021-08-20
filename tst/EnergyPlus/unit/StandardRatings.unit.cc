@@ -254,7 +254,6 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 TEST_F(EnergyPlusFixture, ChillerIPLVTest)
 {
 
-    using DataPlant::TypeOf_Chiller_ElectricEIR;
     using StandardRatings::CalcChillerIPLV;
 
     // Setup an air-cooled Chiller:Electric:EIR chiller
@@ -262,7 +261,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name = "Air Cooled Chiller";
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap = 216000;           // W
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP = 2.81673861898309; // W/W
-    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::AirCooled;
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::nCondenserType::AirCooled;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat = 0.15;
 
     int CurveNum;
@@ -325,7 +324,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     Real64 IPLV;
     CalcChillerIPLV(*state,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name,
-                    TypeOf_Chiller_ElectricEIR,
+                    DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType,

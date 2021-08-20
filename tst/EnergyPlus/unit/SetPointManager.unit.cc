@@ -387,7 +387,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     thisSPM.LoopIndexDemandSide = condLoopIndex;
     thisSPM.ChillerIndexDemandSide = chillerBranchCW;
     thisSPM.BranchIndexDemandSide = chillerCompIndex;
-    thisSPM.TypeNum = DataPlant::TypeOf_Chiller_Electric;
+    thisSPM.TypeNum = DataPlant::PlantEquipmentType::Chiller_Electric;
 
     // switch: Weighted ratio > 9 && etc...
     state->dataPlnt->PlantLoop(1).CoolingDemand = 4700;

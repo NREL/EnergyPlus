@@ -2105,9 +2105,9 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(EnergyPlusData &state)
         bool plantNotFound = false;
         for (auto &g : elecGenCntrlObj) {
             plantNotFound = false;
-           PlantUtilities::ScanPlantLoopsForObject( state,
- g->compPlantName,
- g->compPlantTypeOf,
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    g->compPlantName,
+                                                    g->compPlantTypeOf,
                                                     g->cogenLocation.loopNum,
                                                     g->cogenLocation.loopSideNum,
                                                     g->cogenLocation.branchNum,
@@ -2143,10 +2143,10 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                                          Real64 ratedElecPowerOutput,
                                          std::string const &availSchedName,
                                          Real64 thermalToElectRatio)
-    : compGenTypeOf_Num(GeneratorType::Unassigned), compPlantTypeOf(DataPlant::PlantEquipmentType::Other), generatorType(GeneratorType::Unassigned), generatorIndex(0),
-      maxPowerOut(0.0), availSchedPtr(0), powerRequestThisTimestep(0.0), onThisTimestep(false), eMSPowerRequest(0.0), eMSRequestOn(false),
-      plantInfoFound(false), cogenLocation(PlantLocation(0, 0, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0), dCElectProdRate(0.0),
-      electricityProd(0.0), electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), errCountNegElectProd_(0)
+    : compGenTypeOf_Num(GeneratorType::Unassigned), compPlantTypeOf(DataPlant::PlantEquipmentType::Other), generatorType(GeneratorType::Unassigned),
+      generatorIndex(0), maxPowerOut(0.0), availSchedPtr(0), powerRequestThisTimestep(0.0), onThisTimestep(false), eMSPowerRequest(0.0),
+      eMSRequestOn(false), plantInfoFound(false), cogenLocation(PlantLocation(0, 0, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0),
+      dCElectProdRate(0.0), electricityProd(0.0), electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), errCountNegElectProd_(0)
 {
 
     static constexpr std::string_view routineName = "GeneratorController constructor ";

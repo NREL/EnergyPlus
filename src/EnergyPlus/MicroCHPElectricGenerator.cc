@@ -1526,9 +1526,9 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
     if (this->MyPlantScanFlag) {
         if (allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
-           PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::Generator_MicroCHP,
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    DataPlant::PlantEquipmentType::Generator_MicroCHP,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
                                                     this->CWBranchNum,

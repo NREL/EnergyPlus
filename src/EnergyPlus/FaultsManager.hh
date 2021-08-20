@@ -219,8 +219,8 @@ namespace FaultsManager {
     struct FaultPropertiesFoulingCoil : public FaultProperties // Class for FaultModel:Fouling:Coil
     {
         // Members
-        std::string FouledCoilName;    // The fouled coil name
-        DataPlant::PlantEquipmentType FouledCoiledType;          // Type of coil that's fouled
+        std::string FouledCoilName;                     // The fouled coil name
+        DataPlant::PlantEquipmentType FouledCoiledType; // Type of coil that's fouled
         int FouledCoilNum;             // The "FouledUARated" implies having to use the Coil's UA, which could be autosized, so have to use this index
         FouledCoil FoulingInputMethod; // Coil fouling input method
         Real64 UAFouled;               // Fouling coil UA under rating conditions
@@ -231,8 +231,8 @@ namespace FaultsManager {
 
         // Default Constructor
         FaultPropertiesFoulingCoil()
-        : FouledCoilName(""), FouledCoiledType(DataPlant::PlantEquipmentType::Invalid), FouledCoilNum(0), FoulingInputMethod(FouledCoil::Unassigned), UAFouled(0.0), Rfw(0.0),
-              Rfa(0.0), Aout(0.0), Aratio(0.0)
+            : FouledCoilName(""), FouledCoiledType(DataPlant::PlantEquipmentType::Invalid), FouledCoilNum(0),
+              FoulingInputMethod(FouledCoil::Unassigned), UAFouled(0.0), Rfw(0.0), Rfa(0.0), Aout(0.0), Aratio(0.0)
         {
         }
 

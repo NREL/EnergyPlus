@@ -2454,7 +2454,8 @@ void DecideWorkMode(EnergyPlusData &state,
         DataPlant::PlantEquipmentType tankType = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WHtankType;
 
         if ((tankType == DataPlant::PlantEquipmentType::WtrHeaterMixed) || (tankType == DataPlant::PlantEquipmentType::WtrHeaterStratified) ||
-            (tankType == DataPlant::PlantEquipmentType::ChilledWaterTankMixed) || (tankType == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
+            (tankType == DataPlant::PlantEquipmentType::ChilledWaterTankMixed) ||
+            (tankType == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
 
             int tankIDX = WaterThermalTanks::getTankIDX(state,
                                                         state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WHtankName,
@@ -2467,7 +2468,8 @@ void DecideWorkMode(EnergyPlusData &state,
 
             tank.callerLoopNum = 0;
 
-        } else if (tankType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped || tankType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped) {
+        } else if (tankType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped ||
+                   tankType == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped) {
 
             int hpIDX = WaterThermalTanks::getHPTankIDX(state,
                                                         state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WHtankName,

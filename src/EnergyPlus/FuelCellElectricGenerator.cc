@@ -3733,9 +3733,9 @@ namespace FuelCellElectricGenerator {
         if (this->MyPlantScanFlag_Init && allocated(state.dataPlnt->PlantLoop)) {
             bool errFlag = false;
 
-           PlantUtilities::ScanPlantLoopsForObject( state,
- this->NameExhaustHX,
- DataPlant::PlantEquipmentType::Generator_FCExhaust,
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->NameExhaustHX,
+                                                    DataPlant::PlantEquipmentType::Generator_FCExhaust,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
                                                     this->CWBranchNum,

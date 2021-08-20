@@ -223,13 +223,14 @@ namespace EvaporativeFluidCoolers {
 
         // Default Constructor
         EvapFluidCoolerSpecs()
-        : TypeOf_enum(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PIM::StandardDesignCapacity), Available(true), ON(true), DesignWaterFlowRate(0.0),
-              DesignWaterFlowRateWasAutoSized(false), DesignSprayWaterFlowRate(0.0), DesWaterMassFlowRate(0.0), HighSpeedAirFlowRate(0.0),
-              HighSpeedAirFlowRateWasAutoSized(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false), HighSpeedEvapFluidCoolerUA(0.0),
-              HighSpeedEvapFluidCoolerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0), LowSpeedAirFlowRateWasAutoSized(false),
-              LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0), LowSpeedFanPowerWasAutoSized(false), LowSpeedFanPowerSizingFactor(0.0),
-              LowSpeedEvapFluidCoolerUA(0.0), LowSpeedEvapFluidCoolerUAWasAutoSized(false), LowSpeedEvapFluidCoolerUASizingFactor(0.0),
-              DesignEnteringWaterTemp(0.0), DesignEnteringAirTemp(0.0), DesignEnteringAirWetBulbTemp(0.0), EvapFluidCoolerMassFlowRateMultiplier(0.0),
+            : TypeOf_enum(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PIM::StandardDesignCapacity), Available(true), ON(true),
+              DesignWaterFlowRate(0.0), DesignWaterFlowRateWasAutoSized(false), DesignSprayWaterFlowRate(0.0), DesWaterMassFlowRate(0.0),
+              HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false),
+              HighSpeedEvapFluidCoolerUA(0.0), HighSpeedEvapFluidCoolerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0),
+              LowSpeedAirFlowRateWasAutoSized(false), LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0),
+              LowSpeedFanPowerWasAutoSized(false), LowSpeedFanPowerSizingFactor(0.0), LowSpeedEvapFluidCoolerUA(0.0),
+              LowSpeedEvapFluidCoolerUAWasAutoSized(false), LowSpeedEvapFluidCoolerUASizingFactor(0.0), DesignEnteringWaterTemp(0.0),
+              DesignEnteringAirTemp(0.0), DesignEnteringAirWetBulbTemp(0.0), EvapFluidCoolerMassFlowRateMultiplier(0.0),
               HeatRejectCapNomCapSizingRatio(0.0), HighSpeedStandardDesignCapacity(0.0), LowSpeedStandardDesignCapacity(0.0),
               LowSpeedStandardDesignCapacitySizingFactor(0.0), HighSpeedUserSpecifiedDesignCapacity(0.0), LowSpeedUserSpecifiedDesignCapacity(0.0),
               LowSpeedUserSpecifiedDesignCapacitySizingFactor(0.0), Concentration(0.0), FluidIndex(0), SizFac(0.0), WaterInletNodeNum(0),

@@ -226,7 +226,6 @@ namespace UnitHeater {
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
 
-
         using DataSizing::AutoSize;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanIndex;
@@ -748,7 +747,6 @@ namespace UnitHeater {
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-
 
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::UnitHeater_Num;

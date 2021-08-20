@@ -301,9 +301,11 @@ void WaterThermalTankData::simulate(
     this->initialize(state, FirstHVACIteration);
     //       Plant connected water heaters may have a desuperheater heating coil attached
     if (this->DesuperheaterNum == 0) {
-        if ((this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) || (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankMixed)) {
+        if ((this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) ||
+            (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankMixed)) {
             this->CalcWaterThermalTankMixed(state);
-        } else if ((this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) || (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
+        } else if ((this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) ||
+                   (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
             this->CalcWaterThermalTankStratified(state);
         }
     } else if (this->DesuperheaterNum > 0) {
@@ -4236,7 +4238,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     HPWH.WHOffCycParaFracToTank = Tank.OffCycParaFracToTank;
                     HPWH.WHPLFCurve = Tank.PLFCurve;
 
-                    if (((Tank.TypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) && (HPWH.TypeNum == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped)) ||
+                    if (((Tank.TypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) &&
+                         (HPWH.TypeNum == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped)) ||
                         (Tank.TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified)) {
                         HPWH.TankType = Tank.Type;
                         HPWH.TankTypeNum = Tank.TypeNum;
@@ -4864,7 +4867,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
 void WaterThermalTankData::setupOutputVars(EnergyPlusData &state)
 {
-    if ((this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankMixed) || (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
+    if ((this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankMixed) ||
+        (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
         this->setupChilledWaterTankOutputVars(state);
     } else {
         // moving setupWaterHeaterOutputVars to here causes big table diffs...
@@ -6070,7 +6074,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
 
             // if stratified tank model, ensure that nominal change over rate is greater than one minute, avoid numerical problems.
 
-            if ((this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) || (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
+            if ((this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) ||
+                (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified)) {
                 Real64 MaxSideVolFlow = max(this->UseDesignVolFlowRate, this->SourceDesignVolFlowRate);
 
                 if (MaxSideVolFlow > 0.0) { // protect div by zero
@@ -7683,7 +7688,8 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
     this->HeaterOn2 = this->SavedHeaterOn2;
 
     // Condenser configuration of heat pump water heater
-    const DataPlant::PlantEquipmentType HPWHCondenserConfig = this->HeatPumpNum > 0 ? state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).TypeNum : DataPlant::PlantEquipmentType::Other;
+    const DataPlant::PlantEquipmentType HPWHCondenserConfig =
+        this->HeatPumpNum > 0 ? state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).TypeNum : DataPlant::PlantEquipmentType::Other;
 
     // Heat rate from the heat pump (W)
     const Real64 Qheatpump = [&, this] { // BLB

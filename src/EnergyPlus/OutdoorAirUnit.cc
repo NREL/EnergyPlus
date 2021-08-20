@@ -248,9 +248,6 @@ namespace OutdoorAirUnit {
         auto &GetWHXCoilOutletNode(HVACHXAssistedCoolingCoil::GetCoilOutletNode);
         using DataHVACGlobals::cFanTypes;
 
-
-
-
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanIndex;
@@ -769,7 +766,8 @@ namespace OutdoorAirUnit {
                                                       OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType,
                                                       OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
                                                       ErrorsFound);
-                                OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilPlantTypeOfNum = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilPlantTypeOfNum =
+                                    DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilAirInletNode =
                                     GetWCoilInletNode(state,
                                                       OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType,
@@ -1156,9 +1154,6 @@ namespace OutdoorAirUnit {
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
-
-
-
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::OutdoorAirUnit_Num;
         using FluidProperties::GetDensityGlycol;
@@ -1222,9 +1217,9 @@ namespace OutdoorAirUnit {
                     (OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
 
                     errFlag = false;
-                   ScanPlantLoopsForObject( state,
- OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName,
- OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum,
+                    ScanPlantLoopsForObject(state,
+                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName,
+                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
@@ -1366,7 +1361,8 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum);
                     }
-                    if (static_cast<int>(OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum) == static_cast<int>(CompType::WaterCoil_CoolingHXAsst)) {
+                    if (static_cast<int>(OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum) ==
+                        static_cast<int>(CompType::WaterCoil_CoolingHXAsst)) {
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow =
                             WaterCoils::GetCoilMaxWaterFlowRate(state,
                                                                 OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentType,
@@ -1489,9 +1485,6 @@ namespace OutdoorAirUnit {
         // Using/Aliasing
         using namespace DataSizing;
         using DataHVACGlobals::cFanTypes;
-
-
-
 
         using Fans::GetFanDesignVolumeFlowRate;
 

@@ -98,8 +98,6 @@ namespace WaterToAirHeatPump {
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
 
-
-
     static constexpr std::string_view fluidNameWater("WATER");
 
     void SimWatertoAirHP(EnergyPlusData &state,
@@ -764,7 +762,8 @@ namespace WaterToAirHeatPump {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
-            } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) {
+            } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum ==
+                       DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) {
                 // HEATING COIL Setup Report variables for the Heat Pump
                 SetupOutputVariable(state,
                                     "Heating Coil Electricity Rate",

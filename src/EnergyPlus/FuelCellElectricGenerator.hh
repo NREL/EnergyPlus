@@ -55,8 +55,8 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -548,9 +548,10 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCDataStruct()
-        : TypeOf(DataPlant::PlantEquipmentType::Invalid), FuelSupNum(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0),
-              DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true),
-              SolverErr_Type1_Iter(0), SolverErr_Type1_IterIndex(0), SolverErr_Type2_Iter(0), SolverErr_Type2_IterIndex(0)
+            : TypeOf(DataPlant::PlantEquipmentType::Invalid), FuelSupNum(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
+              ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0), DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true),
+              MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true), SolverErr_Type1_Iter(0), SolverErr_Type1_IterIndex(0), SolverErr_Type2_Iter(0),
+              SolverErr_Type2_IterIndex(0)
         {
         }
 

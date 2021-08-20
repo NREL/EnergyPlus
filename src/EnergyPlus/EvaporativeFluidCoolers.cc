@@ -1889,7 +1889,8 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        if (this->PerformanceInputMethod_Num == PIM::StandardDesignCapacity && this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
+        if (this->PerformanceInputMethod_Num == PIM::StandardDesignCapacity &&
+            this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
             if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->LowSpeedStandardDesignCapacity > 0.0) {
                 // Standard design capacity doesn't include compressor heat;
                 // predefined factor was 1.25 W heat rejection per W of delivered cooling, now user input with default 1.25
@@ -1948,7 +1949,8 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        if (this->PerformanceInputMethod_Num == PIM::UserSpecifiedDesignCapacity && this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
+        if (this->PerformanceInputMethod_Num == PIM::UserSpecifiedDesignCapacity &&
+            this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
             if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->LowSpeedUserSpecifiedDesignCapacity > 0.0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidName,

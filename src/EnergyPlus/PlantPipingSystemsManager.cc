@@ -2114,9 +2114,9 @@ namespace PlantPipingSystemsManager {
             }
 
             bool errFlag = false;
-           PlantUtilities::ScanPlantLoopsForObject( state,
- thisCircuit->Name,
- TypeToLookFor,
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    thisCircuit->Name,
+                                                    TypeToLookFor,
                                                     thisCircuit->LoopNum,
                                                     thisCircuit->LoopSideNum,
                                                     thisCircuit->BranchNum,

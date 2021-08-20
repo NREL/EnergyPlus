@@ -100,7 +100,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     // In general, values set here attempt to avoid as much code as possible so that only the defect code is run.
     // Obviously, not everything can be skipped so some of this information is needed to avoid crashes in other routines.
     auto &thisEFC = state->dataEvapFluidCoolers->SimpleEvapFluidCooler(1);
-    thisEFC.TypeOf_enum = DataPlant::TypeOf_EvapFluidCooler_TwoSpd;
+    thisEFC.TypeOf_enum = DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd;
     thisEFC.MyOneTimeFlag = false;
     thisEFC.OneTimeFlagForEachEvapFluidCooler = false;
     thisEFC.MyEnvrnFlag = false;

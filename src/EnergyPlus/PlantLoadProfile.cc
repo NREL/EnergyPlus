@@ -302,9 +302,9 @@ void PlantProfileData::oneTimeInit(EnergyPlusData &state)
     if (this->SetLoopIndexFlag) {
         if (allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
-           ScanPlantLoopsForObject( state,
- this->Name,
- this->TypeNum,
+            ScanPlantLoopsForObject(state,
+                                    this->Name,
+                                    this->TypeNum,
                                     this->WLoopNum,
                                     this->WLoopSideNum,
                                     this->WLoopBranchNum,
@@ -373,7 +373,8 @@ void GetPlantProfileInput(EnergyPlusData &state)
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataPlantLoadProfile->PlantProfile(ProfileNum).TypeNum = DataPlant::PlantEquipmentType::PlantLoadProfile; // parameter assigned in DataPlant
+            state.dataPlantLoadProfile->PlantProfile(ProfileNum).TypeNum =
+                DataPlant::PlantEquipmentType::PlantLoadProfile; // parameter assigned in DataPlant
 
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).InletNode = GetOnlySingleNode(state,
                                                                                                state.dataIPShortCut->cAlphaArgs(2),

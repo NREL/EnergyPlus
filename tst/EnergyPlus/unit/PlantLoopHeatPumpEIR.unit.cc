@@ -111,7 +111,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfeNum);
+    EXPECT_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfeNum);
     EXPECT_EQ(thisCoolingPLHP, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
@@ -130,17 +130,17 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
+    EXPECT_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
     EXPECT_EQ(thisHeatingPLHP, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, PairingCompanionCoils)
@@ -153,11 +153,11 @@ TEST_F(EnergyPlusFixture, PairingCompanionCoils)
         // a successful try
         coil1->name = "name1";
         coil1->companionCoilName = "name2";
-        coil1->plantTypeOfeNum = DataPlant::TypeOf_HeatPumpEIRCooling;
+        coil1->plantTypeOfeNum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
         coil1->companionHeatPumpCoil = nullptr;
         coil2->name = "name2";
         coil2->companionCoilName = "name1";
-        coil2->plantTypeOfeNum = DataPlant::TypeOf_HeatPumpEIRHeating;
+        coil2->plantTypeOfeNum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
         coil2->companionHeatPumpCoil = nullptr;
         EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(*state);
         EXPECT_EQ(coil2, coil1->companionHeatPumpCoil);
@@ -168,11 +168,11 @@ TEST_F(EnergyPlusFixture, PairingCompanionCoils)
         // but what if we can't find a companion!
         coil1->name = "name1";
         coil1->companionCoilName = "name6";
-        coil1->plantTypeOfeNum = DataPlant::TypeOf_HeatPumpEIRCooling;
+        coil1->plantTypeOfeNum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
         coil1->companionHeatPumpCoil = nullptr;
         coil2->name = "name2";
         coil2->companionCoilName = "name1";
-        coil2->plantTypeOfeNum = DataPlant::TypeOf_HeatPumpEIRHeating;
+        coil2->plantTypeOfeNum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
         coil2->companionHeatPumpCoil = nullptr;
         EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(*state), std::runtime_error);
     }
@@ -181,11 +181,11 @@ TEST_F(EnergyPlusFixture, PairingCompanionCoils)
         // or what if we find a companion but it's the same coil type
         coil1->name = "name1";
         coil1->companionCoilName = "name2";
-        coil1->plantTypeOfeNum = DataPlant::TypeOf_HeatPumpEIRCooling;
+        coil1->plantTypeOfeNum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
         coil1->companionHeatPumpCoil = nullptr;
         coil2->name = "name2";
         coil2->companionCoilName = "name1";
-        coil2->plantTypeOfeNum = DataPlant::TypeOf_HeatPumpEIRCooling;
+        coil2->plantTypeOfeNum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
         coil2->companionHeatPumpCoil = nullptr;
         EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(*state), std::runtime_error);
     }
@@ -218,7 +218,7 @@ TEST_F(EnergyPlusFixture, HeatingConstructionFullObjectsNoCompanion)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -228,15 +228,15 @@ TEST_F(EnergyPlusFixture, HeatingConstructionFullObjectsNoCompanion)
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfeNum);
+    EXPECT_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfeNum);
     EXPECT_EQ(nullptr, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectsNoCompanion)
@@ -266,7 +266,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectsNoCompanion)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -276,15 +276,15 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectsNoCompanion)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
+    EXPECT_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
     EXPECT_EQ(nullptr, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectWithDefaults)
@@ -314,7 +314,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectWithDefaults)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -324,7 +324,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectWithDefaults)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
+    EXPECT_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
     EXPECT_NEAR(1, thisCoolingPLHP->sizingFactor, 0.001);
 }
 
@@ -355,7 +355,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_WaterSource)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -365,15 +365,15 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_WaterSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
+    EXPECT_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
     EXPECT_EQ(nullptr, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, CatchErrorsOnBadCurves)
@@ -396,7 +396,7 @@ TEST_F(EnergyPlusFixture, CatchErrorsOnBadCurves)
                                                       "  dummyCurveC;"});
     ASSERT_TRUE(process_idf(idf_objects));
     // call the factory with a valid name to trigger reading inputs, it should throw for the bad curves
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, Initialization)
@@ -435,7 +435,7 @@ TEST_F(EnergyPlusFixture, Initialization)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -443,13 +443,13 @@ TEST_F(EnergyPlusFixture, Initialization)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -542,7 +542,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -591,10 +591,10 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
     auto &loop2demandComponent2 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
-    loop2demandComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop2demandComponent1.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop1supplyComponent2.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    loop2demandComponent2.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -729,7 +729,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -777,10 +777,10 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
     auto &loop2demandComponent2 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
-    loop2demandComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop2demandComponent1.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop1supplyComponent2.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    loop2demandComponent2.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -866,7 +866,7 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -906,10 +906,10 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
     auto &loop2demandComponent2 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
-    loop2demandComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop2demandComponent1.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop1supplyComponent2.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    loop2demandComponent2.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -979,7 +979,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1015,8 +1015,8 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
 
-    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop2demandComponent1.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -1068,7 +1068,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1104,8 +1104,8 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
 
-    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop2demandComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop2demandComponent1.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop2demandComponent1.Name = thisHeatingPLHP->name;
@@ -1171,10 +1171,10 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1249,7 +1249,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -1257,13 +1257,13 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1399,13 +1399,13 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     auto &PLHPPlantDemandSideComp = state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1);
     auto &extraPLHPPlantSupplySideComp = state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp(1);
     auto &extraPLHPPlantDemandSideComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantSupplySideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
-    PLHPPlantDemandSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
-    extraPLHPPlantSupplySideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
-    extraPLHPPlantDemandSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantSupplySideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    PLHPPlantDemandSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    extraPLHPPlantSupplySideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    extraPLHPPlantDemandSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
     EIRPlantLoopHeatPump *thisCoolingPLHP = &state->dataEIRPlantLoopHeatPump->heatPumps[0];
 
@@ -1500,7 +1500,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
@@ -1509,14 +1509,14 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
     PlantLocation mySourceLocation = PlantLocation(2, 1, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1634,7 +1634,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
@@ -1643,13 +1643,13 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1794,7 +1794,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1805,7 +1805,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfeNum);
+    EXPECT_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfeNum);
     EXPECT_EQ(thisCoolingPLHP, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
@@ -1813,17 +1813,17 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
+    EXPECT_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
     EXPECT_EQ(thisHeatingPLHP, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
@@ -1863,14 +1863,14 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -1980,14 +1980,14 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2103,7 +2103,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_AirSource)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2113,15 +2113,15 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_AirSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
+    EXPECT_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
     EXPECT_EQ(nullptr, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "fake"), std::runtime_error);
-    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "fake"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, ClearState)
@@ -2151,7 +2151,7 @@ TEST_F(EnergyPlusFixture, ClearState)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
     EXPECT_EQ(state->dataEIRPlantLoopHeatPump->heatPumps.size(), 1u);
 
     // test that vector is cleared
@@ -2195,13 +2195,13 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2315,7 +2315,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2357,8 +2357,8 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop1supplyComponent2.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop1supplyComponent2.Name = thisCoolingPLHP->name;
@@ -2479,7 +2479,7 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2517,8 +2517,8 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
 
-    loop1supplyComponent1.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
-    loop1supplyComponent2.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    loop1supplyComponent1.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop1supplyComponent2.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     loop1supplyComponent1.Name = thisHeatingPLHP->name;
     loop1supplyComponent2.Name = thisCoolingPLHP->name;
@@ -2654,7 +2654,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideLoop = state->dataPlnt->PlantLoop(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
     state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
@@ -2663,10 +2663,10 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
 
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2751,7 +2751,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
@@ -2760,13 +2760,13 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2852,7 +2852,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     // then the source side
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
@@ -2861,13 +2861,13 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSourceComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
 
     // the init call expects a "from" calling point
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
@@ -2952,13 +2952,13 @@ TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
     auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.TypeOf_enum = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
     PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(*state, DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
     EXPECT_EQ(1u, state->dataEIRPlantLoopHeatPump->heatPumps.size());

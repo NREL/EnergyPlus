@@ -1960,7 +1960,8 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     auto &this_equip_list(this_op_scheme.EquipList(ListNum));
                     for (int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum) {
                         auto &this_equip(this_equip_list.Comp(EquipNum));
-                        ThisTypeOfNum = static_cast<DataPlant::PlantEquipmentType>(UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes));
+                        ThisTypeOfNum = static_cast<DataPlant::PlantEquipmentType>(
+                            UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes));
                         errFlag1 = false;
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 this_equip.Name,
@@ -1989,27 +1990,31 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         this_equip.BranchNumPtr = BranchNum;
                         this_equip.CompNumPtr = CompNum;
 
-                        if (ValidLoopEquipTypes(static_cast<int>(ThisTypeOfNum)) == LoopType::Plant && this_plant_loop.TypeOfLoop == LoopType::Condenser) {
+                        if (ValidLoopEquipTypes(static_cast<int>(ThisTypeOfNum)) == LoopType::Plant &&
+                            this_plant_loop.TypeOfLoop == LoopType::Condenser) {
                             ShowSevereError(state,
                                             "InitLoadDistribution: CondenserLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
                                                 this_plant_loop.OperationScheme + "\",");
                             ShowContinueError(state,
                                               "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
                                                   "\" includes equipment that is not valid on a Condenser Loop");
-                            ShowContinueError(
-                                state, "Component " + ccSimPlantEquipTypes(static_cast<int>(ThisTypeOfNum)) + " not allowed as supply equipment on this type of loop.");
+                            ShowContinueError(state,
+                                              "Component " + ccSimPlantEquipTypes(static_cast<int>(ThisTypeOfNum)) +
+                                                  " not allowed as supply equipment on this type of loop.");
                             ShowContinueError(state, "Component name = " + this_equip.Name);
                             errFlag2 = true;
                         }
-                        if (ValidLoopEquipTypes(static_cast<int>(ThisTypeOfNum)) == LoopType::Condenser && this_plant_loop.TypeOfLoop == LoopType::Plant) {
+                        if (ValidLoopEquipTypes(static_cast<int>(ThisTypeOfNum)) == LoopType::Condenser &&
+                            this_plant_loop.TypeOfLoop == LoopType::Plant) {
                             ShowSevereError(state,
                                             "InitLoadDistribution: PlantLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
                                                 this_plant_loop.OperationScheme + "\",");
                             ShowContinueError(state,
                                               "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
                                                   "\" includes equipment that is not valid on a Plant Loop");
-                            ShowContinueError(
-                                state, "Component " + ccSimPlantEquipTypes(static_cast<int>(ThisTypeOfNum)) + " not allowed as supply equipment on this type of loop.");
+                            ShowContinueError(state,
+                                              "Component " + ccSimPlantEquipTypes(static_cast<int>(ThisTypeOfNum)) +
+                                                  " not allowed as supply equipment on this type of loop.");
                             ShowContinueError(state, "Component name = " + this_equip.Name);
                             errFlag2 = true;
                         }
@@ -3266,8 +3271,9 @@ void TurnOnPlantLoopPipes(EnergyPlusData &state, int const LoopNum, int const Lo
              ++MachineOnLoopNum) {
             {
                 auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnLoopNum).TypeOf_enum);
-                if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::Pipe) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeInterior) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeExterior) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::ValveTempering)) {
+                if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::Pipe) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeInterior) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeExterior) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeUnderground)) {
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnLoopNum).ON = true;
                 } else {
                     // Don't do anything
@@ -3454,9 +3460,9 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).EMSCtrlOverrideValue);
                 }
                 for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-                    ActuatorName =
-                        "Plant Component " +
-                        ccSimPlantEquipTypes(static_cast<int>(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).TypeOf_enum));
+                    ActuatorName = "Plant Component " +
+                                   ccSimPlantEquipTypes(static_cast<int>(
+                                       state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).TypeOf_enum));
                     UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name;
                     ActuatorType = "On/Off Supervisory";
                     SetupEMSActuator(state,
@@ -3564,7 +3570,8 @@ void ActivateEMSControls(
             // Check lower/upper temperature limit for chillers
             {
                 auto const SELECT_CASE_var(this_comp.TypeOf_enum);
-                if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_Electric) ||
+                if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_Electric) ||
                     (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR)) {
 
                     //- Retrieve data from the plant loop data structure

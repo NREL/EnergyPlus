@@ -572,9 +572,9 @@ namespace FourPipeBeam {
         if (this->plantLoopScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             if (this->beamCoolingPresent) {
-               ScanPlantLoopsForObject( state,
- this->name,
- DataPlant::PlantEquipmentType::FourPipeBeamAirTerminal,
+                ScanPlantLoopsForObject(state,
+                                        this->name,
+                                        DataPlant::PlantEquipmentType::FourPipeBeamAirTerminal,
                                         this->cWLocation.loopNum,
                                         this->cWLocation.loopSideNum,
                                         this->cWLocation.branchNum,
@@ -590,9 +590,9 @@ namespace FourPipeBeam {
                 }
             }
             if (this->beamHeatingPresent) {
-               ScanPlantLoopsForObject( state,
- this->name,
- DataPlant::PlantEquipmentType::FourPipeBeamAirTerminal,
+                ScanPlantLoopsForObject(state,
+                                        this->name,
+                                        DataPlant::PlantEquipmentType::FourPipeBeamAirTerminal,
                                         this->hWLocation.loopNum,
                                         this->hWLocation.loopSideNum,
                                         this->hWLocation.branchNum,

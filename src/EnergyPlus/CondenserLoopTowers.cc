@@ -2693,7 +2693,8 @@ namespace CondenserLoopTowers {
         // Find the appropriate Plant Sizing object
         int PltSizCondNum = state.dataPlnt->PlantLoop(this->LoopNum).PlantSizNum;
 
-        if (this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_SingleSpd || this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_TwoSpd) {
+        if (this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_SingleSpd ||
+            this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_TwoSpd) {
             if (this->TowerInletCondsAutoSize) {
                 if (PltSizCondNum > 0) {
                     // use plant sizing data
@@ -2888,7 +2889,8 @@ namespace CondenserLoopTowers {
                     }
                 }
             }
-            if (this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_SingleSpd || this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_VarSpd) {
+            if (this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_SingleSpd ||
+                this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_VarSpd) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
                         state, this->TowerType, this->Name, "Fan Power at Design Air Flow Rate [W]", this->HighSpeedFanPower);
@@ -2913,7 +2915,8 @@ namespace CondenserLoopTowers {
             tmpHighSpeedAirFlowRate = tmpHighSpeedFanPower * 0.5 * (101325.0 / state.dataEnvrn->StdBaroPress) / 190.0;
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 
-            if (this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_SingleSpd || this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_VarSpd) {
+            if (this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_SingleSpd ||
+                this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_VarSpd) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                 }

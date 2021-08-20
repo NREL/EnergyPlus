@@ -114,9 +114,6 @@ namespace EnergyPlus::PipeHeatTransfer {
 // Using/Aliasing
 using namespace GroundTemperatureManager;
 
-
-
-
 // Functions
 
 PlantComponent *PipeHTData::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
@@ -554,7 +551,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                  state.dataIPShortCut->cAlphaFieldNames(1),
                                                  ErrorsFound);
         state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipeHT->PipeHT(Item).TypeOf = DataPlant::PlantEquipmentType::ValveTempering;
+        state.dataPipeHT->PipeHT(Item).TypeOf = DataPlant::PlantEquipmentType::PipeUnderground;
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);

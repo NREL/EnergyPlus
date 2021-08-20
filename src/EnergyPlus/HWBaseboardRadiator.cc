@@ -492,7 +492,8 @@ namespace HWBaseboardRadiator {
                 state, cCMO_BBRadiator_Water, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water + " Name");
 
             HWBaseboard(BaseboardNum).EquipID = state.dataIPShortCut->cAlphaArgs(1); // Name of this baseboard
-            HWBaseboard(BaseboardNum).EquipType = DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water;   //'ZoneHVAC:Baseboard:RadiantConvective:Water'
+            HWBaseboard(BaseboardNum).EquipType =
+                DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water; //'ZoneHVAC:Baseboard:RadiantConvective:Water'
 
             HWBaseboard(BaseboardNum).designObjectName = state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
             HWBaseboard(BaseboardNum).DesignObjectPtr =
@@ -942,9 +943,9 @@ namespace HWBaseboardRadiator {
         if (SetLoopIndexFlag(BaseboardNum)) {
             if (allocated(state.dataPlnt->PlantLoop)) {
                 errFlag = false;
-               ScanPlantLoopsForObject( state,
- HWBaseboard(BaseboardNum).EquipID,
- HWBaseboard(BaseboardNum).EquipType,
+                ScanPlantLoopsForObject(state,
+                                        HWBaseboard(BaseboardNum).EquipID,
+                                        HWBaseboard(BaseboardNum).EquipType,
                                         HWBaseboard(BaseboardNum).LoopNum,
                                         HWBaseboard(BaseboardNum).LoopSideNum,
                                         HWBaseboard(BaseboardNum).BranchNum,
@@ -1884,7 +1885,6 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using DataPlant::ccSimPlantEquipTypes;
-
 
         using PlantUtilities::PullCompInterconnectTrigger;
 

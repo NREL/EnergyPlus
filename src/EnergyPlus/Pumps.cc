@@ -233,10 +233,6 @@ void GetPumpInput(EnergyPlusData &state)
     using DataHeatBalance::IntGainTypeOf_PumpBank_ConSpeed;
     using DataHeatBalance::IntGainTypeOf_PumpBank_VarSpeed;
 
-
-
-
-
     using DataSizing::AutoSize;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSatDensityRefrig;

@@ -95,7 +95,6 @@ namespace VariableSpeedCoils {
     using namespace DataSizing;
     using namespace DataHVACGlobals;
 
-
     using DXCoils::AdjustCBF;
     using DXCoils::CalcCBF;
 

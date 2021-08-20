@@ -1617,9 +1617,9 @@ namespace WaterUse {
 
         if (this->plantScanFlag && allocated(state.dataPlnt->PlantLoop) && !this->StandAlone) {
             bool errFlag = false;
-           PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::WaterUseConnection,
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    DataPlant::PlantEquipmentType::WaterUseConnection,
                                                     this->PlantLoopNum,
                                                     this->PlantLoopSide,
                                                     this->PlantLoopBranchNum,

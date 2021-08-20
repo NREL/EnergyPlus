@@ -492,28 +492,40 @@ namespace DataPlant {
                 auto const SELECT_CASE_var(ComponentTypeOfNum);
 
                 // possibly air-connected components
-                if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWaterCooling) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilSteamAirHeating) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilUserDefined) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilVSWAHPCoolingEquationFit) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilVSWAHPHeatingEquationFit) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::PackagedTESCoolingCoil)) {
+                if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilSteamAirHeating) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilUserDefined) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilVSWAHPCoolingEquationFit) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilVSWAHPHeatingEquationFit) ||
+                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::PackagedTESCoolingCoil)) {
 
                     this->SimAirLoopsNeeded = true;
                     // sometimes these coils are children in ZoneHVAC equipment
                     // PlantLoop(LoopNum)%LoopSide(LoopSideNum)%SimZoneEquipNeeded= .TRUE.
 
-                } else if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::CoolingPanel_Simple) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::Baseboard_Conv_Water) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::LowTempRadiant_ConstFlow) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::CooledBeamAirTerminal) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::ZoneHVACAirUserDefined) ||
+                } else if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::CoolingPanel_Simple) ||
+                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Baseboard_Conv_Water) ||
+                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam) ||
+                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water) ||
+                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow) ||
+                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::LowTempRadiant_ConstFlow) ||
+                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::CooledBeamAirTerminal) ||
+                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::ZoneHVACAirUserDefined) ||
                            (SELECT_CASE_var == DataPlant::PlantEquipmentType::AirTerminalUserDefined) ||
                            (SELECT_CASE_var == DataPlant::PlantEquipmentType::FourPipeBeamAirTerminal)) { // zone connected components
 
                     this->SimZoneEquipNeeded = true;
 
-                } else if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_FCExhaust) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_FCStackCooler) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_MicroCHP) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_MicroTurbine) ||
+                } else if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_FCExhaust) ||
+                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_FCStackCooler) ||
+                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_MicroCHP) ||
+                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_MicroTurbine) ||
                            (SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_ICEngine) ||
                            (SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_CTurbine)) { // electric center connected components
 
@@ -1155,7 +1167,8 @@ namespace DataPlant {
                         auto const &component(branch.Comp(CompCounter));
                         auto const SELECT_CASE_var(component.TypeOf_enum);
                         if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpVariableSpeed) ||
-                            (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) || (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpCondensate)) {
+                            (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) ||
+                            (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpCondensate)) {
                             if (component.CompNum > 0) {
                                 auto &this_pump(state.dataPumps->PumpEquip(component.CompNum));
                                 this_pump.LoopSolverOverwriteFlag = true;
@@ -1265,8 +1278,6 @@ namespace DataPlant {
         // properties.  Finally, Max/MinAvail are reset for the next time step.
 
         // Using/Aliasing
-
-
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const LoopSideName(2, {"Demand", "Supply"});
@@ -1602,7 +1613,8 @@ namespace DataPlant {
                             auto &this_comp(this_splitter_outlet_branch.Comp(CompCounter));
 
                             // if this isn't a variable speed pump then just keep cycling
-                            if ((this_comp.TypeOf_enum != PlantEquipmentType::PumpVariableSpeed) && (this_comp.TypeOf_enum != PlantEquipmentType::PumpBankVariableSpeed)) {
+                            if ((this_comp.TypeOf_enum != PlantEquipmentType::PumpVariableSpeed) &&
+                                (this_comp.TypeOf_enum != PlantEquipmentType::PumpBankVariableSpeed)) {
                                 continue;
                             }
 

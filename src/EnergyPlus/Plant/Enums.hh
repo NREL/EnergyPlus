@@ -92,18 +92,18 @@ enum OpSchemeType
     ThermalEnergyStorageSchemeType = 17 // Scheme Type for Simplified Thermal Energy Storage operation
 };
 
-
-enum class PlantEquipmentType {
+enum class PlantEquipmentType
+{
     Invalid = -1,
     Other = 0,
     Boiler_Simple = 1,
     Boiler_Steam = 2,
-    Chiller_Absorption = 3,           // older BLAST absorption chiller
-    Chiller_Indirect_Absorption = 4,  // revised absorption chiller
+    Chiller_Absorption = 3,          // older BLAST absorption chiller
+    Chiller_Indirect_Absorption = 4, // revised absorption chiller
     Chiller_CombTurbine = 5,
     Chiller_ConstCOP = 6,
     Chiller_DFAbsorption = 7,
-    Chiller_Electric = 8,  // basic BLAST Chiller
+    Chiller_Electric = 8, // basic BLAST Chiller
     Chiller_ElectricEIR = 9,
     Chiller_ElectricReformEIR = 10,
     Chiller_EngineDriven = 11,
@@ -134,18 +134,18 @@ enum class PlantEquipmentType {
     PumpBankVariableSpeed = 36,
     PumpBankConstantSpeed = 37,
     WaterUseConnection = 38,
-    CoilWaterCooling = 39,              // demand side component
-    CoilWaterDetailedFlatCooling = 40,  // demand side component
-    CoilWaterSimpleHeating = 41,        // demand side component
-    CoilSteamAirHeating = 42,           // demand side component
-    SolarCollectorFlatPlate = 43,       // demand side component
-    PlantLoadProfile = 44,              // demand side component
+    CoilWaterCooling = 39,             // demand side component
+    CoilWaterDetailedFlatCooling = 40, // demand side component
+    CoilWaterSimpleHeating = 41,       // demand side component
+    CoilSteamAirHeating = 42,          // demand side component
+    SolarCollectorFlatPlate = 43,      // demand side component
+    PlantLoadProfile = 44,             // demand side component
     GrndHtExchgSystem = 45,
     GrndHtExchgSurface = 46,
     GrndHtExchgPond = 47,
-    Generator_MicroTurbine = 48,  // newer FSEC turbine
+    Generator_MicroTurbine = 48, // newer FSEC turbine
     Generator_ICEngine = 49,
-    Generator_CTurbine = 50,  // older BLAST turbine
+    Generator_CTurbine = 50, // older BLAST turbine
     Generator_MicroCHP = 51,
     Generator_FCStackCooler = 52,
     FluidCooler_SingleSpd = 53,

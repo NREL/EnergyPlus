@@ -4957,7 +4957,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                 }
                                             }
                                         }
-                                        if (state.dataSetPointManager->InitSetPointManagerNumChiller) {
+                                        if (state.dataSetPointManager->InitSetPointManagerNumChiller > 1) {
                                             ShowSevereError(state,
                                                             cSetPointManagerType + "=\"" +
                                                                 state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).Name +
@@ -7452,8 +7452,9 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
     CurLoad =
         std::abs(state.dataPlnt->PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).MyLoad);
     if (CurLoad > 0) {
-        if (TypeNum == PlantEquipmentType::Chiller_Absorption || TypeNum == PlantEquipmentType::Chiller_CombTurbine || TypeNum == PlantEquipmentType::Chiller_Electric ||
-            TypeNum == PlantEquipmentType::Chiller_ElectricReformEIR || TypeNum == PlantEquipmentType::Chiller_EngineDriven) {
+        if (TypeNum == PlantEquipmentType::Chiller_Absorption || TypeNum == PlantEquipmentType::Chiller_CombTurbine ||
+            TypeNum == PlantEquipmentType::Chiller_Electric || TypeNum == PlantEquipmentType::Chiller_ElectricReformEIR ||
+            TypeNum == PlantEquipmentType::Chiller_EngineDriven) {
             TempDesCondIn = state.dataPlnt->PlantLoop(LoopIndexPlantSide)
                                 .LoopSide(SupplySide)
                                 .Branch(BranchIndexPlantSide)

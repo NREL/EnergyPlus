@@ -156,9 +156,9 @@ void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
     if (this->plantScanFlag) {
         // Locate the heating on the plant loops for later usage
         bool errFlag = false;
-       PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::HPWaterPEHeating,
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::PlantEquipmentType::HPWaterPEHeating,
                                                 this->SourceLoopNum,
                                                 this->SourceLoopSideNum,
                                                 this->SourceBranchNum,
@@ -169,9 +169,9 @@ void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
                                                 _,
                                                 this->SourceSideInletNodeNum,
                                                 _);
-       PlantUtilities::ScanPlantLoopsForObject( state,
- this->Name,
- DataPlant::PlantEquipmentType::HPWaterPEHeating,
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::PlantEquipmentType::HPWaterPEHeating,
                                                 this->LoadLoopNum,
                                                 this->LoadLoopSideNum,
                                                 this->LoadBranchNum,

@@ -500,9 +500,9 @@ namespace AirLoopHVACDOAS {
                                               "The control node number is not found in " + CurrentModuleObject + " = " +
                                                   state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
-                       PlantUtilities::ScanPlantLoopsForObject( state,
- CompName,
- DataPlant::PlantEquipmentType::CoilWaterCooling,
+                        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                                CompName,
+                                                                DataPlant::PlantEquipmentType::CoilWaterCooling,
                                                                 thisDOAS.CWLoopNum,
                                                                 thisDOAS.CWLoopSide,
                                                                 thisDOAS.CWBranchNum,
@@ -533,9 +533,9 @@ namespace AirLoopHVACDOAS {
                                               "The control node number is not found in " + CurrentModuleObject + " = " +
                                                   state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
-                       PlantUtilities::ScanPlantLoopsForObject( state,
- CompName,
- DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
+                        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                                CompName,
+                                                                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                                                 thisDOAS.HWLoopNum,
                                                                 thisDOAS.HWLoopSide,
                                                                 thisDOAS.HWBranchNum,
@@ -573,9 +573,9 @@ namespace AirLoopHVACDOAS {
                                               "The control node number is not found in " + CurrentModuleObject + " = " +
                                                   state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
-                       PlantUtilities::ScanPlantLoopsForObject( state,
- CompName,
- DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling,
+                        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                                CompName,
+                                                                DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling,
                                                                 thisDOAS.CWLoopNum,
                                                                 thisDOAS.CWLoopSide,
                                                                 thisDOAS.CWBranchNum,

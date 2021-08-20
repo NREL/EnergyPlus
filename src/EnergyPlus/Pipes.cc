@@ -120,7 +120,7 @@ void LocalPipeData::oneTimeInit(EnergyPlusData &state)
     int FoundOnLoop = 0;
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(
-                    state, this->Name, this->TypeOf,this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, errFlag, _, _, FoundOnLoop, _, _);
+        state, this->Name, this->TypeOf, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, errFlag, _, _, FoundOnLoop, _, _);
     // Clang can't tell that the FoundOnLoop argument is actually passed by reference since it is an optional, so it thinks FoundOnLoop is always 0.
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "ConstantConditionsOC"

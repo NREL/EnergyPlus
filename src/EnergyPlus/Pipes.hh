@@ -56,8 +56,8 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -73,21 +73,21 @@ namespace Pipes {
 
         // Members
         std::string Name;
-        DataPlant::PlantEquipmentType TypeOf;        // type of pipe
-        int InletNodeNum;  // Node number on the inlet side of the plant
-        int OutletNodeNum; // Node number on the inlet side of the plant
-        int LoopNum;       // Index of plant loop where this pipe resides
-        int LoopSide;      // Index of plant loop side where this pipe resides
-        int BranchIndex;   // Index of plant Branch index where this pipe resides
-        int CompIndex;     // Index of plant Comp index where this pipe resides
+        DataPlant::PlantEquipmentType TypeOf; // type of pipe
+        int InletNodeNum;                     // Node number on the inlet side of the plant
+        int OutletNodeNum;                    // Node number on the inlet side of the plant
+        int LoopNum;                          // Index of plant loop where this pipe resides
+        int LoopSide;                         // Index of plant loop side where this pipe resides
+        int BranchIndex;                      // Index of plant Branch index where this pipe resides
+        int CompIndex;                        // Index of plant Comp index where this pipe resides
         bool OneTimeInit;
         bool CheckEquipName;
         bool EnvrnFlag;
 
         // Default Constructor
         LocalPipeData()
-        : TypeOf(DataPlant::PlantEquipmentType::Invalid), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(0), BranchIndex(0), CompIndex(0), OneTimeInit(true),
-              CheckEquipName(true), EnvrnFlag(true)
+            : TypeOf(DataPlant::PlantEquipmentType::Invalid), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(0), BranchIndex(0),
+              CompIndex(0), OneTimeInit(true), CheckEquipName(true), EnvrnFlag(true)
         {
         }
 

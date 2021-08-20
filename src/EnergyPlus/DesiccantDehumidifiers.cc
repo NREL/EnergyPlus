@@ -1836,9 +1836,9 @@ namespace DesiccantDehumidifiers {
                 (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingSteam)) {
                 if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingWater) {
                     ErrorFlag = false;
-                   ScanPlantLoopsForObject( state,
- DesicDehum(DesicDehumNum).RegenCoilName,
- DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
+                    ScanPlantLoopsForObject(state,
+                                            DesicDehum(DesicDehumNum).RegenCoilName,
+                                            DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                             DesicDehum(DesicDehumNum).LoopNum,
                                             DesicDehum(DesicDehumNum).LoopSide,
                                             DesicDehum(DesicDehumNum).BranchNum,
@@ -1868,9 +1868,9 @@ namespace DesiccantDehumidifiers {
                 } else if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingSteam) {
 
                     ErrorFlag = false;
-                   ScanPlantLoopsForObject( state,
- DesicDehum(DesicDehumNum).RegenCoilName,
- DataPlant::PlantEquipmentType::CoilSteamAirHeating,
+                    ScanPlantLoopsForObject(state,
+                                            DesicDehum(DesicDehumNum).RegenCoilName,
+                                            DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                             DesicDehum(DesicDehumNum).LoopNum,
                                             DesicDehum(DesicDehumNum).LoopSide,
                                             DesicDehum(DesicDehumNum).BranchNum,

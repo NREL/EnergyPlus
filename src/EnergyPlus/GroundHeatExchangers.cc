@@ -3184,8 +3184,19 @@ void GLHEVert::oneTimeInit(EnergyPlusData &state)
     if (this->myOneTImeInitFlag) {
         // Locate the hx on the plant loops for later usage
         bool errFlag = false;
-        ScanPlantLoopsForObject(
-            state, this->name, DataPlant::PlantEquipmentType::GrndHtExchgSystem, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+        ScanPlantLoopsForObject(state,
+                                this->name,
+                                DataPlant::PlantEquipmentType::GrndHtExchgSystem,
+                                this->loopNum,
+                                this->loopSideNum,
+                                this->branchNum,
+                                this->compNum,
+                                errFlag,
+                                _,
+                                _,
+                                _,
+                                _,
+                                _);
         if (errFlag) {
             ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
         }
@@ -3270,8 +3281,19 @@ void GLHESlinky::oneTimeInit(EnergyPlusData &state)
     if (this->myOneTImeInitFlag) {
         // Locate the hx on the plant loops for later usage
         bool errFlag = false;
-        ScanPlantLoopsForObject(
-            state, this->name, DataPlant::PlantEquipmentType::GrndHtExchgSlinky, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+        ScanPlantLoopsForObject(state,
+                                this->name,
+                                DataPlant::PlantEquipmentType::GrndHtExchgSlinky,
+                                this->loopNum,
+                                this->loopSideNum,
+                                this->branchNum,
+                                this->compNum,
+                                errFlag,
+                                _,
+                                _,
+                                _,
+                                _,
+                                _);
         if (errFlag) {
             ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
         }

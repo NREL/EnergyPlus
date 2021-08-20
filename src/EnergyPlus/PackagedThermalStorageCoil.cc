@@ -2221,9 +2221,9 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
 
         if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
             errFlag = false;
-           ScanPlantLoopsForObject( state,
- state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name,
- DataPlant::PlantEquipmentType::PackagedTESCoolingCoil,
+            ScanPlantLoopsForObject(state,
+                                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name,
+                                    DataPlant::PlantEquipmentType::PackagedTESCoolingCoil,
                                     plloopnum,
                                     lsnum,
                                     brnum,
