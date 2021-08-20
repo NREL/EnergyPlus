@@ -1120,7 +1120,8 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                 }
                 // interior window report
             } else if ((Surface(iSurf).Class == SurfaceClass::Window) || (Surface(iSurf).Class == SurfaceClass::TDD_Dome)) {
-                if (!has_prefix(Surface(iSurf).Name, "iz-")) { // don't count created interzone surfaces that are mirrors of other surfaces
+                if (!has_prefix(Surface(iSurf).Name,
+                                "iz-")) { // don't count created interzone surfaces that are mirrors of other surfaces
                     surfName = Surface(iSurf).Name;
                     curCons = Surface(iSurf).Construction;
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntFenCons, surfName, state.dataConstruction->Construct(curCons).Name);
@@ -2380,6 +2381,7 @@ void EvalInsideMovableInsulation(EnergyPlusData &state)
         state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) = state.dataMaterial->Material(MaterialIndex).AbsorpThermal;
     }
 }
+
 void InitSolarHeatGains(EnergyPlusData &state)
 {
 
@@ -2678,8 +2680,10 @@ void InitSolarHeatGains(EnergyPlusData &state)
     }
 
     if (currSolRadPositive) { // Sun is up, calculate solar quantities
-        assert(equal_dimensions(state.dataSurface->SurfReflFacBmToBmSolObs, state.dataSurface->SurfReflFacBmToDiffSolObs)); // For linear indexing
-        assert(equal_dimensions(state.dataSurface->SurfReflFacBmToBmSolObs, state.dataSurface->SurfReflFacBmToDiffSolGnd)); // For linear indexing
+        assert(equal_dimensions(state.dataSurface->SurfReflFacBmToBmSolObs,
+                                state.dataSurface->SurfReflFacBmToDiffSolObs)); // For linear indexing
+        assert(equal_dimensions(state.dataSurface->SurfReflFacBmToBmSolObs,
+                                state.dataSurface->SurfReflFacBmToDiffSolGnd)); // For linear indexing
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfSkySolarInc(SurfNum) = state.dataEnvrn->DifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum);
             state.dataSurface->SurfGndSolarInc(SurfNum) = state.dataEnvrn->GndSolarRad * Surface(SurfNum).ViewFactorGround;
@@ -2774,8 +2778,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
         if (state.dataHeatBalSurf->InterZoneWindow) {
             for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
                 if (state.dataHeatBalSurf->EnclSolRecDifShortFromZ(enclNum)) {
-                    Real64 EnclSolQSDifSol_sum(0.0);                                            // Accumulator
-                    auto lZone(state.dataHeatBalSurf->ZoneFractDifShortZtoZ.index(enclNum, 1)); // Tuned Linear indexing
+                    Real64 EnclSolQSDifSol_sum(0.0); // Accumulator
+                    auto lZone(state.dataHeatBalSurf->ZoneFractDifShortZtoZ.index(enclNum,
+                                                                                  1)); // Tuned Linear indexing
                     for (int otherEnclNum = 1; otherEnclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++otherEnclNum, ++lZone) {
                         if ((otherEnclNum != enclNum) && (state.dataHeatBalSurf->EnclSolRecDifShortFromZ(otherEnclNum))) {
                             EnclSolQSDifSol_sum += state.dataHeatBalSurf->ZoneFractDifShortZtoZ[lZone] *
@@ -2910,9 +2915,11 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso /
                                        state.dataConstruction->Construct(ConstrNum).TransDiff;
             // Incident direct (unreflected) beam
-            state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) =
-                currBeamSolar(SurfNum) * state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum2) *
-                currCosInc(SurfNum); // NOTE: sunlit and coninc array set to SurfNum2
+            state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) = currBeamSolar(SurfNum) *
+                                                                    state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay,
+                                                                                                      state.dataGlobal->TimeStep,
+                                                                                                      SurfNum2) *
+                                                                    currCosInc(SurfNum); // NOTE: sunlit and coninc array set to SurfNum2
 
             // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
             state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = currSkySolarInc(SurfNum);
@@ -5133,7 +5140,8 @@ void UpdateThermalHistories(EnergyPlusData &state)
     } // ...end of loop over all (heat transfer) surfaces
 }
 
-void CalculateZoneMRT(EnergyPlusData &state, Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
+void CalculateZoneMRT(EnergyPlusData &state,
+                      Optional_int_const ZoneToResimulate) // if passed in, then only calculate surfaces that have this zone
 {
 
     // SUBROUTINE INFORMATION:
@@ -5551,6 +5559,7 @@ void ReportVisualResilience(EnergyPlusData &state)
         }
     } // loop over zones
 }
+
 void ReportSurfaceHeatBalance(EnergyPlusData &state)
 {
 
@@ -6831,22 +6840,22 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                 (TempTerm + construct.CTFSourceIn(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +
                                  IterDampConst * state.dataHeatBalSurf->SurfTempInsOld(SurfNum)) *
                                 TempDiv; // Constant portion of conduction eq (history terms) | LW radiation from internal sources | SW radiation
-                                         // from internal sources | Convection from surface to zone air | Net radiant exchange with other zone
-                                         // surfaces | Heat source/sink term for radiant systems | (if there is one present) | Radiant flux from a
-                                         // high temperature radiant heater | Radiant flux from a hot water baseboard heater | Radiant flux from a
-                                         // steam baseboard heater | Radiant flux from an electric baseboard heater | Iterative damping term (for
-                                         // stability) | Conduction term (both partition sides same temp) | Conduction term (both partition sides
-                                         // same temp) | Convection and damping term | Radiation from AFN ducts
+                            // from internal sources | Convection from surface to zone air | Net radiant exchange with other zone
+                            // surfaces | Heat source/sink term for radiant systems | (if there is one present) | Radiant flux from a
+                            // high temperature radiant heater | Radiant flux from a hot water baseboard heater | Radiant flux from a
+                            // steam baseboard heater | Radiant flux from an electric baseboard heater | Iterative damping term (for
+                            // stability) | Conduction term (both partition sides same temp) | Conduction term (both partition sides
+                            // same temp) | Convection and damping term | Radiation from AFN ducts
                         } else {
                             state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
                                 (TempTerm + IterDampConst * state.dataHeatBalSurf->SurfTempInsOld(SurfNum)) *
                                 TempDiv; // Constant portion of conduction eq (history terms) | LW radiation from internal sources | SW radiation
-                                         // from internal sources | Convection from surface to zone air | Net radiant exchange with other zone
-                                         // surfaces | Heat source/sink term for radiant systems | (if there is one present) | Radiant flux from a
-                                         // high temperature radiant heater | Radiant flux from a hot water baseboard heater | Radiant flux from a
-                                         // steam baseboard heater | Radiant flux from an electric baseboard heater | Iterative damping term (for
-                                         // stability) | Conduction term (both partition sides same temp) | Conduction term (both partition sides
-                                         // same temp) | Convection and damping term | Radiation from AFN ducts
+                            // from internal sources | Convection from surface to zone air | Net radiant exchange with other zone
+                            // surfaces | Heat source/sink term for radiant systems | (if there is one present) | Radiant flux from a
+                            // high temperature radiant heater | Radiant flux from a hot water baseboard heater | Radiant flux from a
+                            // steam baseboard heater | Radiant flux from an electric baseboard heater | Iterative damping term (for
+                            // stability) | Conduction term (both partition sides same temp) | Conduction term (both partition sides
+                            // same temp) | Convection and damping term | Radiation from AFN ducts
                         }
                     } else { // this is a pool and it has been simulated this time step
                         state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
@@ -6854,14 +6863,14 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                              IterDampConst * state.dataHeatBalSurf->SurfTempInsOld(SurfNum)) /
                             (construct.CTFInside(0) - construct.CTFCross(0) + state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) +
                              IterDampConst); // Constant part of conduction eq (history terms) | Pool modified terms (see
-                                             // non-pool equation for details) | Iterative damping term (for stability) |
-                                             // Conduction term (both partition sides same temp) | Pool and damping term
+                        // non-pool equation for details) | Iterative damping term (for stability) |
+                        // Conduction term (both partition sides same temp) | Pool and damping term
                     }
                     if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
                         state.dataHeatBalSurf->SurfTempInTmp(SurfNum) -=
                             state.dataMstBalEMPD->HeatFluxLatent(SurfNum) * TempDiv; // Conduction term (both partition sides same temp) |
-                                                                                     // Conduction term (both partition sides same temp) |
-                                                                                     // Convection and damping term
+                        // Conduction term (both partition sides same temp) |
+                        // Convection and damping term
                         if (SurfTempInSat > state.dataHeatBalSurf->SurfTempInTmp(SurfNum)) {
                             state.dataHeatBalSurf->SurfTempInTmp(SurfNum) = SurfTempInSat; // Surface temp cannot be below dew point
                         }
@@ -6879,24 +6888,26 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         Real64 const RadSysDiv(1.0 / (construct.CTFInside(0) - construct.CTFCross(0) + HConvIn_surf));
                         state.dataHeatBalFanSys->RadSysToHBConstCoef(SurfNum) = state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum) =
                             TempTerm * RadSysDiv; // Constant portion of conduction eq (history terms) | LW radiation from internal sources | SW
-                                                  // radiation from internal sources | Convection from surface to zone air | Radiant flux from
-                                                  // high temperature radiant heater | Radiant flux from a hot water baseboard heater | Radiant
-                                                  // flux from a steam baseboard heater | Radiant flux from an electric baseboard heater | Net
-                                                  // radiant exchange with other zone surfaces | Cond term (both partition sides same temp) | Cond
-                                                  // term (both partition sides same temp) | Convection and damping term
+                        // radiation from internal sources | Convection from surface to zone air | Radiant flux from
+                        // high temperature radiant heater | Radiant flux from a hot water baseboard heater | Radiant
+                        // flux from a steam baseboard heater | Radiant flux from an electric baseboard heater | Net
+                        // radiant exchange with other zone surfaces | Cond term (both partition sides same temp) | Cond
+                        // term (both partition sides same temp) | Convection and damping term
                         state.dataHeatBalFanSys->RadSysToHBTinCoef(SurfNum) = state.dataHeatBalFanSys->RadSysTiHBToutCoef(SurfNum) =
                             0.0; // The outside temp is assumed to be equal to the inside temp for a partition
                         state.dataHeatBalFanSys->RadSysToHBQsrcCoef(SurfNum) = state.dataHeatBalFanSys->RadSysTiHBQsrcCoef(SurfNum) =
                             construct.CTFSourceIn(0) * RadSysDiv; // QTF term for the source | Cond term (both partition sides same temp) | Cond
-                                                                  // term (both partition sides same temp) | Convection and damping term
+                        // term (both partition sides same temp) | Convection and damping term
                     }
 
                 } else if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD ||
                            surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
 
                     if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT)
-                        HeatBalanceHAMTManager::ManageHeatBalHAMT(
-                            state, SurfNum, state.dataHeatBalSurf->SurfTempInTmp(SurfNum), TempSurfOutTmp); // HAMT
+                        HeatBalanceHAMTManager::ManageHeatBalHAMT(state,
+                                                                  SurfNum,
+                                                                  state.dataHeatBalSurf->SurfTempInTmp(SurfNum),
+                                                                  TempSurfOutTmp); // HAMT
 
                     if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
                         HeatBalFiniteDiffManager::ManageHeatBalFiniteDiff(
@@ -6939,24 +6950,24 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                     (TempTerm + construct.CTFSourceIn(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +
                                      IterDampConst * state.dataHeatBalSurf->SurfTempInsOld(SurfNum) + construct.CTFCross(0) * TH11) *
                                     TempDiv; // Constant part of conduction eq (history terms) | LW radiation from internal sources | SW
-                                             // radiation from internal sources | Convection from surface to zone air | Net radiant exchange
-                                             // with other zone surfaces | Heat source/sink term for radiant systems | (if there is one
-                                             // present) | Radiant flux from high temp radiant heater | Radiant flux from a hot water
-                                             // baseboard heater | Radiant flux from a steam baseboard heater | Radiant flux from an electric
-                                             // baseboard heater | Iterative damping term (for stability) | Current conduction from | the
-                                             // outside surface | Coefficient for conduction (current time) | Convection and damping term |
-                                             // Radiation from AFN ducts
+                                // radiation from internal sources | Convection from surface to zone air | Net radiant exchange
+                                // with other zone surfaces | Heat source/sink term for radiant systems | (if there is one
+                                // present) | Radiant flux from high temp radiant heater | Radiant flux from a hot water
+                                // baseboard heater | Radiant flux from a steam baseboard heater | Radiant flux from an electric
+                                // baseboard heater | Iterative damping term (for stability) | Current conduction from | the
+                                // outside surface | Coefficient for conduction (current time) | Convection and damping term |
+                                // Radiation from AFN ducts
                             } else {
                                 state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
                                     (TempTerm + IterDampConst * state.dataHeatBalSurf->SurfTempInsOld(SurfNum) + construct.CTFCross(0) * TH11) *
                                     TempDiv; // Constant part of conduction eq (history terms) | LW radiation from internal sources | SW
-                                             // radiation from internal sources | Convection from surface to zone air | Net radiant exchange
-                                             // with other zone surfaces | Heat source/sink term for radiant systems | (if there is one
-                                             // present) | Radiant flux from high temp radiant heater | Radiant flux from a hot water
-                                             // baseboard heater | Radiant flux from a steam baseboard heater | Radiant flux from an electric
-                                             // baseboard heater | Iterative damping term (for stability) | Current conduction from | the
-                                             // outside surface | Coefficient for conduction (current time) | Convection and damping term |
-                                             // Radiation from AFN ducts
+                                // radiation from internal sources | Convection from surface to zone air | Net radiant exchange
+                                // with other zone surfaces | Heat source/sink term for radiant systems | (if there is one
+                                // present) | Radiant flux from high temp radiant heater | Radiant flux from a hot water
+                                // baseboard heater | Radiant flux from a steam baseboard heater | Radiant flux from an electric
+                                // baseboard heater | Iterative damping term (for stability) | Current conduction from | the
+                                // outside surface | Coefficient for conduction (current time) | Convection and damping term |
+                                // Radiation from AFN ducts
                             }
                         } else { // surface is a pool and the pool has been simulated this time step
                             state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
@@ -6964,9 +6975,9 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                  IterDampConst * state.dataHeatBalSurf->SurfTempInsOld(SurfNum) + construct.CTFCross(0) * TH11) /
                                 (construct.CTFInside(0) + state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) +
                                  IterDampConst); // Constant part of conduction eq (history terms) | Pool modified terms
-                                                 // (see non-pool equation for details) | Iterative damping term (for
-                                                 // stability) | Current conduction from | the outside surface |
-                                                 // Coefficient for conduction (current time) | Pool and damping term
+                            // (see non-pool equation for details) | Iterative damping term (for
+                            // stability) | Current conduction from | the outside surface |
+                            // Coefficient for conduction (current time) | Pool and damping term
                         }
                         if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
                             state.dataHeatBalSurf->SurfTempInTmp(SurfNum) -=
@@ -6989,19 +7000,19 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                             Real64 const RadSysDiv(1.0 / (construct.CTFInside(0) + HConvIn_surf));
                             state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum) =
                                 TempTerm * RadSysDiv; // Constant portion of cond eq (history terms) | LW radiation from internal sources | SW
-                                                      // radiation from internal sources | Convection from surface to zone air | Radiant flux
-                                                      // from high temp radiant heater | Radiant flux from a hot water baseboard heater |
-                                                      // Radiant flux from a steam baseboard heater | Radiant flux from an electric baseboard
-                                                      // heater | Net radiant exchange with other zone surfaces | Cond term (both partition
-                                                      // sides same temp) | Convection and damping term
+                            // radiation from internal sources | Convection from surface to zone air | Radiant flux
+                            // from high temp radiant heater | Radiant flux from a hot water baseboard heater |
+                            // Radiant flux from a steam baseboard heater | Radiant flux from an electric baseboard
+                            // heater | Net radiant exchange with other zone surfaces | Cond term (both partition
+                            // sides same temp) | Convection and damping term
                             state.dataHeatBalFanSys->RadSysTiHBToutCoef(SurfNum) =
                                 construct.CTFCross(0) * RadSysDiv; // Outside temp=inside temp for a partition |
-                                                                   // Cond term (both partition sides same temp) |
-                                                                   // Convection and damping term
+                            // Cond term (both partition sides same temp) |
+                            // Convection and damping term
                             state.dataHeatBalFanSys->RadSysTiHBQsrcCoef(SurfNum) =
                                 construct.CTFSourceIn(0) * RadSysDiv; // QTF term for the source | Cond term (both
-                                                                      // partition sides same temp) | Convection and
-                                                                      // damping term
+                            // partition sides same temp) | Convection and
+                            // damping term
 
                             if (surface.ExtBoundCond > 0) { // This is an interzone partition and we need to set outside params
                                 // The inside coefficients of one side are equal to the outside coefficients of the other side.  But,
@@ -7125,10 +7136,10 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                      state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum) + IterDampConst * state.dataHeatBalSurf->SurfTempInsOld(SurfNum) +
                      Ueff * state.dataHeatBalSurf->TH(1, 1, domeNum)) /
                     (Ueff + HConvIn_surf + IterDampConst); // LW radiation from internal sources | SW radiation from internal sources and
-                                                           // solar | Convection from surface to zone air | Net radiant exchange with
-                                                           // other zone surfaces | Iterative damping term (for stability) | Current
-                                                           // conduction from the outside surface | Coefficient for conduction (current
-                                                           // time) | Convection and damping term
+                // solar | Convection from surface to zone air | Net radiant exchange with
+                // other zone surfaces | Iterative damping term (for stability) | Current
+                // conduction from the outside surface | Coefficient for conduction (current
+                // time) | Convection and damping term
 
                 Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum)));
 
@@ -7364,8 +7375,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
         if (Surface(surfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
 
         // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-        Real64 HConvIn = state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(surfNum);
-        auto const HConvInTemp_fac(-HConvIn * (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
+        auto const HConvInTemp_fac(-state.dataHeatBalSurf->SurfHConvInt(surfNum) *
+                                   (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
         state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
         state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
         state.dataHeatBalSurf->QConvInReport(surfNum) = state.dataHeatBalSurf->QdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
@@ -7474,7 +7485,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                                       MAT_zone,
                                                       Psychrometrics::PsyRhFnTdbRhovLBnd0C(state, MAT_zone, state.dataMstBal->RhoVaporAirIn(SurfNum)),
                                                       state.dataEnvrn->OutBaroPress)); // surfInTemp, PsyWFnTdbRhPb( surfInTemp, PsyRhFnTdbRhovLBnd0C(
-                                                                                       // surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
+                // surfInTemp, RhoVaporAirIn( SurfNum ) ), OutBaroPress ) );
                 state.dataHeatBalFanSys->SumHmARaW(ZoneNum) += FD_Area_fac * state.dataMstBal->RhoVaporSurfIn(SurfNum);
             }
         }
@@ -7482,7 +7493,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
     if (state.dataSurface->AnyMovableInsulation) ReportIntMovInsInsideSurfTemp(state);
 
-    CalculateZoneMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
+    CalculateZoneMRT(state,
+                     ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
 }
 
 void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
@@ -7810,19 +7822,19 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                             (state.dataHeatBalFanSys->QRadSurfAFNDuct(surfNum) / state.dataGlobal->TimeStepZoneSec));
                         state.dataHeatBalFanSys->RadSysTiHBConstCoef(surfNum) =
                             TempTerm * RadSysDiv; // Constant portion of cond eq (history terms) | LW radiation from internal sources | SW
-                                                  // radiation from internal sources | Convection from surface to zone air | Radiant flux
-                                                  // from high temp radiant heater | Radiant flux from a hot water baseboard heater |
-                                                  // Radiant flux from a steam baseboard heater | Radiant flux from an electric baseboard
-                                                  // heater | Net radiant exchange with other zone surfaces | Cond term (both partition
-                                                  // sides same temp) | Convection and damping term
+                        // radiation from internal sources | Convection from surface to zone air | Radiant flux
+                        // from high temp radiant heater | Radiant flux from a hot water baseboard heater |
+                        // Radiant flux from a steam baseboard heater | Radiant flux from an electric baseboard
+                        // heater | Net radiant exchange with other zone surfaces | Cond term (both partition
+                        // sides same temp) | Convection and damping term
                         state.dataHeatBalFanSys->RadSysTiHBToutCoef(surfNum) =
                             state.dataHeatBalSurf->SurfCTFCross0(surfNum) * RadSysDiv; // Outside temp=inside temp for a partition |
-                                                                                       // Cond term (both partition sides same temp) |
-                                                                                       // Convection and damping term
+                        // Cond term (both partition sides same temp) |
+                        // Convection and damping term
                         state.dataHeatBalFanSys->RadSysTiHBQsrcCoef(surfNum) =
                             state.dataHeatBalSurf->SurfCTFSourceIn0(surfNum) * RadSysDiv; // QTF term for the source | Cond term (both
-                                                                                          // partition sides same temp) | Convection and
-                                                                                          // damping term
+                        // partition sides same temp) | Convection and
+                        // damping term
 
                         if (Surface(surfNum).ExtBoundCond > 0) { // This is an interzone partition and we need to set outside params
                             // The inside coefficients of one side are equal to the outside coefficients of the other side.  But,
@@ -7870,10 +7882,10 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                          HConvIn_surf * state.dataHeatBalSurfMgr->RefAirTemp(surfNum) + state.dataHeatBalSurf->SurfNetLWRadToSurf(surfNum) +
                          IterDampConst * state.dataHeatBalSurf->SurfTempInsOld(surfNum) + Ueff * state.dataHeatBalSurf->TH(1, 1, domeNum)) /
                         (Ueff + HConvIn_surf + IterDampConst); // LW radiation from internal sources | SW radiation from internal sources and
-                                                               // solar | Convection from surface to zone air | Net radiant exchange with
-                                                               // other zone surfaces | Iterative damping term (for stability) | Current
-                                                               // conduction from the outside surface | Coefficient for conduction (current
-                                                               // time) | Convection and damping term
+                    // solar | Convection from surface to zone air | Net radiant exchange with
+                    // other zone surfaces | Iterative damping term (for stability) | Current
+                    // conduction from the outside surface | Coefficient for conduction (current
+                    // time) | Convection and damping term
 
                     Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum)));
 
@@ -7887,9 +7899,8 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                               state.dataHeatBalFanSys->QCoolingPanelSurf(surfNum) + state.dataHeatBalFanSys->QHWBaseboardSurf(surfNum) +
                               state.dataHeatBalFanSys->QSteamBaseboardSurf(surfNum) + state.dataHeatBalFanSys->QElecBaseboardSurf(surfNum))) -
                         state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
-                            state.dataConstruction->Construct(surface.Construction)
-                                .TransDiff; // Transmitted solar | Convection | IR exchange | IR
-                                            // Zone diffuse interior shortwave reflected back into the TDD
+                            state.dataConstruction->Construct(surface.Construction).TransDiff; // Transmitted solar | Convection | IR exchange | IR
+                    // Zone diffuse interior shortwave reflected back into the TDD
                     state.dataSurface->SurfWinHeatTransfer(surfNum) = state.dataSurface->SurfWinHeatGain(surfNum);
 
                     // fill out report vars for components of Window Heat Gain
@@ -8095,8 +8106,8 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-            Real64 HConvIn = state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(surfNum);
-            auto const HConvInTemp_fac(-HConvIn * (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
+            auto const HConvInTemp_fac(-state.dataHeatBalSurf->SurfHConvInt(surfNum) *
+                                       (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
             state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
             state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
             state.dataHeatBalSurf->QConvInReport(surfNum) = state.dataHeatBalSurf->QdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
@@ -8146,7 +8157,8 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
     if (state.dataSurface->AnyMovableInsulation) ReportIntMovInsInsideSurfTemp(state);
 
-    CalculateZoneMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
+    CalculateZoneMRT(state,
+                     ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
 }
 
 void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, int const SurfNum, ZoneData &zone, int WarmupSurfTemp)
@@ -8432,7 +8444,7 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
                (Ueff + state.dataHeatBalSurf->SurfHcExt(SurfNum) + state.dataHeatBalSurf->SurfHAirExt(SurfNum) +
                 state.dataHeatBalSurf->SurfHSkyExt(SurfNum) + state.dataHeatBalSurf->SurfHGrdExt(SurfNum) -
                 F1 * Ueff); // Instead of QRadSWOutAbs(SurfNum) | ODB used to approx ground surface temp | Use TDD:DIFFUSER surface | Use
-                            // TDD:DIFFUSER surface | Use TDD:DIFFUSER surface and zone | Use TDD:DIFFUSER surface
+        // TDD:DIFFUSER surface | Use TDD:DIFFUSER surface and zone | Use TDD:DIFFUSER surface
 
         // Outside heat balance case: No movable insulation, slow conduction
     } else if ((!MovInsulPresent) && (!QuickConductionSurf)) {
