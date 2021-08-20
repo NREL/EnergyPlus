@@ -313,9 +313,9 @@ namespace BoilerSteam {
     void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
     {
         bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(DataPlant::PlantEquipmentType::Boiler_Steam),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::Boiler_Steam,
                                                 this->LoopNum,
                                                 this->LoopSideNum,
                                                 this->BranchNum,

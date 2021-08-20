@@ -826,9 +826,9 @@ namespace CTElectricGenerator {
         if (this->MyPlantScanFlag) { // this flag to be removed
             if (allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        static_cast<int>(DataPlant::PlantEquipmentType::Generator_CTurbine),
+               PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::Generator_CTurbine,
                                                         this->HRLoopNum,
                                                         this->HRLoopSideNum,
                                                         this->HRBranchNum,

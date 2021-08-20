@@ -58,6 +58,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -130,7 +131,7 @@ namespace SingleDuct {
         HeatingCoilType ReheatComp_Num; // Numeric Equivalent in this module for Coil type
         int ReheatComp_Index;           // Returned Index number from other routines
         std::string ReheatName;         // name of reheat coil
-        int ReheatComp_PlantType;       // typeOf_ number for plant type of heating coil
+        DataPlant::PlantEquipmentType ReheatComp_PlantType;       // typeOf_ number for plant type of heating coil
         std::string FanType;            // Type of the Fan Object
         int Fan_Num;                    // Numeric Equivalent in this module for fan type
         int Fan_Index;                  // Returned Index number from other routines
@@ -218,7 +219,7 @@ namespace SingleDuct {
         // Default Constructor
         SingleDuctAirTerminal()
             : SysNum(-1), SysType_Num(SysType::Unknown), SchedPtr(0), ReheatComp_Num(HeatingCoilType::None), ReheatComp_Index(0),
-              ReheatComp_PlantType(0), Fan_Num(0), Fan_Index(0), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlowRate(0.0),
+            ReheatComp_PlantType(DataPlant::PlantEquipmentType::Invalid), Fan_Num(0), Fan_Index(0), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlowRate(0.0),
               AirMassFlowRateMax(0.0), MaxHeatAirVolFlowRate(0.0), HeatAirMassFlowRateMax(0.0), ZoneMinAirFracMethod(MinFlowFraction::Constant),
               ZoneMinAirFracDes(0.0), ZoneMinAirFrac(0.0), ZoneMinAirFracReport(0.0), ZoneFixedMinAir(0.0), ZoneMinAirFracSchPtr(0),
               ConstantMinAirFracSetByUser(false), FixedMinAirSetByUser(false), DesignMinAirFrac(0.0), DesignFixedMinAir(0.0), InletNodeNum(0),

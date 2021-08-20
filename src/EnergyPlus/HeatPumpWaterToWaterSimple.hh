@@ -169,7 +169,7 @@ namespace HeatPumpWaterToWaterSimple {
 
         virtual ~GshpSpecs() = default;
 
-        static PlantComponent *factory(EnergyPlusData &state, int wwhp_type, std::string eir_wwhp_name);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType wwhp_type, std::string eir_wwhp_name);
 
         static void GetWatertoWaterHPInput(EnergyPlusData &state);
 

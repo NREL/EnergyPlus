@@ -163,7 +163,7 @@ namespace PlantHeatExchangerFluidToFluid {
         PlantConnectionStruct SupplySideLoop;
         std::string HeatTransferMeteringEndUse;
         std::string ComponentUserName; // user name for control-associated  component
-        int ComponentTypeOfNum;
+        DataPlant::PlantEquipmentType ComponentTypeOfNum;
         PlantLocatorStruct OtherCompSupplySideLoop;
         PlantLocatorStruct OtherCompDemandSideLoop;
         Real64 SizingFactor;
@@ -183,7 +183,7 @@ namespace PlantHeatExchangerFluidToFluid {
         HeatExchangerStruct()
             : AvailSchedNum(0), HeatExchangeModelType(iFluidHXType::Unassigned), UA(0.0), UAWasAutoSized(false), ControlMode(iCtrlType::Unassigned),
               SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(iCtrlTemp::Unassigned), MinOperationTemp(-99999.0),
-              MaxOperationTemp(99999.0), ComponentTypeOfNum(0), SizingFactor(1.0), HeatTransferRate(0.0), HeatTransferEnergy(0.0), Effectiveness(0.0),
+              MaxOperationTemp(99999.0), ComponentTypeOfNum(DataPlant::PlantEquipmentType::Invalid), SizingFactor(1.0), HeatTransferRate(0.0), HeatTransferEnergy(0.0), Effectiveness(0.0),
               OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0), DmdSideModulatSolvNoConvergeErrorIndex(0),
               DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0), MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
         {

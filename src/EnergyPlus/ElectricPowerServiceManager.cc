@@ -2105,9 +2105,9 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(EnergyPlusData &state)
         bool plantNotFound = false;
         for (auto &g : elecGenCntrlObj) {
             plantNotFound = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    g->compPlantName,
-                                                    static_cast<int>(g->compPlantTypeOf),
+           PlantUtilities::ScanPlantLoopsForObject( state,
+ g->compPlantName,
+ g->compPlantTypeOf,
                                                     g->cogenLocation.loopNum,
                                                     g->cogenLocation.loopSideNum,
                                                     g->cogenLocation.branchNum,

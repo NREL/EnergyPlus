@@ -98,7 +98,7 @@ namespace EvaporativeFluidCoolers {
     std::string const cEvapFluidCooler_SingleSpeed("EvaporativeFluidCooler:SingleSpeed");
     std::string const cEvapFluidCooler_TwoSpeed("EvaporativeFluidCooler:TwoSpeed");
 
-    PlantComponent *EvapFluidCoolerSpecs::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
+    PlantComponent *EvapFluidCoolerSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
         if (state.dataEvapFluidCoolers->GetEvapFluidCoolerInputFlag) {
@@ -2755,7 +2755,7 @@ namespace EvaporativeFluidCoolers {
         if (this->OneTimeFlagForEachEvapFluidCooler) {
             // Locate the tower on the plant loops for later usage
             PlantUtilities::ScanPlantLoopsForObject(
-                state, this->Name, static_cast<int>(this->TypeOf_enum), this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+                state, this->Name, this->TypeOf_enum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
 
             if (ErrorsFound) {
                 ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");

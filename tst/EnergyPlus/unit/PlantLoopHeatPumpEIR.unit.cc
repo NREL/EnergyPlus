@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfNum);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfeNum);
     EXPECT_EQ(thisCoolingPLHP, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
@@ -130,7 +130,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
     EXPECT_EQ(thisHeatingPLHP, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
@@ -153,11 +153,11 @@ TEST_F(EnergyPlusFixture, PairingCompanionCoils)
         // a successful try
         coil1->name = "name1";
         coil1->companionCoilName = "name2";
-        coil1->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRCooling;
+        coil1->plantTypeOfeNum = DataPlant::TypeOf_HeatPumpEIRCooling;
         coil1->companionHeatPumpCoil = nullptr;
         coil2->name = "name2";
         coil2->companionCoilName = "name1";
-        coil2->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRHeating;
+        coil2->plantTypeOfeNum = DataPlant::TypeOf_HeatPumpEIRHeating;
         coil2->companionHeatPumpCoil = nullptr;
         EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(*state);
         EXPECT_EQ(coil2, coil1->companionHeatPumpCoil);
@@ -168,11 +168,11 @@ TEST_F(EnergyPlusFixture, PairingCompanionCoils)
         // but what if we can't find a companion!
         coil1->name = "name1";
         coil1->companionCoilName = "name6";
-        coil1->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRCooling;
+        coil1->plantTypeOfeNum = DataPlant::TypeOf_HeatPumpEIRCooling;
         coil1->companionHeatPumpCoil = nullptr;
         coil2->name = "name2";
         coil2->companionCoilName = "name1";
-        coil2->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRHeating;
+        coil2->plantTypeOfeNum = DataPlant::TypeOf_HeatPumpEIRHeating;
         coil2->companionHeatPumpCoil = nullptr;
         EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(*state), std::runtime_error);
     }
@@ -181,11 +181,11 @@ TEST_F(EnergyPlusFixture, PairingCompanionCoils)
         // or what if we find a companion but it's the same coil type
         coil1->name = "name1";
         coil1->companionCoilName = "name2";
-        coil1->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRCooling;
+        coil1->plantTypeOfeNum = DataPlant::TypeOf_HeatPumpEIRCooling;
         coil1->companionHeatPumpCoil = nullptr;
         coil2->name = "name2";
         coil2->companionCoilName = "name1";
-        coil2->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRCooling;
+        coil2->plantTypeOfeNum = DataPlant::TypeOf_HeatPumpEIRCooling;
         coil2->companionHeatPumpCoil = nullptr;
         EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(*state), std::runtime_error);
     }
@@ -228,7 +228,7 @@ TEST_F(EnergyPlusFixture, HeatingConstructionFullObjectsNoCompanion)
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfNum);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfeNum);
     EXPECT_EQ(nullptr, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
@@ -276,7 +276,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectsNoCompanion)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
     EXPECT_EQ(nullptr, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
@@ -324,7 +324,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectWithDefaults)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
     EXPECT_NEAR(1, thisCoolingPLHP->sizingFactor, 0.001);
 }
 
@@ -365,7 +365,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_WaterSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
     EXPECT_EQ(nullptr, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
@@ -1805,7 +1805,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfNum);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfeNum);
     EXPECT_EQ(thisCoolingPLHP, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
@@ -1813,7 +1813,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
     EXPECT_EQ(thisHeatingPLHP, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
@@ -2113,7 +2113,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_AirSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfeNum);
     EXPECT_EQ(nullptr, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);

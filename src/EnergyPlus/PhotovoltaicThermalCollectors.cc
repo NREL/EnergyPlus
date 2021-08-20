@@ -1126,9 +1126,9 @@ namespace PhotovoltaicThermalCollectors {
         if (this->SetLoopIndexFlag) {
             if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->TypeNum,
+               PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ this->TypeNum,
                                                         this->WLoopNum,
                                                         this->WLoopSideNum,
                                                         this->WLoopBranchNum,

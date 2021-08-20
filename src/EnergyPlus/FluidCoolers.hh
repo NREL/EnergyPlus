@@ -206,7 +206,7 @@ namespace FluidCoolers {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, int typeOf, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType typeOf, std::string const &objectName);
     };
 
     void GetFluidCoolerInput(EnergyPlusData &state);

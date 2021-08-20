@@ -181,7 +181,7 @@ namespace SurfaceGroundHeatExchanger {
                       Real64 &CurLoad,
                       bool RunFlag) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string objectName);
 
         void InitSurfaceGroundHeatExchanger(EnergyPlusData &state);
 

@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -70,7 +71,7 @@ namespace PlantLoadProfile {
 
         // Members
         std::string Name;   // Name of Plant Load Profile object
-        int TypeNum;        // Plant Side Connection: 'TypeOf_enum' assigned in DataPlant
+        DataPlant::PlantEquipmentType TypeNum;        // Plant Side Connection: 'TypeOf_enum' assigned in DataPlant
         int WLoopNum;       // water plant loop index number
         int WLoopSideNum;   // water plant loop side index
         int WLoopBranchNum; // water plant loop branch index
@@ -99,7 +100,7 @@ namespace PlantLoadProfile {
 
         // Default Constructor
         PlantProfileData()
-            : TypeNum(0), WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0), WLoopCompNum(0), Init(true), InitSizing(true), InletNode(0),
+        : TypeNum(DataPlant::PlantEquipmentType::Invalid), WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0), WLoopCompNum(0), Init(true), InitSizing(true), InletNode(0),
               InletTemp(0.0), OutletNode(0), OutletTemp(0.0), LoadSchedule(0), EMSOverridePower(false), EMSPowerValue(0.0), PeakVolFlowRate(0.0),
               FlowRateFracSchedule(0), VolFlowRate(0.0), MassFlowRate(0.0), EMSOverrideMassFlow(false), EMSMassFlowValue(0.0), Power(0.0),
               Energy(0.0), HeatingEnergy(0.0), CoolingEnergy(0.0), SetLoopIndexFlag(true)

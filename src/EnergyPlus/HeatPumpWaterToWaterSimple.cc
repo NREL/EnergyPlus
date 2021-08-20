@@ -109,7 +109,7 @@ std::string const HPEqFitHeatingUC("HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING");
 std::string const HPEqFitCooling("HeatPump:WatertoWater:EquationFit:Cooling");
 std::string const HPEqFitCoolingUC("HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING");
 
-PlantComponent *GshpSpecs::factory(EnergyPlusData &state, int wwhp_type, std::string eir_wwhp_name)
+PlantComponent *GshpSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType wwhp_type, std::string eir_wwhp_name)
 {
     if (state.dataHPWaterToWaterSimple->GetInputFlag) {
         GshpSpecs::GetWatertoWaterHPInput(state);
@@ -141,7 +141,7 @@ void GshpSpecs::simulate(EnergyPlusData &state,
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->SourceLoopNum,
                                                                 this->SourceLoopSideNum,
-                                                                static_cast<int>(DataPlant::PlantEquipmentType::HPWaterEFCooling),
+                                                                DataPlant::PlantEquipmentType::HPWaterEFCooling,
                                                                 this->SourceSideInletNodeNum,
                                                                 this->SourceSideOutletNodeNum,
                                                                 this->reportQSource,
@@ -161,7 +161,7 @@ void GshpSpecs::simulate(EnergyPlusData &state,
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->SourceLoopNum,
                                                                 this->SourceLoopSideNum,
-                                                                static_cast<int>(DataPlant::PlantEquipmentType::HPWaterEFHeating),
+                                                                DataPlant::PlantEquipmentType::HPWaterEFHeating,
                                                                 this->SourceSideInletNodeNum,
                                                                 this->SourceSideOutletNodeNum,
                                                                 -this->reportQSource,
@@ -750,9 +750,9 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
 
     if (this->MyPlantScanFlag) {
         bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(this->WWHPPlantTypeOfNum),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ this->WWHPPlantTypeOfNum,
                                                 this->SourceLoopNum,
                                                 this->SourceLoopSideNum,
                                                 this->SourceBranchNum,
@@ -763,9 +763,9 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                                 _,
                                                 this->SourceSideInletNodeNum,
                                                 _);
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(this->WWHPPlantTypeOfNum),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ this->WWHPPlantTypeOfNum,
                                                 this->LoadLoopNum,
                                                 this->LoadLoopSideNum,
                                                 this->LoadBranchNum,
@@ -779,7 +779,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
 
         if (!errFlag) {
             PlantUtilities::InterConnectTwoPlantLoopSides(
-                state, this->LoadLoopNum, this->LoadLoopSideNum, this->SourceLoopNum, this->SourceLoopSideNum, static_cast<int>(this->WWHPPlantTypeOfNum), true);
+                state, this->LoadLoopNum, this->LoadLoopSideNum, this->SourceLoopNum, this->SourceLoopSideNum, this->WWHPPlantTypeOfNum, true);
         }
 
         if (errFlag) {

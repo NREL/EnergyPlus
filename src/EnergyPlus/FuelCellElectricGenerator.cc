@@ -3353,7 +3353,7 @@ namespace FuelCellElectricGenerator {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->CWLoopNum,
                                                             this->CWLoopSideNum,
-                                                            static_cast<int>(DataPlant::PlantEquipmentType::Generator_FCStackCooler),
+                                                            DataPlant::PlantEquipmentType::Generator_FCStackCooler,
                                                             this->StackCooler.WaterInNode,
                                                             this->StackCooler.WaterOutNode,
                                                             this->Report.qHX,
@@ -3365,7 +3365,7 @@ namespace FuelCellElectricGenerator {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->CWLoopNum,
                                                             this->CWLoopSideNum,
-                                                            static_cast<int>(DataPlant::PlantEquipmentType::Generator_FCExhaust),
+                                                            DataPlant::PlantEquipmentType::Generator_FCExhaust,
                                                             this->ExhaustHX.WaterInNode,
                                                             this->ExhaustHX.WaterOutNode,
                                                             this->ExhaustHX.qHX,
@@ -3733,9 +3733,9 @@ namespace FuelCellElectricGenerator {
         if (this->MyPlantScanFlag_Init && allocated(state.dataPlnt->PlantLoop)) {
             bool errFlag = false;
 
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->NameExhaustHX,
-                                                    static_cast<int>(DataPlant::PlantEquipmentType::Generator_FCExhaust),
+           PlantUtilities::ScanPlantLoopsForObject( state,
+ this->NameExhaustHX,
+ DataPlant::PlantEquipmentType::Generator_FCExhaust,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
                                                     this->CWBranchNum,

@@ -205,9 +205,9 @@ void SimulateVRF(EnergyPlusData &state,
         (state.dataHVACVarRefFlow->VRF(VRFCondenser).checkPlantCondTypeOneTime)) {
         // scan for loop connection data
         bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                state.dataHVACVarRefFlow->VRF(VRFCondenser).Name,
-                                                static_cast<int>(state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFPlantTypeOfNum),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ state.dataHVACVarRefFlow->VRF(VRFCondenser).Name,
+ state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFPlantTypeOfNum,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceLoopNum,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceLoopSideNum,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceBranchNum,
@@ -331,7 +331,7 @@ void VRFCondenserEquipment::simulate(EnergyPlusData &state,
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             this->SourceLoopNum,
                                                             this->SourceLoopSideNum,
-                                                            static_cast<int>(PlantEquipmentType::HeatPumpVRF),
+                                                            PlantEquipmentType::HeatPumpVRF,
                                                             this->CondenserNodeNum,
                                                             this->CondenserOutletNodeNum,
                                                             this->QCondenser,
@@ -5997,9 +5997,9 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
             // hot water supplemental heating coil
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName,
-                                                    static_cast<int>(PlantEquipmentType::CoilWaterSimpleHeating),
+           PlantUtilities::ScanPlantLoopsForObject( state,
+ state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName,
+ PlantEquipmentType::CoilWaterSimpleHeating,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
@@ -6045,9 +6045,9 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
             // steam supplemental heating coil
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName,
-                                                    static_cast<int>(PlantEquipmentType::CoilSteamAirHeating),
+           PlantUtilities::ScanPlantLoopsForObject( state,
+ state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName,
+ PlantEquipmentType::CoilSteamAirHeating,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilBranchNum,

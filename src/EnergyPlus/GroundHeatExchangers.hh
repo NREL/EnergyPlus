@@ -60,6 +60,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -301,7 +302,7 @@ namespace GroundHeatExchangers {
                       Real64 &CurLoad,
                       bool RunFlag) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
 
         virtual Real64 getGFunc(Real64) = 0;
 

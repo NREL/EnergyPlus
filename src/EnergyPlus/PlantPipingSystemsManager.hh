@@ -65,6 +65,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -692,7 +693,7 @@ namespace PlantPipingSystemsManager {
 
         void initInOutCells(CartesianCell const &in, CartesianCell const &out);
 
-        static PlantComponent *factory(EnergyPlusData &state, int, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType, std::string objectName);
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,

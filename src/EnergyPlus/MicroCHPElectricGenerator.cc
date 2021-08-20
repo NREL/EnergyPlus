@@ -691,7 +691,7 @@ void MicroCHPDataStruct::simulate(EnergyPlusData &state,
     PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
-                                                    static_cast<int>(DataPlant::PlantEquipmentType::Generator_MicroCHP),
+                                                    DataPlant::PlantEquipmentType::Generator_MicroCHP,
                                                     this->PlantInletNodeID,
                                                     this->PlantOutletNodeID,
                                                     this->A42Model.QdotHR,
@@ -1526,9 +1526,9 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
     if (this->MyPlantScanFlag) {
         if (allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    static_cast<int>(DataPlant::PlantEquipmentType::Generator_MicroCHP),
+           PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::Generator_MicroCHP,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
                                                     this->CWBranchNum,

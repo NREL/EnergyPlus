@@ -1973,9 +1973,9 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
 
     if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
         errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(DataPlant::PlantEquipmentType::Generator_MicroTurbine),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::Generator_MicroTurbine,
                                                 this->HRLoopNum,
                                                 this->HRLoopSideNum,
                                                 this->HRBranchNum,

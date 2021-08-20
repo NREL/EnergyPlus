@@ -133,7 +133,7 @@ namespace SurfaceGroundHeatExchanger {
     int const SurfCond_Exposed(2);
 
     PlantComponent *
-    SurfaceGroundHeatExchangerData::factory(EnergyPlusData &state, [[maybe_unused]] int const objectType, std::string const objectName)
+    SurfaceGroundHeatExchangerData::factory(EnergyPlusData &state, [[maybe_unused]] DataPlant::PlantEquipmentType objectType, std::string const objectName)
     {
         if (state.dataSurfaceGroundHeatExchangers->GetInputFlag) {
             GetSurfaceGroundHeatExchanger(state);
@@ -1446,7 +1446,7 @@ namespace SurfaceGroundHeatExchanger {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     this->Name,
-                                    PlantEquipmentType::GrndHtExchgSurface,
+                                    DataPlant::PlantEquipmentType::GrndHtExchgSurface,
                                     this->LoopNum,
                                     this->LoopSideNum,
                                     this->BranchNum,

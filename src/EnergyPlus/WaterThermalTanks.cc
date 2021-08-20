@@ -7683,7 +7683,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
     this->HeaterOn2 = this->SavedHeaterOn2;
 
     // Condenser configuration of heat pump water heater
-    const int HPWHCondenserConfig = this->HeatPumpNum > 0 ? state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).TypeNum : 0;
+    const DataPlant::PlantEquipmentType HPWHCondenserConfig = this->HeatPumpNum > 0 ? state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).TypeNum : DataPlant::PlantEquipmentType::Other;
 
     // Heat rate from the heat pump (W)
     const Real64 Qheatpump = [&, this] { // BLB

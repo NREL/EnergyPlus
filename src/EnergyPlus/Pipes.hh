@@ -91,7 +91,7 @@ namespace Pipes {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
         void simulate([[maybe_unused]] EnergyPlusData &states,
                       const PlantLocation &calledFromLocation,
                       bool FirstHVACIteration,

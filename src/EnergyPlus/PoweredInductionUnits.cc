@@ -320,12 +320,12 @@ void GetPIUs(EnergyPlusData &state)
         state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = state.dataIPShortCut->cAlphaArgs(9); // type (key) of heating coil
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:WATER")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::SimpleHeating;
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = PlantEquipmentType::CoilWaterSimpleHeating;
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:FUEL")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::Gas;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:STEAM")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::SteamAirHeating;
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = PlantEquipmentType::CoilSteamAirHeating;
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex == 0) {
                 ShowSevereError(state, std::string{RoutineName} + "Steam Properties for " + state.dataIPShortCut->cAlphaArgs(1) + " not found.");
@@ -558,12 +558,12 @@ void GetPIUs(EnergyPlusData &state)
         state.dataPowerInductionUnits->PIU(PIUNum).HCoilType = state.dataIPShortCut->cAlphaArgs(9); // type (key) of heating coil
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:WATER")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::SimpleHeating;
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = PlantEquipmentType::CoilWaterSimpleHeating;
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:FUEL")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::Gas;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:STEAM")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::SteamAirHeating;
-            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = PlantEquipmentType::CoilSteamAirHeating;
+            state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
             state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex == 0) {
                 ShowSevereError(state, std::string{RoutineName} + "Steam Properties for " + state.dataIPShortCut->cAlphaArgs(1) + " not found.");
@@ -869,8 +869,8 @@ void InitPIU(EnergyPlusData &state,
     }
 
     if (MyPlantScanFlag(PIUNum) && allocated(state.dataPlnt->PlantLoop)) {
-        if ((state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum == PlantEquipmentType::CoilWaterSimpleHeating) ||
-            (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum == PlantEquipmentType::CoilSteamAirHeating)) {
+        if ((state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
+            (state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantTypeNum == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataPowerInductionUnits->PIU(PIUNum).HCoil,

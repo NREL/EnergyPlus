@@ -91,7 +91,7 @@ namespace UnitHeater {
         std::string HCoilTypeCh; // actual object name
         std::string HCoilName;   // name of heating coil
         int HCoil_Index;
-        int HCoil_PlantTypeNum;
+        DataPlant::PlantEquipmentType HCoil_PlantTypeNum;
         int HCoil_FluidIndex;
         Real64 MaxVolHotWaterFlow; // m3/s
         Real64 MaxVolHotSteamFlow; // m3/s
@@ -125,7 +125,7 @@ namespace UnitHeater {
         // Default Constructor
         UnitHeaterData()
             : SchedPtr(0), AirInNode(0), AirOutNode(0), FanType_Num(0), Fan_Index(0), FanSchedPtr(0), FanAvailSchedPtr(0), ControlCompTypeNum(0),
-              CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), FanOutletNode(0), OpMode(0), HCoil_Index(0), HCoil_PlantTypeNum(0),
+            CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), FanOutletNode(0), OpMode(0), HCoil_Index(0), HCoil_PlantTypeNum(DataPlant::PlantEquipmentType::Invalid),
               HCoil_FluidIndex(0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0),
               MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), MinHotSteamFlow(0.0), HotControlNode(0), HotControlOffset(0.0),
               HotCoilOutNodeNum(0), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), PartLoadFrac(0.0), HeatPower(0.0), HeatEnergy(0.0),

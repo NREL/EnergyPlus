@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -112,7 +113,7 @@ namespace PoweredInductionUnits {
         int FanAvailSchedPtr;     // index to fan availability schedule
         std::string HCoilType;    // type of heating coil component
         iHCoilType HCoilType_Num; // index for heating coil type
-        int HCoil_PlantTypeNum;
+        DataPlant::PlantEquipmentType HCoil_PlantTypeNum;
         std::string HCoil; // name of heating coil component
         int HCoil_Index;   // index to this heating coil
         int HCoil_FluidIndex;
@@ -149,7 +150,7 @@ namespace PoweredInductionUnits {
               MaxPriAirVolFlow(0.0), MaxPriAirMassFlow(0.0), MinPriAirFlowFrac(0.0), MinPriAirMassFlow(0.0), PriDamperPosition(0.0),
               MaxSecAirVolFlow(0.0), MaxSecAirMassFlow(0.0), FanOnFlowFrac(0.0), FanOnAirMassFlow(0.0), PriAirInNode(0), SecAirInNode(0),
               OutAirNode(0), HCoilInAirNode(0), ControlCompTypeNum(0), CompErrIndex(0), Mixer_Num(0), Fan_Num(0), Fan_Index(0), FanAvailSchedPtr(0),
-              HCoilType_Num(iHCoilType::Unassigned), HCoil_PlantTypeNum(0), HCoil_Index(0), HCoil_FluidIndex(0), MaxVolHotWaterFlow(0.0),
+              HCoilType_Num(iHCoilType::Unassigned), HCoil_PlantTypeNum(DataPlant::PlantEquipmentType::Invalid), HCoil_Index(0), HCoil_FluidIndex(0), MaxVolHotWaterFlow(0.0),
               MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinVolHotWaterFlow(0.0), MinHotSteamFlow(0.0),
               MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0), HWLoopNum(0),
               HWLoopSide(0), HWBranchNum(0), HWCompNum(0), ADUNum(0), InducesPlenumAir(false), HeatingRate(0.0), HeatingEnergy(0.0),

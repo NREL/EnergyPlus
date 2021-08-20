@@ -982,7 +982,7 @@ void PullCompInterconnectTrigger(EnergyPlusData &state,
 void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
                                          int const LoopNum,                    // component's loop index
                                          int const LoopSide,                   // component's loop side number
-                                         [[maybe_unused]] int const TypeOfNum, // Component's type index
+                                         DataPlant::PlantEquipmentType TypeOfNum, // Component's type index
                                          int const InletNodeNum,               // Component's inlet node pointer
                                          int const OutletNodeNum,              // Component's outlet node pointer
                                          Real64 const ModelCondenserHeatRate,  // model's heat rejection rate at condenser (W)
@@ -1069,7 +1069,7 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
 void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
                                      int const LoopNum,                    // component's loop index
                                      int const LoopSide,                   // component's loop side number
-                                     [[maybe_unused]] int const TypeOfNum, // Component's type index
+                                     DataPlant::PlantEquipmentType TypeOfNum, // Component's type index
                                      int const InletNodeNum,               // Component's inlet node pointer
                                      int const OutletNodeNum,              // Component's outlet node pointer
                                      Real64 const ModelRecoveryHeatRate,   // model's heat rejection rate at recovery (W)
@@ -1220,7 +1220,7 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
                                    int const Loop1LoopSideNum,
                                    int const Loop2Num,
                                    int const Loop2LoopSideNum,
-                                   int const PlantComponentTypeOfNum,
+                                   DataPlant::PlantEquipmentType PlantComponentTypeOfNum,
                                    bool const Loop1DemandsOnLoop2)
 {
 
@@ -1255,7 +1255,7 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
     }
     connected_1(TotalConnected).LoopNum = Loop2Num;
     connected_1(TotalConnected).LoopSideNum = Loop2LoopSideNum;
-    connected_1(TotalConnected).ConnectorTypeOf_Num = PlantComponentTypeOfNum;
+    connected_1(TotalConnected).ConnectorTypeOf_Num = static_cast<int>(PlantComponentTypeOfNum);
     connected_1(TotalConnected).LoopDemandsOnRemote = Loop1DemandsOnLoop2;
 
     auto &loop_side_2(state.dataPlnt->PlantLoop(Loop2Num).LoopSide(Loop2LoopSideNum));
@@ -1269,7 +1269,7 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
     }
     connected_2(TotalConnected).LoopNum = Loop1Num;
     connected_2(TotalConnected).LoopSideNum = Loop1LoopSideNum;
-    connected_2(TotalConnected).ConnectorTypeOf_Num = PlantComponentTypeOfNum;
+    connected_2(TotalConnected).ConnectorTypeOf_Num = static_cast<int>(PlantComponentTypeOfNum);
     connected_2(TotalConnected).LoopDemandsOnRemote = Loop2DemandsOnLoop1;
 }
 
@@ -1636,7 +1636,7 @@ void LogPlantConvergencePoints(EnergyPlusData &state, bool const FirstHVACIterat
 
 void ScanPlantLoopsForObject(EnergyPlusData &state,
                              std::string_view CompName,
-                             int const CompType,
+                             DataPlant::PlantEquipmentType CompType,
                              int &LoopNum,
                              int &LoopSideNum,
                              int &BranchNum,
@@ -1733,15 +1733,15 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
     }
 
     if (!FoundComponent) {
-        if (CompType >= 1 && CompType <= DataPlant::NumSimPlantEquipTypes) {
+        if (static_cast<int>(CompType) >= 1 && static_cast<int>(CompType) <= DataPlant::NumSimPlantEquipTypes) {
             if (!present(SingleLoopSearch)) {
                 ShowSevereError(state,
-                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + std::string{CompName} +
+                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(CompType)) + " called \"" + std::string{CompName} +
                                     "\" was not found on any plant loops.");
-                AuditBranches(state, true, DataPlant::ccSimPlantEquipTypes(CompType), CompName);
+                AuditBranches(state, true, DataPlant::ccSimPlantEquipTypes(static_cast<int>(CompType)), CompName);
             } else {
                 ShowSevereError(state,
-                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + std::string{CompName} +
+                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(CompType)) + " called \"" + std::string{CompName} +
                                     "\" was not found on plant loop=\"" + state.dataPlnt->PlantLoop(SingleLoopSearch).Name + "\".");
             }
             if (present(InletNodeNumber)) {

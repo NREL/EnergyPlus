@@ -462,10 +462,10 @@ namespace UnitHeater {
                 auto const SELECT_CASE_var(Alphas(7));
                 if (SELECT_CASE_var == "COIL:HEATING:WATER") {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType = state.dataUnitHeaters->WaterHeatingCoil;
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum = PlantEquipmentType::CoilWaterSimpleHeating;
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
                 } else if (SELECT_CASE_var == "COIL:HEATING:STEAM") {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType = state.dataUnitHeaters->SteamCoil;
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum = PlantEquipmentType::CoilSteamAirHeating;
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
                 } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC") {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType = state.dataUnitHeaters->ElectricCoil;
                 } else if (SELECT_CASE_var == "COIL:HEATING:FUEL") {
@@ -798,8 +798,8 @@ namespace UnitHeater {
         }
 
         if (state.dataUnitHeaters->MyPlantScanFlag(UnitHeatNum) && allocated(state.dataPlnt->PlantLoop)) {
-            if ((state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == PlantEquipmentType::CoilWaterSimpleHeating) ||
-                (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == PlantEquipmentType::CoilSteamAirHeating)) {
+            if ((state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
+                (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,

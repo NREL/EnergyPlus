@@ -4957,7 +4957,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                 }
                                             }
                                         }
-                                        if (state.dataSetPointManager->InitSetPointManagerNumChiller > 1) {
+                                        if (state.dataSetPointManager->InitSetPointManagerNumChiller) {
                                             ShowSevereError(state,
                                                             cSetPointManagerType + "=\"" +
                                                                 state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).Name +
@@ -7430,7 +7430,7 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
     int BranchIndexDemandSide(0);
     int LoopIndexPlantSide(0);
     int LoopIndexDemandSide(0);
-    int TypeNum(0);
+    DataPlant::PlantEquipmentType TypeNum(DataPlant::PlantEquipmentType::Invalid);
 
     // Get from tower design values
     NormDsnCondFlow = 5.38e-8; // m3/s per watt (typically 3 gpm/ton)=(Volume of condenser fluid)/(ton of heat rejection)

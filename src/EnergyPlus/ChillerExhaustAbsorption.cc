@@ -177,7 +177,7 @@ void ExhaustAbsorberSpecs::simulate(
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->CDLoopNum,
                                                                 this->CDLoopSideNum,
-                                                                static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption),
+                                                                DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
                                                                 this->CondReturnNodeNum,
                                                                 this->CondSupplyNodeNum,
                                                                 this->TowerLoad,
@@ -829,9 +829,9 @@ void ExhaustAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
         this->setupOutputVariables(state);
 
         bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
                                                 this->CWLoopNum,
                                                 this->CWLoopSideNum,
                                                 this->CWBranchNum,
@@ -846,9 +846,9 @@ void ExhaustAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
             ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
         }
 
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
                                                 this->HWLoopNum,
                                                 this->HWLoopSideNum,
                                                 this->HWBranchNum,
@@ -864,9 +864,9 @@ void ExhaustAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
         }
 
         if (this->isWaterCooled) {
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption),
+           PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
                                                     this->CDLoopNum,
                                                     this->CDLoopSideNum,
                                                     this->CDBranchNum,
@@ -885,19 +885,19 @@ void ExhaustAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                           this->CWLoopSideNum,
                                                           this->CDLoopNum,
                                                           this->CDLoopSideNum,
-                                                          static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption),
+                                                          DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
                                                           true);
             PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                           this->HWLoopNum,
                                                           this->HWLoopSideNum,
                                                           this->CDLoopNum,
                                                           this->CDLoopSideNum,
-                                                          static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption),
+                                                          DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
                                                           true);
         }
 
         PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSideNum, this->HWLoopNum, this->HWLoopSideNum, static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption), true);
+            state, this->CWLoopNum, this->CWLoopSideNum, this->HWLoopNum, this->HWLoopSideNum, DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption, true);
 
         // check if outlet node of chilled water side has a setpoint.
         if ((state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&

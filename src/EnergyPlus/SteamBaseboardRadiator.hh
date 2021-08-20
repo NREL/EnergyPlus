@@ -67,7 +67,7 @@ namespace SteamBaseboardRadiator {
     {
         // Members
         std::string EquipID;
-        int EquipType;
+        DataPlant::PlantEquipmentType EquipType;
         std::string designObjectName; // Design Object
         int DesignObjectPtr;
         std::string Schedule;
@@ -117,7 +117,7 @@ namespace SteamBaseboardRadiator {
 
         // Default Constructor
         SteamBaseboardParams()
-            : EquipType(0), DesignObjectPtr(0), ZonePtr(0), SchedPtr(0), SteamInletNode(0), SteamOutletNode(0), TotSurfToDistrib(0), FluidIndex(0),
+        : EquipType(DataPlant::PlantEquipmentType::Invalid), DesignObjectPtr(0), ZonePtr(0), SchedPtr(0), SteamInletNode(0), SteamOutletNode(0), TotSurfToDistrib(0), FluidIndex(0),
               ControlCompTypeNum(0), CompErrIndex(0), DegOfSubcooling(0.0), SteamMassFlowRate(0.0), SteamMassFlowRateMax(0.0),
               SteamVolFlowRateMax(0.0), SteamOutletTemp(0.0), SteamInletTemp(0.0), SteamInletEnthalpy(0.0), SteamOutletEnthalpy(0.0),
               SteamInletPress(0.0), SteamOutletPress(0.0), SteamInletQuality(0.0), SteamOutletQuality(0.0), FracRadiant(0.0), FracConvect(0.0),
@@ -194,7 +194,7 @@ namespace SteamBaseboardRadiator {
     Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
 
     void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
-                                             int const BaseboardTypeNum,       // type index
+                                             DataPlant::PlantEquipmentType BaseboardTypeNum,       // type index
                                              std::string const &BaseboardName, // component name
                                              int const EquipFlowCtrl,          // Flow control mode for the equipment
                                              int const LoopNum,                // Plant loop index for where called from

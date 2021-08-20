@@ -94,7 +94,7 @@ namespace OutsideEnergySources {
 
         virtual ~OutsideEnergySourceSpecs() = default;
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string objectName);
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,

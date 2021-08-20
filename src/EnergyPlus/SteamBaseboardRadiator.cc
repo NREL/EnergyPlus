@@ -519,7 +519,7 @@ namespace SteamBaseboardRadiator {
 
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID = state.dataIPShortCut->cAlphaArgs(1); // Name of the baseboard
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType =
-                PlantEquipmentType::Baseboard_Rad_Conv_Steam; //'ZoneHVAC:Baseboard:RadiantConvective:Steam'
+                DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam; //'ZoneHVAC:Baseboard:RadiantConvective:Steam'
 
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).designObjectName =
                 state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
@@ -1654,7 +1654,7 @@ namespace SteamBaseboardRadiator {
     }
 
     void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
-                                             int const BaseboardTypeNum,               // type index
+                                             DataPlant::PlantEquipmentType BaseboardTypeNum,               // type index
                                              std::string const &BaseboardName,         // component name
                                              [[maybe_unused]] int const EquipFlowCtrl, // Flow control mode for the equipment
                                              [[maybe_unused]] int const LoopNum,       // Plant loop index for where called from
@@ -1717,13 +1717,13 @@ namespace SteamBaseboardRadiator {
                                           BaseboardName,
                                           state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID));
                 }
-                if (BaseboardTypeNum != PlantEquipmentType::Baseboard_Rad_Conv_Steam) {
+                if (BaseboardTypeNum != DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam) {
                     ShowFatalError(state,
                                    format("UpdateSteamBaseboardPlantConnection: Invalid CompIndex passed={}, baseboard name={}, stored baseboard "
                                           "Name for that index={}",
                                           BaseboardNum,
                                           BaseboardName,
-                                          ccSimPlantEquipTypes(BaseboardTypeNum)));
+                                          ccSimPlantEquipTypes(static_cast<int>(BaseboardTypeNum))));
                 }
             }
         }

@@ -315,7 +315,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPumps->PumpEquip(PumpNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPumps->PumpEquip(PumpNum).pumpType = PumpType::VarSpeed; //'Pump:VariableSpeed'
-        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = PlantEquipmentType::PumpVariableSpeed;
+        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = DataPlant::PlantEquipmentType::PumpVariableSpeed;
 
         state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),
@@ -566,7 +566,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPumps->PumpEquip(PumpNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPumps->PumpEquip(PumpNum).pumpType = PumpType::ConSpeed; //'Pump:ConstantSpeed'
-        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = PlantEquipmentType::PumpConstantSpeed;
+        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = DataPlant::PlantEquipmentType::PumpConstantSpeed;
 
         state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),
@@ -739,7 +739,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPumps->PumpEquip(PumpNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPumps->PumpEquip(PumpNum).pumpType = PumpType::Cond; //'Pump:VariableSpeed:Condensate'
-        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = PlantEquipmentType::PumpCondensate;
+        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = DataPlant::PlantEquipmentType::PumpCondensate;
 
         state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),
@@ -880,7 +880,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPumps->PumpEquip(PumpNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPumps->PumpEquip(PumpNum).pumpType = PumpType::Bank_VarSpeed; //'HeaderedPumps:VariableSpeed'
-        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = PlantEquipmentType::PumpBankVariableSpeed;
+        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = DataPlant::PlantEquipmentType::PumpBankVariableSpeed;
 
         state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),
@@ -1040,7 +1040,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPumps->PumpEquip(PumpNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPumps->PumpEquip(PumpNum).pumpType = PumpType::Bank_ConSpeed; //'HeaderedPumps:ConstantSpeed'
-        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = PlantEquipmentType::PumpBankConstantSpeed;
+        state.dataPumps->PumpEquip(PumpNum).TypeOf_Num = DataPlant::PlantEquipmentType::PumpBankConstantSpeed;
 
         state.dataPumps->PumpEquip(PumpNum).InletNodeNum = GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(2),

@@ -97,7 +97,7 @@ namespace EnergyPlus::FluidCoolers {
 std::string const cFluidCooler_SingleSpeed("FluidCooler:SingleSpeed");
 std::string const cFluidCooler_TwoSpeed("FluidCooler:TwoSpeed");
 
-PlantComponent *FluidCoolerspecs::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
+PlantComponent *FluidCoolerspecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
 {
     if (state.dataFluidCoolers->GetFluidCoolerInputFlag) {
         GetFluidCoolerInput(state);
@@ -765,9 +765,9 @@ void FluidCoolerspecs::oneTimeInit(EnergyPlusData &state)
         this->setupOutputVars(state);
         bool ErrorsFound = false;
         // Locate the tower on the plant loops for later usage
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(this->FluidCoolerType_enum),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ this->FluidCoolerType_enum,
                                                 this->LoopNum,
                                                 this->LoopSideNum,
                                                 this->BranchNum,

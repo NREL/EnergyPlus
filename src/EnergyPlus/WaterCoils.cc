@@ -6377,7 +6377,7 @@ Real64 GetWaterCoilDesAirFlow(EnergyPlusData &state,
 
 void CheckActuatorNode(EnergyPlusData &state,
                        int const ActuatorNodeNum, // input actuator node number
-                       int &iNodeType,            // Cooling or Heating or 0
+                       DataPlant::PlantEquipmentType &iNodeType,            // Cooling or Heating or 0
                        bool &NodeNotFound         // true if matching water inlet node not found
 )
 {
@@ -6403,7 +6403,7 @@ void CheckActuatorNode(EnergyPlusData &state,
     }
 
     WhichCoil = 0;
-    iNodeType = 0;
+    iNodeType = DataPlant::PlantEquipmentType::Invalid;
     NodeNotFound = true;
     for (CoilNum = 1; CoilNum <= state.dataWaterCoils->NumWaterCoils; ++CoilNum) {
         if (state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum == ActuatorNodeNum) {
@@ -6830,7 +6830,7 @@ Real64 GetWaterCoilCapacity(EnergyPlusData &state,
 }
 
 void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
-                                         int const CoilTypeNum,
+                                         DataPlant::PlantEquipmentType const CoilTypeNum,
                                          std::string const &CoilName,
                                          [[maybe_unused]] int const EquipFlowCtrl, // Flow control mode for the equipment
                                          int const LoopNum,                        // Plant loop index for where called from
@@ -6891,7 +6891,7 @@ void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
                     format("UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
                            CoilNum,
                            CoilName,
-                           ccSimPlantEquipTypes(CoilTypeNum)));
+                           ccSimPlantEquipTypes(static_cast<int>(CoilTypeNum))));
             }
         }
     }

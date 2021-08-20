@@ -86,7 +86,7 @@ namespace EnergyPlus::OutsideEnergySources {
 // PURPOSE OF THIS MODULE:
 // Module containing the routines dealing with the OutsideEnergySources
 
-PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, int objectType, std::string objectName)
+PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string objectName)
 {
     // Process the input data for outside energy sources if it hasn't been done already
     if (state.dataOutsideEnergySrcs->SimOutsideEnergyGetInputFlag) {
@@ -464,7 +464,7 @@ void OutsideEnergySourceSpecs::oneTimeInit(EnergyPlusData &state)
         // Locate the unit on the plant loops for later usage
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(
-            state, this->Name, static_cast<int>(this->EnergyType), this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+            state, this->Name, this->EnergyType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
         if (errFlag) {
             ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
         }

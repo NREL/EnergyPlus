@@ -131,7 +131,7 @@ namespace SolarCollectors {
         std::string OSCMName;     // OtherSideConditionsModel
         int VentCavIndex;         // index of ventilated cavity object
         TankTypeEnum ICSType_Num; // ICS collector type number
-        int TypeNum;              // Plant Side Connection: 'TypeOf_enum' assigned in DataPlant
+        DataPlant::PlantEquipmentType TypeNum;              // Plant Side Connection: 'TypeOf_enum' assigned in DataPlant
         int WLoopNum;             // Water plant loop index number
         int WLoopSideNum;         // Water plant loop side index
         int WLoopBranchNum;       // Water plant loop branch index
@@ -210,7 +210,7 @@ namespace SolarCollectors {
 
         // Default Constructor
         CollectorData()
-            : VentCavIndex(0), ICSType_Num(TankTypeEnum::ICSRectangularTank), TypeNum(0), WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0),
+        : VentCavIndex(0), ICSType_Num(TankTypeEnum::ICSRectangularTank), TypeNum(DataPlant::PlantEquipmentType::Invalid), WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0),
               WLoopCompNum(0), Init(true), InitSizing(true), Parameters(0), Surface(0), InletNode(0), InletTemp(0.0), OutletNode(0), OutletTemp(0.0),
               MassFlowRate(0.0), MassFlowRateMax(0.0), VolFlowRateMax(0.0), ErrIndex(0), IterErrIndex(0), IncidentAngleModifier(0.0), Efficiency(0.0),
               Power(0.0), HeatGain(0.0), HeatLoss(0.0), Energy(0.0), HeatRate(0.0), HeatEnergy(0.0), StoredHeatRate(0.0), StoredHeatEnergy(0.0),

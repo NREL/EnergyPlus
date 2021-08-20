@@ -942,9 +942,9 @@ namespace HWBaseboardRadiator {
         if (SetLoopIndexFlag(BaseboardNum)) {
             if (allocated(state.dataPlnt->PlantLoop)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state,
-                                        HWBaseboard(BaseboardNum).EquipID,
-                                        static_cast<int>(HWBaseboard(BaseboardNum).EquipType),
+               ScanPlantLoopsForObject( state,
+ HWBaseboard(BaseboardNum).EquipID,
+ HWBaseboard(BaseboardNum).EquipType,
                                         HWBaseboard(BaseboardNum).LoopNum,
                                         HWBaseboard(BaseboardNum).LoopSideNum,
                                         HWBaseboard(BaseboardNum).BranchNum,

@@ -127,7 +127,7 @@ void GshpPeHeatingSpecs::simulate(
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             this->SourceLoopNum,
                                                             this->SourceLoopSideNum,
-                                                            static_cast<int>(DataPlant::PlantEquipmentType::HPWaterEFHeating),
+                                                            DataPlant::PlantEquipmentType::HPWaterEFHeating,
                                                             this->SourceSideInletNodeNum,
                                                             this->SourceSideOutletNodeNum,
                                                             -this->QSource,
@@ -156,9 +156,9 @@ void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
     if (this->plantScanFlag) {
         // Locate the heating on the plant loops for later usage
         bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(DataPlant::PlantEquipmentType::HPWaterPEHeating),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::HPWaterPEHeating,
                                                 this->SourceLoopNum,
                                                 this->SourceLoopSideNum,
                                                 this->SourceBranchNum,
@@ -169,9 +169,9 @@ void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
                                                 _,
                                                 this->SourceSideInletNodeNum,
                                                 _);
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(DataPlant::PlantEquipmentType::HPWaterPEHeating),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::HPWaterPEHeating,
                                                 this->LoadLoopNum,
                                                 this->LoadLoopSideNum,
                                                 this->LoadBranchNum,
@@ -187,7 +187,7 @@ void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
         }
 
         PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->LoadLoopNum, this->LoadLoopSideNum, this->SourceLoopNum, this->SourceLoopSideNum, static_cast<int>(this->WWHPPlantTypeOfNum), true);
+            state, this->LoadLoopNum, this->LoadLoopSideNum, this->SourceLoopNum, this->SourceLoopSideNum, this->WWHPPlantTypeOfNum, true);
         this->plantScanFlag = false;
     }
 }

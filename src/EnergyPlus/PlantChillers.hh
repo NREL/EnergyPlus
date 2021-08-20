@@ -145,7 +145,7 @@ namespace PlantChillers {
         Real64 CondInletTemp;
         Real64 EvapInletTemp;
         Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
-        int plantTypeOfNum;
+        DataPlant::PlantEquipmentType plantTypeOfNum;
 
         // Default Constructor
         BaseChillerSpecs()
@@ -170,7 +170,7 @@ namespace PlantChillers {
               HeatRecOutletTemp(0.0), // C - Heat Rec outlet temperature, water side
               AvgCondSinkTemp(0.0),   // condenser temperature value for use in curves [C]
               BasinHeaterPower(0.0),  // Basin heater power (W)
-              Power(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), BasinHeaterConsumption(0.0), plantTypeOfNum(0)
+              Power(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), BasinHeaterConsumption(0.0), plantTypeOfNum(DataPlant::PlantEquipmentType::Invalid)
 
         {
         }

@@ -1222,9 +1222,9 @@ namespace OutdoorAirUnit {
                     (OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
 
                     errFlag = false;
-                    ScanPlantLoopsForObject(state,
-                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName,
-                                            static_cast<int>(OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum),
+                   ScanPlantLoopsForObject( state,
+ OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName,
+ OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilPlantTypeOfNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,

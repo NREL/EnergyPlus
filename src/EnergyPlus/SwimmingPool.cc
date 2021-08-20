@@ -821,9 +821,9 @@ void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(EnergyPlusData &state)
     if (this->MyPlantScanFlagPool && allocated(state.dataPlnt->PlantLoop)) {
         bool errFlag = false;
         if (this->WaterInletNode > 0) {
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    static_cast<int>(DataPlant::PlantEquipmentType::SwimmingPool_Indoor),
+           PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::SwimmingPool_Indoor,
                                                     this->HWLoopNum,
                                                     this->HWLoopSide,
                                                     this->HWBranchNum,

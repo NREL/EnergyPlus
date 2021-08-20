@@ -536,9 +536,9 @@ namespace HVACCooledBeam {
 
         if (CoolBeam(CBNum).PlantLoopScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(state,
-                                    CoolBeam(CBNum).Name,
-                                    static_cast<int>(DataPlant::PlantEquipmentType::CooledBeamAirTerminal),
+           ScanPlantLoopsForObject( state,
+ CoolBeam(CBNum).Name,
+ DataPlant::PlantEquipmentType::CooledBeamAirTerminal,
                                     CoolBeam(CBNum).CWLoopNum,
                                     CoolBeam(CBNum).CWLoopSideNum,
                                     CoolBeam(CBNum).CWBranchNum,

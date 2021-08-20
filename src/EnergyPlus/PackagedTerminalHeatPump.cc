@@ -4130,9 +4130,9 @@ void InitPTUnit(EnergyPlusData &state,
             if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
 
                 errFlag = false;
-                ScanPlantLoopsForObject(state,
-                                        state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
-                                        static_cast<int>(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating),
+               ScanPlantLoopsForObject( state,
+ state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
+ DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
@@ -4167,9 +4167,9 @@ void InitPTUnit(EnergyPlusData &state,
             } else if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
 
                 errFlag = false;
-                ScanPlantLoopsForObject(state,
-                                        state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
-                                        static_cast<int>(DataPlant::PlantEquipmentType::CoilSteamAirHeating),
+               ScanPlantLoopsForObject( state,
+ state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
+ DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
@@ -4212,9 +4212,9 @@ void InitPTUnit(EnergyPlusData &state,
                    (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam)) {
             if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                        static_cast<int>(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating),
+               ScanPlantLoopsForObject( state,
+ state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+ DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
@@ -4242,9 +4242,9 @@ void InitPTUnit(EnergyPlusData &state,
                 }
             } else if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                        static_cast<int>(DataPlant::PlantEquipmentType::CoilSteamAirHeating),
+               ScanPlantLoopsForObject( state,
+ state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
+ DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,

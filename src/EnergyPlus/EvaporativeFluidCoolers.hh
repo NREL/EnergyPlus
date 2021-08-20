@@ -248,7 +248,7 @@ namespace EvaporativeFluidCoolers {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
 
         void setupOutputVars(EnergyPlusData &state);
 

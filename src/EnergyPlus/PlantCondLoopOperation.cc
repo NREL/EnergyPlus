@@ -1919,7 +1919,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
     bool FoundSchemeMatch;
     //  LOGICAL, SAVE                     :: FirstHVACInitsDone = .FALSE.
     //  LOGICAL, SAVE                     :: MyEnvrnFlag = .TRUE.
-    int ThisTypeOfNum;
+    DataPlant::PlantEquipmentType ThisTypeOfNum;
     int CompOpNum;
     int OldNumOpSchemes;
     int NewNumEquipLists;
@@ -1960,7 +1960,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     auto &this_equip_list(this_op_scheme.EquipList(ListNum));
                     for (int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum) {
                         auto &this_equip(this_equip_list.Comp(EquipNum));
-                        ThisTypeOfNum = UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes);
+                        ThisTypeOfNum = static_cast<DataPlant::PlantEquipmentType>(UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes));
                         errFlag1 = false;
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 this_equip.Name,
@@ -1989,7 +1989,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         this_equip.BranchNumPtr = BranchNum;
                         this_equip.CompNumPtr = CompNum;
 
-                        if (ValidLoopEquipTypes(ThisTypeOfNum) == LoopType::Plant && this_plant_loop.TypeOfLoop == LoopType::Condenser) {
+                        if (ValidLoopEquipTypes(static_cast<int>(ThisTypeOfNum)) == LoopType::Plant && this_plant_loop.TypeOfLoop == LoopType::Condenser) {
                             ShowSevereError(state,
                                             "InitLoadDistribution: CondenserLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
                                                 this_plant_loop.OperationScheme + "\",");
@@ -1997,11 +1997,11 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                               "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
                                                   "\" includes equipment that is not valid on a Condenser Loop");
                             ShowContinueError(
-                                state, "Component " + ccSimPlantEquipTypes(ThisTypeOfNum) + " not allowed as supply equipment on this type of loop.");
+                                state, "Component " + ccSimPlantEquipTypes(static_cast<int>(ThisTypeOfNum)) + " not allowed as supply equipment on this type of loop.");
                             ShowContinueError(state, "Component name = " + this_equip.Name);
                             errFlag2 = true;
                         }
-                        if (ValidLoopEquipTypes(ThisTypeOfNum) == LoopType::Condenser && this_plant_loop.TypeOfLoop == LoopType::Plant) {
+                        if (ValidLoopEquipTypes(static_cast<int>(ThisTypeOfNum)) == LoopType::Condenser && this_plant_loop.TypeOfLoop == LoopType::Plant) {
                             ShowSevereError(state,
                                             "InitLoadDistribution: PlantLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
                                                 this_plant_loop.OperationScheme + "\",");
@@ -2009,7 +2009,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                               "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
                                                   "\" includes equipment that is not valid on a Plant Loop");
                             ShowContinueError(
-                                state, "Component " + ccSimPlantEquipTypes(ThisTypeOfNum) + " not allowed as supply equipment on this type of loop.");
+                                state, "Component " + ccSimPlantEquipTypes(static_cast<int>(ThisTypeOfNum)) + " not allowed as supply equipment on this type of loop.");
                             ShowContinueError(state, "Component name = " + this_equip.Name);
                             errFlag2 = true;
                         }
@@ -3456,7 +3456,7 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
                 for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     ActuatorName =
                         "Plant Component " +
-                        ccSimPlantEquipTypes(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).TypeOf_enum);
+                        ccSimPlantEquipTypes(static_cast<int>(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).TypeOf_enum));
                     UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name;
                     ActuatorType = "On/Off Supervisory";
                     SetupEMSActuator(state,

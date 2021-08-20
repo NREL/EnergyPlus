@@ -2035,7 +2035,7 @@ namespace CondenserLoopTowers {
         // Locate the tower on the plant loops for later usage
         bool ErrorsFound = false;
         PlantUtilities::ScanPlantLoopsForObject(
-            state, this->Name, static_cast<int>(this->TowerType_Num), this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+            state, this->Name, this->TowerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
         if (ErrorsFound) {
             ShowFatalError(state, "initialize: Program terminated due to previous condition(s).");
         }

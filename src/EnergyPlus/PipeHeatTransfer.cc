@@ -119,7 +119,7 @@ using namespace GroundTemperatureManager;
 
 // Functions
 
-PlantComponent *PipeHTData::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
+PlantComponent *PipeHTData::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
 {
     // Process the input data for pipes if it hasn't been done already
     if (state.dataPipeHT->GetPipeInputFlag) {

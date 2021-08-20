@@ -818,9 +818,9 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     if (state.dataChilledCeilingPanelSimple->SetLoopIndexFlag(CoolingPanelNum)) {
         if (allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(state,
-                                    ThisCP.EquipID,
-                                    static_cast<int>(ThisCP.EquipType),
+           ScanPlantLoopsForObject( state,
+ ThisCP.EquipID,
+ ThisCP.EquipType,
                                     ThisCP.LoopNum,
                                     ThisCP.LoopSideNum,
                                     ThisCP.BranchNum,

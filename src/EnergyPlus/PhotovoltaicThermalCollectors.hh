@@ -55,6 +55,7 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 

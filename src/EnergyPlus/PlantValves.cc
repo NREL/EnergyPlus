@@ -283,9 +283,9 @@ namespace PlantValves {
                 // Search thru PlantLoop Data Structure to check some things.
                 // Locate the component on the plant loops for later usage
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        static_cast<int>(DataPlant::PlantEquipmentType::ValveTempering),
+               PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::ValveTempering,
                                                         this->LoopNum,
                                                         this->LoopSideNum,
                                                         this->BranchNum,

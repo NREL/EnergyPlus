@@ -436,9 +436,9 @@ namespace PlantComponentTemperatureSources {
             this->setupOutputVars(state);
             // Locate the component on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    static_cast<int>(DataPlant::PlantEquipmentType::WaterSource),
+           PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::WaterSource,
                                                     this->Location.loopNum,
                                                     this->Location.loopSideNum,
                                                     this->Location.branchNum,

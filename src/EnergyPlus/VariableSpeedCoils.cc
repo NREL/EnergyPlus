@@ -3814,7 +3814,7 @@ namespace VariableSpeedCoils {
              DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit)) { // fix coil type
             if (state.dataVariableSpeedCoils->MyPlantScanFlag(DXCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
                 // switch from coil type numbers in DataHVACGlobals, to coil type numbers in plant.
-                int plantTypeOfNum(0);
+                DataPlant::PlantEquipmentType plantTypeOfNum(DataPlant::PlantEquipmentType::Invalid);
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
                     plantTypeOfNum = DataPlant::PlantEquipmentType::CoilVSWAHPCoolingEquationFit;
                 } else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum ==

@@ -154,7 +154,7 @@ void ElectricEIRChillerSpecs::simulate(
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             calledFromLocation.loopNum,
                                                             this->CDLoopSideNum,
-                                                            static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ElectricEIR),
+                                                            DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
                                                             this->CondInletNodeNum,
                                                             this->CondOutletNodeNum,
                                                             this->QCondenser,
@@ -167,7 +167,7 @@ void ElectricEIRChillerSpecs::simulate(
         PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                         this->HRLoopNum,
                                                         this->HRLoopSideNum,
-                                                        static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ElectricEIR),
+                                                        DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
                                                         this->HeatRecInletNodeNum,
                                                         this->HeatRecOutletNodeNum,
                                                         this->QHeatRecovered,
@@ -1119,9 +1119,9 @@ void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
 
     // Locate the chillers on the plant loops for later usage
     bool errFlag = false;
-    PlantUtilities::ScanPlantLoopsForObject(state,
-                                            this->Name,
-                                            static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ElectricEIR),
+   PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
                                             this->CWLoopNum,
                                             this->CWLoopSideNum,
                                             this->CWBranchNum,
@@ -1133,9 +1133,9 @@ void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->EvapInletNodeNum,
                                             _);
     if (this->CondenserType != DataPlant::nCondenserType::AirCooled && this->CondenserType != DataPlant::nCondenserType::EvapCooled) {
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ElectricEIR),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
                                                 this->CDLoopNum,
                                                 this->CDLoopSideNum,
                                                 this->CDBranchNum,
@@ -1147,12 +1147,12 @@ void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->CondInletNodeNum,
                                                 _);
         PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ElectricEIR), true);
+            state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::PlantEquipmentType::Chiller_ElectricEIR, true);
     }
     if (this->HeatRecActive) {
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ElectricEIR),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
                                                 this->HRLoopNum,
                                                 this->HRLoopSideNum,
                                                 this->HRBranchNum,
@@ -1164,13 +1164,13 @@ void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->HeatRecInletNodeNum,
                                                 _);
         PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ElectricEIR), true);
+            state, this->CWLoopNum, this->CWLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, DataPlant::PlantEquipmentType::Chiller_ElectricEIR, true);
     }
 
     if (this->CondenserType != DataPlant::nCondenserType::AirCooled && this->CondenserType != DataPlant::nCondenserType::EvapCooled &&
         this->HeatRecActive) {
         PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ElectricEIR), false);
+            state, this->CDLoopNum, this->CDLoopSideNum, this->HRLoopNum, this->HRLoopSideNum, DataPlant::PlantEquipmentType::Chiller_ElectricEIR, false);
     }
 
     if (errFlag) {
@@ -1748,7 +1748,7 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
             Real64 IPLV = 0.0;
             StandardRatings::CalcChillerIPLV(state,
                                              this->Name,
-                                             static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ElectricEIR),
+                                             DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
                                              this->RefCap,
                                              this->RefCOP,
                                              this->CondenserType,

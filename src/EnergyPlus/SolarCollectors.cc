@@ -1255,14 +1255,14 @@ namespace SolarCollectors {
                 if (qEquation < 0.0) {
                     if (this->ErrIndex == 0) {
                         ShowSevereMessage(state,
-                                          "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
+                                          "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->TypeNum)) + "=\"" + this->Name +
                                               "\", possible bad input coefficients.");
                         ShowContinueError(state,
                                           "...coefficients cause negative quadratic equation part in calculating temperature of stagnant fluid.");
                         ShowContinueError(state, "...examine input coefficients for accuracy. Calculation will be treated as linear.");
                     }
                     ShowRecurringSevereErrorAtEnd(state,
-                                                  "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
+                                                  "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->TypeNum)) + "=\"" + this->Name +
                                                       "\", coefficient error continues.",
                                                   this->ErrIndex,
                                                   qEquation,
@@ -1282,11 +1282,11 @@ namespace SolarCollectors {
             if (Iteration > 100) {
                 if (this->IterErrIndex == 0) {
                     ShowWarningMessage(state,
-                                       "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
+                                       "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->TypeNum)) + "=\"" + this->Name +
                                            "\":  Solution did not converge.");
                 }
                 ShowRecurringWarningErrorAtEnd(state,
-                                               "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
+                                               "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->TypeNum)) + "=\"" + this->Name +
                                                    "\", solution not converge error continues.",
                                                this->IterErrIndex);
                 break;

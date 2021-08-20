@@ -91,7 +91,7 @@ void EIRPlantLoopHeatPump::simulate(
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->sourceSideLocation.loopNum,
                                                                 this->sourceSideLocation.loopSideNum,
-                                                                this->plantTypeOfNum,
+                                                                this->plantTypeOfeNum,
                                                                 this->sourceSideNodes.inlet,
                                                                 this->sourceSideNodes.outlet,
                                                                 this->sourceSideHeatTransfer,
@@ -294,8 +294,8 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
     // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
-    if ((this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRCooling && currentLoad >= 0.0) ||
-        (this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating && currentLoad <= 0.0)) {
+    if ((this->plantTypeOfeNum == DataPlant::PlantEquipmentType::HeatPumpEIRCooling && currentLoad >= 0.0) ||
+        (this->plantTypeOfeNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating && currentLoad <= 0.0)) {
         this->resetReportingVariables();
         return;
     }
@@ -439,9 +439,9 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
     Real64 tmpCapacity = this->referenceCapacity;
     Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
 
-    std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
+    std::string const typeName = DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum));
     Real64 loadSideInitTemp = DataGlobalConstants::CWInitConvTemp;
-    if (this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+    if (this->plantTypeOfeNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
         loadSideInitTemp = DataGlobalConstants::HWInitConvTemp;
     }
 
@@ -620,9 +620,9 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
     Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
     Real64 tmpSourceVolFlow;
 
-    std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
+    std::string const typeName = DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum));
     Real64 sourceSideInitTemp = DataGlobalConstants::HWInitConvTemp;
-    if (this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+    if (this->plantTypeOfeNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
         sourceSideInitTemp = DataGlobalConstants::CWInitConvTemp;
     }
 
@@ -726,13 +726,13 @@ void EIRPlantLoopHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
     Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
     Real64 tmpSourceVolFlow = 0.0;
 
-    std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
+    std::string const typeName = DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum));
 
     // will leave like this for now
     // need to update these to better values later
     Real64 sourceSideInitTemp = 20;
     Real64 sourceSideHumRat = 0.0;
-    if (this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+    if (this->plantTypeOfeNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
         // same here; update later
         sourceSideInitTemp = 20;
     }
@@ -780,7 +780,7 @@ void EIRPlantLoopHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
     }
 }
 
-PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, int hp_type_of_num, const std::string &hp_name)
+PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name)
 {
     if (state.dataEIRPlantLoopHeatPump->getInputsPLHP) {
         EIRPlantLoopHeatPump::processInputForEIRPLHP(state);
@@ -789,7 +789,7 @@ PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, int hp_type
     }
 
     for (auto &plhp : state.dataEIRPlantLoopHeatPump->heatPumps) {
-        if (plhp.name == UtilityRoutines::MakeUPPERCase(hp_name) && plhp.plantTypeOfNum == hp_type_of_num) {
+        if (plhp.name == UtilityRoutines::MakeUPPERCase(hp_name) && plhp.plantTypeOfeNum == hp_type_of_num) {
             return &plhp;
         }
     }
@@ -803,10 +803,10 @@ void EIRPlantLoopHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
     for (auto &thisHP : state.dataEIRPlantLoopHeatPump->heatPumps) {
         if (!thisHP.companionCoilName.empty()) {
             auto thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
-            auto &thisCoilType = thisHP.plantTypeOfNum;
+            auto &thisCoilType = thisHP.plantTypeOfeNum;
             auto targetCompanionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
             for (auto &potentialCompanionCoil : state.dataEIRPlantLoopHeatPump->heatPumps) {
-                auto &potentialCompanionType = potentialCompanionCoil.plantTypeOfNum;
+                auto &potentialCompanionType = potentialCompanionCoil.plantTypeOfeNum;
                 auto potentialCompanionName = UtilityRoutines::MakeUPPERCase(potentialCompanionCoil.name);
                 if (potentialCompanionName == thisCoilName) {
                     // skip the current coil
@@ -856,13 +856,13 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
         }
     };
     std::vector<ClassType> classesToInput = {ClassType{"HeatPump:PlantLoop:EIR:Cooling",
-                                                       DataPlant::PlantEquipmentType::HeatPumpEIRCooling,
+                                                       static_cast<int>(DataPlant::PlantEquipmentType::HeatPumpEIRCooling),
                                                        "Chilled Water Nodes",
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add},
                                              ClassType{"HeatPump:PlantLoop:EIR:Heating",
-                                                       DataPlant::PlantEquipmentType::HeatPumpEIRHeating,
+                                                       static_cast<int>(DataPlant::PlantEquipmentType::HeatPumpEIRHeating),
                                                        "Hot Water Nodes",
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
                                                        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
@@ -890,7 +890,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
 
                 EIRPlantLoopHeatPump thisPLHP;
-                thisPLHP.plantTypeOfNum = classToInput.thisTypeNum;
+                thisPLHP.plantTypeOfeNum = static_cast<DataPlant::PlantEquipmentType>(classToInput.thisTypeNum);
                 thisPLHP.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("load_side_inlet_node_name")));
                 std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("load_side_outlet_node_name")));
@@ -1160,7 +1160,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
-        if (this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
+        if (this->plantTypeOfeNum == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
             SetupOutputVariable(state,
                                 "Heat Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -1173,7 +1173,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                 "Cooling",
                                 "Heat Pump",
                                 "Plant");
-        } else if (this->plantTypeOfNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
+        } else if (this->plantTypeOfeNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
             SetupOutputVariable(state,
                                 "Heat Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -1204,9 +1204,9 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
 
         // find this component on the plant
         bool thisErrFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->name,
-                                                this->plantTypeOfNum,
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->name,
+ this->plantTypeOfeNum,
                                                 this->loadSideLocation.loopNum,
                                                 this->loadSideLocation.loopSideNum,
                                                 this->loadSideLocation.branchNum,
@@ -1220,13 +1220,13 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
 
         if (thisErrFlag) {
             ShowSevereError(state,
-                            routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                            routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum)) + " name = \"" +
                                 this->name + "\"");
             ShowContinueError(state, "Could not locate component's load side connections on a plant loop");
             errFlag = true;
         } else if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // only check if !thisErrFlag
             ShowSevereError(state,
-                            routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                            routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum)) + " name = \"" +
                                 this->name + "\"");
             ShowContinueError(state, "The load side connections are not on the Supply Side of a plant loop");
             errFlag = true;
@@ -1234,9 +1234,9 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
 
         thisErrFlag = false;
         if (this->waterSource) {
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->name,
-                                                    this->plantTypeOfNum,
+           PlantUtilities::ScanPlantLoopsForObject( state,
+ this->name,
+ this->plantTypeOfeNum,
                                                     this->sourceSideLocation.loopNum,
                                                     this->sourceSideLocation.loopSideNum,
                                                     this->sourceSideLocation.branchNum,
@@ -1250,13 +1250,13 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
 
             if (thisErrFlag) {
                 ShowSevereError(state,
-                                routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum)) + " name = \"" +
                                     this->name + "\"");
                 ShowContinueError(state, "Could not locate component's source side connections on a plant loop");
                 errFlag = true;
             } else if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // only check if !thisErrFlag
                 ShowSevereError(state,
-                                routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum)) + " name = \"" +
                                     this->name + "\"");
                 ShowContinueError(state, "The source side connections are not on the Demand Side of a plant loop");
                 errFlag = true;
@@ -1265,7 +1265,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
             // make sure it is not the same loop on both sides.
             if (this->loadSideLocation.loopNum == this->sourceSideLocation.loopNum) { // user is being too tricky, don't allow
                 ShowSevereError(state,
-                                routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum)) + " name = \"" +
                                     this->name + "\"");
                 ShowContinueError(state, "The load and source sides need to be on different loops.");
                 errFlag = true;
@@ -1276,7 +1276,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                                               this->loadSideLocation.loopSideNum,
                                                               this->sourceSideLocation.loopNum,
                                                               this->sourceSideLocation.loopSideNum,
-                                                              this->plantTypeOfNum,
+                                                              this->plantTypeOfeNum,
                                                               true);
             }
         } else if (this->airSource) {

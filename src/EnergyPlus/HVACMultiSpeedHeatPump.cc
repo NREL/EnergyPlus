@@ -1888,9 +1888,9 @@ namespace HVACMultiSpeedHeatPump {
         if (MSHeatPump(MSHeatPumpNum).MyPlantScantFlag && allocated(state.dataPlnt->PlantLoop)) {
             if (MSHeatPump(MSHeatPumpNum).HeatRecActive) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state,
-                                        MSHeatPump(MSHeatPumpNum).Name,
-                                        static_cast<int>(DataPlant::PlantEquipmentType::MultiSpeedHeatPumpRecovery),
+               ScanPlantLoopsForObject( state,
+ MSHeatPump(MSHeatPumpNum).Name,
+ DataPlant::PlantEquipmentType::MultiSpeedHeatPumpRecovery,
                                         MSHeatPump(MSHeatPumpNum).HRLoopNum,
                                         MSHeatPump(MSHeatPumpNum).HRLoopSideNum,
                                         MSHeatPump(MSHeatPumpNum).HRBranchNum,
@@ -1911,9 +1911,9 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingWater) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state,
-                                        MSHeatPump(MSHeatPumpNum).HeatCoilName,
-                                        static_cast<int>(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating),
+               ScanPlantLoopsForObject( state,
+ MSHeatPump(MSHeatPumpNum).HeatCoilName,
+ DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                         MSHeatPump(MSHeatPumpNum).LoopNum,
                                         MSHeatPump(MSHeatPumpNum).LoopSide,
                                         MSHeatPump(MSHeatPumpNum).BranchNum,
@@ -1949,9 +1949,9 @@ namespace HVACMultiSpeedHeatPump {
 
             } else if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingSteam) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state,
-                                        MSHeatPump(MSHeatPumpNum).HeatCoilName,
-                                        static_cast<int>(DataPlant::PlantEquipmentType::CoilSteamAirHeating),
+               ScanPlantLoopsForObject( state,
+ MSHeatPump(MSHeatPumpNum).HeatCoilName,
+ DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                         MSHeatPump(MSHeatPumpNum).LoopNum,
                                         MSHeatPump(MSHeatPumpNum).LoopSide,
                                         MSHeatPump(MSHeatPumpNum).BranchNum,
@@ -1983,9 +1983,9 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == Coil_HeatingWater) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state,
-                                        MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
-                                        static_cast<int>(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating),
+               ScanPlantLoopsForObject( state,
+ MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
+ DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopNum,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopSide,
                                         MSHeatPump(MSHeatPumpNum).SuppBranchNum,
@@ -2021,9 +2021,9 @@ namespace HVACMultiSpeedHeatPump {
 
             } else if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == Coil_HeatingSteam) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state,
-                                        MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
-                                        static_cast<int>(DataPlant::PlantEquipmentType::CoilSteamAirHeating),
+               ScanPlantLoopsForObject( state,
+ MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
+ DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopNum,
                                         MSHeatPump(MSHeatPumpNum).SuppLoopSide,
                                         MSHeatPump(MSHeatPumpNum).SuppBranchNum,

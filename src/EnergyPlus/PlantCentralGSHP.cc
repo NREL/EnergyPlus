@@ -1542,9 +1542,9 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
     if (this->MyWrapperFlag) {
         // Locate the chillers on the plant loops for later usage
         bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                 this->CWLoopNum,
                                                 this->CWLoopSideNum,
                                                 this->CWBranchNum,
@@ -1556,9 +1556,9 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 this->CHWInletNodeNum,
                                                 _);
 
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                 this->HWLoopNum,
                                                 this->HWLoopSideNum,
                                                 this->HWBranchNum,
@@ -1570,9 +1570,9 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 this->HWInletNodeNum,
                                                 _);
 
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                static_cast<int>(DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump),
+       PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                 this->GLHELoopNum,
                                                 this->GLHELoopSideNum,
                                                 this->GLHEBranchNum,

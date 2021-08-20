@@ -807,13 +807,13 @@ namespace SetPointManager {
         int BranchIndexDemandSide;  // demand side branch index
         int LoopIndexPlantSide;     // plant side loop index
         int LoopIndexDemandSide;    // deand side loop index
-        int TypeNum;                // chiller type number
+        DataPlant::PlantEquipmentType TypeNum;                // chiller type number
 
         // Default Constructor
         DefineCondEntSetPointManager()
             : CondEntTempSchedPtr(0), TowerDsnInletAirWetBulb(0.0), MinTwrWbCurve(0), MinOaWbCurve(0), OptCondEntCurve(0), MinimumLiftTD(0.0),
               MaxCondEntTemp(0.0), NumCtrlNodes(0), SetPt(0.0), ChillerIndexPlantSide(0), ChillerIndexDemandSide(0), BranchIndexPlantSide(0),
-              BranchIndexDemandSide(0), LoopIndexPlantSide(0), LoopIndexDemandSide(0), TypeNum(0)
+              BranchIndexDemandSide(0), LoopIndexPlantSide(0), LoopIndexDemandSide(0), TypeNum(DataPlant::PlantEquipmentType::Invalid)
         {
         }
 
@@ -841,7 +841,7 @@ namespace SetPointManager {
         Array1D_int ClTowerVarIndex;                           // report variable index
         OutputProcessor::VariableType CndPumpVarType;          // report variable type
         int CndPumpVarIndex;                                   // report variable index
-        int TypeNum;                                           // chiller type number
+        DataPlant::PlantEquipmentType TypeNum;                                           // chiller type number
         Array1D_int TowerNum;                                  // cooling tower number
         int CondLoopNum;                                       // condenser loop number
         Array1D_int CondTowerBranchNum;                        // condenser branch number
@@ -857,7 +857,7 @@ namespace SetPointManager {
             : MinimumLiftTD(0.0), MaxCondEntTemp(0.0), NumCtrlNodes(0), SetPt(0.0), ChillerIndexPlantSide(0), BranchIndexPlantSide(0),
               LoopIndexPlantSide(0), ChllrVarType(OutputProcessor::VariableType::NotFound), ChllrVarIndex(0),
               ChlPumpVarType(OutputProcessor::VariableType::NotFound), ChlPumpVarIndex(0), CndPumpVarType(OutputProcessor::VariableType::NotFound),
-              CndPumpVarIndex(0), TypeNum(0), CondLoopNum(0), numTowers(0), CondPumpNum(0), CondPumpBranchNum(0), ChilledPumpNum(0),
+              CndPumpVarIndex(0), TypeNum(DataPlant::PlantEquipmentType::Invalid), CondLoopNum(0), numTowers(0), CondPumpNum(0), CondPumpBranchNum(0), ChilledPumpNum(0),
               ChilledPumpBranchNum(0), SetupIdealCondEntSetPtVars(true)
         {
         }
@@ -1077,9 +1077,9 @@ struct SetPointManagerData : BaseGlobalStruct
 
     int GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
     int GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
-    int InitSetPointManagerTypeNum = 0;
+    DataPlant::PlantEquipmentType InitSetPointManagerTypeNum = DataPlant::PlantEquipmentType::Invalid;
     int InitSetPointManagerNumChiller = 0;
-    int InitSetPointManagerTypeOf_Num = 0;
+    DataPlant::PlantEquipmentType InitSetPointManagerTypeOf_Num = DataPlant::PlantEquipmentType::Invalid;
 
     bool ManagerOn = false;
     bool GetInputFlag = true; // First time, input is "gotten"
@@ -1209,9 +1209,9 @@ struct SetPointManagerData : BaseGlobalStruct
 
         GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
         GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
-        InitSetPointManagerTypeNum = 0;
+        InitSetPointManagerTypeNum = DataPlant::PlantEquipmentType::Invalid;
         InitSetPointManagerNumChiller = 0;
-        InitSetPointManagerTypeOf_Num = 0;
+        InitSetPointManagerTypeOf_Num = DataPlant::PlantEquipmentType::Invalid;
 
         ManagerOn = false;
         GetInputFlag = true; // First time, input is "gotten"

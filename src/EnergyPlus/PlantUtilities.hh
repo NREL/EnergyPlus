@@ -122,7 +122,7 @@ namespace PlantUtilities {
     void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
                                              int LoopNum,                   // component's loop index
                                              int LoopSide,                  // component's loop side number
-                                             int TypeOfNum,                 // Component's type index
+                                             DataPlant::PlantEquipmentType TypeOfNum,                 // Component's type index
                                              int InletNodeNum,              // Component's inlet node pointer
                                              int OutletNodeNum,             // Component's outlet node pointer
                                              Real64 ModelCondenserHeatRate, // model's heat rejection rate at condenser (W)
@@ -134,7 +134,7 @@ namespace PlantUtilities {
     void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
                                          int LoopNum,                  // component's loop index
                                          int LoopSide,                 // component's loop side number
-                                         int TypeOfNum,                // Component's type index
+                                         DataPlant::PlantEquipmentType TypeOfNum,                // Component's type index
                                          int InletNodeNum,             // Component's inlet node pointer
                                          int OutletNodeNum,            // Component's outlet node pointer
                                          Real64 ModelRecoveryHeatRate, // model's heat rejection rate at recovery (W)
@@ -159,7 +159,7 @@ namespace PlantUtilities {
                                        int Loop1LoopSideNum,
                                        int Loop2Num,
                                        int Loop2LoopSideNum,
-                                       int PlantComponentTypeOfNum,
+                                       DataPlant::PlantEquipmentType PlantComponentTypeOfNum,
                                        bool Loop1DemandsOnLoop2);
 
     void ShiftPlantLoopSideCallingOrder(EnergyPlusData &state, int OldIndex, int NewIndex);
@@ -188,7 +188,7 @@ namespace PlantUtilities {
 
     void ScanPlantLoopsForObject(EnergyPlusData &state,
                                  std::string_view CompName,
-                                 int CompType,
+                                 DataPlant::PlantEquipmentType  CompType,
                                  int &LoopNum,
                                  int &LoopSideNum,
                                  int &BranchNum,

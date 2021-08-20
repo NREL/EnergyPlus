@@ -472,9 +472,9 @@ void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
 {
     // Locate the boilers on the plant loops for later usage
     bool errFlag = false;
-    PlantUtilities::ScanPlantLoopsForObject(state,
-                                            this->Name,
-                                            static_cast<int>(DataPlant::PlantEquipmentType::Boiler_Simple),
+   PlantUtilities::ScanPlantLoopsForObject( state,
+ this->Name,
+ DataPlant::PlantEquipmentType::Boiler_Simple,
                                             this->LoopNum,
                                             this->LoopSideNum,
                                             this->BranchNum,
