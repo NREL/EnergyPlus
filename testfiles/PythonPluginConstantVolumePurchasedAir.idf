@@ -1313,156 +1313,11 @@
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
-  Output:EnergyManagementSystem,
-    Verbose,                 !- Actuator Availability Dictionary Reporting
-    Verbose,                 !- Internal Variable Availability Dictionary Reporting
-    Verbose;                 !- EMS Runtime Language Debug Output Level
-
-  EnergyManagementSystem:ProgramCallingManager,
+  PythonPlugin:Instance,
     Constant Volume Purchased Air Example,  !- Name
-    AfterPredictorAfterHVACManagers,  !- EnergyPlus Model Calling Point
-    Determine_Purch_Air_State,  !- Program Name 1
-    Set_Purch_Air;           !- Program Name 2
-
-  ! State representation:  0.0 is off, 1.0 is heating, 2.0 is cooling
-
-  EnergyManagementSystem:Program,
-    Determine_Purch_Air_State,  !- Name
-    IF (Sensible_Load_Zone_1 < 0.0),  !- Program Line 1
-    SET Zone_1_State = 2.0,  !- Program Line 2
-    ELSEIF (Sensible_Load_Zone_1 > 0.0),  !- <none>
-    SET Zone_1_State = 1.0,  !- <none>
-    ELSE,
-    SET Zone_1_State = 0.0,  !- <none>
-    ENDIF,                   !- <none>
-    IF (Sensible_Load_Zone_2 < 0.0),  !- <none>
-    SET Zone_2_State = 2.0,  !- <none>
-    ELSEIF (Sensible_Load_Zone_2 > 0.0),  !- <none>
-    SET Zone_2_State = 1.0,  !- <none>
-    ELSE,
-    SET Zone_2_State = 0.0,  !- <none>
-    ENDIF,                   !- <none>
-    IF (Sensible_Load_Zone_3 < 0.0),  !- <none>
-    SET Zone_3_State = 2.0,  !- <none>
-    ELSEIF (Sensible_Load_Zone_3 > 0.0),  !- <none>
-    SET Zone_3_State = 1.0,  !- <none>
-    ELSE,
-    SET Zone_3_State = 0.0,  !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:Program,
-    Set_Purch_Air,           !- Name
-    IF (    Zone_1_State == 2.0),  !- Program Line 1
-    SET ZONE_1_AIR_Mdot = 0.3,  !- Program Line 2
-    SET ZONE_1_AIR_SupplyT = 13.0,  !- <none>
-    SET ZONE_1_AIR_SupplyHumRat = 0.009,  !- <none>
-    ELSEIF (Zone_1_State == 1.0),  !- <none>
-    SET ZONE_1_AIR_Mdot = 0.1,  !- <none>
-    SET ZONE_1_AIR_SupplyT = 50.0,  !- <none>
-    SET ZONE_1_AIR_SupplyHumRat = 0.015,  !- <none>
-    ELSE,
-    SET ZONE_1_AIR_Mdot = 0.0,  !- <none>
-    ENDIF,                   !- <none>
-    IF (    Zone_2_State == 2.0),  !- <none>
-    SET ZONE_2_AIR_Mdot = 0.3,  !- <none>
-    SET ZONE_2_AIR_SupplyT = 13.0,  !- <none>
-    SET ZONE_2_AIR_SupplyHumRat = 0.009,  !- <none>
-    ELSEIF (Zone_2_State == 1.0),  !- <none>
-    SET ZONE_2_AIR_Mdot = 0.1,  !- <none>
-    SET ZONE_2_AIR_SupplyT = 50.0,  !- <none>
-    SET ZONE_2_AIR_SupplyHumRat = 0.015,  !- <none>
-    ELSE,
-    SET ZONE_2_AIR_Mdot = 0.0,  !- <none>
-    ENDIF,                   !- <none>
-    IF (    Zone_3_State == 2.0),  !- <none>
-    SET ZONE_3_AIR_Mdot = 0.4,  !- <none>
-    SET ZONE_3_AIR_SupplyT = 13.0,  !- <none>
-    SET ZONE_3_AIR_SupplyHumRat = 0.009,  !- <none>
-    ELSEIF (Zone_3_State == 1.0),  !- <none>
-    SET ZONE_3_AIR_Mdot = 0.15,  !- <none>
-    SET ZONE_3_AIR_SupplyT = 50.0,  !- <none>
-    SET ZONE_3_AIR_SupplyHumRat = 0.015,  !- <none>
-    ELSE,
-    SET ZONE_3_AIR_Mdot = 0.0,  !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:GlobalVariable,
-    Zone_1_State;            !- Erl Variable 1 Name
-
-  EnergyManagementSystem:GlobalVariable,
-    Zone_2_State;            !- Erl Variable 1 Name
-
-  EnergyManagementSystem:GlobalVariable,
-    Zone_3_State;            !- Erl Variable 1 Name
-
-  EnergyManagementSystem:Actuator,
-    ZONE_1_AIR_Mdot,         !- Name
-    ZONE1AIR,                !- Actuated Component Unique Name
-    Ideal Loads Air System,  !- Actuated Component Type
-    Air Mass Flow Rate;      !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    ZONE_2_AIR_Mdot,         !- Name
-    ZONE2AIR,                !- Actuated Component Unique Name
-    Ideal Loads Air System,  !- Actuated Component Type
-    Air Mass Flow Rate;      !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    ZONE_3_AIR_Mdot,         !- Name
-    ZONE3AIR,                !- Actuated Component Unique Name
-    Ideal Loads Air System,  !- Actuated Component Type
-    Air Mass Flow Rate;      !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    ZONE_1_AIR_SupplyT,      !- Name
-    ZONE1AIR,                !- Actuated Component Unique Name
-    Ideal Loads Air System,  !- Actuated Component Type
-    Air Temperature;         !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    ZONE_2_AIR_SupplyT,      !- Name
-    ZONE2AIR,                !- Actuated Component Unique Name
-    Ideal Loads Air System,  !- Actuated Component Type
-    Air Temperature;         !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    ZONE_3_AIR_SupplyT,      !- Name
-    ZONE3AIR,                !- Actuated Component Unique Name
-    Ideal Loads Air System,  !- Actuated Component Type
-    Air Temperature;         !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    ZONE_1_AIR_SupplyHumRat, !- Name
-    ZONE1AIR,                !- Actuated Component Unique Name
-    Ideal Loads Air System,  !- Actuated Component Type
-    Air Humidity Ratio;      !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    ZONE_2_AIR_SupplyHumRat, !- Name
-    ZONE2AIR,                !- Actuated Component Unique Name
-    Ideal Loads Air System,  !- Actuated Component Type
-    Air Humidity Ratio;      !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    ZONE_3_AIR_SupplyHumRat, !- Name
-    ZONE3AIR,                !- Actuated Component Unique Name
-    Ideal Loads Air System,  !- Actuated Component Type
-    Air Humidity Ratio;      !- Actuated Component Control Type
-
-  EnergyManagementSystem:Sensor,
-    Sensible_Load_Zone_1,    !- Name
-    WEST ZONE,               !- Output:Variable or Output:Meter Index Key Name
-    Zone Predicted Sensible Load to Setpoint Heat Transfer Rate;  !- Output:Variable or Output:Meter Name
-
-  EnergyManagementSystem:Sensor,
-    Sensible_Load_Zone_2,    !- Name
-    EAST ZONE,               !- Output:Variable or Output:Meter Index Key Name
-    Zone Predicted Sensible Load to Setpoint Heat Transfer Rate;  !- Output:Variable or Output:Meter Name
-
-  EnergyManagementSystem:Sensor,
-    Sensible_Load_Zone_3,    !- Name
-    NORTH ZONE,              !- Output:Variable or Output:Meter Index Key Name
-    Zone Predicted Sensible Load to Setpoint Heat Transfer Rate;  !- Output:Variable or Output:Meter Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginConstantVolumePurchasedAir,  !- Python Module Name
+    ConstantVolumePurchasedAirExample;  !- Plugin Class Name
 
   PythonPlugin:Instance,
     Window Shading Device EMS Controller,  !- Name
@@ -1471,11 +1326,6 @@
     Set_Shade_Control_State; !- Plugin Class Name
 
   Output:Variable,Zn001:Wall001:Win001,Surface Outside Face Beam Solar Incident Angle Cosine Value,Timestep;
-
-  EnergyManagementSystem:Sensor,
-    Zone_Sensible_Heat_Rate, !- Name
-    WEST ZONE,               !- Output:Variable or Output:Meter Index Key Name
-    Zone Air System Sensible Heating Rate;  !- Output:Variable or Output:Meter Name
 
   PythonPlugin:OutputVariable,
     Erl Shading Control Status,  !- Name
@@ -1506,4 +1356,7 @@
     Shade_Status_Off,        !- Variable Name 1
     Shade_Status_Interior_Blind_On,  !- Variable Name 2
     Zn001_Wall001_Win001_Shading_Deploy_Status,  !- Variable Name 3
-    IncidentAngle;           !- Variable Name 4
+    IncidentAngle,           !- Variable Name 4
+    zn_1_state,              !- Variable Name 5
+    zn_2_state,              !- Variable Name 6
+    zn_3_state;              !- Variable Name 7
