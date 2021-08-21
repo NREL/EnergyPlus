@@ -422,8 +422,7 @@ namespace PVWatts {
 
         // Get the shading from the geometry, if applicable
         if (geometryType_ == GeometryType::SURFACE) {
-            shadedPercent_ =
-                (1.0 - state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, surfaceNum_)) * 100.0;
+            shadedPercent_ = (1.0 - state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, surfaceNum_)) * 100.0;
             ssc_data_set_number(pvwattsData_, "shaded_percent", shadedPercent_);
         }
 
