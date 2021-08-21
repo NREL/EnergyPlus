@@ -1926,7 +1926,6 @@ namespace ThermalComfort {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const AngleFacLimit(0.01); // To set the limit of sum of angle factors
-        int const MaxSurfaces(20);        // Maximum number of surfaces in each AngleFactor List
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AllAngleFacSummed; // Sum of angle factors in each zone
@@ -1977,13 +1976,6 @@ namespace ThermalComfort {
             }
 
             thisAngFacList.TotAngleFacSurfaces = NumNumbers;
-            if (thisAngFacList.TotAngleFacSurfaces > MaxSurfaces) {
-                ShowSevereError(state,
-                                cCurrentModuleObject + ": Too many surfaces specified in " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                    state.dataIPShortCut->cAlphaArgs(1));
-                ErrorsFound = true;
-            }
-
             thisAngFacList.SurfaceName.allocate(thisAngFacList.TotAngleFacSurfaces);
             thisAngFacList.SurfacePtr.allocate(thisAngFacList.TotAngleFacSurfaces);
             thisAngFacList.AngleFactor.allocate(thisAngFacList.TotAngleFacSurfaces);
@@ -2026,7 +2018,7 @@ namespace ThermalComfort {
             if (std::abs(AllAngleFacSummed - 1.0) > AngleFacLimit) {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid - Sum[AngleFactors]");
                 ShowContinueError(state,
-                                  format("...Sum of Angle Factors [{:.3R}] exceed expected sum [1.0] by more than limit [{:.3R}].",
+                                  format("...Sum of Angle Factors [{:.3R}] should not deviate from expected sum [1.0] by more than limit [{:.3R}].",
                                          AllAngleFacSummed,
                                          AngleFacLimit));
                 ErrorsFound = true;
