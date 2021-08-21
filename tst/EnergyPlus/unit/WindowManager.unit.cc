@@ -3053,7 +3053,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
         HeatBalanceManager::SetupSimpleWindowGlazingSystem(*state, MaterNum);
         state->dataWindowManager->scon(1) = state->dataMaterial->Material(MaterNum).Conductivity / state->dataMaterial->Material(MaterNum).Thickness;
         CalcNominalWindowCond(*state, ConstrNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
-        EXPECT_NEAR(NominalConductanceWinter, varyInputU, 0.001);
+        EXPECT_NEAR(NominalConductanceWinter, varyInputU, 0.01);
     }
 
     // winter

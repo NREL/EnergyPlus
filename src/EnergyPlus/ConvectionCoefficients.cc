@@ -327,7 +327,7 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         for (int SurfNum = Zone(ZoneNum).WindowSurfaceFirst; SurfNum <= Zone(ZoneNum).WindowSurfaceLast; ++SurfNum) {
-            if (Surface(SurfNum).ExtBoundCond != ExternalEnvironment) {
+            if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
                 state.dataHeatBalSurf->SurfHConvInt(SurfNum) =
                     state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum);
             }
