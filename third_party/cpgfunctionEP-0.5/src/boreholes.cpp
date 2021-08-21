@@ -3,6 +3,7 @@
 //
 
 #include <cpgfunction/boreholes.h>
+#include <algorithm>
 
 using namespace std;
 
