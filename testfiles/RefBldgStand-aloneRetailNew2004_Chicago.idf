@@ -632,6 +632,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Back_Space,              !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -648,6 +649,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     Back_Space,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -664,6 +666,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Back_Space,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -680,6 +683,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Back_Space,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -696,6 +700,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Back_Space,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_Retail_Wall_North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -712,6 +717,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Back_Space,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -728,6 +734,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Core_Retail,             !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -748,6 +755,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     Core_Retail,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -768,6 +776,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_Retail,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Front_Retail_Wall_West_2,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -784,6 +793,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Core_Retail,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -800,6 +810,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_Retail,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Back_Space_Wall_South,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -816,6 +827,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_Retail,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Point_Of_Sale_Wall_North,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -832,6 +844,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_Retail,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Front_Entry_Wall_North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -848,6 +861,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_Retail,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Front_Retail_Wall_North, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -864,6 +878,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_Retail,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Point_Of_Sale_Wall_East_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -880,6 +895,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Core_Retail,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -896,6 +912,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Front_Entry,             !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -912,6 +929,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     Front_Entry,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -928,6 +946,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Front_Entry,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Front_Retail_Wall_West_1,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -944,6 +963,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Front_Entry,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_Retail_Wall_South_2,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -960,6 +980,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Front_Entry,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -976,6 +997,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Front_Entry,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Point_Of_Sale_Wall_East_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -992,6 +1014,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Front_Retail,            !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1008,6 +1031,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     Front_Retail,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1024,6 +1048,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Front_Retail,            !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_Retail_Wall_South_3,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1040,6 +1065,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Front_Retail,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1056,6 +1082,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Front_Retail,            !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Front_Entry_Wall_East,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1072,6 +1099,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Front_Retail,            !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_Retail_Wall_East_1, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1088,6 +1116,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Front_Retail,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1104,6 +1133,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Point_Of_Sale,           !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1120,6 +1150,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     Point_Of_Sale,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1136,6 +1167,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Point_Of_Sale,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Front_Entry_Wall_West,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1152,6 +1184,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Point_Of_Sale,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_Retail_Wall_West_1, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1168,6 +1201,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Point_Of_Sale,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_Retail_Wall_South_1,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1184,6 +1218,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Point_Of_Sale,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1200,6 +1235,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Point_Of_Sale,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1596,31 +1632,36 @@
     Back_Space Internal Mass,!- Name
     InteriorFurnishings,     !- Construction Name
     Back_Space,              !- Zone or ZoneList Name
-    759.7800;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    759.7800;                !- Extended Field
 
   InternalMass,
     Core_Retail Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Core_Retail,             !- Zone or ZoneList Name
-    3200.9658;               !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    3200.9658;               !- Extended Field
 
   InternalMass,
     Front_Entry Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Front_Entry,             !- Zone or ZoneList Name
-    24.0000;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    24.0000;                 !- Extended Field
 
   InternalMass,
     Front_Retail Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Front_Retail,            !- Zone or ZoneList Name
-    301.6200;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    301.6200;                !- Extended Field
 
   InternalMass,
     Point_Of_Sale Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Point_Of_Sale,           !- Zone or ZoneList Name
-    301.6200;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    301.6200;                !- Extended Field
 
 ! ***INTERNAL GAINS SCHEDULES***
 
