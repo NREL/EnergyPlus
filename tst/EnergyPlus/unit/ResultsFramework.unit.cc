@@ -96,7 +96,6 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject2)
     state->dataResultsFramework->resultsFramework->setupOutputOptions(*state);
 
     EXPECT_TRUE(state->dataResultsFramework->resultsFramework->timeSeriesEnabled());
-    compare_json_stream("");
 }
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_SimInfo)
