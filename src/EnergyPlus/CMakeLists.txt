@@ -384,6 +384,8 @@ set(SRC
     ICEngineElectricGenerator.hh
     IceThermalStorage.cc
     IceThermalStorage.hh
+    InputProcessing/CsvParser.cc
+    InputProcessing/CsvParser.hh
     InputProcessing/DataStorage.hh
     InputProcessing/EmbeddedEpJSONSchema.hh
     "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"

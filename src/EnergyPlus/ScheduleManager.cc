@@ -56,6 +56,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/InputProcessing/CsvParser.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
@@ -212,7 +213,7 @@ namespace ScheduleManager {
         int NumCptSchedules;           // Number of "compact" Schedules
         int NumCommaFileSchedules;     // Number of Schedule:File schedules
         int NumConstantSchedules;      // Number of "constant" schedules
-        int NumCSVAllColumnsSchedules; // Number of imported shading schedules
+        int NumCSVAllColumnsSchedules = 0; // Number of imported shading schedules
         int NumCommaFileShading;       // Number of shading csv schedules
         int TS;                        // Counter for Num Of Time Steps in Hour
         int Hr;                        // Hour Counter
@@ -239,7 +240,6 @@ namespace ScheduleManager {
         WeatherManager::DateType PDateType;
         int PWeekDay;
         int ThruField;
-        std::string ExtraField;
         int UntilFld;
         int xxcount;
         //  REAL(r64) tempval
@@ -248,27 +248,17 @@ namespace ScheduleManager {
         std::string errmsg;
         int kdy;
         // for SCHEDULE:FILE
-        Array1D<Real64> hourlyFileValues;
-        std::map<std::string, int> CSVAllColumnNames;
-        std::map<int, Array1D<Real64>> CSVAllColumnNameAndValues;
-        int colCnt;
         int rowCnt;
-        int wordStart;
-        int wordEnd;
-        std::string::size_type sepPos;
         std::string subString;
-        Real64 columnValue;
         int iDay;
         int hDay;
         int jHour;
         int kDayType;
         Real64 curHrVal;
-        bool errFlag;
         std::string::size_type sPos;
         std::string CurrentModuleObject; // for ease in getting objects
         int MaxNums1;
-        std::string ColumnSep;
-        bool firstLine;
+        char ColumnSep;
         bool FileIntervalInterpolated;
         int rowLimitCount;
         int skiprowCount;
@@ -449,8 +439,7 @@ namespace ScheduleManager {
             ShowWarningError(state, CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
         }
 
-        NumCSVAllColumnsSchedules = 0;
-
+        std::map<fs::path, nlohmann::json>::iterator schedule_file_shading_result;
         if (NumCommaFileShading != 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -473,119 +462,43 @@ namespace ScheduleManager {
                 ShowFatalError(state, "Program terminates due to previous condition.");
             }
 
-            auto SchdFile = state.files.TempFullFilePath.try_open();
-            if (!SchdFile.good()) {
-                ShowSevereError(state, format("{}:\"{}\" cannot be opened.", RoutineName, ShadingSunlitFracFileName));
-                ShowContinueError(state, "... It may be open in another program (such as Excel).  Please close and try again.");
-                ShowFatalError(state, "Program terminates due to previous condition.");
-            }
-            // check for stripping
-            auto LineIn = SchdFile.readLine();
-            const auto endLine = len(LineIn.data);
-            if (endLine > 0) {
-                if (int(LineIn.data[endLine - 1]) == state.dataSysVars->iUnicode_end) {
-                    SchdFile.close();
-                    ShowSevereError(state, format("{}:\"{}\" appears to be a Unicode or binary file.", RoutineName, ShadingSunlitFracFileName));
-                    ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
-                    ShowFatalError(state, "Program terminates due to previous condition.");
-                }
-            }
-            SchdFile.backspace();
-
             numerrors = 0;
-            errFlag = false;
 
-            rowCnt = 0;
-            firstLine = true;
             if (state.dataEnvrn->CurrentYearIsLeapYear) {
                 rowLimitCount = 366 * 24 * state.dataGlobal->NumOfTimeStepInHour;
             } else {
                 rowLimitCount = 365 * 24 * state.dataGlobal->NumOfTimeStepInHour;
             }
             ColumnSep = CharComma;
-            while (!LineIn.eof) { // end of file
-                LineIn = SchdFile.readLine();
-                ++rowCnt;
-                if (rowCnt - 2 > rowLimitCount) break;
-                colCnt = 0;
-                wordStart = 0;
-                columnValue = 0.0;
-                // scan through the line and write values into 2d array
-                while (true) {
-                    sepPos = index(LineIn.data, ColumnSep);
-                    ++colCnt;
-                    if (sepPos != std::string::npos) {
-                        if (sepPos > 0) {
-                            wordEnd = sepPos - 1;
-                        } else {
-                            wordEnd = wordStart;
-                        }
-                        subString = LineIn.data.substr(wordStart, wordEnd - wordStart + 1);
-                        // the next word will start after the comma
-                        wordStart = sepPos + 1;
-                        // get rid of separator so next INDEX will find next separator
-                        LineIn.data.erase(0, wordStart);
-                        firstLine = false;
-                        wordStart = 0;
-                    } else {
-                        // no more commas
-                        subString = LineIn.data.substr(wordStart);
-                        if (firstLine && subString == BlankString) {
-                            ShowWarningError(state,
-                                             format("{}:\"{}\"  first line does not contain the indicated column separator=comma.",
-                                                    RoutineName,
-                                                    ShadingSunlitFracFileName));
-                            ShowContinueError(state, "...first 40 characters of line=[" + LineIn.data.substr(0, 40) + ']');
-                            firstLine = false;
-                        }
-                        break;
-                    }
-                    // skip time stamp column
-                    if (colCnt > 1) {
-                        if (rowCnt == 1) {
-                            if (subString == BlankString) {
-                                ShowWarningError(state, format("{}:\"{}\": invalid blank column header.", RoutineName, ShadingSunlitFracFileName));
-                                errFlag = true;
-                            } else if (CSVAllColumnNames.count(subString)) {
-                                ShowWarningError(
-                                    state, format("{}:\"{}\": duplicated column header: \"{}\".", RoutineName, ShadingSunlitFracFileName, subString));
-                                ShowContinueError(state, "The first occurrence of the same surface name would be used.");
-                                errFlag = true;
-                            }
-                            if (!errFlag) {
-                                NumCSVAllColumnsSchedules++;
-                                Array1D<Real64> timestepColumnValues;
-                                timestepColumnValues.allocate(rowLimitCount);
-                                // {column header: column number - 1}
-                                CSVAllColumnNames[subString] = colCnt - 1;
-                                // {column number - 1: array of numHoursInyear * timestepsInHour values}
-                                CSVAllColumnNameAndValues[colCnt - 1] = timestepColumnValues;
-                            }
-                        } else {
-                            columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
-                            if (errFlag) {
-                                ++numerrors;
-                                columnValue = 0.0;
-                                ShowWarningError(state,
-                                                 format("{}:\"{}\": found error processing column: {}, row:{} in {}.",
-                                                        RoutineName,
-                                                        ShadingSunlitFracFileName,
-                                                        colCnt,
-                                                        rowCnt,
-                                                        ShadingSunlitFracFileName));
-                                ShowContinueError(state, "This value is set to 0.");
-                            }
-                            CSVAllColumnNameAndValues[colCnt - 1](rowCnt - 1) = columnValue;
-                        }
-                    }
+
+            schedule_file_shading_result = state.dataScheduleMgr->UniqueProcessedExternalFiles.find(state.files.TempFullFilePath.filePath);
+            if (schedule_file_shading_result == state.dataScheduleMgr->UniqueProcessedExternalFiles.end()) {
+
+                auto const ext = FileSystem::getFileType(state.files.TempFullFilePath.filePath);
+                if (FileSystem::is_flat_file_type(ext)) {
+                    auto const schedule_data = FileSystem::readFile(state.files.TempFullFilePath.filePath);
+                    CsvParser csvParser;
+                    skiprowCount = 1; // make sure to parse header row only for Schedule:File:Shading
+                    auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(state.files.TempFullFilePath.filePath, csvParser.decode(schedule_data, ColumnSep, skiprowCount));
+                    schedule_file_shading_result = it.first;
+                } else if (FileSystem::is_all_json_type(ext)) {
+                    auto schedule_data = FileSystem::readJSON(state.files.TempFullFilePath.filePath);
+                    auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(state.files.TempFullFilePath.filePath, std::move(schedule_data));
+                    schedule_file_shading_result = it.first;
+                } else {
+                    ShowSevereError(state, fmt::format(R"({}{}="{}", {}="{}" has an unknown file extension and cannot be read by this program.)", RoutineName, CurrentModuleObject, Alphas(1), cAlphaFields(3), Alphas(3)));
+                    ShowFatalError(state, "Program terminates due to previous condition.");
                 }
             }
-            SchdFile.close();
 
-            if (rowCnt - 2 != rowLimitCount) {
-                if (rowCnt - 2 < rowLimitCount) {
-                    ShowSevereError(state, format("{}{}=\"{}\" {} data values read.", RoutineName, CurrentModuleObject, Alphas(1), rowCnt - 2));
-                } else if (rowCnt - 2 > rowLimitCount) {
+            auto const & column_json = schedule_file_shading_result->second["values"].at(0); // assume there is at least 1 column
+            rowCnt = column_json.size();
+            NumCSVAllColumnsSchedules = schedule_file_shading_result->second["header"].get<std::set<std::string>>().size() - 1; // -1 to account for timestamp column
+
+            if (rowCnt != rowLimitCount) {
+                if (rowCnt < rowLimitCount) {
+                    ShowSevereError(state, format("{}{}=\"{}\" {} data values read.", RoutineName, CurrentModuleObject, Alphas(1), rowCnt));
+                } else if (rowCnt > rowLimitCount) {
                     ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\" too many data values read.");
                 }
                 ShowContinueError(
@@ -1643,9 +1556,6 @@ namespace ScheduleManager {
         //         \maximum 60
 
         // continue adding to SchNum,AddWeekSch,AddDaySch
-        if (NumCommaFileSchedules > 0) {
-            hourlyFileValues.allocate(8784 * 60); // sized to accomodate any interval for schedule file.
-        }
         CurrentModuleObject = "Schedule:File";
         for (LoopIndex = 1; LoopIndex <= NumCommaFileSchedules; ++LoopIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -1685,7 +1595,6 @@ namespace ScheduleManager {
                     state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr = CheckIndex;
                 }
             }
-            hourlyFileValues = 0.0; // set default values to zero
 
             // Numbers(1) - which column
             curcolCount = Numbers(1);
@@ -1750,140 +1659,33 @@ namespace ScheduleManager {
             rowLimitCount = (Numbers(3) * 60.0) / MinutesPerItem;
             hrLimitCount = 60 / MinutesPerItem;
 
-            //    ! Number of numbers in the Numbers list okay to process
-            //    Hr=1
-            //    CurMinute=MinutesPerItem
-            //    SCount=1
-            //    DO NumFields=2,NumNumbers
-            //      MinuteValue(Hr,SCount:CurMinute)=Numbers(NumFields)
-            //      SCount=CurMinute+1
-            //      CurMinute=CurMinute+MinutesPerItem
-            //      IF (CurMinute > 60) THEN
-            //        CurMinute=MinutesPerItem
-            //        SCount=1
-            //        Hr=Hr+1
-            //      ENDIF
-            //    ENDDO
-            //    ! Now parcel into TS Value....
-            //    IF (DaySchedule(Count)%IntervalInterpolated) THEN
-            //      DO Hr=1,24
-            //        SCount=1
-            //        CurMinute=MinutesPerTimeStep
-            //        DO TS=1,NumOfTimeStepInHour
-            //          DaySchedule(Count)%TSValue(Hr,TS)=SUM(MinuteValue(Hr,SCount:CurMinute))/REAL(MinutesPerTimeStep,r64)
-            //          SCount=CurMinute+1
-            //          CurMinute=CurMinute+MinutesPerTimeStep
-            //        ENDDO
-            //      ENDDO
-            //    ELSE
-            //      DO Hr=1,24
-            //        CurMinute=MinutesPerTimeStep
-            //        DO TS=1,NumOfTimeStepInHour
-            //          DaySchedule(Count)%TSValue(Hr,TS)=MinuteValue(Hr,CurMinute)
-            //          Curminute=CurMinute+MinutesPerTimeStep
-            //        ENDDO
-            //      ENDDO
-            //    ENDIF
-
             std::string contextString = CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + ": ";
 
             state.files.TempFullFilePath.filePath = CheckForActualFilePath(state, Alphas(3), contextString);
-
-            //    INQUIRE(file=Alphas(3),EXIST=FileExists)
             // Setup file reading parameters
             if (state.files.TempFullFilePath.filePath.empty()) {
                 ErrorsFound = true;
             } else {
-                auto SchdFile = state.files.TempFullFilePath.try_open();
-                if (!SchdFile.good()) {
-                    ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" +
-                                        Alphas(3) + "\" cannot be opened.");
-                    ShowContinueError(state, "... It may be open in another program (such as Excel).  Please close and try again.");
-                    ShowFatalError(state, "Program terminates due to previous condition.");
-                }
-                // check for stripping
-                auto LineIn = SchdFile.readLine();
-                const auto endLine = len(LineIn.data);
-                if (endLine > 0) {
-                    if (int(LineIn.data[endLine - 1]) == state.dataSysVars->iUnicode_end) {
-                        ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" +
-                                            Alphas(3) + " appears to be a Unicode or binary file.");
-                        ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
+                auto result = state.dataScheduleMgr->UniqueProcessedExternalFiles.find(state.files.TempFullFilePath.filePath);
+                if (result == state.dataScheduleMgr->UniqueProcessedExternalFiles.end()) {
+                    auto const ext = FileSystem::getFileType(state.files.TempFullFilePath.filePath);
+                    if (FileSystem::is_flat_file_type(ext)) {
+                        auto const schedule_data = FileSystem::readFile(state.files.TempFullFilePath.filePath);
+                        CsvParser csvParser;
+                        auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(state.files.TempFullFilePath.filePath, csvParser.decode(schedule_data, ColumnSep, skiprowCount));
+                        result = it.first;
+                    } else if (FileSystem::is_all_json_type(ext)) {
+                        auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(state.files.TempFullFilePath.filePath, FileSystem::readJSON(state.files.TempFullFilePath.filePath));
+                        result = it.first;
+                    } else {
+                        ShowSevereError(state, fmt::format(R"({}{}="{}", {}="{}" has an unknown file extension and cannot be read by this program.)", RoutineName, CurrentModuleObject, Alphas(1), cAlphaFields(3), Alphas(3)));
                         ShowFatalError(state, "Program terminates due to previous condition.");
                     }
                 }
-                SchdFile.backspace();
 
-                // skip lines if any need to be skipped.
-                numerrors = 0;
-                rowCnt = 0;
-                if (skiprowCount > 0) {   // Numbers(2) has number of rows to skip
-                    while (!LineIn.eof) { // end of file
-                        LineIn = SchdFile.readLine();
-                        ++rowCnt;
-                        if (rowCnt == skiprowCount) {
-                            break;
-                        }
-                    }
-                }
-
-                //  proper number of lines are skipped.  read the file
-                // for the rest of the lines read from the file
-                rowCnt = 0;
-                firstLine = true;
-                while (!LineIn.eof) { // end of file
-                    LineIn = SchdFile.readLine();
-                    ++rowCnt;
-                    colCnt = 0;
-                    wordStart = 0;
-                    columnValue = 0.0;
-                    // scan through the line looking for a specific column
-                    while (true) {
-                        sepPos = index(LineIn.data, ColumnSep);
-                        ++colCnt;
-                        if (sepPos != std::string::npos) {
-                            if (sepPos > 0) {
-                                wordEnd = sepPos - 1;
-                            } else {
-                                wordEnd = wordStart;
-                            }
-                            subString = LineIn.data.substr(wordStart, wordEnd - wordStart + 1);
-                            // the next word will start after the comma
-                            wordStart = sepPos + 1;
-                            // get rid of separator so next INDEX will find next separator
-                            LineIn.data.erase(0, wordStart);
-                            firstLine = false;
-                            wordStart = 0;
-                        } else {
-                            // no more commas
-                            subString = LineIn.data.substr(wordStart);
-                            if (firstLine && subString == BlankString) {
-                                ShowWarningError(state,
-                                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
-                                                     "\" first line does not contain the indicated column separator=" + Alphas(4) + '.');
-                                ShowContinueError(state, "...first 40 characters of line=[" + LineIn.data.substr(0, 40) + ']');
-                                firstLine = false;
-                            }
-                            break;
-                        }
-                        if (colCnt == curcolCount) break;
-                    }
-                    if (colCnt == curcolCount) {
-                        columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
-                        if (errFlag) {
-                            std::string test = subString;
-                            ++numerrors;
-                            columnValue = 0.0;
-                        }
-                    } else {
-                        columnValue = 0.0;
-                    }
-                    hourlyFileValues(rowCnt) = columnValue;
-                    if (rowCnt == rowLimitCount) break;
-                }
-                SchdFile.close();
+                auto const & column_json = result->second["values"][curcolCount - 1];
+                rowCnt = column_json.size();
+                auto const column_values = column_json.get<std::vector<Real64>>();
 
                 // schedule values have been filled into the hourlyFileValues array.
 
@@ -1912,6 +1714,7 @@ namespace ScheduleManager {
                                              numHourlyValues,
                                              (rowCnt * 60) / MinutesPerItem));
                 }
+
                 // process the data into the normal schedule data structures
                 // note -- schedules are ALWAYS 366 days so some special measures have to be done at 29 Feb "day of year" (60)
                 iDay = 0;
@@ -1922,26 +1725,25 @@ namespace ScheduleManager {
                     ++iDay;
                     ++hDay;
                     if (iDay > 366) break;
-                    ExtraField = fmt::to_string(iDay);
                     // increment both since a week schedule is being defined for each day so that a day is valid
                     // no matter what the day type that is used in a design day.
                     ++AddWeekSch;
                     ++AddDaySch;
                     // define week schedule
-                    state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = Alphas(1) + "_wk_" + ExtraField;
+                    state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = fmt::format("{}_wk_{}", Alphas(1), iDay);
                     // for all day types point the week schedule to the newly defined day schedule
                     for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
                         state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
                     }
                     // day schedule
-                    state.dataScheduleMgr->DaySchedule(AddDaySch).Name = Alphas(1) + "_dy_" + ExtraField;
+                    state.dataScheduleMgr->DaySchedule(AddDaySch).Name = fmt::format("{}_dy_{}", Alphas(1), iDay);
                     state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
                     // schedule is pointing to the week schedule
                     state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
                     if (MinutesPerItem == 60) {
                         for (jHour = 1; jHour <= 24; ++jHour) {
+                            curHrVal = column_values[ifld]; // hourlyFileValues((hDay - 1) * 24 + jHour)
                             ++ifld;
-                            curHrVal = hourlyFileValues(ifld); // hourlyFileValues((hDay - 1) * 24 + jHour)
                             for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                                 state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
                             }
@@ -1951,8 +1753,8 @@ namespace ScheduleManager {
                             CurMinute = MinutesPerItem;
                             SCount = 1;
                             for (NumFields = 1; NumFields <= hrLimitCount; ++NumFields) {
+                                MinuteValue({SCount, CurMinute}, Hr) = column_values[ifld];
                                 ++ifld;
-                                MinuteValue({SCount, CurMinute}, Hr) = hourlyFileValues(ifld);
                                 SCount = CurMinute + 1;
                                 CurMinute += MinutesPerItem;
                             }
@@ -1997,58 +1799,64 @@ namespace ScheduleManager {
                                  state.dataScheduleMgr->Schedule(SchNum).EMSValue);
             }
         }
-        if (NumCommaFileSchedules > 0) {
-            hourlyFileValues.deallocate();
-        }
 
-        std::string curName;
-        Array1D<Real64> timestepColumnValues;
-        for (auto &NameValue : CSVAllColumnNames) {
-            curName = NameValue.first + "_shading";
-            timestepColumnValues = CSVAllColumnNameAndValues[NameValue.second];
-            GlobalNames::VerifyUniqueInterObjectName(
-                state, state.dataScheduleMgr->UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
-            ++SchNum;
-            state.dataScheduleMgr->Schedule(SchNum).Name = curName;
-            state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_file;
+        if (NumCommaFileShading != 0) {
+            auto const & values_json = schedule_file_shading_result->second["values"];
+            auto const headers = schedule_file_shading_result->second["header"].get<std::vector<std::string>>();
+            auto const headers_set = schedule_file_shading_result->second["header"].get<std::set<std::string>>();
 
-            iDay = 0;
-            ifld = 0;
-            while (true) {
-                // create string of which day of year
-                ++iDay;
-                if (iDay > 366) {
-                    break;
+            for (auto const & header : headers_set) {
+                size_t column = 0;
+                auto column_it = std::find(headers.begin(), headers.end(), header);
+                if (column_it != headers.end()) {
+                    column = std::distance(headers.begin(), column_it);
                 }
-                ExtraField = fmt::to_string(iDay);
-                // increment both since a week schedule is being defined for each day so that a day is valid
-                // no matter what the day type that is used in a design day.
-                ++AddWeekSch;
-                ++AddDaySch;
-                // define week schedule
-                state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = curName + "_shading_wk_" + ExtraField;
-                // for all day types point the week schedule to the newly defined day schedule
-                for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
-                    state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
-                }
-                // day schedule
-                state.dataScheduleMgr->DaySchedule(AddDaySch).Name = curName + "_shading_dy_" + ExtraField;
-                state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
-                // schedule is pointing to the week schedule
-                state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
+                if (column == 0) continue; // Skip timestamp column and any duplicate column, which will be 0 as well since it won't be found.
+                auto const column_values = values_json.at(column).get<std::vector<Real64>>();
 
-                for (jHour = 1; jHour <= 24; ++jHour) {
-                    for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        ++ifld;
-                        curHrVal = timestepColumnValues(ifld);
-                        state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
-                    }
-                }
-                if (iDay == 59 && !state.dataEnvrn->CurrentYearIsLeapYear) { // 28 Feb
-                    // Dup 28 Feb to 29 Feb (60)
+                std::string curName = fmt::format("{}_shading", header);
+                GlobalNames::VerifyUniqueInterObjectName(
+                        state, state.dataScheduleMgr->UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                ++SchNum;
+                state.dataScheduleMgr->Schedule(SchNum).Name = curName;
+                state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_file;
+
+                iDay = 0;
+                ifld = 0;
+                while (true) {
+                    // create string of which day of year
                     ++iDay;
-                    state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) =
-                        state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay - 1);
+                    if (iDay > 366) {
+                        break;
+                    }
+                    // increment both since a week schedule is being defined for each day so that a day is valid
+                    // no matter what the day type that is used in a design day.
+                    ++AddWeekSch;
+                    ++AddDaySch;
+                    // define week schedule
+                    state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = fmt::format("{}_wk_{}", curName, iDay);
+                    // for all day types point the week schedule to the newly defined day schedule
+                    for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
+                        state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
+                    }
+                    // day schedule
+                    state.dataScheduleMgr->DaySchedule(AddDaySch).Name = fmt::format("{}_dy_{}", curName, iDay);
+                    state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
+                    // schedule is pointing to the week schedule
+                    state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
+
+                    for (jHour = 1; jHour <= 24; ++jHour) {
+                        for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                            ++ifld;
+                            state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = column_values[ifld];
+                        }
+                    }
+                    if (iDay == 59 && !state.dataEnvrn->CurrentYearIsLeapYear) { // 28 Feb
+                        // Dup 28 Feb to 29 Feb (60)
+                        ++iDay;
+                        state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) =
+                                state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay - 1);
+                    }
                 }
             }
         }
