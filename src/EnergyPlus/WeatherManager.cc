@@ -2179,18 +2179,9 @@ namespace WeatherManager {
 
         ScheduleManager::UpdateScheduleValues(state);
 
-        char time_stamp[10];
-        std::sprintf(
-            time_stamp, "%02d/%02d %02hu", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, (unsigned short)(state.dataGlobal->HourOfDay - 1));
-        state.dataEnvrn->CurMnDyHr = time_stamp;
-
-        char day_stamp[6];
-        std::sprintf(day_stamp, "%02d/%02d", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
-        state.dataEnvrn->CurMnDy = day_stamp;
-
-        char day_year_stamp[11];
-        std::sprintf(day_year_stamp, "%02d/%02d/%04d", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->CalendarYear);
-        state.dataEnvrn->CurMnDyYr = day_year_stamp;
+        state.dataEnvrn->CurMnDyHr = fmt::format("{:02d}/{:02d} {:02d}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, (unsigned short)(state.dataGlobal->HourOfDay - 1));
+        state.dataEnvrn->CurMnDy = fmt::format("{:02d}/{:02d}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+        state.dataEnvrn->CurMnDyYr = fmt::format("{:02d}/{:02d}/{:04d}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->CalendarYear);
 
         state.dataGlobal->WeightNow = state.dataWeatherManager->Interpolation(state.dataGlobal->TimeStep);
         state.dataGlobal->WeightPreviousHour = 1.0 - state.dataGlobal->WeightNow;
@@ -3423,17 +3414,17 @@ namespace WeatherManager {
                                        int const WDay,
                                        int const WHour,
                                        int const WMinute,
-                                       std::string const &SaveLine,
-                                       std::string const &Line)
+                                       std::string_view SaveLine,
+                                       std::string_view Line)
     {
-        ShowSevereError(state, format("Invalid Weather Line at date={:4}/{:2}/{:2} Hour#={:2} Min#={:2}", WYear, WMonth, WDay, WHour, WMinute));
-        ShowContinueError(state, "Full Data Line=" + SaveLine);
-        ShowContinueError(state, "Remainder of line=" + Line);
+        ShowSevereError(state, fmt::format("Invalid Weather Line at date={:4}/{:2}/{:2} Hour#={:2} Min#={:2}", WYear, WMonth, WDay, WHour, WMinute));
+        ShowContinueError(state, fmt::format("Full Data Line={}", SaveLine));
+        ShowContinueError(state, fmt::format("Remainder of line={}", Line));
         ShowFatalError(state, "Error in Reading Weather Data");
     }
 
     void InterpretWeatherDataLine(EnergyPlusData &state,
-                                  std::string &Line,
+                                  std::string_view Line,
                                   bool &ErrorFound, // True if an error is found, false otherwise
                                   int &WYear,
                                   int &WMonth,
@@ -3490,30 +3481,20 @@ namespace WeatherManager {
 
         static constexpr std::string_view ValidDigits("0123456789");
 
-        std::string::size_type Pos;
+        std::string_view::size_type pos = 0;
+        std::string_view current_line = Line;
 
         ErrorFound = false;
-        std::string const SaveLine = Line; // in case of errors
 
         // Do the first five.  (To get to the DataSource field)
         {
-            Real64 RYear;
-            Real64 RMonth;
-            Real64 RDay;
-            Real64 RHour;
-            Real64 RMinute;
-
-            const bool succeeded = readList(Line, RYear, RMonth, RDay, RHour, RMinute);
+            auto nth_pos = nth_occurrence(current_line, ',', 5);
+            const bool succeeded = readList(current_line.substr(pos, nth_pos), WYear, WMonth, WDay, WHour, WMinute);
             if (!succeeded) {
                 ShowSevereError(state, "Invalid Date info in Weather Line");
-                ShowContinueError(state, "Entire Data Line=" + SaveLine);
+                ShowContinueError(state, fmt::format("Entire Data Line={}", Line));
                 ShowFatalError(state, "Error in Reading Weather Data");
             }
-            WYear = nint(RYear);
-            WMonth = nint(RMonth);
-            WDay = nint(RDay);
-            WHour = nint(RHour);
-            WMinute = nint(RMinute);
         }
 
         bool DateInError = false;
@@ -3535,32 +3516,21 @@ namespace WeatherManager {
             ShowFatalError(state, "Program terminates due to previous condition.");
         }
 
-        Pos = index(Line, ','); // WYear
-        if (Pos == std::string::npos) {
+        pos = index(Line, ','); // WYear
+        if (pos == std::string::npos) {
             ShowSevereError(
                 state, format("Invalid Weather Line (no commas) at date={:4}/{:2}/{:2} Hour#={:2} Min#={:2}", WYear, WMonth, WDay, WHour, WMinute));
-            ShowContinueError(state, "Full Data Line=" + SaveLine);
-            ShowContinueError(state, "Remainder of line=" + Line);
+            ShowContinueError(state, fmt::format("Full Data Line={}", Line));
             ShowFatalError(state, "Error in Reading Weather Data");
         }
-        Line.erase(0, Pos + 1);
-        Pos = index(Line, ','); // WMonth
-        Line.erase(0, Pos + 1);
-        Pos = index(Line, ','); // WDay
-        Line.erase(0, Pos + 1);
-        Pos = index(Line, ','); // WHour
-        Line.erase(0, Pos + 1);
-        Pos = index(Line, ','); // WMinute
-        Line.erase(0, Pos + 1);
-
-        // Data Source/Integrity field -- ignore
-        Pos = index(Line, ',');
-        Line.erase(0, Pos + 1);
+        current_line.remove_prefix(nth_occurrence(Line, ',', 6)); // remove WYear,WMonth,WDay,WHour,WMinute,Data Source/Integrity
 
         // Now read more numerics with List Directed I/O (note there is another "character" field lurking)
         Real64 RField21;
         {
-            const bool succeeded = readList(Line,
+            auto nth_pos = nth_occurrence(current_line, ',', 21);
+
+            const bool succeeded = readList(current_line.substr(0, nth_pos),
                                             DryBulb,
                                             DewPoint,
                                             RelHum,
@@ -3583,93 +3553,90 @@ namespace WeatherManager {
                                             CeilHeight,
                                             RField21);
 
-            if (!succeeded) ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+            if (!succeeded) ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
+            current_line.remove_prefix(nth_pos + 1);
         }
-        for (int i = 1; i <= 21; ++i) {
-            Pos = index(Line, ',');
-            Line.erase(0, Pos + 1);
-        }
-        Pos = index(Line, ',');
+        pos = index(current_line, ',');
         std::string PresWeathCodes;
-        if (Pos != std::string::npos && Pos != 0) {
-            PresWeathCodes = Line.substr(0, Pos);
+        if (pos != std::string::npos && pos != 0) {
+            PresWeathCodes = current_line.substr(0, pos);
         } else {
             PresWeathCodes = "999999999";
         }
-        Line.erase(0, Pos + 1);
-        Pos = index(Line, ',');
-        if (Pos != std::string::npos) {
-            if (Pos != 0) {
+        current_line.remove_prefix(pos + 1);
+        pos = index(current_line, ',');
+        if (pos != std::string::npos) {
+            if (pos != 0) {
                 bool error = false;
-                PrecipWater = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                PrecipWater = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                 if (error) {
-                    ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                    ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                 }
             } else {
                 PrecipWater = 999.0;
             }
-            Line.erase(0, Pos + 1);
-            Pos = index(Line, ',');
-            if (Pos != std::string::npos) {
-                if (Pos != 0) {
+            current_line.remove_prefix(pos + 1);
+            pos = index(current_line, ',');
+            if (pos != std::string::npos) {
+                if (pos != 0) {
                     bool error = false;
-                    AerosolOptDepth = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                    AerosolOptDepth = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                     if (error) {
-                        ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                        ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                     }
                 } else {
                     AerosolOptDepth = 999.0;
                 }
-                Line.erase(0, Pos + 1);
-                Pos = index(Line, ',');
-                if (Pos != std::string::npos) {
-                    if (Pos != 0) {
+                current_line.remove_prefix(pos + 1);
+                pos = index(current_line, ',');
+                if (pos != std::string::npos) {
+                    if (pos != 0) {
                         bool error = false;
-                        SnowDepth = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                        SnowDepth = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                         if (error) {
-                            ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                            ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                         }
                     } else {
                         SnowDepth = 999.0;
                     }
-                    Line.erase(0, Pos + 1);
-                    Pos = index(Line, ',');
-                    if (Pos != std::string::npos) {
-                        if (Pos != 0) {
+                    current_line.remove_prefix(pos + 1);
+                    pos = index(current_line, ',');
+                    if (pos != std::string::npos) {
+                        if (pos != 0) {
                             bool error = false;
-                            DaysSinceLastSnow = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                            DaysSinceLastSnow = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                             if (error) {
-                                ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                                ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                             }
                         } else {
                             DaysSinceLastSnow = 999.0;
                         }
-                        Line.erase(0, Pos + 1);
-                        Pos = index(Line, ',');
-                        if (Pos != std::string::npos) {
-                            if (Pos != 0) {
+                        current_line.remove_prefix(pos + 1);
+                        pos = index(current_line, ',');
+                        if (pos != std::string::npos) {
+                            if (pos != 0) {
                                 bool error = false;
-                                Albedo = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                                Albedo = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                                 if (error) {
-                                    ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                                    ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                                 }
                             } else {
                                 Albedo = 999.0;
                             }
-                            Line.erase(0, Pos + 1);
-                            Pos = index(Line, ',');
-                            if (Pos != std::string::npos) {
-                                if (Pos != 0) {
+                            current_line.remove_prefix(pos + 1);
+                            pos = index(current_line, ',');
+                            if (pos != std::string::npos) {
+                                if (pos != 0) {
                                     bool error = false;
-                                    LiquidPrecip = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                                    LiquidPrecip = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                                     if (error) {
-                                        ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                                        ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                                     }
                                 } else {
                                     LiquidPrecip = 999.0;
                                 }
-                                Line.erase(0, Pos + 1);
-                                Pos = index(Line, ',');
+                                current_line.remove_prefix(pos + 1);
+                                pos = index(current_line, ',');
                             } else {
                                 LiquidPrecip = 999.0;
                             }
@@ -3681,7 +3648,7 @@ namespace WeatherManager {
                         bool error = false;
                         DaysSinceLastSnow = UtilityRoutines::ProcessNumber(Line, error);
                         if (error) {
-                            ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                            ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                         }
                         Albedo = 999.0;
                         LiquidPrecip = 999.0;
@@ -3690,7 +3657,7 @@ namespace WeatherManager {
                     bool error = false;
                     SnowDepth = UtilityRoutines::ProcessNumber(Line, error);
                     if (error) {
-                        ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                        ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                     }
                     DaysSinceLastSnow = 999.0;
                     Albedo = 999.0;
@@ -3700,7 +3667,7 @@ namespace WeatherManager {
                 bool error = false;
                 AerosolOptDepth = UtilityRoutines::ProcessNumber(Line, error);
                 if (error) {
-                    ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                    ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                 }
                 SnowDepth = 999.0;
                 DaysSinceLastSnow = 999.0;
@@ -3711,7 +3678,7 @@ namespace WeatherManager {
             bool error = false;
             PrecipWater = UtilityRoutines::ProcessNumber(Line, error);
             if (error) {
-                ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
             }
             AerosolOptDepth = 999.0;
             SnowDepth = 999.0;
@@ -3723,20 +3690,20 @@ namespace WeatherManager {
         WObs = nint(RField21);
         if (WObs == 0) { // Obs Indicator indicates Weather Codes valid
             // Check for miscellaneous characters
-            Pos = index(PresWeathCodes, '\'');
-            while (Pos != std::string::npos) {
-                PresWeathCodes[Pos] = ' ';
-                Pos = index(PresWeathCodes, '\'');
+            pos = index(PresWeathCodes, '\'');
+            while (pos != std::string::npos) {
+                PresWeathCodes[pos] = ' ';
+                pos = index(PresWeathCodes, '\'');
             }
-            Pos = index(PresWeathCodes, '"');
-            while (Pos != std::string::npos) {
-                PresWeathCodes[Pos] = ' ';
-                Pos = index(PresWeathCodes, '"');
+            pos = index(PresWeathCodes, '"');
+            while (pos != std::string::npos) {
+                PresWeathCodes[pos] = ' ';
+                pos = index(PresWeathCodes, '"');
             }
             strip(PresWeathCodes);
             if (len(PresWeathCodes) == 9) {
-                for (Pos = 0; Pos < 9; ++Pos) {
-                    if (!has(ValidDigits, PresWeathCodes[Pos])) PresWeathCodes[Pos] = '9';
+                for (pos = 0; pos < 9; ++pos) {
+                    if (!has(ValidDigits, PresWeathCodes[pos])) PresWeathCodes[pos] = '9';
                 }
 
                 // we are trying to read a string of 9 integers with no spaces, each
