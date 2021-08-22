@@ -57,6 +57,9 @@
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/string.functions.hh>
 
+// Third-party Headers
+#include <fast_float/fast_float.h>
+
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -2385,21 +2388,14 @@ namespace CurveManager {
                     state, format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath.string(), row + 1, numRows));
             }
             std::vector<double> array(numRows - row);
-            std::transform(content.begin() + row, content.end(), array.begin(), [](const std::string &str) {
+            std::transform(content.begin() + row, content.end(), array.begin(), [](std::string_view str) {
                 // Convert strings to double
-                // see https://stackoverflow.com/a/16575025/1344457
-                char *pEnd;
-                double ret = std::strtod(&str[0], &pEnd);
-                if (*pEnd == '\r') {
-                    std::string st = str;
-                    st.pop_back();
-                    ret = std::strtod(&st[0], &pEnd);
-                }
-                if (*pEnd || str.size() == 0) {
+                double result = 0;
+                auto answer = fast_float::from_chars(str.data(), str.data() + str.size(), result);
+                if (answer.ec != std::errc()) {
                     return std::numeric_limits<double>::quiet_NaN();
-                } else {
-                    return ret;
                 }
+                return result;
             });
             arrays[colAndRow] = array;
         }

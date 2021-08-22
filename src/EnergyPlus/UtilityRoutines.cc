@@ -89,11 +89,14 @@ extern "C" {
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+// Third Party Headers
+#include <fast_float/fast_float.h>
+
 namespace EnergyPlus {
 
 namespace UtilityRoutines {
 
-    Real64 ProcessNumber(std::string_view const String, bool &ErrorFlag)
+    Real64 ProcessNumber(std::string_view String, bool &ErrorFlag)
     {
 
         // FUNCTION INFORMATION:
@@ -119,32 +122,30 @@ namespace UtilityRoutines {
         // List directed Fortran input/output.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view ValidNumerics("0123456789.+-EeDd");
-
         Real64 rProcessNumber = 0.0;
-        //  Make sure the string has all what we think numerics should have
-        std::string PString(stripped(String));
-        std::string::size_type const StringLen(PString.length());
         ErrorFlag = false;
-        if (StringLen == 0) return rProcessNumber;
-        if (PString.find_first_not_of(ValidNumerics) == std::string::npos) {
-            // make FORTRAN floating point number (containing 'd' or 'D')
-            // standardized by replacing 'd' or 'D' with 'e'
-            std::replace_if(
-                std::begin(PString), std::end(PString), [](const char c) { return c == 'D' || c == 'd'; }, 'e');
-            // then parse as a normal floating point value
-            try {
-                rProcessNumber = std::stod(PString, nullptr);
-            } catch (std::invalid_argument &e) {
-                rProcessNumber = 0.0;
-                ErrorFlag = true;
-            } catch (std::out_of_range &e) {
+
+        auto last_non_space = String.find_last_not_of(' ');
+        String.remove_suffix(String.size() - last_non_space - 1);
+
+        if (String.empty()) return rProcessNumber;
+
+        auto result = fast_float::from_chars(String.data(), String.data() + String.size(), rProcessNumber);
+        size_t remaining_size = result.ptr - String.begin();
+        if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
+            rProcessNumber = 0.0;
+            ErrorFlag = true;
+        } else if (remaining_size != String.size()) {
+            if (*result.ptr == 'd' || *result.ptr == 'D') {
+                // make FORTRAN floating point number (containing 'd' or 'D')
+                // standardized by replacing 'd' or 'D' with 'e'
+                std::string str{String};
+                std::replace_if(str.begin(), str.end(), [](const char c) { return c == 'D' || c == 'd'; }, 'e');
+                return ProcessNumber(str, ErrorFlag);
+            } else {
                 rProcessNumber = 0.0;
                 ErrorFlag = true;
             }
-        } else {
-            rProcessNumber = 0.0;
-            ErrorFlag = true;
         }
 
         return rProcessNumber;

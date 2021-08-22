@@ -65,6 +65,7 @@
 
 // Third-party Headers
 #include <fmt/format.h>
+#include <fast_float/fast_float.h>
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
@@ -16753,7 +16754,7 @@ std::string RealToStr(Real64 const RealIn, int const numDigits)
     // WRITE(FMT="(F10.4)", UNIT=stringOut, IOSTAT=status ) RealIn
 }
 
-Real64 StrToReal(std::string const &stringIn)
+Real64 StrToReal(std::string_view stringIn)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
@@ -16765,13 +16766,9 @@ Real64 StrToReal(std::string const &stringIn)
     //   Abstract away the internal read concept
 
     // Return value
-    Real64 realValue;
-
-    std::stringstream ss{stringIn};
-    ss.imbue(std::locale("C"));
-    ss >> realValue;
-
-    if (ss.bad()) {
+    Real64 realValue = -99999.0;
+    auto answer = fast_float::from_chars(stringIn.data(), stringIn.data() + stringIn.size(), realValue);
+    if (answer.ec != std::errc()) {
         return -99999.0;
     }
     return realValue;
