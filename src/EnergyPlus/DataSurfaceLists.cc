@@ -192,7 +192,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                     if (SurfNum > 1) {
                         if (ZoneForSurface != state.dataSurface->Surface(SurfList(Item).SurfPtr(SurfNum)).Zone && showSameZoneWarning) {
                             ShowWarningError(
-                                state, format("{}{}{}", "Not all surfaces in same zone for ", CurrentModuleObject1, " = " + SurfList(Item).Name));
+                                    state, format("Not all surfaces in same zone for {} = {}", CurrentModuleObject1, SurfList(Item).Name));
                             if (!state.dataGlobal->DisplayExtraWarnings) {
                                 ShowContinueError(state, "If this is intentionally a radiant system with surfaces in more than one thermal zone,");
                                 ShowContinueError(state,

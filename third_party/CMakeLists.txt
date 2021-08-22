@@ -122,7 +122,8 @@ add_subdirectory(DElight)
 set_target_properties(DElight PROPERTIES FOLDER ThirdParty/DElight)
 add_subdirectory(re2)
 set_target_properties(re2 PROPERTIES FOLDER ThirdParty/re2)
-add_subdirectory(fmt-6.1.2)
+add_subdirectory(fmt-8.0.1)
+target_compile_definitions(fmt PRIVATE FMT_USE_FULL_CACHE_DRAGONBOX=1)
 set_target_properties(fmt PROPERTIES FOLDER ThirdParty/fmt)
 
 # Kiva

@@ -3906,18 +3906,17 @@ namespace OutputProcessor {
         switch (reportingInterval) {
         case ReportingFrequency::EachCall:
         case ReportingFrequency::TimeStep:
-            std::sprintf(state.dataOutputProcessor->stamp,
-                         "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s",
-                         reportIDString.c_str(),
-                         DayOfSimChr.c_str(),
-                         Month(),
-                         DayOfMonth(),
-                         DST(),
-                         Hour(),
-                         StartMinute(),
-                         EndMinute(),
-                         DayType().c_str());
-            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
+            print<FormatSyntax::FMT>(outputFile,
+                                     "{},{},{:2d},{:2d},{:2d},{:2d},{:5.2f},{:5.2f},{}\n",
+                                     reportIDString.c_str(),
+                                     DayOfSimChr.c_str(),
+                                     Month(),
+                                     DayOfMonth(),
+                                     DST(),
+                                     Hour(),
+                                     StartMinute(),
+                                     EndMinute(),
+                                     DayType().c_str());
             if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                                                 reportID,
@@ -3935,18 +3934,17 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Hourly:
-            std::sprintf(state.dataOutputProcessor->stamp,
-                         "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s",
-                         reportIDString.c_str(),
-                         DayOfSimChr.c_str(),
-                         Month(),
-                         DayOfMonth(),
-                         DST(),
-                         Hour(),
-                         0.0,
-                         60.0,
-                         DayType().c_str());
-            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
+            print<FormatSyntax::FMT>(outputFile,
+                                     "{},{},{:2d},{:2d},{:2d},{:2d},{:5.2f},{:5.2f},{}\n",
+                                     reportIDString.c_str(),
+                                     DayOfSimChr.c_str(),
+                                     Month(),
+                                     DayOfMonth(),
+                                     DST(),
+                                     Hour(),
+                                     0.0,
+                                     60.0,
+                                     DayType().c_str());
             if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                                                 reportID,
@@ -3964,15 +3962,14 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Daily:
-            std::sprintf(state.dataOutputProcessor->stamp,
-                         "%s,%s,%2d,%2d,%2d,%s",
-                         reportIDString.c_str(),
-                         DayOfSimChr.c_str(),
-                         Month(),
-                         DayOfMonth(),
-                         DST(),
-                         DayType().c_str());
-            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
+            print<FormatSyntax::FMT>(outputFile,
+                                     "{},{},{:2d},{:2d},{:2d},{}\n",
+                                     reportIDString.c_str(),
+                                     DayOfSimChr.c_str(),
+                                     Month(),
+                                     DayOfMonth(),
+                                     DST(),
+                                     DayType().c_str());
             if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                                                 reportID,
@@ -3990,8 +3987,11 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Monthly:
-            std::sprintf(state.dataOutputProcessor->stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month());
-            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
+            print<FormatSyntax::FMT>(outputFile,
+                                     "{},{},{:2d}\n",
+                                     reportIDString.c_str(),
+                                     DayOfSimChr.c_str(),
+                                     Month());
             if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                                                 reportID,
@@ -4002,8 +4002,10 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Simulation:
-            std::sprintf(state.dataOutputProcessor->stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str());
-            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
+            print<FormatSyntax::FMT>(outputFile,
+                                     "{},{}\n",
+                                     reportIDString.c_str(),
+                                     DayOfSimChr.c_str());
             if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                                                 reportID,
@@ -4014,8 +4016,9 @@ namespace OutputProcessor {
             break;
         default:
             if (state.dataSQLiteProcedures->sqlite) {
-                std::string str(format("Illegal reportingInterval passed to WriteTimeStampFormatData: {}", static_cast<int>(reportingInterval)));
-                state.dataSQLiteProcedures->sqlite->sqliteWriteMessage(str);
+                state.dataSQLiteProcedures->sqlite->sqliteWriteMessage(
+                        format<FormatSyntax::FMT>("Illegal reportingInterval passed to WriteTimeStampFormatData: {}", static_cast<int>(reportingInterval))
+                        );
             }
             break;
         }

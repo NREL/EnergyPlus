@@ -857,14 +857,14 @@ namespace ResultsFramework {
     {
         outputFile.ensure_open(state, "OpenOutputFiles", outputControl);
 
-        print(outputFile, "{}", "Date/Time,");
+        print<FormatSyntax::FMT>(outputFile, "{}", "Date/Time,");
         std::string sep;
         for (auto it = outputVariables.begin(); it != outputVariables.end(); ++it) {
             if (!outputVariableIndices[std::distance(outputVariables.begin(), it)]) continue;
-            print(outputFile, "{}{}", sep, *it);
+            print<FormatSyntax::FMT>(outputFile, "{}{}", sep, *it);
             if (sep.empty()) sep = ",";
         }
-        print(outputFile, "{}", '\n');
+        print<FormatSyntax::FMT>(outputFile, "{}", '\n');
 
         for (auto &item : outputs) {
             std::string datetime = item.first;
@@ -873,7 +873,7 @@ namespace ResultsFramework {
             } else {
                 convertToMonth(state, datetime);
             }
-            print(outputFile, " {},", datetime);
+            print<FormatSyntax::FMT>(outputFile, " {},", datetime);
             item.second.erase(std::remove_if(item.second.begin(),
                                              item.second.end(),
                                              [&](const std::string &d) {
@@ -886,8 +886,9 @@ namespace ResultsFramework {
             if (result != item.second.rend()) {
                 last = (result + 1).base();
             }
-            print(item.second.begin(), last, outputFile, ",");
-            print(outputFile, "{}{}", *last, '\n');
+
+            print<FormatSyntax::FMT>(outputFile, "{}", fmt::format("{}", fmt::join(item.second.begin(), last, ",")));
+            print<FormatSyntax::FMT>(outputFile, "{}\n", *last);
         }
 
         outputFile.close();

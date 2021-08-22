@@ -146,7 +146,7 @@ void ReportSurfaces(EnergyPlusData &state)
     ScanForReports(state, "Surfaces", DoReport, "DXF", Option1, Option2);
     if (DoReport) {
         if (!DXFDone) {
-            if (Option2 != "") {
+            if (!Option2.empty()) {
                 SetUpSchemeColors(state, Option2, "DXF");
             }
             DXFOut(state, Option1, Option2);
@@ -159,7 +159,7 @@ void ReportSurfaces(EnergyPlusData &state)
     ScanForReports(state, "Surfaces", DoReport, "DXF:WireFrame", Option1, Option2);
     if (DoReport) {
         if (!DXFDone) {
-            if (Option2 != "") {
+            if (!Option2.empty()) {
                 SetUpSchemeColors(state, Option2, "DXF");
             }
             DXFOutWireFrame(state, Option2);
@@ -238,12 +238,12 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
         for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             if (state.dataSurface->Surface(surf).Class == SurfaceClass::IntMass) continue;
             if (state.dataSurface->Surface(surf).Sides == 0) continue;
-            print(slnfile, "{}:{}\n", state.dataSurface->Surface(surf).ZoneName, state.dataSurface->Surface(surf).Name);
+            print<FormatSyntax::FMT>(slnfile, "{}:{}\n", state.dataSurface->Surface(surf).ZoneName, state.dataSurface->Surface(surf).Name);
             for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                 static constexpr std::string_view fmt700("{:10.2F},{:10.2F},{:10.2F},{:10.2F},{:10.2F},{:10.2F}\n");
 
                 if (vert != state.dataSurface->Surface(surf).Sides) {
-                    print(slnfile,
+                    print<check_syntax(fmt700)>(slnfile,
                           fmt700,
                           state.dataSurface->Surface(surf).Vertex(vert).x,
                           state.dataSurface->Surface(surf).Vertex(vert).y,
@@ -252,7 +252,7 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
                           state.dataSurface->Surface(surf).Vertex(vert + 1).y,
                           state.dataSurface->Surface(surf).Vertex(vert + 1).z);
                 } else {
-                    print(slnfile,
+                    print<check_syntax(fmt700)>(slnfile,
                           fmt700,
                           state.dataSurface->Surface(surf).Vertex(vert).x,
                           state.dataSurface->Surface(surf).Vertex(vert).y,
@@ -264,8 +264,8 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
             }
         }
     } else {
-        print(slnfile, "{}\n", " Building North Axis = 0");
-        print(slnfile, "{}\n", "GlobalGeometryRules,UpperLeftCorner,CounterClockwise,WorldCoordinates;");
+        print<FormatSyntax::FMT>(slnfile, "{}\n", " Building North Axis = 0");
+        print<FormatSyntax::FMT>(slnfile, "{}\n", "GlobalGeometryRules,UpperLeftCorner,CounterClockwise,WorldCoordinates;");
         for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             if (state.dataSurface->Surface(surf).Class == SurfaceClass::IntMass) continue;
             if (state.dataSurface->Surface(surf).Sides == 0) continue;
@@ -275,12 +275,12 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
                   cSurfaceClass(state.dataSurface->Surface(surf).Class),
                   state.dataSurface->Surface(surf).Name,
                   state.dataSurface->Surface(surf).Azimuth);
-            print(slnfile, "  {},  !- Number of (X,Y,Z) groups in this surface\n", state.dataSurface->Surface(surf).Sides);
+            print<FormatSyntax::FMT>(slnfile, "  {},  !- Number of (X,Y,Z) groups in this surface\n", state.dataSurface->Surface(surf).Sides);
             for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                 std::string optcommasemi = ",";
                 if (vert == state.dataSurface->Surface(surf).Sides) optcommasemi = ";";
                 static constexpr std::string_view fmtcoord("  {:10.2F},{:10.2F},{:10.2F}{}  !- {} {}\n");
-                print(slnfile,
+                print<check_syntax(fmtcoord)>(slnfile,
                       fmtcoord,
                       state.dataSurface->Surface(surf).Vertex(vert).x,
                       state.dataSurface->Surface(surf).Vertex(vert).y,
@@ -374,10 +374,10 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
 
     // This writes "True North" above the Arrow Head
     print(of, Format_710, "Text - True North");
-    print(of, Format_800, DXFcolorno(static_cast<int>(ColorNo::Text)), StemX(1) - 1.0, StemY(1), StemZ(1));
+    print<check_syntax(Format_800)>(of, Format_800, DXFcolorno(static_cast<int>(ColorNo::Text)), StemX(1) - 1.0, StemY(1), StemZ(1));
 
     print(of, Format_710, "Text - Building Title");
-    print(of,
+    print<check_syntax(Format_801)>(of,
           Format_801,
           DXFcolorno(static_cast<int>(ColorNo::Text)),
           StemX(1) - 4.0,
@@ -431,7 +431,7 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
     print(of, Format_710, "Zone Names");
 
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
-        print(of, Format_710, format("Zone={}:{}", zones, normalizeName(state.dataHeatBal->Zone(zones).Name)));
+        print<check_syntax(Format_710)>(of, Format_710, fmt::format("Zone={}:{}", zones, normalizeName(state.dataHeatBal->Zone(zones).Name)));
     }
 }
 
@@ -446,8 +446,8 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
         auto curcolorno = ColorNo::DaylSensor1;
 
         for (int refpt = 1; refpt <= state.dataDaylightingData->ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
-            print(of, "999\n{}:{}:{}\n", state.dataHeatBal->Zone(zones).Name, DELight ? "DEDayRefPt" : "DayRefPt", refpt);
-            print(of,
+            print<FormatSyntax::FMT>(of, "999\n{}:{}:{}\n", state.dataHeatBal->Zone(zones).Name, DELight ? "DEDayRefPt" : "DayRefPt", refpt);
+            print<check_syntax(Format_709)>(of,
                   Format_709,
                   normalizeName(state.dataHeatBal->Zone(zones).Name),
                   state.dataSurfColor->DXFcolorno(static_cast<int>(curcolorno)),
@@ -1849,7 +1849,7 @@ void CostInfoOut(EnergyPlusData &state)
         if (state.dataSurface->Surface(surf).Construction != 0) {
             // Formats
             static constexpr std::string_view Format_801("{:5},{},{},{},{:14.5F},{:14.5F}\n");
-            print(scifile,
+            print<check_syntax(Format_801)>(scifile,
                   Format_801,
                   surf,
                   state.dataSurface->Surface(surf).Name,
@@ -1926,10 +1926,10 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
 
     print(wrlfile, Format_702);
 
-    if (ColorScheme == "") {
-        print(wrlfile, Format_707, state.dataHeatBal->BuildingName, state.dataStrGlobals->VerStringVar, "Default"); // World Info
+    if (ColorScheme.empty()) {
+        print<check_syntax(Format_707)>(wrlfile, Format_707, state.dataHeatBal->BuildingName, state.dataStrGlobals->VerStringVar, "Default"); // World Info
     } else {
-        print(wrlfile, Format_707, state.dataHeatBal->BuildingName, state.dataStrGlobals->VerStringVar, ColorScheme); // World Info
+        print<check_syntax(Format_707)>(wrlfile, Format_707, state.dataHeatBal->BuildingName, state.dataStrGlobals->VerStringVar, ColorScheme); // World Info
     }
 
     print(wrlfile, "# Zone Names\n");
@@ -1939,16 +1939,16 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
 
     // Define the colors:
 
-    print(wrlfile, Format_800, "FLOOR", "0.502 0.502 0.502");
-    print(wrlfile, Format_800, "ROOF", "1 1 0");
-    print(wrlfile, Format_800, "WALL", "0 1 0");
-    print(wrlfile, Format_800, "WINDOW", "0 1 1");
-    print(wrlfile, Format_800, "DOOR", "0 1 1");
-    print(wrlfile, Format_800, "GLASSDOOR", "0 1 1");
-    print(wrlfile, Format_800, "FIXEDSHADE", "1 0 1");
-    print(wrlfile, Format_800, "BLDGSHADE", "0 0 1");
-    print(wrlfile, Format_800, "SUBSHADE", "1 0 1");
-    print(wrlfile, Format_800, "BACKCOLOR", "0.502 0.502 0.784");
+    print<check_syntax(Format_800)>(wrlfile, Format_800, "FLOOR", "0.502 0.502 0.502");
+    print<check_syntax(Format_800)>(wrlfile, Format_800, "ROOF", "1 1 0");
+    print<check_syntax(Format_800)>(wrlfile, Format_800, "WALL", "0 1 0");
+    print<check_syntax(Format_800)>(wrlfile, Format_800, "WINDOW", "0 1 1");
+    print<check_syntax(Format_800)>(wrlfile, Format_800, "DOOR", "0 1 1");
+    print<check_syntax(Format_800)>(wrlfile, Format_800, "GLASSDOOR", "0 1 1");
+    print<check_syntax(Format_800)>(wrlfile, Format_800, "FIXEDSHADE", "1 0 1");
+    print<check_syntax(Format_800)>(wrlfile, Format_800, "BLDGSHADE", "0 0 1");
+    print<check_syntax(Format_800)>(wrlfile, Format_800, "SUBSHADE", "1 0 1");
+    print<check_syntax(Format_800)>(wrlfile, Format_800, "BACKCOLOR", "0.502 0.502 0.784");
 
     int colorindex = 0;
 
@@ -1967,21 +1967,21 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             ShadeType = "Building Shading";
             print(wrlfile, "# Building Shading:{}", state.dataSurface->Surface(surf).Name);
         }
-        print(wrlfile, Format_801, colorstring(colorindex), "Surf", surf);
+        print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring(colorindex), "Surf", surf);
         for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
-            print(wrlfile,
+            print<check_syntax(Format_802)>(wrlfile,
                   Format_802,
                   state.dataSurface->Surface(surf).Vertex(vert).x,
                   state.dataSurface->Surface(surf).Vertex(vert).y,
                   state.dataSurface->Surface(surf).Vertex(vert).z);
         }
-        print(wrlfile, Format_803);
+        print<check_syntax(Format_803)>(wrlfile, Format_803);
         if (state.dataSurface->Surface(surf).Sides <= 4 || !TriangulateFace) {
             for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
-                print(wrlfile, " {}", vert - 1);
+                print<FormatSyntax::FMT>(wrlfile, " {}", vert - 1);
                 if (vert == state.dataSurface->Surface(surf).Sides) print(wrlfile, " -1\n");
             }
-            print(wrlfile, Format_805);
+            print<check_syntax(Format_805)>(wrlfile, Format_805);
         } else { // will be >4 sided polygon with triangulate option
             Array1D<dTriangle> mytriangles;
             const auto ntri = Triangulate(state,
@@ -2018,7 +2018,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             if (state.dataSurface->Surface(surf).Class == SurfaceClass::Door) colorindex = 2;
 
             print(wrlfile, "# {}:{}\n", state.dataSurface->Surface(surf).ZoneName, state.dataSurface->Surface(surf).Name);
-            print(wrlfile, Format_801, colorstring(colorindex), "Surf", oldSurfNum);
+            print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring(colorindex), "Surf", oldSurfNum);
             for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                 print(wrlfile,
                       Format_802,
@@ -2026,13 +2026,13 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
                       state.dataSurface->Surface(surf).Vertex(vert).y,
                       state.dataSurface->Surface(surf).Vertex(vert).z);
             }
-            print(wrlfile, Format_803);
+            print<check_syntax(Format_803)>(wrlfile, Format_803);
             if (state.dataSurface->Surface(surf).Sides <= 4 || !TriangulateFace) {
                 for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                     print(wrlfile, " {}", vert - 1);
                     if (vert == state.dataSurface->Surface(surf).Sides) print(wrlfile, " -1\n");
                 }
-                print(wrlfile, Format_805);
+                print<check_syntax(Format_805)>(wrlfile, Format_805);
             } else { // will be >4 sided polygon with triangulate option
                 Array1D<dTriangle> mytriangles;
                 const auto ntri = Triangulate(state,
@@ -2061,7 +2061,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             if (state.dataSurface->Surface(surf).ZoneName != state.dataHeatBal->Zone(zoneNum).Name) continue;
             if (state.dataSurface->Surface(surf).Sides == 0) continue;
             print(wrlfile, "# {}:{}\n", state.dataSurface->Surface(surf).ZoneName, state.dataSurface->Surface(surf).Name);
-            print(wrlfile, Format_801, colorstring(colorindex), "Surf", surf);
+            print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring(colorindex), "Surf", surf);
             for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
                 print(wrlfile,
                       Format_802,

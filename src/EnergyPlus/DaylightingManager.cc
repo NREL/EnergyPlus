@@ -10906,11 +10906,15 @@ void WriteDaylightMapTitle(EnergyPlusData &state,
     // must add correct number of commas at end
     const auto fullmapName = fmt::format("{}:{}:{} Illuminance [lux] (Hourly)", state.dataHeatBal->Zone(ZoneNum).Name, environmentName, mapName);
     print(mapFile,
-          "Date/Time{Sep}{FullMapName}{Sep}{RefPt1}{Sep}{RefPt2}{Sep}{Sep}\n",
-          fmt::arg("Sep", state.dataDaylightingData->MapColSep),
-          fmt::arg("FullMapName", fullmapName),
-          fmt::arg("RefPt1", refPt1),
-          fmt::arg("RefPt2", refPt2));
+          "Date/Time{}{}{}{}{}{}{}{}\n",
+          state.dataDaylightingData->MapColSep,
+          fullmapName,
+          state.dataDaylightingData->MapColSep,
+          refPt1,
+          state.dataDaylightingData->MapColSep,
+          refPt2,
+          state.dataDaylightingData->MapColSep,
+          state.dataDaylightingData->MapColSep);
 
     if (state.dataSQLiteProcedures->sqlite) {
         state.dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(mapNum, fullmapName, environmentName, ZoneNum, refPt1, refPt2, zcoord);
