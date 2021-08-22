@@ -50,6 +50,9 @@
 
 #include <algorithm>
 #include <fmt/format.h>
+#include <fmt/os.h>
+#include <fmt/ostream.h>
+#include <nlohmann/json.hpp>
 #include <string>
 #if __has_include(<filesystem>)
 #include <filesystem>
@@ -85,16 +88,44 @@ namespace FileSystem {
 
     extern std::string const exeExtension;
 
-    enum class InputFileType
+    enum class FileTypes
     {
+        Unknown,
+        // JSON types should go first,
         EpJSON,
-        IDF,
+        GLHE,
+        JSON,
+        last_json_type = JSON,
         CBOR,
         MsgPack,
         UBJSON,
         BSON,
-        Unknown
+        last_binary_json_type = BSON,
+        CSV,
+        TSV,
+        TXT,
+        ESO,
+        MTR,
+        IMF,
+        IDF,
+        last_flat_file_type = IDF
     };
+
+    inline constexpr bool is_all_json_type(FileTypes t) {
+        return t > FileTypes::Unknown && t <= FileTypes::last_binary_json_type;
+    }
+    inline constexpr bool is_json_type(FileTypes t) {
+      return t > FileTypes::Unknown && t <= FileTypes::last_json_type;
+    }
+    inline constexpr bool is_binary_json_type(FileTypes t) {
+        return t > FileTypes::last_json_type && t <= FileTypes::last_binary_json_type;
+    }
+    inline constexpr bool is_idf_type(FileTypes t) {
+        return t == FileTypes::IDF || t == FileTypes::IMF;
+    }
+    inline constexpr bool is_flat_file_type(FileTypes t) {
+        return t > FileTypes::last_binary_json_type && t <= FileTypes::last_flat_file_type;
+    }
 
     // Similar to fs::path::make_preferred, but also does '\\' => '/' conversion on POSIX, which make_preferred does not do
     [[nodiscard]] fs::path makeNativePath(fs::path const &path);
@@ -118,7 +149,7 @@ namespace FileSystem {
     [[nodiscard]] fs::path getFileExtension(fs::path const &gc);
 
     // Returns the FileType by looking at its extension.
-    [[nodiscard]] InputFileType getInputFileType(fs::path const &filePath);
+    [[nodiscard]]  FileTypes getFileType(fs::path const &filePath);
 
     // Turns a/b/c.txt.idf into a/b/c.txt, **without mutating the original object** unlike fs::path::replace_extension
     [[nodiscard]] fs::path removeFileExtension(fs::path const &filePath);
@@ -147,6 +178,12 @@ namespace FileSystem {
     // On Windows, this just copies the file. On Unix, it creates a symlink
     // Starts by checking that fileExists(filePath) is true
     void linkFile(fs::path const &filePath, fs::path const &linkPath);
+
+    // Reads the full file if it exists
+    std::string readFile(fs::path const &filePath, std::ios_base::openmode mode = std::ios_base::in);
+
+    // Reads the full json file if it exists
+    nlohmann::json readJSON(fs::path const &filePath, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::binary);
 
 } // namespace FileSystem
 } // namespace EnergyPlus

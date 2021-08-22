@@ -100,6 +100,34 @@ InputFile::ReadResult<std::string> InputFile::readLine() noexcept
     }
 }
 
+std::string InputFile::readFile()
+{
+    std::string result(file_size, '\0');
+    is->read(result.data(), file_size);
+    return result;
+}
+
+nlohmann::json InputFile::readJSON()
+{
+    auto const ext = FileSystem::getFileType(filePath);
+    switch (ext) {
+        case FileSystem::FileTypes::EpJSON:
+        case FileSystem::FileTypes::JSON:
+        case FileSystem::FileTypes::GLHE:
+            return nlohmann::json::parse(*is, nullptr, true, true);
+        case FileSystem::FileTypes::CBOR:
+            return nlohmann::json::from_cbor(*is);
+        case FileSystem::FileTypes::MsgPack:
+            return nlohmann::json::from_msgpack(*is);
+        case FileSystem::FileTypes::UBJSON:
+            return nlohmann::json::from_ubjson(*is);
+        case FileSystem::FileTypes::BSON:
+            return nlohmann::json::from_bson(*is);
+        default:
+            throw FatalError("Invalid file extension. Must be epJSON, JSON, or other experimental extensions");
+    }
+}
+
 InputFile::InputFile(fs::path FilePath) : filePath(std::move(FilePath))
 {
 }
@@ -111,8 +139,9 @@ std::ostream::pos_type InputFile::position() const noexcept
 
 void InputFile::open(bool, bool)
 {
-    is->imbue(std::locale("C"));
+    file_size = fs::file_size(filePath);
     is = std::make_unique<std::fstream>(filePath.c_str(), std::ios_base::in | std::ios_base::binary);
+    // is->imbue(std::locale("C"));
 }
 
 std::string InputFile::error_state_to_string() const
@@ -252,12 +281,12 @@ void InputOutputFile::open(const bool forAppend, bool output_to_file)
         }
     }();
     if (!output_to_file) {
-        os->imbue(std::locale("C"));
         os = std::make_unique<std::iostream>(nullptr);
+        // os->imbue(std::locale("C"));
         print_to_dev_null = true;
     } else {
-        os->imbue(std::locale("C"));
         os = std::make_unique<std::fstream>(filePath.c_str(), std::ios_base::in | std::ios_base::out | appendMode);
+        // os->imbue(std::locale("C"));
         print_to_dev_null = false;
     }
 }

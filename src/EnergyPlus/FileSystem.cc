@@ -195,7 +195,7 @@ namespace FileSystem {
         GetModuleFileName(NULL, executableRelativePath, sizeof(executableRelativePath));
 #endif
 
-        return fs::path(executableRelativePath);
+        return executableRelativePath;
     }
 
     // TODO: remove? seems like fs::path::extension would do fine. It's only used in CommandLineInterface to check the input file type, so we could
@@ -210,25 +210,44 @@ namespace FileSystem {
         return fs::path{pext};
     }
 
-    // TODO: is this any better?
-    InputFileType getInputFileType(fs::path const &filePath)
+    FileTypes getFileType(fs::path const &filePath)
     {
-        std::string pext = fs::path(filePath).extension().string();
-        std::transform(pext.begin(), pext.end(), pext.begin(), ::toupper);
-        if (pext == ".EPJSON" || pext == ".JSON") {
-            return InputFileType::EpJSON;
-        } else if (pext == ".IDF" || pext == ".IMF") {
-            return InputFileType::IDF;
-        } else if (pext == ".CBOR") {
-            return InputFileType::CBOR;
-        } else if (pext == ".MSGPACK") {
-            return InputFileType::MsgPack;
-        } else if (pext == ".UBJSON") {
-            return InputFileType::UBJSON;
-        } else if (pext == ".BSON") {
-            return InputFileType::BSON;
+        // std::string buffer{};
+        // TODO: Make sure this works with memory_buffer
+        auto buffer = fmt::memory_buffer();
+        auto extension = std::string_view(fs::path(filePath).extension().c_str());
+        std::transform(extension.begin(), extension.end(), buffer.begin(), ::toupper);
+        auto const buffer_view = std::string_view(buffer.data());
+        if (buffer_view.compare(".EPJSON") == 0) {
+            return FileTypes::EpJSON;
+        } else if (buffer_view.compare(".IDF") == 0) {
+            return FileTypes::IDF;
+        } else if (buffer_view.compare(".CBOR") == 0) {
+            return FileTypes::CBOR;
+        } else if (buffer_view.compare(".CSV") == 0) {
+            return FileTypes::CSV;
+        } else if (buffer_view.compare(".TSV") == 0) {
+            return FileTypes::TSV;
+        } else if (buffer_view.compare(".TXT") == 0) {
+            return FileTypes::TXT;
+        } else if (buffer_view.compare(".ESO") == 0) {
+            return FileTypes::ESO;
+        } else if (buffer_view.compare(".MTR") == 0) {
+            return FileTypes::MTR;
+        } else if (buffer_view.compare(".MSGPACK") == 0) {
+            return FileTypes::MsgPack;
+        } else if (buffer_view.compare(".UBJSON") == 0) {
+            return FileTypes::UBJSON;
+        } else if (buffer_view.compare(".BSON") == 0) {
+            return FileTypes::BSON;
+        } else if (buffer_view.compare(".IMF") == 0) {
+            return FileTypes::IMF;
+        } else if (buffer_view.compare(".JSON") == 0) {
+            return FileTypes::JSON;
+        } else if (buffer_view.compare(".GLHE") == 0) {
+            return FileTypes::GLHE;
         }
-        return InputFileType::Unknown;
+        return FileTypes::Unknown;
     }
 
     // TODO: remove for fs::path::replace_extension directly? Note that replace_extension mutates the object
@@ -283,7 +302,7 @@ namespace FileSystem {
             return;
         }
 
-        // rename would fail if copying accross devices
+        // rename would fail if copying across devices
         try {
             fs::rename(fs::path(filePath), destination);
         } catch (fs::filesystem_error &) {
@@ -327,6 +346,91 @@ namespace FileSystem {
         // we could return bool?
         fs::create_symlink(filePath, linkPath);
 #endif
+    }
+
+    std::string readFile(fs::path const &filePath, std::ios_base::openmode mode)
+    {
+        if (!fileExists(filePath)) {
+            throw FatalError(fmt::format("File does not exists: {}", filePath.c_str()));
+        }
+
+        std::string_view fopen_mode;
+        switch (mode) {
+            case std::ios_base::in:
+                fopen_mode = "r"; break;
+            case std::ios_base::binary:
+                fopen_mode = "b"; break;
+            case std::ios_base::in | std::ios_base::binary:
+                fopen_mode = "rb"; break;
+            default:
+                throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+        }
+
+        auto close_file = [](FILE* f){fclose(f);};
+        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(filePath.c_str(), fopen_mode.data()), close_file);
+        if (!holder) {
+            throw FatalError(fmt::format("Could not open file: {}", filePath.c_str()));
+        }
+
+        auto f = holder.get();
+        const auto size = fs::file_size(filePath);
+        std::string result;
+        result.resize(size);
+
+        auto bytes_read = fread(result.data(), 1, size, f);
+        auto is_eof = feof(f);
+        auto has_error = ferror(f);
+        if (is_eof != 0) {
+            return result;
+        }
+        if (has_error != 0 || bytes_read != size) {
+            throw FatalError(fmt::format("Error reading file: {}", filePath.c_str()));
+        }
+        return result;
+    }
+
+    nlohmann::json readJSON(fs::path const &filePath, std::ios_base::openmode mode)
+    {
+        if (!fileExists(filePath)) {
+            throw FatalError(fmt::format("File does not exists: {}", filePath.c_str()));
+        }
+
+        std::string_view fopen_mode;
+        switch (mode) {
+            case std::ios_base::in:
+                fopen_mode = "r"; break;
+            case std::ios_base::binary:
+                fopen_mode = "b"; break;
+            case std::ios_base::in | std::ios_base::binary:
+                fopen_mode = "rb"; break;
+            default:
+                throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+        }
+
+        auto close_file = [](FILE* f){fclose(f);};
+        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(filePath.c_str(), fopen_mode.data()), close_file);
+        if (!holder) {
+            throw FatalError(fmt::format("Could not open file: {}", filePath.c_str()));
+        }
+        auto f = holder.get();
+
+        auto const ext = getFileType(filePath);
+        switch (ext) {
+            case FileTypes::EpJSON:
+            case FileTypes::JSON:
+            case FileTypes::GLHE:
+                return nlohmann::json::parse(f, nullptr, true, true);
+            case FileTypes::CBOR:
+                return nlohmann::json::from_cbor(f);
+            case FileTypes::MsgPack:
+                return nlohmann::json::from_msgpack(f);
+            case FileTypes::UBJSON:
+                return nlohmann::json::from_ubjson(f);
+            case FileTypes::BSON:
+                return nlohmann::json::from_bson(f);
+            default:
+                throw FatalError("Invalid file extension. Must be epJSON, JSON, or other experimental extensions");
+        }
     }
 
 } // namespace FileSystem

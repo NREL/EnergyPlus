@@ -50,6 +50,7 @@
 #include <fstream>
 #include <iostream>
 #include <istream>
+#include <memory>
 #include <unordered_set>
 
 #include <ObjexxFCL/Array1S.hh>
@@ -71,8 +72,10 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
+#include <fmt/os.h>
 
 namespace EnergyPlus {
 // Module containing the input processor routines
@@ -252,43 +255,14 @@ void cleanEPJSON(json &epjson)
 
 void InputProcessor::processInput(EnergyPlusData &state)
 {
-    std::ifstream input_stream(state.dataStrGlobals->inputFilePath, std::ifstream::in | std::ifstream::binary);
-    if (!input_stream.is_open()) {
+    if (!FileSystem::fileExists(state.dataStrGlobals->inputFilePath)) {
         ShowFatalError(state, "Input file path " + state.dataStrGlobals->inputFilePath.string() + " not found");
         return;
     }
 
-    // For some reason this does not work properly on Windows. This will be faster so should investigate in future.
-    // std::ifstream::pos_type size = input_stream.tellg();
-    // char *memblock = new char[(size_t) size + 1];
-    // input_stream.seekg(0, std::ios::beg);
-    // input_stream.read(memblock, size);
-    // memblock[size] = '\0';
-    // input_stream.close();
-    // std::string input_file = memblock;
-    // delete[] memblock;
-
-    // Potential C approach to reading file
-    // std::vector<char> v;
-    // if (FILE *fp = fopen("filename", "r"))
-    // {
-    //  char buf[1024];
-    //  while (size_t len = fread(buf, 1, sizeof(buf), fp))
-    //      v.insert(v.end(), buf, buf + len);
-    //  fclose(fp);
-    // }
-
     try {
         if (!state.dataGlobal->isEpJSON) {
-            std::string input_file;
-            std::string line;
-            while (std::getline(input_stream, line)) {
-                input_file.append(line + '\n');
-            }
-            if (input_file.empty()) {
-                ShowFatalError(state, "Failed to read input file: " + state.dataStrGlobals->inputFilePath.string());
-                return;
-            }
+            auto input_file = FileSystem::readFile(state.dataStrGlobals->inputFilePath);
 
             bool success = true;
             epJSON = idf_parser->decode(input_file, schema, success);
@@ -303,16 +277,8 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 std::ofstream convertedFS(convertedIDF, std::ofstream::out);
                 convertedFS << input_file << std::endl;
             }
-        } else if (state.dataGlobal->isCBOR) {
-            epJSON = json::from_cbor(input_stream);
-        } else if (state.dataGlobal->isMsgPack) {
-            epJSON = json::from_msgpack(input_stream);
-        } else if (state.dataGlobal->isUBJSON) {
-            epJSON = json::from_ubjson(input_stream);
-        } else if (state.dataGlobal->isBSON) {
-            epJSON = json::from_bson(input_stream);
         } else {
-            epJSON = json::parse(input_stream);
+            epJSON = FileSystem::readJSON(state.dataStrGlobals->inputFilePath, std::ios_base::in | std::ios_base::binary);
         }
     } catch (const std::exception &e) {
         ShowSevereError(state, e.what());

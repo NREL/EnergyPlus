@@ -515,9 +515,14 @@ public:
         }
     }
 
+    std::string readFile();
+
+    nlohmann::json readJSON();
+
     explicit InputFile(fs::path FilePath);
 
 private:
+    std::uintmax_t file_size{};
     std::unique_ptr<std::istream> is;
     friend class IOFiles;
 };
