@@ -1146,7 +1146,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 flow_rate{fields.at("air_flow_value")};
                 bool is_mass_flow = true;
                 if (fields.find("air_flow_units") != fields.end()) {
-                    if (fields.at("air_flow_units") != "kg/s") {
+                    if (fields.at("air_flow_units") != "MassFlow") {
                         is_mass_flow = false;
                     }
                 }
