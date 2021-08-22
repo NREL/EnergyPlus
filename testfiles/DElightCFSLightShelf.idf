@@ -520,6 +520,7 @@
     WALL,                    !- Surface Type
     INTERIOR,                !- Construction Name
     1fNY1vx3jAvesY6geZTgIV,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     3i2eFc1ofBz80jvIMxrXvL1fNY1vx3jAvesY6geZTgIV>O0>WF0,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -538,6 +539,7 @@
     WALL,                    !- Surface Type
     INTERIOR,                !- Construction Name
     3i2eFc1ofBz80jvIMxrXvL,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     1fNY1vx3jAvesY6geZTgIV3i2eFc1ofBz80jvIMxrXvL>O0>WF0,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -560,6 +562,7 @@
     WALL,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     1fNY1vx3jAvesY6geZTgIV,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -581,6 +584,7 @@
     WALL,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     1fNY1vx3jAvesY6geZTgIV,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -602,6 +606,7 @@
     WALL,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     1fNY1vx3jAvesY6geZTgIV,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -642,6 +647,7 @@
     ROOF,                    !- Surface Type
     ROOFSLAB,                !- Construction Name
     1fNY1vx3jAvesY6geZTgIV,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -663,6 +669,7 @@
     FLOOR,                   !- Surface Type
     FLOORSLAB,               !- Construction Name
     1fNY1vx3jAvesY6geZTgIV,  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -684,6 +691,7 @@
     WALL,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     3i2eFc1ofBz80jvIMxrXvL,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -705,6 +713,7 @@
     WALL,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     3i2eFc1ofBz80jvIMxrXvL,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -745,6 +754,7 @@
     WALL,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     3i2eFc1ofBz80jvIMxrXvL,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -766,6 +776,7 @@
     ROOF,                    !- Surface Type
     ROOFSLAB,                !- Construction Name
     3i2eFc1ofBz80jvIMxrXvL,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -787,6 +798,7 @@
     FLOOR,                   !- Surface Type
     FLOORSLAB,               !- Construction Name
     3i2eFc1ofBz80jvIMxrXvL,  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure

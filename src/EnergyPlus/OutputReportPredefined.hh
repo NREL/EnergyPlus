@@ -405,6 +405,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdrLighting = 0;
     int pdstInLite = 0;
     int pdchInLtZone = 0;
+    int pdchInLtSpace = 0;
+    int pdchInLtSpaceType = 0;
     int pdchInLtDens = 0;
     int pdchInLtArea = 0;
     int pdchInLtPower = 0;
@@ -1368,6 +1370,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdrLighting = 0;
         this->pdstInLite = 0;
         this->pdchInLtZone = 0;
+        this->pdchInLtSpace = 0;
+        this->pdchInLtSpaceType = 0;
         this->pdchInLtDens = 0;
         this->pdchInLtArea = 0;
         this->pdchInLtPower = 0;
