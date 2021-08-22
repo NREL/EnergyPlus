@@ -579,33 +579,33 @@ using InputFilePath = IOFilePath<InputFile>;
 
 struct JsonOutputStreams
 {
-    std::unique_ptr<std::ostream> json_stream; // Internal stream used for json output
-    std::unique_ptr<std::ostream> json_TSstream_Zone;
-    std::unique_ptr<std::ostream> json_TSstream_HVAC;
-    std::unique_ptr<std::ostream> json_TSstream;
-    std::unique_ptr<std::ostream> json_HRstream;
-    std::unique_ptr<std::ostream> json_MNstream;
-    std::unique_ptr<std::ostream> json_DYstream;
-    std::unique_ptr<std::ostream> json_SMstream;
-    std::unique_ptr<std::ostream> json_YRstream;
-    std::unique_ptr<std::ostream> cbor_stream; // Internal stream used for cbor output
-    std::unique_ptr<std::ostream> cbor_TSstream_Zone;
-    std::unique_ptr<std::ostream> cbor_TSstream_HVAC;
-    std::unique_ptr<std::ostream> cbor_TSstream;
-    std::unique_ptr<std::ostream> cbor_HRstream;
-    std::unique_ptr<std::ostream> cbor_MNstream;
-    std::unique_ptr<std::ostream> cbor_DYstream;
-    std::unique_ptr<std::ostream> cbor_SMstream;
-    std::unique_ptr<std::ostream> cbor_YRstream;
-    std::unique_ptr<std::ostream> msgpack_stream; // Internal stream used for messagepack output
-    std::unique_ptr<std::ostream> msgpack_TSstream_Zone;
-    std::unique_ptr<std::ostream> msgpack_TSstream_HVAC;
-    std::unique_ptr<std::ostream> msgpack_TSstream;
-    std::unique_ptr<std::ostream> msgpack_HRstream;
-    std::unique_ptr<std::ostream> msgpack_MNstream;
-    std::unique_ptr<std::ostream> msgpack_DYstream;
-    std::unique_ptr<std::ostream> msgpack_SMstream;
-    std::unique_ptr<std::ostream> msgpack_YRstream;
+    std::unique_ptr<fmt::ostream> json_stream; // Internal stream used for json output
+    std::unique_ptr<fmt::ostream> json_TSstream_Zone;
+    std::unique_ptr<fmt::ostream> json_TSstream_HVAC;
+    std::unique_ptr<fmt::ostream> json_TSstream;
+    std::unique_ptr<fmt::ostream> json_HRstream;
+    std::unique_ptr<fmt::ostream> json_MNstream;
+    std::unique_ptr<fmt::ostream> json_DYstream;
+    std::unique_ptr<fmt::ostream> json_SMstream;
+    std::unique_ptr<fmt::ostream> json_YRstream;
+    std::unique_ptr<fmt::ostream> cbor_stream; // Internal stream used for cbor output
+    std::unique_ptr<fmt::ostream> cbor_TSstream_Zone;
+    std::unique_ptr<fmt::ostream> cbor_TSstream_HVAC;
+    std::unique_ptr<fmt::ostream> cbor_TSstream;
+    std::unique_ptr<fmt::ostream> cbor_HRstream;
+    std::unique_ptr<fmt::ostream> cbor_MNstream;
+    std::unique_ptr<fmt::ostream> cbor_DYstream;
+    std::unique_ptr<fmt::ostream> cbor_SMstream;
+    std::unique_ptr<fmt::ostream> cbor_YRstream;
+    std::unique_ptr<fmt::ostream> msgpack_stream; // Internal stream used for messagepack output
+    std::unique_ptr<fmt::ostream> msgpack_TSstream_Zone;
+    std::unique_ptr<fmt::ostream> msgpack_TSstream_HVAC;
+    std::unique_ptr<fmt::ostream> msgpack_TSstream;
+    std::unique_ptr<fmt::ostream> msgpack_HRstream;
+    std::unique_ptr<fmt::ostream> msgpack_MNstream;
+    std::unique_ptr<fmt::ostream> msgpack_DYstream;
+    std::unique_ptr<fmt::ostream> msgpack_SMstream;
+    std::unique_ptr<fmt::ostream> msgpack_YRstream;
 
     fs::path outputJsonFilePath;
     fs::path outputTSHvacJsonFilePath;
