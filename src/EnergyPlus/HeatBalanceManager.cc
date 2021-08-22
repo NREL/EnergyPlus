@@ -4484,6 +4484,7 @@ namespace HeatBalanceManager {
 
         state.dataHeatBal->NominalRforNominalUCalculation.dimension(state.dataHeatBal->TotConstructs, 0.0);
         state.dataHeatBal->NominalU.dimension(state.dataHeatBal->TotConstructs, 0.0);
+        state.dataHeatBal->NominalUGlazingOnly.dimension(state.dataHeatBal->TotConstructs, 0.0);
         state.dataHeatBal->CoeffAdjRatio.dimension(state.dataHeatBal->TotConstructs, 1.0);
 
         // Allocate the array to the number of constructions/initialize selected variables
@@ -7343,6 +7344,7 @@ namespace HeatBalanceManager {
             state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalUGlazingOnly.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs) = 1.0;
 
             // these Construct arrays dimensioned based on MaxSolidWinLayers
@@ -8462,6 +8464,7 @@ namespace HeatBalanceManager {
         state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
         state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
         state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
+        state.dataHeatBal->NominalUGlazingOnly.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
         state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs + NumNewConst) = 1.0;
 
         NumNewConst = state.dataHeatBal->TotConstructs;

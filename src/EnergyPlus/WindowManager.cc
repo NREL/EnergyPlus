@@ -7099,6 +7099,10 @@ namespace WindowManager {
         // including inside and outside air films
         Real64 inputU = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
 
+        // Calculate the NominalConductance glazing only
+        EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
+        state.dataHeatBal->NominalUGlazingOnly = NominalConductance;
+
         if (WinterSummerFlag == 1 && inputU > 0) { // only compute adjustment ratio when there is valid user input U
             Real64 CoeffAdjRatio = 1;
             Real64 hcinRated = state.dataWindowManager->hcin;
@@ -7115,8 +7119,6 @@ namespace WindowManager {
             }
             // For each iteration, hcin / hcinRated == hcout / hcoutRated
             state.dataHeatBal->CoeffAdjRatio(ConstrNum) = state.dataWindowManager->hcin / hcinRated;
-        } else {
-            EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
         }
 
         // EPTeam - again -- believe that is enforced in input //Autodesk But this routine is not self-protecting: Add as an assert
@@ -7506,8 +7508,8 @@ namespace WindowManager {
 
             print(state.files.eio,
                   "{}\n",
-                  "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},SHGC,Solar "
-                  "Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
+                  "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},Conductance (Glazing Only) {W/m2-K},"
+                  "SHGC,Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
             if ((state.dataHeatBal->TotSimpleWindow > 0) || (state.dataHeatBal->W5GlsMat > 0) || (state.dataHeatBal->W5GlsMatAlt > 0))
                 print(state.files.eio,
                       "{}\n",
@@ -7674,6 +7676,7 @@ namespace WindowManager {
                               state.dataConstruction->Construct(ThisNum).TotLayers,
                               Roughness(static_cast<int>(state.dataConstruction->Construct(ThisNum).OutsideRoughness)),
                               NominalConductanceWinter,
+                              state.dataHeatBal->NominalUGlazingOnly(ThisNum),
                               SHGCSummer,
                               TransSolNorm,
                               TransVisNorm);

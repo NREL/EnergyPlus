@@ -148,6 +148,7 @@ namespace OutputReportPredefined {
         s->pdchFenAreaOf1 = newPreDefColumn(state, s->pdstFen, "Area of One Opening [m2]");
         s->pdchFenArea = newPreDefColumn(state, s->pdstFen, "Area of Multiplied Openings [m2]");
         s->pdchFenUfact = newPreDefColumn(state, s->pdstFen, "Glass U-Factor [W/m2-K]");
+        s->pdchFenUfactGlazingOnly = newPreDefColumn(state, s->pdstFen, "Glass U-Factor (Glazing Only) [W/m2-K]");
         s->pdchFenSHGC = newPreDefColumn(state, s->pdstFen, "Glass SHGC");
         s->pdchFenVisTr = newPreDefColumn(state, s->pdstFen, "Glass Visible Transmittance");
         s->pdchFenFrameConductance = newPreDefColumn(state, s->pdstFen, "Frame Conductance [W/m2-K]");
@@ -164,6 +165,7 @@ namespace OutputReportPredefined {
         s->pdchIntFenAreaOf1 = newPreDefColumn(state, s->pdstIntFen, "Area of One Opening [m2]");
         s->pdchIntFenArea = newPreDefColumn(state, s->pdstIntFen, "Area of Openings [m2]");
         s->pdchIntFenUfact = newPreDefColumn(state, s->pdstIntFen, "Glass U-Factor [W/m2-K]");
+        s->pdchIntFenUfactGlazingOnly = newPreDefColumn(state, s->pdstFen, "Glass U-Factor (Glazing Only) [W/m2-K]");
         s->pdchIntFenSHGC = newPreDefColumn(state, s->pdstIntFen, "Glass SHGC");
         s->pdchIntFenVisTr = newPreDefColumn(state, s->pdstIntFen, "Glass Visible Transmittance");
         // s->pdchIntFenGlassAreaOf1 =   newPreDefColumn(state, s->pdstIntFen,'Glass Area [m2]')
