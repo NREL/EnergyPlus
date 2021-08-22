@@ -1757,41 +1757,31 @@ TEST_F(InputProcessorFixture, eat_comment)
 TEST_F(InputProcessorFixture, parse_string)
 {
     size_t index = 0;
-    bool success = true;
     std::string output_string;
 
-    output_string = parse_string("test_string", index, success);
+    output_string = parse_string("test_string", index);
     EXPECT_EQ("test_string", output_string);
     EXPECT_EQ(11ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    success = true;
-    output_string = parse_string("-1234.1234", index, success);
+    output_string = parse_string("-1234.1234", index);
     EXPECT_EQ("-1234.1234", output_string);
     EXPECT_EQ(10ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    success = true;
-    output_string = parse_string(R"(\b\t/\\\";)", index, success);
+    output_string = parse_string(R"(\b\t/\\\";)", index);
     EXPECT_EQ(R"(\b\t/\\\")", output_string);
     EXPECT_EQ(9ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    success = true;
-    output_string = parse_string(R"(test \n string)", index, success);
+    output_string = parse_string(R"(test \n string)", index);
     EXPECT_EQ(R"(test \n string)", output_string);
     EXPECT_EQ(14ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    success = true;
-    output_string = parse_string(R"(! this is a comment \n)", index, success);
+    output_string = parse_string(R"(! this is a comment \n)", index);
     EXPECT_EQ("", output_string);
     EXPECT_EQ(0ul, index);
-    EXPECT_TRUE(success);
 }
 
 TEST_F(InputProcessorFixture, parse_value)
@@ -1823,136 +1813,114 @@ TEST_F(InputProcessorFixture, parse_value)
 TEST_F(InputProcessorFixture, parse_number)
 {
     size_t index = 0;
-    bool success = true;
     json output;
 
-    output = parse_number("4.5,", index, success);
+    output = parse_number("4.5,", index);
     EXPECT_EQ(4.5, output.get<double>());
     EXPECT_EQ(3ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number("0.53;", index, success);
+    output = parse_number("0.53;", index);
     EXPECT_EQ(0.53, output.get<double>());
     EXPECT_EQ(4ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number("1.53  ;", index, success);
+    output = parse_number("1.53  ;", index);
     EXPECT_EQ(1.53, output.get<double>());
     EXPECT_EQ(4ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number(" 1.53  ;", index, success);
+    output = parse_number(" 1.53  ;", index);
     EXPECT_EQ(1.53, output.get<double>());
     EXPECT_EQ(5ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number("2.510035e5;", index, success);
+    output = parse_number("2.510035e5;", index);
     EXPECT_EQ(251003.5, output.get<double>());
     EXPECT_EQ(10ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number("2.510035e-05;", index, success);
+    output = parse_number("2.510035e-05;", index);
     EXPECT_EQ(0.00002510035, output.get<double>());
     EXPECT_EQ(12ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number("1.0E-05;", index, success);
+    output = parse_number("1.0E-05;", index);
     EXPECT_EQ(0.000010, output.get<double>());
     EXPECT_EQ(7ul, index);
-    EXPECT_TRUE(success);
 
     // handling weird scientific notation
     index = 0;
-    output = parse_number("5E-5;", index, success);
+    output = parse_number("5E-5;", index);
     EXPECT_EQ(0.00005, output.get<double>());
     EXPECT_EQ(4ul, index);
-    EXPECT_TRUE(success);
 
     // handling weird scientific notation
     index = 0;
-    output = parse_number("5E-05;", index, success);
+    output = parse_number("5E-05;", index);
     EXPECT_EQ(0.00005, output.get<double>());
     EXPECT_EQ(5ul, index);
-    EXPECT_TRUE(success);
 
     // handling weird scientific notation
     index = 0;
-    output = parse_number("5.E-05;", index, success);
+    output = parse_number("5.E-05;", index);
     EXPECT_EQ(0.00005, output.get<double>());
     EXPECT_EQ(6ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number("11th of April,", index, success);
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    output = parse_number("11th of April,", index);
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(13ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("-+4,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("-+4,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(3ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4..0,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4..0,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(4ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("++4,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("++4,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(3ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("--4,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("--4,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(3ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4++,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4++,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(3ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4--,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4--,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(3ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4ee5,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4ee5,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(4ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4EE5,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4EE5,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(4ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4eE5,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4eE5,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(4ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4Ee5,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4Ee5,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(4ul, index);
 }
 
 TEST_F(InputProcessorFixture, look_ahead)

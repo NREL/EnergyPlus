@@ -125,10 +125,10 @@ protected:
         idfParser.eat_comment(idf, index);
     }
 
-    std::string parse_string(std::string const &idf, size_t &index, bool &success)
+    std::string parse_string(std::string const &idf, size_t &index)
     {
         IdfParser idfParser;
-        return idfParser.parse_string(idf, index, success);
+        return idfParser.parse_string(idf, index);
     }
 
     json parse_value(std::string const &idf, size_t &index, bool &success)
@@ -143,10 +143,10 @@ protected:
         return idfParser.parse_value(idf, index, success, field_loc);
     }
 
-    json parse_number(std::string const &idf, size_t &index, bool &success)
+    json parse_number(std::string const &idf, size_t &index)
     {
         IdfParser idfParser;
-        return idfParser.parse_number(idf, index, success);
+        return idfParser.parse_number(idf, index);
     }
 
     IdfParser::Token look_ahead(std::string const &idf, size_t index)
