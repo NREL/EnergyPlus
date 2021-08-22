@@ -188,11 +188,15 @@ namespace HeatBalanceIntRadExchange {
         int startEnclosure = 1;
         int endEnclosure = state.dataViewFactor->NumOfRadiantEnclosures;
         if (PartialResimulate) {
-            startEnclosure = endEnclosure = state.dataHeatBal->Zone(ZoneToResimulate).RadiantEnclosureNum;
-            auto const &enclosure(state.dataViewFactor->ZoneRadiantInfo(startEnclosure));
-            for (int i : enclosure.SurfacePtr) {
-                NetLWRadToSurf(i) = 0.0;
-                state.dataSurface->SurfWinIRfromParentZone(i) = 0.0;
+            // ToDo: For now, use min and max enclosure numbers associated with this zone, this could include unrelated enclosures
+            startEnclosure = state.dataHeatBal->Zone(ZoneToResimulate).zoneRadEnclosureFirst;
+            endEnclosure = state.dataHeatBal->Zone(ZoneToResimulate).zoneRadEnclosureLast;
+            for (int enclosureNum = startEnclosure; enclosureNum <= endEnclosure; ++enclosureNum) {
+                auto const &enclosure(state.dataViewFactor->EnclRadInfo(enclosureNum));
+                for (int i : enclosure.SurfacePtr) {
+                    NetLWRadToSurf(i) = 0.0;
+                    state.dataSurface->SurfWinIRfromParentZone(i) = 0.0;
+                }
             }
         } else {
             NetLWRadToSurf = 0.0;
@@ -202,7 +206,7 @@ namespace HeatBalanceIntRadExchange {
 
         for (int enclosureNum = startEnclosure; enclosureNum <= endEnclosure; ++enclosureNum) {
 
-            auto &zone_info(state.dataViewFactor->ZoneRadiantInfo(enclosureNum));
+            auto &zone_info(state.dataViewFactor->EnclRadInfo(enclosureNum));
             auto &zone_ScriptF(zone_info.ScriptF); // Tuned Transposed
             auto &zone_SurfacePtr(zone_info.SurfacePtr);
             int const n_zone_Surfaces(zone_info.NumOfSurfaces);
@@ -491,7 +495,7 @@ namespace HeatBalanceIntRadExchange {
 
         state.dataHeatBalIntRadExchg->MaxNumOfRadEnclosureSurfs = 0;
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
-            auto &thisEnclosure(state.dataViewFactor->ZoneRadiantInfo(enclosureNum));
+            auto &thisEnclosure(state.dataViewFactor->EnclRadInfo(enclosureNum));
             if (enclosureNum == 1) {
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     print(state.files.eio,
@@ -501,10 +505,11 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
             int numEnclosureSurfaces = 0;
-            for (int zoneNum : thisEnclosure.ZoneNums) {
-                for (int surfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
-                     surfNum <= surfNum_end;
-                     ++surfNum) {
+            for (int spaceNum : thisEnclosure.spaceNums) {
+                // Note that Space.Surfaces only includes HT surfs, see SurfaceGeometry::CreateMissingSpaces
+                // But it also includes air boundary surfaces which need to be excluded here
+                for (int surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
+                    if (state.dataSurface->Surface(surfNum).IsAirBoundarySurf) continue;
                     ++numEnclosureSurfaces;
                 }
             }
@@ -526,20 +531,17 @@ namespace HeatBalanceIntRadExchange {
 
             // Initialize the surface pointer array
             int enclosureSurfNum = 0;
-            for (int const zoneNum : thisEnclosure.ZoneNums) {
+            for (int const spaceNum : thisEnclosure.spaceNums) {
                 int priorZoneTotEnclSurfs = enclosureSurfNum;
-                for (int surfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
-                     surfNum <= surfNum_end;
-                     ++surfNum) {
+                for (int surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
+                    if (state.dataSurface->Surface(surfNum).IsAirBoundarySurf) continue;
                     ++enclosureSurfNum;
                     thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
                 }
                 // Store SurfaceReportNums to maintain original reporting order
-                for (int allSurfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
-                     allSurfNum <= surfNum_end;
-                     ++allSurfNum) {
+                for (int surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
                     for (int enclSNum = priorZoneTotEnclSurfs + 1; enclSNum <= enclosureSurfNum; ++enclSNum) {
-                        if (thisEnclosure.SurfacePtr(enclSNum) == state.dataSurface->AllSurfaceListReportOrder[allSurfNum - 1]) {
+                        if (thisEnclosure.SurfacePtr(enclSNum) == state.dataSurface->AllSurfaceListReportOrder[surfNum - 1]) {
                             thisEnclosure.SurfaceReportNums.push_back(enclSNum);
                             break;
                         }
@@ -617,7 +619,7 @@ namespace HeatBalanceIntRadExchange {
                                thisEnclosure.Area,
                                thisEnclosure.F,
                                thisEnclosure.Name,
-                               thisEnclosure.ZoneNums,
+                               thisEnclosure.spaceNums,
                                CheckValue1,
                                CheckValue2,
                                FinalCheckValue,
@@ -805,7 +807,7 @@ namespace HeatBalanceIntRadExchange {
         if (NumZonesWithUserFbyS > 0) AlignInputViewFactors(state, cCurrentModuleObject, ErrorsFound);
 
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-            auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
+            auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclosureNum));
             if (enclosureNum == 1) {
                 if (state.dataGlobal->DisplayAdvancedReportVariables)
                     print(state.files.eio,
@@ -815,11 +817,11 @@ namespace HeatBalanceIntRadExchange {
                           "Convergence");
             }
             int numEnclosureSurfaces = 0;
-            for (int zoneNum : thisEnclosure.ZoneNums) {
-                for (int surfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
-                     surfNum <= surfNum_end;
-                     ++surfNum) {
-                    // Include only heat transfer surfaces
+            for (int spaceNum : thisEnclosure.spaceNums) {
+                // Note that Space.Surfaces only includes HT surfs, see SurfaceGeometry::CreateMissingSpaces
+                // But it also includes air boundary surfaces which need to be excluded here
+                for (int surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
+                    if (state.dataSurface->Surface(surfNum).IsAirBoundarySurf) continue;
                     ++numEnclosureSurfaces;
                 }
             }
@@ -836,24 +838,21 @@ namespace HeatBalanceIntRadExchange {
 
             // Initialize the surface pointer array
             int enclosureSurfNum = 0;
-            for (int const zoneNum : thisEnclosure.ZoneNums) {
+            for (int const spaceNum : thisEnclosure.spaceNums) {
                 int priorZoneTotEnclSurfs = enclosureSurfNum;
-                for (int surfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
-                     surfNum <= surfNum_end;
-                     ++surfNum) {
-                    // Do not include non-heat transfer surfaces
+                for (int surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
+                    if (state.dataSurface->Surface(surfNum).IsAirBoundarySurf) continue;
                     ++enclosureSurfNum;
                     thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
                     // Store pointers back to here
                     state.dataSurface->Surface(surfNum).SolarEnclSurfIndex = enclosureSurfNum;
                     state.dataSurface->Surface(surfNum).SolarEnclIndex = enclosureNum;
+                    state.dataSurface->Surface(surfNum).RadEnclIndex = enclosureNum; // Radiant and Solar enclosures are parallel for now
                 }
                 // Store SurfaceReportNums to maintain original reporting order
-                for (int allSurfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
-                     allSurfNum <= surfNum_end;
-                     ++allSurfNum) {
+                for (int surfNum : state.dataHeatBal->space(spaceNum).surfaces) {
                     for (int enclSNum = priorZoneTotEnclSurfs + 1; enclSNum <= enclosureSurfNum; ++enclSNum) {
-                        if (thisEnclosure.SurfacePtr(enclSNum) == state.dataSurface->AllSurfaceListReportOrder[allSurfNum - 1]) {
+                        if (thisEnclosure.SurfacePtr(enclSNum) == state.dataSurface->AllSurfaceListReportOrder[surfNum - 1]) {
                             thisEnclosure.SurfaceReportNums.push_back(enclSNum);
                             break;
                         }
@@ -921,7 +920,7 @@ namespace HeatBalanceIntRadExchange {
                            thisEnclosure.Area,
                            thisEnclosure.F,
                            thisEnclosure.Name,
-                           thisEnclosure.ZoneNums,
+                           thisEnclosure.spaceNums,
                            CheckValue1,
                            CheckValue2,
                            FinalCheckValue,
@@ -1140,15 +1139,15 @@ namespace HeatBalanceIntRadExchange {
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
-            std::string const thisZoneOrZoneListName = fields.at("zone_or_zonelist_name");
+            std::string const thisSpaceOrSpaceListName = fields.at("space_or_spacelist_name");
             // do not mark object as used here - let GetInputViewFactorsbyName do that
 
-            // Look for matching solar enclosure name
+            // Look for matching radiant enclosure name
             bool enclMatchFound = false;
             for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
-                auto &thisEnclosure(state.dataViewFactor->ZoneRadiantInfo(enclosureNum));
-                if (UtilityRoutines::SameString(thisZoneOrZoneListName, thisEnclosure.Name)) {
-                    // View factor zone name matches enclosure name
+                auto &thisEnclosure(state.dataViewFactor->EnclRadInfo(enclosureNum));
+                if (UtilityRoutines::SameString(thisSpaceOrSpaceListName, thisEnclosure.Name)) {
+                    // View factor space name matches enclosure name
                     enclMatchFound = true;
                     break;
                 }
@@ -1156,92 +1155,91 @@ namespace HeatBalanceIntRadExchange {
             if (enclMatchFound) continue; // We're done with this instance
             // Look for matching solar enclosure name
             for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-                auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
-                if (UtilityRoutines::SameString(thisZoneOrZoneListName, thisEnclosure.Name)) {
-                    // View factor zone name matches enclosure name
+                auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclosureNum));
+                if (UtilityRoutines::SameString(thisSpaceOrSpaceListName, thisEnclosure.Name)) {
+                    // View factor space name matches enclosure name
                     enclMatchFound = true;
                     break;
                 }
             }
             if (enclMatchFound) continue; // We're done with this instance
-            // Find matching ZoneList name
-            int zoneListNum = UtilityRoutines::FindItemInList(
-                UtilityRoutines::MakeUPPERCase(thisZoneOrZoneListName), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
-            if (zoneListNum > 0) {
-                // Look for radiant enclosure with same list of zones
-                auto &thisZoneList(state.dataHeatBal->ZoneList(zoneListNum));
+            // Find matching SpaceList name
+            int spaceListNum =
+                UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(thisSpaceOrSpaceListName), state.dataHeatBal->spaceList);
+            if (spaceListNum > 0) {
+                // Look for radiant enclosure with same list of spaces
+                auto &thisSpaceList(state.dataHeatBal->spaceList(spaceListNum));
                 for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
-                    auto &thisEnclosure(state.dataViewFactor->ZoneRadiantInfo(enclosureNum));
-                    bool anyZoneNotFound = false;
-                    // If the number of enclosure zones is not the same as the number of zonelist zone, go to the next enclosure
-                    int zlistNumZones = thisEnclosure.ZoneNums.size();
-                    if (thisZoneList.NumOfZones != zlistNumZones) continue;
-                    for (int zListZoneNum : thisZoneList.Zone) {
-                        // Search for matching zones
-                        bool thisZoneFound = false;
-                        for (int enclZoneNum : thisEnclosure.ZoneNums) {
-                            if (enclZoneNum == zListZoneNum) {
-                                thisZoneFound = true;
+                    auto &thisEnclosure(state.dataViewFactor->EnclRadInfo(enclosureNum));
+                    bool anySpaceNotFound = false;
+                    // If the number of enclosure spaces is not the same as the number of spacelist space, go to the next enclosure
+                    if (thisSpaceList.spaces.size() != thisEnclosure.spaceNums.size()) continue;
+                    for (int sListSpaceNum : thisSpaceList.spaces) {
+                        // Search for matching spaces
+                        bool thisSpaceFound = false;
+                        for (int enclSpaceNum : thisEnclosure.spaceNums) {
+                            if (enclSpaceNum == sListSpaceNum) {
+                                thisSpaceFound = true;
                                 break;
                             }
                         }
-                        if (!thisZoneFound) {
-                            anyZoneNotFound = true;
+                        if (!thisSpaceFound) {
+                            anySpaceNotFound = true;
                             break;
                         }
                     }
-                    if (anyZoneNotFound) {
+                    if (anySpaceNotFound) {
                         continue; // On to the next enclosure
                     } else {
                         enclMatchFound = true;
-                        // If matching ZoneList found, set the enclosure name to match
-                        thisEnclosure.Name = thisZoneOrZoneListName;
+                        // If matching SpaceList found, set the enclosure name to match
+                        thisEnclosure.Name = thisSpaceOrSpaceListName;
                         break; // We're done with radiant enclosures
                     }
                 }
                 if (!enclMatchFound) {
                     // Look for solar enclosure with same list of zones
                     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-                        auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
-                        bool anyZoneNotFound = false;
-                        // If the number of enclosure zones is not the same as the number of zonelist zone, go to the next enclosure
-                        int zlistNumZones = thisEnclosure.ZoneNums.size();
-                        if (thisZoneList.NumOfZones != zlistNumZones) continue;
-                        for (int zListZoneNum : thisZoneList.Zone) {
-                            // Search for matching zones
-                            bool thisZoneFound = false;
-                            for (int enclZoneNum : thisEnclosure.ZoneNums) {
-                                if (enclZoneNum == zListZoneNum) {
-                                    thisZoneFound = true;
+                        auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclosureNum));
+                        bool anySpaceNotFound = false;
+                        // If the number of enclosure spaces is not the same as the number of spacelist space, go to the next enclosure
+                        if (thisSpaceList.spaces.size() != thisEnclosure.spaceNums.size()) continue;
+                        for (int sListSpaceNum : thisSpaceList.spaces) {
+                            // Search for matching spaces
+                            bool thisSpaceFound = false;
+                            for (int enclSpaceNum : thisEnclosure.spaceNums) {
+                                if (enclSpaceNum == sListSpaceNum) {
+                                    thisSpaceFound = true;
                                     break;
                                 }
                             }
-                            if (!thisZoneFound) {
-                                anyZoneNotFound = true;
+                            if (!thisSpaceFound) {
+                                anySpaceNotFound = true;
                                 break;
                             }
                         }
-                        if (anyZoneNotFound) {
+                        if (anySpaceNotFound) {
                             continue; // On to the next enclosure
                         } else {
                             enclMatchFound = true;
-                            // If matching ZoneList found, set the enclosure name to match
-                            thisEnclosure.Name = thisZoneOrZoneListName;
+                            // If matching SpaceList found, set the enclosure name to match
+                            thisEnclosure.Name = thisSpaceOrSpaceListName;
                             break; // We're done with radiant enclosures
                         }
                     }
                 }
             }
             if (!enclMatchFound) {
-                if (zoneListNum > 0) {
-                    ShowSevereError(state,
-                                    "AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisZoneOrZoneListName +
-                                        "\" found a matching ZoneList, but did not find a matching radiant or solar enclosure with the same zones.");
+                if (spaceListNum > 0) {
+                    ShowSevereError(
+                        state,
+                        "AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisSpaceOrSpaceListName +
+                            "\" found a matching SpaceList, but did not find a matching radiant or solar enclosure with the same spaces.");
                     ErrorsFound = true;
 
                 } else {
                     ShowSevereError(state,
-                                    "AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisZoneOrZoneListName +
+                                    "AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisSpaceOrSpaceListName +
                                         "\" did not find a matching radiant or solar enclosure name.");
                     ErrorsFound = true;
                 }
@@ -1286,7 +1284,7 @@ namespace HeatBalanceIntRadExchange {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         NoUserInputF = true;
         UserFZoneIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(
-            state, "ZoneProperty:UserViewFactors:BySurfaceName", "zone_or_zonelist_name", EnclosureName);
+            state, "ZoneProperty:UserViewFactors:BySurfaceName", "space_or_spacelist_name", EnclosureName);
 
         if (UserFZoneIndex > 0) {
             enclosureSurfaceNames.allocate(N);
@@ -1467,17 +1465,17 @@ namespace HeatBalanceIntRadExchange {
     }
 
     void FixViewFactors(EnergyPlusData &state,
-                        int const N,                     // NUMBER OF SURFACES
-                        const Array1D<Real64> &A,        // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-                        Array2A<Real64> F,               // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
-                        std::string &enclName,           // Name of Enclosure being fixed
-                        std::vector<int> const zoneNums, // Zones which are part of this enclosure
-                        Real64 &OriginalCheckValue,      // check of SUM(F) - N
-                        Real64 &FixedCheckValue,         // check after fixed of SUM(F) - N
-                        Real64 &FinalCheckValue,         // the one to go with
-                        int &NumIterations,              // number of iterations to fixed
-                        Real64 &RowSum,                  // RowSum of Fixed
-                        bool const anyIntMassInZone      // are there any internal mass surfaces in the zone
+                        int const N,                      // NUMBER OF SURFACES
+                        const Array1D<Real64> &A,         // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                        Array2A<Real64> F,                // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+                        std::string &enclName,            // Name of Enclosure being fixed
+                        std::vector<int> const spaceNums, // Zones which are part of this enclosure
+                        Real64 &OriginalCheckValue,       // check of SUM(F) - N
+                        Real64 &FixedCheckValue,          // check after fixed of SUM(F) - N
+                        Real64 &FinalCheckValue,          // the one to go with
+                        int &NumIterations,               // number of iterations to fixed
+                        Real64 &RowSum,                   // RowSum of Fixed
+                        bool const anyIntMassInZone       // are there any internal mass surfaces in the zone
     )
     {
 
@@ -1640,8 +1638,8 @@ namespace HeatBalanceIntRadExchange {
             }
             FinalCheckValue = FixedCheckValue = std::abs(RowSum - N);
             F = FixedF;
-            for (int zoneNum : zoneNums) {
-                state.dataHeatBal->Zone(zoneNum).EnforcedReciprocity = true;
+            for (int spaceNum : spaceNums) {
+                state.dataHeatBal->Zone(state.dataHeatBal->space(spaceNum).zoneNum).EnforcedReciprocity = true;
             }
             return; // Do not iterate, stop with reciprocity satisfied.
 
@@ -2070,26 +2068,23 @@ namespace HeatBalanceIntRadExchange {
             return surfNum;
         }
 
-        // Check if the surface and equipment are in the same zone or radiant enclosure
-        int const surfRadEnclNum = state.dataHeatBal->Zone(state.dataSurface->Surface(surfNum).Zone).RadiantEnclosureNum;
-        int const radSysEnclNum = state.dataHeatBal->Zone(RadSysZoneNum).RadiantEnclosureNum;
-        if (radSysEnclNum == 0) {
+        // Check if the surface and equipment are in the same zone
+        int const surfZoneNum = state.dataSurface->Surface(surfNum).Zone;
+        if (RadSysZoneNum == 0) {
             // This should never happen - but it does in some simple unit tests that are designed to throw errors
-            ShowSevereError(state,
-                            std::string{routineName} + "Somehow the radiant system enclosure number is zero for" + cCurrentModuleObject + " = " +
-                                RadSysName);
+            ShowSevereError(
+                state, std::string{routineName} + "Somehow the radiant system zone number is zero for" + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
-        } else if (surfRadEnclNum == 0) {
+        } else if (surfZoneNum == 0) {
             // This should never happen
             ShowSevereError(state,
-                            std::string{routineName} + "Somehow  the surface enclosure number is zero for" + cCurrentModuleObject + " = " +
-                                RadSysName + " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
-            ErrorsFound = true;                                                // LCOV_EXCL_LINE
-        } else if (surfRadEnclNum != radSysEnclNum) {
-            ShowSevereError(
-                state, std::string{routineName} + "Surface = " + SurfaceName + " is not in the same zone or enclosure as the radiant equipment.");
-            ShowContinueError(state, "Surface zone or enclosure = " + state.dataViewFactor->ZoneRadiantInfo(surfRadEnclNum).Name);
-            ShowContinueError(state, "Radiant equipment zone or enclosure = " + state.dataViewFactor->ZoneRadiantInfo(radSysEnclNum).Name);
+                            std::string{routineName} + "Somehow  the surface zone number is zero for" + cCurrentModuleObject + " = " + RadSysName +
+                                " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
+            ErrorsFound = true;                                   // LCOV_EXCL_LINE
+        } else if (surfZoneNum != RadSysZoneNum) {
+            ShowSevereError(state, std::string(routineName) + "Surface = " + SurfaceName + " is not in the same zone  as the radiant equipment.");
+            ShowContinueError(state, "Surface zone or enclosure = " + state.dataHeatBal->Zone(surfZoneNum).Name);
+            ShowContinueError(state, "Radiant equipment zone or enclosure = " + state.dataHeatBal->Zone(RadSysZoneNum).Name);
             ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
         }

@@ -883,13 +883,15 @@ namespace RoomAirModelAirflowNetwork {
 
         // Sum all convective internal gains: SumIntGain
         SumInternalConvectionGainsByIndices(state,
-                                            ZoneNum,
+                                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).NumIntGains,
+                                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).intGainsDeviceSpaces,
                                             state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsDeviceIndices,
                                             state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsFractions,
                                             state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumIntSensibleGain);
 
         SumInternalLatentGainsByIndices(state,
-                                        ZoneNum,
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).NumIntGains,
+                                        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).intGainsDeviceSpaces,
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsDeviceIndices,
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsFractions,
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumIntLatentGain);
@@ -897,7 +899,8 @@ namespace RoomAirModelAirflowNetwork {
         if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
             // *******************************************
             SumReturnAirConvectionGainsByIndices(state,
-                                                 ZoneNum,
+                                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).NumIntGains,
+                                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).intGainsDeviceSpaces,
                                                  state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsDeviceIndices,
                                                  state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsFractions,
                                                  SumIntGain);
