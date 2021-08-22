@@ -2903,12 +2903,6 @@
 
   Output:Variable,*,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,hourly;
-
-  Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,hourly;
-
-  Output:Variable,*,Surface Window Inside and Outside Face Convective Coefficient Adjustment Ratio,HOURLY;
-
 ! ***REPORT TABLES***
 
   OutputControl:Table:Style,

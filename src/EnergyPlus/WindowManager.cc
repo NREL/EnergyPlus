@@ -7101,12 +7101,11 @@ namespace WindowManager {
 
         // Calculate the NominalConductance glazing only
         EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
-        state.dataHeatBal->NominalUGlazingOnly = NominalConductance;
 
         if (WinterSummerFlag == 1 && inputU > 0) { // only compute adjustment ratio when there is valid user input U
             Real64 CoeffAdjRatio = 1;
             Real64 hcinRated = state.dataWindowManager->hcin;
-
+            state.dataHeatBal->NominalUGlazingOnly = NominalConductance;
             // Adjustment ratio applies to convective film coefficients when input U value is above the limit of the simple glazing nominal U
             // Representing the nominal highly conductive frame effects. Solved iteratively.
             int MaxIter = 10;
@@ -7668,7 +7667,7 @@ namespace WindowManager {
                         state.dataConstruction->Construct(ThisNum).SummerSHGC = SHGCSummer;
                         state.dataConstruction->Construct(ThisNum).VisTransNorm = TransVisNorm;
 
-                        static constexpr fmt::string_view Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                        static constexpr fmt::string_view Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                         print(state.files.eio,
                               Format_700,
                               state.dataConstruction->Construct(ThisNum).Name,
