@@ -212,7 +212,7 @@ namespace FileSystem {
 
     FileTypes getFileType(fs::path const &filePath)
     {
-        auto buffer = fmt::memory_buffer();
+        std::string buffer{};
         auto extension = std::string_view(fs::path(filePath).extension().c_str());
         std::transform(extension.begin(), extension.end(), buffer.begin(), ::toupper);
         auto const buffer_view = std::string_view(buffer.data());
