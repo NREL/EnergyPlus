@@ -270,12 +270,9 @@ void InputProcessor::processInput(EnergyPlusData &state)
             if (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly) {
                 json epJSONClean = epJSON;
                 cleanEPJSON(epJSONClean);
-                input_file = epJSONClean.dump(4, ' ', false, json::error_handler_t::replace);
-                // input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
                 fs::path convertedIDF = FileSystem::makeNativePath(
-                    FileSystem::replaceFileExtension(state.dataStrGlobals->outputDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".epJSON"));
-                std::ofstream convertedFS(convertedIDF, std::ofstream::out);
-                convertedFS << input_file << std::endl;
+                    FileSystem::replaceFileExtension(state.dataStrGlobals->outDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".epJSON"));
+                FileSystem::writeFile<FileSystem::FileTypes::EpJSON>(convertedIDF, epJSONClean);
             }
         } else {
             epJSON = FileSystem::readJSON(state.dataStrGlobals->inputFilePath, std::ios_base::in | std::ios_base::binary);
@@ -297,9 +294,8 @@ void InputProcessor::processInput(EnergyPlusData &state)
         if (versionMatch) {
             std::string const encoded = idf_parser->encode(epJSON, schema);
             fs::path convertedEpJSON = FileSystem::makeNativePath(
-                FileSystem::replaceFileExtension(state.dataStrGlobals->outputDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".idf"));
-            std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
-            convertedFS << encoded << std::endl;
+                FileSystem::replaceFileExtension(state.dataStrGlobals->outDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".idf"));
+            FileSystem::writeFile<FileSystem::FileTypes::IDF>(convertedEpJSON, encoded);
         } else {
             ShowWarningError(state, "Skipping conversion of epJSON to IDF due to mismatched Version.");
         }

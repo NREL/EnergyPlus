@@ -185,6 +185,101 @@ namespace FileSystem {
     // Reads the full json file if it exists
     nlohmann::json readJSON(fs::path const &filePath, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::binary);
 
+    template <FileTypes fileType>
+    std::string getJSON(const nlohmann::json& data, int const indent = 4) {
+        if constexpr (is_json_type(fileType)) {
+            return data.dump(indent, ' ', false, nlohmann::json::error_handler_t::replace);
+        } else if constexpr (is_binary_json_type(fileType)) {
+            std::string binary_data;
+            if constexpr(fileType == FileTypes::CBOR) {
+                nlohmann::json::to_cbor(data, binary_data);
+            } else if constexpr(fileType == FileTypes::MsgPack) {
+                nlohmann::json::to_msgpack(data, binary_data);
+            } else if constexpr(fileType == FileTypes::BSON) {
+                nlohmann::json::to_bson(data, binary_data);
+            } else if constexpr(fileType == FileTypes::UBJSON) {
+                nlohmann::json::to_ubjson(data, binary_data);
+            }
+            return binary_data;
+        } else {
+            static_assert(is_all_json_type(fileType), "Must be a JSON type");
+        }
+    }
+
+    template <class T, class... Ts>
+    struct is_any : std::disjunction<std::is_same<T, Ts>...> {};
+
+    template <class T>
+    inline constexpr bool enable_unique_ptr_v = is_any<T, std::unique_ptr<fs::path>, std::unique_ptr<fmt::ostream>, std::unique_ptr<std::ostream>, std::unique_ptr<FILE*>>::value;
+
+    template <class T, FileTypes fileType>
+    inline constexpr bool enable_json_v = is_all_json_type(fileType) && is_any<T, nlohmann::json, const nlohmann::json>::value && !is_any<T, std::string_view, std::string, const std::string_view, const std::string, char *, const char *>::value;
+
+    template <FileTypes fileType>
+    void writeFile(fs::path const &filePath, const std::string_view data) {
+        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        auto f = fmt::output_file(filePath.c_str(), fmt::buffer_size=(2<<17));
+        f.print("{}", data);
+    }
+
+    template <FileTypes fileType>
+    void writeFile(fmt::ostream &os, const std::string_view data) {
+        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        os.print("{}", data);
+    }
+
+    template <FileTypes fileType>
+    void writeFile(std::ostream &os, const std::string_view data) {
+        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        fmt::print(os, "{}", data);
+    }
+
+    template <FileTypes fileType>
+    void writeFile(FILE* f, const std::string_view data) {
+        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        fmt::print(f, "{}", data);
+    }
+
+    template <class T, FileTypes fileType, typename = std::enable_if_t<enable_unique_ptr_v<T>>>
+    void writeFile(const T & os, const std::string_view data) {
+        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        if (os) {
+            writeFile<fileType>(*os, data);
+        }
+    }
+
+    template <FileTypes fileType, class T, typename = std::enable_if_t<enable_json_v<T, fileType>>>
+    void writeFile(fs::path const &filePath, T& data, int const indent = 4) {
+        auto const json_str = getJSON<fileType>(data, indent);
+        writeFile<fileType>(filePath, std::string_view(json_str));
+    }
+
+    template <FileTypes fileType, class T, typename = std::enable_if_t<enable_json_v<T, fileType>>>
+    void writeFile(fmt::ostream &os, T& data, int const indent = 4) {
+        auto const json_str = getJSON<fileType>(data, indent);
+        writeFile<fileType>(os, std::string_view(json_str));
+    }
+
+    template <FileTypes fileType, class T, typename = std::enable_if_t<enable_json_v<T, fileType>>>
+    void writeFile(std::ostream &os, T& data, int const indent = 4) {
+        auto const json_str = getJSON<fileType>(data, indent);
+        writeFile<fileType>(os, std::string_view(json_str));
+    }
+
+    template <FileTypes fileType, class T, typename = std::enable_if_t<enable_json_v<T, fileType>>>
+    void writeFile(FILE* f, T& data, int const indent = 4) {
+        auto const json_str = getJSON<fileType>(data, indent);
+        writeFile<fileType>(f, std::string_view(json_str));
+    }
+
+    template <FileTypes fileType, class T, class T2, typename = std::enable_if_t<enable_json_v<T2, fileType> && enable_unique_ptr_v<T>>>
+    void writeFile(const T & os, T2& data, int const indent = 4) {
+        if (os) {
+            auto const json_str = getJSON<fileType>(data, indent);
+            writeFile<fileType>(*os, std::string_view(json_str));
+        }
+    }
+
 } // namespace FileSystem
 } // namespace EnergyPlus
 #endif
