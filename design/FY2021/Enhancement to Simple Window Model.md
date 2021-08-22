@@ -116,11 +116,16 @@ In the current implementation, because the window model in EnergyPlus is for fla
 ![inputU_nominalU](inputU_nominalU.png)
 <p style="text-align: center;"> Figure 4. Comparison of input U and computed nominal U (nominal conductance in winter) before applying the adjustment ratio. </p>
 
-In order to remove this restriction to model glazing systems with high conductive frames, we will introduce the concept of film coefficient adjustment ratio to hcout, hcin, hOutRad, hInRad. The adjustment ratio α to both inside and outside can be calculated as α= U<sub>input</sub>/U.
+In order to remove this restriction to model simple glazing windows with high conductive frames, we will introduce the concept of film coefficient adjustment ratio to hcout, hcin. The adjustment ratio α to both inside and outside is computed iteratively. In each iteration, the nominal (or effective) U is
+re-evaluated, and the adjustment ratio at the current iteration is computed as
+a ratio between the input U and nominal U at the current iteration. The iterative
+process stops when the input U and the nominal U is close enough (with a less than
+0.01 W/m\(^{2}\)\(\cdot\)K difference). This method essentially finds the solutions 
+for the following quadratic equations in Equation (9).
 
-αU =  1/(1/α(hOutRad+hcout) + αRbare + 1/α(hInRad+hcin)) &nbsp;&nbsp; Eq. (9)
+U<sub>input</sub> = 1/(1/hOutRad+αhcout + Rbare + 1/hInRad+αhcin) &nbsp;&nbsp; Eq. (9)
 
-Based on Equation (9), during the simulation, when final hcout, hcin, hOutRad, and hInRad are calculated for window objects using simple window models, these factors will be applied back to adjust hcout, hcin, hOutRad, hInRad as αhcout, αhcin, αhOutRad, and αhInRad, accordingly. Since the derived Rbare is neglectable when U > 7.0, we don’t apply the α back to the window glazing layer.
+During the simulation, when final hcout and hcin are calculated for window objects using simple window models, these factors will be applied back to adjust hcout and hcin as αhcout and αhcin, accordingly. Since the derived Rbare is neglectable when U > 7.0, we don’t apply the α back to the window glazing layer.
 
 ## Testing/Validation/Data Source(s): ##
 
