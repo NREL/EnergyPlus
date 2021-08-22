@@ -2032,7 +2032,7 @@
   AirflowNetwork:MultiZone:SpecifiedFlowRate,
     SF-1,                    !- Name
     0.06,                    !- Air Flow Value
-    kg/s;                    !- Air Flow Units
+    MassFlow;                !- Air Flow Units
 
   AirflowNetwork:MultiZone:Surface:Crack,
     CRcri,                   !- Name
