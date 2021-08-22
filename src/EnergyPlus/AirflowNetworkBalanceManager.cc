@@ -341,7 +341,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 temperature{fields.at("reference_temperature")};
                 Real64 pressure(101325.0);
                 if (fields.find("reference_barometric_pressure") != fields.end()) { // not required field, has default value
-                    pressure = fields.at("reference_barometric_pressure");
+                    pressure = fields.at("reference_barometric_pressure").get<Real64>();
                     if (std::abs((pressure - state.dataEnvrn->StdBaroPress) / state.dataEnvrn->StdBaroPress) > 0.1) { // 10% off
                         ShowWarningError(state,
                                          format("{}: {}: Pressure = {:.0R} differs by more than 10% from Standard Barometric Pressure = {:.0R}.",
@@ -398,14 +398,14 @@ namespace AirflowNetworkBalanceManager {
                 Real64 coeff{fields.at("air_mass_flow_coefficient_at_reference_conditions")}; // Required field
                 Real64 expnt{0.65};
                 if (fields.find("air_mass_flow_exponent") != fields.end()) { // not required field, has default value
-                    expnt = fields.at("air_mass_flow_exponent");
+                    expnt = fields.at("air_mass_flow_exponent").get<Real64>();
                 }
                 Real64 refT = defaultReferenceConditions.temperature;
                 Real64 refP = defaultReferenceConditions.pressure;
                 Real64 refW = defaultReferenceConditions.humidity_ratio;
                 if (!conditionsAreDefaulted) {
                     if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
-                        auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
+                        auto result = referenceConditions.find(fields.at("reference_crack_conditions").get<std::string>());
                         if (result == referenceConditions.end()) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + CurrentModuleObject + ": " + thisObjectName +
@@ -455,7 +455,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_the_zone_exhaust_fan_is_off_at_reference_conditions")}; // Required field
                 Real64 expnt{0.65};
                 if (fields.find("air_mass_flow_exponent_when_the_zone_exhaust_fan_is_off") != fields.end()) { // not required field, has default value
-                    expnt = fields.at("air_mass_flow_exponent_when_the_zone_exhaust_fan_is_off");
+                    expnt = fields.at("air_mass_flow_exponent_when_the_zone_exhaust_fan_is_off").get<Real64>();
                 }
 
                 // This breaks the component model, need to fix
@@ -492,7 +492,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 refW = defaultReferenceConditions.humidity_ratio;
                 if (!conditionsAreDefaulted) {
                     if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
-                        auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
+                        auto result = referenceConditions.find(fields.at("reference_crack_conditions").get<std::string>());
                         if (result == referenceConditions.end()) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + CurrentModuleObject + ": " + thisObjectName +
@@ -548,11 +548,11 @@ namespace AirflowNetworkBalanceManager {
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
-                std::string mixer_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("outdoor_air_mixer_name")));
+                std::string mixer_name = UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_mixer_name").get<std::string>());
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_no_outdoor_air_flow_at_reference_conditions")};
                 Real64 expnt{0.65};
                 if (fields.find("air_mass_flow_exponent_when_no_outdoor_air_flow") != fields.end()) {
-                    expnt = fields.at("air_mass_flow_exponent_when_no_outdoor_air_flow");
+                    expnt = fields.at("air_mass_flow_exponent_when_no_outdoor_air_flow").get<Real64>();
                 }
 
                 int OAMixerNum = MixedAir::GetOAMixerNumber(state, mixer_name);
@@ -568,7 +568,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 refW = defaultReferenceConditions.humidity_ratio;
                 if (!conditionsAreDefaulted) {
                     if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
-                        auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
+                        auto result = referenceConditions.find(fields.at("reference_crack_conditions").get<std::string>());
                         if (result == referenceConditions.end()) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + CurrentModuleObject + ": " + thisObjectName +
@@ -623,11 +623,11 @@ namespace AirflowNetworkBalanceManager {
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
-                std::string mixer_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("outdoor_air_mixer_name")));
+                std::string mixer_name = UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_mixer_name").get<std::string>());
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_no_outdoor_air_flow_at_reference_conditions")};
                 Real64 expnt{0.65};
                 if (fields.find("air_mass_flow_exponent_when_no_outdoor_air_flow") != fields.end()) {
-                    expnt = fields.at("air_mass_flow_exponent_when_no_outdoor_air_flow");
+                    expnt = fields.at("air_mass_flow_exponent_when_no_outdoor_air_flow").get<Real64>();
                 }
 
                 int OAMixerNum{MixedAir::GetOAMixerNumber(state, mixer_name)};
@@ -643,7 +643,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 refW = defaultReferenceConditions.humidity_ratio;
                 if (!conditionsAreDefaulted) {
                     if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
-                        auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
+                        auto result = referenceConditions.find(fields.at("reference_crack_conditions").get<std::string>());
                         if (result == referenceConditions.end()) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + CurrentModuleObject + ": " + thisObjectName +
@@ -699,7 +699,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_opening_is_closed")};
                 Real64 expnt{0.65};
                 if (fields.find("air_mass_flow_exponent_when_opening_is_closed") != fields.end()) {
-                    expnt = fields.at("air_mass_flow_exponent_when_opening_is_closed");
+                    expnt = fields.at("air_mass_flow_exponent_when_opening_is_closed").get<Real64>();
                 }
 
                 int LVOtype{1};
@@ -721,7 +721,7 @@ namespace AirflowNetworkBalanceManager {
 
                 Real64 extra{0.0};
                 if (fields.find("extra_crack_length_or_height_of_pivoting_axis") != fields.end()) {
-                    extra = fields.at("extra_crack_length_or_height_of_pivoting_axis");
+                    extra = fields.at("extra_crack_length_or_height_of_pivoting_axis").get<Real64>();
                 }
 
                 Real64 N{fields.at("number_of_sets_of_opening_factor_data")};
@@ -738,19 +738,19 @@ namespace AirflowNetworkBalanceManager {
                 //}
                 Real64 cd{0.001};
                 if (fields.find("discharge_coefficient_for_opening_factor_1") != fields.end()) {
-                    cd = fields.at("discharge_coefficient_for_opening_factor_1");
+                    cd = fields.at("discharge_coefficient_for_opening_factor_1").get<Real64>();
                 }
                 Real64 width_factor{0.0};
                 if (fields.find("width_factor_for_opening_factor_1") != fields.end()) {
-                    width_factor = fields.at("width_factor_for_opening_factor_1");
+                    width_factor = fields.at("width_factor_for_opening_factor_1").get<Real64>();
                 }
                 Real64 height_factor{0.0};
                 if (fields.find("height_factor_for_opening_factor_1") != fields.end()) {
-                    height_factor = fields.at("height_factor_for_opening_factor_1");
+                    height_factor = fields.at("height_factor_for_opening_factor_1").get<Real64>();
                 }
                 Real64 start_height_factor{0.0};
                 if (fields.find("start_height_factor_for_opening_factor_1") != fields.end()) {
-                    start_height_factor = fields.at("start_height_factor_for_opening_factor_1");
+                    start_height_factor = fields.at("start_height_factor_for_opening_factor_1").get<Real64>();
                 }
 
                 factors[0] = 0.0; // factor; // This factor must be zero
@@ -762,19 +762,19 @@ namespace AirflowNetworkBalanceManager {
                 Real64 factor{fields.at("opening_factor_2")};
                 cd = 1.0;
                 if (fields.find("discharge_coefficient_for_opening_factor_2") != fields.end()) {
-                    cd = fields.at("discharge_coefficient_for_opening_factor_2");
+                    cd = fields.at("discharge_coefficient_for_opening_factor_2").get<Real64>();
                 }
                 width_factor = 1.0;
                 if (fields.find("width_factor_for_opening_factor_2") != fields.end()) {
-                    width_factor = fields.at("width_factor_for_opening_factor_2");
+                    width_factor = fields.at("width_factor_for_opening_factor_2").get<Real64>();
                 }
                 height_factor = 1.0;
                 if (fields.find("height_factor_for_opening_factor_2") != fields.end()) {
-                    height_factor = fields.at("height_factor_for_opening_factor_2");
+                    height_factor = fields.at("height_factor_for_opening_factor_2").get<Real64>();
                 }
                 start_height_factor = 0.0;
                 if (fields.find("start_height_factor_for_opening_factor_2") != fields.end()) {
-                    start_height_factor = fields.at("start_height_factor_for_opening_factor_2");
+                    start_height_factor = fields.at("start_height_factor_for_opening_factor_2").get<Real64>();
                 }
 
                 factors[1] = factor;
@@ -784,22 +784,22 @@ namespace AirflowNetworkBalanceManager {
                 start_height_factors[1] = start_height_factor;
 
                 if (N >= 3) {
-                    factor = fields.at("opening_factor_3");
+                    factor = fields.at("opening_factor_3").get<Real64>();
                     cd = 0.0;
                     if (fields.find("discharge_coefficient_for_opening_factor_3") != fields.end()) {
-                        cd = fields.at("discharge_coefficient_for_opening_factor_3");
+                        cd = fields.at("discharge_coefficient_for_opening_factor_3").get<Real64>();
                     }
                     width_factor = 0.0;
                     if (fields.find("width_factor_for_opening_factor_3") != fields.end()) {
-                        width_factor = fields.at("width_factor_for_opening_factor_3");
+                        width_factor = fields.at("width_factor_for_opening_factor_3").get<Real64>();
                     }
                     height_factor = 0.0;
                     if (fields.find("height_factor_for_opening_factor_3") != fields.end()) {
-                        height_factor = fields.at("height_factor_for_opening_factor_3");
+                        height_factor = fields.at("height_factor_for_opening_factor_3").get<Real64>();
                     }
                     start_height_factor = 0.0;
                     if (fields.find("start_height_factor_for_opening_factor_3") != fields.end()) {
-                        start_height_factor = fields.at("start_height_factor_for_opening_factor_3");
+                        start_height_factor = fields.at("start_height_factor_for_opening_factor_3").get<Real64>();
                     }
 
                     factors[2] = factor;
@@ -809,22 +809,22 @@ namespace AirflowNetworkBalanceManager {
                     start_height_factors[2] = start_height_factor;
 
                     if (N >= 4) {
-                        factor = fields.at("opening_factor_4");
+                        factor = fields.at("opening_factor_4").get<Real64>();
                         cd = 0.0;
                         if (fields.find("discharge_coefficient_for_opening_factor_4") != fields.end()) {
-                            cd = fields.at("discharge_coefficient_for_opening_factor_4");
+                            cd = fields.at("discharge_coefficient_for_opening_factor_4").get<Real64>();
                         }
                         width_factor = 0.0;
                         if (fields.find("width_factor_for_opening_factor_4") != fields.end()) {
-                            width_factor = fields.at("width_factor_for_opening_factor_4");
+                            width_factor = fields.at("width_factor_for_opening_factor_4").get<Real64>();
                         }
                         height_factor = 0.0;
                         if (fields.find("height_factor_for_opening_factor_4") != fields.end()) {
-                            height_factor = fields.at("height_factor_for_opening_factor_4");
+                            height_factor = fields.at("height_factor_for_opening_factor_4").get<Real64>();
                         }
                         start_height_factor = 0.0;
                         if (fields.find("start_height_factor_for_opening_factor_4") != fields.end()) {
-                            start_height_factor = fields.at("start_height_factor_for_opening_factor_4");
+                            start_height_factor = fields.at("start_height_factor_for_opening_factor_4").get<Real64>();
                         }
 
                         factors[3] = factor;
@@ -999,7 +999,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_opening_is_closed")};
                 Real64 expnt{0.65};
                 if (fields.find("air_mass_flow_exponent_when_opening_is_closed") != fields.end()) {
-                    expnt = fields.at("air_mass_flow_exponent_when_opening_is_closed");
+                    expnt = fields.at("air_mass_flow_exponent_when_opening_is_closed").get<Real64>();
                 }
                 Real64 diff{fields.at("minimum_density_difference_for_two_way_flow")};
                 Real64 dischargeCoeff{fields.at("discharge_coefficient")};
@@ -1042,11 +1042,11 @@ namespace AirflowNetworkBalanceManager {
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_opening_is_closed")};
                 Real64 expnt{0.65};
                 if (fields.find("air_mass_flow_exponent_when_opening_is_closed") != fields.end()) {
-                    expnt = fields.at("air_mass_flow_exponent_when_opening_is_closed");
+                    expnt = fields.at("air_mass_flow_exponent_when_opening_is_closed").get<Real64>();
                 }
                 Real64 angle{90.0};
                 if (fields.find("sloping_plane_angle") != fields.end()) {
-                    angle = fields.at("sloping_plane_angle");
+                    angle = fields.at("sloping_plane_angle").get<Real64>();
                 }
                 Real64 dischargeCoeff{fields.at("discharge_coefficient")};
 
@@ -1087,15 +1087,15 @@ namespace AirflowNetworkBalanceManager {
                 Real64 ela{fields.at("effective_leakage_area")};
                 Real64 cd{1.0};
                 if (fields.find("discharge_coefficient") != fields.end()) {
-                    cd = fields.at("discharge_coefficient");
+                    cd = fields.at("discharge_coefficient").get<Real64>();
                 }
                 Real64 dp{4.0};
                 if (fields.find("reference_pressure_difference") != fields.end()) {
-                    dp = fields.at("reference_pressure_difference");
+                    dp = fields.at("reference_pressure_difference").get<Real64>();
                 }
                 Real64 expnt{0.65};
                 if (fields.find("air_mass_flow_exponent") != fields.end()) {
-                    expnt = fields.at("air_mass_flow_exponent");
+                    expnt = fields.at("air_mass_flow_exponent").get<Real64>();
                 }
 
                 state.dataAirflowNetwork->MultizoneSurfaceELAData(i).name = thisObjectName; // Name of surface effective leakage area component
@@ -1136,7 +1136,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 coeff{fields.at("air_mass_flow_coefficient")};
                 Real64 expnt{0.65};
                 if (fields.find("air_mass_flow_exponent") != fields.end()) {
-                    expnt = fields.at("air_mass_flow_exponent");
+                    expnt = fields.at("air_mass_flow_exponent").get<Real64>();
                 }
 
                 state.dataAirflowNetwork->DisSysCompLeakData(i).name = thisObjectName; // Name of duct leak component
@@ -1175,7 +1175,7 @@ namespace AirflowNetworkBalanceManager {
                 Real64 dp{fields.at("reference_pressure_difference")};
                 Real64 expnt{0.65};
                 if (fields.find("air_mass_flow_exponent") != fields.end()) {
-                    expnt = fields.at("air_mass_flow_exponent");
+                    expnt = fields.at("air_mass_flow_exponent").get<Real64>();
                 }
 
                 state.dataAirflowNetwork->DisSysCompELRData(i).name = thisObjectName; // Name of duct effective leakage ratio component
@@ -1216,27 +1216,27 @@ namespace AirflowNetworkBalanceManager {
                 Real64 A{fields.at("cross_section_area")};
                 Real64 e{0.0009};
                 if (fields.find("surface_roughness") != fields.end()) {
-                    e = fields.at("surface_roughness");
+                    e = fields.at("surface_roughness").get<Real64>();
                 }
                 Real64 dlc{0.0};
                 if (fields.find("coefficient_for_local_dynamic_loss_due_to_fitting") != fields.end()) {
-                    dlc = fields.at("coefficient_for_local_dynamic_loss_due_to_fitting");
+                    dlc = fields.at("coefficient_for_local_dynamic_loss_due_to_fitting").get<Real64>();
                 }
                 Real64 U{0.943};
                 if (fields.find("heat_transmittance_coefficient_u_factor_for_duct_wall_construction") != fields.end()) {
-                    U = fields.at("heat_transmittance_coefficient_u_factor_for_duct_wall_construction");
+                    U = fields.at("heat_transmittance_coefficient_u_factor_for_duct_wall_construction").get<Real64>();
                 }
                 Real64 Um{0.001};
                 if (fields.find("overall_moisture_transmittance_coefficient_from_air_to_air") != fields.end()) {
-                    Um = fields.at("overall_moisture_transmittance_coefficient_from_air_to_air");
+                    Um = fields.at("overall_moisture_transmittance_coefficient_from_air_to_air").get<Real64>();
                 }
                 Real64 hout{0.0};
                 if (fields.find("outside_convection_coefficient") != fields.end()) {
-                    hout = fields.at("outside_convection_coefficient");
+                    hout = fields.at("outside_convection_coefficient").get<Real64>();
                 }
                 Real64 hin{0.0};
                 if (fields.find("inside_convection_coefficient") != fields.end()) {
-                    hin = fields.at("inside_convection_coefficient");
+                    hin = fields.at("inside_convection_coefficient").get<Real64>();
                 }
 
                 state.dataAirflowNetwork->DisSysCompDuctData(i).name = thisObjectName;   // Name of duct effective leakage ratio component
@@ -1301,8 +1301,8 @@ namespace AirflowNetworkBalanceManager {
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
-                std::string fan_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("fan_name")));
-                std::string fan_type = fields.at("supply_fan_object_type");
+                std::string fan_name = UtilityRoutines::MakeUPPERCase(fields.at("fan_name").get<std::string>());
+                std::string fan_type = fields.at("supply_fan_object_type").get<std::string>();
 
                 bool FanErrorFound = false;
                 int fanIndex;
@@ -1420,8 +1420,8 @@ namespace AirflowNetworkBalanceManager {
                 // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
-                std::string coil_name = fields.at("coil_name");
-                std::string coil_type = fields.at("coil_object_type");
+                std::string coil_name = fields.at("coil_name").get<std::string>();
+                std::string coil_type = fields.at("coil_object_type").get<std::string>();
                 Real64 L{fields.at("air_path_length")};
                 Real64 D{fields.at("air_path_hydraulic_diameter")};
 
@@ -1461,8 +1461,8 @@ namespace AirflowNetworkBalanceManager {
                 // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
-                std::string hx_name = fields.at("heatexchanger_name");
-                std::string hx_type = fields.at("heatexchanger_object_type");
+                std::string hx_name = fields.at("heatexchanger_name").get<std::string>();
+                std::string hx_type = fields.at("heatexchanger_object_type").get<std::string>();
                 Real64 L{fields.at("air_path_length")};
                 Real64 D{fields.at("air_path_hydraulic_diameter")};
 
@@ -1504,8 +1504,8 @@ namespace AirflowNetworkBalanceManager {
                 // auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
-                std::string tu_name = fields.at("terminal_unit_name");
-                std::string tu_type = fields.at("terminal_unit_object_type");
+                std::string tu_name = fields.at("terminal_unit_name").get<std::string>();
+                std::string tu_type = fields.at("terminal_unit_object_type").get<std::string>();
                 Real64 L{fields.at("air_path_length")};
                 Real64 D{fields.at("air_path_hydraulic_diameter")};
 

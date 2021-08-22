@@ -55,10 +55,17 @@ namespace EmbeddedEpJSONSchema {
 
     ${embedded_epJSON_schema}
 
-    std::pair<std::uint8_t const *, std::size_t>
+    const gsl::span<const std::uint8_t>
     embeddedEpJSONSchema()
     {
-        return std::make_pair(embeddedSchema.data(), embeddedSchema.size());
+        return gsl::span<const std::uint8_t>(embeddedSchema);
+    }
+
+    const std::string_view
+    embeddedEpJSONSchemaView()
+    {
+        static const std::string str(embeddedSchema.begin(), embeddedSchema.end());
+        return str;
     }
 
 } // namespace EmbeddedEpJSONSchema

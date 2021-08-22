@@ -1971,7 +1971,7 @@ namespace CurveManager {
 
                 // Loop through independent variables in list and add them to the grid
                 for (auto indVar : fields.at("independent_variables")) {
-                    std::string indVarName = UtilityRoutines::MakeUPPERCase(AsString(indVar.at("independent_variable_name")));
+                    std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name").get<std::string>());
                     std::string contextString = "Table:IndependentVariable \"" + indVarName + "\"";
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                     Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
@@ -1983,7 +1983,7 @@ namespace CurveManager {
 
                         // TODO: Actually use this to define output variable units
                         if (indVarInstance.count("unit_type")) {
-                            std::string unitType = indVarInstance.at("unit_type");
+                            std::string unitType = indVarInstance.at("unit_type").get<std::string>();
                             if (!IsCurveOutputTypeValid(unitType)) {
                                 ShowSevereError(state, contextString + ": Unit Type [" + unitType + "] is invalid");
                             }
@@ -1992,7 +1992,7 @@ namespace CurveManager {
                         std::vector<double> axis;
 
                         if (indVarInstance.count("external_file_name")) {
-                            std::string tmp = indVarInstance.at("external_file_name");
+                            std::string tmp = indVarInstance.at("external_file_name").get<std::string>();
                             fs::path filePath(tmp);
                             if (!indVarInstance.count("external_file_column_number")) {
                                 ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath.string() + "\"");
@@ -2028,7 +2028,7 @@ namespace CurveManager {
 
                         } else if (indVarInstance.count("values")) {
                             for (auto value : indVarInstance.at("values")) {
-                                axis.push_back(value.at("value"));
+                                axis.push_back(value.at("value").get<Real64>());
                             }
                         } else {
                             ShowSevereError(state, contextString + ": No values defined.");
@@ -2037,7 +2037,7 @@ namespace CurveManager {
 
                         Btwxt::Method interpMethod, extrapMethod;
                         if (indVarInstance.count("interpolation_method")) {
-                            interpMethod = CurveManager::BtwxtManager::interpMethods.at(indVarInstance.at("interpolation_method"));
+                            interpMethod = CurveManager::BtwxtManager::interpMethods.at(indVarInstance.at("interpolation_method").get<std::string>());
                         } else {
                             interpMethod = Btwxt::Method::CUBIC;
                         }
@@ -2047,7 +2047,7 @@ namespace CurveManager {
                                 ShowSevereError(state, contextString + ": Extrapolation method \"Unavailable\" is not yet available.");
                                 ErrorsFound = true;
                             }
-                            extrapMethod = CurveManager::BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method"));
+                            extrapMethod = CurveManager::BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method").get<std::string>());
                         } else {
                             extrapMethod = Btwxt::Method::LINEAR;
                         }
@@ -2057,13 +2057,13 @@ namespace CurveManager {
 
                         double min_val, max_val;
                         if (indVarInstance.count("minimum_value")) {
-                            min_val = indVarInstance.at("minimum_value");
+                            min_val = indVarInstance.at("minimum_value").get<Real64>();
                         } else {
                             min_val = min_grid_value;
                         }
 
                         if (indVarInstance.count("maximum_value")) {
-                            max_val = indVarInstance.at("maximum_value");
+                            max_val = indVarInstance.at("maximum_value").get<Real64>();
                         } else {
                             max_val = max_grid_value;
                         }
@@ -2072,7 +2072,7 @@ namespace CurveManager {
 
                         Real64 normalizationRefValue;
                         if (indVarInstance.count("normalization_reference_value")) {
-                            normalizationRefValue = indVarInstance.at("normalization_reference_value");
+                            normalizationRefValue = indVarInstance.at("normalization_reference_value").get<Real64>();
                         } else {
                             normalizationRefValue = std::numeric_limits<double>::quiet_NaN();
                         }
@@ -2109,7 +2109,7 @@ namespace CurveManager {
                 state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Table:Lookup";
                 state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
 
-                std::string indVarListName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("independent_variable_list_name")));
+                std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name").get<std::string>());
 
                 std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveNum).Name + "\"";
                 std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
@@ -2117,7 +2117,7 @@ namespace CurveManager {
 
                 // TODO: Actually use this to define output variable units
                 if (fields.count("output_unit_type")) {
-                    std::string unitType = fields.at("output_unit_type");
+                    std::string unitType = fields.at("output_unit_type").get<std::string>();
                     if (!IsCurveOutputTypeValid(unitType)) {
                         ShowSevereError(state, contextString + ": Output Unit Type [" + unitType + "] is invalid");
                     }
@@ -2153,7 +2153,7 @@ namespace CurveManager {
                 }
 
                 if (fields.count("minimum_output")) {
-                    state.dataCurveManager->PerfCurve(CurveNum).CurveMin = fields.at("minimum_output");
+                    state.dataCurveManager->PerfCurve(CurveNum).CurveMin = fields.at("minimum_output").get<Real64>();
                     state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
                 } else {
                     state.dataCurveManager->PerfCurve(CurveNum).CurveMin = -DBL_MAX;
@@ -2161,7 +2161,7 @@ namespace CurveManager {
                 }
 
                 if (fields.count("maximum_output")) {
-                    state.dataCurveManager->PerfCurve(CurveNum).CurveMax = fields.at("maximum_output");
+                    state.dataCurveManager->PerfCurve(CurveNum).CurveMax = fields.at("maximum_output").get<Real64>();
                     state.dataCurveManager->PerfCurve(CurveNum).CurveMaxPresent = true;
                 } else {
                     state.dataCurveManager->PerfCurve(CurveNum).CurveMax = DBL_MAX;
@@ -2187,12 +2187,12 @@ namespace CurveManager {
                 }
 
                 if (normalizeMethod != NM_NONE && fields.count("normalization_divisor")) {
-                    normalizationDivisor = fields.at("normalization_divisor");
+                    normalizationDivisor = fields.at("normalization_divisor").get<Real64>();
                 }
 
                 std::vector<double> lookupValues;
                 if (fields.count("external_file_name")) {
-                    std::string tmp = fields.at("external_file_name");
+                    std::string tmp = fields.at("external_file_name").get<std::string>();
                     fs::path filePath(tmp);
 
                     if (!fields.count("external_file_column_number")) {

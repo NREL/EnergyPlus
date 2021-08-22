@@ -1034,7 +1034,7 @@ namespace SimulationManager {
                                 ShowWarningError(state, CurrentModuleObject + ": empty key found, consider removing it to avoid this warning.");
                                 continue;
                             }
-                            std::string diagnosticName = *it;
+                            std::string diagnosticName = it->get<std::string>();
 
                             if (UtilityRoutines::SameString(diagnosticName, "DisplayExtraWarnings")) {
                                 state.dataGlobal->DisplayExtraWarnings = true;
@@ -1182,11 +1182,11 @@ namespace SimulationManager {
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
                     state.dataGlobal->DoCoilDirectSolutions =
-                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("use_coil_direct_solutions"))) == "YES";
+                        UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions").get<std::string>()) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
                     state.dataHeatBalIntRadExchg->CarrollMethod =
-                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("zone_radiant_exchange_algorithm"))) == "CARROLLMRT";
+                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm").get<std::string>()) == "CARROLLMRT";
                 }
                 bool overrideTimestep(false);
                 bool overrideZoneAirHeatBalAlg(false);
@@ -1197,7 +1197,7 @@ namespace SimulationManager {
                 bool overrideMaxAllowedDelTemp(false);
                 state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
-                    overrideModeValue = UtilityRoutines::MakeUPPERCase(AsString(fields.at("override_mode")));
+                    overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode").get<std::string>());
                     if (overrideModeValue == "NORMAL") {
                         // no overrides
                     } else if (overrideModeValue == "MODE01") {
@@ -1245,14 +1245,14 @@ namespace SimulationManager {
                     } else if (overrideModeValue == "ADVANCED") {
                         bool advancedModeUsed = false;
                         if (fields.find("maxzonetempdiff") != fields.end()) { // not required field, has default value
-                            state.dataConvergeParams->MaxZoneTempDiff = fields.at("maxzonetempdiff");
+                            state.dataConvergeParams->MaxZoneTempDiff = fields.at("maxzonetempdiff").get<Real64>();
                             ShowWarningError(state,
                                              format("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxZoneTempDiff set to: {:.4R}",
                                                     state.dataConvergeParams->MaxZoneTempDiff));
                             advancedModeUsed = true;
                         }
                         if (fields.find("maxalloweddeltemp") != fields.end()) { // not required field, has default value
-                            state.dataHeatBal->MaxAllowedDelTemp = fields.at("maxalloweddeltemp");
+                            state.dataHeatBal->MaxAllowedDelTemp = fields.at("maxalloweddeltemp").get<Real64>();
                             ShowWarningError(
                                 state,
                                 format("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxAllowedDelTemp set to: {:.4R}",

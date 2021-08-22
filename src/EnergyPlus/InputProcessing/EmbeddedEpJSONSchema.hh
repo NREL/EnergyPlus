@@ -51,12 +51,17 @@
 #include <cstddef>
 #include <cstdint>
 #include <utility>
+#include <GSL/span.h>
 
 namespace EnergyPlus {
 
 namespace EmbeddedEpJSONSchema {
 
-    std::pair<std::uint8_t const *, std::size_t> embeddedEpJSONSchema();
+    const gsl::span<const std::uint8_t>
+    embeddedEpJSONSchema();
+
+    const std::string_view
+    embeddedEpJSONSchemaView();
 }
 
 } // namespace EnergyPlus

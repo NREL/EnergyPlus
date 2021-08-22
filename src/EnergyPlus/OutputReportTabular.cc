@@ -14417,7 +14417,7 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
             // if exterior is other side coefficients using ground preprocessor terms then
             // set it to ground instead of other side coefficients
             if (curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt) {
-                if (has_prefixi(AsString(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name), "surfPropOthSdCoef")) {
+                if (has_prefixi(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
                     curExtBoundCond = Ground;
                 }
             }

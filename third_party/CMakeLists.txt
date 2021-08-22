@@ -2,6 +2,18 @@
 # add_library( ModernJSON INTERFACE )
 # target_include_directories( ModernJSON INTERFACE "${PROJECT_SOURCE_DIR}/nlohmann" "${PROJECT_SOURCE_DIR}/doj" )
 
+add_library( ModernJSON INTERFACE )
+target_compile_definitions(
+        ModernJSON
+        INTERFACE
+        JSON_USE_IMPLICIT_CONVERSIONS=OFF
+)
+target_include_directories(
+        ModernJSON
+        INTERFACE
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/nlohmann>
+)
+
 # To avoid modifying every third_party library
 # we link the project_options in here for every library in this
 # subdirectory

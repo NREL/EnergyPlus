@@ -5361,7 +5361,7 @@ void SetupOutputVariable(EnergyPlusData &state,
             } else {
                 EndUseSub = "";
                 if (present(EndUseKey)) {
-                    if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::MakeUPPERCase(AsString(EndUseKey))) !=
+                    if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::MakeUPPERCase(std::string{EndUseKey})) !=
                         endUseCategoryNames.end()) {
                         EndUseSub = "General";
                     }

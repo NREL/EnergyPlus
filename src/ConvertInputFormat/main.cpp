@@ -88,7 +88,7 @@ bool checkVersionMatch(json const &epJSON)
     auto it = epJSON.find("Version");
     if (it != epJSON.end()) {
         for (auto const &version : it.value()) {
-            std::string v = version["version_identifier"];
+            std::string v = version["version_identifier"].get<std::string>();
             if (v.empty()) {
                 displayMessage("Input errors occurred and version ID was left blank, verify file version");
             } else {
@@ -494,7 +494,7 @@ int main(int argc, const char *argv[])
     }
 
     auto const embeddedEpJSONSchema = EnergyPlus::EmbeddedEpJSONSchema::embeddedEpJSONSchema();
-    auto schema = json::from_cbor(embeddedEpJSONSchema.first, embeddedEpJSONSchema.second);
+    auto schema = json::from_cbor(embeddedEpJSONSchema);
 
     int number_files = static_cast<int>(files.size());
     std::size_t fileCount = 0;

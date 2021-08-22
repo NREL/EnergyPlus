@@ -1142,7 +1142,7 @@ namespace HeatBalanceIntRadExchange {
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
-            std::string const thisZoneOrZoneListName = fields.at("zone_or_zonelist_name");
+            std::string const thisZoneOrZoneListName = fields.at("zone_or_zonelist_name").get<std::string>();
             // do not mark object as used here - let GetInputViewFactorsbyName do that
 
             // Look for matching solar enclosure name
