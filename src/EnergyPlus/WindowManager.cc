@@ -146,8 +146,7 @@ namespace WindowManager {
         CheckAndReadCustomSprectrumData(state);
 
         // allocate surface level adj ratio data member
-        state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn.dimension(state.dataSurface->TotSurfaces, 1.0);
-        state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(state.dataSurface->TotSurfaces, 1.0);
+        state.dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(state.dataSurface->TotSurfaces, 1.0);
 
         if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
             InitWCE_SimplifiedOpticalData(state);
@@ -7129,8 +7128,7 @@ namespace WindowManager {
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
                     int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                    state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
-                    state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+                    state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
                 }
             }
         }

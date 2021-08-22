@@ -613,12 +613,12 @@ TEST_F(ConvectionCoefficientsFixture, initExtConvCoeffAdjRatio)
     Real64 HExtAdj;
     Real64 adjRatio = 2.0;
 
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(1);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(1);
     // without adjust ratio
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(1) = 1.0;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio(1) = 1.0;
     InitExteriorConvectionCoeff(*state, 1, HMovInsul, RoughSurf, AbsThermSurf, TempExt, HExt, HSky, HGround, HAir);
     // with adjust ratio
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(1) = adjRatio;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio(1) = adjRatio;
     InitExteriorConvectionCoeff(*state, 1, HMovInsul, RoughSurf, AbsThermSurf, TempExt, HExtAdj, HSky, HGround, HAir);
     // adjust ratio scales the returned exterior convection coefficient
     EXPECT_EQ(HExtAdj, HExt * adjRatio);
@@ -819,7 +819,7 @@ TEST_F(ConvectionCoefficientsFixture, initIntConvCoeffAdjRatio)
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     SurfaceGeometry::GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
 
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.dimension(7, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(7, 1.0);
 
     state->dataHeatBalSurf->SurfTempInTmp.dimension(7, 20.0);
     state->dataHeatBalFanSys->MAT.dimension(1, 25.0);
@@ -831,7 +831,7 @@ TEST_F(ConvectionCoefficientsFixture, initIntConvCoeffAdjRatio)
     // exterior window interior surface convection coefficient without adjustment
     Real64 hcin = state->dataHeatBalSurf->SurfHConvInt(7);
     Real64 adjRatio = 2.0;
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn(7) = adjRatio;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio(7) = adjRatio;
     InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->SurfTempInTmp);
     // exterior window interior surface convection coefficient with adjustment
     Real64 hcinAdj = state->dataHeatBalSurf->SurfHConvInt(7);

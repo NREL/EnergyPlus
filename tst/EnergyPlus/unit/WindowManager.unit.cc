@@ -578,11 +578,8 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
     state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
 
-    // todo
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.allocate(3);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0;
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn(surfNum2) = 1.0;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio(surfNum2) = 1.0;
 
     state->dataHeatBalSurf->QdotConvOutRep.allocate(3);
     state->dataHeatBalSurf->QdotConvOutRepPerArea.allocate(3);
@@ -2578,8 +2575,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     EXPECT_FALSE(FoundError);                            // expect no errors
 
     // allocate surface level adj ratio data member
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.dimension(34, 1.0);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(34, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(34, 1.0);
     WindowManager::InitGlassOpticalCalculations(*state);
 
     int NumAngles = 10; // Number of incident angles
@@ -2820,10 +2816,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
 
     // initialize simple glazing adjustment ratio
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.allocate(3);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0024;
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn(surfNum2) = 1.0024;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio(surfNum2) = 1.0024;
 
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 25.0;
