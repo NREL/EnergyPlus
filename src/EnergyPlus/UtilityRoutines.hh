@@ -228,6 +228,17 @@ namespace UtilityRoutines {
 
     int FindItemInList(std::string_view const String, Array1S_string const ListOfItems, int NumItems);
 
+    template <typename InputIterator>
+    int FindItemInList(std::string_view const str, InputIterator first, InputIterator last)
+    {
+        auto it = std::find(first, last, str);
+        if (it != last) {
+            return std::distance(first, it);
+        } else {
+            return 0;
+        }
+    }
+
     inline int FindItemInList(std::string_view const String, Array1S_string const ListOfItems)
     {
         return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());

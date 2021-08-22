@@ -9744,7 +9744,7 @@ void WriteBEPSTable(EnergyPlusData &state)
     }
 }
 
-std::string ResourceWarningMessage(std::string resource)
+std::string ResourceWarningMessage(std::string const &resource)
 {
     return "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: " + resource;
 }
@@ -15910,6 +15910,7 @@ std::string MakeAnchorName(std::string const &reportString, std::string const &o
 
     // Return value
     std::string StringOut;
+    StringOut.reserve(reportString.size() + objectString.size() + 2);
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -15925,15 +15926,15 @@ std::string MakeAnchorName(std::string const &reportString, std::string const &o
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    for (std::string::size_type i = 0, e = reportString.length(); i < e; ++i) {
-        if (has(validChars, reportString[i])) {
-            StringOut += reportString[i];
+    for (auto const i : reportString) {
+        if (has(validChars, i)) {
+            StringOut += i;
         }
     }
     StringOut += "::";
-    for (std::string::size_type i = 0, e = objectString.length(); i < e; ++i) {
-        if (has(validChars, objectString[i])) {
-            StringOut += objectString[i];
+    for (auto const i : objectString) {
+        if (has(validChars, i)) {
+            StringOut += i;
         }
     }
     return StringOut;
@@ -16801,47 +16802,45 @@ std::string DateToString(int const codedDate) // word containing encoded month, 
     int Minute; // minute in integer format (0:59)
     std::string monthName;
 
-    if (codedDate != 0) {
-        DecodeMonDayHrMin(codedDate, Month, Day, Hour, Minute);
-        --Hour;
-        if (Minute == 60) {
-            ++Hour;
-            Minute = 0;
-        }
-        if (Month == 1) {
-            monthName = "JAN";
-        } else if (Month == 2) {
-            monthName = "FEB";
-        } else if (Month == 3) {
-            monthName = "MAR";
-        } else if (Month == 4) {
-            monthName = "APR";
-        } else if (Month == 5) {
-            monthName = "MAY";
-        } else if (Month == 6) {
-            monthName = "JUN";
-        } else if (Month == 7) {
-            monthName = "JUL";
-        } else if (Month == 8) {
-            monthName = "AUG";
-        } else if (Month == 9) {
-            monthName = "SEP";
-        } else if (Month == 10) {
-            monthName = "OCT";
-        } else if (Month == 11) {
-            monthName = "NOV";
-        } else if (Month == 12) {
-            monthName = "DEC";
-        } else {
-            monthName = "***";
-        }
-        StringOut = format("{:02}-{:3}-{:02}:{:02}", Day, monthName, Hour, Minute);
-        if (has(StringOut, "*")) {
-            StringOut = "-";
-        }
-    } else { // codeddate = 0
-        StringOut = "-";
+    if (codedDate == 0) {
+        return "-";
     }
+
+    DecodeMonDayHrMin(codedDate, Month, Day, Hour, Minute);
+    --Hour;
+    if (Minute == 60) {
+        ++Hour;
+        Minute = 0;
+    }
+    switch (Month) {
+        case 1:
+            monthName = "JAN"; break;
+        case 2:
+            monthName = "FEB"; break;
+        case 3:
+            monthName = "MAR"; break;
+        case 4:
+            monthName = "APR"; break;
+        case 5:
+            monthName = "MAY"; break;
+        case 6:
+            monthName = "JUN"; break;
+        case 7:
+            monthName = "JUL"; break;
+        case 8:
+            monthName = "AUG"; break;
+        case 9:
+            monthName = "SEP"; break;
+        case 10:
+            monthName = "OCT"; break;
+        case 11:
+            monthName = "NOV"; break;
+        case 12:
+            monthName = "DEC"; break;
+        default:
+            return "-";  // monthName = "***";
+    }
+    StringOut = fmt::format("{:02}-{:3}-{:02}:{:02}", Day, monthName, Hour, Minute);
 
     return StringOut;
 }
@@ -16857,7 +16856,7 @@ bool isNumber(std::string const &s)
 
 // return the number of digits after the decimal point
 // Glazer - November 2016
-int digitsAferDecimal(std::string s)
+int digitsAferDecimal(std::string const &s)
 {
     std::size_t decimalpos = s.find('.');
     std::size_t numDigits;

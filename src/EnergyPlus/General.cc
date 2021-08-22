@@ -1037,9 +1037,9 @@ void DecodeMonDayHrMin(int const Item, // word containing encoded month, day, ho
     // as a minimum (capable of representing up to 2,147,483,647).
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const DecMon(100 * 100 * 100);
-    int const DecDay(100 * 100);
-    int const DecHr(100);
+    static constexpr int DecMon(100 * 100 * 100);
+    static constexpr int DecDay(100 * 100);
+    static constexpr int DecHr(100);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int TmpItem;
@@ -1253,21 +1253,7 @@ std::string CreateTimeString(Real64 const Time) // Time in seconds
 
     // TimeStamp written with formatting
     // "hh:mm:ss.s"
-    // 10 chars + null terminator = 11
-    // This approach should not normally be used due to the fixed width c-style
-    // string but in this case the output string is a fixed size so this is more
-    // clear for formatting and faster. If formatted string changes, make sure to
-    // add more to buffer.
-    char buffer[11];
-    int cx = snprintf(buffer, 11, "%02d:%02d:%04.1f", Hours, Minutes, Seconds);
-
-    // Make sure output string is only between 0 and 10 characters so string is
-    // not out of bounds of the buffer.
-    assert(cx >= 0 && cx < 11);
-    // Only done to quiet release compiler warning for unused variable.
-    (void)cx;
-
-    return std::string(buffer);
+    return fmt::format("{:02d}:{:02d}:{:04.1f}", Hours, Minutes, Seconds);
 }
 
 std::string CreateTimeIntervalString(Real64 const StartTime, // Start of current interval in seconds
