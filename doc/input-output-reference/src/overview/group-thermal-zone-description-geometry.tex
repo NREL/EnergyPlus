@@ -2702,11 +2702,6 @@ Former Name: Prior to version 7.1, these outputs were called ``Surface Int Conve
 
 This is the coefficient that describes the convection heat transfer. It is the value of ``Hc'' in the classic convection model Q = Hc* A* (T -- T). This is the result of the surface convection algorithm used for the inside face. Former Name: Prior to version 7.1, this output was called ``Surface Int Convection Coeff.''
 
-\subsubsection{Surface Window Inside and Outside Face Convective Coefficient Adjustment Ratio}
-\label{surface-window-inside-and-outside-face-convective-coefficient-adjustment-ratio}
-
-This adjustment ratio is applied to exterior simple-glazing windows with highly conductive window frames (large input U values). Prior to Version 9.4.0, windows with large input U values are "upper-bounded" to a smaller effective U. For example, an input U of 7 W/m2*K corresponded to an effective U of about 5.8 W/m2*K. In later versions, an adjustment ratio is applied to scale the inside and outside surface convection heat transfer coefficients so that the input U and the effective U are close to each other. The scaling happens both at the nominal condition calculation and at the run-time.
-
 \subsubsection{Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate {[}W{]}}\label{surface-inside-face-net-surface-thermal-radiation-heat-gain-rate-w}
 
 \subsubsection{Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area {[}W/m2{]}}\label{surface-inside-face-net-surface-thermal-radiation-heat-gain-rate-per-area-wm2}
