@@ -922,6 +922,7 @@
     WALL,                    !- Surface Type
     CBECS_New_Restaurant_North_Mass_Ext-wall,  !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -953,6 +954,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_2_Wall_4, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -969,6 +971,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_5_Wall_1, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -985,6 +988,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_4_Wall_1, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1001,6 +1005,7 @@
     FLOOR,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Unheated_Ext-slab,  !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1017,6 +1022,7 @@
     ROOF,                    !- Surface Type
     CBECS_New_Restaurant_North_IEAD_Roof,  !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1032,7 +1038,8 @@
     ZN_1_FLR_1_SEC_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList Name
-    50.4821;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    50.4821;                 !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_1_Infiltration,  !- Name
@@ -1472,6 +1479,7 @@
     WALL,                    !- Surface Type
     CBECS_New_Restaurant_North_Mass_Ext-wall,  !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1503,6 +1511,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_3_Wall_2, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1519,6 +1528,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_5_Wall_2, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1535,6 +1545,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_1_Wall_2, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1551,6 +1562,7 @@
     FLOOR,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Unheated_Ext-slab,  !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1567,6 +1579,7 @@
     ROOF,                    !- Surface Type
     CBECS_New_Restaurant_North_IEAD_Roof,  !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1582,7 +1595,8 @@
     ZN_1_FLR_1_SEC_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone or ZoneList Name
-    44.0261;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    44.0261;                 !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_2_Infiltration,  !- Name
@@ -2021,6 +2035,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_5_Wall_3, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2037,6 +2052,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_2_Wall_2, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2053,6 +2069,7 @@
     WALL,                    !- Surface Type
     CBECS_New_Restaurant_North_Mass_Ext-wall,  !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2084,6 +2101,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_4_Wall_3, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2100,6 +2118,7 @@
     FLOOR,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Unheated_Ext-slab,  !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2116,6 +2135,7 @@
     ROOF,                    !- Surface Type
     CBECS_New_Restaurant_North_IEAD_Roof,  !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2131,7 +2151,8 @@
     ZN_1_FLR_1_SEC_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone or ZoneList Name
-    50.4821;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    50.4821;                 !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_3_Infiltration,  !- Name
@@ -2570,6 +2591,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_1_Wall_4, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2586,6 +2608,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_5_Wall_4, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2602,6 +2625,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_3_Wall_4, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2618,6 +2642,7 @@
     WALL,                    !- Surface Type
     CBECS_New_Restaurant_North_Mass_Ext-wall,  !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2649,6 +2674,7 @@
     FLOOR,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Unheated_Ext-slab,  !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2665,6 +2691,7 @@
     ROOF,                    !- Surface Type
     CBECS_New_Restaurant_North_IEAD_Roof,  !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2680,7 +2707,8 @@
     ZN_1_FLR_1_SEC_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone or ZoneList Name
-    44.0261;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    44.0261;                 !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_4_Infiltration,  !- Name
@@ -3119,6 +3147,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_1_Wall_3, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3135,6 +3164,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_2_Wall_3, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3151,6 +3181,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_3_Wall_1, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3167,6 +3198,7 @@
     WALL,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_4_Wall_2, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3183,6 +3215,7 @@
     FLOOR,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-4_Unheated_Ext-slab,  !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3199,6 +3232,7 @@
     ROOF,                    !- Surface Type
     CBECS_New_Restaurant_North_IEAD_Roof,  !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3214,7 +3248,8 @@
     ZN_1_FLR_1_SEC_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone or ZoneList Name
-    15.3636;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    15.3636;                 !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_5_Infiltration,  !- Name
