@@ -1836,13 +1836,6 @@ void AllocateModuleArrays(EnergyPlusData &state)
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfLoop).Name);
-                SetupOutputVariable(state,
-                                    "Surface Window Inside and Outside Face Convective Coefficient Adjustment Ratio",
-                                    OutputProcessor::Unit::None,
-                                    state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfLoop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
-                                    state.dataSurface->Surface(SurfLoop).Name);
             } else { // Not ExtSolar
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     // CurrentModuleObject='InteriorWindows(Advanced)'
