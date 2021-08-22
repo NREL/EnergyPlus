@@ -165,7 +165,6 @@ namespace OutputReportPredefined {
         s->pdchIntFenAreaOf1 = newPreDefColumn(state, s->pdstIntFen, "Area of One Opening [m2]");
         s->pdchIntFenArea = newPreDefColumn(state, s->pdstIntFen, "Area of Openings [m2]");
         s->pdchIntFenUfact = newPreDefColumn(state, s->pdstIntFen, "Glass U-Factor [W/m2-K]");
-        s->pdchIntFenUfactGlazingOnly = newPreDefColumn(state, s->pdstIntFen, "Glass U-Factor (Glazing Only) [W/m2-K]");
         s->pdchIntFenSHGC = newPreDefColumn(state, s->pdstIntFen, "Glass SHGC");
         s->pdchIntFenVisTr = newPreDefColumn(state, s->pdstIntFen, "Glass Visible Transmittance");
         // s->pdchIntFenGlassAreaOf1 =   newPreDefColumn(state, s->pdstIntFen,'Glass Area [m2]')

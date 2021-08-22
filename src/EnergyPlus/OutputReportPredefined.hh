@@ -379,7 +379,6 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchIntFenAreaOf1 = 0;
     int pdchIntFenArea = 0;
     int pdchIntFenUfact = 0;
-    int pdchIntFenUfactGlazingOnly = 0;
     int pdchIntFenSHGC = 0;
     int pdchIntFenVisTr = 0;
     int pdchIntFenParent = 0;
@@ -1350,7 +1349,6 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchIntFenAreaOf1 = 0;
         this->pdchIntFenArea = 0;
         this->pdchIntFenUfact = 0;
-        this->pdchIntFenUfactGlazingOnly = 0;
         this->pdchIntFenSHGC = 0;
         this->pdchIntFenVisTr = 0;
         this->pdchIntFenParent = 0;
