@@ -87,6 +87,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
         "    Floor,                   !- Surface Type",
         "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
         "    T3-RF1,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
