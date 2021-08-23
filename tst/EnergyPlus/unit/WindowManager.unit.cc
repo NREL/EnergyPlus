@@ -3085,7 +3085,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
 
     // winter
     // for legal input U values, the adjusted NominalConductance should be close to input U
-    std::array<Real64, 4> legalInputUs = {3.0, 5.0, 7.0, 9.0};
+    std::array<Real64, 3> legalInputUs = {3.0, 5.0, 7.0};
     for (auto varyInputU : legalInputUs) {
         state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = varyInputU;
         HeatBalanceManager::SetupSimpleWindowGlazingSystem(*state, MaterNum);
