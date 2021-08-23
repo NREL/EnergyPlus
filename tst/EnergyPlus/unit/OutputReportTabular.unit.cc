@@ -7516,8 +7516,10 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
 
     state->dataHeatBal->NominalU.allocate(1);
     state->dataHeatBal->NominalU(1) = 0.2;
-    state->dataHeatBal->NominalUGlazingOnly.allocate(1);
-    state->dataHeatBal->NominalUGlazingOnly(1) = 0.2;
+    state->dataHeatBal->NominalUBeforeAdjusted.allocate(1);
+    state->dataHeatBal->NominalUBeforeAdjusted(1) = 0.2;
+    state->dataHeatBal->CoeffAdjRatio.allocate(1);
+    state->dataHeatBal->CoeffAdjRatio(1) = 1.0;
     // Create one wall and one window with each azimuth from expectedAzimuthToCards
     // Azimuth & Cardinal entries happen in two separate blocks,
     // so test both to increase coverage and make sure both are correct
@@ -7631,8 +7633,8 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
 
     state->dataHeatBal->NominalU.allocate(1);
     state->dataHeatBal->NominalU(1) = 0.2;
-    state->dataHeatBal->NominalUGlazingOnly.allocate(1);
-    state->dataHeatBal->NominalUGlazingOnly(1) = 0.2;
+    state->dataHeatBal->NominalUBeforeAdjusted.allocate(1);
+    state->dataHeatBal->NominalUBeforeAdjusted(1) = 0.2;
 
     state->dataSurface->TotSurfaces = 4;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
