@@ -14874,7 +14874,7 @@ namespace SurfaceGeometry {
             }
         }
         // Check for any spaces defined only by floor surface(s) and group them
-        for (auto const zone : state.dataHeatBal->Zone) {
+        for (auto const &zone : state.dataHeatBal->Zone) {
             int newEnclosureNum = 0;
             for (int const spaceNum : zone.spaceIndexes) {
                 int spaceEnclosureNum = 0;
