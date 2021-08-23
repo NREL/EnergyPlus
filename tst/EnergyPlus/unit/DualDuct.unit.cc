@@ -302,7 +302,8 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 //		EXPECT_EQ(3u, dd_airterminal.size());
 //		EXPECT_TRUE(compare_enums( DualDuct::DualDuct_ConstantVolume, dd_airterminal( 1 ).dd_airterminalType ));
 //		EXPECT_TRUE(compare_enums( DualDuct::DualDuct_VariableVolume, dd_airterminal( 2 ).dd_airterminalType )); // AT SD VAV HeatCool Reheat
-//Type 		EXPECT_TRUE(compare_enums( DualDuct::DualDuct_OutdoorAir, dd_airterminal( 3 ).dd_airterminalType )); // AT SD VAV HeatCool Reheat Type
+// Type 		EXPECT_TRUE(compare_enums( DualDuct::DualDuct_OutdoorAir, dd_airterminal( 3 ).dd_airterminalType )); // AT SD VAV HeatCool
+// Reheat Type
 //
 //
 //		for (size_t i = 1; i <= DualDuct::dd_airterminal.size(); ++i) {

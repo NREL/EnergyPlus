@@ -2490,109 +2490,109 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     }
 
     // Run and Check: VRFOU_CompSpd
-    { //   Test the method VRFOU_CompSpd, which calculates the compressor speed at given
-        //   operational conditions to meet the evaporator or condenser capacity provided.
+    {//   Test the method VRFOU_CompSpd, which calculates the compressor speed at given
+     //   operational conditions to meet the evaporator or condenser capacity provided.
 
-        { // a. Evaporator
+     {// a. Evaporator
 
-            // Inputs_condition
-            Real64 const Q_req = 6971;          // Required capacity [W]
-            Real64 const T_suction = -13.35;    // Compressor suction temperature Te' [C]
-            Real64 const T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
-            Real64 const h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-            Real64 const h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-            Real64 CompSpdActual;               // Actual compressor running speed [rps]
+      // Inputs_condition
+      Real64 const Q_req = 6971;        // Required capacity [W]
+    Real64 const T_suction = -13.35;    // Compressor suction temperature Te' [C]
+    Real64 const T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
+    Real64 const h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 const h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
-            // Run
-            state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
-                *state, Q_req, iHXOpMode::EvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+    // Run
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
+        *state, Q_req, iHXOpMode::EvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
-            // Test
-            EXPECT_NEAR(1295, CompSpdActual, 5);
-        }
+    // Test
+    EXPECT_NEAR(1295, CompSpdActual, 5);
+}
 
-        {
-            // b. Condenser
+{
+    // b. Condenser
 
-            // Inputs_condition
-            Real64 const Q_req = 6953;          // Required capacity [W]
-            Real64 const T_suction = -13.35;    // Compressor suction temperature Te' [C]
-            Real64 const T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
-            Real64 const h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-            Real64 const h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-            Real64 CompSpdActual;               // Actual compressor running speed [rps]
+    // Inputs_condition
+    Real64 const Q_req = 6953;          // Required capacity [W]
+    Real64 const T_suction = -13.35;    // Compressor suction temperature Te' [C]
+    Real64 const T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
+    Real64 const h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 const h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
-            // Run
-            state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
-                *state, Q_req, iHXOpMode::CondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+    // Run
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
+        *state, Q_req, iHXOpMode::CondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
-            // Test
-            EXPECT_NEAR(950, CompSpdActual, 5);
-        }
-    } // namespace EnergyPlus
+    // Test
+    EXPECT_NEAR(950, CompSpdActual, 5);
+}
+} // namespace EnergyPlus
 
-    // Run and Check: VRFOU_CompCap
-    {
-        //   Test the method VRFOU_CompCap, which calculates the compressor performance (power and capacity)
-        //   at given compressor speed and operational conditions.
+// Run and Check: VRFOU_CompCap
+{
+    //   Test the method VRFOU_CompCap, which calculates the compressor performance (power and capacity)
+    //   at given compressor speed and operational conditions.
 
-        // Inputs_condition
-        Real64 const CompSpdActual = 1298;  // Actual compressor running speed [rps]
-        Real64 const T_suction = -13.35;    // Compressor suction temperature Te' [C]
-        Real64 const T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
-        Real64 const h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-        Real64 const h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-        Real64 Q_c_tot;                     // Compressor evaporative capacity [W]
-        Real64 Ncomp;                       // Compressor power [W]
+    // Inputs_condition
+    Real64 const CompSpdActual = 1298;  // Actual compressor running speed [rps]
+    Real64 const T_suction = -13.35;    // Compressor suction temperature Te' [C]
+    Real64 const T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
+    Real64 const h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 const h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 Q_c_tot;                     // Compressor evaporative capacity [W]
+    Real64 Ncomp;                       // Compressor power [W]
 
-        // Run
-        state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(*state, CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);
+    // Run
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(*state, CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);
 
-        // Test
-        EXPECT_NEAR(6990, Q_c_tot, 10);
-        EXPECT_NEAR(1601, Ncomp, 10);
-    }
+    // Test
+    EXPECT_NEAR(6990, Q_c_tot, 10);
+    EXPECT_NEAR(1601, Ncomp, 10);
+}
 
-    // Run and Check: VRFOU_CalcComp
-    {
-        //   Test the method VRFOU_CalcCompH, which simulates the compressor performance at given oprtaional conditions. More specifically, it
-        //   sepcifies the compressor speed to provide sufficient evaporative capacity, and calculate the power of the compressor running at the
-        //   specified speed. Note that it may be needed to manipulate the operational conditions to further adjust system capacity at low load
-        //   conditions. The low load modification logics are different for cooling mode and heating mode.
+// Run and Check: VRFOU_CalcComp
+{
+    //   Test the method VRFOU_CalcCompH, which simulates the compressor performance at given oprtaional conditions. More specifically, it
+    //   sepcifies the compressor speed to provide sufficient evaporative capacity, and calculate the power of the compressor running at the
+    //   specified speed. Note that it may be needed to manipulate the operational conditions to further adjust system capacity at low load
+    //   conditions. The low load modification logics are different for cooling mode and heating mode.
 
-        // Inputs_condition
-        Real64 TU_load = 6006;              // Indoor unit cooling load [W]
-        Real64 T_suction = 8.86;            // Compressor suction temperature Te' [C]
-        Real64 T_discharge = 40.26;         // Compressor discharge temperature Tc' [C]
-        Real64 Pipe_h_out_ave = 233428;     // Average Enthalpy of the refrigerant leaving IUs [kJ/kg]
-        Real64 IUMaxCondTemp = 36;          // VRV IU condensing temperature, max among all indoor units [C]
-        Real64 MinOutdoorUnitTe = -72;      // The minimum temperature that OU Te can be at cooling mode (only used for calculating Min capacity)
-        Real64 Tfs = 10.90;                 // Temperature of the air at the OU evaporator coil surface [C]]
-        Real64 Pipe_Q = 162.67;             // Piping Loss Algorithm Parameter: Heat loss [W]
-        Real64 OUEvapHeatExtract = 5110.40; // Evaporator heat extract [W]
-        Real64 Ncomp = 1058;                // Compressor power [W]
-        Real64 CompSpdActual;               // Actual compressor running speed [rps]
+    // Inputs_condition
+    Real64 TU_load = 6006;              // Indoor unit cooling load [W]
+    Real64 T_suction = 8.86;            // Compressor suction temperature Te' [C]
+    Real64 T_discharge = 40.26;         // Compressor discharge temperature Tc' [C]
+    Real64 Pipe_h_out_ave = 233428;     // Average Enthalpy of the refrigerant leaving IUs [kJ/kg]
+    Real64 IUMaxCondTemp = 36;          // VRV IU condensing temperature, max among all indoor units [C]
+    Real64 MinOutdoorUnitTe = -72;      // The minimum temperature that OU Te can be at cooling mode (only used for calculating Min capacity)
+    Real64 Tfs = 10.90;                 // Temperature of the air at the OU evaporator coil surface [C]]
+    Real64 Pipe_Q = 162.67;             // Piping Loss Algorithm Parameter: Heat loss [W]
+    Real64 OUEvapHeatExtract = 5110.40; // Evaporator heat extract [W]
+    Real64 Ncomp = 1058;                // Compressor power [W]
+    Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
-        // Run
-        state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CalcCompH(*state,
-                                                                TU_load,
-                                                                T_suction,
-                                                                T_discharge,
-                                                                Pipe_h_out_ave,
-                                                                IUMaxCondTemp,
-                                                                MinOutdoorUnitTe,
-                                                                Tfs,
-                                                                Pipe_Q,
-                                                                OUEvapHeatExtract,
-                                                                CompSpdActual,
-                                                                Ncomp);
+    // Run
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CalcCompH(*state,
+                                                            TU_load,
+                                                            T_suction,
+                                                            T_discharge,
+                                                            Pipe_h_out_ave,
+                                                            IUMaxCondTemp,
+                                                            MinOutdoorUnitTe,
+                                                            Tfs,
+                                                            Pipe_Q,
+                                                            OUEvapHeatExtract,
+                                                            CompSpdActual,
+                                                            Ncomp);
 
-        // Test
-        EXPECT_NEAR(5110, OUEvapHeatExtract, 1);
-        EXPECT_NEAR(1500, CompSpdActual, 1);
-        EXPECT_NEAR(2080, Ncomp, 1);
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(1).VRFTUInletNodeNum).MassFlowRate, 0.0);
-    }
+    // Test
+    EXPECT_NEAR(5110, OUEvapHeatExtract, 1);
+    EXPECT_NEAR(1500, CompSpdActual, 1);
+    EXPECT_NEAR(2080, Ncomp, 1);
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(1).VRFTUInletNodeNum).MassFlowRate, 0.0);
+}
 }
 
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
@@ -2672,82 +2672,81 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
 } // namespace EnergyPlus
 
 // Run and Check: VRFOU_FlowRate
-{     //   Test the method VRFOU_Cap, which calculates the outdoor unit fan flow rate, given VRF OU load and refrigerant side temperature, i.e.,
-      //   condensing temperature and SC for condenser, or evaporating temperature and SH for evaporator.
-    { // a. Condenser
+{ //   Test the method VRFOU_Cap, which calculates the outdoor unit fan flow rate, given VRF OU load and refrigerant side temperature, i.e.,
+  //   condensing temperature and SC for condenser, or evaporating temperature and SH for evaporator.
+ {// a. Condenser
 
-        // Inputs_condition
-        Q_h_OU = 27551;
-        OutDryBulbTemp = 28;
-        OutHumRat = 0.0146;
-        SC = 1;
-        Tdischarge = 36;
+  // Inputs_condition
+  Q_h_OU = 27551;
+OutDryBulbTemp = 28;
+OutHumRat = 0.0146;
+SC = 1;
+Tdischarge = 36;
 
-        // Run
-        m_air =
-            state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, iHXOpMode::CondMode, Tdischarge, SC, Q_h_OU, OutDryBulbTemp, OutHumRat);
+// Run
+m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, iHXOpMode::CondMode, Tdischarge, SC, Q_h_OU, OutDryBulbTemp, OutHumRat);
 
-        // Test
-        EXPECT_NEAR(3.6, m_air, 0.01);
-    }
+// Test
+EXPECT_NEAR(3.6, m_air, 0.01);
+}
 
-    {
-        // b. Evaporator
+{
+    // b. Evaporator
 
-        // Inputs_condition
-        Q_c_OU = 24456;
-        OutDryBulbTemp = 7;
-        OutHumRat = 0.0019;
-        SH = 1;
-        Tsuction = -3;
+    // Inputs_condition
+    Q_c_OU = 24456;
+    OutDryBulbTemp = 7;
+    OutHumRat = 0.0019;
+    SH = 1;
+    Tsuction = -3;
 
-        // Run
-        m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, iHXOpMode::EvapMode, Tsuction, SH, Q_c_OU, OutDryBulbTemp, OutHumRat);
+    // Run
+    m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, iHXOpMode::EvapMode, Tsuction, SH, Q_c_OU, OutDryBulbTemp, OutHumRat);
 
-        // Test
-        EXPECT_NEAR(3.6, m_air, 0.01);
-    }
+    // Test
+    EXPECT_NEAR(3.6, m_air, 0.01);
+}
 }
 
 // Run and Check: VRFOU_TeTc
-{     //   Test the method VRFOU_Cap, which calculates the VRF OU refrigerant side temperature, i.e., condensing temperature
-      //   at cooling mode, or evaporating temperature at heating mode, given the coil heat
-      //   release/extract amount and air side parameters.
-    { // a. Condenser
+{ //   Test the method VRFOU_Cap, which calculates the VRF OU refrigerant side temperature, i.e., condensing temperature
+  //   at cooling mode, or evaporating temperature at heating mode, given the coil heat
+  //   release/extract amount and air side parameters.
+ {// a. Condenser
 
-        // Inputs_condition
-        m_air = 3.6;
-        Q_h_OU = 27551;
-        OutDryBulbTemp = 28;
-        OutHumRat = 0.0146;
-        SC = 1;
+  // Inputs_condition
+  m_air = 3.6;
+Q_h_OU = 27551;
+OutDryBulbTemp = 28;
+OutHumRat = 0.0146;
+SC = 1;
 
-        // Run
-        state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
-            *state, iHXOpMode::CondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tdischarge);
+// Run
+state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
+    *state, iHXOpMode::CondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tdischarge);
 
-        // Test
-        EXPECT_NEAR(36, Tdischarge, 0.05);
-    }
+// Test
+EXPECT_NEAR(36, Tdischarge, 0.05);
+}
 
-    {
-        // b. Evaporator
+{
+    // b. Evaporator
 
-        // Inputs_condition
-        m_air = 3.6;
-        Q_c_OU = 24456;
-        OutDryBulbTemp = 7;
-        OutHumRat = 0.0019;
-        SH = 1;
-        Tsuction = -3;
+    // Inputs_condition
+    m_air = 3.6;
+    Q_c_OU = 24456;
+    OutDryBulbTemp = 7;
+    OutHumRat = 0.0019;
+    SH = 1;
+    Tsuction = -3;
 
-        // Run
-        state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
-            *state, iHXOpMode::EvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tsuction);
+    // Run
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
+        *state, iHXOpMode::EvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tsuction);
 
-        // Test
-        EXPECT_NEAR(-3, Tsuction, 0.05);
-    }
+    // Test
+    EXPECT_NEAR(-3, Tsuction, 0.05);
+}
 }
 
 // Run and Check: VRFOU_SCSH
