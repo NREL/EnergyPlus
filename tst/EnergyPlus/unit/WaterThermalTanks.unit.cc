@@ -5313,7 +5313,7 @@ TEST_F(EnergyPlusFixture, PlantMassFlowRatesFuncTest)
 
     auto &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
 
-    state->dataLoopNodes->Node(1).MassFlowRate = 1.0e-23;
+    state->dataLoopNodes->Node(1).MassFlowRate = 1.0e-33;
     int inNodeNum = 1;
     int plantLoopSide = DataPlant::DemandSupply_No;
     Real64 outletTemp = 23.0;
@@ -5321,7 +5321,7 @@ TEST_F(EnergyPlusFixture, PlantMassFlowRatesFuncTest)
     Real64 setPtTemp = 25.0;
     Real64 result;
     Real64 expected = 0.0;
-    Real64 answerTolerance = 1.0e-25;
+    Real64 answerTolerance = 1.0e-35;
     Tank.UseSideAvailSchedNum = -1;
 
     result = Tank.PlantMassFlowRatesFunc(*state,
