@@ -146,7 +146,8 @@ namespace WindowManager {
         CheckAndReadCustomSprectrumData(state);
 
         // allocate surface level adj ratio data member
-        state.dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(state.dataSurface->TotSurfaces, 1.0);
+        state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn.dimension(state.dataSurface->TotSurfaces, 1.0);
+        state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(state.dataSurface->TotSurfaces, 1.0);
 
         if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
             InitWCE_SimplifiedOpticalData(state);
@@ -7091,7 +7092,7 @@ namespace WindowManager {
 
         state.dataWindowManager->thetas = 0.0;
 
-        WindowTempsForNominalCond(state, ConstrNum, hgap , 1.0);
+        WindowTempsForNominalCond(state, ConstrNum, hgap, 1.0);
 
         if (!ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) AbsBeamShadeNorm = 0.0;
 
@@ -7099,11 +7100,11 @@ namespace WindowManager {
         // including inside and outside air films
         Real64 inputU = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
 
-        // Calculate the NominalConductance glazing only
+        // Calculate the NominalConductance glazing only (before adjusted)
         EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
 
         if (WinterSummerFlag == 1) {
-            state.dataHeatBal->NominalUGlazingOnly = NominalConductance;
+            state.dataHeatBal->NominalUBeforeAdjusted(ConstrNum) = NominalConductance;
             if (inputU > 0) { // only compute adjustment ratio when there is valid user input U
                 Real64 CoeffAdjRatio = 1;
                 Real64 hcinRated = state.dataWindowManager->hcin;
@@ -7115,14 +7116,16 @@ namespace WindowManager {
                     CoeffAdjRatio = inputU / NominalConductance;
                     state.dataWindowManager->hcout *= CoeffAdjRatio;
                     WindowTempsForNominalCond(state, ConstrNum, hgap, CoeffAdjRatio);
-//                    std::cout << inputU << "," << NominalConductance << "," << CoeffAdjRatio << "," << state.dataWindowManager->hcout
-//                              << "," << state.dataWindowManager->hcin << "," << state.dataWindowManager->thetas(1) << "," << NominalConductance << std::endl;
+                    std::cout << inputU << "," << NominalConductance << "," << CoeffAdjRatio << "," << state.dataWindowManager->hcout << ","
+                              << state.dataWindowManager->hcin << "," << state.dataWindowManager->thetas(1) << "," << NominalConductance << std::endl;
                     EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
                     MaxIter -= 1;
                 }
-//                std::cout << state.dataWindowManager->hcin / hcinRated
-//                          << "," << state.dataWindowManager->hcout / hcoutRated << "," << NominalConductance << std::endl;
-                state.dataHeatBal->CoeffAdjRatio(ConstrNum) = state.dataWindowManager->hcin / hcinRated;
+                std::cout << state.dataWindowManager->hcin / hcinRated << "," << state.dataWindowManager->hcout / hcoutRated << ","
+                          << NominalConductance << std::endl;
+
+                state.dataHeatBal->CoeffAdjRatioIn(ConstrNum) = state.dataWindowManager->hcin / hcinRated;
+                state.dataHeatBal->CoeffAdjRatioOut(ConstrNum) = state.dataWindowManager->hcout / hcoutRated;
             }
         }
 
@@ -7135,7 +7138,8 @@ namespace WindowManager {
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
                     int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                    state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+                    state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum) = state.dataHeatBal->CoeffAdjRatioIn(ConstrNum);
+                    state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) = state.dataHeatBal->CoeffAdjRatioOut(ConstrNum);
                 }
             }
         }
@@ -7228,7 +7232,7 @@ namespace WindowManager {
     //****************************************************************************
 
     void WindowTempsForNominalCond(EnergyPlusData &state,
-                                   int const ConstrNum, // Construction number
+                                   int const ConstrNum,  // Construction number
                                    Array1A<Real64> hgap, // Gap gas conductive conductance (W/m2-K)
                                    Real64 const adjRatio // adjusment Ratio to hcin
     )
@@ -7513,8 +7517,9 @@ namespace WindowManager {
 
             print(state.files.eio,
                   "{}\n",
-                  "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},Conductance (Glazing Only) {W/m2-K},"
-                  "SHGC,Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
+                  "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},Conductance (Before Adjusted) {W/m2-K},"
+                  "Convection Coefficient Adjustment Ratio In,Convection Coefficient Adjustment Ratio Out,SHGC,"
+                  "Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
             if ((state.dataHeatBal->TotSimpleWindow > 0) || (state.dataHeatBal->W5GlsMat > 0) || (state.dataHeatBal->W5GlsMatAlt > 0))
                 print(state.files.eio,
                       "{}\n",
@@ -7673,7 +7678,8 @@ namespace WindowManager {
                         state.dataConstruction->Construct(ThisNum).SummerSHGC = SHGCSummer;
                         state.dataConstruction->Construct(ThisNum).VisTransNorm = TransVisNorm;
 
-                        static constexpr fmt::string_view Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                        static constexpr fmt::string_view Format_700(
+                            " WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                         print(state.files.eio,
                               Format_700,
                               state.dataConstruction->Construct(ThisNum).Name,
@@ -7681,7 +7687,9 @@ namespace WindowManager {
                               state.dataConstruction->Construct(ThisNum).TotLayers,
                               Roughness(static_cast<int>(state.dataConstruction->Construct(ThisNum).OutsideRoughness)),
                               NominalConductanceWinter,
-                              state.dataHeatBal->NominalUGlazingOnly(ThisNum),
+                              state.dataHeatBal->NominalUBeforeAdjusted(ThisNum),
+                              state.dataHeatBal->CoeffAdjRatioIn(ThisNum),
+                              state.dataHeatBal->CoeffAdjRatioOut(ThisNum),
                               SHGCSummer,
                               TransSolNorm,
                               TransVisNorm);

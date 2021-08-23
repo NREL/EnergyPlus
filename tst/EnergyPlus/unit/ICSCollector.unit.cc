@@ -133,7 +133,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataHeatBal->SurfQRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
     state->dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(NumOfSurf, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.dimension(NumOfSurf, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(NumOfSurf, 1.0);
     state->dataSurface->SurfExtConvCoeffIndex.allocate(NumOfSurf);
     state->dataSurface->SurfExtConvCoeffIndex(SurfNum) = 0;
     state->dataSurface->SurfHasSurroundingSurfProperties.allocate(NumOfSurf);

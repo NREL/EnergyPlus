@@ -399,7 +399,7 @@ namespace WindowManager {
     //****************************************************************************
 
     void WindowTempsForNominalCond(EnergyPlusData &state,
-                                   int const ConstrNum, // Construction number
+                                   int const ConstrNum,  // Construction number
                                    Array1A<Real64> hgap, // Gap gas conductive conductance (W/m2-K)
                                    Real64 const adjRatio // adjusment Ratio to hcin
     );

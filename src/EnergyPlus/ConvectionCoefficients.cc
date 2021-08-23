@@ -329,7 +329,7 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
         for (int SurfNum = Zone(ZoneNum).WindowSurfaceFirst; SurfNum <= Zone(ZoneNum).WindowSurfaceLast; ++SurfNum) {
             if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
                 state.dataHeatBalSurf->SurfHConvInt(SurfNum) =
-                    state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum);
+                    state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum);
             }
         }
     }
@@ -615,7 +615,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
         }
     }
 
-    HExt = HExt * state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum);
+    HExt = HExt * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum);
 
     if (TSurf == TSky || algoNum == ConvectionConstants::HcExt_ASHRAESimple) {
         HSky = 0.0;
@@ -4105,7 +4105,7 @@ void CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
     if (state.dataSurface->SurfEMSOverrideIntConvCoef(SurfNum))
         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
     else
-        state.dataHeatBalSurf->SurfHConvInt(SurfNum) *= state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum);
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) *= state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum);
 
     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
     if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
