@@ -285,16 +285,30 @@ namespace WindowManager {
             }
             auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, isSummer);
 
-            const double frameUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.FrameConductance, hIntConvCoeff, hExtConvCoeff);
             const double centerOfGlassUvalue = insulGlassUnit->getUValue();
-            const double edgeUValue{centerOfGlassUvalue * frameDivider.FrEdgeToCenterGlCondRatio}; // not sure about this
 
-            const double projectedFrameDimension{frameDivider.FrameWidth};
-            const double wettedLength{projectedFrameDimension + frameDivider.FrameProjectionIn};
-            const double absorptance{frameDivider.FrameSolAbsorp};
+            const double frameUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.FrameConductance, hIntConvCoeff, hExtConvCoeff);
+            const double frameEdgeUValue{centerOfGlassUvalue * frameDivider.FrEdgeToCenterGlCondRatio}; // not sure about this
+            const double frameProjectedDimension{frameDivider.FrameWidth};
+            const double frameWettedLength{frameProjectedDimension + frameDivider.FrameProjectionIn};
+            const double frameAbsorptance{frameDivider.FrameSolAbsorp};
 
-            Tarcog::ISO15099::FrameData frameData{frameUvalue, edgeUValue, projectedFrameDimension, wettedLength, absorptance};
+            Tarcog::ISO15099::FrameData frameData{
+                frameUvalue, frameEdgeUValue, frameProjectedDimension, frameWettedLength, frameAbsorptance};
 
+            const double dividerUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.DividerConductance, hIntConvCoeff, hExtConvCoeff);
+            const double dividerEdgeUValue{centerOfGlassUvalue * frameDivider.DivEdgeToCenterGlCondRatio}; // not sure about this
+            const double dividerProjectedDimension{frameDivider.DividerWidth};
+            const double dividerWettedLength{dividerProjectedDimension + frameDivider.DividerProjectionIn};
+            const double dividerAbsorptance{frameDivider.DividerSolAbsorp};
+            const int numHorizDividers{frameDivider.HorDividers};
+            const int numVertDividers{frameDivider.VertDividers};
+
+            Tarcog::ISO15099::FrameData dividerData{
+                dividerUvalue, dividerEdgeUValue, dividerProjectedDimension, dividerWettedLength, dividerAbsorptance};
+
+
+            //JG not sure what these values are (maybe visible transmittance and solar transmittance) and what they should be set to 
             const auto tVis{0.6385};
             const auto tSol{0.371589958668};
 
@@ -304,6 +318,7 @@ namespace WindowManager {
                 window.setFrameBottom(frameData);
                 window.setFrameLeft(frameData);
                 window.setFrameRight(frameData);
+                window.setDividers(dividerData, numHorizDividers, numVertDividers);
 
                 if (isSummer) {
                     vt = window.uValue();
@@ -321,6 +336,7 @@ namespace WindowManager {
                 window.setFrameTopLeft(frameData);
                 window.setFrameTopRight(frameData);
                 window.setFrameMeetingRail(frameData);
+                window.setDividers(dividerData, numHorizDividers, numVertDividers);
 
                 if (isSummer) {
                     vt = window.uValue();
@@ -338,6 +354,7 @@ namespace WindowManager {
                 window.setFrameBottomLeft(frameData);
                 window.setFrameBottomRight(frameData);
                 window.setFrameMeetingRail(frameData);
+                window.setDividers(dividerData, numHorizDividers, numVertDividers);
 
                 if (isSummer) {
                     vt = window.uValue();
@@ -351,6 +368,7 @@ namespace WindowManager {
                 window.setFrameBottom(frameData);
                 window.setFrameLeft(frameData);
                 window.setFrameRight(frameData);
+                window.setDividers(dividerData, numHorizDividers, numVertDividers);
 
                 if (isSummer) {
                     vt = window.uValue();
@@ -852,8 +870,8 @@ namespace WindowManager {
     {
         double rOverall(0.); 
         double uFactor(0.);
-        if (insideFilm + outsideFilm != 0.) {
-            rOverall = 1 / insideFilm + conductance + 1 / outsideFilm;
+        if (insideFilm !=0 && outsideFilm != 0. && conductance != 0.) {
+            rOverall = 1 / insideFilm + 1/conductance + 1 / outsideFilm;
         } 
         if (rOverall != 0.) {
             uFactor = 1 / rOverall;
