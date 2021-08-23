@@ -123,7 +123,7 @@ process stops when the input U and the nominal U is close enough (with a less th
 0.01 W/m\(^{2}\)\(\cdot\)K difference). This method essentially finds the solutions 
 for the following quadratic equations in Equation (9).
 
-U<sub>input</sub> = 1/(1/hOutRad+αhcout + Rbare + 1/hInRad+αhcin) &nbsp;&nbsp; Eq. (9)
+U<sub>input</sub> = 1/(1/(hOutRad+α∙hcout) + Rbare + 1/(hInRad+α∙hcin)) &nbsp;&nbsp; Eq. (9)
 
 During the simulation, when final hcout and hcin are calculated for window objects using simple window models, these factors will be applied back to adjust hcout and hcin as αhcout and αhcin, accordingly. Since the derived Rbare is neglectable when U > 7.0, we don’t apply the α back to the window glazing layer.
 
