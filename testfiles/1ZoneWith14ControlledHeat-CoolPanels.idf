@@ -578,6 +578,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -594,6 +595,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -610,6 +612,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -626,6 +629,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -642,6 +646,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -658,6 +663,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     OtherSideCoefficients,   !- Outside Boundary Condition
     Zn001:Roof001:OSC,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure

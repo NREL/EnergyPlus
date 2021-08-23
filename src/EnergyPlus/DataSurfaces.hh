@@ -547,6 +547,7 @@ namespace DataSurfaces {
         int Zone;                     // Interior environment or zone the surface is a part of
                                       // Note that though attached shading surfaces are part of a zone, this
                                       // value is 0 there to facilitate using them as detached surfaces (more accurate shading.
+        int spaceNum;                 // Space the surface is part of
         std::string ExtBoundCondName; // Name for the Outside Environment Object
         int ExtBoundCond;             // For an "interzone" surface, this is the adjacent surface number.
                                       // for an internal/adiabatic surface this is the current surface number.
@@ -586,9 +587,10 @@ namespace DataSurfaces {
         int FrameDivider;                                // Pointer to frame and divider information (windows only)
         Real64 Multiplier;                               // Multiplies glazed area, frame area and divider area (windows only)
 
-        // Air boundaries
+        // Air boundaries and spaces
+        int RadEnclIndex;       // Pointer to raidant enclosure this surface belongs to
         int SolarEnclIndex;     // Pointer to solar enclosure this surface belongs to
-        int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, ZoneSolarInfo(n).SurfacePtr(RadEnclSurfIndex) points to this surface
+        int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, EnclSolInfo(n).SurfacePtr(SolarEnclSurfIndex) points to this surface
         bool IsAirBoundarySurf; // True if surface is an air boundary surface (Construction:AirBoundary)
 
         ConvectionConstants::SurfConvOrientation ConvOrientation; // Surface orientation for convection calculations
@@ -601,9 +603,9 @@ namespace DataSurfaces {
               lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
-              HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), ExtBoundCond(0), ExtSolar(false),
-              ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0),
-              MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
+              HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
+              ExtSolar(false), ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0),
+              OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
               SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),
               FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false),
               ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid)
@@ -666,9 +668,9 @@ namespace DataSurfaces {
         Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point N [lux]
         Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point N [cd/m2]
         // for shadowing of ground by building and obstructions [W/m2]
-        Array1D<Real64> ZoneAreaMinusThisSurf; // Zone inside surface area minus this surface and its subsurfaces
+        Array1D<Real64> EnclAreaMinusThisSurf; // Enclosure inside surface area minus this surface and its subsurfaces
         // for floor/wall/ceiling (m2)
-        Array1D<Real64> ZoneAreaReflProdMinusThisSurf; // Zone product of inside surface area times vis reflectance
+        Array1D<Real64> EnclAreaReflProdMinusThisSurf; // Enclosure product of inside surface area times vis reflectance
         // minus this surface and its subsurfaces,
         // for floor/wall/ceiling (m2)
 
@@ -677,7 +679,7 @@ namespace DataSurfaces {
         // Default Constructor
         SurfaceWindowCalc()
             : WinCenter(3, 0.0), ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0), EffShBlindEmiss(MaxSlatAngs, 0.0),
-              EffGlassEmiss(MaxSlatAngs, 0.0), ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0)
+              EffGlassEmiss(MaxSlatAngs, 0.0), EnclAreaMinusThisSurf(3, 0.0), EnclAreaReflProdMinusThisSurf(3, 0.0)
         {
         }
     };
@@ -1072,15 +1074,21 @@ namespace DataSurfaces {
     {
         // Members
         std::string Name;
-        std::string ZoneOrZoneListName; // zone or zone list name
-        int ZoneOrZoneListPtr;          // pointer to a zone list
-        int NumOfZones;                 // number of zones in a zone list
-        int Construction;               // pointer to contruction object
-        Real64 GrossArea;               // internal surface area, [m2]
-        bool ZoneListActive;            // flag to a list
+        std::string ZoneOrZoneListName;   // zone or zone list name
+        int ZoneOrZoneListPtr;            // pointer to a zone list
+        int NumOfZones;                   // number of zones in a zone list
+        int Construction;                 // pointer to contruction object
+        Real64 GrossArea;                 // internal surface area, [m2]
+        bool ZoneListActive;              // flag to a list
+        std::string spaceOrSpaceListName; // Space or Space list name
+        int spaceOrSpaceListPtr;          // pointer to a Space list
+        int numOfSpaces;                  // number of Spaces in a Space list
+        bool spaceListActive;             // flag to a list
 
         // Default Constructor
-        IntMassObject() : ZoneOrZoneListPtr(0), NumOfZones(0), Construction(0), GrossArea(0.0), ZoneListActive(false)
+        IntMassObject()
+            : ZoneOrZoneListPtr(0), NumOfZones(0), Construction(0), GrossArea(0.0), ZoneListActive(false), spaceOrSpaceListPtr(0), numOfSpaces(0),
+              spaceListActive(false)
         {
         }
     };
