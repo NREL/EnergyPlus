@@ -7091,7 +7091,7 @@ namespace WindowManager {
 
         state.dataWindowManager->thetas = 0.0;
 
-        WindowTempsForNominalCond(state, ConstrNum, hgap);
+        WindowTempsForNominalCond(state, ConstrNum, hgap , 1.0);
 
         if (!ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) AbsBeamShadeNorm = 0.0;
 
@@ -7107,18 +7107,21 @@ namespace WindowManager {
             if (inputU > 0) { // only compute adjustment ratio when there is valid user input U
                 Real64 CoeffAdjRatio = 1;
                 Real64 hcinRated = state.dataWindowManager->hcin;
+                Real64 hcoutRated = state.dataWindowManager->hcout;
                 // Adjustment ratio applies to convective film coefficients when input U value is above the limit of the simple glazing nominal U
                 // Representing the nominal highly conductive frame effects. Solved iteratively.
-                int MaxIter = 1000;
-                while (inputU - NominalConductance > 0.01 && MaxIter > 0) {
+                int MaxIter = 100;
+                while (std::abs(inputU - NominalConductance) > 0.01 && MaxIter > 0) {
                     CoeffAdjRatio = inputU / NominalConductance;
                     state.dataWindowManager->hcout *= CoeffAdjRatio;
-                    state.dataWindowManager->hcin *= CoeffAdjRatio;
-                    WindowTempsForNominalCond(state, ConstrNum, hgap);
+                    WindowTempsForNominalCond(state, ConstrNum, hgap, CoeffAdjRatio);
+//                    std::cout << inputU << "," << NominalConductance << "," << CoeffAdjRatio << "," << state.dataWindowManager->hcout
+//                              << "," << state.dataWindowManager->hcin << "," << state.dataWindowManager->thetas(1) << "," << NominalConductance << std::endl;
                     EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
                     MaxIter -= 1;
                 }
-                // For each iteration, hcin / hcinRated == hcout / hcoutRated
+//                std::cout << state.dataWindowManager->hcin / hcinRated
+//                          << "," << state.dataWindowManager->hcout / hcoutRated << "," << NominalConductance << std::endl;
                 state.dataHeatBal->CoeffAdjRatio(ConstrNum) = state.dataWindowManager->hcin / hcinRated;
             }
         }
@@ -7226,7 +7229,8 @@ namespace WindowManager {
 
     void WindowTempsForNominalCond(EnergyPlusData &state,
                                    int const ConstrNum, // Construction number
-                                   Array1A<Real64> hgap // Gap gas conductive conductance (W/m2-K)
+                                   Array1A<Real64> hgap, // Gap gas conductive conductance (W/m2-K)
+                                   Real64 const adjRatio // adjusment Ratio to hcin
     )
     {
 
@@ -7349,6 +7353,8 @@ namespace WindowManager {
             // End calculations for ISO 15099 method.
 
             if (iter >= 1) state.dataWindowManager->hcin = 0.5 * (hcinprev + state.dataWindowManager->hcin);
+
+            state.dataWindowManager->hcin *= adjRatio;
 
             ++iter;
 
