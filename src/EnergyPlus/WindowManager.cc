@@ -7510,7 +7510,7 @@ namespace WindowManager {
             print(state.files.eio,
                   "{}\n",
                   "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},Conductance (Glazing Only) {W/m2-K},"
-                  "SHGC,Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
+                  "Convection Coefficient Adjustment Ratio,SHGC,Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
             if ((state.dataHeatBal->TotSimpleWindow > 0) || (state.dataHeatBal->W5GlsMat > 0) || (state.dataHeatBal->W5GlsMatAlt > 0))
                 print(state.files.eio,
                       "{}\n",
@@ -7669,7 +7669,7 @@ namespace WindowManager {
                         state.dataConstruction->Construct(ThisNum).SummerSHGC = SHGCSummer;
                         state.dataConstruction->Construct(ThisNum).VisTransNorm = TransVisNorm;
 
-                        static constexpr fmt::string_view Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                        static constexpr fmt::string_view Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                         print(state.files.eio,
                               Format_700,
                               state.dataConstruction->Construct(ThisNum).Name,
@@ -7678,6 +7678,7 @@ namespace WindowManager {
                               Roughness(static_cast<int>(state.dataConstruction->Construct(ThisNum).OutsideRoughness)),
                               NominalConductanceWinter,
                               state.dataHeatBal->NominalUGlazingOnly(ThisNum),
+                              state.dataHeatBal->CoeffAdjRatio(ThisNum),
                               SHGCSummer,
                               TransSolNorm,
                               TransVisNorm);
