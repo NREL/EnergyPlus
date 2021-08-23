@@ -578,8 +578,10 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
     state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
 
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(3);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatio(surfNum2) = 1.0;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn(surfNum2) = 1.0;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0;
 
     state->dataHeatBalSurf->QdotConvOutRep.allocate(3);
     state->dataHeatBalSurf->QdotConvOutRepPerArea.allocate(3);
@@ -2575,7 +2577,8 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     EXPECT_FALSE(FoundError);                            // expect no errors
 
     // allocate surface level adj ratio data member
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(34, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.dimension(34, 1.0);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(34, 1.0);
     WindowManager::InitGlassOpticalCalculations(*state);
 
     int NumAngles = 10; // Number of incident angles
@@ -2816,8 +2819,10 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
 
     // initialize simple glazing adjustment ratio
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(3);
-    state->dataHeatBalSurf->SurfWinCoeffAdjRatio(surfNum2) = 1.0024;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioIn(surfNum2) = 1.0024;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0024;
 
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 25.0;
@@ -3079,9 +3084,11 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
 
     MaterNum = state->dataConstruction->Construct(ConstrNum).LayerPoint(1);
     // summer, adj ratio should stay the same, only change for winter
-    state->dataHeatBal->CoeffAdjRatio(ConstrNum) = 1.5;
+    state->dataHeatBal->CoeffAdjRatioIn(ConstrNum) = 1.5;
+    state->dataHeatBal->CoeffAdjRatioOut(ConstrNum) = 1.5;
     CalcNominalWindowCond(*state, ConstrNum, 2, NominalConductanceSummer, SHGC, TransSolNorm, TransVisNorm, errFlag);
-    EXPECT_EQ(state->dataHeatBal->CoeffAdjRatio(ConstrNum), 1.5);
+    EXPECT_EQ(state->dataHeatBal->CoeffAdjRatioIn(ConstrNum), 1.5);
+    EXPECT_EQ(state->dataHeatBal->CoeffAdjRatioOut(ConstrNum), 1.5);
 
     // winter
     // for legal input U values, the adjusted NominalConductance should be close to input U
@@ -3098,11 +3105,13 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     // illegal inputs, the adjustment ratio should stay as default 1.0
     std::array<Real64, 2> illegalInputUs = {0.0, -2.0};
     for (auto varyInputU : illegalInputUs) {
-        state->dataHeatBal->CoeffAdjRatio(ConstrNum) = 1.0;
+        state->dataHeatBal->CoeffAdjRatioIn(ConstrNum) = 1.0;
+        state->dataHeatBal->CoeffAdjRatioOut(ConstrNum) = 1.0;
         state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = varyInputU;
         CalcNominalWindowCond(*state, ConstrNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
         // expect adjustment ratio equal to 1
-        EXPECT_EQ(state->dataHeatBal->CoeffAdjRatio(ConstrNum), 1.0);
+        EXPECT_EQ(state->dataHeatBal->CoeffAdjRatioIn(ConstrNum), 1.0);
+        EXPECT_EQ(state->dataHeatBal->CoeffAdjRatioOut(ConstrNum), 1.0);
     }
 }
 

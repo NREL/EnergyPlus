@@ -353,7 +353,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchFenArea = 0;
     int pdchFenUfact = 0;
     int pdchFenUfactBeforeAdjusted = 0;
-    int pdchFenCoeffAdjRatio = 0;
+    int pdchFenCoeffAdjRatioIn = 0;
+    int pdchFenCoeffAdjRatioOut = 0;
     int pdchFenSHGC = 0;
     int pdchFenVisTr = 0;
     int pdchFenFrameConductance = 0;
