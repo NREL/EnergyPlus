@@ -88,7 +88,7 @@ namespace {
 
 namespace fmt {
     template <>
-    struct fmt::formatter<DoubleWrapper> {
+    struct formatter<DoubleWrapper> {
         fmt::detail::dynamic_format_specs<char> specs_;
         fmt::memory_buffer buffer = fmt::memory_buffer();
 
@@ -440,6 +440,10 @@ inline constexpr bool is_fortran_syntax(const std::string_view format_str) {
     }
     return false;
 }
+
+class InputOutputFile;
+template <FormatSyntax formatSyntax = FormatSyntax::Fortran, typename... Args>
+void print(InputOutputFile &outputFile, std::string_view format_str, Args &&... args);
 
 inline constexpr FormatSyntax check_syntax(const std::string_view format_str) {
     if (is_fortran_syntax(format_str)) {
@@ -847,7 +851,7 @@ void print(std::ostream &os, std::string_view format_str, Args &&... args)
     }
 }
 
-template <FormatSyntax formatSyntax = FormatSyntax::Fortran, typename... Args>
+template <FormatSyntax formatSyntax, typename... Args>
 void print(InputOutputFile &outputFile, std::string_view format_str, Args &&... args)
 {
     auto *outputStream = [&]() -> std::ostream * {

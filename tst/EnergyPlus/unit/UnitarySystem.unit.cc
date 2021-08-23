@@ -17309,8 +17309,8 @@ TEST_F(EnergyPlusFixture, WaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
-    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None);
-    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_TRUE(compare_enums(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None));
+    EXPECT_TRUE(compare_enums(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint));
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
@@ -17394,8 +17394,8 @@ TEST_F(EnergyPlusFixture, DetailedWaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
-    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::CoolReheat);
-    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_TRUE(compare_enums(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::CoolReheat));
+    EXPECT_TRUE(compare_enums(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint));
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWaterDetailed);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
@@ -17495,8 +17495,8 @@ TEST_F(EnergyPlusFixture, HXAssistedWaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
-    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::CoolReheat);
-    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_TRUE(compare_enums(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::CoolReheat));
+    EXPECT_TRUE(compare_enums(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint));
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
@@ -17687,8 +17687,8 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
-    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None);
-    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_TRUE(compare_enums(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None));
+    EXPECT_TRUE(compare_enums(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint));
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
@@ -17937,8 +17937,8 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
-    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None);
-    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_TRUE(compare_enums(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None));
+    EXPECT_TRUE(compare_enums(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint));
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);
@@ -18210,8 +18210,8 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
-    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None);
-    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_TRUE(compare_enums(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None));
+    EXPECT_TRUE(compare_enums(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint));
     EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
     EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
     EXPECT_TRUE(thisSys.m_CoolCoilExists);

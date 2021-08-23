@@ -353,15 +353,14 @@ namespace FileSystem {
         }
 
         std::string_view fopen_mode;
-        switch (mode) {
-            case std::ios_base::in:
-                fopen_mode = "r"; break;
-            case std::ios_base::binary:
-                fopen_mode = "b"; break;
-            case std::ios_base::in | std::ios_base::binary:
-                fopen_mode = "rb"; break;
-            default:
-                throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+        if (mode == std::ios_base::in) {
+            fopen_mode = "r";
+        } else if (mode == std::ios_base::binary) {
+            fopen_mode = "b";
+        } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
+            fopen_mode = "rb";
+        } else {
+            throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
         }
 
         auto close_file = [](FILE* f){fclose(f);};
@@ -394,15 +393,14 @@ namespace FileSystem {
         }
 
         std::string_view fopen_mode;
-        switch (mode) {
-            case std::ios_base::in:
-                fopen_mode = "r"; break;
-            case std::ios_base::binary:
-                fopen_mode = "b"; break;
-            case std::ios_base::in | std::ios_base::binary:
-                fopen_mode = "rb"; break;
-            default:
-                throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+        if (mode == std::ios_base::in) {
+            fopen_mode = "r";
+        } else if (mode == std::ios_base::binary) {
+            fopen_mode = "b";
+        } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
+            fopen_mode = "rb";
+        } else {
+            throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
         }
 
         auto close_file = [](FILE* f){fclose(f);};

@@ -2181,10 +2181,9 @@ namespace CurveManager {
                 };
                 NormalizationMethod normalizeMethod = NM_NONE;
                 if (fields.count("normalization_method")) {
-                    if (UtilityRoutines::SameString(static_cast<const std::string &>(fields.at("normalization_method")), "DIVISORONLY")) {
+                    if (UtilityRoutines::SameString(fields.at("normalization_method").get<std::string>(), "DIVISORONLY")) {
                         normalizeMethod = NM_DIVISOR_ONLY;
-                    } else if (UtilityRoutines::SameString(static_cast<const std::string &>(fields.at("normalization_method")),
-                                                           "AUTOMATICWITHDIVISOR")) {
+                    } else if (UtilityRoutines::SameString(fields.at("normalization_method").get<std::string>(), "AUTOMATICWITHDIVISOR")) {
                         normalizeMethod = NM_AUTO_WITH_DIVISOR;
                     }
                 }
