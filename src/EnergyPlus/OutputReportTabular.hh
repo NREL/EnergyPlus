@@ -597,9 +597,6 @@ namespace OutputReportTabular {
 
     void WriteBEPSTable(EnergyPlusData &state);
 
-<<<<<<< HEAD
-    std::string ResourceWarningMessage(std::string const &resource);
-=======
     void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
                                             endUseSubTableType tableType,
                                             Array2D<Real64> &endUseSubOther,
@@ -610,8 +607,7 @@ namespace OutputReportTabular {
                                             const bool produceTabular,
                                             const bool produceSQLite);
 
-    std::string ResourceWarningMessage(std::string resource);
->>>>>>> origin/develop
+    std::string ResourceWarningMessage(std::string const &resource);
 
     Real64 WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor);
 

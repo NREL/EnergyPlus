@@ -4688,7 +4688,7 @@ namespace OutputProcessor {
         }
 
         if (state.files.eso.good()) {
-            print<EnergyPlus::FormatSyntax::FMT>(state.files.eso, "{},{}\n", creportID, repValue);
+            print<FormatSyntax::FMT>(state.files.eso, "{},{}\n", creportID, repValue);
         }
     }
 
@@ -4720,7 +4720,7 @@ namespace OutputProcessor {
         }
 
         if (state.files.eso.good()) {
-            print<EnergyPlus::FormatSyntax::FMT>(state.files.eso, "{},{}\n", creportID, fmt::format_int(repValue).c_str());
+            print<FormatSyntax::FMT>(state.files.eso, "{},{}\n", creportID, fmt::format_int(repValue).c_str());
         }
     }
 

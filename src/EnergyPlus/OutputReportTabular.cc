@@ -12144,17 +12144,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
                 spaceTableBody(colSpacePlugProcess, spaceTableRowNum) = RealToStr(0.0, 4);
             }
 
-            std::string tags;
-            bool firstTag = true;
-            for (std::string const tag : curSpace.tags) {
-                if (firstTag) {
-                    tags += tag;
-                    firstTag = false;
-                } else {
-                    tags += ", " + tag;
-                }
-            }
-            spaceTableBody(colSpaceTags, spaceTableRowNum) = tags;
+            spaceTableBody(colSpaceTags, spaceTableRowNum) = fmt::format("{}", fmt::join(curSpace.tags, ", "));
 
             // If not part of total, goes directly to this row
             if (!useSpaceFloorArea) {

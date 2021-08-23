@@ -116,7 +116,7 @@ class CsvParser
 
             void parse_header(std::string_view csv, size_t &index, bool &success, json & header);
 
-            void parse_line(std::string_view csv, size_t &index, bool &success, json & columns);
+            void parse_line(std::string_view csv, size_t &index, json & columns);
 
             json parse_value(std::string_view csv, size_t &index);
 

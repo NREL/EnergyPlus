@@ -255,12 +255,7 @@ json IdfParser::parse_idf(std::string_view idf, size_t &index, bool &success, js
                 if (found_index != std::string::npos) {
                     line = idf.substr(beginning_of_line_index, found_index - beginning_of_line_index - 1);
                 }
-<<<<<<< HEAD
                 errors_.emplace_back(fmt::format("Line: {} Index: {} - Error parsing \"{}\". Error in following line.", cur_line_num, index_into_cur_line, obj_name));
-=======
-                errors_.emplace_back(fmt::format("Line: {} Index: {}", cur_line_num, index_into_cur_line) + " - Error parsing \"" + obj_name +
-                                     "\". Error in following line.");
->>>>>>> origin/develop
                 errors_.emplace_back(fmt::format("~~~ {}", line));
                 success = false;
                 continue;

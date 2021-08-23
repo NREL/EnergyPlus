@@ -3274,13 +3274,9 @@ namespace InternalHeatGains {
             ShowFatalError(state, std::string{RoutineName} + "Errors found in Getting Internal Gains Input, Program Stopped");
         }
 
-<<<<<<< HEAD
-        static constexpr std::string_view Format_721(
-=======
         setupIHGOutputs(state);
 
-        static constexpr fmt::string_view Format_721(
->>>>>>> origin/develop
+        static constexpr std::string_view Format_721(
             "! <Zone Internal Gains Nominal>,Zone Name, Floor Area {{m2}},# Occupants,Area per Occupant "
             "{{m2/person}},Occupant per Area {{person/m2}},Interior Lighting {{W/m2}},Electric Load {{W/m2}},Gas Load {{W/m2}},Other "
             "Load {{W/m2}},Hot Water Eq {{W/m2}},Steam Equipment {{W/m2}},Sum Loads per Area {{W/m2}},Outdoor Controlled Baseboard "

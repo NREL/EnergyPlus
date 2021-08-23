@@ -206,7 +206,7 @@ json CsvParser::parse_csv(std::string_view csv, size_t &index, bool &success)
                 continue;
             }
 
-            parse_line(csv, index, success, columns);
+            parse_line(csv, index, columns);
             if (!success) {
                 auto found_index = csv.find_first_of('\n', beginning_of_line_index);
                 std::string line;
@@ -242,7 +242,7 @@ void CsvParser::parse_header(std::string_view csv, size_t &index, bool &success,
     }
 }
 
-void CsvParser::parse_line(std::string_view csv, size_t &index, bool &success, json & columns)
+void CsvParser::parse_line(std::string_view csv, size_t &index, json & columns)
 {
     Token token;
     int column_num = 0;

@@ -324,21 +324,14 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
             errorsFound = true;
             ShowSevereError(state, "GroundHeatExchanger:ResponseFactors object not found.");
         }
-<<<<<<< HEAD
-    } else if (j.find("ghe_vertical_array_object_name") != j.end()) {
-        // Response factors come from array object
-        this->myRespFactors = BuildAndGetResponseFactorObjectFromArray(
-            state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_array_object_name"].get<std::string>())));
-=======
     }
->>>>>>> origin/develop
 
     // no g-functions in the input file, so they need to be calculated
     if (!this->gFunctionsExist) {
 
         // g-function calculation method
         if (j.find("g_function_calculation_method") != j.end()) {
-            std::string gFunctionMethodStr = UtilityRoutines::MakeUPPERCase(AsString(j["g_function_calculation_method"]));
+            std::string gFunctionMethodStr = UtilityRoutines::MakeUPPERCase(j["g_function_calculation_method"].get<std::string>());
             if (gFunctionMethodStr == "UHFCALC") {
                 this->gFuncCalcMethod = GFuncCalcMethod::UniformHeatFlux;
             } else if (gFunctionMethodStr == "UBHWTCALC") {
@@ -353,7 +346,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
         if (j.find("ghe_vertical_array_object_name") != j.end()) {
             // Response factors come from array object
             this->myRespFactors = BuildAndGetResponseFactorObjectFromArray(
-                state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_array_object_name"]))));
+                    state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_array_object_name"].get<std::string>())));
 
             if (!this->myRespFactors) {
                 errorsFound = true;
@@ -371,32 +364,19 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
             // Calculate response factors from individual boreholes
             std::vector<std::shared_ptr<GLHEVertSingle>> tempVectOfBHObjects;
 
-<<<<<<< HEAD
-        for (auto const &var : vars) {
-            if (!var.at("ghe_vertical_single_object_name").empty()) {
-                std::shared_ptr<GLHEVertSingle> tempBHptr =
-                    GetSingleBH(state, UtilityRoutines::MakeUPPERCase(var.at("ghe_vertical_single_object_name").get<std::string>()));
-                if (tempBHptr) {
-                    tempVectOfBHObjects.push_back(tempBHptr);
-                } else {
-                    errorsFound = true;
-                    std::string const tmpName = var.at("ghe_vertical_single_object_name").get<std::string>();
-                    ShowSevereError(state, "Borehole= " + tmpName + " not found.");
-=======
             for (auto const &var : vars) {
                 if (!var.at("ghe_vertical_single_object_name").empty()) {
                     std::shared_ptr<GLHEVertSingle> tempBHptr =
-                        GetSingleBH(state, UtilityRoutines::MakeUPPERCase(AsString(var.at("ghe_vertical_single_object_name"))));
+                            GetSingleBH(state, UtilityRoutines::MakeUPPERCase(var.at("ghe_vertical_single_object_name").get<std::string>()));
                     if (tempBHptr) {
                         tempVectOfBHObjects.push_back(tempBHptr);
                     } else {
                         errorsFound = true;
-                        std::string const tmpName = var.at("ghe_vertical_single_object_name");
+                        std::string const tmpName = var.at("ghe_vertical_single_object_name").get<std::string>();
                         ShowSevereError(state, "Borehole= " + tmpName + " not found.");
                         break;
                     }
                 } else {
->>>>>>> origin/develop
                     break;
                 }
             }
