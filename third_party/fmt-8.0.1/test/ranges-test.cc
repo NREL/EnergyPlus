@@ -263,8 +263,25 @@ TEST(ranges_test, join_range) {
 }
 #endif  // FMT_RANGES_TEST_ENABLE_JOIN
 
+TEST(ranges_test, is_printable) {
+  using fmt::detail::is_printable;
+  EXPECT_TRUE(is_printable(0x0323));
+  EXPECT_FALSE(is_printable(0x0378));
+  EXPECT_FALSE(is_printable(0x110000));
+}
+
 TEST(ranges_test, escape_string) {
-  EXPECT_EQ(fmt::format("{}", std::vector<std::string>{"\n\r\t\"\\"}),
-            "[\"\\n\\r\\t\\\"\\\\\"]");
-  EXPECT_EQ(fmt::format("{}", std::vector<std::string>{"\x7"}), "[\"\\x07\"]");
+  using vec = std::vector<std::string>;
+  EXPECT_EQ(fmt::format("{}", vec{"\n\r\t\"\\"}), "[\"\\n\\r\\t\\\"\\\\\"]");
+  EXPECT_EQ(fmt::format("{}", vec{"\x07"}), "[\"\\x07\"]");
+  EXPECT_EQ(fmt::format("{}", vec{"\x7f"}), "[\"\\x7f\"]");
+  EXPECT_EQ(fmt::format("{}", vec{"n\xcc\x83"}), "[\"n\xcc\x83\"]");
+
+  if (fmt::detail::is_utf8()) {
+    EXPECT_EQ(fmt::format("{}", vec{"\xcd\xb8"}), "[\"\\u0378\"]");
+    // Unassigned Unicode code points.
+    EXPECT_EQ(fmt::format("{}", vec{"\xf0\xaa\x9b\x9e"}), "[\"\\U0002a6de\"]");
+    EXPECT_EQ(fmt::format("{}", vec{"\xf4\x8f\xbf\xc0"}),
+              "[\"\\xf4\\x8f\\xbf\\xc0\"]");
+  }
 }

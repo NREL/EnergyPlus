@@ -4,11 +4,11 @@
 #ifndef FUZZER_COMMON_H
 #define FUZZER_COMMON_H
 
-#include <cstdint>      // std::uint8_t
-#include <cstring>      // memcpy
-#include <vector>
-
 #include <fmt/core.h>
+
+#include <cstdint>  // std::uint8_t
+#include <cstring>  // memcpy
+#include <vector>
 
 // One can format to either a string, or a buffer. The latter is faster, but
 // one may be interested in formatting to a string instead to verify it works
@@ -56,7 +56,9 @@ struct data_to_string {
 
   data_to_string(const uint8_t* data, size_t size, bool add_terminator = false)
       : buffer(size + (add_terminator ? 1 : 0)) {
-    std::memcpy(buffer.data(), data, size);
+    if (size) {
+      std::memcpy(buffer.data(), data, size);
+    }
   }
 
   fmt::string_view get() const { return {buffer.data(), buffer.size()}; }

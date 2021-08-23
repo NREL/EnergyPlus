@@ -233,7 +233,7 @@ namespace UtilityRoutines {
     {
         auto it = std::find(first, last, str);
         if (it != last) {
-            return std::distance(first, it);
+            return std::distance(first, it) + 1;
         } else {
             return 0;
         }

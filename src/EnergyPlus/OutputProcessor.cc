@@ -4574,14 +4574,14 @@ namespace OutputProcessor {
 
         if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface && !state.dataSysVars->ReportDuringWarmup) return;
 
-        dtoa(repValue, state.dataOutputProcessor->s_WriteNumericData);
+//        dtoa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
-            print(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
+            print<EnergyPlus::FormatSyntax::FMT>(state.files.eso, "{},{}\n", creportID, repValue);
         }
     }
 
@@ -4606,14 +4606,14 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-        i32toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
+//        i32toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
-            print(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
+            print<EnergyPlus::FormatSyntax::FMT>(state.files.eso, "{},{}\n", creportID, fmt::format_int(repValue).c_str());
         }
     }
 
