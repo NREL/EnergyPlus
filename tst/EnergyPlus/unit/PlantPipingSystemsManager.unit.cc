@@ -1753,7 +1753,8 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation)
 
     // first call the factory, it will call GetInput
     bool initLoopEquip = true;
-    PlantComponent *thisCircuit = PlantPipingSystemsManager::Circuit::factory(*state, DataPlant::PlantEquipmentType::PipingSystemPipeCircuit, "MY PIPE CIRCUIT");
+    PlantComponent *thisCircuit =
+        PlantPipingSystemsManager::Circuit::factory(*state, DataPlant::PlantEquipmentType::PipingSystemPipeCircuit, "MY PIPE CIRCUIT");
 
     EXPECT_EQ(2u, state->dataPlantPipingSysMgr->domains.size());
 
