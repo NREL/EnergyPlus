@@ -1250,6 +1250,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Corner_Class_1_Pod_1,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1391,6 +1392,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Corner_Class_1_Pod_1,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1407,6 +1409,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Corner_Class_1_Pod_1,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_Wall_1,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1423,6 +1426,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Corner_Class_1_Pod_1,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1484,6 +1488,7 @@
     Floor,                   !- Surface Type
     ASHRAE 90.1-1999_Table B-2_Unheated_Ext-slab,  !- Construction Name
     Corner_Class_1_Pod_1,    !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1500,6 +1505,7 @@
     Roof,                    !- Surface Type
     IEAD_R-15 ci_Roof,       !- Construction Name
     Corner_Class_1_Pod_1,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1515,7 +1521,8 @@
     Corner_Class_1_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_1_Pod_1,    !- Zone or ZoneList Name
-    198.0000;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    198.0000;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Corner_Class_1_Pod_1_Infiltration,  !- Name
@@ -1790,6 +1797,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Mult_Class_1_Pod_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2306,6 +2314,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Mult_Class_1_Pod_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_Wall_5,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2322,6 +2331,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Mult_Class_1_Pod_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_Wall_2,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2338,6 +2348,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Mult_Class_1_Pod_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2354,6 +2365,7 @@
     Floor,                   !- Surface Type
     ASHRAE 90.1-1999_Table B-2_Unheated_Ext-slab,  !- Construction Name
     Mult_Class_1_Pod_1,      !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2370,6 +2382,7 @@
     Roof,                    !- Surface Type
     IEAD_R-15 ci_Roof,       !- Construction Name
     Mult_Class_1_Pod_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2385,7 +2398,8 @@
     Mult_Class_1_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_1_Pod_1,      !- Zone or ZoneList Name
-    954.0000;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    954.0000;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Mult_Class_1_Pod_1_Infiltration,  !- Name
@@ -2660,6 +2674,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Corridor_Pod_1,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2676,6 +2691,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Corridor_Pod_1,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2692,6 +2708,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Corridor_Pod_1,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_Wall_7,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2708,6 +2725,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Corridor_Pod_1,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2724,6 +2742,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Corridor_Pod_1,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2740,6 +2759,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Corridor_Pod_1,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2771,6 +2791,7 @@
     Floor,                   !- Surface Type
     ASHRAE 90.1-1999_Table B-2_Unheated_Ext-slab,  !- Construction Name
     Corridor_Pod_1,          !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2787,6 +2808,7 @@
     Roof,                    !- Surface Type
     IEAD_R-15 ci_Roof,       !- Construction Name
     Corridor_Pod_1,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2802,7 +2824,8 @@
     Corridor_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_Pod_1,          !- Zone or ZoneList Name
-    384.0000;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    384.0000;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Corridor_Pod_1_Infiltration,  !- Name
@@ -3042,6 +3065,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Corner_Class_2_Pod_1,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_Wall_5,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3058,6 +3082,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Corner_Class_2_Pod_1,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3074,6 +3099,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Corner_Class_2_Pod_1,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3165,6 +3191,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Corner_Class_2_Pod_1,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3226,6 +3253,7 @@
     Floor,                   !- Surface Type
     ASHRAE 90.1-1999_Table B-2_Unheated_Ext-slab,  !- Construction Name
     Corner_Class_2_Pod_1,    !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3242,6 +3270,7 @@
     Roof,                    !- Surface Type
     IEAD_R-15 ci_Roof,       !- Construction Name
     Corner_Class_2_Pod_1,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3257,7 +3286,8 @@
     Corner_Class_2_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_2_Pod_1,    !- Zone or ZoneList Name
-    198.0000;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    198.0000;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Corner_Class_2_Pod_1_Infiltration,  !- Name
@@ -3532,6 +3562,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Mult_Class_2_Pod_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_Wall_4,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3548,6 +3579,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Mult_Class_2_Pod_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_Wall_6,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3564,6 +3596,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Mult_Class_2_Pod_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3880,6 +3913,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Mult_Class_2_Pod_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3896,6 +3930,7 @@
     Floor,                   !- Surface Type
     ASHRAE 90.1-1999_Table B-2_Unheated_Ext-slab,  !- Construction Name
     Mult_Class_2_Pod_1,      !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3912,6 +3947,7 @@
     Roof,                    !- Surface Type
     IEAD_R-15 ci_Roof,       !- Construction Name
     Mult_Class_2_Pod_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3927,7 +3963,8 @@
     Mult_Class_2_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_2_Pod_1,      !- Zone or ZoneList Name
-    954.0000;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    954.0000;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Mult_Class_2_Pod_1_Infiltration,  !- Name
@@ -4202,6 +4239,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Main_Corridor,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_Wall_4,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4218,6 +4256,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Main_Corridor,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_Wall_8,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4234,6 +4273,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Main_Corridor,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bath_Wall_1,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4250,6 +4290,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Main_Corridor,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4386,6 +4427,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Main_Corridor,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4447,6 +4489,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Main_Corridor,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4463,6 +4506,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Main_Corridor,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_Wall_3,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4479,6 +4523,7 @@
     Floor,                   !- Surface Type
     ASHRAE 90.1-1999_Table B-2_Unheated_Ext-slab,  !- Construction Name
     Main_Corridor,           !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4495,6 +4540,7 @@
     Roof,                    !- Surface Type
     IEAD_R-15 ci_Roof,       !- Construction Name
     Main_Corridor,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4510,7 +4556,8 @@
     Main_Corridor Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Main_Corridor,           !- Zone or ZoneList Name
-    1092.0000;               !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    1092.0000;               !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Main_Corridor_Infiltration,  !- Name
@@ -4676,6 +4723,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Lobby,                   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4892,6 +4940,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Lobby,                   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Offices_Wall_5,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4908,6 +4957,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Lobby,                   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_Wall_1,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4924,6 +4974,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Lobby,                   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_Wall_1,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4940,6 +4991,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Lobby,                   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4956,6 +5008,7 @@
     Floor,                   !- Surface Type
     ASHRAE 90.1-1999_Table B-2_Unheated_Ext-slab,  !- Construction Name
     Lobby,                   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4972,6 +5025,7 @@
     Roof,                    !- Surface Type
     IEAD_R-15 ci_Roof,       !- Construction Name
     Lobby,                   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4987,7 +5041,8 @@
     Lobby Internal Mass,     !- Name
     InteriorFurnishings,     !- Construction Name
     Lobby,                   !- Zone or ZoneList Name
-    342.0000;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    342.0000;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Lobby_Infiltration,      !- Name
@@ -5153,6 +5208,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Mech,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_Wall_3,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5169,6 +5225,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Mech,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Offices_Wall_4,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5185,6 +5242,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Mech,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5366,6 +5424,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Mech,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bath_Wall_2,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5382,6 +5441,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Mech,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_Wall_2,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5398,6 +5458,7 @@
     Floor,                   !- Surface Type
     ASHRAE 90.1-1999_Table B-2_Unheated_Ext-slab,  !- Construction Name
     Mech,                    !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5414,6 +5475,7 @@
     Roof,                    !- Surface Type
     IEAD_R-15 ci_Roof,       !- Construction Name
     Mech,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5429,7 +5491,8 @@
     Mech Internal Mass,      !- Name
     InteriorFurnishings,     !- Construction Name
     Mech,                    !- Zone or ZoneList Name
-    504.0000;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    504.0000;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Mech_Infiltration,       !- Name
@@ -5595,6 +5658,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Bathrooms,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_Wall_3,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5611,6 +5675,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Bathrooms,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_Wall_4,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5627,6 +5692,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Bathrooms,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5703,6 +5769,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Bathrooms,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Library_Media_Center_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5719,6 +5786,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Bathrooms,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5795,6 +5863,7 @@
     Floor,                   !- Surface Type
     ASHRAE 90.1-1999_Table B-2_Unheated_Ext-slab,  !- Construction Name
     Bathrooms,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5811,6 +5880,7 @@
     Roof,                    !- Surface Type
     IEAD_R-15 ci_Roof,       !- Construction Name
     Bathrooms,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5826,7 +5896,8 @@
     Bathrooms Internal Mass, !- Name
     InteriorFurnishings,     !- Construction Name
     Bathrooms,               !- Zone or ZoneList Name
-    380.0000;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    380.0000;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Bathrooms_Infiltration,  !- Name
@@ -6067,6 +6138,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Offices,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6308,6 +6380,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Offices,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6444,6 +6517,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Offices,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6595,6 +6669,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Offices,                 !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_Wall_2,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6611,6 +6686,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Offices,                 !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_Wall_2,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6627,6 +6703,7 @@
     Floor,                   !- Surface Type
     ASHRAE 90.1-1999_Table B-2_Unheated_Ext-slab,  !- Construction Name
     Offices,                 !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6643,6 +6720,7 @@
     Roof,                    !- Surface Type
     IEAD_R-15 ci_Roof,       !- Construction Name
     Offices,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6658,7 +6736,8 @@
     Offices Internal Mass,   !- Name
     InteriorFurnishings,     !- Construction Name
     Offices,                 !- Zone or ZoneList Name
-    882.0000;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    882.0000;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Offices_Infiltration,    !- Name
@@ -6860,6 +6939,7 @@
     Wall,                    !- Surface Type
     Standard_Int-Wall,       !- Construction Name
     Media_Center,            !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bath_Wall_4,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6876,6 +6956,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Media_Center,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7012,6 +7093,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Media_Center,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7148,6 +7230,7 @@
     Wall,                    !- Surface Type
     Steel-Framed_R-13_Ext-wall,  !- Construction Name
     Media_Center,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7284,6 +7367,7 @@
     Floor,                   !- Surface Type
     ASHRAE 90.1-1999_Table B-2_Unheated_Ext-slab,  !- Construction Name
     Media_Center,            !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7300,6 +7384,7 @@
     Roof,                    !- Surface Type
     IEAD_R-15 ci_Roof,       !- Construction Name
     Media_Center,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7315,7 +7400,8 @@
     Media_Center Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     Media_Center,            !- Zone or ZoneList Name
-    798.0000;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    798.0000;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Media_Center_Infiltration,  !- Name

@@ -211,7 +211,6 @@ struct OutputReportTabularData;
 struct OutputReportsData;
 struct OutputsData;
 struct OutsideEnergySourcesData;
-struct PVWattsData;
 struct PackagedTerminalHeatPumpData;
 struct PackagedThermalStorageCoilData;
 struct PhotovoltaicStateData;
@@ -472,7 +471,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<OutputReportsData> dataOutputReports;
     std::unique_ptr<OutputsData> dataOutput;
     std::unique_ptr<OutsideEnergySourcesData> dataOutsideEnergySrcs;
-    std::unique_ptr<PVWattsData> dataPVWatts;
     std::unique_ptr<PackagedTerminalHeatPumpData> dataPTHP;
     std::unique_ptr<PackagedThermalStorageCoilData> dataPackagedThermalStorageCoil;
     std::unique_ptr<PhotovoltaicStateData> dataPhotovoltaicState;

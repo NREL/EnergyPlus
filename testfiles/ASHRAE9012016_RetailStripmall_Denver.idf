@@ -3794,6 +3794,7 @@
     Floor,                   !- Surface Type
     ext_slab_6in_with_carpet,!- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3810,6 +3811,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3826,6 +3828,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3842,6 +3845,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3890,6 +3894,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore1_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3906,6 +3911,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4011,7 +4017,8 @@
     LGstore1_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     LGstore1,                !- Zone or ZoneList Name
-    696.7728;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    696.7728;                !- Extended Field
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION ===========
 
@@ -4230,6 +4237,7 @@
     Floor,                   !- Surface Type
     ext_slab_6in_with_carpet,!- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4246,6 +4254,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4307,6 +4316,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LGstore1_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4323,6 +4333,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4339,6 +4350,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4370,6 +4382,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore2_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4385,7 +4398,8 @@
     SMstore1_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore1,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION ===========
 
@@ -4604,6 +4618,7 @@
     Floor,                   !- Surface Type
     ext_slab_6in_with_carpet,!- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4620,6 +4635,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4681,6 +4697,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore1_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4697,6 +4714,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4713,6 +4731,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4744,6 +4763,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore3_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4759,7 +4779,8 @@
     SMstore2_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore2,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION ===========
 
@@ -4978,6 +4999,7 @@
     Floor,                   !- Surface Type
     ext_slab_6in_with_carpet,!- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4994,6 +5016,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5055,6 +5078,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore2_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5071,6 +5095,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5087,6 +5112,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5118,6 +5144,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore4_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5133,7 +5160,8 @@
     SMstore3_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore3,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION ===========
 
@@ -5352,6 +5380,7 @@
     Floor,                   !- Surface Type
     ext_slab_6in_with_carpet,!- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5368,6 +5397,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5429,6 +5459,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore3_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5445,6 +5476,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5461,6 +5493,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5492,6 +5525,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LGstore2_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5507,7 +5541,8 @@
     SMstore4_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore4,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION ===========
 
@@ -5726,6 +5761,7 @@
     Floor,                   !- Surface Type
     ext_slab_6in_with_carpet,!- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5742,6 +5778,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore4_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5758,6 +5795,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5774,6 +5812,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5820,6 +5859,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore5_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5836,6 +5876,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5941,7 +5982,8 @@
     LGstore2_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     LGstore2,                !- Zone or ZoneList Name
-    696.7728;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    696.7728;                !- Extended Field
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION ===========
 
@@ -6160,6 +6202,7 @@
     Floor,                   !- Surface Type
     ext_slab_6in_with_carpet,!- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6176,6 +6219,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6237,6 +6281,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LGstore2_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6253,6 +6298,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6269,6 +6315,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6300,6 +6347,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore6_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6315,7 +6363,8 @@
     SMstore5_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore5,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION ===========
 
@@ -6534,6 +6583,7 @@
     Floor,                   !- Surface Type
     ext_slab_6in_with_carpet,!- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6550,6 +6600,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6611,6 +6662,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore5_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6627,6 +6679,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6643,6 +6696,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6674,6 +6728,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore7_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6689,7 +6744,8 @@
     SMstore6_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore6,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION ===========
 
@@ -6908,6 +6964,7 @@
     Floor,                   !- Surface Type
     ext_slab_6in_with_carpet,!- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6924,6 +6981,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6985,6 +7043,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore6_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7001,6 +7060,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7017,6 +7077,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7048,6 +7109,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore8_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7063,7 +7125,8 @@
     SMstore7_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore7,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION ===========
 
@@ -7280,6 +7343,7 @@
     Floor,                   !- Surface Type
     ext_slab_6in_with_carpet,!- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7296,6 +7360,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7357,6 +7422,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore7_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7373,6 +7439,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7389,6 +7456,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7420,6 +7488,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7435,7 +7504,8 @@
     SMstore8_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore8,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION ===========
 
@@ -14155,3 +14225,4 @@
     SET_LGSTORE2_Light_EMS_Program_Prog_Manager,  !- Name
     BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
     SET_LGSTORE2_Light_EMS_Program;  !- Program Name 1
+
