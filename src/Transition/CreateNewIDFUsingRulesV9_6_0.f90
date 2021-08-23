@@ -394,10 +394,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
 
               CASE('AIRLOOPHVAC:OUTDOORAIRSYSTEM')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
                   IF (CurArgs == 4) THEN
-                      CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                      nodiff=.false.
-                      OutArgs(1:3)=InArgs(1:3)
                       CurArgs = 3
                   END IF
 
