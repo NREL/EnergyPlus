@@ -250,6 +250,7 @@ namespace StandardRatings {
         // USE STATEMENTS:
 
         // Using/Aliasing
+        using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveName;
 
@@ -300,14 +301,16 @@ namespace StandardRatings {
         Real64 COPReduced(0.0); // COP at reduced capacity test conditions (100%, 75%, 50%, and 25%)
         Real64 LoadFactor(0.0); // Fractional "on" time for last stage at the desired reduced capacity,
         // (dimensionless)
-        Real64 DegradationCoeff(0.0); // Degradation coeficient, (dimenssionless)
-        Real64 ChillerCapFT(0.0);     // Chiller capacity fraction (evaluated as a function of temperature)
-        Real64 ChillerEIRFT(0.0);     // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
-        Real64 ChillerEIRFPLR(0.0);   // Chiller EIR as a function of part-load ratio (PLR)
-        Real64 PartLoadRatio(0.0);    // Part load ratio (PLR) at which chiller is operatign at reduced capacity
-        int RedCapNum;                // Integer counter for reduced capacity
-        int SolFla;                   // Flag of solver
-        Array1D<Real64> Par(11);      // Parameter array need for RegulaFalsi routine
+        Real64 DegradationCoeff(0.0);   // Degradation coeficient, (dimenssionless)
+        Real64 ChillerCapFT_rated(0.0); // Chiller capacity fraction at AHRI rated conditions (evaluated as a function of temperature)
+        Real64 ChillerCapFT(0.0);       // Chiller capacity fraction (evaluated as a function of temperature)
+        Real64 ChillerEIRFT_rated(0.0); // Chiller electric input ratio (EIR = 1 / COP) at AHRI rated conditions as a function of temperature
+        Real64 ChillerEIRFT(0.0);       // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
+        Real64 ChillerEIRFPLR(0.0);     // Chiller EIR as a function of part-load ratio (PLR)
+        Real64 PartLoadRatio(0.0);      // Part load ratio (PLR) at which chiller is operatign at reduced capacity
+        int RedCapNum;                  // Integer counter for reduced capacity
+        int SolFla;                     // Flag of solver
+        Array1D<Real64> Par(11);        // Parameter array need for RegulaFalsi routine
 
         // Initialize local variables
         AvailChillerCap = 0.0;
@@ -326,7 +329,9 @@ namespace StandardRatings {
         COPReduced = 0.0;
         LoadFactor = 0.0;
         DegradationCoeff = 0.0;
+        ChillerCapFT_rated = 0.0;
         ChillerCapFT = 0.0;
+        ChillerEIRFT_rated = 0.0;
         ChillerEIRFT = 0.0;
         ChillerEIRFPLR = 0.0;
         PartLoadRatio = 0.0;
@@ -361,12 +366,22 @@ namespace StandardRatings {
                 auto const SELECT_CASE_var(ChillerType);
 
                 if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
+                    if (RedCapNum == 1.0) {
+                        // Get curve modifier values at rated conditions (load = 100%)
+                        ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
+                        ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
+
+                        // Report rated capacity and chiller COP
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
+                    }
+
                     // Get capacity curve info with respect to CW setpoint and entering condenser temps
                     ChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
                     ChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
-                    PartLoadRatio = ReducedPLR(RedCapNum) / ChillerCapFT;
+                    PartLoadRatio = ReducedPLR(RedCapNum) * ChillerCapFT_rated / ChillerCapFT;
 
                     if (PartLoadRatio >= MinUnloadRat) {
                         ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, PartLoadRatio);
@@ -418,11 +433,21 @@ namespace StandardRatings {
                         ShowContinueError(state, "Reformulated Chiller IPLV calculation failed for " + ChillerName);
                     }
 
+                    if (RedCapNum == 1.0) {
+                        // Get curve modifier values at rated conditions (load = 100%)
+                        ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
+                        ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
+
+                        // Report rated capacity and chiller COP
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
+                    }
+
                     ChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
 
                     ChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
 
-                    PartLoadRatio = ReducedPLR(RedCapNum) / ChillerCapFT;
+                    PartLoadRatio = ReducedPLR(RedCapNum) * ChillerCapFT_rated / ChillerCapFT;
 
                     if (PartLoadRatio >= MinUnloadRat) {
                         ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio);

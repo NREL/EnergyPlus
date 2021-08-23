@@ -251,7 +251,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     EXPECT_DOUBLE_EQ(HSPF, 0.0);
 }
 
-TEST_F(EnergyPlusFixture, ChillerIPLVTest)
+TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
 {
 
     using StandardRatings::CalcChillerIPLV;
@@ -338,6 +338,99 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
                     Optional<const Real64>());
 
     EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 3.87); // 13.20 IPLV
+}
+
+TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
+{
+
+    using DataPlant::TypeOf_Chiller_ElectricEIR;
+    using StandardRatings::CalcChillerIPLV;
+
+    // Setup a water-cooled Chiller:Electric:EIR chiller with reference conditions being at non-rated conditions
+    state->dataChillerElectricEIR->ElectricEIRChiller.allocate(1);
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes";
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap = 471200; // W
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP = 5.89;   // W/W
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::WaterCooled;
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat = 0.10;
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).MaxPartLoadRat = 1.15;
+
+    int CurveNum;
+    state->dataCurveManager->NumCurves = 3;
+    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+
+    state->dataCurveManager->NumCurves = 3;
+    state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
+
+    // Cap=f(T)
+    CurveNum = 1;
+    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
+    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes CAPFT";
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 2.521130E-01;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 1.324053E-02;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -8.637329E-03;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 8.581056E-02;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = -4.261176E-03;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 8.661899E-03;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.22;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 12.78;
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 12.78;
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 26.67;
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerCapFTIndex = 1;
+
+    // EIR=f(T)
+    CurveNum = 2;
+    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
+    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFT";
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 4.475238E-01;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -2.588210E-02;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -1.459053E-03;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 4.342595E-02;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = -1.000651E-03;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 1.920106E-03;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.22;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 12.78;
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 12.78;
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 26.67;
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFTIndex = 2;
+
+    // EIR=f(PLR)
+    CurveNum = 3;
+    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
+    state->dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
+    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes EIRFPLR";
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 2.778889E-01;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 2.338363E-01;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 4.883748E-01;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.15;
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
+
+    Real64 IPLV;
+    CalcChillerIPLV(*state,
+                    state->dataChillerElectricEIR->ElectricEIRChiller(1).Name,
+                    TypeOf_Chiller_ElectricEIR,
+                    state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap,
+                    state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP,
+                    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType,
+                    state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerCapFTIndex,
+                    state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFTIndex,
+                    state->dataChillerElectricEIR->ElectricEIRChiller(1).ChillerEIRFPLRIndex,
+                    state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat,
+                    IPLV,
+                    Optional<const Real64>(),
+                    ObjexxFCL::Optional_int_const(),
+                    Optional<const Real64>());
+
+    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 5.44); // 18.56 IPLV
 }
 
 TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)

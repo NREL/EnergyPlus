@@ -220,6 +220,7 @@ namespace WaterCoils {
         int ControllerIndex;            // controller index used by water coil
         bool reportCoilFinalSizes;      // one time report of sizes to coil summary report
         bool AirLoopDOASFlag;           // True when this coil is used AirLoopDOAS
+        bool heatRecoveryCoil;          // is true when coils are connected to each other to create a heat recovery loop
 
         // Default Constructor
         WaterCoilEquipConditions()
@@ -245,7 +246,7 @@ namespace WaterCoils {
               WaterLoopCompNum(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
               CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0),
               DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
-              ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false)
+              ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false), heatRecoveryCoil(false)
         {
         }
     };
@@ -534,7 +535,8 @@ namespace WaterCoils {
                           int const CoilNum,                           // index of hot water heating Coil
                           bool &ErrorsFound,                           // Set to true if certain errors found
                           Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
-                          Optional_int DesiccantDehumIndex = _         // Index for the desiccant dehum system where this caoil is used
+                          Optional_int DesiccantDehumIndex = _,        // Index for the desiccant dehum system where this caoil is used
+                          Optional_bool heatRecoveryCoil = _           // true if water coil is connected to heat recovery loop
     );
 
     // estimate heating coil design inlet water temperature for autosizing UA-value

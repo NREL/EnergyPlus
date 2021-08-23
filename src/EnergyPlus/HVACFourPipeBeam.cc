@@ -854,7 +854,7 @@ namespace FourPipeBeam {
             Real64 minFlow(0.0);
             Real64 maxFlowCool(0.0);
             minFlow = std::min(state.dataEnvrn->StdRhoAir * originalTermUnitSizeMaxVDot,
-                               state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesOAFlow * state.dataEnvrn->StdRhoAir);
+                               state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).MinOA * state.dataEnvrn->StdRhoAir);
             minFlow = std::max(0.0, minFlow);
             // max flow is as if the air supply was sufficient to provide all the conditioning
 
@@ -959,7 +959,7 @@ namespace FourPipeBeam {
             // make sure this is higher than the zone OA requirement
             this->mDotDesignPrimAir =
                 std::max(this->mDotDesignPrimAir,
-                         state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesOAFlow * state.dataEnvrn->StdRhoAir);
+                         state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).MinOA * state.dataEnvrn->StdRhoAir);
             this->vDotDesignPrimAir = this->mDotDesignPrimAir / state.dataEnvrn->StdRhoAir;
             this->totBeamLength = this->vDotDesignPrimAir / this->vDotNormRatedPrimAir;
             if (this->vDotDesignCWWasAutosized) {

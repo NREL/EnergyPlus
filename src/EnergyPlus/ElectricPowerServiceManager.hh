@@ -60,7 +60,8 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/PVWatts.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
 // SSC Headers
@@ -571,6 +572,8 @@ public:                              // data // might make this class a friend o
     Real64 electProdRate;     // Current AC Electric Production Rate from Equipment (W)
     Real64 thermalProd;       // Current Thermal energy Produced from Equipment (J)
     Real64 thermProdRate;     // Current Thermal energy Production Rate from Equipment (W)
+
+    std::unique_ptr<PVWatts::PVWattsGenerator> pvwattsGenerator; // PVWattsGenerator object pointer
 
 private:
     int errCountNegElectProd_; // error count for reccuring error when generators produce negative electric power
