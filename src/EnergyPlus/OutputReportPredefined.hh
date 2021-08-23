@@ -907,10 +907,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchS62svrClPs = 0;
     int pdchS62svrClSumPz = 0;
     int pdchS62svrClD = 0;
+    int pdchS62svrClDorg = 0;
     int pdchS62svrClVou = 0;
     int pdchS62svrClVps = 0;
     int pdchS62svrClXs = 0;
     int pdchS62svrClEv = 0;
+    int pdchS62svrClEvMthd = 0;
     int pdchS62svrClVot = 0;
     int pdchS62svrClPercOA = 0;
     int pdchS62svrClEnvironmentOfPs = 0;
@@ -921,10 +923,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchS62svrHtPs = 0;
     int pdchS62svrHtSumPz = 0;
     int pdchS62svrHtD = 0;
+    int pdchS62svrHtDorg = 0;
     int pdchS62svrHtVou = 0;
     int pdchS62svrHtVps = 0;
     int pdchS62svrHtXs = 0;
     int pdchS62svrHtEv = 0;
+    int pdchS62svrHtEvMthd = 0;
     int pdchS62svrHtVot = 0;
     int pdchS62svrHtPercOA = 0;
     int pdchS62svrHtEnvironmentOfPs = 0;
@@ -959,6 +963,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchS62zcdVsec = 0;
     int pdchS62zcdVdz = 0;
     int pdchS62zcdVpzmin = 0;
+    int pdchS62zcdVpzminSPSize = 0;
     int pdchS62zcdVozclg = 0;
     int pdchS62zcdZpz = 0;
     int pdchS62zcdEp = 0;
@@ -985,6 +990,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchS62zhdVsec = 0;
     int pdchS62zhdVdz = 0;
     int pdchS62zhdVpzmin = 0;
+    int pdchS62zhdVpzminSPSize = 0;
     int pdchS62zhdVozhtg = 0;
     int pdchS62zhdZpz = 0;
     int pdchS62zhdEp = 0;
@@ -1831,6 +1837,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchS62svrClPs = 0;
         this->pdchS62svrClSumPz = 0;
         this->pdchS62svrClD = 0;
+        this->pdchS62svrClDorg = 0;
         this->pdchS62svrClVou = 0;
         this->pdchS62svrClVps = 0;
         this->pdchS62svrClXs = 0;
@@ -1844,6 +1851,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchS62svrHtPs = 0;
         this->pdchS62svrHtSumPz = 0;
         this->pdchS62svrHtD = 0;
+        this->pdchS62svrHtDorg = 0;
         this->pdchS62svrHtVou = 0;
         this->pdchS62svrHtVps = 0;
         this->pdchS62svrHtXs = 0;
@@ -1879,6 +1887,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchS62zcdVsec = 0;
         this->pdchS62zcdVdz = 0;
         this->pdchS62zcdVpzmin = 0;
+        this->pdchS62zcdVpzminSPSize = 0;
         this->pdchS62zcdVozclg = 0;
         this->pdchS62zcdZpz = 0;
         this->pdchS62zcdEp = 0;
@@ -1903,6 +1912,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchS62zhdVsec = 0;
         this->pdchS62zhdVdz = 0;
         this->pdchS62zhdVpzmin = 0;
+        this->pdchS62zhdVpzminSPSize = 0;
         this->pdchS62zhdVozhtg = 0;
         this->pdchS62zhdZpz = 0;
         this->pdchS62zhdEp = 0;
