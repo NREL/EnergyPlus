@@ -2797,9 +2797,28 @@ namespace SurfaceGeometry {
                              std::string{RoutineName} + "When using DElight daylighting the presence of exterior shading surfaces is ignored.");
         }
 
-        // Initialize run time surface arrays
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+            // Initialize run time surface arrays
             state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+            state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
+        }
+
+        // Representative surface calculations: Assign representative heat transfer surfaces
+        if (state.dataSurface->UseRepresentativeSurfaceCalculations &&
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName") == 0) {
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+                int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+                int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+                for (int surfNum = firstSurf; surfNum <= lastSurf; surfNum++) {
+                    // Conditions where surface always needs to be unique
+                    bool forceUniqueSurface = state.dataSurface->Surface(surfNum).HasShadeControl ||
+                                              state.dataSurface->SurfWinAirflowSource(surfNum) ||
+                                              state.dataConstruction->Construct(state.dataSurface->Surface(surfNum).Construction).SourceSinkPresent;
+                    if (!forceUniqueSurface) {
+                        state.dataSurface->Surface(surfNum).set_representative_surface(state, surfNum);
+                    }
+                }
+            }
         }
         // Initialize surface with movable insulation index list
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
@@ -14863,7 +14882,7 @@ namespace SurfaceGeometry {
             }
         }
         // Check for any spaces defined only by floor surface(s) and group them
-        for (auto const zone : state.dataHeatBal->Zone) {
+        for (auto const &zone : state.dataHeatBal->Zone) {
             int newEnclosureNum = 0;
             for (int const spaceNum : zone.spaceIndexes) {
                 int spaceEnclosureNum = 0;
