@@ -18248,7 +18248,7 @@
     VAV_POD_1_DCV,           !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedure,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList 1 Name
     Classroom_OA_Design_Spec,!- Design Specification Outdoor Air Object Name 1
@@ -18288,7 +18288,7 @@
     VAV_POD_2_DCV,           !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedure,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList 1 Name
     Classroom_OA_Design_Spec,!- Design Specification Outdoor Air Object Name 1
@@ -18310,7 +18310,7 @@
     VAV_OTHER_DCV,           !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedure,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Computer_Class_ZN_1_FLR_1,  !- Zone or ZoneList 1 Name
     CM DSOA Computer_Class_ZN_1_FLR_1,  !- Design Specification Outdoor Air Object Name 1
@@ -18422,7 +18422,7 @@
     VAV_POD_3_DCV,           !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedure,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList 1 Name
     Classroom_OA_Design_Spec,!- Design Specification Outdoor Air Object Name 1
