@@ -165,7 +165,7 @@ void BLASTAbsorberSpecs::simulate(
         PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide(state,
                                                                     calledFromLocation.loopNum,
                                                                     calledFromLocation.loopSideNum,
-                                                                    static_cast<int>(DataPlant::PlantEquipmentType::Chiller_Absorption),
+                                                                    DataPlant::PlantEquipmentType::Chiller_Absorption,
                                                                     this->GeneratorInletNodeNum,
                                                                     this->GeneratorOutletNodeNum,
                                                                     this->GenHeatSourceType,

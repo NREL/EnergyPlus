@@ -155,7 +155,7 @@ void IndirectAbsorberSpecs::simulate(
         PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide(state,
                                                                     calledFromLocation.loopNum,
                                                                     calledFromLocation.loopSideNum,
-                                                                    static_cast<int>(DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption),
+                                                                    DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                                     this->GeneratorInletNodeNum,
                                                                     this->GeneratorOutletNodeNum,
                                                                     this->GenHeatSourceType,
