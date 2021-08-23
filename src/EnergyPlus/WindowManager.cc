@@ -7103,18 +7103,18 @@ namespace WindowManager {
         EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
 
         if (WinterSummerFlag == 1) {
-            state.dataHeatBal->NominalUGlazingOnly = NominalConductance;
+            state.dataHeatBal->NominalUGlazingOnly(ConstrNum) = NominalConductance;
             if (inputU > 0) { // only compute adjustment ratio when there is valid user input U
-                Real64 CoeffAdjRatio = 1;
+                Real64 CoeffAdjRatioAdjustmentFactor = 1;
                 Real64 hcinRated = state.dataWindowManager->hcin;
                 // Adjustment ratio applies to convective film coefficients when input U value is above the limit of the simple glazing nominal U
                 // Representing the nominal highly conductive frame effects. Solved iteratively.
                 int MaxIter = 10;
                 while (inputU - NominalConductance > 0.01 && MaxIter > 0) {
-                    state.dataWindowManager->hcout *= CoeffAdjRatio;
-                    state.dataWindowManager->hcin *= CoeffAdjRatio;
+                    state.dataWindowManager->hcout *= CoeffAdjRatioAdjustmentFactor;
+                    state.dataWindowManager->hcin *= CoeffAdjRatioAdjustmentFactor;
                     EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
-                    CoeffAdjRatio = inputU / NominalConductance;
+                    CoeffAdjRatioAdjustmentFactor = inputU / NominalConductance;
                     MaxIter -= 1;
                 }
                 // For each iteration, hcin / hcinRated == hcout / hcoutRated
