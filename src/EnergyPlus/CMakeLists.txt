@@ -775,7 +775,8 @@ target_link_libraries(
          btwxt
          Windows-CalcEngine
          airflownetworklib
-         ssc)
+         ssc
+         cpgfunctionEP)
 
 target_link_libraries(energypluslib PRIVATE project_options project_fp_options project_warnings cpp_pch_files)
 

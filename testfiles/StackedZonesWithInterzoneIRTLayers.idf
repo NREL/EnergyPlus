@@ -372,6 +372,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     Bottom,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Bottom:South Wall,       !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -391,6 +392,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     Bottom,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Bottom:East Wall,        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -410,6 +412,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     Bottom,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Bottom:North Wall,       !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -429,6 +432,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     Bottom,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Bottom:West Wall,        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -448,6 +452,7 @@
     CEILING,                 !- Surface Type
     IRTSurface,              !- Construction Name
     Bottom,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SecondLevel:Bottom,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -466,6 +471,7 @@
     Floor,                   !- Surface Type
     Light Floor,             !- Construction Name
     Bottom,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bottom:Floor,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -485,6 +491,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     SecondLevel,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     SecondLevel:South Wall,  !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -504,6 +511,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     SecondLevel,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     SecondLevel:East Wall,   !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -523,6 +531,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     SecondLevel,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     SecondLevel:North Wall,  !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -542,6 +551,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     SecondLevel,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     SecondLevel:West Wall,   !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -561,6 +571,7 @@
     CEILING,                 !- Surface Type
     IRTSurface,              !- Construction Name
     SecondLevel,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ThirdLevel:Bottom,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -580,6 +591,7 @@
     FLOOR,                   !- Surface Type
     IRTSurface,              !- Construction Name
     SecondLevel,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bottom:Top,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -599,6 +611,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     ThirdLevel,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ThirdLevel:South Wall,   !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -618,6 +631,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     ThirdLevel,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ThirdLevel:East Wall,    !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -637,6 +651,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     ThirdLevel,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ThirdLevel:North Wall,   !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -656,6 +671,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     ThirdLevel,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ThirdLevel:West Wall,    !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -675,6 +691,7 @@
     FLOOR,                   !- Surface Type
     IRTSurface,              !- Construction Name
     ThirdLevel,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SecondLevel:Top,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -694,6 +711,7 @@
     Wall,                    !- Surface Type
     Light Roof/Ceiling,      !- Construction Name
     ThirdLevel,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ThirdLevel:Top,          !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -755,7 +773,8 @@
     Bottom:PartitionIntMass1,!- Name
     Light Partitions,        !- Construction Name
     Bottom,                  !- Zone or ZoneList Name
-    4.645;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    4.645;                   !- Extended Field
 
 ! =========================
 
@@ -763,7 +782,8 @@
     Bottom:PartitionIntMass2,!- Name
     Light Partitions,        !- Construction Name
     Bottom,                  !- Zone or ZoneList Name
-    4.645;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    4.645;                   !- Extended Field
 
 ! =========================
 
@@ -771,7 +791,8 @@
     SecondLevel:IntMass1,    !- Name
     Light Partitions,        !- Construction Name
     SecondLevel,             !- Zone or ZoneList Name
-    4.645;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    4.645;                   !- Extended Field
 
 ! =========================
 
@@ -779,7 +800,8 @@
     SecondLevel:IntMass2,    !- Name
     Light Partitions,        !- Construction Name
     SecondLevel,             !- Zone or ZoneList Name
-    4.645;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    4.645;                   !- Extended Field
 
 ! =========================
 
@@ -787,7 +809,8 @@
     ThirdLevel:IntMass1,     !- Name
     Light Partitions,        !- Construction Name
     ThirdLevel,              !- Zone or ZoneList Name
-    4.645;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    4.645;                   !- Extended Field
 
 ! =========================
 
@@ -795,7 +818,8 @@
     ThirdLevel:IntMass2,     !- Name
     Light Partitions,        !- Construction Name
     ThirdLevel,              !- Zone or ZoneList Name
-    4.645;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    4.645;                   !- Extended Field
 
   SurfaceProperty:ConvectionCoefficients,
     Bottom:Top,              !- Surface Name

@@ -746,7 +746,10 @@ This field is the name of a surface in the zone seen by the person.
 
 \paragraph{Field: Angle Factor \textless{}\#\textgreater{}}\label{field-angle-factor}
 
-This field is the fraction that this surface contributes to the total mean radiant temperature. This can be thought of as a weighting factor for this surface and the actual mean radiant temperature used in the thermal comfort model is simply the sum of all angle factors multiplied by the corresponding inside surface temperature. Note that the Surface Name/Angle Factor pair can be repeated up to 20 times. The sum of all angle factors within any angle factor list must equal unity, otherwise the program will not accept the input as valid.
+This field is the fraction that this surface contributes to the total mean radiant temperature. This can be thought of as a weighting factor for this surface and the actual mean radiant temperature used in the thermal comfort model is simply the sum of all angle factors multiplied by the corresponding inside surface temperature. The sum of all angle factors within any angle factor list must equal unity, otherwise the program will not accept the input as valid.
+
+Note that the Surface Name/Angle Factor pair is extensible to accommodate as many
+surfaces as required.
 
 An example IDF with an electric low temperature radiant system is shown below.
 
