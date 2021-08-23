@@ -56,7 +56,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CommandLineInterface.hh>
-#include <EnergyPlus/InputProcessing/CsvParser.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
@@ -65,6 +64,7 @@
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/InputProcessing/CsvParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -205,20 +205,20 @@ namespace ScheduleManager {
         // "compact" Schedules ! added for FMU Import
         int NumExternalInterfaceFunctionalMockupUnitExportSchedules; // Number of "FunctionalMockupUnitExport ExternalInterface"
         // "compact" Schedules ! added for FMU Export
-        int NumLstDaySchedules;        // Number of "list" dayschedules
-        int NumRegDaySchedules;        // Number of hourly+interval+list dayschedules
-        int NumRegWeekSchedules;       // Number of "regular" Weekschedules
-        int NumRegSchedules;           // Number of "regular" Schedules
-        int NumCptWeekSchedules;       // Number of "compact" WeekSchedules
-        int NumCptSchedules;           // Number of "compact" Schedules
-        int NumCommaFileSchedules;     // Number of Schedule:File schedules
-        int NumConstantSchedules;      // Number of "constant" schedules
+        int NumLstDaySchedules;            // Number of "list" dayschedules
+        int NumRegDaySchedules;            // Number of hourly+interval+list dayschedules
+        int NumRegWeekSchedules;           // Number of "regular" Weekschedules
+        int NumRegSchedules;               // Number of "regular" Schedules
+        int NumCptWeekSchedules;           // Number of "compact" WeekSchedules
+        int NumCptSchedules;               // Number of "compact" Schedules
+        int NumCommaFileSchedules;         // Number of Schedule:File schedules
+        int NumConstantSchedules;          // Number of "constant" schedules
         int NumCSVAllColumnsSchedules = 0; // Number of imported shading schedules
-        int NumCommaFileShading;       // Number of shading csv schedules
-        int TS;                        // Counter for Num Of Time Steps in Hour
-        int Hr;                        // Hour Counter
-        Array2D<Real64> MinuteValue;   // Temporary for processing interval schedules
-        Array2D_bool SetMinuteValue;   // Temporary for processing interval schedules
+        int NumCommaFileShading;           // Number of shading csv schedules
+        int TS;                            // Counter for Num Of Time Steps in Hour
+        int Hr;                            // Hour Counter
+        Array2D<Real64> MinuteValue;       // Temporary for processing interval schedules
+        Array2D_bool SetMinuteValue;       // Temporary for processing interval schedules
         int NumFields;
         int SCount;
         //  LOGICAL RptSchedule
@@ -479,21 +479,30 @@ namespace ScheduleManager {
                     auto const schedule_data = FileSystem::readFile(state.files.TempFullFilePath.filePath);
                     CsvParser csvParser;
                     skiprowCount = 1; // make sure to parse header row only for Schedule:File:Shading
-                    auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(state.files.TempFullFilePath.filePath, csvParser.decode(schedule_data, ColumnSep, skiprowCount));
+                    auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(state.files.TempFullFilePath.filePath,
+                                                                                          csvParser.decode(schedule_data, ColumnSep, skiprowCount));
                     schedule_file_shading_result = it.first;
                 } else if (FileSystem::is_all_json_type(ext)) {
                     auto schedule_data = FileSystem::readJSON(state.files.TempFullFilePath.filePath);
-                    auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(state.files.TempFullFilePath.filePath, std::move(schedule_data));
+                    auto it =
+                        state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(state.files.TempFullFilePath.filePath, std::move(schedule_data));
                     schedule_file_shading_result = it.first;
                 } else {
-                    ShowSevereError(state, fmt::format(R"({}{}="{}", {}="{}" has an unknown file extension and cannot be read by this program.)", RoutineName, CurrentModuleObject, Alphas(1), cAlphaFields(3), Alphas(3)));
+                    ShowSevereError(state,
+                                    fmt::format(R"({}{}="{}", {}="{}" has an unknown file extension and cannot be read by this program.)",
+                                                RoutineName,
+                                                CurrentModuleObject,
+                                                Alphas(1),
+                                                cAlphaFields(3),
+                                                Alphas(3)));
                     ShowFatalError(state, "Program terminates due to previous condition.");
                 }
             }
 
-            auto const & column_json = schedule_file_shading_result->second["values"].at(0); // assume there is at least 1 column
+            auto const &column_json = schedule_file_shading_result->second["values"].at(0); // assume there is at least 1 column
             rowCnt = column_json.size();
-            NumCSVAllColumnsSchedules = schedule_file_shading_result->second["header"].get<std::set<std::string>>().size() - 1; // -1 to account for timestamp column
+            NumCSVAllColumnsSchedules =
+                schedule_file_shading_result->second["header"].get<std::set<std::string>>().size() - 1; // -1 to account for timestamp column
 
             if (rowCnt != rowLimitCount) {
                 if (rowCnt < rowLimitCount) {
@@ -1672,18 +1681,26 @@ namespace ScheduleManager {
                     if (FileSystem::is_flat_file_type(ext)) {
                         auto const schedule_data = FileSystem::readFile(state.files.TempFullFilePath.filePath);
                         CsvParser csvParser;
-                        auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(state.files.TempFullFilePath.filePath, csvParser.decode(schedule_data, ColumnSep, skiprowCount));
+                        auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(
+                            state.files.TempFullFilePath.filePath, csvParser.decode(schedule_data, ColumnSep, skiprowCount));
                         result = it.first;
                     } else if (FileSystem::is_all_json_type(ext)) {
-                        auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(state.files.TempFullFilePath.filePath, FileSystem::readJSON(state.files.TempFullFilePath.filePath));
+                        auto it = state.dataScheduleMgr->UniqueProcessedExternalFiles.emplace(
+                            state.files.TempFullFilePath.filePath, FileSystem::readJSON(state.files.TempFullFilePath.filePath));
                         result = it.first;
                     } else {
-                        ShowSevereError(state, fmt::format(R"({}{}="{}", {}="{}" has an unknown file extension and cannot be read by this program.)", RoutineName, CurrentModuleObject, Alphas(1), cAlphaFields(3), Alphas(3)));
+                        ShowSevereError(state,
+                                        fmt::format(R"({}{}="{}", {}="{}" has an unknown file extension and cannot be read by this program.)",
+                                                    RoutineName,
+                                                    CurrentModuleObject,
+                                                    Alphas(1),
+                                                    cAlphaFields(3),
+                                                    Alphas(3)));
                         ShowFatalError(state, "Program terminates due to previous condition.");
                     }
                 }
 
-                auto const & column_json = result->second["values"][curcolCount - 1];
+                auto const &column_json = result->second["values"][curcolCount - 1];
                 rowCnt = column_json.size();
                 auto const column_values = column_json.get<std::vector<Real64>>();
 
@@ -1801,11 +1818,11 @@ namespace ScheduleManager {
         }
 
         if (NumCommaFileShading != 0) {
-            auto const & values_json = schedule_file_shading_result->second["values"];
+            auto const &values_json = schedule_file_shading_result->second["values"];
             auto const headers = schedule_file_shading_result->second["header"].get<std::vector<std::string>>();
             auto const headers_set = schedule_file_shading_result->second["header"].get<std::set<std::string>>();
 
-            for (auto const & header : headers_set) {
+            for (auto const &header : headers_set) {
                 size_t column = 0;
                 auto column_it = std::find(headers.begin(), headers.end(), header);
                 if (column_it != headers.end()) {
@@ -1816,7 +1833,7 @@ namespace ScheduleManager {
 
                 std::string curName = fmt::format("{}_shading", header);
                 GlobalNames::VerifyUniqueInterObjectName(
-                        state, state.dataScheduleMgr->UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                    state, state.dataScheduleMgr->UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
                 ++SchNum;
                 state.dataScheduleMgr->Schedule(SchNum).Name = curName;
                 state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_file;
@@ -1855,7 +1872,7 @@ namespace ScheduleManager {
                         // Dup 28 Feb to 29 Feb (60)
                         ++iDay;
                         state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) =
-                                state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay - 1);
+                            state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay - 1);
                     }
                 }
             }

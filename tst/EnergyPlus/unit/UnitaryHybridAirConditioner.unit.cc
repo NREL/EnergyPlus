@@ -490,12 +490,14 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_TRUE(compare_enums(ResourceTypes.at(4), DataGlobalConstants::ResourceType::Electricity)); // ELECTRIC - Fan Energy
     EXPECT_EQ(EndUses(4), "FANS");
     EXPECT_EQ(Groups(4), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(5),
-              DataGlobalConstants::ResourceType::Natural_Gas)); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
+    EXPECT_TRUE(compare_enums(
+        ResourceTypes.at(5),
+        DataGlobalConstants::ResourceType::Natural_Gas)); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
     EXPECT_EQ(EndUses(5), "COOLING");
     EXPECT_EQ(Groups(5), "HVAC");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(6),
-              DataGlobalConstants::ResourceType::DistrictCooling)); // DISTRICTCOOLING - Third Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
+    EXPECT_TRUE(compare_enums(
+        ResourceTypes.at(6),
+        DataGlobalConstants::ResourceType::DistrictCooling)); // DISTRICTCOOLING - Third Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
     EXPECT_EQ(EndUses(6), "COOLING");
     EXPECT_EQ(Groups(6), "HVAC");
     EXPECT_TRUE(compare_enums(ResourceTypes.at(7), DataGlobalConstants::ResourceType::Water)); // WATER - Cooling Water Use

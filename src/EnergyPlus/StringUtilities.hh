@@ -62,7 +62,7 @@ inline std::stringstream stringReader(std::string_view str)
     return result;
 }
 
-inline bool readListItem(std::string_view input, size_t & index, char delimiter, int &param)
+inline bool readListItem(std::string_view input, size_t &index, char delimiter, int &param)
 {
     if (index >= input.size()) return false;
 
@@ -81,7 +81,7 @@ inline bool readListItem(std::string_view input, size_t & index, char delimiter,
     return true;
 }
 
-inline bool readListItem(std::string_view input, size_t & index, char delimiter, double &param)
+inline bool readListItem(std::string_view input, size_t &index, char delimiter, double &param)
 {
     if (index >= input.size()) return false;
 
@@ -100,8 +100,7 @@ inline bool readListItem(std::string_view input, size_t & index, char delimiter,
     return true;
 }
 
-template <typename Param>
-bool readListItem(std::istream &stream, Param &&param)
+template <typename Param> bool readListItem(std::istream &stream, Param &&param)
 {
     if (stream.good()) {
         stream >> param;
@@ -161,8 +160,7 @@ inline auto nth_occurrence(std::string_view input_str, char const search_char, s
     return pos;
 }
 
-template <typename... Param>
-bool readList(std::string_view input, Param &&... param)
+template <typename... Param> bool readList(std::string_view input, Param &&...param)
 {
     if constexpr (std::conjunction_v<std::is_same<double &, Param>...> || std::conjunction_v<std::is_same<int &, Param>...>) {
         size_t index = 0;

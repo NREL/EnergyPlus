@@ -73,9 +73,9 @@
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <fmt/os.h>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
-#include <fmt/os.h>
 
 namespace EnergyPlus {
 // Module containing the input processor routines
@@ -1893,7 +1893,8 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             for (auto const &extensions : fields[extension_key]) {
                 auto it = extensions.find("key_name");
                 if (it != extensions.end() && !obj.key().empty()) {
-                    addRecordToOutputVariableStructure(state, it.value().get<std::string>(), extensions.at("output_variable_or_meter_name").get<std::string>());
+                    addRecordToOutputVariableStructure(
+                        state, it.value().get<std::string>(), extensions.at("output_variable_or_meter_name").get<std::string>());
                 } else {
                     addRecordToOutputVariableStructure(state, "*", extensions.at("output_variable_or_meter_name").get<std::string>());
                 }
@@ -1914,7 +1915,8 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             for (auto const &extensions : fields[extension_key]) {
                 auto it = extensions.find("key_name");
                 if (it != extensions.end() && !obj.key().empty()) {
-                    addRecordToOutputVariableStructure(state, it.value().get<std::string>(), extensions.at("output_variable_or_meter_name").get<std::string>());
+                    addRecordToOutputVariableStructure(
+                        state, it.value().get<std::string>(), extensions.at("output_variable_or_meter_name").get<std::string>());
                 } else {
                     addRecordToOutputVariableStructure(state, "*", extensions.at("output_variable_or_meter_name").get<std::string>());
                 }
@@ -1929,7 +1931,8 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             auto it = fields.find("output_variable_or_output_meter_index_key_name");
             if (it != fields.end() && !it.value().empty()) {
-                addRecordToOutputVariableStructure(state, it.value().get<std::string>(), fields.at("output_variable_or_output_meter_name").get<std::string>());
+                addRecordToOutputVariableStructure(
+                    state, it.value().get<std::string>(), fields.at("output_variable_or_output_meter_name").get<std::string>());
             } else {
                 addRecordToOutputVariableStructure(state, "*", fields.at("output_variable_or_output_meter_name").get<std::string>());
             }
@@ -1993,7 +1996,8 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    addRecordToOutputVariableStructure(state, "*", extensions.at("variable_or_meter_or_ems_variable_or_field_name").get<std::string>());
+                    addRecordToOutputVariableStructure(
+                        state, "*", extensions.at("variable_or_meter_or_ems_variable_or_field_name").get<std::string>());
                 } catch (...) {
                     continue; // blank or erroneous fields are handled at the get input function for the object
                 }

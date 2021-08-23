@@ -490,9 +490,10 @@ void DetermineDateTokens(EnergyPlusData &state,
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr int NumSingleChars(3);
-    static constexpr std::array<std::string_view, NumSingleChars>SingleChars{"/", ":", "-"};
+    static constexpr std::array<std::string_view, NumSingleChars> SingleChars{"/", ":", "-"};
     static constexpr int NumDoubleChars(6);
-    static constexpr std::array<std::string_view, NumDoubleChars> DoubleChars{"ST ", "ND ", "RD ", "TH ", "OF ", "IN "}; // Need trailing spaces: Want thse only at end of words
+    static constexpr std::array<std::string_view, NumDoubleChars> DoubleChars{
+        "ST ", "ND ", "RD ", "TH ", "OF ", "IN "}; // Need trailing spaces: Want thse only at end of words
     static constexpr std::array<std::string_view, 12> Months{"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
     static constexpr std::array<std::string_view, 7> Weekdays{"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
 

@@ -75,7 +75,7 @@ public:
 
     std::string encode(json const &root, json const &schema);
 
-    std::string normalizeObjectType(std::string const & objectType);
+    std::string normalizeObjectType(std::string const &objectType);
 
     std::vector<std::string> const &errors();
 

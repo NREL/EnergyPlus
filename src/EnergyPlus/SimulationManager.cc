@@ -1676,9 +1676,9 @@ namespace SimulationManager {
     {
         std::unique_ptr<fmt::ostream> result = nullptr;
         try {
-            auto f = fmt::output_file(filePath.c_str(), fmt::buffer_size=(2<<17));
+            auto f = fmt::output_file(filePath.c_str(), fmt::buffer_size = (2 << 17));
             result = std::make_unique<fmt::ostream>(std::move(f));
-        } catch (const std::system_error & error) {
+        } catch (const std::system_error &error) {
             ShowSevereError(state, error.what());
             ShowFatalError(state, "OpenOutputFiles: Could not open file " + filePath.string() + " for output (write).");
         }

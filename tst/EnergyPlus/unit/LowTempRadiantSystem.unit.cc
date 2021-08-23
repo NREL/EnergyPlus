@@ -3626,21 +3626,24 @@ TEST_F(LowTempRadiantSystemTest, getFluidToSlabHeatTransferInputTest)
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ISOStandard;
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer =
         thisCFloSys.getFluidToSlabHeatTransferInput(*state, userInput);
-    EXPECT_TRUE(compare_enums(FluidToSlabHeatTransferTypes::ConvectionOnly, state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer));
+    EXPECT_TRUE(compare_enums(FluidToSlabHeatTransferTypes::ConvectionOnly,
+                              state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer));
 
     // Test 2: Input is ISOStandard--so this field needs to get reset to ISOStandard
     userInput = "ISOStandard";
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ConvectionOnly;
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer =
         thisCFloSys.getFluidToSlabHeatTransferInput(*state, userInput);
-    EXPECT_TRUE(compare_enums(FluidToSlabHeatTransferTypes::ISOStandard, state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer));
+    EXPECT_TRUE(compare_enums(FluidToSlabHeatTransferTypes::ISOStandard,
+                              state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer));
 
     // Test 3: Input is ISOStandard--so this field needs to get reset to ConvectionOnly (the default)
     userInput = "WeWantSomethingElse!";
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ISOStandard;
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer =
         thisCFloSys.getFluidToSlabHeatTransferInput(*state, userInput);
-    EXPECT_TRUE(compare_enums(FluidToSlabHeatTransferTypes::ConvectionOnly, state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer));
+    EXPECT_TRUE(compare_enums(FluidToSlabHeatTransferTypes::ConvectionOnly,
+                              state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer));
 }
 
 TEST_F(LowTempRadiantSystemTest, calculateUFromISOStandardTest)

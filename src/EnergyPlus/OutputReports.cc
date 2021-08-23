@@ -244,22 +244,22 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
 
                 if (vert != state.dataSurface->Surface(surf).Sides) {
                     print<check_syntax(fmt700)>(slnfile,
-                          fmt700,
-                          state.dataSurface->Surface(surf).Vertex(vert).x,
-                          state.dataSurface->Surface(surf).Vertex(vert).y,
-                          state.dataSurface->Surface(surf).Vertex(vert).z,
-                          state.dataSurface->Surface(surf).Vertex(vert + 1).x,
-                          state.dataSurface->Surface(surf).Vertex(vert + 1).y,
-                          state.dataSurface->Surface(surf).Vertex(vert + 1).z);
+                                                fmt700,
+                                                state.dataSurface->Surface(surf).Vertex(vert).x,
+                                                state.dataSurface->Surface(surf).Vertex(vert).y,
+                                                state.dataSurface->Surface(surf).Vertex(vert).z,
+                                                state.dataSurface->Surface(surf).Vertex(vert + 1).x,
+                                                state.dataSurface->Surface(surf).Vertex(vert + 1).y,
+                                                state.dataSurface->Surface(surf).Vertex(vert + 1).z);
                 } else {
                     print<check_syntax(fmt700)>(slnfile,
-                          fmt700,
-                          state.dataSurface->Surface(surf).Vertex(vert).x,
-                          state.dataSurface->Surface(surf).Vertex(vert).y,
-                          state.dataSurface->Surface(surf).Vertex(vert).z,
-                          state.dataSurface->Surface(surf).Vertex(1).x,
-                          state.dataSurface->Surface(surf).Vertex(1).y,
-                          state.dataSurface->Surface(surf).Vertex(1).z);
+                                                fmt700,
+                                                state.dataSurface->Surface(surf).Vertex(vert).x,
+                                                state.dataSurface->Surface(surf).Vertex(vert).y,
+                                                state.dataSurface->Surface(surf).Vertex(vert).z,
+                                                state.dataSurface->Surface(surf).Vertex(1).x,
+                                                state.dataSurface->Surface(surf).Vertex(1).y,
+                                                state.dataSurface->Surface(surf).Vertex(1).z);
                 }
             }
         }
@@ -281,13 +281,13 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
                 if (vert == state.dataSurface->Surface(surf).Sides) optcommasemi = ";";
                 static constexpr std::string_view fmtcoord("  {:10.2F},{:10.2F},{:10.2F}{}  !- {} {}\n");
                 print<check_syntax(fmtcoord)>(slnfile,
-                      fmtcoord,
-                      state.dataSurface->Surface(surf).Vertex(vert).x,
-                      state.dataSurface->Surface(surf).Vertex(vert).y,
-                      state.dataSurface->Surface(surf).Vertex(vert).z,
-                      optcommasemi,
-                      vertexstring,
-                      vert);
+                                              fmtcoord,
+                                              state.dataSurface->Surface(surf).Vertex(vert).x,
+                                              state.dataSurface->Surface(surf).Vertex(vert).y,
+                                              state.dataSurface->Surface(surf).Vertex(vert).z,
+                                              optcommasemi,
+                                              vertexstring,
+                                              vert);
             }
         }
     }
@@ -378,12 +378,12 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
 
     print(of, Format_710, "Text - Building Title");
     print<check_syntax(Format_801)>(of,
-          Format_801,
-          DXFcolorno(static_cast<int>(ColorNo::Text)),
-          StemX(1) - 4.0,
-          StemY(1) - 4.0,
-          StemZ(1),
-          "Building - " + state.dataHeatBal->BuildingName);
+                                    Format_801,
+                                    DXFcolorno(static_cast<int>(ColorNo::Text)),
+                                    StemX(1) - 4.0,
+                                    StemY(1) - 4.0,
+                                    StemZ(1),
+                                    "Building - " + state.dataHeatBal->BuildingName);
 
     // We want to point the north arrow to true north
     print(of, Format_710, "North Arrow Stem");
@@ -1852,13 +1852,13 @@ void CostInfoOut(EnergyPlusData &state)
             // Formats
             static constexpr std::string_view Format_801("{:5},{},{},{},{:14.5F},{:14.5F}\n");
             print<check_syntax(Format_801)>(scifile,
-                  Format_801,
-                  surf,
-                  state.dataSurface->Surface(surf).Name,
-                  state.dataConstruction->Construct(state.dataSurface->Surface(surf).Construction).Name,
-                  cSurfaceClass(state.dataSurface->Surface(surf).Class),
-                  state.dataSurface->Surface(surf).Area,
-                  state.dataSurface->Surface(surf).GrossArea);
+                                            Format_801,
+                                            surf,
+                                            state.dataSurface->Surface(surf).Name,
+                                            state.dataConstruction->Construct(state.dataSurface->Surface(surf).Construction).Name,
+                                            cSurfaceClass(state.dataSurface->Surface(surf).Class),
+                                            state.dataSurface->Surface(surf).Area,
+                                            state.dataSurface->Surface(surf).GrossArea);
         }
     }
 
@@ -1929,9 +1929,11 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     print(wrlfile, Format_702);
 
     if (ColorScheme.empty()) {
-        print<check_syntax(Format_707)>(wrlfile, Format_707, state.dataHeatBal->BuildingName, state.dataStrGlobals->VerStringVar, "Default"); // World Info
+        print<check_syntax(Format_707)>(
+            wrlfile, Format_707, state.dataHeatBal->BuildingName, state.dataStrGlobals->VerStringVar, "Default"); // World Info
     } else {
-        print<check_syntax(Format_707)>(wrlfile, Format_707, state.dataHeatBal->BuildingName, state.dataStrGlobals->VerStringVar, ColorScheme); // World Info
+        print<check_syntax(Format_707)>(
+            wrlfile, Format_707, state.dataHeatBal->BuildingName, state.dataStrGlobals->VerStringVar, ColorScheme); // World Info
     }
 
     print(wrlfile, "# Zone Names\n");
@@ -1972,10 +1974,10 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         print<check_syntax(Format_801)>(wrlfile, Format_801, colorstring(colorindex), "Surf", surf);
         for (int vert = 1; vert <= state.dataSurface->Surface(surf).Sides; ++vert) {
             print<check_syntax(Format_802)>(wrlfile,
-                  Format_802,
-                  state.dataSurface->Surface(surf).Vertex(vert).x,
-                  state.dataSurface->Surface(surf).Vertex(vert).y,
-                  state.dataSurface->Surface(surf).Vertex(vert).z);
+                                            Format_802,
+                                            state.dataSurface->Surface(surf).Vertex(vert).x,
+                                            state.dataSurface->Surface(surf).Vertex(vert).y,
+                                            state.dataSurface->Surface(surf).Vertex(vert).z);
         }
         print<check_syntax(Format_803)>(wrlfile, Format_803);
         if (state.dataSurface->Surface(surf).Sides <= 4 || !TriangulateFace) {

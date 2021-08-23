@@ -111,20 +111,20 @@ nlohmann::json InputFile::readJSON()
 {
     auto const ext = FileSystem::getFileType(filePath);
     switch (ext) {
-        case FileSystem::FileTypes::EpJSON:
-        case FileSystem::FileTypes::JSON:
-        case FileSystem::FileTypes::GLHE:
-            return nlohmann::json::parse(*is, nullptr, true, true);
-        case FileSystem::FileTypes::CBOR:
-            return nlohmann::json::from_cbor(*is);
-        case FileSystem::FileTypes::MsgPack:
-            return nlohmann::json::from_msgpack(*is);
-        case FileSystem::FileTypes::UBJSON:
-            return nlohmann::json::from_ubjson(*is);
-        case FileSystem::FileTypes::BSON:
-            return nlohmann::json::from_bson(*is);
-        default:
-            throw FatalError("Invalid file extension. Must be epJSON, JSON, or other experimental extensions");
+    case FileSystem::FileTypes::EpJSON:
+    case FileSystem::FileTypes::JSON:
+    case FileSystem::FileTypes::GLHE:
+        return nlohmann::json::parse(*is, nullptr, true, true);
+    case FileSystem::FileTypes::CBOR:
+        return nlohmann::json::from_cbor(*is);
+    case FileSystem::FileTypes::MsgPack:
+        return nlohmann::json::from_msgpack(*is);
+    case FileSystem::FileTypes::UBJSON:
+        return nlohmann::json::from_ubjson(*is);
+    case FileSystem::FileTypes::BSON:
+        return nlohmann::json::from_bson(*is);
+    default:
+        throw FatalError("Invalid file extension. Must be epJSON, JSON, or other experimental extensions");
     }
 }
 

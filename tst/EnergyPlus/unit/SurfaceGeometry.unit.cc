@@ -530,21 +530,24 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     surfNum = UtilityRoutines::FindItemInList("SURFACE 5 - RECTANGULAROVERHANG", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
     EXPECT_FALSE(compare_enums(SurfaceShape::RectangularOverhang,
-                               state->dataSurface->Surface(surfNum).Shape, false)); // fins and overhangs will not get set to the proper surface shape.
+                               state->dataSurface->Surface(surfNum).Shape,
+                               false)); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularLeftFin = 6
     //	"Surface 6 - RectangularLeftFin"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 6 - RECTANGULARLEFTFIN Left", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
     EXPECT_FALSE(compare_enums(SurfaceShape::RectangularLeftFin,
-                               state->dataSurface->Surface(surfNum).Shape, false)); // fins and overhangs will not get set to the proper surface shape.
+                               state->dataSurface->Surface(surfNum).Shape,
+                               false)); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularRightFin = 7
     //	"Surface 7 - RectangularRightFin"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 7 - RECTANGULARRIGHTFIN Right", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
     EXPECT_FALSE(compare_enums(SurfaceShape::RectangularRightFin,
-                               state->dataSurface->Surface(surfNum).Shape, false)); // fins and overhangs will not get set to the proper surface shape.
+                               state->dataSurface->Surface(surfNum).Shape,
+                               false)); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:TriangularWindow = 8
     //	"Surface 8 - TriangularWindow"

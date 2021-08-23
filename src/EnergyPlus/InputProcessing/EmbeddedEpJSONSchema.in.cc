@@ -53,16 +53,17 @@ namespace EnergyPlus {
 
 namespace EmbeddedEpJSONSchema {
 
-    ${embedded_epJSON_schema}
+    $
+    {
+        embedded_epJSON_schema
+    }
 
-    const gsl::span<const std::uint8_t>
-    embeddedEpJSONSchema()
+    const gsl::span<const std::uint8_t> embeddedEpJSONSchema()
     {
         return gsl::span<const std::uint8_t>(embeddedSchema);
     }
 
-    const std::string_view
-    embeddedEpJSONSchemaView()
+    const std::string_view embeddedEpJSONSchemaView()
     {
         static const std::string str(embeddedSchema.begin(), embeddedSchema.end());
         return str;

@@ -60,12 +60,14 @@
 #include <EnergyPlus/api/TypeDefs.h>
 
 namespace EnergyPlus {
-    class FatalError : public std::runtime_error
+class FatalError : public std::runtime_error
+{
+public:
+    FatalError(std::string const &msg) : runtime_error(msg)
     {
-    public:
-        FatalError(std::string const &msg) : runtime_error(msg) {}
-    };
-}
+    }
+};
+} // namespace EnergyPlus
 
 // macro to guarantee array sizing in debug builds
 #define EP_SIZE_CHECK(array, min_size)                                                                                                               \

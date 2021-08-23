@@ -80,9 +80,9 @@
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <fmt/ostream.h>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
-#include <fmt/ostream.h>
 
 namespace EnergyPlus {
 
@@ -4096,11 +4096,7 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Monthly:
-            print<FormatSyntax::FMT>(outputFile,
-                                     "{},{},{:2d}\n",
-                                     reportIDString.c_str(),
-                                     DayOfSimChr.c_str(),
-                                     Month());
+            print<FormatSyntax::FMT>(outputFile, "{},{},{:2d}\n", reportIDString.c_str(), DayOfSimChr.c_str(), Month());
             if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                                                 reportID,
@@ -4111,10 +4107,7 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Simulation:
-            print<FormatSyntax::FMT>(outputFile,
-                                     "{},{}\n",
-                                     reportIDString.c_str(),
-                                     DayOfSimChr.c_str());
+            print<FormatSyntax::FMT>(outputFile, "{},{}\n", reportIDString.c_str(), DayOfSimChr.c_str());
             if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                                                 reportID,
@@ -4125,9 +4118,8 @@ namespace OutputProcessor {
             break;
         default:
             if (state.dataSQLiteProcedures->sqlite) {
-                state.dataSQLiteProcedures->sqlite->sqliteWriteMessage(
-                        format<FormatSyntax::FMT>("Illegal reportingInterval passed to WriteTimeStampFormatData: {}", static_cast<int>(reportingInterval))
-                        );
+                state.dataSQLiteProcedures->sqlite->sqliteWriteMessage(format<FormatSyntax::FMT>(
+                    "Illegal reportingInterval passed to WriteTimeStampFormatData: {}", static_cast<int>(reportingInterval)));
             }
             break;
         }
@@ -4681,7 +4673,7 @@ namespace OutputProcessor {
 
         if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface && !state.dataSysVars->ReportDuringWarmup) return;
 
-//        dtoa(repValue, state.dataOutputProcessor->s_WriteNumericData);
+        //        dtoa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
@@ -4713,7 +4705,7 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-//        i32toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
+        //        i32toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);

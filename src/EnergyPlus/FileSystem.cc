@@ -363,7 +363,7 @@ namespace FileSystem {
             throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
         }
 
-        auto close_file = [](FILE* f){fclose(f);};
+        auto close_file = [](FILE *f) { fclose(f); };
         auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(filePath.c_str(), fopen_mode.data()), close_file);
         if (!holder) {
             throw FatalError(fmt::format("Could not open file: {}", filePath.c_str()));
@@ -403,7 +403,7 @@ namespace FileSystem {
             throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
         }
 
-        auto close_file = [](FILE* f){fclose(f);};
+        auto close_file = [](FILE *f) { fclose(f); };
         auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(filePath.c_str(), fopen_mode.data()), close_file);
         if (!holder) {
             throw FatalError(fmt::format("Could not open file: {}", filePath.c_str()));
@@ -412,20 +412,20 @@ namespace FileSystem {
 
         auto const ext = getFileType(filePath);
         switch (ext) {
-            case FileTypes::EpJSON:
-            case FileTypes::JSON:
-            case FileTypes::GLHE:
-                return nlohmann::json::parse(f, nullptr, true, true);
-            case FileTypes::CBOR:
-                return nlohmann::json::from_cbor(f);
-            case FileTypes::MsgPack:
-                return nlohmann::json::from_msgpack(f);
-            case FileTypes::UBJSON:
-                return nlohmann::json::from_ubjson(f);
-            case FileTypes::BSON:
-                return nlohmann::json::from_bson(f);
-            default:
-                throw FatalError("Invalid file extension. Must be epJSON, JSON, or other experimental extensions");
+        case FileTypes::EpJSON:
+        case FileTypes::JSON:
+        case FileTypes::GLHE:
+            return nlohmann::json::parse(f, nullptr, true, true);
+        case FileTypes::CBOR:
+            return nlohmann::json::from_cbor(f);
+        case FileTypes::MsgPack:
+            return nlohmann::json::from_msgpack(f);
+        case FileTypes::UBJSON:
+            return nlohmann::json::from_ubjson(f);
+        case FileTypes::BSON:
+            return nlohmann::json::from_bson(f);
+        default:
+            throw FatalError("Invalid file extension. Must be epJSON, JSON, or other experimental extensions");
         }
     }
 

@@ -6364,8 +6364,8 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
     Real64 OutAirMassFlowFracActual(0.0);
 
     // check OA controller inputs
-    EXPECT_EQ(curOACntrl.MinOA, 0.2);                                         // user specified minimum OA vol flow rate
-    EXPECT_TRUE(curOACntrl.FixedMin);                                         // Economizer Minimum Limit Type = FixedMinimum
+    EXPECT_EQ(curOACntrl.MinOA, 0.2);                                                          // user specified minimum OA vol flow rate
+    EXPECT_TRUE(curOACntrl.FixedMin);                                                          // Economizer Minimum Limit Type = FixedMinimum
     EXPECT_TRUE(compare_enums(curOACntrl.Lockout, MixedAir::iLockoutType::NoLockoutPossible)); // NoLockout (economizer always active)
     EXPECT_EQ(curOACntrl.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
 
@@ -6573,8 +6573,8 @@ TEST_F(EnergyPlusFixture, OAController_HighExhaustMassFlowTest)
     Real64 OutAirMassFlowFracActual(0.0);
 
     // check OA controller inputs
-    EXPECT_EQ(curOACntrl.MinOA, 0.2);                                         // user specified minimum OA vol flow rate
-    EXPECT_TRUE(curOACntrl.FixedMin);                                         // Economizer Minimum Limit Type = FixedMinimum
+    EXPECT_EQ(curOACntrl.MinOA, 0.2);                                                          // user specified minimum OA vol flow rate
+    EXPECT_TRUE(curOACntrl.FixedMin);                                                          // Economizer Minimum Limit Type = FixedMinimum
     EXPECT_TRUE(compare_enums(curOACntrl.Lockout, MixedAir::iLockoutType::NoLockoutPossible)); // NoLockout (economizer always active)
     EXPECT_EQ(curOACntrl.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
 
@@ -6826,8 +6826,8 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
     Real64 OutAirMassFlowFracActual(0.0);
 
     // check OA controller inputs
-    EXPECT_EQ(curOACntrl.MinOA, 0.5);                                         // user specified minimum OA vol flow rate
-    EXPECT_TRUE(curOACntrl.FixedMin);                                         // Economizer Minimum Limit Type = FixedMinimum
+    EXPECT_EQ(curOACntrl.MinOA, 0.5);                                                          // user specified minimum OA vol flow rate
+    EXPECT_TRUE(curOACntrl.FixedMin);                                                          // Economizer Minimum Limit Type = FixedMinimum
     EXPECT_TRUE(compare_enums(curOACntrl.Lockout, MixedAir::iLockoutType::NoLockoutPossible)); // NoLockout (economizer always active)
     EXPECT_EQ(curOACntrl.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
 

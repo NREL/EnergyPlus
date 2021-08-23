@@ -55,92 +55,92 @@
 #include <unordered_map>
 
 namespace EnergyPlus {
-    class InputProcessorFixture;
+class InputProcessorFixture;
 }
 
 class CsvParser
-        {
-        public:
-            friend class EnergyPlus::InputProcessorFixture;
-            using json = nlohmann::json;
+{
+public:
+    friend class EnergyPlus::InputProcessorFixture;
+    using json = nlohmann::json;
 
-            CsvParser() = default;
+    CsvParser() = default;
 
-            // Skipping 1 row is assumed to be the header row and will be recorded as such.
-            // Otherwise, if rows_to_skip == 0 or >1 then there will be no header
-            json decode(std::string_view csv, char delimiter = ',', int rows_to_skip = 0);
+    // Skipping 1 row is assumed to be the header row and will be recorded as such.
+    // Otherwise, if rows_to_skip == 0 or >1 then there will be no header
+    json decode(std::string_view csv, char delimiter = ',', int rows_to_skip = 0);
 
-            json decode(std::string_view csv, bool &success, char delimiter = ',', int rows_to_skip = 0);
+    json decode(std::string_view csv, bool &success, char delimiter = ',', int rows_to_skip = 0);
 
-            json decode(std::string_view csv, size_t csv_size, char delimiter = ',', int rows_to_skip = 0);
+    json decode(std::string_view csv, size_t csv_size, char delimiter = ',', int rows_to_skip = 0);
 
-            json decode(std::string_view csv, size_t csv_size, bool &success, char delimiter = ',', int rows_to_skip = 0);
+    json decode(std::string_view csv, size_t csv_size, bool &success, char delimiter = ',', int rows_to_skip = 0);
 
-            std::string encode(json const &root);
+    std::string encode(json const &root);
 
-            std::vector<std::string> const &errors();
+    std::vector<std::string> const &errors();
 
-            std::vector<std::string> const &warnings();
+    std::vector<std::string> const &warnings();
 
-            bool hasErrors();
+    bool hasErrors();
 
-            enum class Token : size_t
-            {
-                NONE = 0,
-                FILE_END = 1,
-                DELIMITER = 2,
-                LINE_END = 3,
-                VALUE = 4
-            };
+    enum class Token : size_t
+    {
+        NONE = 0,
+        FILE_END = 1,
+        DELIMITER = 2,
+        LINE_END = 3,
+        VALUE = 4
+    };
 
-        private:
-            size_t cur_line_num = 1;
-            size_t index_into_cur_line = 0;
-            size_t beginning_of_line_index = 0;
-            size_t csv_size = 0;
-            char delimiter = ',';
-            int rows_to_skip = 0;
-            char s[129] = {};
-            std::vector<std::string> errors_;
-            std::vector<std::string> warnings_;
+private:
+    size_t cur_line_num = 1;
+    size_t index_into_cur_line = 0;
+    size_t beginning_of_line_index = 0;
+    size_t csv_size = 0;
+    char delimiter = ',';
+    int rows_to_skip = 0;
+    char s[129] = {};
+    std::vector<std::string> errors_;
+    std::vector<std::string> warnings_;
 
-            static void increment_both_index(size_t &index, size_t &line_index);
+    static void increment_both_index(size_t &index, size_t &line_index);
 
-            static void decrement_both_index(size_t &index, size_t &line_index);
+    static void decrement_both_index(size_t &index, size_t &line_index);
 
-            void skip_rows(std::string_view csv, size_t &index);
+    void skip_rows(std::string_view csv, size_t &index);
 
-            int find_number_columns(std::string_view csv, size_t &index);
+    int find_number_columns(std::string_view csv, size_t &index);
 
-            json parse_csv(std::string_view csv, size_t &index, bool &success);
+    json parse_csv(std::string_view csv, size_t &index, bool &success);
 
-            void parse_header(std::string_view csv, size_t &index, bool &success, json & header);
+    void parse_header(std::string_view csv, size_t &index, bool &success, json &header);
 
-            void parse_line(std::string_view csv, size_t &index, json & columns);
+    void parse_line(std::string_view csv, size_t &index, json &columns);
 
-            json parse_value(std::string_view csv, size_t &index);
+    json parse_value(std::string_view csv, size_t &index);
 
-//            json parse_number(std::string_view csv, size_t &index);
+    //            json parse_number(std::string_view csv, size_t &index);
 
-//            std::string parse_string(std::string_view csv, size_t &index);
+    //            std::string parse_string(std::string_view csv, size_t &index);
 
-            Token look_ahead(std::string_view csv, size_t index);
+    Token look_ahead(std::string_view csv, size_t index);
 
-            Token next_token(std::string_view csv, size_t &index);
+    Token next_token(std::string_view csv, size_t &index);
 
-            static std::string_view rtrim(std::string_view str);
+    static std::string_view rtrim(std::string_view str);
 
-            void eat_whitespace(std::string_view csv, size_t &index);
+    void eat_whitespace(std::string_view csv, size_t &index);
 
-            static inline std::string convertToUpper(std::string str)
-            {
-                size_t len = str.size();
-                for (size_t i = 0; i < len; ++i) {
-                    char c = str[i];
-                    str[i] = ('a' <= c && c <= 'z') ? c ^ 0x20 : c; // ASCII only, which is fine
-                }
-                return str;
-            }
-        };
+    static inline std::string convertToUpper(std::string str)
+    {
+        size_t len = str.size();
+        for (size_t i = 0; i < len; ++i) {
+            char c = str[i];
+            str[i] = ('a' <= c && c <= 'z') ? c ^ 0x20 : c; // ASCII only, which is fine
+        }
+        return str;
+    }
+};
 
 #endif // InputProcessing_CsvParser_hh_INCLUDED

@@ -82,9 +82,12 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_AssignResourceTypeNum)
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Steam, DataGlobalConstants::AssignResourceTypeNum("Steam")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::DistrictCooling, DataGlobalConstants::AssignResourceTypeNum("DistrictCooling")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::DistrictHeating, DataGlobalConstants::AssignResourceTypeNum("DistrictHeating")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::ElectricityProduced, DataGlobalConstants::AssignResourceTypeNum("ElectricityProduced")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::ElectricityPurchased, DataGlobalConstants::AssignResourceTypeNum("ElectricityPurchased")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::ElectricitySurplusSold, DataGlobalConstants::AssignResourceTypeNum("ElectricitySurplusSold")));
+    EXPECT_TRUE(
+        compare_enums(DataGlobalConstants::ResourceType::ElectricityProduced, DataGlobalConstants::AssignResourceTypeNum("ElectricityProduced")));
+    EXPECT_TRUE(
+        compare_enums(DataGlobalConstants::ResourceType::ElectricityPurchased, DataGlobalConstants::AssignResourceTypeNum("ElectricityPurchased")));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::ElectricitySurplusSold,
+                              DataGlobalConstants::AssignResourceTypeNum("ElectricitySurplusSold")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::ElectricityNet, DataGlobalConstants::AssignResourceTypeNum("ElectricityNet")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::SolarWater, DataGlobalConstants::AssignResourceTypeNum("SolarWater")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::SolarAir, DataGlobalConstants::AssignResourceTypeNum("SolarAir")));
@@ -103,10 +106,13 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_AssignResourceTypeNum)
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Pb, DataGlobalConstants::AssignResourceTypeNum("Pb")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NuclearHigh, DataGlobalConstants::AssignResourceTypeNum("Nuclear High")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::NuclearLow, DataGlobalConstants::AssignResourceTypeNum("Nuclear Low")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::WaterEnvironmentalFactors, DataGlobalConstants::AssignResourceTypeNum("WaterEnvironmentalFactors")));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::WaterEnvironmentalFactors,
+                              DataGlobalConstants::AssignResourceTypeNum("WaterEnvironmentalFactors")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::CarbonEquivalent, DataGlobalConstants::AssignResourceTypeNum("Carbon Equivalent")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::PlantLoopHeatingDemand, DataGlobalConstants::AssignResourceTypeNum("PlantLoopHeatingDemand")));
-    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::PlantLoopCoolingDemand, DataGlobalConstants::AssignResourceTypeNum("PlantLoopCoolingDemand")));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::PlantLoopHeatingDemand,
+                              DataGlobalConstants::AssignResourceTypeNum("PlantLoopHeatingDemand")));
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::PlantLoopCoolingDemand,
+                              DataGlobalConstants::AssignResourceTypeNum("PlantLoopCoolingDemand")));
     EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::None, DataGlobalConstants::AssignResourceTypeNum("XYZ")));
 }
 

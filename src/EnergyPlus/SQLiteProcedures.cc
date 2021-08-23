@@ -134,8 +134,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                 }
             }
         }
-        auto errorStream =
-            std::make_shared<std::ofstream>(state.dataStrGlobals->outputSqliteErrFilePath, std::ofstream::out | std::ofstream::trunc);
+        auto errorStream = std::make_shared<std::ofstream>(state.dataStrGlobals->outputSqliteErrFilePath, std::ofstream::out | std::ofstream::trunc);
         return std::make_unique<SQLite>(errorStream,
                                         state.dataStrGlobals->outputSqlFilePath,
                                         state.dataStrGlobals->outputSqliteErrFilePath,
@@ -2145,33 +2144,27 @@ void SQLite::addNominalPeopleData(int const number, DataHeatBalance::PeopleData 
 }
 void SQLite::addNominalElectricEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalElectricEquipmentData)
 {
-    nominalElectricEquipments.push_back(
-        std::make_unique<NominalElectricEquipment>(m_errorStream, m_db, number, nominalElectricEquipmentData));
+    nominalElectricEquipments.push_back(std::make_unique<NominalElectricEquipment>(m_errorStream, m_db, number, nominalElectricEquipmentData));
 }
 void SQLite::addNominalGasEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalGasEquipmentData)
 {
-    nominalGasEquipments.push_back(
-        std::make_unique<NominalGasEquipment>(m_errorStream, m_db, number, nominalGasEquipmentData));
+    nominalGasEquipments.push_back(std::make_unique<NominalGasEquipment>(m_errorStream, m_db, number, nominalGasEquipmentData));
 }
 void SQLite::addNominalSteamEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalSteamEquipmentData)
 {
-    nominalSteamEquipments.push_back(
-        std::make_unique<NominalSteamEquipment>(m_errorStream, m_db, number, nominalSteamEquipmentData));
+    nominalSteamEquipments.push_back(std::make_unique<NominalSteamEquipment>(m_errorStream, m_db, number, nominalSteamEquipmentData));
 }
 void SQLite::addNominalHotWaterEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalHotWaterEquipmentData)
 {
-    nominalHotWaterEquipments.push_back(
-        std::make_unique<NominalHotWaterEquipment>(m_errorStream, m_db, number, nominalHotWaterEquipmentData));
+    nominalHotWaterEquipments.push_back(std::make_unique<NominalHotWaterEquipment>(m_errorStream, m_db, number, nominalHotWaterEquipmentData));
 }
 void SQLite::addNominalOtherEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalOtherEquipmentData)
 {
-    nominalOtherEquipments.push_back(
-        std::make_unique<NominalOtherEquipment>(m_errorStream, m_db, number, nominalOtherEquipmentData));
+    nominalOtherEquipments.push_back(std::make_unique<NominalOtherEquipment>(m_errorStream, m_db, number, nominalOtherEquipmentData));
 }
 void SQLite::addNominalBaseboardData(int const number, DataHeatBalance::BBHeatData const &nominalBaseboardData)
 {
-    nominalBaseboardHeats.push_back(
-        std::make_unique<NominalBaseboardHeat>(m_errorStream, m_db, number, nominalBaseboardData));
+    nominalBaseboardHeats.push_back(std::make_unique<NominalBaseboardHeat>(m_errorStream, m_db, number, nominalBaseboardData));
 }
 void SQLite::addInfiltrationData(int const number, DataHeatBalance::InfiltrationData const &infiltrationData)
 {

@@ -63,8 +63,7 @@
 
 namespace EnergyPlus {
 
-template<typename T, typename = typename std::enable_if_t<std::is_enum_v<T>, T>>
-constexpr std::ostream& operator<<(std::ostream& stream, T e)
+template <typename T, typename = typename std::enable_if_t<std::is_enum_v<T>, T>> constexpr std::ostream &operator<<(std::ostream &stream, T e)
 {
     return stream << static_cast<typename std::underlying_type_t<T>>(e);
 }
@@ -128,7 +127,7 @@ protected:
 
     // This will compare two enums and convert them to their underlying_type. Without this function or operator<<
     // overload, googletest will not properly link since it can't implicitly convert to underlying_type anymore
-    template<typename T, typename = typename std::enable_if_t<std::is_enum_v<T>, T>>
+    template <typename T, typename = typename std::enable_if_t<std::is_enum_v<T>, T>>
     constexpr bool compare_enums(T const expected, T const actual, bool const expect_eq = true)
     {
         const bool is_valid = (expected == actual);

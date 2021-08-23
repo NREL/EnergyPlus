@@ -47,10 +47,10 @@
 
 #include <EnergyPlus/InputProcessing/CsvParser.hh>
 #include <charconv>
+#include <fast_float/fast_float.h>
 #include <fmt/format.h>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
-#include <fast_float/fast_float.h>
 
 using json = nlohmann::json;
 
@@ -165,10 +165,7 @@ int CsvParser::find_number_columns(std::string_view csv, size_t &index)
 
 json CsvParser::parse_csv(std::string_view csv, size_t &index, bool &success)
 {
-    json root = {
-            {"header", {}},
-            {"values", {}}
-    };
+    json root = {{"header", {}}, {"values", {}}};
     bool check_first_row = true;
     bool has_header = (rows_to_skip == 1);
 
@@ -184,8 +181,8 @@ json CsvParser::parse_csv(std::string_view csv, size_t &index, bool &success)
         skip_rows(csv, index);
     }
 
-    json & header = root["header"];
-    json & columns = root["values"];
+    json &header = root["header"];
+    json &columns = root["values"];
     while (true) {
         if (index == csv_size) {
             break;
@@ -196,7 +193,7 @@ json CsvParser::parse_csv(std::string_view csv, size_t &index, bool &success)
 
                 for (int i = 0; i < num_columns; ++i) {
                     auto arr = std::vector<json>();
-                    arr.reserve(8764*4);
+                    arr.reserve(8764 * 4);
                     columns.push_back(std::move(arr));
                 }
 
@@ -224,7 +221,7 @@ json CsvParser::parse_csv(std::string_view csv, size_t &index, bool &success)
     return root;
 }
 
-void CsvParser::parse_header(std::string_view csv, size_t &index, bool &success, json & header)
+void CsvParser::parse_header(std::string_view csv, size_t &index, bool &success, json &header)
 {
     Token token;
 
@@ -242,7 +239,7 @@ void CsvParser::parse_header(std::string_view csv, size_t &index, bool &success,
     }
 }
 
-void CsvParser::parse_line(std::string_view csv, size_t &index, json & columns)
+void CsvParser::parse_line(std::string_view csv, size_t &index, json &columns)
 {
     Token token;
     int column_num = 0;
@@ -257,12 +254,12 @@ void CsvParser::parse_line(std::string_view csv, size_t &index, json & columns)
             ++column_num;
         } else {
             columns.at(column_num).push_back(parse_value(csv, index));
-//            if (!success) return;
+            //            if (!success) return;
         }
     }
 }
 
-//json CsvParser::parse_value(std::string_view csv, size_t &index, bool &success)
+// json CsvParser::parse_value(std::string_view csv, size_t &index, bool &success)
 //{
 //    Token token;
 //    token = look_ahead(csv, index);
@@ -289,7 +286,7 @@ json CsvParser::parse_value(std::string_view csv, size_t &index)
     eat_whitespace(csv, index);
     size_t save_i = index;
 
-    while(true) {
+    while (true) {
         if (save_i == csv_size) {
             break;
         }
@@ -311,47 +308,47 @@ json CsvParser::parse_value(std::string_view csv, size_t &index)
     if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range || result.ptr != value.end()) {
         return rtrim(value);
     }
-//    double integral;
-//    double fractional = std::modf(val, &integral);
-//    if (fractional == 0) {
-//        return static_cast<int>(fractional);
-//    }
+    //    double integral;
+    //    double fractional = std::modf(val, &integral);
+    //    if (fractional == 0) {
+    //        return static_cast<int>(fractional);
+    //    }
     return val;
 
-//    auto const convert_double = [](std::string_view str) -> json {
-//        double val;
-//        auto result = fast_float::from_chars(str.data(), str.data() + str.size(), val);
-//        if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range || result.ptr != str.end()) {
-//            return rtrim(str);
-//        }
-//        return val;
-//    };
-//
-//    auto const convert_int = [&convert_double](std::string_view str) -> json {
-//        int val;
-//        auto result = std::from_chars(str.data(), str.data() + str.size(), val);
-//        if (result.ec == std::errc::result_out_of_range) {
-//            return convert_double(str);
-//        } else if (result.ec == std::errc::invalid_argument) {
-//            if (*result.ptr == '.') {
-//                return convert_double(str);
-//            } else {
-//                return rtrim(str);
-//            }
-//        } else if (result.ptr != str.end()) {
-//            if (*result.ptr == '.' || *result.ptr == 'e' || *result.ptr == 'E') {
-//                return convert_double(str);
-//            } else {
-//                return rtrim(str);
-//            }
-//        }
-//        return val;
-//    };
-//
-//    return convert_int(value);
+    //    auto const convert_double = [](std::string_view str) -> json {
+    //        double val;
+    //        auto result = fast_float::from_chars(str.data(), str.data() + str.size(), val);
+    //        if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range || result.ptr != str.end()) {
+    //            return rtrim(str);
+    //        }
+    //        return val;
+    //    };
+    //
+    //    auto const convert_int = [&convert_double](std::string_view str) -> json {
+    //        int val;
+    //        auto result = std::from_chars(str.data(), str.data() + str.size(), val);
+    //        if (result.ec == std::errc::result_out_of_range) {
+    //            return convert_double(str);
+    //        } else if (result.ec == std::errc::invalid_argument) {
+    //            if (*result.ptr == '.') {
+    //                return convert_double(str);
+    //            } else {
+    //                return rtrim(str);
+    //            }
+    //        } else if (result.ptr != str.end()) {
+    //            if (*result.ptr == '.' || *result.ptr == 'e' || *result.ptr == 'E') {
+    //                return convert_double(str);
+    //            } else {
+    //                return rtrim(str);
+    //            }
+    //        }
+    //        return val;
+    //    };
+    //
+    //    return convert_int(value);
 }
 
-//std::string CsvParser::parse_string(std::string_view csv, size_t &index)
+// std::string CsvParser::parse_string(std::string_view csv, size_t &index)
 //{
 //    eat_whitespace(csv, index);
 //
@@ -444,10 +441,7 @@ void CsvParser::decrement_both_index(size_t &index, size_t &line_index)
 void CsvParser::eat_whitespace(std::string_view csv, size_t &index)
 {
     while (index < csv_size) {
-        if ((delimiter != ' ' && csv[index] == ' ') ||
-            (delimiter != '\t' && csv[index] == '\t') ||
-            csv[index] == '\r')
-        {
+        if ((delimiter != ' ' && csv[index] == ' ') || (delimiter != '\t' && csv[index] == '\t') || csv[index] == '\r') {
             increment_both_index(index, index_into_cur_line);
             continue;
         } else {

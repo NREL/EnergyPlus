@@ -299,34 +299,34 @@ namespace CommandLineInterface {
             auto const fileType = FileSystem::getFileType(state.dataStrGlobals->inputFilePath);
             state.dataGlobal->isEpJSON = FileSystem::is_all_json_type(fileType);
             switch (fileType) {
-                case FileSystem::FileTypes::IDF:
-                case FileSystem::FileTypes::IMF:
-                case FileSystem::FileTypes::EpJSON:
-                case FileSystem::FileTypes::JSON:
-                    break;
-                case FileSystem::FileTypes::CBOR:
-                    state.dataGlobal->isCBOR = true;
-                    DisplayString(state, "CBOR input format is experimental and unsupported.");
-                    break;
-                case FileSystem::FileTypes::MsgPack:
-                    state.dataGlobal->isMsgPack = true;
-                    DisplayString(state, "MsgPack input format is experimental and unsupported.");
-                    break;
-                case FileSystem::FileTypes::UBJSON:
-                    state.dataGlobal->isUBJSON = true;
-                    DisplayString(state, "UBJSON input format is experimental and unsupported.");
-                    break;
-                case FileSystem::FileTypes::BSON:
-                    state.dataGlobal->isBSON = true;
-                    DisplayString(state, "BSON input format is experimental and unsupported.");
-                    break;
-                default:
-                    DisplayString(state, "ERROR: Input file must have IDF, IMF, or epJSON extension.");
-                    if (eplusRunningViaAPI) {
-                        return static_cast<int>(ReturnCodes::Failure);
-                    } else {
-                        exit(EXIT_FAILURE);
-                    }
+            case FileSystem::FileTypes::IDF:
+            case FileSystem::FileTypes::IMF:
+            case FileSystem::FileTypes::EpJSON:
+            case FileSystem::FileTypes::JSON:
+                break;
+            case FileSystem::FileTypes::CBOR:
+                state.dataGlobal->isCBOR = true;
+                DisplayString(state, "CBOR input format is experimental and unsupported.");
+                break;
+            case FileSystem::FileTypes::MsgPack:
+                state.dataGlobal->isMsgPack = true;
+                DisplayString(state, "MsgPack input format is experimental and unsupported.");
+                break;
+            case FileSystem::FileTypes::UBJSON:
+                state.dataGlobal->isUBJSON = true;
+                DisplayString(state, "UBJSON input format is experimental and unsupported.");
+                break;
+            case FileSystem::FileTypes::BSON:
+                state.dataGlobal->isBSON = true;
+                DisplayString(state, "BSON input format is experimental and unsupported.");
+                break;
+            default:
+                DisplayString(state, "ERROR: Input file must have IDF, IMF, or epJSON extension.");
+                if (eplusRunningViaAPI) {
+                    return static_cast<int>(ReturnCodes::Failure);
+                } else {
+                    exit(EXIT_FAILURE);
+                }
             }
         }
 

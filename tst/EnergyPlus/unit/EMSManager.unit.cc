@@ -1327,7 +1327,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.015174171, 0.00000001); // RhovFnTdbRh 30.0 0.5 =
 
     EXPECT_TRUE(compare_enums(state->dataRuntimeLang->ErlExpression(27).Operator,
-              ErlFunc::RhovFnTdbRhLBnd0C)); // fails before #5284, returns FuncRhovFnTdbRh( 41 )
+                              ErlFunc::RhovFnTdbRhLBnd0C)); // fails before #5284, returns FuncRhovFnTdbRh( 41 )
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(27).NumOperands, 2);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(27).Operand.size(), 2u);
     EXPECT_TRUE(compare_enums(state->dataRuntimeLang->ErlExpression(27).Operand(2).Type, Value::Number)); // argument was passed to EMS function
@@ -1355,7 +1355,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.3295072808, 0.00000001); // RhFnTdbRhov 30.0 0.01 =
 
     EXPECT_TRUE(compare_enums(state->dataRuntimeLang->ErlExpression(30).Operator,
-              ErlFunc::RhFnTdbRhovLBnd0C)); // fails before #5284, returns int const FuncRhFnTdbRhov( 44 )
+                              ErlFunc::RhFnTdbRhovLBnd0C)); // fails before #5284, returns int const FuncRhFnTdbRhov( 44 )
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(30).NumOperands, 2);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(30).Operand.size(), 2u);
     EXPECT_TRUE(compare_enums(state->dataRuntimeLang->ErlExpression(30).Operand(2).Type, Value::Number)); // argument was passed to EMS function

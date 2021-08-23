@@ -72,8 +72,7 @@ enum class OutputTypes
     BSON
 };
 
-template <typename... Args>
-void displayMessage(std::string_view str_format, Args &&... args)
+template <typename... Args> void displayMessage(std::string_view str_format, Args &&...args)
 {
     fmt::print(std::cout, str_format, args...);
     std::cout.write("\n", 1);
@@ -279,8 +278,8 @@ bool processInput(std::string const &inputFilePath,
         outputDirPath = inputDirPath;
     }
 
-//    auto inputFileExt = EnergyPlus::FileSystem::getFileExtension(inputFilePath).string();
-//    std::transform(inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper);
+    //    auto inputFileExt = EnergyPlus::FileSystem::getFileExtension(inputFilePath).string();
+    //    std::transform(inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper);
 
     auto const inputFileType = EnergyPlus::FileSystem::getFileType(inputFilePath);
 
@@ -295,10 +294,12 @@ bool processInput(std::string const &inputFilePath,
         return false;
     }
 
-    if (outputType == OutputTypes::epJSON && (inputFileType == EnergyPlus::FileSystem::FileTypes::EpJSON || inputFileType == EnergyPlus::FileSystem::FileTypes::JSON)) {
+    if (outputType == OutputTypes::epJSON &&
+        (inputFileType == EnergyPlus::FileSystem::FileTypes::EpJSON || inputFileType == EnergyPlus::FileSystem::FileTypes::JSON)) {
         displayMessage("Same output format as input format requested (epJSON). Skipping conversion and moving to next file.");
         return false;
-    } else if (outputType == OutputTypes::IDF && (inputFileType == EnergyPlus::FileSystem::FileTypes::IDF || inputFileType == EnergyPlus::FileSystem::FileTypes::IMF)) {
+    } else if (outputType == OutputTypes::IDF &&
+               (inputFileType == EnergyPlus::FileSystem::FileTypes::IDF || inputFileType == EnergyPlus::FileSystem::FileTypes::IMF)) {
         displayMessage("Same output format as input format requested (IDF). Skipping conversion and moving to next file.");
         return false;
     } else if (outputType == OutputTypes::CBOR && isCBOR) {

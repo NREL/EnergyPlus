@@ -101,7 +101,9 @@ protected:
     static void write_ground_temps(InputOutputFile &os, const std::string &name, const Array1D<Real64> &data)
     {
         print<FormatSyntax::FMT>(os,
-                                 "! <Site:GroundTemperature:{}>,Jan{{C}},Feb{{C}},Mar{{C}},Apr{{C}},May{{C}},Jun{{C}},Jul{{C}},Aug{{C}},Sep{{C}},Oct{{C}},Nov{{C}},Dec{{C}}\n",
+                                 "! "
+                                 "<Site:GroundTemperature:{}>,Jan{{C}},Feb{{C}},Mar{{C}},Apr{{C}},May{{C}},Jun{{C}},Jul{{C}},Aug{{C}},Sep{{C}},Oct{{"
+                                 "C}},Nov{{C}},Dec{{C}}\n",
                                  name);
         print<FormatSyntax::FMT>(os, " Site:GroundTemperature:{}{}\n", name, fmt::format("{:6.2F}", fmt::join(data, ", ")));
     }

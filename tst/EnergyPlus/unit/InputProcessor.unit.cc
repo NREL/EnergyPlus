@@ -639,7 +639,7 @@ TEST_F(InputProcessorFixture, parse_latin1_json)
     json &epJSON = getEpJSON();
 
     auto it = epJSON.find("Construction");
-    ASSERT_TRUE(it !=epJSON.end());
+    ASSERT_TRUE(it != epJSON.end());
     auto iit = it->begin();
     EXPECT_EQ("1\xB0piano", iit.key());
 }

@@ -47,10 +47,10 @@
 
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <charconv>
+#include <fast_float/fast_float.h>
 #include <fmt/format.h>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
-#include <fast_float/fast_float.h>
 
 using json = nlohmann::json;
 
@@ -117,7 +117,7 @@ std::string IdfParser::encode(json const &root, json const &schema)
             encoded += obj.key();
             size_t skipped_fields = 0;
             for (size_t i = 0; i < legacy_idd_field.size(); i++) {
-                std::string const & entry = legacy_idd_field[i].get<std::string>();
+                std::string const &entry = legacy_idd_field[i].get<std::string>();
                 if (obj_in.value().find(entry) == obj_in.value().end()) {
                     if (entry == "name")
                         encoded += std::string{end_of_field} + obj_in.key();
@@ -148,7 +148,7 @@ std::string IdfParser::encode(json const &root, json const &schema)
                 auto const &cur_extension_obj = extensions[extension_i];
                 auto const &extensible = schema["properties"][obj.key()]["legacy_idd"]["extensibles"];
                 for (size_t i = 0; i < extensible.size(); i++) {
-                    std::string const & tmp = extensible[i].get<std::string>();
+                    std::string const &tmp = extensible[i].get<std::string>();
                     if (cur_extension_obj.find(tmp) == cur_extension_obj.end()) {
                         skipped_fields++;
                         continue;
@@ -171,7 +171,7 @@ std::string IdfParser::encode(json const &root, json const &schema)
     return encoded;
 }
 
-std::string IdfParser::normalizeObjectType(std::string const & objectType)
+std::string IdfParser::normalizeObjectType(std::string const &objectType)
 {
     if (objectType.empty()) return std::string{};
     auto key = convertToUpper(objectType);
@@ -239,7 +239,8 @@ json IdfParser::parse_idf(std::string_view idf, size_t &index, bool &success, js
             auto const parsed_obj_name = parse_string(idf, index);
             auto const obj_name = normalizeObjectType(parsed_obj_name);
             if (obj_name.empty()) {
-                errors_.emplace_back(fmt::format("Line: {} Index: {} - \"{}\" is not a valid Object Type.", cur_line_num, index_into_cur_line, parsed_obj_name));
+                errors_.emplace_back(
+                    fmt::format("Line: {} Index: {} - \"{}\" is not a valid Object Type.", cur_line_num, index_into_cur_line, parsed_obj_name));
                 while (token != Token::SEMICOLON && token != Token::END)
                     token = next_token(idf, index);
                 continue;
@@ -255,7 +256,8 @@ json IdfParser::parse_idf(std::string_view idf, size_t &index, bool &success, js
                 if (found_index != std::string::npos) {
                     line = idf.substr(beginning_of_line_index, found_index - beginning_of_line_index - 1);
                 }
-                errors_.emplace_back(fmt::format("Line: {} Index: {} - Error parsing \"{}\". Error in following line.", cur_line_num, index_into_cur_line, obj_name));
+                errors_.emplace_back(
+                    fmt::format("Line: {} Index: {} - Error parsing \"{}\". Error in following line.", cur_line_num, index_into_cur_line, obj_name));
                 errors_.emplace_back(fmt::format("~~~ {}", line));
                 success = false;
                 continue;
@@ -280,7 +282,8 @@ json IdfParser::parse_idf(std::string_view idf, size_t &index, bool &success, js
             }
 
             if (root[obj_name].find(name) != root[obj_name].end()) {
-                errors_.emplace_back(fmt::format(R"(Duplicate name found for object of type "{}" named "{}". Overwriting existing object.)", obj_name, name));
+                errors_.emplace_back(
+                    fmt::format(R"(Duplicate name found for object of type "{}" named "{}". Overwriting existing object.)", obj_name, name));
             }
 
             root[obj_name][name] = std::move(obj);
@@ -396,7 +399,7 @@ json IdfParser::parse_object(
             }
             auto const &legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
             auto const size = legacy_idd_extensibles_array.size();
-            std::string const & field_name = legacy_idd_extensibles_array[extensible_index % size].get<std::string>();
+            std::string const &field_name = legacy_idd_extensibles_array[extensible_index % size].get<std::string>();
             auto val = parse_value(idf, index, success, schema_obj_extensions->at(field_name));
             if (!success) return root;
             extensible[field_name] = std::move(val);
@@ -408,7 +411,7 @@ json IdfParser::parse_object(
             }
         } else {
             was_value_parsed = true;
-            std::string const & field = legacy_idd_fields_array[legacy_idd_index].get<std::string>();
+            std::string const &field = legacy_idd_fields_array[legacy_idd_index].get<std::string>();
             auto const &find_field_iter = schema_obj_props.find(field);
             if (find_field_iter == schema_obj_props.end()) {
                 if (field == "name") {
@@ -438,22 +441,22 @@ json IdfParser::parse_number(std::string_view idf, size_t &index)
     size_t save_i = index;
 
     bool running = true;
-    while(running) {
+    while (running) {
         if (save_i == idf_size) {
             break;
         }
 
         char const c = idf[save_i];
         switch (c) {
-            case '!':
-            case ',':
-            case ';':
-            case '\r':
-            case '\n':
-                running = false;
-                break;
-            default:
-                ++save_i;
+        case '!':
+        case ',':
+        case ';':
+        case '\r':
+        case '\n':
+            running = false;
+            break;
+        default:
+            ++save_i;
         }
     }
 
@@ -667,14 +670,14 @@ IdfParser::Token IdfParser::next_limited_token(std::string_view idf, size_t &ind
     char const c = idf[index];
     increment_both_index(index, index_into_cur_line);
     switch (c) {
-        case '!':
-            return Token::EXCLAMATION;
-        case ',':
-            return Token::COMMA;
-        case ';':
-            return Token::SEMICOLON;
-        default:
-            return Token::NONE;
+    case '!':
+        return Token::EXCLAMATION;
+    case ',':
+        return Token::COMMA;
+    case ';':
+        return Token::SEMICOLON;
+    default:
+        return Token::NONE;
     }
 }
 

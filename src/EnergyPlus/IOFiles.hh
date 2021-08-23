@@ -49,14 +49,14 @@
 #define IOFiles_hh_INCLUDED
 
 // C++ Headers
+#include <array>
 #include <cassert>
+#include <charconv>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <ostream>
 #include <vector>
-#include <array>
-#include <charconv>
-#include <limits>
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
@@ -71,371 +71,393 @@
 #include <fmt/printf.h>
 
 namespace {
-    struct DoubleWrapper {
-        // this cannot be marked explicit
-        // we need the implicit conversion for it to work
-        DoubleWrapper(double val) : value(val){};
-        operator double() const {return value;};
-        DoubleWrapper& operator=(const double& other)
-        {
-            value = other;
-            return *this;
-        }
-    private:
-        double value;
+struct DoubleWrapper
+{
+    // this cannot be marked explicit
+    // we need the implicit conversion for it to work
+    DoubleWrapper(double val) : value(val){};
+    operator double() const
+    {
+        return value;
     };
-}
+    DoubleWrapper &operator=(const double &other)
+    {
+        value = other;
+        return *this;
+    }
+
+private:
+    double value;
+};
+} // namespace
 
 namespace fmt {
-    template <>
-    struct formatter<DoubleWrapper> {
-        fmt::detail::dynamic_format_specs<char> specs_;
-        fmt::memory_buffer buffer = fmt::memory_buffer();
+template <> struct formatter<DoubleWrapper>
+{
+    fmt::detail::dynamic_format_specs<char> specs_;
+    fmt::memory_buffer buffer = fmt::memory_buffer();
 
-        static constexpr bool should_be_fixed_output(const double value)
-        {
-            return (value >= 0.099999999999999995 || value <= -0.099999999999999995) || (value == 0.0) || (value == -0.0);
+    static constexpr bool should_be_fixed_output(const double value)
+    {
+        return (value >= 0.099999999999999995 || value <= -0.099999999999999995) || (value == 0.0) || (value == -0.0);
+    }
+
+    static constexpr bool fixed_will_fit(const double value, const int places)
+    {
+        if (value < 1.0 && value > -1.0) {
+            return true;
+        } else {
+            return static_cast<int>(std::log10(std::abs(value))) < places;
+        }
+    }
+
+    static std::string &zero_pad_exponent(std::string &str)
+    {
+        // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
+        if (str.size() > 3) {
+            if (!std::isdigit(str[str.size() - 3])) {
+                // wants a 0 inserted
+                str.insert(str.size() - 2, "0");
+            }
+        }
+        return str;
+    }
+
+    std::string_view spec_builder()
+    {
+        buffer.clear();
+        buffer.push_back('{');
+        buffer.push_back(':');
+        //    [[fill]align][sign]["#"]["0"][width]["." precision]["L"][type]
+
+        //    [[fill]align]
+        switch (specs_.align) {
+        case align_t::left:
+            if (specs_.fill.size()) buffer.append(specs_.fill);
+            buffer.push_back('<');
+            break;
+        case align_t::right:
+            if (specs_.fill.size()) buffer.append(specs_.fill);
+            buffer.push_back('>');
+            break;
+        case align_t::center:
+            if (specs_.fill.size()) buffer.append(specs_.fill);
+            buffer.push_back('^');
+            break;
+        case align_t::none:
+        case align_t::numeric:
+            break;
+        default:
+            throw fmt::format_error("Bad alignment");
         }
 
-        static constexpr bool fixed_will_fit(const double value, const int places)
-        {
-            if (value < 1.0 && value > -1.0) {
-                return true;
-            } else {
-                return static_cast<int>(std::log10(std::abs(value))) < places;
+        //    [sign]
+        switch (specs_.sign) {
+        case sign_t::plus:
+            buffer.push_back('+');
+            break;
+        case sign_t::minus:
+            buffer.push_back('-');
+            break;
+        case sign_t::space:
+            buffer.push_back(' ');
+            break;
+        case sign_t::none:
+            break;
+        default:
+            throw fmt::format_error("Bad sign");
+        }
+
+        //    [alt]
+        if (specs_.alt) {
+            buffer.push_back('#');
+        }
+
+        //    [width]
+        if (specs_.width >= 0) {
+            if (specs_.fill[0] == '0') {
+                buffer.push_back('0');
+            }
+            std::array<char, std::numeric_limits<int>::digits10> buf{};
+            if (auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), specs_.width); ec == std::errc()) {
+                std::string_view buf_view(buf.data(), ptr - buf.data());
+                buffer.append(buf_view.begin(), buf_view.end());
             }
         }
 
-        static std::string& zero_pad_exponent(std::string &str)
-        {
-            // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
-            if (str.size() > 3) {
-                if (!std::isdigit(str[str.size() - 3])) {
-                    // wants a 0 inserted
-                    str.insert(str.size() - 2, "0");
-                }
+        //    [precision]
+        if (specs_.precision >= 0) {
+            buffer.push_back('.');
+            std::array<char, std::numeric_limits<int>::digits10> buf{};
+            if (auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), specs_.precision); ec == std::errc()) {
+                std::string_view buf_view(buf.data(), ptr - buf.data());
+                buffer.append(buf_view.begin(), buf_view.end());
             }
-            return str;
         }
 
-        std::string_view spec_builder() {
-            buffer.clear();
-            buffer.push_back('{');
-            buffer.push_back(':');
-            //    [[fill]align][sign]["#"]["0"][width]["." precision]["L"][type]
-
-            //    [[fill]align]
-            switch (specs_.align) {
-                case align_t::left:
-                    if (specs_.fill.size()) buffer.append(specs_.fill);
-                    buffer.push_back('<'); break;
-                case align_t::right:
-                    if (specs_.fill.size()) buffer.append(specs_.fill);
-                    buffer.push_back('>'); break;
-                case align_t::center:
-                    if (specs_.fill.size()) buffer.append(specs_.fill);
-                    buffer.push_back('^'); break;
-                case align_t::none:
-                case align_t::numeric:
-                    break;
-                default:
-                    throw fmt::format_error("Bad alignment");
-            }
-
-            //    [sign]
-            switch (specs_.sign) {
-                case sign_t::plus:
-                    buffer.push_back('+'); break;
-                case sign_t::minus:
-                    buffer.push_back('-'); break;
-                case sign_t::space:
-                    buffer.push_back(' '); break;
-                case sign_t::none:
-                    break;
-                default:
-                    throw fmt::format_error("Bad sign");
-            }
-
-            //    [alt]
-            if (specs_.alt) {
-                buffer.push_back('#');
-            }
-
-            //    [width]
-            if (specs_.width >= 0) {
-                if (specs_.fill[0] == '0') {
-                    buffer.push_back('0');
-                }
-                std::array<char, std::numeric_limits<int>::digits10> buf{};
-                if(auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), specs_.width); ec == std::errc()) {
-                    std::string_view buf_view(buf.data(), ptr - buf.data());
-                    buffer.append(buf_view.begin(), buf_view.end());
-                }
-            }
-
-            //    [precision]
-            if (specs_.precision >= 0) {
-                buffer.push_back('.');
-                std::array<char, std::numeric_limits<int>::digits10> buf{};
-                if(auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), specs_.precision); ec == std::errc()) {
-                    std::string_view buf_view(buf.data(), ptr - buf.data());
-                    buffer.append(buf_view.begin(), buf_view.end());
-                }
-            }
-
-            //    [locale]
-            if (specs_.localized) {
-                buffer.push_back('L');
-            }
-
-            //    [type]
-            buffer.push_back(specs_.type);
-
-            buffer.push_back('}');
-
-            return {buffer.data(), buffer.size()};
+        //    [locale]
+        if (specs_.localized) {
+            buffer.push_back('L');
         }
 
-        template <typename ParseContext>
-        constexpr auto parse(ParseContext& ctx) {
-            auto begin = ctx.begin(), end = ctx.end();
-            if (begin == end) return begin;
-            using handler_type = fmt::detail::dynamic_specs_handler<ParseContext>;
-            auto it = fmt::detail::parse_format_specs(begin, end, handler_type(specs_, ctx));
-            return it;
-        }
+        //    [type]
+        buffer.push_back(specs_.type);
 
-        template <typename FormatContext>
-        auto format(const DoubleWrapper doubleWrapper, FormatContext& ctx) {
-            const auto next_float = [](const double value) {
-                if (std::signbit(value)) {
-                    if (value == -0.0) {
-                        return value;
-                    } else {
-                        return std::nextafter(value, std::numeric_limits<decltype(value)>::lowest());
-                    }
+        buffer.push_back('}');
+
+        return {buffer.data(), buffer.size()};
+    }
+
+    template <typename ParseContext> constexpr auto parse(ParseContext &ctx)
+    {
+        auto begin = ctx.begin(), end = ctx.end();
+        if (begin == end) return begin;
+        using handler_type = fmt::detail::dynamic_specs_handler<ParseContext>;
+        auto it = fmt::detail::parse_format_specs(begin, end, handler_type(specs_, ctx));
+        return it;
+    }
+
+    template <typename FormatContext> auto format(const DoubleWrapper doubleWrapper, FormatContext &ctx)
+    {
+        const auto next_float = [](const double value) {
+            if (std::signbit(value)) {
+                if (value == -0.0) {
+                    return value;
                 } else {
-                    if (value == 0.0) {
-                        return value;
-                    } else {
-                        return std::nextafter(value, std::numeric_limits<decltype(value)>::max());
-                    }
+                    return std::nextafter(value, std::numeric_limits<decltype(value)>::lowest());
+                }
+            } else {
+                if (value == 0.0) {
+                    return value;
+                } else {
+                    return std::nextafter(value, std::numeric_limits<decltype(value)>::max());
+                }
+            }
+        };
+
+        double val = doubleWrapper;
+
+        // matches Fortran's 'E' format
+        if (specs_.type == 'Z') {
+            // The Fortran 'G' format insists on a leading 0, even though
+            // that actually means losing data
+            specs_.type = 'E';
+
+            // 0 pad the end
+            specs_.alt = true;
+
+            bool initialPrecisionWas1 = false;
+            if (specs_.precision > 1) {
+                // reduce the precision to get rounding behavior
+                --specs_.precision;
+            } else {
+                // We need AT LEAST one in precision so we capture a '.' below
+                initialPrecisionWas1 = true;
+                specs_.precision = 1;
+                ++specs_.width;
+            }
+
+            // multiply by 10 to get the exponent we want
+            auto str = fmt::format(spec_builder(), val * 10);
+            //      auto str = write_to_string(value * 10);
+
+            // we need "space" to insert our leading 0
+            if (str.front() != ' ') {
+                str.insert(str.begin(), ' ');
+            }
+
+            auto begin = std::find(std::begin(str), std::end(str), '.');
+            if (initialPrecisionWas1) {
+                // 123.45 => 1.2E+03, except we asked for precision = 1. So we delete the thing after the dot
+                // and this is why we manually increased the specs_.width by one above
+                str.erase(std::next(begin));
+            }
+            // if (begin != std::end(str)) {
+            // ' -1.2345E15'
+            //     ^
+            std::swap(*begin, *std::prev(begin));
+            // ' -.12345E15'
+            //     ^
+            std::advance(begin, -2);
+            // ' -.12345E15'
+            //   ^
+            if (*begin != ' ') {
+                // found a sign
+                std::swap(*begin, *std::prev(begin));
+                // '- .12345E15'
+                //   ^
+            }
+            // '-0.12345E15'
+            //   ^
+            *begin = '0';
+            return fmt::format_to(ctx.out(), "{}", str);
+        } else if (specs_.type == 'S') {
+            // matches Fortran's 'G', but stripped of whitespace
+            specs_.type = 'N';
+            // Need to rerun with double wrapper since 'N' is one of our custom ones
+            auto str = fmt::format(spec_builder(), doubleWrapper);
+
+            auto strip_whitespace = [](std::string_view const s) -> std::string {
+                if (s.empty()) {
+                    return std::string{};
+                }
+                auto const first = s.find_first_not_of(' ');
+                auto const last = s.find_last_not_of(' ');
+                if ((first == std::string::npos) || (last == std::string::npos)) {
+                    return std::string{};
+                } else {
+                    return std::string{s.substr(first, last - first + 1)};
                 }
             };
 
-            double val = doubleWrapper;
+            return fmt::format_to(ctx.out(), "{}", strip_whitespace(str));
+        } else if (specs_.type == 'N') {
+            // matches Fortran's 'G' format
 
-            // matches Fortran's 'E' format
-            if (specs_.type == 'Z') {
+            if (specs_.width == 0 && specs_.precision == -1) {
+                // Need to rerun with double wrapper since 'N' is one of our custom ones
+                return fmt::format_to(ctx.out(), "{:20N}", doubleWrapper);
+            } else if (should_be_fixed_output(val) && fixed_will_fit(val, specs_.width - 5)) {
+                specs_.type = 'F';
+
+                // account for alignment with E formatted
+                specs_.width -= 4;
+                if (val == 0.0) {
+                    --specs_.precision;
+                } else if (val < 1.0 && val > -1.0) {
+                    // No adjustment necessary
+                } else if (specs_.precision == -1) {
+                    const auto order_of_magnitude = static_cast<int>(std::log10(std::abs(val)));
+                    specs_.precision = specs_.width - (order_of_magnitude + 2);
+                } else {
+                    const auto order_of_magnitude = static_cast<int>(std::log10(std::abs(val)));
+                    specs_.precision -= (order_of_magnitude + 1);
+                }
+
+                // if precision adjustment would result in negative, make it 0 to get rounding
+                // and adjust spacing
+                if (specs_.precision <= 0) {
+                    specs_.width -= 1;
+                    specs_.precision = 0;
+                }
+
+                auto str = fmt::format(spec_builder(), val);
+
+                // When precision hit 0, add . to match Fortran formatting
+                if (specs_.precision == 0) {
+                    // write the last 4 chars
+                    return fmt::format_to(ctx.out(), "{}.    ", str);
+                } else {
+                    // write the last 4 chars
+                    return fmt::format_to(ctx.out(), "{}    ", str);
+                }
+            } else {
                 // The Fortran 'G' format insists on a leading 0, even though
                 // that actually means losing data
-                specs_.type = 'E';
-
-                // 0 pad the end
-                specs_.alt = true;
-
-                bool initialPrecisionWas1 = false;
-                if (specs_.precision > 1) {
-                    // reduce the precision to get rounding behavior
-                    --specs_.precision;
-                } else {
-                    // We need AT LEAST one in precision so we capture a '.' below
-                    initialPrecisionWas1 = true;
-                    specs_.precision = 1;
-                    ++specs_.width;
-                }
-
-                // multiply by 10 to get the exponent we want
-                auto str = fmt::format(spec_builder(), val * 10);
-                //      auto str = write_to_string(value * 10);
-
-                // we need "space" to insert our leading 0
-                if (str.front() != ' ') {
-                    str.insert(str.begin(), ' ');
-                }
-
-                auto begin = std::find(std::begin(str), std::end(str), '.');
-                if (initialPrecisionWas1) {
-                    // 123.45 => 1.2E+03, except we asked for precision = 1. So we delete the thing after the dot
-                    // and this is why we manually increased the specs_.width by one above
-                    str.erase(std::next(begin));
-                }
-                // if (begin != std::end(str)) {
-                // ' -1.2345E15'
-                //     ^
-                std::swap(*begin, *std::prev(begin));
-                // ' -.12345E15'
-                //     ^
-                std::advance(begin, -2);
-                // ' -.12345E15'
-                //   ^
-                if (*begin != ' ') {
-                    // found a sign
-                    std::swap(*begin, *std::prev(begin));
-                    // '- .12345E15'
-                    //   ^
-                }
-                // '-0.12345E15'
-                //   ^
-                *begin = '0';
-                return fmt::format_to(ctx.out(), "{}", str);
-            } else if (specs_.type == 'S') {
-                // matches Fortran's 'G', but stripped of whitespace
-                specs_.type = 'N';
-                // Need to rerun with double wrapper since 'N' is one of our custom ones
-                auto str = fmt::format(spec_builder(), doubleWrapper);
-
-                auto strip_whitespace = [](std::string_view const s) -> std::string {
-                    if (s.empty()) {
-                        return std::string{};
-                    }
-                    auto const first = s.find_first_not_of(' ');
-                    auto const last = s.find_last_not_of(' ');
-                    if ((first == std::string::npos) || (last == std::string::npos)) {
-                        return std::string{};
-                    } else {
-                        return std::string{s.substr(first, last - first + 1)};
-                    }
-                };
-
-                return fmt::format_to(ctx.out(), "{}", strip_whitespace(str));
-            } else if (specs_.type == 'N') {
-                // matches Fortran's 'G' format
-
-                if (specs_.width == 0 && specs_.precision == -1) {
-                    // Need to rerun with double wrapper since 'N' is one of our custom ones
-                    return fmt::format_to(ctx.out(), "{:20N}", doubleWrapper);
-                } else if (should_be_fixed_output(val) && fixed_will_fit(val, specs_.width - 5)) {
-                    specs_.type = 'F';
-
-                    // account for alignment with E formatted
-                    specs_.width -= 4;
-                    if (val == 0.0) {
-                        --specs_.precision;
-                    } else if (val < 1.0 && val > -1.0) {
-                        // No adjustment necessary
-                    } else if (specs_.precision == -1) {
-                        const auto order_of_magnitude = static_cast<int>(std::log10(std::abs(val)));
-                        specs_.precision = specs_.width - (order_of_magnitude + 2);
-                    } else {
-                        const auto order_of_magnitude = static_cast<int>(std::log10(std::abs(val)));
-                        specs_.precision -= (order_of_magnitude + 1);
-                    }
-
-                    // if precision adjustment would result in negative, make it 0 to get rounding
-                    // and adjust spacing
-                    if (specs_.precision <= 0) {
-                        specs_.width -= 1;
-                        specs_.precision = 0;
-                    }
-
-                    auto str = fmt::format(spec_builder(), val);
-
-                    // When precision hit 0, add . to match Fortran formatting
-                    if (specs_.precision == 0) {
-                        // write the last 4 chars
-                        return fmt::format_to(ctx.out(), "{}.    ", str);
-                    } else {
-                        // write the last 4 chars
-                        return fmt::format_to(ctx.out(), "{}    ", str);
-                    }
-                } else {
-                    // The Fortran 'G' format insists on a leading 0, even though
-                    // that actually means losing data
-                    specs_.type = 'Z';
-                    // Need to rerun with double wrapper since 'Z' is one of our custom ones
-                    return fmt::format_to(ctx.out(), spec_builder(), doubleWrapper);
-                }
-            } else if (specs_.type == 'R') { // matches RoundSigDigits() behavior
-                // push the value up a tad to get the same rounding behavior as Objexx
-                const auto fixed_output = should_be_fixed_output(val);
-
-                if (fixed_output) {
-                    specs_.type = 'F';
-
-                    if (val > 100000.0) {
-                        const auto digits10 = static_cast<int>(std::log10(val));
-                        // we cannot represent this val to the required precision, truncate the floating
-                        // point portion
-                        if (digits10 + specs_.precision >= std::numeric_limits<decltype(val)>::max_digits10) {
-                            specs_.precision = 0;
-                            spec_builder();
-                            // add '.' to match old RoundSigDigits
-                            buffer.push_back('.');
-                            std::string_view fmt_buffer(buffer.data(), buffer.size());
-                            return fmt::format_to(ctx.out(), fmt_buffer, val);
-                        } else {
-                            return fmt::format_to(ctx.out(), spec_builder(), val);
-                        }
-                    } else {
-                        if (val == 0.0 || val == -0.0) {
-                            return fmt::format_to(ctx.out(), spec_builder(), 0.0);
-                        } else {
-                            // nudge up to next rounded val
-                            return fmt::format_to(ctx.out(), spec_builder(), next_float(next_float(next_float(val))));
-                        }
-                    }
-                } else {
-                    specs_.type = 'E';
-                    auto str = fmt::format(spec_builder(), next_float(val));
-                    return fmt::format_to(ctx.out(), "{}", zero_pad_exponent(str));
-                }
-            } else if (specs_.type == 'T') { // matches TrimSigDigits behavior
-                const auto fixed_output = should_be_fixed_output(val);
-
-                if (fixed_output) {
-                    const auto magnitude = std::pow(10, specs_.precision);
-                    const auto adjusted = (val * magnitude) + 0.0001;
-                    const auto truncated = std::trunc(adjusted) / magnitude;
-                    specs_.type = 'F';
-                    return fmt::format_to(ctx.out(), spec_builder(), truncated);
-                } else {
-                    specs_.type = 'E';
-                    specs_.precision += 2;
-
-                    // write the `E` formatted float to a std::string
-                    auto str = fmt::format(spec_builder(), val);
-                    str = zero_pad_exponent(str);
-
-                    // Erase last 2 numbers to truncate the value
-                    const auto E_itr = std::find(begin(str), end(str), 'E');
-                    if (E_itr != str.end()) {
-                        str.erase(std::prev(E_itr, 2), E_itr);
-                    }
-
-                    return fmt::format_to(ctx.out(), "{}", str);
-                }
+                specs_.type = 'Z';
+                // Need to rerun with double wrapper since 'Z' is one of our custom ones
+                return fmt::format_to(ctx.out(), spec_builder(), doubleWrapper);
             }
-            return fmt::format_to(ctx.out(), spec_builder(), val);
+        } else if (specs_.type == 'R') { // matches RoundSigDigits() behavior
+            // push the value up a tad to get the same rounding behavior as Objexx
+            const auto fixed_output = should_be_fixed_output(val);
+
+            if (fixed_output) {
+                specs_.type = 'F';
+
+                if (val > 100000.0) {
+                    const auto digits10 = static_cast<int>(std::log10(val));
+                    // we cannot represent this val to the required precision, truncate the floating
+                    // point portion
+                    if (digits10 + specs_.precision >= std::numeric_limits<decltype(val)>::max_digits10) {
+                        specs_.precision = 0;
+                        spec_builder();
+                        // add '.' to match old RoundSigDigits
+                        buffer.push_back('.');
+                        std::string_view fmt_buffer(buffer.data(), buffer.size());
+                        return fmt::format_to(ctx.out(), fmt_buffer, val);
+                    } else {
+                        return fmt::format_to(ctx.out(), spec_builder(), val);
+                    }
+                } else {
+                    if (val == 0.0 || val == -0.0) {
+                        return fmt::format_to(ctx.out(), spec_builder(), 0.0);
+                    } else {
+                        // nudge up to next rounded val
+                        return fmt::format_to(ctx.out(), spec_builder(), next_float(next_float(next_float(val))));
+                    }
+                }
+            } else {
+                specs_.type = 'E';
+                auto str = fmt::format(spec_builder(), next_float(val));
+                return fmt::format_to(ctx.out(), "{}", zero_pad_exponent(str));
+            }
+        } else if (specs_.type == 'T') { // matches TrimSigDigits behavior
+            const auto fixed_output = should_be_fixed_output(val);
+
+            if (fixed_output) {
+                const auto magnitude = std::pow(10, specs_.precision);
+                const auto adjusted = (val * magnitude) + 0.0001;
+                const auto truncated = std::trunc(adjusted) / magnitude;
+                specs_.type = 'F';
+                return fmt::format_to(ctx.out(), spec_builder(), truncated);
+            } else {
+                specs_.type = 'E';
+                specs_.precision += 2;
+
+                // write the `E` formatted float to a std::string
+                auto str = fmt::format(spec_builder(), val);
+                str = zero_pad_exponent(str);
+
+                // Erase last 2 numbers to truncate the value
+                const auto E_itr = std::find(begin(str), end(str), 'E');
+                if (E_itr != str.end()) {
+                    str.erase(std::prev(E_itr, 2), E_itr);
+                }
+
+                return fmt::format_to(ctx.out(), "{}", str);
+            }
         }
-    };
-}  // namespace fmt
+        return fmt::format_to(ctx.out(), spec_builder(), val);
+    }
+};
+} // namespace fmt
 
 namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
 
-enum class FormatSyntax {
+enum class FormatSyntax
+{
     Fortran,
     FMT,
     Printf
 };
 
-inline constexpr bool is_fortran_syntax(const std::string_view format_str) {
+inline constexpr bool is_fortran_syntax(const std::string_view format_str)
+{
     bool within_fmt_str = false;
     for (auto const c : format_str) {
         switch (c) {
-            case '{': within_fmt_str = true; break;
-            case '}': within_fmt_str = false; break;
-            case 'R':
-            case 'S':
-            case 'N':
-            case 'Z':
-            case 'T':
-                if (within_fmt_str) {return true;} else {break;}
-            default:
+        case '{':
+            within_fmt_str = true;
+            break;
+        case '}':
+            within_fmt_str = false;
+            break;
+        case 'R':
+        case 'S':
+        case 'N':
+        case 'Z':
+        case 'T':
+            if (within_fmt_str) {
+                return true;
+            } else {
                 break;
+            }
+        default:
+            break;
         }
     }
     return false;
@@ -443,9 +465,10 @@ inline constexpr bool is_fortran_syntax(const std::string_view format_str) {
 
 class InputOutputFile;
 template <FormatSyntax formatSyntax = FormatSyntax::Fortran, typename... Args>
-void print(InputOutputFile &outputFile, std::string_view format_str, Args &&... args);
+void print(InputOutputFile &outputFile, std::string_view format_str, Args &&...args);
 
-inline constexpr FormatSyntax check_syntax(const std::string_view format_str) {
+inline constexpr FormatSyntax check_syntax(const std::string_view format_str)
+{
     if (is_fortran_syntax(format_str)) {
         return FormatSyntax::Fortran;
     } else {
@@ -556,8 +579,7 @@ public:
 private:
     std::unique_ptr<std::iostream> os;
     bool print_to_dev_null = false;
-    template <FormatSyntax, typename... Args>
-        friend void print(InputOutputFile &outputFile, std::string_view format_str, Args &&... args);
+    template <FormatSyntax, typename... Args> friend void print(InputOutputFile &outputFile, std::string_view format_str, Args &&...args);
     friend class IOFiles;
 };
 
@@ -777,8 +799,7 @@ public:
     }
 };
 
-template <typename... Args>
-void vprint(std::ostream &os, std::string_view format_str, const Args &... args)
+template <typename... Args> void vprint(std::ostream &os, std::string_view format_str, const Args &...args)
 {
     //    assert(os.good());
     auto buffer = fmt::memory_buffer();
@@ -790,8 +811,7 @@ void vprint(std::ostream &os, std::string_view format_str, const Args &... args)
     os.write(buffer.data(), buffer.size());
 }
 
-template <typename... Args>
-std::string vprint(std::string_view format_str, const Args &... args)
+template <typename... Args> std::string vprint(std::string_view format_str, const Args &...args)
 {
     auto buffer = fmt::memory_buffer();
     try {
@@ -824,35 +844,31 @@ std::string vprint(std::string_view format_str, const Args &... args)
 // to match the behavior of TrimSigDigits utility function
 //
 
-namespace
-{
-        template <typename... Args>
-        void print_fortran_syntax(std::ostream &os, std::string_view format_str, const Args &... args)
-        {
-            EnergyPlus::vprint<std::conditional_t<std::is_same_v<double,Args>,DoubleWrapper,Args>...>(os, format_str, args...);
-        }
+namespace {
+    template <typename... Args> void print_fortran_syntax(std::ostream &os, std::string_view format_str, const Args &...args)
+    {
+        EnergyPlus::vprint<std::conditional_t<std::is_same_v<double, Args>, DoubleWrapper, Args>...>(os, format_str, args...);
+    }
 
-        template <typename... Args>
-        std::string format_fortran_syntax(std::string_view format_str, const Args &... args)
-        {
-            return EnergyPlus::vprint<std::conditional_t<std::is_same_v<double,Args>,DoubleWrapper,Args>...>(format_str, args...);
-        }
-}
+    template <typename... Args> std::string format_fortran_syntax(std::string_view format_str, const Args &...args)
+    {
+        return EnergyPlus::vprint<std::conditional_t<std::is_same_v<double, Args>, DoubleWrapper, Args>...>(format_str, args...);
+    }
+} // namespace
 
 template <FormatSyntax formatSyntax = FormatSyntax::Fortran, typename... Args>
-void print(std::ostream &os, std::string_view format_str, Args &&... args)
+void print(std::ostream &os, std::string_view format_str, Args &&...args)
 {
-    if constexpr(formatSyntax == FormatSyntax::Fortran) {
+    if constexpr (formatSyntax == FormatSyntax::Fortran) {
         print_fortran_syntax(os, format_str, args...);
-    } else if constexpr(formatSyntax == FormatSyntax::FMT) {
+    } else if constexpr (formatSyntax == FormatSyntax::FMT) {
         fmt::print(os, format_str, std::forward<Args>(args)...);
     } else {
         static_assert(!(formatSyntax == FormatSyntax::Fortran || formatSyntax == FormatSyntax::FMT), "Invalid FormatSyntax selection");
     }
 }
 
-template <FormatSyntax formatSyntax, typename... Args>
-void print(InputOutputFile &outputFile, std::string_view format_str, Args &&... args)
+template <FormatSyntax formatSyntax, typename... Args> void print(InputOutputFile &outputFile, std::string_view format_str, Args &&...args)
 {
     auto *outputStream = [&]() -> std::ostream * {
         if (outputFile.os) {
@@ -866,23 +882,22 @@ void print(InputOutputFile &outputFile, std::string_view format_str, Args &&... 
             }
         }
     }();
-    if constexpr(formatSyntax == FormatSyntax::Fortran) {
+    if constexpr (formatSyntax == FormatSyntax::Fortran) {
         print_fortran_syntax(*outputStream, format_str, args...);
-    } else if constexpr(formatSyntax == FormatSyntax::FMT) {
+    } else if constexpr (formatSyntax == FormatSyntax::FMT) {
         fmt::print(*outputStream, format_str, std::forward<Args>(args)...);
     } else {
         static_assert(!(formatSyntax == FormatSyntax::Fortran || formatSyntax == FormatSyntax::FMT), "Invalid FormatSyntax selection");
     }
 }
 
-template <FormatSyntax formatSyntax = FormatSyntax::Fortran, typename... Args>
-std::string format(std::string_view format_str, Args &&... args)
+template <FormatSyntax formatSyntax = FormatSyntax::Fortran, typename... Args> std::string format(std::string_view format_str, Args &&...args)
 {
-    if constexpr(formatSyntax == FormatSyntax::Fortran) {
+    if constexpr (formatSyntax == FormatSyntax::Fortran) {
         return format_fortran_syntax(format_str, args...);
-    } else if constexpr(formatSyntax == FormatSyntax::FMT) {
+    } else if constexpr (formatSyntax == FormatSyntax::FMT) {
         return fmt::format(format_str, std::forward<Args>(args)...);
-    } else if constexpr(formatSyntax == FormatSyntax::Printf) {
+    } else if constexpr (formatSyntax == FormatSyntax::Printf) {
         return fmt::sprintf(format_str, std::forward<Args>(args)...);
     }
 }
