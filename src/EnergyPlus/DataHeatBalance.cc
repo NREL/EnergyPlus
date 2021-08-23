@@ -919,8 +919,8 @@ int AssignReverseConstructionNumber(EnergyPlusData &state,
         state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) = 0.0;
         state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
         state.dataHeatBal->NominalU(state.dataHeatBal->TotConstructs) = 0.0;
-        state.dataHeatBal->NominalUGlazingOnly.redimension(state.dataHeatBal->TotConstructs);
-        state.dataHeatBal->NominalUGlazingOnly(state.dataHeatBal->TotConstructs) = 0.0;
+        state.dataHeatBal->NominalUBeforeAdjusted.redimension(state.dataHeatBal->TotConstructs);
+        state.dataHeatBal->NominalUBeforeAdjusted(state.dataHeatBal->TotConstructs) = 0.0;
         state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs) = 1.0;
         //  Put in new attributes
         NewConstrNum = state.dataHeatBal->TotConstructs;

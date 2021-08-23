@@ -7099,11 +7099,11 @@ namespace WindowManager {
         // including inside and outside air films
         Real64 inputU = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
 
-        // Calculate the NominalConductance glazing only
+        // Calculate the NominalConductance glazing only (before adjusted)
         EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
 
         if (WinterSummerFlag == 1) {
-            state.dataHeatBal->NominalUGlazingOnly(ConstrNum) = NominalConductance;
+            state.dataHeatBal->NominalUBeforeAdjusted(ConstrNum) = NominalConductance;
             if (inputU > 0) { // only compute adjustment ratio when there is valid user input U
                 Real64 CoeffAdjRatioAdjustmentFactor = 1;
                 Real64 hcinRated = state.dataWindowManager->hcin;
@@ -7509,7 +7509,7 @@ namespace WindowManager {
 
             print(state.files.eio,
                   "{}\n",
-                  "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},Conductance (Glazing Only) {W/m2-K},"
+                  "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},Conductance (Before Adjusted) {W/m2-K},"
                   "Convection Coefficient Adjustment Ratio,SHGC,Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
             if ((state.dataHeatBal->TotSimpleWindow > 0) || (state.dataHeatBal->W5GlsMat > 0) || (state.dataHeatBal->W5GlsMatAlt > 0))
                 print(state.files.eio,
@@ -7677,7 +7677,7 @@ namespace WindowManager {
                               state.dataConstruction->Construct(ThisNum).TotLayers,
                               Roughness(static_cast<int>(state.dataConstruction->Construct(ThisNum).OutsideRoughness)),
                               NominalConductanceWinter,
-                              state.dataHeatBal->NominalUGlazingOnly(ThisNum),
+                              state.dataHeatBal->NominalUBeforeAdjusted(ThisNum),
                               state.dataHeatBal->CoeffAdjRatio(ThisNum),
                               SHGCSummer,
                               TransSolNorm,

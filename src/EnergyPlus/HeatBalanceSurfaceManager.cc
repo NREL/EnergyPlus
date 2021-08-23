@@ -856,9 +856,9 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     Real64 ufactArea(0.0);
     Real64 ufactAreaNorth(0.0);
     Real64 ufactAreaNonNorth(0.0);
-    Real64 ufactGlazingOnlyArea(0.0);
-    Real64 ufactGlazingOnlyAreaNorth(0.0);
-    Real64 ufactGlazingOnlyAreaNonNorth(0.0);
+    Real64 ufactBeforeAdjustedArea(0.0);
+    Real64 ufactBeforeAdjustedAreaNorth(0.0);
+    Real64 ufactBeforeAdjustedAreaNonNorth(0.0);
     Real64 shgcArea(0.0);
     Real64 shgcAreaNorth(0.0);
     Real64 shgcAreaNonNorth(0.0);
@@ -957,10 +957,10 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenArea, surfName, windowAreaWMult);
                     computedNetArea(Surface(iSurf).BaseSurf) -= windowAreaWMult;
                     nomUfact = state.dataHeatBal->NominalU(Surface(iSurf).Construction);
-                    Real64 nomUfactGlazingOnly = state.dataHeatBal->NominalUGlazingOnly(Surface(iSurf).Construction);
+                    Real64 nomUfactBeforeAdjusted = state.dataHeatBal->NominalUBeforeAdjusted(Surface(iSurf).Construction);
                     Real64 coeffAdjRatio = state.dataHeatBal->CoeffAdjRatio(Surface(iSurf).Construction);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, surfName, nomUfact, 3);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfactGlazingOnly, surfName, nomUfactGlazingOnly, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfactBeforeAdjusted, surfName, nomUfactBeforeAdjusted, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenCoeffAdjRatio, surfName, coeffAdjRatio, 3);
                     // if the construction report is requested the SummerSHGC is already calculated
                     if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
@@ -998,19 +998,19 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     // compute totals for area weighted averages
                     fenTotArea += windowAreaWMult;
                     ufactArea += nomUfact * windowAreaWMult;
-                    ufactGlazingOnlyArea += nomUfactGlazingOnly * windowAreaWMult;
+                    ufactBeforeAdjustedArea += nomUfactBeforeAdjusted * windowAreaWMult;
                     shgcArea += SHGCSummer * windowAreaWMult;
                     vistranArea += TransVisNorm * windowAreaWMult;
                     if (isNorth) {
                         fenTotAreaNorth += windowAreaWMult;
                         ufactAreaNorth += nomUfact * windowAreaWMult;
-                        ufactGlazingOnlyAreaNorth += nomUfactGlazingOnly * windowAreaWMult;
+                        ufactBeforeAdjustedAreaNorth += nomUfactBeforeAdjusted * windowAreaWMult;
                         shgcAreaNorth += SHGCSummer * windowAreaWMult;
                         vistranAreaNorth += TransVisNorm * windowAreaWMult;
                     } else {
                         fenTotAreaNonNorth += windowAreaWMult;
                         ufactAreaNonNorth += nomUfact * windowAreaWMult;
-                        ufactGlazingOnlyAreaNonNorth += nomUfactGlazingOnly * windowAreaWMult;
+                        ufactBeforeAdjustedAreaNonNorth += nomUfactBeforeAdjusted * windowAreaWMult;
                         shgcAreaNonNorth += SHGCSummer * windowAreaWMult;
                         vistranAreaNonNorth += TransVisNorm * windowAreaWMult;
                     }
@@ -1231,12 +1231,12 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenArea, "Total or Average", fenTotArea);
     if (fenTotArea > 0.0) {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, "Total or Average", ufactArea / fenTotArea, 3);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfactGlazingOnly, "Total or Average", ufactGlazingOnlyArea / fenTotArea, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfactBeforeAdjusted, "Total or Average", ufactBeforeAdjustedArea / fenTotArea, 3);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, "Total or Average", shgcArea / fenTotArea, 3);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, "Total or Average", vistranArea / fenTotArea, 3);
     } else {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, "Total or Average", "-");
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfactGlazingOnly, "Total or Average", "-");
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfactBeforeAdjusted, "Total or Average", "-");
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, "Total or Average", "-");
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, "Total or Average", "-");
     }
@@ -1245,12 +1245,12 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     if (fenTotAreaNorth > 0.0) {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, "North Total or Average", ufactAreaNorth / fenTotAreaNorth, 3);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchFenUfactGlazingOnly, "North Total or Average", ufactGlazingOnlyAreaNorth / fenTotAreaNorth, 3);
+            state, state.dataOutRptPredefined->pdchFenUfactBeforeAdjusted, "North Total or Average", ufactBeforeAdjustedAreaNorth / fenTotAreaNorth, 3);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, "North Total or Average", shgcAreaNorth / fenTotAreaNorth, 3);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, "North Total or Average", vistranAreaNorth / fenTotAreaNorth, 3);
     } else {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, "North Total or Average", "-");
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfactGlazingOnly, "North Total or Average", "-");
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfactBeforeAdjusted, "North Total or Average", "-");
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, "North Total or Average", "-");
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, "North Total or Average", "-");
     }
@@ -1259,15 +1259,15 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     if (fenTotAreaNonNorth > 0.0) {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, "Non-North Total or Average", ufactAreaNonNorth / fenTotAreaNonNorth, 3);
         PreDefTableEntry(state,
-                         state.dataOutRptPredefined->pdchFenUfactGlazingOnly,
+                         state.dataOutRptPredefined->pdchFenUfactBeforeAdjusted,
                          "Non-North Total or Average",
-                         ufactGlazingOnlyAreaNonNorth / fenTotAreaNonNorth,
+                         ufactBeforeAdjustedAreaNonNorth / fenTotAreaNonNorth,
                          3);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, "Non-North Total or Average", shgcAreaNonNorth / fenTotAreaNonNorth, 3);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, "Non-North Total or Average", vistranAreaNonNorth / fenTotAreaNonNorth, 3);
     } else {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, "Non-North Total or Average", "-");
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfactGlazingOnly, "Non-North Total or Average", "-");
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfactBeforeAdjusted, "Non-North Total or Average", "-");
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, "Non-North Total or Average", "-");
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, "Non-North Total or Average", "-");
     }
