@@ -4,7 +4,7 @@
 // Created by jackcook on 7/11/20.
 //
 
-#include <thread>
+#include <iostream>
 #include <chrono>
 #include <LU-Decomposition/lu.h>
 #include <blas/blas.h>
@@ -14,17 +14,15 @@
 #include <cpgfunction/heat_transfer.h>
 
 
-using namespace std;  // lots of vectors, only namespace to be used
-
 namespace gt::gfunction {
     // The uniform borehole wall temperature (UBWHT) g-function calculation.
     // Originally presented in Cimmino and Bernier (2014) and a later paper on
     // speed improvements by Cimmino (2018)
-    vector<double> uniform_borehole_wall_temperature(
-            vector<gt::boreholes::Borehole> &boreField, vector<double> &time,
+    std::vector<double> uniform_borehole_wall_temperature(
+            std::vector<gt::boreholes::Borehole> &boreField, std::vector<double> &time,
             double alpha, int nSegments, bool use_similarities, int n_Threads,
             bool display){
-        vector<double> gFunction(time.size());
+        std::vector<double> gFunction(time.size());
 
         if (display) {
             std::cout << "---------------------------------------------------"
@@ -37,7 +35,7 @@ namespace gt::gfunction {
         auto startall = std::chrono::steady_clock::now();
 
         if (display) {
-            cout << "\tMaking use of " << n_Threads << " threads." << endl;
+            std::cout << "\tMaking use of " << n_Threads << " threads." << std::endl;
         }
 
         // Number of boreholes
@@ -100,7 +98,7 @@ namespace gt::gfunction {
         } // next b
 
         end = std::chrono::steady_clock::now();
-        milli = chrono::duration_cast<chrono::milliseconds>
+        milli = std::chrono::duration_cast<std::chrono::milliseconds>
                 (end - start).count();
         segment_length_time += milli;
 
@@ -147,7 +145,7 @@ namespace gt::gfunction {
         } // next i
 
         end = std::chrono::steady_clock::now();
-        milli = chrono::duration_cast<chrono::milliseconds>
+        milli = std::chrono::duration_cast<std::chrono::milliseconds>
                 (end - start).count();
         time_vector_time += milli;
 
@@ -157,7 +155,7 @@ namespace gt::gfunction {
         auto tic = std::chrono::steady_clock::now();
         auto toc = std::chrono::steady_clock::now();
         if (display) {
-            double milli = chrono::duration_cast<chrono::milliseconds>
+            double milli = std::chrono::duration_cast<std::chrono::milliseconds>
                     (tic - toc).count();
             double seconds = milli;
             std::cout << "Time to open a pool : "
@@ -167,14 +165,14 @@ namespace gt::gfunction {
 
         start = std::chrono::steady_clock::now();
 
-        end = chrono::steady_clock::now();
-        milli = chrono::duration_cast<chrono::milliseconds>
+        end = std::chrono::steady_clock::now();
+        milli = std::chrono::duration_cast<std::chrono::milliseconds>
                 (end - start).count();
         segment_h_values_time += milli;
 
         // after interpolation scheme, get rid of h_ij first
         // Initialize segment heat extraction rates
-        vector<vector<double> > Q(nSources, vector<double> (nt));
+        std::vector<std::vector<double> > Q(nSources, std::vector<double> (nt));
 
         // Define A and b for utitilizing Ax=b
         /**
@@ -187,8 +185,8 @@ namespace gt::gfunction {
          * **/
 
         int SIZE = nSources + 1;
-        vector<vector<double> > A(SIZE, vector<double> (SIZE, 0));
-        vector<double> B (SIZE, 0);
+        std::vector<std::vector<double> > A(SIZE, std::vector<double> (SIZE, 0));
+        std::vector<double> B (SIZE, 0);
 
         // Fill A
         int n = SIZE - 1;
@@ -255,7 +253,7 @@ namespace gt::gfunction {
                 _fillA(i, p, SIZE);
             }  // next i
             end = std::chrono::steady_clock::now();  // _fill_A
-            milli = chrono::duration_cast<chrono::milliseconds>
+            milli = std::chrono::duration_cast<std::chrono::milliseconds>
                     (end - start).count();
             fill_A_time += milli;
 
@@ -263,12 +261,12 @@ namespace gt::gfunction {
             start = std::chrono::steady_clock::now();
             load_history_reconstruction(q_r,time, _time, Q, dt, p);
             end = std::chrono::steady_clock::now();
-            milli = chrono::duration_cast<chrono::milliseconds>
+            milli = std::chrono::duration_cast<std::chrono::milliseconds>
                     (end - start).count();
             load_history_reconstruction_time += milli;
 
             // ----- temporal superposition
-            start = chrono::steady_clock::now();
+            start = std::chrono::steady_clock::now();
             _temporal_superposition(Tb_0,
                                     SegRes,
                                     H_ij,
@@ -280,14 +278,14 @@ namespace gt::gfunction {
             for (int i=0; i<Tb_0.size(); i++) {
                 B[i] = -Tb_0[i];
             }
-            end = chrono::steady_clock::now();
-            milli = chrono::duration_cast<chrono::milliseconds>
+            end = std::chrono::steady_clock::now();
+            milli = std::chrono::duration_cast<std::chrono::milliseconds>
                     (end - start).count();
             temporal_superposition_time += milli;
 
             int m = SIZE;
             int n = SIZE;
-            vector<double> x(SIZE);
+            std::vector<double> x(SIZE);
 //            _solve_eqn(x, A, b);
             /** was _solve_eqn **/
 
@@ -295,13 +293,13 @@ namespace gt::gfunction {
             start = std::chrono::steady_clock::now();
 
             end = std::chrono::steady_clock::now();
-            milli = chrono::duration_cast<chrono::milliseconds>
+            milli = std::chrono::duration_cast<std::chrono::milliseconds>
                     (end - start).count();
             fill_gsl_matrices_time += milli;
 
             // ----- LU decomposition -----
             start = std::chrono::steady_clock::now();
-            vector<int> indx(SIZE, 0);
+            std::vector<int> indx(SIZE, 0);
             double d;
             jcc::decomposition(A, SIZE, indx, d);
             jcc::back_substitution(A, SIZE, indx, B);
@@ -309,8 +307,8 @@ namespace gt::gfunction {
 //            for (int i=0; i<SIZE; i++) {
 //                x[i] = X(i, 0);
 //            } // next i
-            end = chrono::steady_clock::now();
-            milli = chrono::duration_cast<chrono::milliseconds>
+            end = std::chrono::steady_clock::now();
+            milli = std::chrono::duration_cast<std::chrono::milliseconds>
                     (end - start).count();
             LU_decomposition_time += milli;
 
@@ -333,28 +331,28 @@ namespace gt::gfunction {
         LU_decomposition_time /= 1000;
 
         if (display) {
-            cout << "------ timings report -------" << endl;
-            cout << " t\t " << " t/p\t" << "name" << endl;
-            cout << segment_length_time << "\t" << segment_length_time << "\t" << "segment length time" << endl;
-            cout << time_vector_time << "\t" << time_vector_time << "\t" << "time vector time" << endl;
-            cout << segment_h_values_time << "\t" << segment_h_values_time << "\t" << "segment h values time" << endl;
-            cout << fill_A_time << "\t" << fill_A_time / double(nt) << "\t" << "time to fill vector A" << endl;
-            cout << load_history_reconstruction_time << "\t" << load_history_reconstruction_time / double(nt)
-                 << "\t" << "load hist reconstruction" << endl;
-            cout << temporal_superposition_time << "\t" << temporal_superposition_time / double(nt)
-                 << "\t" << "temporal superposition time:" << endl;
-            cout << fill_gsl_matrices_time << "\t" << fill_gsl_matrices_time / double(nt)
-                 << "\t" << "gsl fill matrices time" << endl;
-            cout << LU_decomposition_time << "\t" << LU_decomposition_time/double(nt)
-                 << "\t" << "LU decomp time" << endl;
+            std::cout << "------ timings report -------" << std::endl;
+            std::cout << " t\t " << " t/p\t" << "name" << std::endl;
+            std::cout << segment_length_time << "\t" << segment_length_time << "\t" << "segment length time" << std::endl;
+            std::cout << time_vector_time << "\t" << time_vector_time << "\t" << "time vector time" << std::endl;
+            std::cout << segment_h_values_time << "\t" << segment_h_values_time << "\t" << "segment h values time" << std::endl;
+            std::cout << fill_A_time << "\t" << fill_A_time / double(nt) << "\t" << "time to fill vector A" << std::endl;
+            std::cout << load_history_reconstruction_time << "\t" << load_history_reconstruction_time / double(nt)
+                 << "\t" << "load hist reconstruction" << std::endl;
+            std::cout << temporal_superposition_time << "\t" << temporal_superposition_time / double(nt)
+                 << "\t" << "temporal superposition time:" << std::endl;
+            std::cout << fill_gsl_matrices_time << "\t" << fill_gsl_matrices_time / double(nt)
+                 << "\t" << "gsl fill matrices time" << std::endl;
+            std::cout << LU_decomposition_time << "\t" << LU_decomposition_time/double(nt)
+                 << "\t" << "LU decomp time" << std::endl;
         }
 
         auto end2 = std::chrono::steady_clock::now();
         if (display) {
-            double milli1 = chrono::duration_cast<chrono::milliseconds>
+            double milli1 = std::chrono::duration_cast<std::chrono::milliseconds>
                     (end2 - start2).count();
             double seconds1 = milli1 / 1000;
-            double milli2 = chrono::duration_cast<chrono::milliseconds>
+            double milli2 = std::chrono::duration_cast<std::chrono::milliseconds>
                     (end2 - startall).count();
             double seconds2 = milli2 / 1000;
             std::cout << "Elapsed time in seconds : "
@@ -386,8 +384,8 @@ namespace gt::gfunction {
     } // void _borehole_segments
 
     void load_history_reconstruction(std::vector<double>& q_reconstructed,
-            vector<double>& time, vector<double>& _time,
-            vector<vector<double> >& Q, vector<double>& dt, const int p) {
+            std::vector<double>& time, std::vector<double>& _time,
+            std::vector<std::vector<double> >& Q, std::vector<double>& dt, const int p) {
         // for s in range p+1
         int nSources = Q.size();
 
@@ -415,7 +413,7 @@ namespace gt::gfunction {
         }
         int _tsize = t.size();
         // Q*dt
-        vector<vector <double>> Q_dt (nSources,
+        std::vector<std::vector <double>> Q_dt (nSources,
                                       std::vector<double> (t.size()));
         auto _Q_dot_dt = [&Q_dt, &Q, &dt, &p, &_tsize, &t](const int i) {
             for (int j = 1; j<_tsize; j++) {
@@ -455,10 +453,10 @@ namespace gt::gfunction {
         }
     } // load_history_reconstruction
 
-    void _temporal_superposition(vector<double>& Tb_0,
+    void _temporal_superposition(std::vector<double>& Tb_0,
                                  gt::segments::SegmentResponse &SegRes,
-                                 vector<double> &h_ij,
-                                 vector<double> &q_reconstructed,
+                                 std::vector<double> &h_ij,
+                                 std::vector<double> &q_reconstructed,
                                  const int p, int &nSources)
             {
         // This function performs equation (37) of Cimmino (2017)
@@ -466,7 +464,7 @@ namespace gt::gfunction {
         // Number of time steps
         int nt = p + 1;
 
-        const auto processor_count = thread::hardware_concurrency();
+        const auto processor_count = std::thread::hardware_concurrency();
         int n_threads = int(processor_count);
 
         int gauss_sum = nSources * (nSources + 1) / 2;  // Number of positions in packed symmetric matrix

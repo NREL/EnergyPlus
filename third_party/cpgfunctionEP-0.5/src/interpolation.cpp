@@ -4,8 +4,6 @@
 
 #include <cpgfunction/interpolation.h>
 
-using namespace std;
-
 namespace jcc::interpolation {
 
     double linterp(double xp, double x0, double y0, double x1, double y1) {
@@ -14,12 +12,12 @@ namespace jcc::interpolation {
         return yp;
     } // linterp
 
-    void interp1d(vector<double>& xp, vector<double>& yp, vector<double>& x,
-                  vector<double>& y) {
+    void interp1d(std::vector<double>& xp, std::vector<double>& yp, std::vector<double>& x,
+                  std::vector<double>& y) {
         int counter = 0;
         for (int i=0; i<yp.size(); i++) {
             if (xp[i] < x[0] || xp[i] > x[x.size()-1]) {
-                throw invalid_argument("Need to add extrapolation");
+                throw std::invalid_argument("Need to add extrapolation");
             }
             for (int j = counter; j<y.size();j++) {
                 if (xp[i] - x[j] < 10) {
@@ -35,7 +33,7 @@ namespace jcc::interpolation {
         } // next i
     } // interp1d
 
-    double interp1d(double &xp, vector<double>& x, vector<double>& y) {
+    double interp1d(double &xp, std::vector<double>& x, std::vector<double>& y) {
         // this function takes in an x point, an x-vector and a y-vector
         // a linear interpolation occurs over the y-vector
         int counter = 0;
@@ -63,13 +61,13 @@ namespace jcc::interpolation {
         return yp;  // this function should never reach this point
     } // interp1d
 
-    void interp1d(double &xp, double &yp, vector<double> &time,
+    void interp1d(double &xp, double &yp, std::vector<double> &time,
                   gt::segments::SegmentResponse &SegRes,
                   int &i, int &j, int &k) {
         // if the x point is out of bounds, then tell the user that
         // extrapolation is not possible
         if (xp < 0 || xp > time[time.size()-1]) {
-            throw invalid_argument("Need to add extrapolation");
+            throw std::invalid_argument("Need to add extrapolation");
         }
         // if the time value falls in between 0 and the first time value,
         // then interpolate 0 to t1

@@ -5,12 +5,9 @@
 #include <cpgfunction/heat_transfer.h>
 #include <stdexcept>
 #include <thread>
+#include <iostream>
 #include <cpgfunction/boreholes.h>
-#include <cmath>
 #include <qdt.h>
-
-using namespace gt;
-using namespace std;
 
 namespace gt::heat_transfer {
 
@@ -54,7 +51,7 @@ namespace gt::heat_transfer {
     } // void finite_line_source
 
     void thermal_response_factors(gt::segments::SegmentResponse &SegRes,
-                                  vector<double> &time, const double alpha,
+                                  std::vector<double> &time, const double alpha,
                                   bool use_similaries, bool disp) {
         // total number of line sources
         int nSources = SegRes.boreSegments.size();
@@ -64,10 +61,10 @@ namespace gt::heat_transfer {
         // Open up processes here
         // Create a vector of threads
         //may return 0 when not able to detect
-        const auto processor_count = thread::hardware_concurrency();
+        const auto processor_count = std::thread::hardware_concurrency();
         if (disp) {
-            cout << "\tDetected " << processor_count
-            << " as the number of available threads" << endl;
+            std::cout << "\tDetected " << processor_count
+            << " as the number of available threads" << std::endl;
         }
 
         gt::boreholes::SimilaritiesType SimReal; // positive
@@ -80,7 +77,7 @@ namespace gt::heat_transfer {
             auto start = std::chrono::steady_clock::now();
             // Calculations with similarities
             if (disp) {
-                cout << "Identifying similarities..." << endl;
+                std::cout << "Identifying similarities..." << std::endl;
             }
             bool splitRealAndImage = true;
             double disTol = 0.1;
@@ -105,11 +102,11 @@ namespace gt::heat_transfer {
                 gt::boreholes::Borehole b1;
                 gt::boreholes::Borehole b2;
                 // begin thread
-                n1 = get<0>(SimReal.Sim[s][0]);
-                n2 = get<1>(SimReal.Sim[s][0]);
+                n1 = std::get<0>(SimReal.Sim[s][0]);
+                n2 = std::get<1>(SimReal.Sim[s][0]);
                 b1 = SegRes.boreSegments[n1];
                 b2 = SegRes.boreSegments[n2];
-                vector<double> hPos(nt);
+                std::vector<double> hPos(nt);
                 if (splitRealAndImage) {
                     for (int k=0; k<nt; k++) {
                         hPos[k] = finite_line_source(time[k], alpha, b1,
@@ -121,8 +118,8 @@ namespace gt::heat_transfer {
                         // will loop through every (i, j), will combine real+image
                         int index;
                         for (std::size_t k=0; k<SimReal.Sim[s].size(); k++) {
-                            i = get<0>(SimReal.Sim[s][k]);
-                            j = get<1>(SimReal.Sim[s][k]);
+                            i = std::get<0>(SimReal.Sim[s][k]);
+                            j = std::get<1>(SimReal.Sim[s][k]);
                             for (std::size_t t=0; t<time.size(); t++){
                                 // must consider real and image source separate
                                 // when combining
@@ -149,8 +146,8 @@ namespace gt::heat_transfer {
             };
             auto end = std::chrono::steady_clock::now();
             if (disp) {
-                auto milli = chrono::duration_cast<
-                        chrono::milliseconds>(end - start).count();
+                auto milli = std::chrono::duration_cast<
+                        std::chrono::milliseconds>(end - start).count();
                 double seconds = double(milli) / 1000;
                 std::cout << "Elapsed time in seconds : " << seconds
                 << " sec" << std::endl;

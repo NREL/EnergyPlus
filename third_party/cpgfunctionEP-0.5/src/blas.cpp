@@ -6,7 +6,7 @@
 
 namespace jcc::blas {
 
-    void axpy(int &n, double &a, vector<double> &x, vector<double> &y,
+    void axpy(int &n, double &a, std::vector<double> &x, std::vector<double> &y,
               int &start, int &n_threads){
         // y = a*x + y
         #pragma omp parallel for num_threads(n_threads)
@@ -15,8 +15,8 @@ namespace jcc::blas {
         }
     }  // axpy();
 
-    void spmv(int &n, double &alpha, vector<double> &A, vector<double> &x,
-              double &beta, vector<double> &y, int &start, int &n_threads) {
+    void spmv(int &n, double &alpha, std::vector<double> &A, std::vector<double> &x,
+              double &beta, std::vector<double> &y, int &start, int &n_threads) {
         // TODO: implement upper
 
         // LOWER

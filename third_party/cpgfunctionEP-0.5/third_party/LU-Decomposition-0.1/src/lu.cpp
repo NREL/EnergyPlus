@@ -3,22 +3,24 @@
 //
 
 #include <LU-Decomposition/lu.h>
+#include <cmath>
+#include <stdexcept>
 
 
-void jcc::decomposition(vector<vector<double> > &A, int &n, vector<int> &indx,
+void jcc::decomposition(std::vector<std::vector<double> > &A, int &n, std::vector<int> &indx,
                    double &d) {
     const double TINY = 1.0e-20;  // a small number
     int i, imax, j, k;
     double big, dum, sum;
 
-    vector<double> vv(n); // vv stores the implicit scaling of each row
+    std::vector<double> vv(n); // vv stores the implicit scaling of each row
     d = 1.0; // No row interchanges yet
     for (i=0; i<n;i++){  // loop over rows to get implicit scaling formation
         big = 0.0;
         for (j=0; j<n;j++) {
-            if (fabs(A[i][j]) > big) big = fabs(A[i][j]);
+            if (std::fabs(A[i][j]) > big) big = std::fabs(A[i][j]);
         } // next j
-        if (big == 0.0) throw invalid_argument("Singular matrix in routine "
+        if (big == 0.0) throw std::invalid_argument("Singular matrix in routine "
                                                "decomposition");
         // No nonzero biggest element
         vv[i] = 1.0/big; // save the scaling
@@ -35,8 +37,8 @@ void jcc::decomposition(vector<vector<double> > &A, int &n, vector<int> &indx,
             sum = A[i][j];
             for (k=0; k<j;k++) sum -= A[i][k] * A[k][j];
             A[i][j] = sum;
-            if (fabs(sum) >= big) {
-                big = fabs(sum);
+            if (std::fabs(sum) >= big) {
+                big = std::fabs(sum);
                 imax = i;
             } // end if()
         } // next i
@@ -59,8 +61,8 @@ void jcc::decomposition(vector<vector<double> > &A, int &n, vector<int> &indx,
 
 } // decomposition()
 
-void jcc::back_substitution(vector<vector<double> > &A, int &n, vector<int> indx,
-                       vector<double> &b) {
+void jcc::back_substitution(std::vector<std::vector<double> > &A, int &n, std::vector<int> indx,
+                       std::vector<double> &b) {
     int i, ii=0, ip, j;
     double sum;
 

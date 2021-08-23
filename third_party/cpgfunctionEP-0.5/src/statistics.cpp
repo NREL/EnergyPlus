@@ -3,6 +3,7 @@
 //
 
 #include <cpgfunction/statistics.h>
+#include <cmath>
 
 namespace gt {
     namespace statistics {

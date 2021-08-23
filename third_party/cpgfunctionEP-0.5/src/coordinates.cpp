@@ -7,14 +7,12 @@
 //#include <string>
 #include <algorithm>
 
-using namespace std;
-
 namespace gt::coordinates {
 
-    vector<tuple<double, double>> configuration(const string& shape, int Nx,
+    std::vector<std::tuple<double, double>> configuration(const std::string& shape, int Nx,
                                                 int Ny, double Bx, double By){
         // define acceptable inputs
-        vector<string> acceptable_arguments{"Rectangle",
+        std::vector<std::string> acceptable_arguments{"Rectangle",
                                             "OpenRectangle",
                                             "U",
                                             "L"};
@@ -65,7 +63,7 @@ namespace gt::coordinates {
 //        return custom;
 //    }  // configuration();
 
-    vector<tuple<double, double>> rectangle(int Nx, int Ny, double Bx,
+    std::vector<std::tuple<double, double>> rectangle(int Nx, int Ny, double Bx,
                                             double By) {
         std::vector<std::tuple<double, double>> r;  // rectangular coordinates
 
@@ -80,9 +78,9 @@ namespace gt::coordinates {
         return r;
     }  // rectangle();
 
-    vector<tuple<double, double>> Open_rectangle(int Nx, int Ny, double Bx,
+    std::vector<std::tuple<double, double>> Open_rectangle(int Nx, int Ny, double Bx,
                                                  double By){
-        vector<tuple<double, double>> open_r;  // open rectangle coordinates
+        std::vector<std::tuple<double, double>> open_r;  // open rectangle coordinates
 
         int nbh;
         if (Nx > 2 && Ny > 2) {
@@ -108,7 +106,7 @@ namespace gt::coordinates {
         return open_r;
     }  // Open_rectangle();
 
-    vector<tuple<double, double>> U_shape(int Nx, int Ny, double Bx, double By){
+    std::vector<std::tuple<double, double>> U_shape(int Nx, int Ny, double Bx, double By){
         std::vector<std::tuple<double, double>> U;  // U-shape coordinates
 
         int nbh;
@@ -132,7 +130,7 @@ namespace gt::coordinates {
         return U;
     }  // U_shape();
 
-    vector<tuple<double, double>> L_shape(int Nx, int Ny, double Bx, double By){
+    std::vector<std::tuple<double, double>> L_shape(int Nx, int Ny, double Bx, double By){
         std::vector<std::tuple<double, double>> L;  // L-shape coordinates
 
         int nbh = Nx + Ny - 1;
@@ -147,9 +145,9 @@ namespace gt::coordinates {
         return L;
     }  // L_shape();
 
-//    vector<tuple<double, double>> import_coordinates_from_file(
+//    std::vector<std::tuple<double, double>> import_coordinates_from_file(
 //            const string& input_path){
-//        vector<tuple<double, double>> custom;  // custom-shape from .json file
+//        std::vector<std::tuple<double, double>> custom;  // custom-shape from .json file
 //
 //        // nlohmann json input
 //        std::ifstream in(input_path);
@@ -168,7 +166,7 @@ namespace gt::coordinates {
 //    }  // import_coordinates_from_file();
 //
 //    void export_coordinates_to_file(
-//            const vector<tuple<double, double>> &coordinates,
+//            const std::vector<std::tuple<double, double>> &coordinates,
 //            const std::string& output_path){
 //        // Use nlohmann json to export the coordinates to a path
 //

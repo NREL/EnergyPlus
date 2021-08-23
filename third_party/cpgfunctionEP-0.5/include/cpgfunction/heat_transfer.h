@@ -2,17 +2,12 @@
 // Created by jackcook on 7/11/20.
 //
 
-#include <iostream>
-#include <vector>
-#include <cmath>
-#include <cpgfunction/boreholes.h>
-#include <cpgfunction/segments.h>
-
-using namespace std;
-using namespace gt;
-
 #ifndef CPPGFUNCTION_HEAT_TRANSFER_H
 #define CPPGFUNCTION_HEAT_TRANSFER_H
+
+#include <vector>
+#include <cpgfunction/boreholes.h>
+#include <cpgfunction/segments.h>
 
 namespace gt::heat_transfer {
 
@@ -20,7 +15,7 @@ namespace gt::heat_transfer {
                               boreholes::Borehole& b1, boreholes::Borehole& b2,
                               bool reaSource=true, bool imgSource=true);
     void thermal_response_factors(gt::segments::SegmentResponse &SegRes,
-                                  vector<double>& time, double alpha,
+                                  std::vector<double>& time, double alpha,
                                   bool use_similaries, bool disp=false);
 
 } // namespace gt::heat_transfer

@@ -3,14 +3,13 @@
 //
 
 #include <cpgfunction/boreholes.h>
+#include <cmath>
 #include <algorithm>
-
-using namespace std;
 
 namespace gt {
 
     double Distance_Formula(double x1, double y1, double x2, double y2) {
-        return sqrt(pow((x1 - x2), 2) + pow((y1 - y2), 2));
+        return std::sqrt(std::pow((x1 - x2), 2) + std::pow((y1 - y2), 2));
     }
     
 }  // namespace gt
@@ -23,25 +22,25 @@ namespace gt::boreholes {
         double x2 = target.x;
         double y2 = target.y;
         double dist = Distance_Formula(x1, y1, x2, y2);
-        return max(r_b, double(dist));  // max needs doubles
+        return std::max(r_b, double(dist));  // max needs doubles
     }
 
-    tuple<double, double> Borehole::position() {
-        tuple<double, double> t (x, y);
+    std::tuple<double, double> Borehole::position() {
+        std::tuple<double, double> t (x, y);
         return t;
     };
 
-    vector<Borehole> boreField(const vector<tuple<double, double>> &coordinates,
+    std::vector<Borehole> boreField(const std::vector<std::tuple<double, double>> &coordinates,
                                const double &r_b, const double &H,
                                const double &D){
-        vector<Borehole> bores(coordinates.size());
+        std::vector<Borehole> bores(coordinates.size());
 
         double x;
         double y;
 
         for (size_t i = 0; i < coordinates.size(); i++) {
-            x = get<0>(coordinates[i]);
-            y = get<1>(coordinates[i]);
+            x = std::get<0>(coordinates[i]);
+            y = std::get<1>(coordinates[i]);
             bores[i] = Borehole(H, D, r_b, x, y);
         }  // next i
 
@@ -50,21 +49,21 @@ namespace gt::boreholes {
 
     void Similarity::similarities(SimilaritiesType &SimReal,
                                   SimilaritiesType &SimImage,
-                                  vector<gt::boreholes::Borehole> &boreSegments,
+                                  std::vector<gt::boreholes::Borehole> &boreSegments,
                                   bool splitRealAndImage, double disTol,
                                   double tol) {
         // TODO: fork a pool
 
         // declare the variables local to this function
         int nDis;
-        vector<double> disPairs;
-        vector<int> nPairs;
-        vector< vector < tuple <int, int> > > Pairs;
+        std::vector<double> disPairs;
+        std::vector<int> nPairs;
+        std::vector< std::vector < std::tuple <int, int> > > Pairs;
         _similarities_group_by_distance(boreSegments, Pairs, nPairs,
                                         disPairs, nDis);
 
-        vector<SimilaritiesType> RealSimT(Pairs.size());
-        vector<SimilaritiesType> ImageSimT;
+        std::vector<SimilaritiesType> RealSimT(Pairs.size());
+        std::vector<SimilaritiesType> ImageSimT;
 
         // if real and image parts of the FLS are split,
         // evaluate real and image similarities seperately:
@@ -79,18 +78,18 @@ namespace gt::boreholes {
             } // next i
             int a = 1;
         } else {
-            throw invalid_argument("splitRealAndImage == false code not "
+            throw std::invalid_argument("splitRealAndImage == false code not "
                                    "implemented yet.");
         } //
 
         // TODO: close pool
         // aggregate all real similarities for all distances
 
-        auto _aggregate = [&nDis, &disPairs](vector<SimilaritiesType> &SimFrom,
+        auto _aggregate = [&nDis, &disPairs](std::vector<SimilaritiesType> &SimFrom,
                 SimilaritiesType &SimTo) {
             int nSimtmp;
             // reserve and insert
-            auto _res_and_ins = [](vector<SimilaritiesType> &SimFrom,
+            auto _res_and_ins = [](std::vector<SimilaritiesType> &SimFrom,
                     SimilaritiesType &SimTo, const int &i) {
                 // Sim positions
                 SimTo.Sim.reserve(SimTo.Sim.size() +
@@ -114,7 +113,7 @@ namespace gt::boreholes {
                 for (int j = 0; j < nSimtmp; j++) {
                     SimTo.disSim.push_back(disPairs[i]);
                 }  // next j
-                vector<vector<tuple<int, int> > > tmp;
+                std::vector<std::vector<std::tuple<int, int> > > tmp;
                 tmp = SimFrom[i].Sim;
                 _res_and_ins(SimFrom, SimTo, i);
             }  // next i
@@ -127,13 +126,13 @@ namespace gt::boreholes {
     } // Similarity::similarities
 
     void Similarity::_similarities_group_by_distance(
-            vector<gt::boreholes::Borehole> &boreSegments,
-            vector< vector < tuple <int, int> > > &Pairs, vector<int> &nPairs,
-            vector<double> &disPairs, int &nDis, double disTol) {
+            std::vector<gt::boreholes::Borehole> &boreSegments,
+            std::vector< std::vector < std::tuple <int, int> > > &Pairs, std::vector<int> &nPairs,
+            std::vector<double> &disPairs, int &nDis, double disTol) {
         // initialize lists
         nPairs.push_back(1);
-        vector< tuple <int, int > > vect_w_tup(1);
-        vect_w_tup[0] = tuple<int, int> (0, 0);
+        std::vector< std::tuple <int, int > > vect_w_tup(1);
+        vect_w_tup[0] = std::tuple<int, int> (0, 0);
         Pairs.push_back(vect_w_tup);
         disPairs.push_back(boreSegments[0].r_b);
         nDis = 1;
@@ -167,7 +166,7 @@ namespace gt::boreholes {
                 for (int k=0; k<nDis; k++) {
                     diff = abs(disPairs[k] - dis);
                     if (diff < rTol) {
-                        Pairs[k].push_back(tuple<int, int> (i, j));
+                        Pairs[k].push_back(std::tuple<int, int> (i, j));
                         nPairs[k]++;
                         break;
                     } // fi disPairs[k] - dis < rTol
@@ -175,7 +174,7 @@ namespace gt::boreholes {
                     if (k == nDis-1) {
                         nDis++;
                         disPairs.push_back(dis);
-                        vect_w_tup[0] = tuple<int, int> (i, j);
+                        vect_w_tup[0] = std::tuple<int, int> (i, j);
                         Pairs.push_back(vect_w_tup);
                         nPairs.push_back(1);
                         break;
@@ -187,8 +186,8 @@ namespace gt::boreholes {
     } // Similarity::_similarities_group_by_distance
 
     void Similarity::_similarities_one_distance(
-            SimilaritiesType & SimT, vector<tuple<int, int> > &pairs,
-            vector<gt::boreholes::Borehole> &boreSegments, const string& kind,
+            SimilaritiesType & SimT, std::vector<std::tuple<int, int> > &pairs,
+            std::vector<gt::boreholes::Borehole> &boreSegments, const std::string& kind,
             double tol) {
         // Condition for equivalence of the real part of the FLS solution
         auto compare_real_segments = [](const double &H1a, const double &H1b,
@@ -225,9 +224,9 @@ namespace gt::boreholes {
             return similarity;
         };
 
-        string real("real");
-        string image("image");
-        string realandimage("realandimage");
+        std::string real("real");
+        std::string image("image");
+        std::string realandimage("realandimage");
 
         // compare segments is a pointer to one of the lambda functions
         bool(*compare_segments)(const double&, const double&, const double&,
@@ -241,22 +240,22 @@ namespace gt::boreholes {
         } else if (realandimage.compare(kind) == 0) {
             compare_segments = compare_realandimage_segments;
         } else {
-            throw invalid_argument("Error kind not implemented yet.");
+            throw std::invalid_argument("Error kind not implemented yet.");
         }
 
         SimT.nSim = 1;
-        tuple<double, double> doub_tup_temp_H;
-        tuple<double, double> doub_tup_temp_D;
-        tuple<int, int> int_tup_temp_sim;
-        vector< tuple <int, int > > vect_w_tup(1);
+        std::tuple<double, double> doub_tup_temp_H;
+        std::tuple<double, double> doub_tup_temp_D;
+        std::tuple<int, int> int_tup_temp_sim;
+        std::vector< std::tuple <int, int > > vect_w_tup(1);
         vect_w_tup[0] = pairs[0];
-//        tuple<int, int> pair0 = pairs[0];
-        int i0 = get<0>(pairs[0]);
-        int j0 = get<1>(pairs[0]);
+//        std::tuple<int, int> pair0 = pairs[0];
+        int i0 = std::get<0>(pairs[0]);
+        int j0 = std::get<1>(pairs[0]);
         SimT.Sim.push_back(vect_w_tup);
-        doub_tup_temp_H = make_tuple(boreSegments[i0].H, boreSegments[j0].H);
+        doub_tup_temp_H = std::make_tuple(boreSegments[i0].H, boreSegments[j0].H);
         SimT.HSim.push_back(doub_tup_temp_H);
-        doub_tup_temp_D = make_tuple(boreSegments[i0].D, boreSegments[j0].D);
+        doub_tup_temp_D = std::make_tuple(boreSegments[i0].D, boreSegments[j0].D);
         SimT.DSim.push_back(doub_tup_temp_D);
 
         // values used in loops
@@ -271,37 +270,37 @@ namespace gt::boreholes {
 
         // Cycle through all pairs of boreholes for the given distance
         for (size_t i=1; i<pairs.size(); i++) {
-            ibor = get<0>(pairs[i]);
-            jbor = get<1>(pairs[i]);
+            ibor = std::get<0>(pairs[i]);
+            jbor = std::get<1>(pairs[i]);
             if (ibor > jbor) {
-                swap(ibor, jbor);
+                std::swap(ibor, jbor);
             }
             b1 = boreSegments[ibor];
             b2 = boreSegments[jbor];
             // Verify if the current pair should be included in the previously identified symmetries
             for (int j=0; j<SimT.nSim; j++) {
-                H1 = get<0>(SimT.HSim[j]);
-                H2 = get<1>(SimT.HSim[j]);
-                D1 = get<0>(SimT.DSim[j]);
-                D2 = get<1>(SimT.DSim[j]);
+                H1 = std::get<0>(SimT.HSim[j]);
+                H2 = std::get<1>(SimT.HSim[j]);
+                D1 = std::get<0>(SimT.DSim[j]);
+                D2 = std::get<1>(SimT.DSim[j]);
                 if (compare_segments(H1, b1.H, H2, b2.H, D1, b1.D, D2, b2.D,
                                      tol)) {
-                    int_tup_temp_sim = make_tuple(ibor, jbor);
+                    int_tup_temp_sim = std::make_tuple(ibor, jbor);
                     SimT.Sim[j].push_back(int_tup_temp_sim);
                     break;
                 } else if (compare_segments(H1, b2.H, H2, b1.H, D1, b2.D, D2,
                                             b1.D, tol)) {
-                    int_tup_temp_sim = make_tuple(jbor, ibor);
+                    int_tup_temp_sim = std::make_tuple(jbor, ibor);
                     SimT.Sim[j].push_back(int_tup_temp_sim);
                     break;
                 } else if (j == SimT.nSim-1) {
                     SimT.nSim++;
-                    int_tup_temp_sim = make_tuple(ibor, jbor);
+                    int_tup_temp_sim = std::make_tuple(ibor, jbor);
                     vect_w_tup[0] = int_tup_temp_sim;
                     SimT.Sim.push_back(vect_w_tup);
-                    doub_tup_temp_H = make_tuple(b1.H, b2.H);
+                    doub_tup_temp_H = std::make_tuple(b1.H, b2.H);
                     SimT.HSim.push_back(doub_tup_temp_H);
-                    doub_tup_temp_D = make_tuple(b1.D, b2.D);
+                    doub_tup_temp_D = std::make_tuple(b1.D, b2.D);
                     SimT.DSim.push_back(doub_tup_temp_D);
                     break;
                 }

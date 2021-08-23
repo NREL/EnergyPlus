@@ -7,8 +7,6 @@
 #include <cpgfunction/segments.h>
 #include <cpgfunction/interpolation.h>
 
-using namespace std;
-
 namespace gt::segments {
 
     void SegmentResponse::get_h_value(double &h, const int i, const int j,
@@ -16,7 +14,7 @@ namespace gt::segments {
         int index;
         switch (storage_mode) {
             case 0 :
-                cout << "Case 0 not written yet" << endl;
+                std::cout << "Case 0 not written yet" << std::endl;
                 break;
             case 1 :
                 if (i <= j) {
@@ -28,7 +26,7 @@ namespace gt::segments {
                 }
                 break;
             default:
-                throw invalid_argument("The case selected is not currently "
+                throw std::invalid_argument("The case selected is not currently "
                                        "implemented.");
         }  // switch();
     }  // SegmentResponse::get_h_value();
@@ -77,7 +75,7 @@ namespace gt::segments {
                                               drilling_depths[n1],
                                               ideal_segment_lengths[n1]);
         }
-        int _nq = floor(nq);
+        int _nq = std::floor(nq);
         return _nq;
     }
 }

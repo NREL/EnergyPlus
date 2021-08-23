@@ -12,7 +12,7 @@ int main() {
     int n = 3;
 
     // Define 2D vector A of nxn full of zeros
-    vector<vector<double> > A(n, vector<double> (n, 0));
+    std::vector<std::vector<double> > A(n, std::vector<double> (n, 0));
     //        {5., 9., 10.},
     //        {2., 7., 3.},
     //        {8., 2., 4.}
@@ -26,12 +26,12 @@ int main() {
     A[2][1] = 2.;
     A[2][2] = 4.;
 
-    vector<double> b(n, 0);
+    std::vector<double> b(n, 0);
     b[0] = 22.;
     b[1] = 13.;
     b[2] = 17.;
 
-    vector<int> indx(n);
+    std::vector<int> indx(n);
 
     double d;
 
