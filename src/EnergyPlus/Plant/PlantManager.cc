@@ -3574,7 +3574,7 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                     {
                         auto const SELECT_CASE_var(this_component.TypeOf_enum);
 
-                        if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Other) { //                             = -1
+                        if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Invalid) { //                             = -1
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Unknown;
                             this_component.FlowPriority = LoopFlowStatus_Unknown;
                             this_component.HowLoadServed = HowMet_Unknown;

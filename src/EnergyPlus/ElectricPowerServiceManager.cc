@@ -2142,7 +2142,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                                          Real64 ratedElecPowerOutput,
                                          std::string const &availSchedName,
                                          Real64 thermalToElectRatio)
-    : compGenTypeOf_Num(GeneratorType::Unassigned), compPlantTypeOf(DataPlant::PlantEquipmentType::Other), generatorType(GeneratorType::Unassigned),
+    : compGenTypeOf_Num(GeneratorType::Unassigned), compPlantTypeOf(DataPlant::PlantEquipmentType::Invalid), generatorType(GeneratorType::Unassigned),
       generatorIndex(0), maxPowerOut(0.0), availSchedPtr(0), powerRequestThisTimestep(0.0), onThisTimestep(false), eMSPowerRequest(0.0),
       eMSRequestOn(false), plantInfoFound(false), cogenLocation(PlantLocation(0, 0, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0),
       dCElectProdRate(0.0), electricityProd(0.0), electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), pvwattsGenerator(nullptr),
@@ -2176,7 +2176,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     } else if (UtilityRoutines::SameString(objectType, "Generator:PVWatts")) {
         generatorType = GeneratorType::PVWatts;
         compGenTypeOf_Num = GeneratorType::PVWatts;
-        compPlantTypeOf = DataPlant::PlantEquipmentType::Other;
+        compPlantTypeOf = DataPlant::PlantEquipmentType::Invalid;
 
         int ObjNum =
             state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(objectName));
@@ -2203,7 +2203,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     } else if (UtilityRoutines::SameString(objectType, "Generator:WindTurbine")) {
         generatorType = GeneratorType::WindTurbine;
         compGenTypeOf_Num = GeneratorType::WindTurbine;
-        compPlantTypeOf = DataPlant::PlantEquipmentType::Other;
+        compPlantTypeOf = DataPlant::PlantEquipmentType::Invalid;
     } else {
         ShowSevereError(state, std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + " invalid entry.");
         ShowContinueError(state, "Invalid " + objectType + " associated with generator = " + objectName);

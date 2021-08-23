@@ -95,7 +95,6 @@ enum OpSchemeType
 enum class PlantEquipmentType
 {
     Invalid = -1,
-    Other = 0,
     Boiler_Simple = 1,
     Boiler_Steam = 2,
     Chiller_Absorption = 3,          // older BLAST absorption chiller
