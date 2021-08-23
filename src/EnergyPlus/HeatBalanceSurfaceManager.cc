@@ -1244,8 +1244,11 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenArea, "North Total or Average", fenTotAreaNorth);
     if (fenTotAreaNorth > 0.0) {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, "North Total or Average", ufactAreaNorth / fenTotAreaNorth, 3);
-        PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchFenUfactBeforeAdjusted, "North Total or Average", ufactBeforeAdjustedAreaNorth / fenTotAreaNorth, 3);
+        PreDefTableEntry(state,
+                         state.dataOutRptPredefined->pdchFenUfactBeforeAdjusted,
+                         "North Total or Average",
+                         ufactBeforeAdjustedAreaNorth / fenTotAreaNorth,
+                         3);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, "North Total or Average", shgcAreaNorth / fenTotAreaNorth, 3);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, "North Total or Average", vistranAreaNorth / fenTotAreaNorth, 3);
     } else {
