@@ -449,9 +449,18 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
     INTEGER iCurArgs
     LOGICAL compactwarning
     LOGICAL :: ErrFlag
+    INTEGER NVertFieldNum
+    INTEGER SurfaceSpaceFieldShift
 
     Written=.true.
     compactwarning=.false.
+
+    ! Surface fields shifted by one with the addition of Space Name field
+    IF (VersionNum < 9.6) THEN
+      SurfaceSpaceFieldShift = 0
+    ELSE
+      SurfaceSpaceFieldShift = 1
+    ENDIF
 
     IF (VersionNum < 3.0) THEN
       SELECT CASE (MakeUPPERCase(ObjectName))
@@ -799,31 +808,32 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           CALL WriteOutIDFLinesAsSingleLine(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,FieldUnits)
 
         CASE('BUILDINGSURFACE:DETAILED')
+          NVertFieldNum = 10 + SurfaceSpaceFieldShift
           IF (MakeUPPERCase(OutArgs(11)) == 'AUTOCALCULATE') THEN
-            NVert=(CurArgs-11)/3
-          ELSEIF (OutArgs(11) == '') THEN
-            NVert=(CurArgs-11)/3
+            NVert=(CurArgs-NVertFieldNum)/3
+          ELSEIF (OutArgs(NVertFieldNum) == '') THEN
+            NVert=(CurArgs-NVertFieldNum)/3
           ELSE
             ! Try to read the number of vertices as an integer
-            NVert = ProcessNumber(OutArgs(11),ErrFlag)
+            NVert = ProcessNumber(OutArgs(NVertFieldNum),ErrFlag)
             IF (ErrFlag) THEN
               ! If failed, default to autocalculate instead
-              NVert=(CurArgs-11)/3
+              NVert=(CurArgs-NVertFieldNum)/3
               ! Replace in existing with Autocalculate
-              OutArgs(11) = 'Autocalculate'
+              OutArgs(NVertFieldNum) = 'Autocalculate'
               CALL ShowWarningError('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not a number, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')',Auditf)
             ELSE
               ! Silently trim any float to an integer
-              OutArgs(11) = TrimSigDigits(NVert)
+              OutArgs(NVertFieldNum) = TrimSigDigits(NVert)
             ENDIF
           ENDIF
 
           ! Now we write the first few fields
-          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,11,OutArgs,FieldNames,FieldUnits)
+          CALL WriteOutPartialIDFLines(DifUnit,ObjectName,NVertFieldNum,OutArgs,FieldNames,FieldUnits)
 
-          VArg=12
+          VArg=NVertFieldNum + 1
           DO Arg=1,NVert
             IF (Arg /= NVert) THEN
               LString=',  !- '
@@ -935,31 +945,32 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
           ENDIF
 
         CASE('WALL:DETAILED','ROOFCEILING:DETAILED','FLOOR:DETAILED')
-          IF (MakeUPPERCase(OutArgs(10)) == 'AUTOCALCULATE') THEN
-            NVert=(CurArgs-10)/3
-          ELSEIF (OutArgs(10) == '') THEN
-            NVert=(CurArgs-10)/3
+          NVertFieldNum = 9 + SurfaceSpaceFieldShift
+          IF (MakeUPPERCase(OutArgs(NVertFieldNum)) == 'AUTOCALCULATE') THEN
+            NVert=(CurArgs-NVertFieldNum)/3
+          ELSEIF (OutArgs(NVertFieldNum) == '') THEN
+            NVert=(CurArgs-NVertFieldNum)/3
           ELSE
             ! Try to read the number of vertices as an integer
-            NVert = ProcessNumber(OutArgs(10),ErrFlag)
+            NVert = ProcessNumber(OutArgs(NVertFieldNum),ErrFlag)
             IF (ErrFlag) THEN
               ! If failed, default to autocalculate instead
-              NVert=(CurArgs-10)/3
+              NVert=(CurArgs-NVertFieldNum)/3
               ! Replace in existing with Autocalculate
-              OutArgs(10) = 'Autocalculate'
+              OutArgs(NVertFieldNum) = 'Autocalculate'
               CALL ShowWarningError('For ' // TRIM(ObjectName) // ' named ''' // TRIM(OutArgs(1)) // &
                   ''', Number of vertices is not a number, defaulting to Autocalculate (N='// &
                   TRIM(TrimSigDigits(NVert)) //')',Auditf)
             ELSE
               ! Silently trim any float to an integer
-              OutArgs(10) = TrimSigDigits(NVert)
+              OutArgs(NVertFieldNum) = TrimSigDigits(NVert)
             ENDIF
           ENDIF
 
           ! Now we write the first few fields
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,10,OutArgs,FieldNames,FieldUnits)
 
-          VArg=11
+          VArg=NVertFieldNum + 1
           DO Arg=1,NVert
             IF (Arg /= NVert) THEN
               LString=',  !- '
