@@ -958,8 +958,10 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     computedNetArea(Surface(iSurf).BaseSurf) -= windowAreaWMult;
                     nomUfact = state.dataHeatBal->NominalU(Surface(iSurf).Construction);
                     Real64 nomUfactGlazingOnly = state.dataHeatBal->NominalUGlazingOnly(Surface(iSurf).Construction);
+                    Real64 coeffAdjRatio = state.dataHeatBal->CoeffAdjRatio(Surface(iSurf).Construction);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfact, surfName, nomUfact, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenUfactGlazingOnly, surfName, nomUfactGlazingOnly, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenCoeffAdjRatio, surfName, coeffAdjRatio, 3);
                     // if the construction report is requested the SummerSHGC is already calculated
                     if (state.dataConstruction->Construct(curCons).SummerSHGC != 0) {
                         SHGCSummer = state.dataConstruction->Construct(curCons).SummerSHGC;

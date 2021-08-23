@@ -149,6 +149,7 @@ namespace OutputReportPredefined {
         s->pdchFenArea = newPreDefColumn(state, s->pdstFen, "Area of Multiplied Openings [m2]");
         s->pdchFenUfact = newPreDefColumn(state, s->pdstFen, "Glass U-Factor [W/m2-K]");
         s->pdchFenUfactGlazingOnly = newPreDefColumn(state, s->pdstFen, "Glass U-Factor (Glazing Only) [W/m2-K]");
+        s->pdchFenCoeffAdjRatio = newPreDefColumn(state, s->pdstFen, "Convection Coefficient Adjustment Ratio");
         s->pdchFenSHGC = newPreDefColumn(state, s->pdstFen, "Glass SHGC");
         s->pdchFenVisTr = newPreDefColumn(state, s->pdstFen, "Glass Visible Transmittance");
         s->pdchFenFrameConductance = newPreDefColumn(state, s->pdstFen, "Frame Conductance [W/m2-K]");
