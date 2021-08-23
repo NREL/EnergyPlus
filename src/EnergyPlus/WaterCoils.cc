@@ -6890,7 +6890,7 @@ void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
                     format("UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
                            CoilNum,
                            CoilName,
-                           ccSimPlantEquipTypes(static_cast<int>(CoilTypeNum))));
+                           ccSimPlantEquipTypes[static_cast<int>(CoilTypeNum)]));
             }
         }
     }

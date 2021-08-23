@@ -1999,8 +1999,8 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                               "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
                                                   "\" includes equipment that is not valid on a Condenser Loop");
                             ShowContinueError(state,
-                                              "Component " + ccSimPlantEquipTypes(static_cast<int>(ThisTypeOfNum)) +
-                                                  " not allowed as supply equipment on this type of loop.");
+                                              format("Component {} not allowed as supply equipment on this type of loop.",
+                                                     ccSimPlantEquipTypes[static_cast<int>(ThisTypeOfNum)]));
                             ShowContinueError(state, "Component name = " + this_equip.Name);
                             errFlag2 = true;
                         }
@@ -2013,8 +2013,8 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                               "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
                                                   "\" includes equipment that is not valid on a Plant Loop");
                             ShowContinueError(state,
-                                              "Component " + ccSimPlantEquipTypes(static_cast<int>(ThisTypeOfNum)) +
-                                                  " not allowed as supply equipment on this type of loop.");
+                                              format("Component {} not allowed as supply equipment on this type of loop.",
+                                                     ccSimPlantEquipTypes[static_cast<int>(ThisTypeOfNum)]));
                             ShowContinueError(state, "Component name = " + this_equip.Name);
                             errFlag2 = true;
                         }
@@ -3460,9 +3460,9 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).EMSCtrlOverrideValue);
                 }
                 for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-                    ActuatorName = "Plant Component " +
-                                   ccSimPlantEquipTypes(static_cast<int>(
-                                       state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).TypeOf_enum));
+                    ActuatorName = format("Plant Component {}",
+                                          ccSimPlantEquipTypes[static_cast<int>(
+                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).TypeOf_enum)]);
                     UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name;
                     ActuatorType = "On/Off Supervisory";
                     SetupEMSActuator(state,

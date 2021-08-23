@@ -1684,7 +1684,7 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
 
             // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
             if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                std::string CompType = DataPlant::ccSimPlantEquipTypes(static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ElectricEIR));
+                std::string_view CompType = DataPlant::ccSimPlantEquipTypes[static_cast<int>(DataPlant::PlantEquipmentType::Chiller_ElectricEIR)];
                 state.dataSize->DataConstantUsedForSizing = this->RefCap;
                 state.dataSize->DataFractionUsedForSizing = 0.000114;
                 Real64 TempSize = this->CondVolFlowRate;

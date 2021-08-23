@@ -625,8 +625,9 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 }
                 ShowRecurringWarningErrorAtEnd(
                     state,
-                    ccSimPlantEquipTypes(static_cast<int>(PlantEquipmentType::HeatPumpVRF)) + " \"" + state.dataHVACVarRefFlow->VRF(VRFCond).Name +
-                        "\": Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...",
+                    format("{} \"{}\": Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...",
+                           ccSimPlantEquipTypes[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
+                           state.dataHVACVarRefFlow->VRF(VRFCond).Name),
                     state.dataHVACVarRefFlow->VRF(VRFCond).CoolCapFTErrorIndex,
                     TotCoolCapTempModFac,
                     TotCoolCapTempModFac);
@@ -651,8 +652,9 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 }
                 ShowRecurringWarningErrorAtEnd(
                     state,
-                    ccSimPlantEquipTypes(static_cast<int>(PlantEquipmentType::HeatPumpVRF)) + " \"" + state.dataHVACVarRefFlow->VRF(VRFCond).Name +
-                        "\": Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...",
+                    format("{} \"{}\": Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...",
+                           ccSimPlantEquipTypes[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
+                           state.dataHVACVarRefFlow->VRF(VRFCond).Name),
                     state.dataHVACVarRefFlow->VRF(VRFCond).EIRFTempCoolErrorIndex,
                     TotCoolEIRTempModFac,
                     TotCoolEIRTempModFac);
@@ -687,8 +689,9 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 }
                 ShowRecurringWarningErrorAtEnd(
                     state,
-                    ccSimPlantEquipTypes(static_cast<int>(PlantEquipmentType::HeatPumpVRF)) + " \"" + state.dataHVACVarRefFlow->VRF(VRFCond).Name +
-                        "\": Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...",
+                    format("{} \"{}\": Cooling Capacity Modifier curve (function of temperature) output is negative warning continues...",
+                           ccSimPlantEquipTypes[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
+                           state.dataHVACVarRefFlow->VRF(VRFCond).Name),
                     state.dataHVACVarRefFlow->VRF(VRFCond).CoolCapFTErrorIndex,
                     TotCoolCapTempModFac,
                     TotCoolCapTempModFac);
@@ -712,8 +715,9 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 }
                 ShowRecurringWarningErrorAtEnd(
                     state,
-                    ccSimPlantEquipTypes(static_cast<int>(PlantEquipmentType::HeatPumpVRF)) + " \"" + state.dataHVACVarRefFlow->VRF(VRFCond).Name +
-                        "\": Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...",
+                    format("{} \"{}\": Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...",
+                           ccSimPlantEquipTypes[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
+                           state.dataHVACVarRefFlow->VRF(VRFCond).Name),
                     state.dataHVACVarRefFlow->VRF(VRFCond).EIRFTempCoolErrorIndex,
                     TotCoolEIRTempModFac,
                     TotCoolEIRTempModFac);
@@ -810,8 +814,9 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 }
                 ShowRecurringWarningErrorAtEnd(
                     state,
-                    ccSimPlantEquipTypes(static_cast<int>(PlantEquipmentType::HeatPumpVRF)) + " \"" + state.dataHVACVarRefFlow->VRF(VRFCond).Name +
-                        "\": Heating Capacity Ratio Modifier curve (function of temperature) output is negative warning continues...",
+                    format("{} \"{}\": Heating Capacity Ratio Modifier curve (function of temperature) output is negative warning continues...",
+                           ccSimPlantEquipTypes[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
+                           state.dataHVACVarRefFlow->VRF(VRFCond).Name),
                     state.dataHVACVarRefFlow->VRF(VRFCond).HeatCapFTErrorIndex,
                     TotHeatCapTempModFac,
                     TotHeatCapTempModFac);
@@ -848,8 +853,9 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                 }
                 ShowRecurringWarningErrorAtEnd(
                     state,
-                    ccSimPlantEquipTypes(static_cast<int>(PlantEquipmentType::HeatPumpVRF)) + " \"" + state.dataHVACVarRefFlow->VRF(VRFCond).Name +
-                        "\": Heating Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...",
+                    format("{} \"{}\": Heating Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...",
+                           ccSimPlantEquipTypes[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
+                           state.dataHVACVarRefFlow->VRF(VRFCond).Name),
                     state.dataHVACVarRefFlow->VRF(VRFCond).EIRFTempHeatErrorIndex,
                     TotHeatEIRTempModFac,
                     TotHeatEIRTempModFac);
@@ -911,10 +917,10 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                                 ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                             }
                             ShowRecurringWarningErrorAtEnd(state,
-                                                           ccSimPlantEquipTypes(static_cast<int>(PlantEquipmentType::HeatPumpVRF)) + " \"" +
-                                                               state.dataHVACVarRefFlow->VRF(VRFCond).Name +
-                                                               "\": Defrost Energy Input Ratio Modifier curve (function of temperature) output "
-                                                               "is negative warning continues...",
+                                                           format("{} \"{}\": Defrost Energy Input Ratio Modifier curve (function of temperature) "
+                                                                  "output is negative warning continues...",
+                                                                  ccSimPlantEquipTypes[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
+                                                                  state.dataHVACVarRefFlow->VRF(VRFCond).Name),
                                                            state.dataHVACVarRefFlow->VRF(VRFCond).DefrostHeatErrorIndex,
                                                            DefrostEIRTempModFac,
                                                            DefrostEIRTempModFac);
@@ -12361,10 +12367,10 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                                 ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
                             }
                             ShowRecurringWarningErrorAtEnd(state,
-                                                           ccSimPlantEquipTypes(static_cast<int>(PlantEquipmentType::HeatPumpVRF)) + " \"" +
-                                                               this->Name +
-                                                               "\": Defrost Energy Input Ratio Modifier curve (function of temperature) output "
-                                                               "is negative warning continues...",
+                                                           format("{} \"{}\": Defrost Energy Input Ratio Modifier curve (function of temperature) "
+                                                                  "output is negative warning continues...",
+                                                                  ccSimPlantEquipTypes[static_cast<int>(PlantEquipmentType::HeatPumpVRF)],
+                                                                  this->Name),
                                                            this->DefrostHeatErrorIndex,
                                                            DefrostEIRTempModFac,
                                                            DefrostEIRTempModFac);

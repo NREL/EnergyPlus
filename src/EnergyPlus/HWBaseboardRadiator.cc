@@ -1926,7 +1926,7 @@ namespace HWBaseboardRadiator {
                                           "for that index={}",
                                           BaseboardNum,
                                           BaseboardName,
-                                          ccSimPlantEquipTypes(BaseboardTypeNum)));
+                                          ccSimPlantEquipTypes[BaseboardTypeNum]));
                 }
             }
         }

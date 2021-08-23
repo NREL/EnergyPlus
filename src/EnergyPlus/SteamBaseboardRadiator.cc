@@ -1722,7 +1722,7 @@ namespace SteamBaseboardRadiator {
                                           "Name for that index={}",
                                           BaseboardNum,
                                           BaseboardName,
-                                          ccSimPlantEquipTypes(static_cast<int>(BaseboardTypeNum))));
+                                          ccSimPlantEquipTypes[static_cast<int>(BaseboardTypeNum)]));
                 }
             }
         }

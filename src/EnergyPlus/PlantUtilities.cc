@@ -1736,14 +1736,16 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
         if (static_cast<int>(CompType) >= 1 && static_cast<int>(CompType) <= DataPlant::NumSimPlantEquipTypes) {
             if (!present(SingleLoopSearch)) {
                 ShowSevereError(state,
-                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(CompType)) + " called \"" +
-                                    std::string{CompName} + "\" was not found on any plant loops.");
-                AuditBranches(state, true, DataPlant::ccSimPlantEquipTypes(static_cast<int>(CompType)), CompName);
+                                format("Plant Component {} called \"{}\" was not found on any plant loops.",
+                                       DataPlant::ccSimPlantEquipTypes[static_cast<int>(CompType)],
+                                       std::string{CompName}));
+                AuditBranches(state, true, DataPlant::ccSimPlantEquipTypes[static_cast<int>(CompType)], CompName);
             } else {
                 ShowSevereError(state,
-                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(CompType)) + " called \"" +
-                                    std::string{CompName} + "\" was not found on plant loop=\"" + state.dataPlnt->PlantLoop(SingleLoopSearch).Name +
-                                    "\".");
+                                format("Plant Component {} called \"{}\" was not found on plant loop=\"{}\".",
+                                       DataPlant::ccSimPlantEquipTypes[static_cast<int>(CompType)],
+                                       std::string{CompName},
+                                       state.dataPlnt->PlantLoop(SingleLoopSearch).Name));
             }
             if (present(InletNodeNumber)) {
                 if (FoundCompName) {

@@ -439,7 +439,7 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
     Real64 tmpCapacity = this->referenceCapacity;
     Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
 
-    std::string const typeName = DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum));
+    std::string_view const typeName = DataPlant::ccSimPlantEquipTypes[static_cast<int>(this->plantTypeOfeNum)];
     Real64 loadSideInitTemp = DataGlobalConstants::CWInitConvTemp;
     if (this->plantTypeOfeNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
         loadSideInitTemp = DataGlobalConstants::HWInitConvTemp;
@@ -620,7 +620,7 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
     Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
     Real64 tmpSourceVolFlow;
 
-    std::string const typeName = DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum));
+    std::string_view const typeName = DataPlant::ccSimPlantEquipTypes[static_cast<int>(this->plantTypeOfeNum)];
     Real64 sourceSideInitTemp = DataGlobalConstants::HWInitConvTemp;
     if (this->plantTypeOfeNum == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
         sourceSideInitTemp = DataGlobalConstants::CWInitConvTemp;
@@ -726,7 +726,7 @@ void EIRPlantLoopHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
     Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
     Real64 tmpSourceVolFlow = 0.0;
 
-    std::string const typeName = DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum));
+    std::string_view const typeName = DataPlant::ccSimPlantEquipTypes[static_cast<int>(this->plantTypeOfeNum)];
 
     // will leave like this for now
     // need to update these to better values later
@@ -1220,14 +1220,18 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
 
         if (thisErrFlag) {
             ShowSevereError(state,
-                            routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum)) +
-                                " name = \"" + this->name + "\"");
+                            format("{}: Plant topology problem for {} name = \"{}\"",
+                                   routineName,
+                                   DataPlant::ccSimPlantEquipTypes[static_cast<int>(this->plantTypeOfeNum)],
+                                   this->name));
             ShowContinueError(state, "Could not locate component's load side connections on a plant loop");
             errFlag = true;
         } else if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // only check if !thisErrFlag
             ShowSevereError(state,
-                            routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum)) +
-                                " name = \"" + this->name + "\"");
+                            format("{}: Invalid connections for {} name = \"{}\"",
+                                   routineName,
+                                   DataPlant::ccSimPlantEquipTypes[static_cast<int>(this->plantTypeOfeNum)],
+                                   this->name));
             ShowContinueError(state, "The load side connections are not on the Supply Side of a plant loop");
             errFlag = true;
         }
@@ -1250,14 +1254,18 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
 
             if (thisErrFlag) {
                 ShowSevereError(state,
-                                routineName + ": Plant topology problem for " +
-                                    DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum)) + " name = \"" + this->name + "\"");
+                                format("{}: Plant topology problem for {} name = \"{}\"",
+                                       routineName,
+                                       DataPlant::ccSimPlantEquipTypes[static_cast<int>(this->plantTypeOfeNum)],
+                                       this->name));
                 ShowContinueError(state, "Could not locate component's source side connections on a plant loop");
                 errFlag = true;
             } else if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // only check if !thisErrFlag
                 ShowSevereError(state,
-                                routineName + ": Invalid connections for " +
-                                    DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum)) + " name = \"" + this->name + "\"");
+                                format("{}: Invalid connections for {} name = \"{}\"",
+                                       routineName,
+                                       DataPlant::ccSimPlantEquipTypes[static_cast<int>(this->plantTypeOfeNum)],
+                                       this->name));
                 ShowContinueError(state, "The source side connections are not on the Demand Side of a plant loop");
                 errFlag = true;
             }
@@ -1265,8 +1273,10 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
             // make sure it is not the same loop on both sides.
             if (this->loadSideLocation.loopNum == this->sourceSideLocation.loopNum) { // user is being too tricky, don't allow
                 ShowSevereError(state,
-                                routineName + ": Invalid connections for " +
-                                    DataPlant::ccSimPlantEquipTypes(static_cast<int>(this->plantTypeOfeNum)) + " name = \"" + this->name + "\"");
+                                format("{}: Invalid connections for {} name = \"{}\"",
+                                       routineName,
+                                       DataPlant::ccSimPlantEquipTypes[static_cast<int>(this->plantTypeOfeNum)],
+                                       this->name));
                 ShowContinueError(state, "The load and source sides need to be on different loops.");
                 errFlag = true;
             } else {
