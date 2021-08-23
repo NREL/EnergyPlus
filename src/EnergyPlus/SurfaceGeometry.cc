@@ -2801,14 +2801,22 @@ namespace SurfaceGeometry {
             // Initialize run time surface arrays
             state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
             state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
-            // Automatic Surface Multipliers: Assign representative heat transfer surfaces
-            if (state.dataSurface->UseRepresentativeSurfaceCalculations && state.dataSurface->Surface(SurfNum).HeatTransSurf &&
-                state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName") == 0) {
-                // Conditions where surface always needs to be unique
-                bool forceUniqueSurface = state.dataSurface->Surface(SurfNum).HasShadeControl || state.dataSurface->SurfWinAirflowSource(SurfNum) ||
-                                          state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).SourceSinkPresent;
-                if (!forceUniqueSurface) {
-                    state.dataSurface->Surface(SurfNum).set_representative_surface(state, SurfNum);
+        }
+
+        // Representative surface calculations: Assign representative heat transfer surfaces
+        if (state.dataSurface->UseRepresentativeSurfaceCalculations &&
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneProperty:UserViewFactors:BySurfaceName") == 0) {
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+                int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+                int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+                for (int surfNum = firstSurf; surfNum <= lastSurf; surfNum++) {
+                    // Conditions where surface always needs to be unique
+                    bool forceUniqueSurface = state.dataSurface->Surface(surfNum).HasShadeControl ||
+                                              state.dataSurface->SurfWinAirflowSource(surfNum) ||
+                                              state.dataConstruction->Construct(state.dataSurface->Surface(surfNum).Construction).SourceSinkPresent;
+                    if (!forceUniqueSurface) {
+                        state.dataSurface->Surface(surfNum).set_representative_surface(state, surfNum);
+                    }
                 }
             }
         }
