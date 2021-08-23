@@ -133,6 +133,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputs)
                                                  "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
     process_idf(idfTxt);
     EXPECT_FALSE(has_err_output());
+<<<<<<< HEAD
     PVWattsGenerator &pvw1 = GetOrCreatePVWattsGenerator(*state, "PVWattsArray1");
     EXPECT_TRUE(compare_enums(pvw1.getModuleType(), ModuleType::PREMIUM));
     EXPECT_TRUE(compare_enums(pvw1.getArrayType(), ArrayType::ONE_AXIS));
@@ -144,6 +145,18 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputs)
     EXPECT_DOUBLE_EQ(21.0, pvw3.getTilt());
     EXPECT_DOUBLE_EQ(0.5, pvw3.getGroundCoverageRatio());
     EXPECT_EQ(static_cast<int>(state->dataPVWatts->PVWattsGenerators.size()), 3);
+=======
+    auto pvw1 = PVWattsGenerator::createFromIdfObj(*state, 1);
+    EXPECT_EQ(pvw1->getModuleType(), ModuleType::PREMIUM);
+    EXPECT_EQ(pvw1->getArrayType(), ArrayType::ONE_AXIS);
+    EXPECT_DOUBLE_EQ(0.4, pvw1->getGroundCoverageRatio());
+    auto pvw2 = PVWattsGenerator::createFromIdfObj(*state, 2);
+    EXPECT_DOUBLE_EQ(0.4, pvw2->getGroundCoverageRatio());
+    auto pvw3 = PVWattsGenerator::createFromIdfObj(*state, 3);
+    EXPECT_DOUBLE_EQ(175.0, pvw3->getAzimuth());
+    EXPECT_DOUBLE_EQ(21.0, pvw3->getTilt());
+    EXPECT_DOUBLE_EQ(0.5, pvw3->getGroundCoverageRatio());
+>>>>>>> origin/develop
 }
 
 TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputsFailure)
@@ -161,7 +174,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputsFailure)
                                                  ";",
                                                  "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
     EXPECT_FALSE(process_idf(idfTxt, false));
-    ASSERT_THROW(GetOrCreatePVWattsGenerator(*state, "PVWattsArray1"), std::runtime_error);
+    ASSERT_THROW(PVWattsGenerator::createFromIdfObj(*state, 1), std::runtime_error);
     std::string const error_string = delimited_string(
         {"   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][array_geometry_type] - \"asdf\" - Failed to match against any enum values.",
          "   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][array_type] - \"FixedRoofMount\" - Failed to match against any enum values.",

@@ -797,6 +797,8 @@ void GetAirPathData(EnergyPlusData &state)
                         PackagedUnit(AirSysNum) = true;
                     } else if (componentType == "COILSYSTEM:HEATING:DX") {
                         PackagedUnit(AirSysNum) = true;
+                    } else if (componentType == "COILSYSTEM:COOLING:WATER") {
+                        PackagedUnit(AirSysNum) = true;
                     } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM") {
                         PackagedUnit(AirSysNum) = true;
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
@@ -1244,6 +1246,15 @@ void GetAirPathData(EnergyPlusData &state)
                                             PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
                                             false,
                                             0);
+                    } else if (componentType == "COILSYSTEM:COOLING:WATER") {
+                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::CoilSystemWater;
+                        UnitarySystems::UnitarySys thisSys;
+                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
+                            thisSys.factory(state,
+                                            DataHVACGlobals::UnitarySys_AnyCoilType,
+                                            PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
+                                            false,
+                                            0);
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatOnly;
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL") {
@@ -1372,6 +1383,7 @@ void GetAirPathData(EnergyPlusData &state)
                 WaterCoilNodeNum =
                     GetCoilWaterInletNode(state, GetOACompType(state, OASysNum, OACompNum), GetOACompName(state, OASysNum, OACompNum), ErrorsFound);
                 CheckCoilWaterInletNode(state, WaterCoilNodeNum, NodeNotFound);
+                UnitarySystems::isWaterCoilHeatRecoveryType(state, WaterCoilNodeNum, NodeNotFound);
                 if (NodeNotFound) {
                     ErrorsFound = true;
                     ShowSevereError(state,
@@ -3641,7 +3653,27 @@ void SimAirLoopComponent(EnergyPlusData &state,
                                   ZoneEquipFlag,
                                   sensOut,
                                   latOut);
-
+        } else if (SELECT_CASE_var == CompType::CoilSystemWater) { // 'CoilSystemCooling:Water'
+            if (CompPointer == nullptr) {
+                UnitarySystems::UnitarySys thisSys;
+                CompPointer = thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+                // temporary fix for saving pointer, eventually apply to UnitarySystem 16 lines above
+                state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Branch(branchNum).Comp(compNum).compPointer = CompPointer;
+            }
+            Real64 sensOut = 0.0;
+            Real64 latOut = 0.0;
+            CompPointer->simulate(state,
+                                  CompName,
+                                  FirstHVACIteration,
+                                  AirLoopNum,
+                                  CompIndex,
+                                  HeatingActive,
+                                  CoolingActive,
+                                  OAUnitNum,
+                                  OAUCoilOutTemp,
+                                  ZoneEquipFlag,
+                                  sensOut,
+                                  latOut);
         } else if (SELECT_CASE_var == CompType::Furnace_UnitarySys_HeatOnly || SELECT_CASE_var == CompType::Furnace_UnitarySys_HeatCool) {
             // 'AirLoopHVAC:Unitary:Furnace:HeatOnly', 'AirLoopHVAC:Unitary:Furnace:HeatCool',
             // 'AirLoopHVAC:UnitaryHeatOnly', 'AirLoopHVAC:UnitaryHeatCool'

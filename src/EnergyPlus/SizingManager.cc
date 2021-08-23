@@ -2200,8 +2200,6 @@ void GetOARequirements(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         R. Raustad - FSEC
     //       DATE WRITTEN   February 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Obtains input data for the OA Requirements object and stores it in
@@ -2212,22 +2210,17 @@ void GetOARequirements(EnergyPlusData &state)
     // This object requires only a name where the default values are assumed
     // if subsequent fields are not entered.
 
-    // Using/Aliasing
     using ScheduleManager::CheckScheduleValueMinMax;
     using ScheduleManager::GetScheduleIndex;
     using ScheduleManager::GetScheduleMaxValue;
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetOARequirements: "); // include trailing blank space
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumAlphas;  // Number of Alphas for each GetObjectItem call
-    int NumNumbers; // Number of Numbers for each GetObjectItem call
-    int TotalArgs;  // Total number of alpha and numeric arguments (max) for a
-    int IOStatus;   // Used in GetObjectItem
-    int OAIndex;
+    int NumAlphas;           // Number of Alphas for each GetObjectItem call
+    int NumNumbers;          // Number of Numbers for each GetObjectItem call
+    int TotalArgs;           // Total number of alpha and numeric arguments (max) for a
+    int IOStatus;            // Used in GetObjectItem
     bool ErrorsFound(false); // If errors detected in input
-    //  REAL(r64) :: CalcAmt
 
     std::string CurrentModuleObject; // for ease in getting objects
     Array1D_string Alphas;           // Alpha input items for object
@@ -2238,8 +2231,11 @@ void GetOARequirements(EnergyPlusData &state)
     Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
     CurrentModuleObject = "DesignSpecification:OutdoorAir";
-    state.dataSize->NumOARequirements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    int numOARequirements = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+    std::string cCurrentModuleObject2 = "DesignSpecification:OutdoorAir:SpaceList";
+    int numOARequirementsLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject2);
+    state.dataSize->NumOARequirements = numOARequirements + numOARequirementsLists;
 
     Alphas.allocate(NumAlphas);
     cAlphaFields.allocate(NumAlphas);
@@ -2252,7 +2248,7 @@ void GetOARequirements(EnergyPlusData &state)
         state.dataSize->OARequirements.allocate(state.dataSize->NumOARequirements);
 
         // Start Loading the System Input
-        for (OAIndex = 1; OAIndex <= state.dataSize->NumOARequirements; ++OAIndex) {
+        for (int OAIndex = 1; OAIndex <= numOARequirements; ++OAIndex) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
@@ -2291,8 +2287,57 @@ void GetOARequirements(EnergyPlusData &state)
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        if (ErrorsFound) {
-            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
+        // DesignSpecification:OutdoorAir:SpaceList
+        auto &ip = state.dataInputProcessing->inputProcessor;
+        auto const instances = ip->epJSON.find(cCurrentModuleObject2);
+        if (instances != ip->epJSON.end()) {
+            auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject2);
+            auto &instancesValue = instances.value();
+            int oaIndex = numOARequirements; // add lists to the end of the same array
+
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                ++oaIndex;
+                auto const &objectFields = instance.value();
+                auto &thisOAReq = state.dataSize->OARequirements(oaIndex);
+                ip->markObjectAsUsed(cCurrentModuleObject2, instance.key());
+                std::string thisOAReqName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                if (UtilityRoutines::FindItemInList(thisOAReqName, state.dataSize->OARequirements) > 0) {
+                    ShowSevereError(state,
+                                    std::string(RoutineName) + cCurrentModuleObject2 + "=\"" + thisOAReqName +
+                                        "\" is a duplicate DesignSpecification:OutdoorAir name.");
+                    ErrorsFound = true;
+                }
+                thisOAReq.Name = thisOAReqName;
+
+                // List of spaces and DSOA names
+                thisOAReq.numDSOA = 0;
+                auto extensibles = objectFields.find("space_specs");
+                auto const &extensionSchemaProps = objectSchemaProps["space_specs"]["items"]["properties"];
+                if (extensibles != objectFields.end()) {
+                    auto extensiblesArray = extensibles.value();
+                    for (auto extensibleInstance : extensiblesArray) {
+                        // Zones and spaces are not created yet, validate space names in ZoneEquipmentManager::SetupZoneSizingArrays
+                        std::string thisSpaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
+                        thisOAReq.dsoaSpaceNames.emplace_back(thisSpaceName);
+                        std::string thisDsoaName =
+                            ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_design_specification_outdoor_air_object_name");
+                        int thisDsoaNum = UtilityRoutines::FindItemInList(thisDsoaName, state.dataSize->OARequirements, oaIndex);
+                        if (thisDsoaNum > 0) {
+                            thisOAReq.dsoaIndexes.emplace_back(thisDsoaNum);
+                            ++thisOAReq.numDSOA;
+                        } else {
+                            ShowSevereError(state, std::string(RoutineName) + cCurrentModuleObject2 + "=" + thisOAReq.Name);
+                            ShowContinueError(state, "DesignSpecification:OutdoorAir=" + thisDsoaName + " not found.");
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+            }
+
+            if (ErrorsFound) {
+                ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
+            }
         }
     }
 }
@@ -3033,10 +3078,6 @@ void GetZoneSizingInput(EnergyPlusData &state)
                     OAIndex = UtilityRoutines::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).DesignSpecOAObjName,
                                                               state.dataSize->OARequirements);
                     if (OAIndex > 0) {
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).OADesMethod = state.dataSize->OARequirements(OAIndex).OAFlowMethod;
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).DesOAFlowPPer = state.dataSize->OARequirements(OAIndex).OAFlowPerPerson;
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).DesOAFlowPerArea = state.dataSize->OARequirements(OAIndex).OAFlowPerArea;
-                        state.dataSize->ZoneSizingInput(ZoneSizIndex).DesOAFlow = state.dataSize->OARequirements(OAIndex).OAFlowPerZone;
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneDesignSpecOAIndex = OAIndex;
                     } else {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
@@ -3045,11 +3086,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                                               "\".");
                         ErrorsFound = true;
                     }
-                } else { // If no design spec object specified, i.e. no OA, then set OA method to None as default but flows to 0
-                    state.dataSize->ZoneSizingInput(ZoneSizIndex).OADesMethod = 0;
-                    state.dataSize->ZoneSizingInput(ZoneSizIndex).DesOAFlowPPer = 0.0;
-                    state.dataSize->ZoneSizingInput(ZoneSizIndex).DesOAFlowPerArea = 0.0;
-                    state.dataSize->ZoneSizingInput(ZoneSizIndex).DesOAFlow = 0.0;
+                } else { // If no design spec object specified, i.e. no OA, then leave ZoneDesignSpecOAIndex = 0
                 }
 
                 //  N7, \field Zone Heating Sizing Factor

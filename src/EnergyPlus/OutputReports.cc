@@ -442,6 +442,7 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
     static constexpr std::string_view Format_709("  0\nCIRCLE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n{:15.5F}\n");
 
     // Do any daylighting reference points on layer for zone
+<<<<<<< HEAD
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         auto curcolorno = ColorNo::DaylSensor1;
 
@@ -456,6 +457,24 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
                   state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt),
                   0.2);
             curcolorno = ColorNo::DaylSensor2; // ref pts 2 and later are this color
+=======
+    if (state.dataDaylightingData->TotRefPoints > 0) {
+        for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
+            auto curcolorno = ColorNo::DaylSensor1;
+
+            for (int refpt = 1; refpt <= state.dataDaylightingData->ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
+                print(of, "999\n{}:{}:{}\n", state.dataHeatBal->Zone(zones).Name, DELight ? "DEDayRefPt" : "DayRefPt", refpt);
+                print(of,
+                      Format_709,
+                      normalizeName(state.dataHeatBal->Zone(zones).Name),
+                      state.dataSurfColor->DXFcolorno(static_cast<int>(curcolorno)),
+                      state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt),
+                      state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt),
+                      state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt),
+                      0.2);
+                curcolorno = ColorNo::DaylSensor2; // ref pts 2 and later are this color
+            }
+>>>>>>> origin/develop
         }
     }
 }

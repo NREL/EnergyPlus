@@ -515,7 +515,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
     state->dataSQLiteProcedures->sqlite->addZoneData(1, *zone);
     state->dataSQLiteProcedures->sqlite->createZoneExtendedOutput();
     state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(
-        1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", 0.8);
+        1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, " RefPt1=(2.50:2.00:0.80), RefPt2=(2.50:18.00:0.80)", 0.8);
     state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMap(1, 2005, 7, 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue);
 
     auto zones = queryResult("SELECT * FROM Zones;", "Zones");
@@ -531,7 +531,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
 
     ASSERT_EQ(1ul, daylightMaps.size());
     std::vector<std::string> daylightMap0{
-        "1", "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", "1", "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", "0.8"};
+        "1", "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", "1", " RefPt1=(2.50:2.00:0.80), RefPt2=(2.50:18.00:0.80)", "0.8", ""};
     EXPECT_EQ(daylightMap0, daylightMaps[0]);
 
     ASSERT_EQ(1ul, daylightMapHourlyReports.size());
@@ -550,9 +550,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
 
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     // this should fail due to missing foreign key
-    state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(2, "test", "test", 2, "test", "test", 0.8);
+    state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(2, "test", "test", 2, "test,test", 0.8);
     // this should fail due to duplicate primary key
-    state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(1, "test", "test", 1, "test", "test", 0.8);
+    state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(1, "test", "test", 1, "test,test", 0.8);
     // this should fail due to missing foreign key
     state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMap(2, 2005, 7, 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue);
     daylightMaps = queryResult("SELECT * FROM DaylightMaps;", "DaylightMaps");

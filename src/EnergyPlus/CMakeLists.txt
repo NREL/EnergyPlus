@@ -778,7 +778,8 @@ target_link_libraries(
          btwxt
          Windows-CalcEngine
          airflownetworklib
-         ssc)
+         ssc
+         cpgfunctionEP)
 
 target_link_libraries(energypluslib PRIVATE project_options project_fp_options project_warnings cpp_pch_files)
 
@@ -931,23 +932,22 @@ if(LINK_WITH_PYTHON)
   add_custom_command(
     TARGET energyplusapi
     POST_BUILD # TODO: I don't think we want to quote the generator expression
-               # here
     COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplusapi>" "python_standard_lib")
 endif()
 
 if(BUILD_PACKAGE)
   # if we are building package, we need to drop in some API/Plugin stuff
   if(LINK_WITH_PYTHON)
-    # we'll want to grab the standard lib for python plugins TODO: I don't think
-    # we want to quote the generator expression
+    # we'll want to grab the standard lib for python plugins
+    # TODO: I don't think we want to quote the generator expression
     install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/python_standard_lib/" DESTINATION "./python_standard_lib")
   endif()
   # we'll want to always provide the C API headers
   foreach(HEADER ${API_HEADERS})
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}" DESTINATION "./include/EnergyPlus/api")
   endforeach()
-  # we'll want to always grab the python API wrapper TODO: I don't think we want
-  # to quote the generator expression
+  # we'll want to always grab the python API wrapper
+  # TODO: I don't think we want to quote the generator expression
   install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/pyenergyplus/" DESTINATION "./pyenergyplus")
 endif()
 
@@ -992,69 +992,42 @@ if(BUILD_TESTING)
   # "API.TestAutosizingC" COMMAND TestAPI_Autosizing_C -d "${TEST_DIR}" -w
   # "${EPW_FILE}" -D "${IDF_FILE}")
 
-  # This is tricky, the test scripts should be copied into the Products/<config>
-  # directory, but add_test has to be called so early, it's hard to figure that
-  # out ahead of time.  I dunno.  Just skipping these on MSVC builds for now.
-  if(NOT MSVC)
-    set(API_TEST_TARGET_DIR "${PROJECT_BINARY_DIR}/Products")
+  # TODO: The Python API tests should depend on a completed build of energyplusapi
 
-    configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.py" "${API_TEST_TARGET_DIR}/TestFunctional.py")
-    add_test(
-      NAME "API.TestFunctionalPython"
-      COMMAND "${Python_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestFunctional.py"
-      WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+  set(DIR_WITH_PY_ENERGYPLUS $<TARGET_FILE_DIR:energyplusapi>)
 
-    set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/runtime_python")
-    file(MAKE_DIRECTORY ${TEST_DIR})
-    configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.py" "${API_TEST_TARGET_DIR}/TestRuntime.py")
-    add_test(
-      NAME "API.TestRuntimePython"
-      COMMAND "${Python_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestRuntime.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
-      WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+  # Functional API does not need a run folder to be created
+  add_test(NAME "API.TestFunctionalPython" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.py")
+  set_tests_properties("API.TestFunctionalPython" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
 
-    set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/exchange_python")
-    file(MAKE_DIRECTORY ${TEST_DIR})
-    configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestDataTransfer.py" "${API_TEST_TARGET_DIR}/TestDataTransfer.py")
-    add_test(
-      NAME "API.TestDataTransferPython"
-      COMMAND "${Python_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
-      WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
-
-    # set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing_python")
-    # file(MAKE_DIRECTORY ${TEST_DIR}) configure_file(
-    # "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestAutosizing.py"
-    # "${API_TEST_TARGET_DIR}/TestAutosizing.py" ) add_test(NAME
-    # "API.TestAutosizingPython" COMMAND "${Python_EXECUTABLE}"
-    # "${API_TEST_TARGET_DIR}/TestAutosizing.py" -d "${TEST_DIR}" -w
-    # "${EPW_FILE}" -D "${IDF_FILE}" WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
-
-    set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/plugin_tester_tester")
-    file(MAKE_DIRECTORY ${TEST_DIR})
-    configure_file("${PROJECT_SOURCE_DIR}/src/EnergyPlus/api/plugin_tester.py" "${API_TEST_TARGET_DIR}/plugin_tester.py")
-    add_test(
-      NAME "API.PluginTesterTester"
-      COMMAND "${Python_EXECUTABLE}" "${API_TEST_TARGET_DIR}/plugin_tester.py" "${PROJECT_SOURCE_DIR}/testfiles/PythonPluginCustomTrendVariable.py"
-      WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
-
-    configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_DataTransferTypes.py" "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py" COPYONLY)
-    add_test(
-      NAME "API.test_DataTransferTypes"
-      COMMAND "${Python_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py"
-      WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
-
-    configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_SysExit.py" "${API_TEST_TARGET_DIR}/test_SysExit.py" COPYONLY)
-    add_test(
-      NAME "API.test_SysExit"
-      COMMAND "${Python_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_SysExit.py"
-      WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
-
-    configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_OutputFiles.py" "${API_TEST_TARGET_DIR}/test_OutputFiles.py" @ONLY)
-    add_test(
-      NAME "API.test_OutputFiles"
-      COMMAND "${Python_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_OutputFiles.py"
-      WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
-
+  # Runtime tests need a folder to be created for output files, if we are building fortran, let's test that the python API properly sets the E+ install root by passing "-r"
+  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/runtime_python")
+  file(MAKE_DIRECTORY ${TEST_DIR})
+  if(BUILD_FORTRAN)
+    # TODO: This should depend on a completed build of readvars
+    add_test(NAME "API.TestRuntimePython" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.py" -r -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+  else()
+    add_test(NAME "API.TestRuntimePython" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
   endif()
+  set_tests_properties("API.TestRuntimePython" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
+
+  # Data exchange tests also need an output folder
+  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/exchange_python")
+  file(MAKE_DIRECTORY ${TEST_DIR})
+  add_test(NAME "API.TestDataTransferPython" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestDataTransfer.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+  set_tests_properties("API.TestDataTransferPython" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
+
+  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/plugin_tester_tester")
+  file(MAKE_DIRECTORY ${TEST_DIR})
+  add_test(NAME "API.PluginTesterTester" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/src/EnergyPlus/api/plugin_tester.py" "${PROJECT_SOURCE_DIR}/testfiles/PythonPluginCustomTrendVariable.py")
+  set_tests_properties("API.PluginTesterTester" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
+
+  add_test(NAME "API.test_DataTransferTypes" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_DataTransferTypes.py")
+  set_tests_properties("API.test_DataTransferTypes" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
+  add_test(NAME "API.test_SysExit" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_SysExit.py")
+  set_tests_properties("API.test_SysExit" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
+  add_test(NAME "API.test_OutputFiles" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_OutputFiles.py")
+  set_tests_properties("API.test_OutputFiles" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
 endif()
 
 if(UNIX AND NOT APPLE)

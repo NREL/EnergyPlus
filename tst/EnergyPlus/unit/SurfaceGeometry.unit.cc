@@ -233,6 +233,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
         "    Floor,                   !- Surface Type",
         "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
         "    Zone1,                   !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -248,6 +249,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
         "    Floor,                   !- Surface Type",
         "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
         "    Zone1,                   !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -272,6 +274,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
         "    Wall,                    !- Surface Type",
         "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
         "    Zone1,                   !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -368,6 +371,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
         "    Floor,                   !- Surface Type",
         "    ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name",
         "    Zone1,                   !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -634,6 +638,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -840,6 +845,7 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
         "	Wall,                    !- Surface Type                     ",
         "	ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name     ",
         "	ZoneExample,             !- Zone Name                        ",
+        "   ,                        !- Space Name",
         "	Outdoors,                !- Outside Boundary Condition       ",
         "	,                        !- Outside Boundary Condition Object",
         "	NoSun,                   !- Sun Exposure                     ",
@@ -856,6 +862,7 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
         "	Floor,                   !- Surface Type                     ",
         "	ExtSlabCarpet 4in ClimateZone 1-8,  !- Construction Name     ",
         "	ZoneExample,             !- Zone Name                        ",
+        "   ,                        !- Space Name",
         "	Outdoors,                !- Outside Boundary Condition       ",
         "	,                        !- Outside Boundary Condition Object",
         "	NoSun,                   !- Sun Exposure                     ",
@@ -2954,6 +2961,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
         "	Floor, !- Surface Type",
         "	Typical, !- Construction Name",
         "	ZONE 1, !- Zone Name",
+        "    ,                        !- Space Name",
         "	Surface, !- Outside Boundary Condition",
         "	006W27_Restrooms - RoofCeiling : a, !- Outside Boundary Condition Object",
         "	NoSun, !- Sun Exposure",
@@ -2971,6 +2979,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
         "   Ceiling, !- Surface Type",
         "   Typical, !- Construction Name",
         "   ZONE 2, !- Zone Name",
+        "    ,                        !- Space Name",
         "   Surface, !- Outside Boundary Condition",
         "   016W88_WaterMeter - Floor : a, !- Outside Boundary Condition Object",
         "   NoSun, !- Sun Exposure",
@@ -3738,6 +3747,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
         "    Ceiling,                 !- Surface Type",
         "    Project semi-exposed ceiling,  !- Construction Name",
         "    DATATELCOM,       !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone1_Floor_4_0_10000,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -3762,6 +3772,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
         "    Floor,                   !- Surface Type",
         "    Project semi-exposed ceiling_Rev,  !- Construction Name",
         "    ZONE1,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    DATATELCOM_Ceiling_1_0_0,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -3786,6 +3797,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
         "    Floor,                   !- Surface Type",
         "    Project semi-exposed ceiling_Rev,  !- Construction Name",
         "    ZONE1,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -3810,6 +3822,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
         "    Floor,                   !- Surface Type",
         "    Project semi-exposed ceiling_Rev,  !- Construction Name",
         "    ZONE1,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -3970,6 +3983,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
         "  Wall,                    !- Surface Type",
         "  Typical,                 !- Construction Name",
         "  ZONE 1,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "  Surface,                 !- Outside Boundary Condition",
         "  Surface B,               !- Outside Boundary Condition Object", // Surface B doesn't exist!
         "  NoSun,                   !- Sun Exposure",
@@ -4291,6 +4305,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
         "    GFloorZonesIntMass,      !- Name",
         "    InteriorFurnishings,     !- Construction Name",
         "    IntMassZoneList_GF,      !- Zone or ZoneList Name",
+        "    ,                        !- Space Name",
         "    88.249272671219;         !- Surface Area {m2}",
 
         "  ZoneList,",
@@ -4308,6 +4323,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
         "    MFloorZonesIntMass,      !- Name",
         "    InteriorFurnishings,     !- Construction Name",
         "    IntMassZoneList_MF,      !- Zone or ZoneList Name",
+        "    ,                        !- Space Name",
         "    176.498545342438;        !- Surface Area {m2}",
 
         "  ZoneList,",
@@ -4325,6 +4341,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
         "    TFloorZonesIntMass,      !- Name",
         "    InteriorFurnishings,     !- Construction Name",
         "    IntMassZoneList_TF,      !- Zone or ZoneList Name",
+        "    ,                        !- Space Name",
         "    88.249272671219;         !- Surface Area {m2}",
 
         "  ZoneList,",
@@ -4629,6 +4646,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
         "    GFloorZonesIntMass,      !- Name",
         "    InteriorFurnishings,     !- Construction Name",
         "    IntMassZoneList_GF,      !- Zone or ZoneList Name",
+        "    ,                        !- Space Name",
         "    88.249272671219;         !- Surface Area {m2}",
 
         "  ZoneList,",
@@ -4646,6 +4664,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
         "    MFloorZonesIntMass,      !- Name",
         "    InteriorFurnishings,     !- Construction Name",
         "    IntMassZoneList_MF,      !- Zone or ZoneList Name",
+        "    ,                        !- Space Name",
         "    176.498545342438;        !- Surface Area {m2}",
 
         "  ZoneList,",
@@ -4663,6 +4682,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
         "    TFloorZonesIntMass,      !- Name",
         "    InteriorFurnishings,     !- Construction Name",
         "    IntMassZoneList_TF,      !- Zone or ZoneList Name",
+        "    ,                        !- Space Name",
         "    88.249272671219;         !- Surface Area {m2}",
 
         "  ZoneList,",
@@ -5033,6 +5053,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
         "Zone,",
         "Zone 3;             !- Name",
 
+        "Space,",
+        "Space 1,             !- Name",
+        "Zone 1;             !- Zone Name",
+
+        "Space,",
+        "Space 2,             !- Name",
+        "Zone 2;             !- Zone Name",
+
+        "Space,",
+        "Space 3,             !- Name",
+        "Zone 3;             !- Zone Name",
+
         "Material,",
         "    Some Material,         !- Name",
         "    VeryRough,               !- Roughness",
@@ -5052,6 +5084,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
         "    Wall,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
+        "    Space 1,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone2-Surface1,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5068,6 +5101,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
         "    Wall,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 2,       !- Zone Name",
+        "    Space 2,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone1-Surface1,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5084,6 +5118,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
         "    Wall,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
+        "    Space 1,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone3-Surface1,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5100,6 +5135,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
         "    Wall,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 3,       !- Zone Name",
+        "    Space 3,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone1-Surface2,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5130,26 +5166,26 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 3);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).Name, "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(2).Name, "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(3).Name, "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(2).ZoneNames[0], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(3).ZoneNames[0], "Zone 3"));
-    EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 2);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 3);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(3).Name, "Space 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(3).spaceNames[0], "Space 3"));
+    EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 3);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 3);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).Name, "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(2).Name, "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(3).Name, "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(3).ZoneNames[0], "Zone 3"));
-    EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 2);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 3);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(3).Name, "Space 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(3).spaceNames[0], "Space 3"));
+    EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 3);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries1)
@@ -5164,6 +5200,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
 
         "Zone,",
         "Zone 3;             !- Name",
+
+        "Space,",
+        "Space 1,             !- Name",
+        "Zone 1;             !- Zone Name",
+
+        "Space,",
+        "Space 2,             !- Name",
+        "Zone 2;             !- Zone Name",
+
+        "Space,",
+        "Space 3,             !- Name",
+        "Zone 3;             !- Zone Name",
 
         "Material,",
         "    Some Material,         !- Name",
@@ -5187,6 +5235,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
+        "    Space 1,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone2-Surface1,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5203,6 +5252,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 2,       !- Zone Name",
+        "    Space 2,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone1-Surface1,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5219,6 +5269,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
+        "    Space 1,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone3-Surface1,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5235,6 +5286,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 3,       !- Zone Name",
+        "    Space 3,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone1-Surface2,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5251,6 +5303,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Floor,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
+        "    Space 1,                 !- Space Name",
         "    Ground,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5267,6 +5320,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Floor,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 2,       !- Zone Name",
+        "    Space 2,                 !- Space Name",
         "    Ground,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5283,6 +5337,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Floor,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 3,       !- Zone Name",
+        "    Space 3,                 !- Space Name",
         "    Ground,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5314,22 +5369,22 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[2], "Zone 3"));
-    EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[2], "Space 3"));
+    EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 1);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[2], "Zone 3"));
-    EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[2], "Space 3"));
+    EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries2)
@@ -5344,6 +5399,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
 
         "Zone,",
         "Zone 3;             !- Name",
+
+        "Space,",
+        "Space 1,             !- Name",
+        "Zone 1;             !- Zone Name",
+
+        "Space,",
+        "Space 2,             !- Name",
+        "Zone 2;             !- Zone Name",
+
+        "Space,",
+        "Space 3,             !- Name",
+        "Zone 3;             !- Zone Name",
 
         "Material,",
         "    Some Material,         !- Name",
@@ -5368,6 +5435,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
+        "    Space 1,                 !- Space Name",
         "    Outdoors,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5384,6 +5452,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 2,       !- Zone Name",
+        "    Space 2,                 !- Space Name",
         "    Outdoors,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5400,6 +5469,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
+        "    Space 1,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone3-Surface1,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5416,6 +5486,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 3,       !- Zone Name",
+        "    Space 3,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone1-Surface2,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5432,6 +5503,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Floor,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
+        "    Space 1,                 !- Space Name",
         "    Ground,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5448,6 +5520,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Floor,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 2,       !- Zone Name",
+        "    Space 2,                 !- Space Name",
         "    Ground,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5464,6 +5537,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Floor,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 3,       !- Zone Name",
+        "    Space 3,                 !- Space Name",
         "    Ground,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5505,24 +5579,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     // For this test case, Zones 1 and 3 share radiant and solar enclosures
 
     EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 2);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[1], "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(2).Name, "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(2).ZoneNames[0], "Zone 2"));
-    EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 2);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 1);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 2);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[1], "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(2).Name, "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
-    EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 2);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
 
     // Check surface order
     int Zone1Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Surface1"), state->dataSurface->Surface);
@@ -5567,6 +5641,26 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "Zone,",
         "Zone 5;             !- Name",
 
+        "Space,",
+        "Space 1,             !- Name",
+        "Zone 1;             !- Zone Name",
+
+        "Space,",
+        "Space 2,             !- Name",
+        "Zone 2;             !- Zone Name",
+
+        "Space,",
+        "Space 3,             !- Name",
+        "Zone 3;             !- Zone Name",
+
+        "Space,",
+        "Space 4,             !- Name",
+        "Zone 4;             !- Zone Name",
+
+        "Space,",
+        "Space 5,             !- Name",
+        "Zone 5;             !- Zone Name",
+
         "Material,",
         "    Some Material,         !- Name",
         "    VeryRough,               !- Roughness",
@@ -5589,6 +5683,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
+        "    Space 1,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone2-Surface1,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5605,6 +5700,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 2,       !- Zone Name",
+        "    Space 2,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone1-Surface1,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5621,6 +5717,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 2,       !- Zone Name",
+        "    Space 2,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone3-Surface1,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5637,6 +5734,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 3,       !- Zone Name",
+        "    Space 3,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone2-Surface2,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5653,6 +5751,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 3,       !- Zone Name",
+        "    Space 3,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone4-Surface1,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5669,6 +5768,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 4,       !- Zone Name",
+        "    Space 4,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone3-Surface2,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5685,6 +5785,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 4,       !- Zone Name",
+        "    Space 4,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone5-Surface1,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5701,6 +5802,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 5,       !- Zone Name",
+        "    Space 5,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone4-Surface2,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5717,6 +5819,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
+        "    Space 1,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone5-Surface2,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5733,6 +5836,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 5,       !- Zone Name",
+        "    Space 5,                 !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone1-Surface3,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5749,6 +5853,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Floor,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
+        "    Space 1,                 !- Space Name",
         "    Ground,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5765,6 +5870,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Floor,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 2,       !- Zone Name",
+        "    Space 2,                 !- Space Name",
         "    Ground,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5781,6 +5887,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Floor,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 3,       !- Zone Name",
+        "    Space 3,                 !- Space Name",
         "    Ground,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5797,6 +5904,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Floor,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 4,       !- Zone Name",
+        "    Space 4,                 !- Space Name",
         "    Ground,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5813,6 +5921,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Floor,                 !- Surface Type",
         "    Some Construction,  !- Construction Name",
         "    Zone 5,       !- Zone Name",
+        "    Space 5,                 !- Space Name",
         "    Ground,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -5852,30 +5961,30 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     // This should trigger the enclosure merging and all five zones should share a radiant and solar enclosure
 
     EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[2], "Zone 5"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[3], "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[4], "Zone 4"));
-    EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(4).RadiantEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(5).RadiantEnclosureNum, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[2], "Space 5"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[3], "Space 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[4], "Space 4"));
+    EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(4).radiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(5).radiantEnclosureNum, 1);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[2], "Zone 5"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[3], "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[4], "Zone 4"));
-    EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(4).SolarEnclosureNum, 1);
-    EXPECT_EQ(state->dataHeatBal->Zone(5).SolarEnclosureNum, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[2], "Space 5"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[3], "Space 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[4], "Space 4"));
+    EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(4).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(5).solarEnclosureNum, 1);
 }
 
 TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
@@ -6182,6 +6291,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6198,6 +6308,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6214,6 +6325,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6230,6 +6342,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6246,6 +6359,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    WALL,                    !- Surface Type",
         "    INTERIORWall,            !- Construction Name",
         "    GARAGE ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Living:Interior,         !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -6262,6 +6376,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    WALL,                    !- Surface Type",
         "    INTERIORWall,            !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Garage:Interior,         !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -6278,6 +6393,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR:LIVING,            !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Living:Floor,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -6294,6 +6410,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    CEILING,                 !- Surface Type",
         "    CEILING:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Attic:LivingFloor,       !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -6310,6 +6427,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    FLOOR,                   !- Surface Type",
         "    reverseCEILING:LIVING,   !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Living:Ceiling,          !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -6326,6 +6444,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    ROOF,                    !- Surface Type",
         "    ROOF,                    !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6342,6 +6461,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    ROOF,                    !- Surface Type",
         "    ROOF,                    !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6358,6 +6478,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    ROOF,                    !- Surface Type",
         "    ROOF,                    !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6374,6 +6495,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    ROOF,                    !- Surface Type",
         "    ROOF,                    !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6390,6 +6512,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    ROOF,                    !- Surface Type",
         "    ROOF,                    !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6405,6 +6528,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    WALL,                    !- Surface Type",
         "    GABLE,                   !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6420,6 +6544,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    WALL,                    !- Surface Type",
         "    GABLE,                   !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6435,6 +6560,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    ROOF,                    !- Surface Type",
         "    ROOF,                    !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6451,6 +6577,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    ROOF,                    !- Surface Type",
         "    ROOF,                    !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6467,6 +6594,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    WALL,                    !- Surface Type",
         "    GABLE,                   !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6482,6 +6610,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    WALL,                    !- Surface Type",
         "    EXTWALL:GARAGE,          !- Construction Name",
         "    GARAGE ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6498,6 +6627,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    WALL,                    !- Surface Type",
         "    EXTWALL:GARAGE,          !- Construction Name",
         "    GARAGE ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6513,6 +6643,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    EVChargingStation,      !- Name",
         "    Garage:SteelDoor,     !- Construction Name",
         "    GARAGE ZONE,      !- Zone or ZoneList Name",
+        "    ,                        !- Space Name",
         "    88.249272671219;         !- Surface Area {m2}",
 
         "  BuildingSurface:Detailed,",
@@ -6520,6 +6651,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    WALL,                    !- Surface Type",
         "    Garage:SteelDoor,        !- Construction Name",
         "    GARAGE ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -6536,6 +6668,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    FLOOR,                   !- Surface Type",
         "    CEILING:Garage,          !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Garage:Ceiling,          !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -6552,6 +6685,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    CEILING,                 !- Surface Type",
         "    CEILING:Garage,          !- Construction Name",
         "    GARAGE ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Attic:GarageFloor,       !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -6568,6 +6702,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR:GARAGE,            !- Construction Name",
         "    GARAGE ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Garage:Floor,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -7080,6 +7215,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,               !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -7096,6 +7232,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -7112,6 +7249,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height)
         "Wall, !-Surface Type",
         "R13WALL, !-Construction Name",
         "ZONE ONE, !-Zone Name",
+        ",         !- Space Name",
         "Outdoors, !-Outside Boundary Condition",
         ", !-Outside Boundary Condition Object",
         "SunExposed, !-Sun Exposure",
@@ -7130,6 +7268,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -7146,6 +7285,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -7164,6 +7304,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -7180,6 +7321,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height)
         "Roof,                    !- Surface Type",
         "R13WALL,                 !- Construction Name",
         "ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "Outdoors,                !- Outside Boundary Condition",
         ",                        !- Outside Boundary Condition Object",
         "SunExposed,              !- Sun Exposure",
@@ -7196,6 +7338,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height)
         "Roof,                    !- Surface Type",
         "R13WALL,                 !- Construction Name",
         "ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "Outdoors,                !- Outside Boundary Condition",
         ",                        !- Outside Boundary Condition Object",
         "SunExposed,              !- Sun Exposure",
@@ -7356,6 +7499,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height_with_Window)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,               !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -7372,6 +7516,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height_with_Window)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -7388,6 +7533,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height_with_Window)
         "Wall, !-Surface Type",
         "R13WALL, !-Construction Name",
         "ZONE ONE, !-Zone Name",
+        ",         !- Space Name",
         "Outdoors, !-Outside Boundary Condition",
         ", !-Outside Boundary Condition Object",
         "SunExposed, !-Sun Exposure",
@@ -7406,6 +7552,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height_with_Window)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -7422,6 +7569,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height_with_Window)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -7440,6 +7588,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height_with_Window)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -7456,6 +7605,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height_with_Window)
         "Roof,                    !- Surface Type",
         "R13WALL,                 !- Construction Name",
         "ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "Outdoors,                !- Outside Boundary Condition",
         ",                        !- Outside Boundary Condition Object",
         "SunExposed,              !- Sun Exposure",
@@ -7472,6 +7622,7 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height_with_Window)
         "Roof,                    !- Surface Type",
         "R13WALL,                 !- Construction Name",
         "ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "Outdoors,                !- Outside Boundary Condition",
         ",                        !- Outside Boundary Condition Object",
         "SunExposed,              !- Sun Exposure",

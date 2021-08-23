@@ -243,16 +243,6 @@ json IdfParser::parse_idf(std::string_view idf, size_t &index, bool &success, js
                 while (token != Token::SEMICOLON && token != Token::END)
                     token = next_token(idf, index);
                 continue;
-            } else if (obj_name.find("Parametric:") != std::string::npos) {
-                errors_.emplace_back(fmt::format("Line: {} You must run Parametric Preprocessor for \"{}\"", cur_line_num, obj_name));
-                while (token != Token::SEMICOLON && token != Token::END)
-                    token = next_token(idf, index);
-                continue;
-            } else if (obj_name.find("Template") != std::string::npos) {
-                errors_.emplace_back(fmt::format("Line: {} You must run the ExpandObjects program for \"{}\"", cur_line_num, obj_name));
-                while (token != Token::SEMICOLON && token != Token::END)
-                    token = next_token(idf, index);
-                continue;
             }
 
             bool object_success = true;
@@ -263,9 +253,14 @@ json IdfParser::parse_idf(std::string_view idf, size_t &index, bool &success, js
                 auto found_index = idf.find_first_of('\n', beginning_of_line_index);
                 std::string line;
                 if (found_index != std::string::npos) {
-                    line = idf.substr(beginning_of_line_index, found_index - beginning_of_line_index);
+                    line = idf.substr(beginning_of_line_index, found_index - beginning_of_line_index - 1);
                 }
+<<<<<<< HEAD
                 errors_.emplace_back(fmt::format("Line: {} Index: {} - Error parsing \"{}\". Error in following line.", cur_line_num, index_into_cur_line, obj_name));
+=======
+                errors_.emplace_back(fmt::format("Line: {} Index: {}", cur_line_num, index_into_cur_line) + " - Error parsing \"" + obj_name +
+                                     "\". Error in following line.");
+>>>>>>> origin/develop
                 errors_.emplace_back(fmt::format("~~~ {}", line));
                 success = false;
                 continue;
