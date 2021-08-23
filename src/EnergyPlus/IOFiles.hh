@@ -465,7 +465,7 @@ inline constexpr bool is_fortran_syntax(const std::string_view format_str)
 
 class InputOutputFile;
 template <FormatSyntax formatSyntax = FormatSyntax::Fortran, typename... Args>
-void print(InputOutputFile &outputFile, std::string_view format_str, Args &&...args);
+void print(InputOutputFile &outputFile, std::string_view format_str, Args &&... args);
 
 inline constexpr FormatSyntax check_syntax(const std::string_view format_str)
 {
@@ -579,7 +579,7 @@ public:
 private:
     std::unique_ptr<std::iostream> os;
     bool print_to_dev_null = false;
-    template <FormatSyntax, typename... Args> friend void print(InputOutputFile &outputFile, std::string_view format_str, Args &&...args);
+    template <FormatSyntax, typename... Args> friend void print(InputOutputFile &outputFile, std::string_view format_str, Args &&... args);
     friend class IOFiles;
 };
 
@@ -799,7 +799,7 @@ public:
     }
 };
 
-template <typename... Args> void vprint(std::ostream &os, std::string_view format_str, const Args &...args)
+template <typename... Args> void vprint(std::ostream &os, std::string_view format_str, const Args &... args)
 {
     //    assert(os.good());
     auto buffer = fmt::memory_buffer();
@@ -811,7 +811,7 @@ template <typename... Args> void vprint(std::ostream &os, std::string_view forma
     os.write(buffer.data(), buffer.size());
 }
 
-template <typename... Args> std::string vprint(std::string_view format_str, const Args &...args)
+template <typename... Args> std::string vprint(std::string_view format_str, const Args &... args)
 {
     auto buffer = fmt::memory_buffer();
     try {
@@ -845,19 +845,19 @@ template <typename... Args> std::string vprint(std::string_view format_str, cons
 //
 
 namespace {
-    template <typename... Args> void print_fortran_syntax(std::ostream &os, std::string_view format_str, const Args &...args)
+    template <typename... Args> void print_fortran_syntax(std::ostream &os, std::string_view format_str, const Args &... args)
     {
         EnergyPlus::vprint<std::conditional_t<std::is_same_v<double, Args>, DoubleWrapper, Args>...>(os, format_str, args...);
     }
 
-    template <typename... Args> std::string format_fortran_syntax(std::string_view format_str, const Args &...args)
+    template <typename... Args> std::string format_fortran_syntax(std::string_view format_str, const Args &... args)
     {
         return EnergyPlus::vprint<std::conditional_t<std::is_same_v<double, Args>, DoubleWrapper, Args>...>(format_str, args...);
     }
 } // namespace
 
 template <FormatSyntax formatSyntax = FormatSyntax::Fortran, typename... Args>
-void print(std::ostream &os, std::string_view format_str, Args &&...args)
+void print(std::ostream &os, std::string_view format_str, Args &&... args)
 {
     if constexpr (formatSyntax == FormatSyntax::Fortran) {
         print_fortran_syntax(os, format_str, args...);
@@ -868,7 +868,7 @@ void print(std::ostream &os, std::string_view format_str, Args &&...args)
     }
 }
 
-template <FormatSyntax formatSyntax, typename... Args> void print(InputOutputFile &outputFile, std::string_view format_str, Args &&...args)
+template <FormatSyntax formatSyntax, typename... Args> void print(InputOutputFile &outputFile, std::string_view format_str, Args &&... args)
 {
     auto *outputStream = [&]() -> std::ostream * {
         if (outputFile.os) {
@@ -891,7 +891,7 @@ template <FormatSyntax formatSyntax, typename... Args> void print(InputOutputFil
     }
 }
 
-template <FormatSyntax formatSyntax = FormatSyntax::Fortran, typename... Args> std::string format(std::string_view format_str, Args &&...args)
+template <FormatSyntax formatSyntax = FormatSyntax::Fortran, typename... Args> std::string format(std::string_view format_str, Args &&... args)
 {
     if constexpr (formatSyntax == FormatSyntax::Fortran) {
         return format_fortran_syntax(format_str, args...);
