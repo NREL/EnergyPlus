@@ -61,31 +61,31 @@ namespace EnergyPlus {
 
 namespace DataViewFactorInformation {
 
-    struct ZoneViewFactorInformation
+    struct EnclosureViewFactorInformation
     {
         // Members
-        std::string Name;                   // Enclosure name
-        std::vector<std::string> ZoneNames; // Zone names which are part of this enclosure
-        std::vector<int> ZoneNums;          // Zones which are part of this enclosure
-        int NumOfSurfaces;                  // Number of surfaces in the enclosure
-        Array2D<Real64> F;                  // View Factors
-        Array2D<Real64> ScriptF;            // Hottel's Script F //Tuned Transposed
-        Array1D<Real64> Area;               // Surface area
-        Array1D<Real64> Emissivity;         // Surface emissivity
-        Array1D<Real64> Azimuth;            // Azimuth angle of the surface (in degrees)
-        Array1D<Real64> Tilt;               // Tilt angle of the surface (in degrees)
-        Array1D<Real64> FMRT;               // Mean Radiant Temperature "View Factor" used in Carroll method
-        Array1D<Real64> Fp;                 // F' (Oppenheim surface resistance used in Carroll method)
-        Array1D_int SurfacePtr;             // Surface number for surfaces in this enclosure
-        std::vector<int> SurfaceReportNums; // Enclosure surface numbers for reporting view factors in old order (sub-surfaces follow base surfaces)
-        Real64 FloorArea;                   // Floor area of zone(s) in enclosure
-        Real64 ExtWindowArea;               // Exterior window area
-        Real64 TotalSurfArea;               // Total surface area
-        Array1D<Real64> SolAbsorptance;     // Surface solar absorptance
-        int TotalEnclosureDaylRefPoints;    // Total number of daylighting reference points in enclosure
+        std::string Name;                    // Enclosure name
+        std::vector<std::string> spaceNames; // Space names which are part of this enclosure
+        std::vector<int> spaceNums;          // Spaces which are part of this enclosure
+        int NumOfSurfaces;                   // Number of surfaces in the enclosure
+        Array2D<Real64> F;                   // View Factors: F(i,j) = from surface j to surface i (counter-intuitive, but optimized for performance)
+        Array2D<Real64> ScriptF;             // Hottel's Script F //Tuned Transposed
+        Array1D<Real64> Area;                // Surface area
+        Array1D<Real64> Emissivity;          // Surface emissivity
+        Array1D<Real64> Azimuth;             // Azimuth angle of the surface (in degrees)
+        Array1D<Real64> Tilt;                // Tilt angle of the surface (in degrees)
+        Array1D<Real64> FMRT;                // Mean Radiant Temperature "View Factor" used in Carroll method
+        Array1D<Real64> Fp;                  // F' (Oppenheim surface resistance used in Carroll method)
+        Array1D_int SurfacePtr;              // Surface number for surfaces in this enclosure
+        std::vector<int> SurfaceReportNums;  // Enclosure surface numbers for reporting view factors in old order (sub-surfaces follow base surfaces)
+        Real64 FloorArea;                    // Floor area of zone(s) in enclosure
+        Real64 ExtWindowArea;                // Exterior window area
+        Real64 TotalSurfArea;                // Total surface area
+        Array1D<Real64> SolAbsorptance;      // Surface solar absorptance
+        int TotalEnclosureDaylRefPoints;     // Total number of daylighting reference points in enclosure
 
         // Default Constructor
-        ZoneViewFactorInformation() : NumOfSurfaces(0), FloorArea(0.0), ExtWindowArea(0.0), TotalSurfArea(0.0), TotalEnclosureDaylRefPoints(0)
+        EnclosureViewFactorInformation() : NumOfSurfaces(0), FloorArea(0.0), ExtWindowArea(0.0), TotalSurfArea(0.0), TotalEnclosureDaylRefPoints(0)
         {
         }
     };
@@ -97,15 +97,15 @@ struct ViewFactorInfoData : BaseGlobalStruct
 
     int NumOfRadiantEnclosures = 0; // Number of radiant enclosures
     int NumOfSolarEnclosures = 0;   // Number of solar enclosures
-    Array1D<DataViewFactorInformation::ZoneViewFactorInformation> ZoneRadiantInfo;
-    Array1D<DataViewFactorInformation::ZoneViewFactorInformation> ZoneSolarInfo;
+    Array1D<DataViewFactorInformation::EnclosureViewFactorInformation> EnclRadInfo;
+    Array1D<DataViewFactorInformation::EnclosureViewFactorInformation> EnclSolInfo;
 
     void clear_state() override
     {
         NumOfRadiantEnclosures = 0;
         NumOfSolarEnclosures = 0;
-        ZoneRadiantInfo.clear();
-        ZoneSolarInfo.clear();
+        EnclRadInfo.clear();
+        EnclSolInfo.clear();
     }
 };
 
