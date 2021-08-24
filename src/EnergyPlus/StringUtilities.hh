@@ -49,7 +49,7 @@
 #define StringUtilities_hh_INCLUDED
 
 #include <ObjexxFCL/src/ObjexxFCL/Array1S.hh>
-#include <charconv>
+#include <EnergyPlus/FromChars.hh>
 #include <fast_float/fast_float.h>
 #include <sstream>
 #include <type_traits>
@@ -73,7 +73,7 @@ inline bool readListItem(std::string_view input, size_t &index, char delimiter, 
         pos = input.size();
     }
 
-    auto result = std::from_chars(input.data(), input.data() + pos, param);
+    auto result = FromChars::from_chars(input.data(), input.data() + pos, param);
     if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
         return false;
     }

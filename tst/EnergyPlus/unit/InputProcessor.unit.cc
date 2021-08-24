@@ -410,7 +410,7 @@ TEST_F(InputProcessorFixture, parse_empty_fields)
             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
-                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
             }
         }
     }
@@ -449,7 +449,7 @@ TEST_F(InputProcessorFixture, parse_utf_8)
             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
-                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
             }
         }
     }
@@ -750,7 +750,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
-                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
             }
         }
     }
@@ -818,7 +818,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_non_extensible_objects)
             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
-                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
             }
         }
     }
@@ -947,16 +947,16 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
                 if (!tmp.is_array()) {
-                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
                 } else {
                     for (size_t i = 0; i < it_in_in.value().size(); i++) {
                         for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
                             if (it_ext.value().empty()) {
-                                EXPECT_EQ(epJSON[it.key()][it_in.key()][it_in_in.key()][i].empty(), it_ext.value().empty());
+                                EXPECT_EQ(epJSON[it.key()][it_in.key()][it_in_in.key()][i].empty(), it_ext.value().empty()) << "key: " << it_ext.key();
                                 continue;
                             }
                             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
-                            EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                            EXPECT_EQ(tmp.dump(), it_ext.value().dump()) << "key: " << it_ext.key();
                         }
                     }
                 }
@@ -1054,12 +1054,12 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_required_extensible_fie
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
                 if (!tmp.is_array()) {
-                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
                 } else {
                     for (size_t i = 0; i < it_in_in.value().size(); i++) {
                         for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
                             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
-                            EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                            EXPECT_EQ(tmp.dump(), it_ext.value().dump()) << "key: " << it_ext.key();
                         }
                     }
                 }
@@ -1116,12 +1116,12 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_extensible)
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
                 if (!tmp.is_array()) {
-                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
                 } else {
                     for (size_t i = 0; i < it_in_in.value().size(); i++) {
                         for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
                             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
-                            EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                            EXPECT_EQ(tmp.dump(), it_ext.value().dump()) << "key: " << it_ext.key();
                         }
                     }
                 }
@@ -1230,12 +1230,12 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_extensible_objects)
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
                 if (!tmp.is_array()) {
-                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
                 } else {
                     for (size_t i = 0; i < it_in_in.value().size(); i++) {
                         for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
                             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
-                            EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                            EXPECT_EQ(tmp.dump(), it_ext.value().dump()) << "key: " << it_ext.key();
                         }
                     }
                 }
@@ -1338,7 +1338,7 @@ TEST_F(InputProcessorFixture, parse_idf)
             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
-                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
             }
         }
     }
@@ -1397,7 +1397,7 @@ TEST_F(InputProcessorFixture, parse_idf_two_objects)
             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
-                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
             }
         }
     }
@@ -1449,12 +1449,12 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles)
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
                 if (!tmp.is_array()) {
-                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
                 } else {
                     for (size_t i = 0; i < it_in_in.value().size(); i++) {
                         for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
                             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
-                            EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                            EXPECT_EQ(tmp.dump(), it_ext.value().dump()) << "key: " << it_ext.key();
                         }
                     }
                 }
@@ -1541,12 +1541,12 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles_two_objects)
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
                 if (!tmp.is_array()) {
-                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
                 } else {
                     for (size_t i = 0; i < it_in_in.value().size(); i++) {
                         for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
                             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
-                            EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                            EXPECT_EQ(tmp.dump(), it_ext.value().dump()) << "key: " << it_ext.key();
                         }
                     }
                 }
@@ -1566,7 +1566,7 @@ TEST_F(InputProcessorFixture, validate_idf_parametric_ght_HVACtemplate)
                                             "$bldgArea = 300.0,       !- Parametric Logic Line 5",
                                             "$depth = SQRT($bldgArea / $aspectRatio),  !- Parametric Logic Line 6",
                                             "$width = $depth * $aspectRatio,  !- Parametric Logic Line 7",
-                                            "$height = 4.0;           !- Parametric Logic Line 8"
+                                            "$height = 4.0;           !- Parametric Logic Line 8",
                                             "",
                                             "GroundHeatTransfer:Control,",
                                             "GHT Control, !- Name",

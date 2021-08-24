@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/InputProcessing/CsvParser.hh>
-#include <charconv>
 #include <fast_float/fast_float.h>
 #include <fmt/format.h>
 #include <milo/dtoa.h>
@@ -305,7 +304,21 @@ json CsvParser::parse_value(std::string_view csv, size_t &index)
 
     double val;
     auto result = fast_float::from_chars(value.data(), value.data() + value.size(), val);
-    if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range || result.ptr != value.end()) {
+    if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range) {
+        return rtrim(value);
+    } else if (result.ptr != value.end()) {
+        auto const initial_ptr = result.ptr;
+        while (delimiter != ' ' && result.ptr != value.end()) {
+            if (*result.ptr != ' ') {
+                break;
+            }
+            ++result.ptr;
+        }
+        if (result.ptr == value.end()) {
+            index -= (value.end() - initial_ptr);
+            index_into_cur_line -= (value.end() - initial_ptr);
+            return val;
+        }
         return rtrim(value);
     }
     //    double integral;

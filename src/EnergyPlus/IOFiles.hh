@@ -51,7 +51,6 @@
 // C++ Headers
 #include <array>
 #include <cassert>
-#include <charconv>
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -178,21 +177,16 @@ template <> struct formatter<DoubleWrapper>
             if (specs_.fill[0] == '0') {
                 buffer.push_back('0');
             }
-            std::array<char, std::numeric_limits<int>::digits10> buf{};
-            if (auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), specs_.width); ec == std::errc()) {
-                std::string_view buf_view(buf.data(), ptr - buf.data());
-                buffer.append(buf_view.begin(), buf_view.end());
-            }
+            auto fmt_int = fmt::format_int(specs_.width);
+            buffer.append(fmt_int.data(), fmt_int.data() + fmt_int.size());
         }
 
         //    [precision]
         if (specs_.precision >= 0) {
             buffer.push_back('.');
-            std::array<char, std::numeric_limits<int>::digits10> buf{};
-            if (auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), specs_.precision); ec == std::errc()) {
-                std::string_view buf_view(buf.data(), ptr - buf.data());
-                buffer.append(buf_view.begin(), buf_view.end());
-            }
+
+            auto fmt_int = fmt::format_int(specs_.precision);
+            buffer.append(fmt_int.data(), fmt_int.data() + fmt_int.size());
         }
 
         //    [locale]

@@ -278,6 +278,7 @@ set(SRC
     FluidCoolers.hh
     FluidProperties.cc
     FluidProperties.hh
+    FromChars.hh
     FuelCellElectricGenerator.cc
     FuelCellElectricGenerator.hh
     Furnaces.cc

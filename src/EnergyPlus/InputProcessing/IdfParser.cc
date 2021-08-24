@@ -46,7 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
-#include <charconv>
+#include <EnergyPlus/FromChars.hh>
 #include <fast_float/fast_float.h>
 #include <fmt/format.h>
 #include <milo/dtoa.h>
@@ -465,24 +465,50 @@ json IdfParser::parse_number(std::string_view idf, size_t &index)
     index_into_cur_line += diff;
     index = save_i;
 
-    auto const convert_double = [](std::string_view str) -> json {
+    auto const convert_double = [&index, this](std::string_view str) -> json {
         double val;
         auto result = fast_float::from_chars(str.data(), str.data() + str.size(), val);
-        if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range || result.ptr != str.end()) {
+        if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range) {
+            return rtrim(str);
+        } else if (result.ptr != str.end()) {
+            auto const initial_ptr = result.ptr;
+            while (result.ptr != str.end()) {
+                if (*result.ptr != ' ') {
+                   break;
+                }
+                ++result.ptr;
+            }
+            if (result.ptr == str.end()) {
+                index -= (str.end() - initial_ptr);
+                this->index_into_cur_line -= (str.end() - initial_ptr);
+                return val;
+            }
             return rtrim(str);
         }
         return val;
     };
 
-    auto const convert_int = [&convert_double](std::string_view str) -> json {
+    auto const convert_int = [&convert_double, &index, this](std::string_view str) -> json {
         int val;
-        auto result = std::from_chars(str.data(), str.data() + str.size(), val);
+        auto result = FromChars::from_chars(str.data(), str.data() + str.size(), val);
         if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
             return convert_double(str);
         } else if (result.ptr != str.end()) {
             if (*result.ptr == '.' || *result.ptr == 'e' || *result.ptr == 'E') {
                 return convert_double(str);
             } else {
+                auto const initial_ptr = result.ptr;
+                while (result.ptr != str.end()) {
+                    if (*result.ptr != ' ') {
+                        break;
+                    }
+                    ++result.ptr;
+                }
+                if (result.ptr == str.end()) {
+                    index -= (str.end() - initial_ptr);
+                    this->index_into_cur_line -= (str.end() - initial_ptr);
+                    return val;
+                }
                 return rtrim(str);
             }
         }
