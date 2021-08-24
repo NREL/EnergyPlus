@@ -197,6 +197,7 @@ TEST_F(InputProcessorFixture, decode_encode_1)
                                        "  Floor,",
                                        "  FLOOR38,",
                                        "  SCWINDOW,",
+                                       "  ,",
                                        "  Surface,",
                                        "  Zn009:Flr001,",
                                        "  NoSun,",
@@ -986,6 +987,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_required_extensible_fie
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -1075,6 +1077,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_extensible)
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -1140,6 +1143,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_extensible_objects)
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -1156,6 +1160,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_extensible_objects)
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -1252,6 +1257,7 @@ TEST_F(InputProcessorFixture, validate_two_extensible_objects_and_one_non_extens
         "    Floor,                   !- Surface Type",
         "    FLOOR38,                 !- Construction Name",
         "    SCWINDOW,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn009:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1268,6 +1274,7 @@ TEST_F(InputProcessorFixture, validate_two_extensible_objects_and_one_non_extens
         "    Floor,                   !- Surface Type",
         "    FLOOR38,                 !- Construction Name",
         "    SCWINDOW,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn009:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1403,6 +1410,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles)
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -1462,6 +1470,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles_two_objects)
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -1478,6 +1487,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles_two_objects)
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -2184,6 +2194,7 @@ TEST_F(InputProcessorFixture, getObjectItem_json3)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2228,12 +2239,12 @@ TEST_F(InputProcessorFixture, getObjectItem_json3)
                                                               cNumericFields);
 
     EXPECT_TRUE(compare_containers(
-        std::vector<std::string>({"ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED"}), Alphas));
+        std::vector<std::string>({"ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED"}), Alphas));
     EXPECT_TRUE(compare_containers(
         std::vector<bool>({false, false, false, false, false, false, false, false, false, false, false, false, false, false}), lNumericBlanks));
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, true, false, false}), lAlphaBlanks));
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, false, true, false, false}), lAlphaBlanks));
     EXPECT_TRUE(compare_containers(std::vector<Real64>({0.5, 4, 0, 0, 4.572, 0, 0, 0, 15.24, 0, 0, 15.24, 0, 4.572}), Numbers));
-    EXPECT_EQ(8, NumAlphas);
+    EXPECT_EQ(9, NumAlphas);
     EXPECT_EQ(14, NumNumbers);
     EXPECT_EQ(1, IOStatus);
 }
@@ -2658,10 +2669,10 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, true, true, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(26, NumNumbers);
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8, 16.7,   0.0085, 0.0085, 0,      0, 0,
-                                                        0,      0,   0, 0,      0,    0,      1,    -99999, 0,      0,      -99999, 0, 0}),
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8,   16.7, 0.0085, 0.0085, 0, 0, 0, 0,
+                                                        0,      0,   0, 0,      0,    1,      -99999, 0,    0,      -99999, 0, 0, 0}),
                                    Numbers));
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true, true,
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true, true, true,
                                                       true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true, true, true}),
                                    lNumericBlanks));
     EXPECT_EQ(1, IOStatus);

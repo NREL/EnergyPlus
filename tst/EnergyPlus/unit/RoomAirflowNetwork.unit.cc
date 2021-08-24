@@ -100,14 +100,17 @@ protected:
         state->dataSize->CurSysNum = 0;
         state->dataSize->CurOASysNum = 0;
         state->dataGlobal->NumOfZones = 1;
+        state->dataGlobal->numSpaces = 1;
         state->dataLoopNodes->NumOfNodes = 5;
         state->dataGlobal->BeginEnvrnFlag = true;
         int NumOfSurfaces = 2;
         state->dataRoomAirMod->RoomAirflowNetworkZoneInfo.allocate(state->dataGlobal->NumOfZones);
         state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+        state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
         state->dataHeatBal->ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
+        state->dataHeatBal->spaceIntGainDevices.allocate(state->dataGlobal->numSpaces);
         state->dataLoopNodes->NodeID.allocate(state->dataLoopNodes->NumOfNodes);
         state->dataLoopNodes->Node.allocate(state->dataLoopNodes->NumOfNodes);
         state->dataSurface->Surface.allocate(NumOfSurfaces);
@@ -171,8 +174,14 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).HVAC(1).Name = "ZoneHVAC";
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsDeviceIndices.allocate(1);
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsDeviceIndices.allocate(1);
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).intGainsDeviceSpaces.allocate(1);
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).intGainsDeviceSpaces.allocate(1);
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).NumIntGains = 1;
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).NumIntGains = 1;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsDeviceIndices(1) = 1;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsDeviceIndices(1) = 1;
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).intGainsDeviceSpaces(1) = 1;
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).intGainsDeviceSpaces(1) = 1;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsFractions.allocate(1);
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsFractions.allocate(1);
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsFractions(1) = 0.4;
@@ -255,13 +264,14 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(ZoneNum).HTSurfaceLast = 2;
     state->dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist = 0;
+    state->dataHeatBal->Zone(ZoneNum).spaceIndexes.emplace_back(1);
 
-    state->dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices = 1;
-    state->dataHeatBal->ZoneIntGain(ZoneNum).Device.allocate(state->dataHeatBal->ZoneIntGain(1).NumberOfDevices);
-    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).CompObjectName = "PEOPLE";
-    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).CompTypeOfNum = DataHeatBalance::IntGainTypeOf::People;
-    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).ConvectGainRate = 300.0;
-    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).LatentGainRate = 200.0;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).numberOfDevices = 1;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device.allocate(state->dataHeatBal->spaceIntGainDevices(1).numberOfDevices);
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompObjectName = "PEOPLE";
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompTypeOfNum = DataHeatBalance::IntGainTypeOf::People;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).ConvectGainRate = 300.0;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).LatentGainRate = 200.0;
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(2).HeatTransSurf = true;
@@ -380,6 +390,7 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
         "    Wall,                    !- Surface Type",
         "    PARTITION,               !- Construction Name",
         "    living_unit1,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",

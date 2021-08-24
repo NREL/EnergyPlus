@@ -1045,12 +1045,11 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
                     ShowContinueError(state, "ElectricLoadCenter:Inverter:PVWatts can only be used with Generator:PVWatts");
                     ShowContinueError(state, "\"" + generatorController->name + "\" is of type " + generatorController->typeOfName);
                 } else {
-                    PVWatts::PVWattsGenerator &pvwGen = PVWatts::GetOrCreatePVWattsGenerator(state, generatorController->name);
-                    totalDCCapacity += pvwGen.getDCSystemCapacity();
+                    totalDCCapacity += generatorController->pvwattsGenerator->getDCSystemCapacity();
 
                     // Pass the inverter properties to the PVWatts generator class
-                    pvwGen.setDCtoACRatio(inverterObj->pvWattsDCtoACSizeRatio());
-                    pvwGen.setInverterEfficiency(inverterObj->pvWattsInverterEfficiency());
+                    generatorController->pvwattsGenerator->setDCtoACRatio(inverterObj->pvWattsDCtoACSizeRatio());
+                    generatorController->pvwattsGenerator->setInverterEfficiency(inverterObj->pvWattsInverterEfficiency());
                 }
             }
             if (!errorsFound) {
@@ -2146,7 +2145,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     : compGenTypeOf_Num(GeneratorType::Unassigned), compPlantTypeOf_Num(0), generatorType(GeneratorType::Unassigned), generatorIndex(0),
       maxPowerOut(0.0), availSchedPtr(0), powerRequestThisTimestep(0.0), onThisTimestep(false), eMSPowerRequest(0.0), eMSRequestOn(false),
       plantInfoFound(false), cogenLocation(PlantLocation(0, 0, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0), dCElectProdRate(0.0),
-      electricityProd(0.0), electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), errCountNegElectProd_(0)
+      electricityProd(0.0), electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), pvwattsGenerator(nullptr), errCountNegElectProd_(0)
 {
 
     static constexpr std::string_view routineName = "GeneratorController constructor ";
@@ -2177,6 +2176,16 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         generatorType = GeneratorType::PVWatts;
         compGenTypeOf_Num = GeneratorType::PVWatts;
         compPlantTypeOf_Num = DataPlant::TypeOf_Other;
+
+        int ObjNum =
+            state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(objectName));
+        assert(ObjNum >= 0);
+        if (ObjNum == 0) {
+            ShowFatalError(state, "Cannot find Generator:PVWatts " + objectName);
+        }
+        pvwattsGenerator = PVWatts::PVWattsGenerator::createFromIdfObj(state, ObjNum);
+        pvwattsGenerator->setupOutputVariables(state);
+
     } else if (UtilityRoutines::SameString(objectType, "Generator:FuelCell")) {
         generatorType = GeneratorType::FuelCell;
         compGenTypeOf_Num = GeneratorType::FuelCell;
@@ -2324,9 +2333,8 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         break;
     }
     case GeneratorType::PVWatts: {
-        PVWatts::PVWattsGenerator &pvwattsGenerator(PVWatts::GetOrCreatePVWattsGenerator(state, name));
-        pvwattsGenerator.calc(state);
-        pvwattsGenerator.getResults(dCElectProdRate, dCElectricityProd, thermProdRate, thermalProd);
+        pvwattsGenerator->calc(state);
+        pvwattsGenerator->getResults(dCElectProdRate, dCElectricityProd, thermProdRate, thermalProd);
         electricPowerOutput = dCElectProdRate;
         thermalPowerOutput = thermProdRate;
         break;
