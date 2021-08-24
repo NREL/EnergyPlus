@@ -849,67 +849,67 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_ViewFactorAngleLimitTest)
     ZoneNum = 1;
     state->dataHeatBal->Zone.allocate(ZoneNum);
     state->dataHeatBal->Zone(ZoneNum).Name = "Test";
-    state->dataViewFactor->ZoneRadiantInfo.allocate(ZoneNum);
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Name = state->dataHeatBal->Zone(ZoneNum).Name;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).ZoneNums.push_back(ZoneNum);
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth.allocate(N);
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt.allocate(N);
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr.allocate(N);
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(1) = 1;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(2) = 2;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(3) = 3;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(4) = 4;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(5) = 5;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(6) = 6;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(7) = 7;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(8) = 8;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr(9) = 9;
+    state->dataViewFactor->EnclSolInfo.allocate(ZoneNum);
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Name = state->dataHeatBal->Zone(ZoneNum).Name;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).spaceNums.push_back(ZoneNum);
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Azimuth.allocate(N);
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Tilt.allocate(N);
+    state->dataViewFactor->EnclSolInfo(ZoneNum).SurfacePtr.allocate(N);
+    state->dataViewFactor->EnclSolInfo(ZoneNum).SurfacePtr(1) = 1;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).SurfacePtr(2) = 2;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).SurfacePtr(3) = 3;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).SurfacePtr(4) = 4;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).SurfacePtr(5) = 5;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).SurfacePtr(6) = 6;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).SurfacePtr(7) = 7;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).SurfacePtr(8) = 8;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).SurfacePtr(9) = 9;
     state->dataSurface->Surface.allocate(N);
 
     // wall
     state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(1) = 0;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(1) = 90;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Azimuth(1) = 0;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Tilt(1) = 90;
     // opposite wall
     state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Wall;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(2) = 90;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(2) = 180;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Tilt(2) = 90;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Azimuth(2) = 180;
     // floor
     state->dataSurface->Surface(3).Class = DataSurfaces::SurfaceClass::Floor;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(3) = 0;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(3) = 180;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Azimuth(3) = 0;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Tilt(3) = 180;
     // ceiling/roof
     state->dataSurface->Surface(4).Class = DataSurfaces::SurfaceClass::Roof;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(4) = 0;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(4) = 0;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Azimuth(4) = 0;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Tilt(4) = 0;
     // additional floor with different tilt
     state->dataSurface->Surface(5).Class = DataSurfaces::SurfaceClass::Floor;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(5) = 0;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(5) = 270;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Azimuth(5) = 0;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Tilt(5) = 270;
     // additional wall with slight difference in azimuth (<10 degrees)
     state->dataSurface->Surface(6).Class = DataSurfaces::SurfaceClass::Wall;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(6) = 358;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(6) = 90;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Azimuth(6) = 358;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Tilt(6) = 90;
     // ceiling/roof with slight difference in azimuth (<10 degrees)
     state->dataSurface->Surface(7).Class = DataSurfaces::SurfaceClass::Roof;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(7) = 5;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(7) = 0;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Azimuth(7) = 5;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Tilt(7) = 0;
     // ceiling/roof with large difference in azimuth
     state->dataSurface->Surface(8).Class = DataSurfaces::SurfaceClass::Roof;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(8) = 90;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(8) = 0;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Azimuth(8) = 90;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Tilt(8) = 0;
     // internal mass
     state->dataSurface->Surface(9).Class = DataSurfaces::SurfaceClass::IntMass;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth(9) = 0;
-    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt(9) = 0;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Azimuth(9) = 0;
+    state->dataViewFactor->EnclSolInfo(ZoneNum).Tilt(9) = 0;
 
     CalcApproximateViewFactors(*state,
                                N,
                                A,
-                               state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Azimuth,
-                               state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Tilt,
+                               state->dataViewFactor->EnclSolInfo(ZoneNum).Azimuth,
+                               state->dataViewFactor->EnclSolInfo(ZoneNum).Tilt,
                                F,
-                               state->dataViewFactor->ZoneRadiantInfo(ZoneNum).SurfacePtr);
+                               state->dataViewFactor->EnclSolInfo(ZoneNum).SurfacePtr);
 
     // surfaces can't see themselves, no view factor
     EXPECT_EQ(F(1, 1), 0.0);
