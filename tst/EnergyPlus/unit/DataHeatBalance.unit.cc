@@ -494,6 +494,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -547,6 +548,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -563,6 +565,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -579,6 +582,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -595,6 +599,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Floor,                   !- Surface Type",
         "    FLOOR SLAB 8 IN,         !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -611,6 +616,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    Roof,                    !- Surface Type",
         "    ROOF34,                  !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -984,4 +990,51 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
     thisConstruct.setNodeSourceAndUserTemp(nodePerLayer);
     EXPECT_EQ(expectedNodeNumberAtSource, thisConstruct.NodeSource);
     EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation, thisConstruct.NodeUserTemp);
+}
+
+TEST_F(EnergyPlusFixture, DataHeatBalance_AssignReverseConstructionNumberTest)
+{
+    int ConstrNum;
+    int expectedResultRevConstrNum;
+    int functionResultRevConstrNum;
+    bool ErrorsFound = false;
+
+    state->dataHeatBal->TotConstructs = 2;
+    state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
+    state->dataConstruction->LayerPoint.allocate(Construction::MaxLayersInConstruct);
+
+    auto &thisConstruct(state->dataConstruction->Construct(1));
+    auto &otherConstruct(state->dataConstruction->Construct(2));
+
+    // Test: For an interzone surface that uses the zone as the other side, a new
+    //       interzone surface for that zone has to be created.  That interzone has
+    //       to have the reversed construction.  If that reversed construction is
+    //       not used for any defined surface, the variable IsUsed is false.  However,
+    //       since it now is being used, IsUsed has to be set to true.  Prior to
+    //       work on Defect #8919, when using CondFD and a zone other side condition
+    //       for an interzone surface (implied or E+ internally created other side)
+    //       for a construction that was reversed in the input file but not used
+    //       for other defined surfaces, IsUsed was set to false and this construction
+    //       was then skipped in the CondFD routine that calculates the number of
+    //       nodes.  This led to a hard crash.  This test simply makes sure that
+    //       IsUsed is set to true when the reversed construction already exists.
+    ConstrNum = 1;
+    thisConstruct.IsUsed = true;
+    thisConstruct.TotLayers = 2;
+    thisConstruct.LayerPoint.allocate(Construction::MaxLayersInConstruct);
+    thisConstruct.LayerPoint = 0;
+    thisConstruct.LayerPoint(1) = 10;
+    thisConstruct.LayerPoint(2) = 12;
+    otherConstruct.IsUsed = false;
+    otherConstruct.TotLayers = 2;
+    otherConstruct.LayerPoint.allocate(Construction::MaxLayersInConstruct);
+    otherConstruct.LayerPoint = 0;
+    otherConstruct.LayerPoint(1) = 12;
+    otherConstruct.LayerPoint(2) = 10;
+    expectedResultRevConstrNum = 2;
+
+    functionResultRevConstrNum = AssignReverseConstructionNumber(*state, ConstrNum, ErrorsFound);
+    EXPECT_EQ(expectedResultRevConstrNum, functionResultRevConstrNum);
+    EXPECT_TRUE(otherConstruct.IsUsed);
+    EXPECT_FALSE(ErrorsFound);
 }
