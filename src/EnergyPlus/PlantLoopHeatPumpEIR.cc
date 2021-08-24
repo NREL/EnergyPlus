@@ -726,8 +726,6 @@ void EIRPlantLoopHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
     Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
     Real64 tmpSourceVolFlow = 0.0;
 
-    std::string_view const typeName = DataPlant::ccSimPlantEquipTypes[static_cast<int>(this->plantTypeOfeNum)];
-
     // will leave like this for now
     // need to update these to better values later
     Real64 sourceSideInitTemp = 20;
