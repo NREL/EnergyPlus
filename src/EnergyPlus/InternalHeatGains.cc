@@ -8711,11 +8711,12 @@ namespace InternalHeatGains {
         SumConvGainRateExceptPeople = tmpSumConvGainRateExceptPeople;
     }
 
-    void SumInternalConvectionGainsByTypes(EnergyPlusData &state,
-                                           int const ZoneNum,              // zone index pointer for which zone to sum gains for
-                                           const Array1D<DataHeatBalance::IntGainTypeOf> &GainTypeARR, // variable length 1-d array of enum valued gain types
-                                           Real64 &SumConvGainRate,
-                                           int const spaceIndex) // space index pointer, sum gains only for this space
+    void SumInternalConvectionGainsByTypes(
+        EnergyPlusData &state,
+        int const ZoneNum,                                          // zone index pointer for which zone to sum gains for
+        const Array1D<DataHeatBalance::IntGainTypeOf> &GainTypeARR, // variable length 1-d array of enum valued gain types
+        Real64 &SumConvGainRate,
+        int const spaceIndex) // space index pointer, sum gains only for this space
     {
 
         // SUBROUTINE INFORMATION:
@@ -8848,11 +8849,12 @@ namespace InternalHeatGains {
         sumRadGainRate = tmpSumRadGainRate;
     }
 
-    void SumInternalRadiationGainsByTypes(EnergyPlusData &state,
-                                          int const ZoneNum,              // zone index pointer for which zone to sum gains for
-                                          const Array1D<DataHeatBalance::IntGainTypeOf> &GainTypeARR, // variable length 1-d array of enum valued gain types
-                                          Real64 &SumRadiationGainRate,
-                                          int const spaceIndex) // space index pointer, sum gains only for this space
+    void SumInternalRadiationGainsByTypes(
+        EnergyPlusData &state,
+        int const ZoneNum,                                          // zone index pointer for which zone to sum gains for
+        const Array1D<DataHeatBalance::IntGainTypeOf> &GainTypeARR, // variable length 1-d array of enum valued gain types
+        Real64 &SumRadiationGainRate,
+        int const spaceIndex) // space index pointer, sum gains only for this space
     {
 
         // SUBROUTINE INFORMATION:
@@ -8941,11 +8943,12 @@ namespace InternalHeatGains {
         SumLatentGainRateExceptPeople = tmpSumLatentGainRateExceptPeople;
     }
 
-    void SumInternalLatentGainsByTypes(EnergyPlusData &state,
-                                       int const ZoneNum,              // zone index pointer for which zone to sum gains for
-                                       const Array1D<DataHeatBalance::IntGainTypeOf> &GainTypeARR, // variable length 1-d array of enum valued gain types
-                                       Real64 &SumLatentGainRate,
-                                       int const spaceIndex) // space index pointer, sum gains only for this space
+    void
+    SumInternalLatentGainsByTypes(EnergyPlusData &state,
+                                  int const ZoneNum,                                          // zone index pointer for which zone to sum gains for
+                                  const Array1D<DataHeatBalance::IntGainTypeOf> &GainTypeARR, // variable length 1-d array of enum valued gain types
+                                  Real64 &SumLatentGainRate,
+                                  int const spaceIndex) // space index pointer, sum gains only for this space
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -9263,9 +9266,9 @@ namespace InternalHeatGains {
     }
 
     int GetInternalGainDeviceIndex(EnergyPlusData &state,
-                                   int const spaceNum,                                     // space index pointer for which space to sum gains for
-                                   DataHeatBalance::IntGainTypeOf const intGainTypeOfNum,  // space internal gain type enum
-                                   std::string_view const &intGainName)                    // Internal gain name
+                                   int const spaceNum,                                    // space index pointer for which space to sum gains for
+                                   DataHeatBalance::IntGainTypeOf const intGainTypeOfNum, // space internal gain type enum
+                                   std::string_view const &intGainName)                   // Internal gain name
     {
 
         // SUBROUTINE INFORMATION:

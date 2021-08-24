@@ -129,8 +129,8 @@ struct DisplacementVentMgrData : BaseGlobalStruct
                                                  DataHeatBalance::IntGainTypeOf::RefrigerationSecondaryReceiver,
                                                  DataHeatBalance::IntGainTypeOf::RefrigerationSecondaryPipe,
                                                  DataHeatBalance::IntGainTypeOf::RefrigerationWalkIn});
-    Array1D<DataHeatBalance::IntGainTypeOf> const IntGainTypesMixedSubzone = Array1D<DataHeatBalance::IntGainTypeOf>
-                                   (2, {DataHeatBalance::IntGainTypeOf::DaylightingDeviceTubular, DataHeatBalance::IntGainTypeOf::Lights});
+    Array1D<DataHeatBalance::IntGainTypeOf> const IntGainTypesMixedSubzone = Array1D<DataHeatBalance::IntGainTypeOf>(
+        2, {DataHeatBalance::IntGainTypeOf::DaylightingDeviceTubular, DataHeatBalance::IntGainTypeOf::Lights});
 
     void clear_state() override
     {

@@ -1337,10 +1337,11 @@ namespace DataHeatBalance {
 
         // Default Constructor
         GenericComponentZoneIntGainStruct()
-            : CompTypeOfNum(IntGainTypeOf::Unassigned), spaceGainFrac(1.0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0), PtrReturnAirConvGainRate(nullptr),
-              ReturnAirConvGainRate(0.0), PtrRadiantGainRate(nullptr), RadiantGainRate(0.0), PtrLatentGainRate(nullptr), LatentGainRate(0.0),
-              PtrReturnAirLatentGainRate(nullptr), ReturnAirLatentGainRate(0.0), PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0),
-              PtrGenericContamGainRate(nullptr), GenericContamGainRate(0.0), ReturnAirNodeNum(0)
+            : CompTypeOfNum(IntGainTypeOf::Unassigned), spaceGainFrac(1.0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0),
+              PtrReturnAirConvGainRate(nullptr), ReturnAirConvGainRate(0.0), PtrRadiantGainRate(nullptr), RadiantGainRate(0.0),
+              PtrLatentGainRate(nullptr), LatentGainRate(0.0), PtrReturnAirLatentGainRate(nullptr), ReturnAirLatentGainRate(0.0),
+              PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0), PtrGenericContamGainRate(nullptr), GenericContamGainRate(0.0),
+              ReturnAirNodeNum(0)
         {
         }
     };
