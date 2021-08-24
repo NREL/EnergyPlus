@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cpgfunction/utilities.h>
+#include <stdexcept>
 
 
 namespace gt::utilities {
