@@ -3098,7 +3098,8 @@ namespace HVACMultiSpeedHeatPump {
                     if (state.dataHVACMultiSpdHP->ErrCountCyc == 0) {
                         ++state.dataHVACMultiSpdHP->ErrCountCyc;
                         ShowWarningError(state,
-                                         "Iteration limit exceeded calculating DX unit cycling ratio, for unit=" + MSHeatPump(MSHeatPumpNum).Name);
+                                         "Iteration limit exceeded calculating DX unit cycling ratio, for unit=" + MSHeatPump(MSHeatPumpNum).Name +
+                                             ". The warning is caused by the EMS program overriding the coil speed.");
                         ShowContinueErrorTimeStamp(state, format("Cycling ratio returned={:.2R}", PartLoadFrac));
                     } else {
                         ++state.dataHVACMultiSpdHP->ErrCountCyc;
@@ -3113,7 +3114,8 @@ namespace HVACMultiSpeedHeatPump {
                     if (state.dataHVACMultiSpdHP->ErrCountVar == 0) {
                         ++state.dataHVACMultiSpdHP->ErrCountVar;
                         ShowWarningError(state,
-                                         "Iteration limit exceeded calculating DX unit speed ratio, for unit=" + MSHeatPump(MSHeatPumpNum).Name);
+                                         "Iteration limit exceeded calculating DX unit speed ratio, for unit=" + MSHeatPump(MSHeatPumpNum).Name +
+                                             ". The warning is caused by the EMS program overriding the coil speed.");
                         ShowContinueErrorTimeStamp(state, format("Speed ratio returned=[{:.2R}], Speed number ={}", SpeedRatio, SpeedNum));
                     } else {
                         ++state.dataHVACMultiSpdHP->ErrCountVar;
@@ -3127,8 +3129,9 @@ namespace HVACMultiSpeedHeatPump {
                 }
             }
         } else if (SolFla == -2) {
-            ShowFatalError(
-                state, "DX unit compressor speed calculation failed: speed limits exceeded, for unit=" + MSHeatPump(MSHeatPumpNum).DXCoolCoilName);
+            ShowFatalError(state,
+                           "DX unit compressor speed calculation failed: speed limits exceeded, for unit=" +
+                               MSHeatPump(MSHeatPumpNum).DXCoolCoilName + ". The error is caused by the EMS program overriding the coil speed.");
         }
 
         ControlMSHPSupHeater(state,
