@@ -635,55 +635,64 @@
     Freezer_1_Load,          !- Name
     Fish Frozen,             !- Construction Name
     Freezer_1,               !- Zone or ZoneList Name
-    36200.;                  !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    36200.;                  !- Extended Field
 
   InternalMass,
     Freezer_2_Load,          !- Name
     Meat,                    !- Construction Name
     Freezer_2,               !- Zone or ZoneList Name
-    8440.;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    8440.;                   !- Extended Field
 
   InternalMass,
     Freezer_3_Load,          !- Name
     Vegetable Frozen,        !- Construction Name
     Freezer_3,               !- Zone or ZoneList Name
-    9540.;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    9540.;                   !- Extended Field
 
   InternalMass,
     Freezer_4_Load,          !- Name
     Fruit Frozen,            !- Construction Name
     Freezer_4,               !- Zone or ZoneList Name
-    8000.;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    8000.;                   !- Extended Field
 
   InternalMass,
     Freezer_5_Load,          !- Name
     Fruit Frozen,            !- Construction Name
     Freezer_5,               !- Zone or ZoneList Name
-    25440.;                  !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    25440.;                  !- Extended Field
 
   InternalMass,
     Sub Freezer_Load,        !- Name
     Ice Cream,               !- Construction Name
     SubFreezer,              !- Zone or ZoneList Name
-    7000.;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    7000.;                   !- Extended Field
 
   InternalMass,
     Cooler_1_Load,           !- Name
     Fruit Fresh,             !- Construction Name
     Cooler_1,                !- Zone or ZoneList Name
-    18600.;                  !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    18600.;                  !- Extended Field
 
   InternalMass,
     Cooler_2_Load,           !- Name
     Vegetable Fresh,         !- Construction Name
     Cooler_2,                !- Zone or ZoneList Name
-    4760.;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    4760.;                   !- Extended Field
 
   InternalMass,
     Cooler_3_Load,           !- Name
     Dairy Milk,              !- Construction Name
     Cooler_3,                !- Zone or ZoneList Name
-    4000.;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    4000.;                   !- Extended Field
 
 !-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========
 
@@ -1811,6 +1820,7 @@
     Floor,                   !- Surface Type
     Freezer Floor Const,     !- Construction Name
     Freezer_1,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1827,6 +1837,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_1,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SubFreezer_Wall_2,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1843,6 +1854,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_1,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1859,6 +1871,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_1,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1875,6 +1888,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_1,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dock_Wall_3_Subsurface6, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1891,6 +1905,7 @@
     Roof,                    !- Surface Type
     Freezer Roof Const,      !- Construction Name
     Freezer_1,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1916,6 +1931,7 @@
     Floor,                   !- Surface Type
     Freezer Floor Const,     !- Construction Name
     SubFreezer,              !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1932,6 +1948,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     SubFreezer,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1948,6 +1965,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     SubFreezer,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_1_Wall_4_SubSurface2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1964,6 +1982,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     SubFreezer,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_2_Wall_1,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1980,6 +1999,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     SubFreezer,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_3_Wall_2,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1996,6 +2016,7 @@
     Roof,                    !- Surface Type
     Freezer Roof Const,      !- Construction Name
     SubFreezer,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2021,6 +2042,7 @@
     Floor,                   !- Surface Type
     Freezer Floor Const,     !- Construction Name
     Freezer_2,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2037,6 +2059,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_2,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_1_Wall_4_SubSurface1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2053,6 +2076,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_2,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dock_Wall_3_Subsurface7, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2069,6 +2093,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_2,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_4_Wall_2,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2085,6 +2110,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_2,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SubFreezer_Wall_3,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2101,6 +2127,7 @@
     Roof,                    !- Surface Type
     Freezer Roof Const,      !- Construction Name
     Freezer_2,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2126,6 +2153,7 @@
     Floor,                   !- Surface Type
     Freezer Floor Const,     !- Construction Name
     Freezer_3,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2142,6 +2170,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_3,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Cooler_1_Wall_2_SubSurface1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2158,6 +2187,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_3,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2174,6 +2204,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_3,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SubFreezer_Wall_4,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2190,6 +2221,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_3,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_4_Wall_1,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2206,6 +2238,7 @@
     Roof,                    !- Surface Type
     Freezer Roof Const,      !- Construction Name
     Freezer_3,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2231,6 +2264,7 @@
     Floor,                   !- Surface Type
     Freezer Floor Const,     !- Construction Name
     Freezer_4,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2247,6 +2281,7 @@
     Roof,                    !- Surface Type
     Freezer Roof Const,      !- Construction Name
     Freezer_4,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2263,6 +2298,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_4,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_3_Wall_3,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2279,6 +2315,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_4,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_2_Wall_4,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2295,6 +2332,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_4,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dock_Wall_3_Subsurface8, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2311,6 +2349,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_4,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Cooler_1_Wall_2_SubSurface2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2336,6 +2375,7 @@
     Floor,                   !- Surface Type
     Cooler Floor Const,      !- Construction Name
     Cooler_1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2368,6 +2408,7 @@
     Wall,                    !- Surface Type
     Cooler Wall Const,       !- Construction Name
     Cooler_1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2384,6 +2425,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Cooler_1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_4_Wall_4,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2400,6 +2442,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Cooler_1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dock_Wall_3_Subsurface9, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2416,6 +2459,7 @@
     Roof,                    !- Surface Type
     Cooler Roof Const,       !- Construction Name
     Cooler_1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2441,6 +2485,7 @@
     Floor,                   !- Surface Type
     Cooler Floor Const,      !- Construction Name
     Cooler_2,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2457,6 +2502,7 @@
     Wall,                    !- Surface Type
     Cooler Wall Const,       !- Construction Name
     Cooler_2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Cooler_3_Wall_1,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2473,6 +2519,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Cooler_2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_5_Wall_2_SubSurface1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2489,6 +2536,7 @@
     Wall,                    !- Surface Type
     Cooler Wall Const,       !- Construction Name
     Cooler_2,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Cooler_1,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2505,6 +2553,7 @@
     Wall,                    !- Surface Type
     Cooler Wall Const,       !- Construction Name
     Cooler_2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2521,6 +2570,7 @@
     Roof,                    !- Surface Type
     Cooler Roof Const,       !- Construction Name
     Cooler_2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2546,6 +2596,7 @@
     Floor,                   !- Surface Type
     Cooler Floor Const,      !- Construction Name
     Cooler_3,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2562,6 +2613,7 @@
     Wall,                    !- Surface Type
     Cooler Wall Const,       !- Construction Name
     Cooler_3,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Cooler_2_Wall_3,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2578,6 +2630,7 @@
     Wall,                    !- Surface Type
     Cooler Wall Const,       !- Construction Name
     Cooler_3,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Cooler_1,                !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2594,6 +2647,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Cooler_3,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dock_Wall_3_Subsurface10,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2610,6 +2664,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Cooler_3,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_5_Wall_2_SubSurface2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2626,6 +2681,7 @@
     Roof,                    !- Surface Type
     Cooler Roof Const,       !- Construction Name
     Cooler_3,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2651,6 +2707,7 @@
     Floor,                   !- Surface Type
     Freezer Floor Const,     !- Construction Name
     Freezer_5,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2667,6 +2724,7 @@
     Roof,                    !- Surface Type
     Freezer Roof Const,      !- Construction Name
     Freezer_5,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2683,6 +2741,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_5,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2699,6 +2758,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_5,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Cooler_3_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2715,6 +2775,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_5,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dock_Wall_3_Subsurface11,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2731,6 +2792,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_5,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2756,6 +2818,7 @@
     Floor,                   !- Surface Type
     Dock Floor Const,        !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2772,6 +2835,7 @@
     Wall,                    !- Surface Type
     Dock Wall Const,         !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2788,6 +2852,7 @@
     Wall,                    !- Surface Type
     Dock Wall Const,         !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2804,6 +2869,7 @@
     Wall,                    !- Surface Type
     Dock Wall Const,         !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Office2_Upper_Wall_1,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2820,6 +2886,7 @@
     Roof,                    !- Surface Type
     Dock Roof Const,         !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2836,6 +2903,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freeze_1_Wall_3,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2861,6 +2929,7 @@
     Floor,                   !- Surface Type
     Office Floor Const,      !- Construction Name
     Office1_Lower,           !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2877,6 +2946,7 @@
     Wall,                    !- Surface Type
     Office Wall Const,       !- Construction Name
     Office1_Lower,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2893,6 +2963,7 @@
     Wall,                    !- Surface Type
     Office Wall Const,       !- Construction Name
     Office1_Lower,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2909,6 +2980,7 @@
     Wall,                    !- Surface Type
     Office Wall Const,       !- Construction Name
     Office1_Lower,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2925,6 +2997,7 @@
     Ceiling,                 !- Surface Type
     Office Ceiling Const,    !- Construction Name
     Office1_Lower,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Office1_Upper_Floor,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2941,6 +3014,7 @@
     Wall,                    !- Surface Type
     Dock Wall Const,         !- Construction Name
     Office1_Lower,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dock_Wall_3_Subsurface2, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2966,6 +3040,7 @@
     Floor,                   !- Surface Type
     Office Ceiling Const,    !- Construction Name
     Office1_Upper,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Office1_Lower_Ceiling,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2982,6 +3057,7 @@
     Wall,                    !- Surface Type
     Office Wall Const,       !- Construction Name
     Office1_Upper,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2998,6 +3074,7 @@
     Wall,                    !- Surface Type
     Office Wall Const,       !- Construction Name
     Office1_Upper,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3014,6 +3091,7 @@
     Wall,                    !- Surface Type
     Office Wall Const,       !- Construction Name
     Office1_Upper,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3030,6 +3108,7 @@
     Roof,                    !- Surface Type
     Office Roof Const,       !- Construction Name
     Office1_Upper,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3046,6 +3125,7 @@
     Wall,                    !- Surface Type
     Dock Wall Const,         !- Construction Name
     Office1_Upper,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dock_Wall_3_Subsurface1, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3071,6 +3151,7 @@
     Floor,                   !- Surface Type
     Office Floor Const,      !- Construction Name
     Office2_Lower,           !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3087,6 +3168,7 @@
     Wall,                    !- Surface Type
     Office Wall Const,       !- Construction Name
     Office2_Lower,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3103,6 +3185,7 @@
     Ceiling,                 !- Surface Type
     Office Ceiling Const,    !- Construction Name
     Office2_Lower,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Office2_Upper_Floor,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3119,6 +3202,7 @@
     Wall,                    !- Surface Type
     Office Wall Const,       !- Construction Name
     Office2_Lower,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3135,6 +3219,7 @@
     Wall,                    !- Surface Type
     Dock Wall Const,         !- Construction Name
     Office2_Lower,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dock_Wall_3_Subsurface5, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3151,6 +3236,7 @@
     Wall,                    !- Surface Type
     Office Wall Const,       !- Construction Name
     Office2_Lower,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3176,6 +3262,7 @@
     Floor,                   !- Surface Type
     Office Ceiling Const,    !- Construction Name
     Office2_Upper,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Office2_Lower_Ceiling,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3192,6 +3279,7 @@
     Wall,                    !- Surface Type
     Office Wall Const,       !- Construction Name
     Office2_Upper,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3208,6 +3296,7 @@
     Wall,                    !- Surface Type
     Office Wall Const,       !- Construction Name
     Office2_Upper,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3224,6 +3313,7 @@
     Roof,                    !- Surface Type
     Office Roof Const,       !- Construction Name
     Office2_Upper,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3240,6 +3330,7 @@
     Wall,                    !- Surface Type
     Dock Wall Const,         !- Construction Name
     Office2_Upper,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dock_Wall_3_Subsurface4, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3256,6 +3347,7 @@
     Wall,                    !- Surface Type
     Office Wall Const,       !- Construction Name
     Office2_Upper,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4172,6 +4264,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_2_Wall_3,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4188,6 +4281,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_4_Wall_3,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4204,6 +4298,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Cooler_1_Wall_3,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4220,6 +4315,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Cooler_3_Wall_3,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4236,6 +4332,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_5_Wall_3,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4252,6 +4349,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_1,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_2_Wall_2,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4268,6 +4366,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Cooler_1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Freezer_3_Wall_4,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4284,6 +4383,7 @@
     Wall,                    !- Surface Type
     Freezer Wall Const,      !- Construction Name
     Freezer_5,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Cooler_2_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4300,6 +4400,7 @@
     Wall,                    !- Surface Type
     Dock Wall Const,         !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Office1_Upper_Wall_1,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4316,6 +4417,7 @@
     Wall,                    !- Surface Type
     Dock Wall Const,         !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Office1_Lower_Wall_1,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4332,6 +4434,7 @@
     Wall,                    !- Surface Type
     Dock Wall Const,         !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4348,6 +4451,7 @@
     Wall,                    !- Surface Type
     Dock Wall Const,         !- Construction Name
     Dock,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Office2_Lower_Wall_1,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure

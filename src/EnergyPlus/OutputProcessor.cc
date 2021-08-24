@@ -1900,6 +1900,7 @@ namespace OutputProcessor {
                       std::string &EndUseSub,                // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
                       std::string &Group,                    // Group key (Facility, Zone, Building, etc.)
                       std::string const &ZoneName,           // Zone key only applicable for Building group
+                      std::string const &SpaceType,          // Space Type key only applicable for Building group
                       int const RepVarNum,                   // Number of this report variable
                       int &MeterArrayPtr,                    // Output set of Pointers to Meters
                       bool &ErrorsFound                      // True if errors in this call
@@ -1920,11 +1921,7 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &op(state.dataOutputProcessor);
 
-        if (UtilityRoutines::SameString(Group, "Building")) {
-            ValidateNStandardizeMeterTitles(state, MtrUnits, ResourceType, EndUse, EndUseSub, Group, ErrorsFound, ZoneName);
-        } else {
-            ValidateNStandardizeMeterTitles(state, MtrUnits, ResourceType, EndUse, EndUseSub, Group, ErrorsFound);
-        }
+        ValidateNStandardizeMeterTitles(state, MtrUnits, ResourceType, EndUse, EndUseSub, Group, ErrorsFound, ZoneName, SpaceType);
 
         op->VarMeterArrays.redimension(++op->NumVarMeterArrays);
         MeterArrayPtr = op->NumVarMeterArrays;
@@ -1942,11 +1939,20 @@ namespace OutputProcessor {
                 ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                 op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
             }
-            if (UtilityRoutines::SameString(Group, "Building")) { // Match to Zone
-                Found = UtilityRoutines::FindItem(ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
-                if (Found != 0) {
-                    ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
-                    op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+            if (UtilityRoutines::SameString(Group, "Building")) { // Match to Zone and Space Type
+                if (!ZoneName.empty()) {
+                    Found = UtilityRoutines::FindItem(ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
+                    if (Found != 0) {
+                        ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
+                        op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+                    }
+                }
+                if (!SpaceType.empty()) {
+                    Found = UtilityRoutines::FindItem(ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
+                    if (Found != 0) {
+                        ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
+                        op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+                    }
                 }
             }
         }
@@ -1959,10 +1965,21 @@ namespace OutputProcessor {
                 op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
             }
             if (UtilityRoutines::SameString(Group, "Building")) { // Match to Zone
-                Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
-                if (Found != 0) {
-                    ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
-                    op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+                if (!ZoneName.empty()) {
+                    Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
+                    if (Found != 0) {
+                        ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
+                        op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+                    }
+                }
+                if (!SpaceType.empty()) {
+                    Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
+                    if (Found != 0) {
+                        ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
+                        op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+
+                        addEndUseSpaceType(state, EndUse, SpaceType);
+                    }
                 }
             }
 
@@ -1973,13 +1990,23 @@ namespace OutputProcessor {
                     ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
                     op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
 
-                    AddEndUseSubcategory(state, ResourceType, EndUse, EndUseSub);
+                    addEndUseSubcategory(state, EndUse, EndUseSub);
                 }
                 if (UtilityRoutines::SameString(Group, "Building")) { // Match to Zone
-                    Found = UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
-                    if (Found != 0) {
-                        ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
-                        op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+                    if (!ZoneName.empty()) {
+                        Found = UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
+                        if (Found != 0) {
+                            ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
+                            op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+                        }
+                    }
+                    if (!SpaceType.empty()) {
+                        Found =
+                            UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
+                        if (Found != 0) {
+                            ++op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters;
+                            op->VarMeterArrays(op->NumVarMeterArrays).OnMeters(op->VarMeterArrays(op->NumVarMeterArrays).NumOnMeters) = Found;
+                        }
                     }
                 }
             }
@@ -2028,7 +2055,8 @@ namespace OutputProcessor {
                                          std::string &EndUseSub,                // End Use Sub Type (General Lights, Task Lights, etc.)
                                          std::string &Group,                    // Group key (Facility, Zone, Building, etc.)
                                          bool &ErrorsFound,                     // True if errors in this call
-                                         Optional_string_const ZoneName         // ZoneName when Group=Building
+                                         const std::string &ZoneName,           // Zone Name when Group=Building
+                                         const std::string &SpaceType           // Space Type when Group=Building
     )
     {
 
@@ -2086,9 +2114,17 @@ namespace OutputProcessor {
             Found = UtilityRoutines::FindItem(ResourceType + ':' + Group, op->EnergyMeters);
             if (Found == 0) AddMeter(state, ResourceType + ':' + Group, MtrUnits, ResourceType, "", "", Group);
             if (Group == "Building") {
-                Found = UtilityRoutines::FindItem(ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
-                if (Found == 0) {
-                    AddMeter(state, ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, "", "", "Zone");
+                if (!ZoneName.empty()) {
+                    Found = UtilityRoutines::FindItem(ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
+                    if (Found == 0) {
+                        AddMeter(state, ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, "", "", "Zone");
+                    }
+                }
+                if (!SpaceType.empty()) {
+                    Found = UtilityRoutines::FindItem(ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
+                    if (Found == 0) {
+                        AddMeter(state, ResourceType + ":SpaceType:" + SpaceType, MtrUnits, ResourceType, "", "", "SpaceType");
+                    }
                 }
             }
         }
@@ -2273,10 +2309,18 @@ namespace OutputProcessor {
             Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType, op->EnergyMeters);
             if (Found == 0) AddMeter(state, EndUse + ':' + ResourceType, MtrUnits, ResourceType, EndUse, "", "");
 
-            if (Group == "Building") { // Match to Zone
-                Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
-                if (Found == 0) {
-                    AddMeter(state, EndUse + ':' + ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, EndUse, "", "Zone");
+            if (Group == "Building") { // Match to Zone and Space
+                if (!ZoneName.empty()) {
+                    Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
+                    if (Found == 0) {
+                        AddMeter(state, EndUse + ':' + ResourceType + ":Zone:" + ZoneName, MtrUnits, ResourceType, EndUse, "", "Zone");
+                    }
+                }
+                if (!SpaceType.empty()) {
+                    Found = UtilityRoutines::FindItem(EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
+                    if (Found == 0) {
+                        AddMeter(state, EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, MtrUnits, ResourceType, EndUse, "", "SpaceType");
+                    }
                 }
             }
         } else if (LocalErrorsFound) {
@@ -2288,6 +2332,33 @@ namespace OutputProcessor {
             MeterName = EndUseSub + ':' + EndUse + ':' + ResourceType;
             Found = UtilityRoutines::FindItem(MeterName, op->EnergyMeters);
             if (Found == 0) AddMeter(state, MeterName, MtrUnits, ResourceType, EndUse, EndUseSub, "");
+
+            if (Group == "Building") { // Match to Zone and Space
+                if (!ZoneName.empty()) {
+                    Found = UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName, op->EnergyMeters);
+                    if (Found == 0) {
+                        AddMeter(state,
+                                 EndUseSub + ':' + EndUse + ':' + ResourceType + ":Zone:" + ZoneName,
+                                 MtrUnits,
+                                 ResourceType,
+                                 EndUse,
+                                 EndUseSub,
+                                 "Zone");
+                    }
+                }
+                if (!SpaceType.empty()) {
+                    Found = UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType, op->EnergyMeters);
+                    if (Found == 0) {
+                        AddMeter(state,
+                                 EndUseSub + ':' + EndUse + ':' + ResourceType + ":SpaceType:" + SpaceType,
+                                 MtrUnits,
+                                 ResourceType,
+                                 EndUse,
+                                 EndUseSub,
+                                 "SpaceType");
+                    }
+                }
+            }
         } else if (LocalErrorsFound) {
             ErrorsFound = true;
         }
@@ -3585,10 +3656,7 @@ namespace OutputProcessor {
     // End of routines for Energy Meters implementation in EnergyPlus.
     // *****************************************************************************
 
-    void AddEndUseSubcategory(EnergyPlusData &state,
-                              [[maybe_unused]] std::string const &ResourceName,
-                              std::string const &EndUseName,
-                              std::string const &EndUseSubName)
+    void addEndUseSubcategory(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSubName)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3637,6 +3705,45 @@ namespace OutputProcessor {
 
         if (!Found) {
             ShowSevereError(state, "Nonexistent end use passed to AddEndUseSubcategory=" + EndUseName);
+        }
+    }
+    void addEndUseSpaceType(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSpaceTypeName)
+    {
+
+        auto &op(state.dataOutputProcessor);
+
+        bool Found = false;
+        for (size_t EndUseNum = 1; EndUseNum <= state.dataGlobalConst->iEndUse.size(); ++EndUseNum) {
+            if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).Name, EndUseName)) {
+
+                for (int endUseSpTypeNum = 1; endUseSpTypeNum <= op->EndUseCategory(EndUseNum).numSpaceTypes; ++endUseSpTypeNum) {
+                    if (UtilityRoutines::SameString(op->EndUseCategory(EndUseNum).spaceTypeName(endUseSpTypeNum), EndUseSpaceTypeName)) {
+                        // Space type already exists, no further action required
+                        Found = true;
+                        break;
+                    }
+                }
+
+                if (!Found) {
+                    // Add the space type by reallocating the array
+                    int numSpTypes = op->EndUseCategory(EndUseNum).numSpaceTypes;
+                    op->EndUseCategory(EndUseNum).spaceTypeName.redimension(numSpTypes + 1);
+
+                    op->EndUseCategory(EndUseNum).numSpaceTypes = numSpTypes + 1;
+                    op->EndUseCategory(EndUseNum).spaceTypeName(numSpTypes + 1) = EndUseSpaceTypeName;
+
+                    if (op->EndUseCategory(EndUseNum).numSpaceTypes > op->maxNumEndUseSpaceTypes) {
+                        op->maxNumEndUseSpaceTypes = op->EndUseCategory(EndUseNum).numSpaceTypes;
+                    }
+
+                    Found = true;
+                }
+                break;
+            }
+        }
+
+        if (!Found) {
+            ShowSevereError(state, "Nonexistent end use passed to addEndUseSpaceType=" + EndUseName);
         }
     }
     void WriteTimeStampFormatData(
@@ -4303,8 +4410,8 @@ namespace OutputProcessor {
                 print(state.files.eso, "{},{}\n", creportID, NumberOut);
                 ++state.dataGlobal->StdOutputRecordCount;
             }
-        } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //
-                 // 2, 3, 4
+        } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) {
+                 // // 2, 3, 4
             std::string MaxOut; // Character for Max out string
             std::string MinOut; // Character for Min out string
 
@@ -4575,8 +4682,8 @@ namespace OutputProcessor {
             if (state.files.eso.good()) {
                 print(state.files.eso, "{},{}\n", reportIDString, NumberOut);
             }
-        } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) { //
-                 // 2, 3, 4
+        } else { // if ( ( reportingInterval == ReportDaily ) || ( reportingInterval == ReportMonthly ) || ( reportingInterval == ReportSim ) ) {
+                 // // 2, 3, 4
             if (state.files.eso.good()) {
                 print(state.files.eso, "{},{},{},{}\n", reportIDString, NumberOut, MinOut, MaxOut);
             }
@@ -5067,7 +5174,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Optional_int_const ZoneMult,                            // Zone Multiplier, defaults to 1
                          Optional_int_const ZoneListMult,                        // Zone List Multiplier, defaults to 1
                          Optional_int_const indexGroupKey,                       // Group identifier for SQL output
-                         Optional_string_const customUnitName                    // the custom name for the units from EMS definition of units
+                         Optional_string_const customUnitName,                   // the custom name for the units from EMS definition of units
+                         Optional_string_const SpaceType                         // Space type (applicable for Building group only)
 )
 {
 
@@ -5098,7 +5206,8 @@ void SetupOutputVariable(EnergyPlusData &state,
     std::string EndUse;       // Will hold value of EndUseKey
     std::string EndUseSub;    // Will hold value of EndUseSubKey
     std::string Group;        // Will hold value of GroupKey
-    std::string ZoneName;     // Will hold value of ZoneKey
+    std::string zoneName;     // Will hold value of ZoneKey
+    std::string spaceType;    // Will hold value of SpaceType
     int localIndexGroupKey;
     auto &op(state.dataOutputProcessor);
 
@@ -5163,10 +5272,16 @@ void SetupOutputVariable(EnergyPlusData &state,
                 Group = "";
             }
             if (present(ZoneKey)) {
-                ZoneName = ZoneKey;
+                zoneName = ZoneKey;
                 OnMeter = true;
             } else {
-                ZoneName = "";
+                zoneName = "";
+            }
+            if (present(SpaceType)) {
+                spaceType = SpaceType;
+                OnMeter = true;
+            } else {
+                spaceType = "";
             }
         }
 
@@ -5241,7 +5356,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                 } else {
                     Unit mtrUnits = op->RVariableTypes(CV).units;
                     bool ErrorsFound = false;
-                    AttachMeters(state, mtrUnits, ResourceType, EndUse, EndUseSub, Group, ZoneName, CV, thisVarPtr.MeterArrayPtr, ErrorsFound);
+                    AttachMeters(
+                        state, mtrUnits, ResourceType, EndUse, EndUseSub, Group, zoneName, spaceType, CV, thisVarPtr.MeterArrayPtr, ErrorsFound);
                     if (ErrorsFound) {
                         ShowContinueError(state, "Invalid Meter spec for variable=" + KeyedValue + ':' + VariableName);
                         op->ErrorsLogged = true;

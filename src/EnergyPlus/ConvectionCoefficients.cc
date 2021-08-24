@@ -5809,8 +5809,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     int EquipOnLoop(0);
     int thisZoneInletNode(0);
     ConvectionConstants::InConvFlowRegime FinalFlowRegime(ConvectionConstants::InConvFlowRegime::Invalid);
-    Real64 Tmin(std::numeric_limits<float>::min()); // temporary min surf temp
-    Real64 Tmax(std::numeric_limits<float>::max()); // temporary max surf temp
+    Real64 Tmin(std::numeric_limits<float>::max()); // temporary min surf temp
+    Real64 Tmax(std::numeric_limits<float>::min()); // temporary max surf temp
     Real64 GrH(0.0);                                // Grashof number for zone height H
     Real64 Re(0.0);                                 // Reynolds number for zone air system flow
     Real64 Ri(0.0);                                 // Richardson Number, Gr/Re**2 for determining mixed regime

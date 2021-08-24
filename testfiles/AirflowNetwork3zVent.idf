@@ -441,6 +441,7 @@
     WALL,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     WEST_ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -457,6 +458,7 @@
     WALL,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     WEST_ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -473,6 +475,7 @@
     WALL,                    !- Surface Type
     PARTITION06,             !- Construction Name
     WEST_ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Surface_17,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -489,6 +492,7 @@
     WALL,                    !- Surface Type
     PARTITION06,             !- Construction Name
     WEST_ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Surface_10,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -505,6 +509,7 @@
     FLOOR,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
     WEST_ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Surface_5,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -521,6 +526,7 @@
     ROOF,                    !- Surface Type
     ROOF34,                  !- Construction Name
     WEST_ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -537,6 +543,7 @@
     WALL,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST_ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -553,6 +560,7 @@
     WALL,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST_ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -569,6 +577,7 @@
     WALL,                    !- Surface Type
     PARTITION06,             !- Construction Name
     EAST_ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Surface_4,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -585,6 +594,7 @@
     WALL,                    !- Surface Type
     PARTITION06,             !- Construction Name
     EAST_ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Surface_18,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -601,6 +611,7 @@
     FLOOR,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
     EAST_ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Surface_12,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -617,6 +628,7 @@
     ROOF,                    !- Surface Type
     ROOF34,                  !- Construction Name
     EAST_ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -633,6 +645,7 @@
     WALL,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH_ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -649,6 +662,7 @@
     WALL,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH_ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -665,6 +679,7 @@
     WALL,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH_ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -681,6 +696,7 @@
     WALL,                    !- Surface Type
     PARTITION06,             !- Construction Name
     NORTH_ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Surface_3,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -697,6 +713,7 @@
     WALL,                    !- Surface Type
     PARTITION06,             !- Construction Name
     NORTH_ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Surface_11,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -713,6 +730,7 @@
     FLOOR,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
     NORTH_ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Surface_19,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -729,6 +747,7 @@
     ROOF,                    !- Surface Type
     ROOF34,                  !- Construction Name
     NORTH_ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
