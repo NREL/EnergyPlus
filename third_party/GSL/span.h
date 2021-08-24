@@ -3539,7 +3539,7 @@ public:
 
 #else
 
-  template< size_t N
+  template< size_t \
         gsl_ENABLE_IF_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
     >
     gsl_constexpr span( std::array< value_type, N > & arr )
