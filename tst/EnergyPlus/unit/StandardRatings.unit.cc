@@ -343,7 +343,6 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
 TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
 {
 
-    using DataPlant::TypeOf_Chiller_ElectricEIR;
     using StandardRatings::CalcChillerIPLV;
 
     // Setup a water-cooled Chiller:Electric:EIR chiller with reference conditions being at non-rated conditions
@@ -351,7 +350,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes";
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap = 471200; // W
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP = 5.89;   // W/W
-    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::WaterCooled;
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::nCondenserType::WaterCooled;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat = 0.10;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MaxPartLoadRat = 1.15;
 
@@ -417,7 +416,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     Real64 IPLV;
     CalcChillerIPLV(*state,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name,
-                    TypeOf_Chiller_ElectricEIR,
+                    DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP,
                     state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType,
