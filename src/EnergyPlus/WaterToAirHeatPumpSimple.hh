@@ -281,9 +281,10 @@ struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct
 
     Real64 const CelsiustoKelvin; // Conversion from Celsius to Kelvin
 
-    int NumWatertoAirHPs;   // The Number of Water to Air Heat Pumps found in the Input
-                            // INTEGER        :: WaterIndex = 0                   ! Water index
-                            // INTEGER        :: Count = 0
+    int NumWatertoAirHPs; // The Number of Water to Air Heat Pumps found in the Input
+                          // INTEGER        :: WaterIndex = 0                   ! Water index
+                          // INTEGER        :: Count = 0
+    int AirflowErrPointer;
     bool GetCoilsInputFlag; // Flag set to make sure you get input once
     Array1D_bool MySizeFlag;
     Array1D_bool SimpleHPTimeStepFlag; // determines whether the previous operating mode for the coil and it's partner has been initialized
@@ -320,6 +321,7 @@ struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct
     void clear_state() override
     {
         this->NumWatertoAirHPs = 0;
+        this->AirflowErrPointer = 0;
         this->MyOneTimeFlag = true;
         this->GetCoilsInputFlag = true;
         this->MySizeFlag.clear();
@@ -337,10 +339,10 @@ struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct
 
     // Default Constructor
     WaterToAirHeatPumpSimpleData()
-        : CelsiustoKelvin(DataGlobalConstants::KelvinConv), NumWatertoAirHPs(0), GetCoilsInputFlag(true), SourceSideMassFlowRate(0.0),
-          SourceSideInletTemp(0.0), SourceSideInletEnth(0.0), LoadSideInletDBTemp(0.0), LoadSideInletWBTemp(0.0), LoadSideInletHumRat(0.0),
-          LoadSideInletEnth(0.0), LoadSideOutletDBTemp(0.0), LoadSideOutletHumRat(0.0), QSensible(0.0), QLoadTotal(0.0), QLatRated(0.0),
-          QLatActual(0.0), QSource(0.0), Winput(0.0), MyOneTimeFlag(true), firstTime(true)
+        : CelsiustoKelvin(DataGlobalConstants::KelvinConv), NumWatertoAirHPs(0), AirflowErrPointer(0), GetCoilsInputFlag(true),
+          SourceSideMassFlowRate(0.0), SourceSideInletTemp(0.0), SourceSideInletEnth(0.0), LoadSideInletDBTemp(0.0), LoadSideInletWBTemp(0.0),
+          LoadSideInletHumRat(0.0), LoadSideInletEnth(0.0), LoadSideOutletDBTemp(0.0), LoadSideOutletHumRat(0.0), QSensible(0.0), QLoadTotal(0.0),
+          QLatRated(0.0), QLatActual(0.0), QSource(0.0), Winput(0.0), MyOneTimeFlag(true), firstTime(true)
     {
     }
 };

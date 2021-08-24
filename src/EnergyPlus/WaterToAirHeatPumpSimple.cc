@@ -1151,15 +1151,9 @@ namespace WaterToAirHeatPumpSimple {
                                                      state.dataLoopNodes->Node(AirInletNode).HumRat,
                                                      RoutineName);
             if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate < 0.25 * RatedAirMassFlowRate) {
-                ShowWarningError(state,
-                                 "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
-                                     ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name +
-                                     "\"");
-                ShowContinueError(state, std::string{RoutineName} + ": Actual air mass flow rate is smaller than 25% of coil rated air flow rate.");
-                ShowContinueError(
-                    state,
-                    format("Actual air mass flow rate = {:.2T} W", state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate));
-                ShowContinueError(state, format("Rated air mass flow rate    = {:.2T} W", RatedAirMassFlowRate));
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "Actual air mass flow rate is smaller than 25% of water-to-air heat pump coil rated air flow rate.",
+                                               state.dataWaterToAirHeatPumpSimple->AirflowErrPointer);
             }
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterFlowMode = true;
         } else { // heat pump is off
