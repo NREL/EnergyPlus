@@ -61,3 +61,16 @@ The following table outputs are new:
 
 
 See [PR#8394](https://github.com/NREL/EnergyPlus/pull/8394)
+
+
+### Table Output Changes in Standard 62.1 Summary Report
+The System Ventilation Requirements for Cooling/Heating tables have two new columns: "Origin of D" and "Calculation Method for Ev". The former indicates how D has been calculated (user specified value, or using the occupancy design levels and schedules), and the latter indicates which method was used to determined that value.
+
+The Zone Ventilation Calculations for Cooling/Heating Design tables have one new column: "Is Vpz-min calculated using the Standard 62.1 Simplified Procedure?". As its name indicates, it specifies if the zone minimum primary air flow was determined using the ASHRAE Standard 62.1 Simplified Procedure.
+
+See PR [#8891](https://github.com/NREL/EnergyPlus/pull/8891).
+
+### VentilationRateProcedure Name Change
+The name of the `VentilationRateProcedure` method was changed to `Standard62.1VentilationRateProcedure` to be consistent with the Standard 62.1 Summary Report. The name of the method has been changed throughout EnergyPlus and is thus reflected in the EIO files.
+
+See PR [#8891](https://github.com/NREL/EnergyPlus/pull/8891).
