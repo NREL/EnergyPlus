@@ -2731,8 +2731,6 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     state->dataLoopNodes->Node.allocate(4);
-    state->dataHeatBal->SurfTempEffBulkAir.allocate(3);
-    state->dataHeatBalSurf->SurfTempInTmp.allocate(3);
 
     int surfNum1 = UtilityRoutines::FindItemInList("WALL", state->dataSurface->Surface);
     int surfNum2 = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
@@ -2763,57 +2761,17 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
-    state->dataHeatBalSurf->SurfHConvInt.allocate(3);
     state->dataHeatBalSurf->SurfHConvInt(surfNum1) = 0.5;
     state->dataHeatBalSurf->SurfHConvInt(surfNum2) = 0.5;
     state->dataHeatBalSurf->SurfHConvInt(surfNum3) = 0.5;
     state->dataHeatBal->Zone(1).IsControlled = true;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
-    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
 
-    state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 25.0;
-    state->dataHeatBalFanSys->QHTRadSysSurf.allocate(3);
-    state->dataHeatBalFanSys->QHWBaseboardSurf.allocate(3);
-    state->dataHeatBalFanSys->QSteamBaseboardSurf.allocate(3);
-    state->dataHeatBalFanSys->QElecBaseboardSurf.allocate(3);
-    state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
-    state->dataHeatBal->SurfQdotRadIntGainsInPerArea.allocate(3);
-    state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
-    state->dataSurface->SurfWinTransSolar.allocate(3);
-    state->dataHeatBal->ZoneWinHeatGain.allocate(1);
-    state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
-    state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
-    state->dataSurface->SurfWinHeatGain.allocate(3);
-    state->dataSurface->SurfWinHeatTransfer.allocate(3);
-    state->dataSurface->SurfWinGainConvGlazToZoneRep.allocate(3);
-    state->dataSurface->SurfWinGainIRGlazToZoneRep.allocate(3);
-    state->dataSurface->SurfWinGapConvHtFlowRep.allocate(3);
-    state->dataSurface->SurfWinGapConvHtFlowRepEnergy.allocate(3);
-    state->dataHeatBal->EnclSolQSWRad.allocate(1);
-    state->dataSurface->SurfWinLossSWZoneToOutWinRep.allocate(3);
-    state->dataSurface->SurfWinSysSolTransmittance.allocate(3);
-    state->dataSurface->SurfWinSysSolAbsorptance.allocate(3);
-    state->dataSurface->SurfWinSysSolReflectance.allocate(3);
-    state->dataSurface->SurfWinInsideGlassCondensationFlag.allocate(3);
-    state->dataSurface->SurfWinGainFrameDividerToZoneRep.allocate(3);
-    state->dataSurface->SurfWinInsideFrameCondensationFlag.allocate(3);
-    state->dataSurface->SurfWinInsideDividerCondensationFlag.allocate(3);
     state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
     state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
-
-    state->dataHeatBalSurf->QdotConvOutRep.allocate(3);
-    state->dataHeatBalSurf->SurfQdotConvOutPerArea.allocate(3);
-    state->dataHeatBalSurf->QConvOutReport.allocate(3);
-    state->dataHeatBalSurf->QdotRadOutRep.allocate(3);
-    state->dataHeatBalSurf->QdotRadOutRepPerArea.allocate(3);
-    state->dataHeatBalSurf->QRadOutReport.allocate(3);
-    state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs.allocate(3);
-    state->dataHeatBalSurf->QAirExtReport.allocate(3);
-    state->dataHeatBalSurf->QHeatEmiReport.allocate(3);
 
     state->dataHeatBal->SurfQRadSWOutIncident = 0.0;
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
@@ -2832,6 +2790,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     // Calculate temperature based on supply flow rate
 
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBalSurf->SurfHConvInt(surfNum2), inSurfTemp, outSurfTemp);
+    HeatBalanceSurfaceManager::ReportSurfaceHeatBalance(*state);
+
     // Test if LWR from surrounding surfaces correctly calculated
     EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.84 * 0.6 *
                          (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(state->dataWindowManager->thetas(1))),
