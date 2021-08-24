@@ -4943,10 +4943,8 @@ void UpdateThermalHistories(EnergyPlusData &state)
             // reduncant.
             if (construct.SourceSinkPresent) {
                 Real64 const QH_12s = state.dataHeatBalSurf->QH[l21] = QH_12 + state.dataHeatBalSurf->QsrcHist(SurfNum, 1) * construct.CTFSourceIn(0);
-                state.dataHeatBalSurf->SurfOpaqInsFaceConduction(SurfNum) = surface.Area * QH_12s;
                 state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(SurfNum) = QH_12s;
             } else {
-                state.dataHeatBalSurf->SurfOpaqInsFaceConduction(SurfNum) = surface.Area * QH_12;
                 state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(SurfNum) = QH_12; // CR 8901
             }
             //      IF (Surface(SurfNum)%Class/=SurfaceClass::IntMass)  &
@@ -4985,7 +4983,6 @@ void UpdateThermalHistories(EnergyPlusData &state)
                                                  state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum);
             }
             state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum) = -state.dataHeatBalSurf->QH[l11]; // switch sign for balance at outside face
-            state.dataHeatBalSurf->SurfOpaqOutFaceCond(SurfNum) = surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum);
         }
     } // ...end of loop over all (heat transfer) surfaces...
 
@@ -5721,6 +5718,7 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
             }
 
             // inside face conduction updates
+            state.dataHeatBalSurf->SurfOpaqInsFaceConduction(surfNum) = state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(surfNum) * surface.Area;
             state.dataHeatBalSurf->SurfOpaqInsFaceConductionEnergy(surfNum) =
                 state.dataHeatBalSurf->SurfOpaqInsFaceConduction(surfNum) * state.dataGlobal->TimeStepZoneSec;
             state.dataHeatBal->ZoneOpaqSurfInsFaceCond(zoneNum) += state.dataHeatBalSurf->SurfOpaqInsFaceConduction(surfNum);
@@ -5733,6 +5731,7 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
             }
 
             // outside face conduction updates
+            state.dataHeatBalSurf->SurfOpaqOutFaceCond(surfNum) = surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(surfNum);
             state.dataHeatBalSurf->SurfOpaqOutFaceCondEnergy(surfNum) =
                 state.dataHeatBalSurf->SurfOpaqOutFaceCond(surfNum) * state.dataGlobal->TimeStepZoneSec;
             state.dataHeatBal->ZoneOpaqSurfExtFaceCond(zoneNum) += state.dataHeatBalSurf->SurfOpaqOutFaceCond(surfNum);
@@ -7100,8 +7099,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                             state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.Tconv - DataGlobalConstants::KelvinConv;
                         state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(SurfNum) =
                             state.dataSurfaceGeometry->kivaManager.surfaceMap[SurfNum].results.qtot;
-                        state.dataHeatBalSurf->SurfOpaqInsFaceConduction(SurfNum) =
-                            state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(SurfNum) * Surface(SurfNum).Area;
 
                         TH11 = 0.0;
                     }
