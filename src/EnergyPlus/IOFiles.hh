@@ -67,6 +67,7 @@
 #include <fmt/format.h>
 #include <fmt/os.h>
 #include <fmt/ostream.h>
+#include <fmt/ranges.h>
 #include <fmt/printf.h>
 
 namespace {

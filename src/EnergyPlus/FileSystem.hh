@@ -52,6 +52,7 @@
 #include <fmt/format.h>
 #include <fmt/os.h>
 #include <fmt/ostream.h>
+#include <fmt/ranges.h>
 #include <nlohmann/json.hpp>
 #include <string>
 #if __has_include(<filesystem>)
