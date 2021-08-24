@@ -4,7 +4,40 @@ Without spaces, thermal zones, and surfaces, the building can't be simulated. Th
 
 \subsection{Space}\label{space}
 
-This element sets up the parameters to simulate each space within a thermal zone of the building.
+This object defines a space (or room) in the building. All Spaces are part of a \hyperref[zone]{Zone}.
+Every Zone contains one or more spaces.
+
+Space is an optional input. If a Zone has no Space(s) specified in the input then a default Space named \textless{}Zone Name\textgreater{} will be created.
+If some surfaces in a Zone are assigned to a Space and some are not, then a default Space
+named \textless{}Zone Name\textgreater{}-Remainder will be created. 
+Input references to Space Names must have a matching Space object. 
+Default space names may not be referenced in the input except for \hyperref[outputvariable]{Output:Variable} keys).
+
+\subsubsection{Inputs}\label{space-inputs-048}
+
+\paragraph{Field: Name}\label{space-object-name}
+
+The name of the Space object. Must be unique across Zone and Space names.
+
+\paragraph{Field: Zone Name}\label{space-zone-name}
+
+The name of the \hyperref[zone]{Zone} this Space is a part of. This field is required.
+
+\paragraph{Field: Floor Area}\label{space-field-floor-area}
+
+Space floor area is used in many places within EnergyPlus. EnergyPlus automatically calculates the space floor area (\SI{}{\area}) from the space geometry given by the surfaces that belong to the space. If this field is 0.0, negative or \textbf{autocalculate} (the default), then the calculated space floor area will be used in subsequent calculations. If this field is positive, then it will be used as the space floor area. If this number differs significantly from the calculated space floor area a warning message will be issued.
+
+\paragraph{Field: Space Type}\label{space-type}
+
+Space type is used to categorize spaces by activity type, such as office, classroom, storage, etc. There is no predefined list of space types; 
+any valid input string may be used. Several table outputs include a subtable by Space Type. There are also SpaceType \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meters}. See the meter details (mtd) output file for a list of all available meters for a given simulation.
+If left blank, this field defaults to ``General'''.
+ 
+\paragraph{Field: Tag \textless{}\#\textgreater{}}\label{field-space-tag}
+
+Tags are used to group spaces by additional characteristics that may be more or less detailed than Space Type. For example, codes and standards designations for ventilation or occupancy may use specific terms that are different from one standard to the next. There is no predefined list of tags; 
+any valid input string may be used. Several table outputs include a subtable by Space Tag.
+
 
 \subsection{SpaceList}\label{spacelist}
 
@@ -16,16 +49,16 @@ Space lists are not exclusive. A Space can be referenced by more than one SpaceL
 
 \paragraph{Field: Space List Name}\label{field-space-list-name-000}
 
-The name of the SpaceList object. Must be unique across SpaceLists.
+The name of the SpaceList object. Must be unique across SpaceLists and Spaces.
 
 \paragraph{Field: Space \textless{}\#\textgreater{} Name}\label{field-space-name}
 
-Reference to a Space object. This object is extensible, so additional fields of this type can be added to the end of this object.
+Reference to a Space object.
 
 \begin{lstlisting}
 
 SpaceList,
-  Mid Floor List,  !- Name
+  Mid Floor List,   !- Name
   Mid West Space,   !- Space 1 Name
   Mid Center Space, !- Space 2 Name
   Mid East Space;   !- Space 3 Name
@@ -35,8 +68,19 @@ SpaceList,
 \subsection{Zone}\label{zone}
 
 This element sets up the parameters to simulate each thermal zone of the building.
+This object defines a thermal zone of the building. Every Zone contains one or more \hyperref[space]{Spaces}.
+
+Space is an optional input. If a Zone has no Space(s) specified in the input then a default Space named \textless{}Zone Name\textgreater{} will be created.
+If some surfaces in a Zone are assigned to a Space and some are not, then a default Space
+named \textless{}Zone Name\textgreater{}-Remainder will be created. 
+Input references to Space Names must have a matching Space object. 
+Default space names may not be referenced in the input except for \hyperref[outputvariable]{Output:Variable} keys).
 
 \subsubsection{Inputs}\label{inputs-048}
+
+\paragraph{Field: Name}\label{zone-object-name}
+
+The name of the Zone object. Must be unique across Zone and Space names.
 
 \paragraph{Field: Direction of Relative North}\label{field-direction-of-relative-north}
 
@@ -68,11 +112,11 @@ Note that the Zone Ceiling Height is the distance from the Floor to the Ceiling 
 
 \paragraph{Field: Volume}\label{field-volume}
 
-Zone volume is used in several areas within EnergyPlus (such as calculating air change rates for reporting or flow when air change rates are chosen as input, daylighting calculations, some convection coefficient calculations). EnergyPlus automatically calculates the zone volume (m\(^{3}\)) from the zone geometry given by the surfaces that belong to the zone. If this field is 0.0, negative or \textbf{autocalculate}, then the calculated zone volume will be used in subsequent calculations. If this field is positive, then it will be used as the zone volume. If this number differs significantly from the calculated zone volume a warning message will be issued. For autocalculate to work properly, the zone must be enclosed by the entered walls. Note that indicating the volume to be calculated but entering a positive ceiling height in the previous field will cause the volume to be calculated as the floor area (if \textgreater{} 0) times the entered ceiling height; else the volume will be calculated from the described surfaces. If this field is positive, any ceiling height positive value will not be used in volume calculations.
+Zone volume is used in several areas within EnergyPlus (such as calculating air change rates for reporting or flow when air change rates are chosen as input, daylighting calculations, some convection coefficient calculations). EnergyPlus automatically calculates the zone volume (\SI{}{\volume}) from the zone geometry given by the surfaces that belong to the zone. If this field is 0.0, negative or \textbf{autocalculate}, then the calculated zone volume will be used in subsequent calculations. If this field is positive, then it will be used as the zone volume. If this number differs significantly from the calculated zone volume a warning message will be issued. For autocalculate to work properly, the zone must be enclosed by the entered walls. Note that indicating the volume to be calculated but entering a positive ceiling height in the previous field will cause the volume to be calculated as the floor area (if \textgreater{} 0) times the entered ceiling height; else the volume will be calculated from the described surfaces. If this field is positive, any ceiling height positive value will not be used in volume calculations.
 
 \paragraph{Field: Floor Area}\label{field-floor-area}
 
-Zone floor area is used in many places within EnergyPlus. EnergyPlus automatically calculates the zone floor area (m\(^{2}\)) from the zone geometry given by the surfaces that belong to the zone. If this field is 0.0, negative or \textbf{autocalculate}, then the calculated zone floor area will be used in subsequent calculations. If this field is positive, then it will be used as the zone floor area. If this number differs significantly from the calculated zone floor area a warning message will be issued.
+Zone floor area is used in many places within EnergyPlus. EnergyPlus automatically calculates the zone floor area (\SI{}{\area}) from the zone geometry given by the surfaces that belong to the zone. If this field is 0.0, negative or \textbf{autocalculate}, then the calculated zone floor area will be used in subsequent calculations. If this field is positive, then it will be used as the zone floor area. If this number differs significantly from the calculated zone floor area a warning message will be issued.
 
 \paragraph{Field: Zone Inside Convection Algorithm}\label{field-zone-inside-convection-algorithm}
 
@@ -108,7 +152,7 @@ And, an IDF example:
       autocalculate;           !- Volume {m3}
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs-037}
+\subsubsection{Zone Outputs}\label{outputs-037}
 
 \begin{itemize}
 \item
@@ -130,6 +174,30 @@ The outdoor air wet-bulb temperature calculated at the height above ground of th
 \paragraph{Zone Outdoor Air Wind Speed {[}m/s{]}}\label{zone-outdoor-air-wind-speed-ms-000}
 
 The outdoor wind speed calculated at the height above ground of the zone centroid.
+
+\subsection{Space Thermal Output(s)}\label{Space-thermal-outputs}
+
+\begin{itemize}
+\item
+  Space,Sum,Space Total Internal Radiant Heating Energy {[}J{]}
+\item
+  Space,Average,Space Total Internal Radiant Heating Rate {[}W{]}
+\item
+  Space,Sum,Space Total Internal Visible Radiation Heating Energy {[}J{]}
+\item
+  Space,Average,Space Total Internal Visible Radiation Heating Rate {[}W{]}
+\item
+  Space,Sum,Space Total Internal Convective Heating Energy {[}J{]}
+\item
+  Space,Average,Space Total Internal Convective Heating Rate {[}W{]}
+\item
+  Space,Sum,Space Total Internal Latent Gain Energy {[}J{]}
+\item
+  Space,Average,Space Total Internal Latent Gain Rate {[}W{]}
+\item
+  Space,Sum,Space Total Internal Total Heating Energy {[}J{]}
+\item
+  Space,Average,Space Total Internal Total Heating Rate {[}W{]}
 
 \subsection{Zone Thermal Output(s)}\label{zone-thermal-outputs}
 
@@ -322,33 +390,33 @@ This output variable represents the air humidity ratio after the correct step fo
 
 This output variable represents the air relative humidity after the correct step for each zone. The relative humidity is in percent and uses the Zone Air Temperature, the Zone Air Humidity Ratio and the Outside Barometric Pressure for calculation.
 
-\subsubsection{Zone Total Internal Radiant Heating Rate {[}W{]}}\label{zone-total-internal-radiant-heating-rate-w}
+\subsubsection{Zone or Space Total Internal Radiant Heating Rate {[}W{]}}\label{zone-total-internal-radiant-heating-rate-w}
 
-\subsubsection{Zone Total Internal Radiant Heating Energy {[}J{]}}\label{zone-total-internal-radiant-heating-energy-j}
+\subsubsection{Zone or Space Total Internal Radiant Heating Energy {[}J{]}}\label{zone-total-internal-radiant-heating-energy-j}
 
 These output variables represent the sum of radiant gains from specific internal sources (e.g.~equipment) throughout the zone in Watts (for rate) or joules. This includes radiant gain from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
 
-\subsubsection{Zone Total Internal Visible Radiation Heating Rate {[}W{]}}\label{zone-total-internal-visible-radiation-heating-rate-w}
+\subsubsection{Zone or Space Total Internal Visible Radiation Heating Rate {[}W{]}}\label{zone-total-internal-visible-radiation-heating-rate-w}
 
-\subsubsection{Zone Total Internal Visible Radiation Heating Energy {[}J{]}}\label{zone-total-internal-visible-radiation-heating-energy-j}
+\subsubsection{Zone or Space Total Internal Visible Radiation Heating Energy {[}J{]}}\label{zone-total-internal-visible-radiation-heating-energy-j}
 
 These output variables expresse the sum of heat gain in Watts (for rate) or joules that is the calculated short wavelength radiation gain from lights in the zones. This calculation uses the total energy from lights and the fraction visible to realize this value, summed over the zones in the simulation.
 
-\subsubsection{Zone Total Internal Convective Heating Rate {[}W{]}}\label{zone-total-internal-convective-heating-rate-w}
+\subsubsection{Zone or Space Total Internal Convective Heating Rate {[}W{]}}\label{zone-total-internal-convective-heating-rate-w}
 
-\subsubsection{Zone Total Internal Convective Heating Energy {[}J{]}}\label{zone-total-internal-convective-heating-energy-j}
+\subsubsection{Zone or Space Total Internal Convective Heating Energy {[}J{]}}\label{zone-total-internal-convective-heating-energy-j}
 
 These output variables represent the sum of convective gains from specific sources (e.g.~equipment) throughout the zone in Watts (for rate) or joules. This includes convective gain from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
 
-\subsubsection{Zone Total Internal Latent Gain Rate {[}W{]}}\label{zone-total-internal-latent-gain-rate-w}
+\subsubsection{Zone or Space Total Internal Latent Gain Rate {[}W{]}}\label{zone-total-internal-latent-gain-rate-w}
 
-\subsubsection{Zone Total Internal Latent Gain Energy {[}J{]}}\label{zone-total-internal-latent-gain-energy-j}
+\subsubsection{Zone or Space Total Internal Latent Gain Energy {[}J{]}}\label{zone-total-internal-latent-gain-energy-j}
 
 These output variables represent the sum of latent gains from specific internal sources (e.g.~equipment) throughout the zone in Watts (for rate) or joules. This includes latent gain from \hyperref[people]{People}, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
 
-\subsubsection{Zone Total Internal Total Heating Rate {[}W{]}}\label{zone-total-internal-total-heating-rate-w}
+\subsubsection{Zone or Space Total Internal Total Heating Rate {[}W{]}}\label{zone-total-internal-total-heating-rate-w}
 
-\subsubsection{Zone Total Internal Total Heating Energy {[}J{]}}\label{zone-total-internal-total-heating-energy-j}
+\subsubsection{Zone or Space Total Internal Total Heating Energy {[}J{]}}\label{zone-total-internal-total-heating-energy-j}
 
 These output variables represent the sum of all heat gains throughout the zone in Watts (for rate) or joules. This includes all heat gains from \hyperref[people]{People}, Lights, Electric Equipment, Gas Equipment, Other Equipment, Hot Water Equipment, and Steam Equipment.
 

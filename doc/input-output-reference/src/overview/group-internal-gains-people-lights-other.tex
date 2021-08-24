@@ -4,18 +4,67 @@
 Not all the influence for energy consumption in the building is due to envelope and ambient conditions. This group of objects describes other internal gains that may come into play (\hyperref[people]{People}, \hyperref[lights-000]{Lights}, Various Equipment Types).
 
 \subsection{Specifying Applicable Zone(s) or Space(s)}\label{specifying-applicable-zones-or-spaces}
-Each internal gains object has a field for " \hyperref[zone]{Zone} or  \hyperref[zonelist]{ZoneList} or \hyperref[space]{Space} or  \hyperref[spacelist]{SpaceList} Name". All internal gains are modeled at the Space level, so each internal gain input object may be expanded to multiple instances of that gain according to the following rules with names constructed using the \textless{}Object Name\textgreater{}, \textless{}Zone Name\textgreater{}, or \textless{}Space Name\textgreater{}. If the resulting concatenated name is greater than 100 characters a warning will be shown and it will be truncated. If the resulting name duplicates another such concatenated name, there will be a severe error and terminate the run. The concatenated name is used when referring to specific instances of internal gains for \hyperref[outputvariable]{Output:Variables}, \hyperref[group-energy-management-system-ems]{Energy Management System (EMS)} controls, and \hyperref[group-demand-limiting-controls]{Demand Limiting Controls}.
+Each internal gains object has a field for ``\hyperref[zone]{Zone} or  \hyperref[zonelist]{ZoneList} or \hyperref[space]{Space} or  \hyperref[spacelist]{SpaceList} Name''. All internal gains are modeled at the Space level, so each internal gain input object may be expanded to multiple instances of that gain according to the following rules with names constructed using the \textless{}Object Name\textgreater{}, \textless{}Zone Name\textgreater{}, or \textless{}Space Name\textgreater{}. If the resulting concatenated name is greater than 100 characters a warning will be shown and it will be truncated. If the resulting name duplicates another such concatenated name, there will be a severe error and terminate the run. The concatenated name is used when referring to specific instances of internal gains for \hyperref[outputvariable]{Output:Variables}, \hyperref[group-energy-management-system-ems]{Energy Management System (EMS)} controls, and \hyperref[group-demand-limiting-controls]{Demand Limiting Controls}.
 
 \begin{description}
-  \item[Space Name] will result in one instance of the internal gain, named \textless{}Object Name\textgreater{}. The full magnitude of the gain will be applied to the Space using the Space floor area or occupancy as appropriate.
-  \item[SpaceList Name] will result in one instance of the internal gain for each Space in the SpaceList, named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. The full magnitude of the gain will be applied to each Space in the SpaceList using the Space floor area or occupancy as appropriate.
-  \item[Zone Name] will result in one instance of the internal gain for each Space in the Zone. If there is only one Space in the Zone, then the single instance will be named \textless{}Object Name\textgreater{}. If there is more than one Space in the Zone, then each instance will be named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. The full magnitude of the gain will be split between the Spaces in the Zone apportioned by the Space floor are or occupancy depending on the input method.
-  \item[ZoneList Name] will result in one instange of the internal gain for each Space in each Zone in the ZoneList. If there is only one Space in a Zone, then that instance will be named \textless{}Zone Name\textgreater{} \textless{}Object Name\textgreater{}. If there is more than one Space in a Zone, the each instance will be named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. 
+  \item[Space Name] will result in one instance of the internal gain, named \textless{}Object Name\textgreater{}. The full magnitude of the gain will be applied to the Space using the design level, space floor area, or space occupancy as appropriate.
+  \item[SpaceList Name] will result in one instance of the internal gain for each Space in the SpaceList, named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. The full magnitude of the gain will be applied to each Space in the SpaceList using the design level, space floor area, or space occupancy as appropriate.
+  \item[Zone Name] will result in one instance of the internal gain for each Space in the Zone. If there is only one Space in the Zone, then the single instance will be named \textless{}Object Name\textgreater{}. If there is more than one Space in the Zone, then each instance will be named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. The full magnitude of the gain will be split between the Spaces in the Zone apportioned by the Space floor area or occupancy depending on the input method.
+  \item[ZoneList Name] will result in one instance of the internal gain for each Space in each Zone in the ZoneList. Each instance will be named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. 
   The full magnitude of the gain will be applied to each Zone in the ZoneList then split between the Spaces in each Zone apportioned by the Space floor area or occupancy depending on the input method.
 \end{description}
 
 One exception to this is \hyperref[electricequipmentiteaircooled]{ElectricEquipment:ITE:AirCooled}
 which only allows Zone or Space Name. If a Zone Name is specified which contains more than one Space, the same rules apply.
+
+As an example, assume that Zone 1 contains Space 1A and Space 1B, and Zone 2 contains only Space 2 (objects are abbreviated for clarity):
+\begin{lstlisting}
+Space,
+Space 1A, !- Name
+Zone 1,   !- Zone Name
+75.0,     !- Floor Area
+
+Space,
+Space 1B, !- Name
+Zone 1;   !- Zone Name
+25.0,     !- Floor Area
+
+Space,
+Space 2,  !- Name
+Zone 2,   !- Zone Name
+
+SpaceList,
+All Spaces, !- Name
+Space 1A,   !- Space 1 Name
+Space 1B,   !- Space 2 Name
+Space 2,    !- Space 3 Name
+
+People,
+Office People, !- Name
+Zone 1,     !- Zone or ZoneList or Space or SpaceList Name
+100.0,      !- Number of People
+
+People,
+Lunchroom People, !- Name
+Zone 2,     !- Zone or ZoneList or Space or SpaceList Name
+50.0,       !- Number of People
+
+People,
+Cleaning Crew, !- Name
+All Spaces, !- Zone or ZoneList or Space or SpaceList Name
+2.0,        !- Number of People
+
+Resulting instances of People:
+
+Space 1A Office People, 75 people. (concatenated name, apportioned by space floor area)
+Space 1B Office People, 25 people. (concatenated name, apportioned by space floor area)
+Lunchroom People, 50 people.       (simple object name for a single space)
+Space 1A Cleaning Crew, 2 people.  (full load applied to each space in SpaceList)
+Space 1B Cleaning Crew, 2 people.
+Space 2 Cleaning Crew, 2 people.
+
+\end{lstlisting}
+
 
 \subsection{People}\label{people}
 
@@ -29,9 +78,7 @@ The name of the People object. Must be unique across all People objects.
 
 \paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{field-zone-or-zonelist-name-000}
 
-This field is the name of the zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: \hyperref[zonelist]{ZoneList}) and links a particular people statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this people definition is applied to each of the zones in the zone list effecting a global definition for the number of people in the zone. The Zonelist option can be used effectively with the people/area and area/person options of the Number of People Calculation Method.
-
-The name of the actual people object becomes \textless{}Zone Name\textgreater{} \textless{}People Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
+This field applies this People object to one or more thermal zones or spaces in the building. The Zone, Zonelist or SpaceList options can be used effectively with the people/area and area/person options of the Number of People Calculation Method to place a varying number of people at the same density in each zone or space. The names of the actual people objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}People Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Number of People Schedule Name}\label{field-number-of-people-schedule-name}
 
@@ -254,7 +301,7 @@ The following IDF example allows for a maximum of 31 people with scheduled occup
 
 People,
   Kitchen_ZN_1_FLR_1,   !- Name
-  Kitchen_ZN_1_FLR_1,   !- Zone or ZoneList Name
+  Kitchen_ZN_1_FLR_1,   !- Zone or ZoneList or Space or SpaceList Name
   BLDG_OCC_SCH,         !- Number of People Schedule Name
   People,               !- Number of People Calculation Method
   25.2000,,,            !- Number of People, People per Zone Floor Area, Zone Floor Area per Person
@@ -312,7 +359,7 @@ ZoneList,AllOccupiedZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
 
 People,
   AllZones with People, !- Name
-  AllOccupiedZones,     !- Zone or ZoneList Name
+  AllOccupiedZones,     !- Zone or ZoneList or Space or SpaceList Name
   OCCUPY-1,             !- Number of People Schedule Name
   People/Area,          !- Number of People Calculation Method
   ,                     !- Number of People
@@ -791,11 +838,9 @@ A zone may have multiple Lights statements. For example, one statement may descr
 
 The name of the Lights object.
 
-\paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-1-000}
+\paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{lights-field-zone-or-zonelist-name-000}
 
-The field is the name of the thermal zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: ZoneLIst) and links this Lights statement to a thermal zone or set of thermal zones in the buidling. When the \hyperref[zonelist]{ZoneList} option is used then this lights definition is applied to each of the zones in the zone list effecting a global definition for the amount of light wattage in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
-
-The name of the actual lights object becomes \textless{}Zone Name\textgreater{} \textless{}Lights Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
+This field applies this Lights object to one or more thermal zones or spaces in the building. The Zone, Zonelist or SpaceList options can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method to place a varying lighting load at the same density in each zone or space. The names of the actual lights objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}Lights Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-002}
 
@@ -987,7 +1032,7 @@ ZoneList,AllOccupiedZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
 
 Lights,
   AllZones with Lights, !- Name
-  AllOccupiedZones,     !- Zone or ZoneList Name
+  AllOccupiedZones,     !- Zone or ZoneList or Space or SpaceList Name
   LIGHTS-1,             !- Schedule Name
   Watts/Area,           !- Design Level Calculation Method
   ,                     !- Lighting Level {W}
@@ -1182,11 +1227,9 @@ The object models equipment in the zone which consumes electricity, such as comp
 
 The name of the ElectricEquipment object.
 
-\paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-2}
+\paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{eleceq-field-zone-or-zonelist-name-000}
 
-This field is the name of the zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: \hyperref[zonelist]{ZoneList}) and attaches a particular electric equipment statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this electric equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of electric wattage in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
-
-The name of the actual electric equipment object becomes \textless{}Zone Name\textgreater{} \textless{}ElectricEquipment Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
+This field applies this ElectricEquipment object to one or more thermal zones or spaces in the building. The Zone, Zonelist or SpaceList options can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method to place a varying equipment load at the same density in each zone or space. The names of the actual electric equipment objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}ElectricEquipment Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-1-001}
 
@@ -1283,7 +1326,7 @@ ZoneList,AllOccupiedZones,SPACE1-1,SPACE2-1,SPACE3-1,SPACE4-1,SPACE5-1;
 
 ElectricEquipment,
   AllZones with Electric Equipment,     !- Name
-  AllOccupiedZones,                     !- Zone or ZoneList Name
+  AllOccupiedZones,                     !- Zone or ZoneList or Space or SpaceList Name
   EQUIP-1,                              !- Schedule Name
   Watts/Person,                         !- Design Level Calculation Method
   ,                                     !- Design Level {W}
@@ -1304,11 +1347,9 @@ The object models equipment in the zone which consumes natural gas, such as cook
 
 The name of the GasEquipment object.
 
-\paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-3}
+\paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{gaseq-field-zone-or-zonelist-name-000}
 
-This field is the name of the thermal zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: \hyperref[zonelist]{ZoneList}) and attaches a particular gas equipment statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this gas equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of gas in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
-
-The name of the actual gas equipment object becomes \textless{}Zone Name\textgreater{} \textless{}GasEquipment Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
+This field applies this GasEquipment object to one or more thermal zones or spaces in the building. The Zone, Zonelist or SpaceList options can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method to place a varying equipment load at the same density in each zone or space. The names of the actual gas equipment objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}GasEquipment Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-2-001}
 
@@ -1389,7 +1430,7 @@ An IDF example:
 \begin{lstlisting}
 GasEquipment,
   DORM ROOMS AND COMMON AREAS GasEq 1,  !- Name
-  DORM ROOMS AND COMMON AREAS,          !- Zone Name
+  DORM ROOMS AND COMMON AREAS,          !- Zone or ZoneList or Space or SpaceList Name
   Gas Eq Sch,                           !-Schedule Name
   EquipmentLevel,                       !- Design Level Calculation Method
   29287.51,                             !- Design Level {W}
@@ -1409,7 +1450,7 @@ ZoneList,OfficeZones,Left Fork, Middle Fork, Right Fork;
 
 GasEquipment,
   Office Zones with Gas,                !- Name
-  OfficeZones,                          !- Zone Name
+  OfficeZones,                          !- Zone or ZoneList or Space or SpaceList Name
   Gas Eq Sch,                           !- Schedule Name
   Watts/Area,                           !- Design Level Calculation Method
   ,                                     !- Design Level {W}
@@ -1430,11 +1471,9 @@ The object models hot water equipment in the zone which consumes district heatin
 
 The name of the HotWaterEquipment object.
 
-\paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-4}
+\paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{hweq-field-zone-or-zonelist-name-000}
 
-This field is the name of the thermal zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: \hyperref[zonelist]{ZoneList}) and attaches a particular hot water equipment statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this hot water equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of hot water in the zone. The Zonelist option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
-
-The name of the actual hot water equipment object becomes \textless{}Zone Name\textgreater{} \textless{}HotWaterEquipment Object Name\textgreater{} and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
+This field applies this HotWaterEquipment object to one or more thermal zones or spaces in the building. The Zone, Zonelist or SpaceList options can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method to place a varying equipment load at the same density in each zone or space. The names of the actual hot water equipment objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}HotWaterEquipment Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-3-000}
 
@@ -1511,7 +1550,7 @@ IDF Examples:
 \begin{lstlisting}
 HotWaterEquipment,
   SPACE2-1 HWEq 1,    !- Name
-  SPACE2-1,           !- Zone Name
+  SPACE2-1,           !- Zone or ZoneList or Space or SpaceList Name
   EQUIP-1,            !- SCHEDULE Name
   EquipmentLevel,     !- Design Level calculation method
   300,                !- Design Level {W}
@@ -1530,7 +1569,7 @@ ZoneList,OfficeZones,Left Fork, Middle Fork, Right Fork;
 
 HotWaterEquipment,
   Office Zones with HoWater Equipment,!- Name
-  OfficeZones,                        !- Zone Name
+  OfficeZones,                        !- Zone or ZoneList or Space or SpaceList Name
   HotWater Eq Sch,                    !- Schedule Name
   Watts/Area,                         !- Design Level Calculation Method
   ,                                   !- Design Level {W}
@@ -1551,9 +1590,9 @@ The object models steam equipment in the zone which consumes district heating, s
 
 The name of the SteamEquipment object.
 
-\paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-5}
+\paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{steameq-field-zone-or-zonelist-name-000}
 
-This field is the name of the thermal zone (ref: Zone) and attaches a particular steam equipment statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this steam equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of steam in the zone. This option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
+This field applies this SteamEquipment object to one or more thermal zones or spaces in the building. The Zone, Zonelist or SpaceList options can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method to place a varying equipment load at the same density in each zone or space. The names of the actual steam equipment objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}SteamEquipment Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-4-000}
 
@@ -1631,7 +1670,7 @@ IDF Examples:
 
 SteamEquipment,
   SPACE4-1 ElecEq 1, !- Name
-  SPACE4-1,          !- Zone Name
+  SPACE4-1,          !- Zone or ZoneList or Space or SpaceList Name
   EQUIP-1,           !- SCHEDULE Name
   EquipmentLevel,    !- Design Level calculation method
   1050,              !- Design Level {W}
@@ -1907,9 +1946,9 @@ The name of the OtherEquipment object.
 
 This field designates the appropriate meter for the equipment. Valid fuel types are: None, Electricity, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, Steam, \hyperref[districtheating]{DistrictHeating}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. If the None fuel type is selected (the default if left blank), no end uses will be associated with the object, only the zone gains.
 
-\paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-6}
+\paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{othereq-field-zone-or-zonelist-name-000}
 
-This field is the name of the thermal zone (ref: Zone) and attaches a particular other equipment statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this other equipment definition is applied to each of the zones in the zone list effecting a global definition for the amount of other in the zone. This option can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method.
+This field applies this OtherEquipment object to one or more thermal zones or spaces in the building. The Zone, Zonelist or SpaceList options can be used effectively with the watts/area and watts/person options of the Design Level Calculation Method to place a varying equipment load at the same density in each zone or space. The names of the actual other equipment objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}OtherEquipment Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-5-000}
 
@@ -1992,7 +2031,7 @@ IDF Examples
 OtherEquipment,
 	BASE-1 OthEq 1, !- Name
 	Propane,  !- Fuel Use Type
-	BASE-1, !- Zone Name
+	BASE-1, !- Zone or ZoneList or Space or SpaceList Name
 	ALWAYSON, !- SCHEDULE Name
 	EquipmentLevel, !- Design Level calculation method
 	6766., !- Design Level {W}
@@ -2310,9 +2349,9 @@ This object describes air-cooled electric information technology equipment (ITE)
 
 The name of this object.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-1-005}
+\paragraph{Field: Zone or Space Name}\label{iteq-field-zone-or-space-name-000}
 
-This field is the name of the thermal zone (ref: Zone) which contains this ElectricEquipment:ITE:AirCooled object.
+This field applies this ElectricEquipment:ITE:AirCooled object to a thermal zones or space in the building. If a Zone Name is specified and the zone contains more than one Space, the names of the actual IT equipment objects will be concatenated as \textless{}Space Name\textgreater{} \textless{}ITEquipment Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Air Flow Calculation Method}\label{field-air-flow-calculation-method}
 
@@ -2464,7 +2503,7 @@ An IDF example:
 
 ElectricEquipment:ITE:AirCooled,
   Data Center Servers,     !- Name
-  Main Zone,               !- Zone Name
+  Main Zone,               !- Zone or Space Name
   FlowFromSystem,      !- Air Flow Calculation Method
   Watts/Unit,              !- Design Power Input Calculation Method
   500,                     !- Watts per Unit {W}
@@ -2498,7 +2537,7 @@ Another IDF example when Air Flow Calculation Method = FlowControlWithApproachTe
 \begin{lstlisting}
   ElectricEquipment:ITE:AirCooled,
     SmallDataCenter ComputerRoom Elec Equip,     !- Name
-    ComputerRoom ZN,                             !- Zone Name
+    ComputerRoom ZN,                             !- Zone or Space Name
     FlowControlWithApproachTemperatures,         !- Air Flow Calculation Method
     Watts/Area,                      !- Design Power Input Calculation Method
     ,                                !- Watts per Unit {W}
@@ -3419,9 +3458,9 @@ Outdoor Dry-bulb(C) & Baseboard Output \tabularnewline
 
 The name of the ZoneBaseboard:OutdoorTemperatureControlled object.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-7-002}
+\paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{bbheat-field-zone-or-zonelist-name-000}
 
-This field is the name of the zone and attaches the baseboard heat equipment statement to a thermal zone in the building.
+This field applies this ZoneBaseboard:OutdoorTemperatureControlled object to one or more thermal zones or spaces in the building. The names of the actual baseboard heat objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}ZoneBaseboard Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-11}
 
