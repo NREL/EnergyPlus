@@ -89,43 +89,37 @@ void ConvertCaseToLower(std::string_view InputString, // Input string
 
 std::string::size_type FindNonSpace(std::string const &String); // String to be scanned
 
-template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
-inline constexpr T pow2(T x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inline constexpr T pow2(T x)
 {
     return x * x;
 }
 
-template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
-inline constexpr T pow3(T x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inline constexpr T pow3(T x)
 {
     return x * x * x;
 }
 
-template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
-inline constexpr T pow4(T x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inline constexpr T pow4(T x)
 {
     T y(x * x);
     return y * y;
 }
 
-template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
-inline constexpr T pow5(T x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inline constexpr T pow5(T x)
 {
     T y(x * x);
     y *= y;
     return y * x;
 }
 
-template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
-inline constexpr T pow6(T x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inline constexpr T pow6(T x)
 {
     T y(x * x);
     y *= y;
     return y * y;
 }
 
-template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
-inline constexpr T pow7(T x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inline constexpr T pow7(T x)
 {
     T y(x * x);
     y *= y;

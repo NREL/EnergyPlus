@@ -1177,6 +1177,10 @@ namespace SimulationManager {
                     state.dataHeatBalIntRadExchg->CarrollMethod =
                         UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm").get<std::string>()) == "CARROLLMRT";
                 }
+                if (fields.find("use_representative_surfaces_for_calculations") != fields.end()) {
+                    state.dataSurface->UseRepresentativeSurfaceCalculations =
+                        UtilityRoutines::MakeUPPERCase(fields.at("use_representative_surfaces_for_calculations").get<std::string>()) == "YES";
+                }
                 bool overrideTimestep(false);
                 bool overrideZoneAirHeatBalAlg(false);
                 bool overrideMinNumWarmupDays(false);
@@ -1325,7 +1329,6 @@ namespace SimulationManager {
                 }
             }
         }
-
         if (ErrorsFound) {
             ShowFatalError(state, "Errors found getting Project Input");
         }

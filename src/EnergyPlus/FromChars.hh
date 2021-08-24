@@ -51,63 +51,64 @@
 #if __has_include(<charconv>)
 #include <charconv>
 #endif
+#include <system_error>
 
 namespace FromChars {
 
-    struct from_chars_result {
-        const char *ptr;
-        std::errc ec;
-    };
+struct from_chars_result
+{
+    const char *ptr;
+    std::errc ec;
+};
 
-    // GCC doesn't have <charconv> until 8.1 so we need to implement an equivalent shim until we move to >=8.1
-    template<typename T>
-    from_chars_result from_chars(const char *first, const char *last, T &value)  noexcept  {
-        static_assert (std::is_same_v<T, int> || std::is_same_v<T, long int>, "only int and long int are currently supported");
+// GCC doesn't have <charconv> until 8.1 so we need to implement an equivalent shim until we move to >=8.1
+template <typename T> from_chars_result from_chars(const char *first, const char *last, T &value) noexcept
+{
+    static_assert(std::is_same_v<T, int> || std::is_same_v<T, long int>, "only int and long int are currently supported");
 
-        from_chars_result answer{};
+    from_chars_result answer{};
 
 #if __has_include(<charconv>)
-        auto const result = std::from_chars(first, last, value);
-        answer.ptr = result.ptr;
-        answer.ec = result.ec;
-        return answer;
+    auto const result = std::from_chars(first, last, value);
+    answer.ptr = result.ptr;
+    answer.ec = result.ec;
+    return answer;
 #else
-        while (first != last) {
-            if (*first == ' ') {
-                ++first;
-            } else {
-                break;
-            }
+    while (first != last) {
+        if (*first == ' ') {
+            ++first;
+        } else {
+            break;
         }
-
-        if (first == last) {
-            answer.ec = std::errc::invalid_argument;
-            answer.ptr = first;
-            return answer;
-        }
-
-        char * pEnd;
-        value = std::strtol(first, &pEnd, 10);
-
-        if (errno == ERANGE) {
-            errno = 0;
-            answer.ec = std::errc::result_out_of_range;
-            answer.ptr = pEnd;
-            return answer;
-        }
-        if (pEnd == first) {
-            answer.ec = std::errc::invalid_argument;
-            answer.ptr = pEnd;
-            return answer;
-        }
-
-        answer.ptr = pEnd;
-        answer.ec = std::errc();
-        return answer;
-#endif
-
     }
 
+    if (first == last) {
+        answer.ec = std::errc::invalid_argument;
+        answer.ptr = first;
+        return answer;
+    }
+
+    char *pEnd;
+    value = std::strtol(first, &pEnd, 10);
+
+    if (errno == ERANGE) {
+        errno = 0;
+        answer.ec = std::errc::result_out_of_range;
+        answer.ptr = pEnd;
+        return answer;
+    }
+    if (pEnd == first) {
+        answer.ec = std::errc::invalid_argument;
+        answer.ptr = pEnd;
+        return answer;
+    }
+
+    answer.ptr = pEnd;
+    answer.ec = std::errc();
+    return answer;
+#endif
 }
 
-#endif //FromChars_hh_INCLUDED
+} // namespace FromChars
+
+#endif // FromChars_hh_INCLUDED

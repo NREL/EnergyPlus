@@ -112,7 +112,8 @@ namespace FileSystem {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExt {"epJSON", "json", "glhe", "cbor", "msgpack", "ubjson", "bson", "idf", "imf", "csv", "tsv", "txt", "eso", "mtr"};
+    constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExt{
+        "epJSON", "json", "glhe", "cbor", "msgpack", "ubjson", "bson", "idf", "imf", "csv", "tsv", "txt", "eso", "mtr"};
     static_assert(FileTypesExt.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExt array.");
     static_assert(!FileTypesExt.back().empty(), "Likely missing an enum from FileTypes in FileTypesExt array.");
 
@@ -225,8 +226,8 @@ namespace FileSystem {
         is_any<T, std::unique_ptr<fs::path>, std::unique_ptr<fmt::ostream>, std::unique_ptr<std::ostream>, std::unique_ptr<FILE *>>::value;
 
     template <class T, FileTypes fileType>
-    inline constexpr bool
-        enable_json_v = is_all_json_type(fileType) && is_any<T, nlohmann::json>::value && !is_any<T, std::string_view, std::string, char *>::value;
+    inline constexpr bool enable_json_v = is_all_json_type(fileType) && is_any<T, nlohmann::json>::value &&
+                                          !is_any<T, std::string_view, std::string, char *>::value;
 
     template <FileTypes fileType> void writeFile(fs::path const &filePath, const std::string_view data)
     {
@@ -253,8 +254,7 @@ namespace FileSystem {
         fmt::print(f, "{}", data);
     }
 
-    template <class T, FileTypes fileType, typename = std::enable_if_t<enable_unique_ptr_v<T>>>
-    void writeFile(T &os, const std::string_view data)
+    template <class T, FileTypes fileType, typename = std::enable_if_t<enable_unique_ptr_v<T>>> void writeFile(T &os, const std::string_view data)
     {
         static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
         if (os) {

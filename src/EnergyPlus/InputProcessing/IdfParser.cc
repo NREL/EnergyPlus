@@ -45,8 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/FromChars.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <fast_float/fast_float.h>
 #include <fmt/format.h>
 #include <milo/dtoa.h>
@@ -474,7 +474,7 @@ json IdfParser::parse_number(std::string_view idf, size_t &index)
             auto const initial_ptr = result.ptr;
             while (result.ptr != str.end()) {
                 if (*result.ptr != ' ') {
-                   break;
+                    break;
                 }
                 ++result.ptr;
             }

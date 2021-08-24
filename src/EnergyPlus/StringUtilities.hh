@@ -48,8 +48,8 @@
 #ifndef StringUtilities_hh_INCLUDED
 #define StringUtilities_hh_INCLUDED
 
-#include <ObjexxFCL/src/ObjexxFCL/Array1S.hh>
 #include <EnergyPlus/FromChars.hh>
+#include <ObjexxFCL/src/ObjexxFCL/Array1S.hh>
 #include <fast_float/fast_float.h>
 #include <sstream>
 #include <type_traits>
