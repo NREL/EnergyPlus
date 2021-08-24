@@ -843,23 +843,23 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,         // Area available for venting the gap [m2]
                                   Real64 const Cv,               // Orifice coefficient for volume-based discharge, wind-driven [--]
-                                  Real64 const Cd,               // Orifice coefficient for discharge,  bouyancy-driven [--]
+                                  Real64 const Cd,               // Orifice coefficient for discharge,  buoyancy-driven [--]
                                   Real64 const HdeltaNPL,        // Height difference from neutral pressure level [m]
                                   Real64 const SolAbs,           // solar absorptivity of baffle [--]
                                   Real64 const AbsExt,           // thermal absorptance/emittance of baffle material [--]
                                   Real64 const Tilt,             // Tilt of gap [Degrees]
                                   Real64 const AspRat,           // aspect ratio of gap  Height/gap [--]
                                   Real64 const GapThick,         // Thickness of air space between baffle and underlying heat transfer surface
-                                  int const Roughness,           // Roughness index (1-6), see DataHeatBalance parameters
-                                  Real64 const QdotSource,       // Source/sink term, e.g. electricity exported from solar cell [W]
-                                  Real64 &TsBaffle,              // Temperature of baffle (both sides) use lagged value on input [C]
-                                  Real64 &TaGap,                 // Temperature of air gap (assumed mixed) use lagged value on input [C]
+                                  DataSurfaces::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
+                                  Real64 const QdotSource,                        // Source/sink term, e.g. electricity exported from solar cell [W]
+                                  Real64 &TsBaffle,                               // Temperature of baffle (both sides) use lagged value on input [C]
+                                  Real64 &TaGap, // Temperature of air gap (assumed mixed) use lagged value on input [C]
                                   Optional<Real64> HcGapRpt,
                                   Optional<Real64> HrGapRpt,
                                   Optional<Real64> IscRpt,
                                   Optional<Real64> MdotVentRpt,
                                   Optional<Real64> VdotWindRpt,
-                                  Optional<Real64> VdotBouyRpt)
+                                  Optional<Real64> VdotBuoyRpt)
 {
 
     // SUBROUTINE INFORMATION:
@@ -874,7 +874,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
 
     // METHODOLOGY EMPLOYED:
     // Heat balances on baffle and air space.
-    // Natural ventilation calculations use bouyancy and wind.
+    // Natural ventilation calculations use buoyancy and wind.
 
     // REFERENCES:
     // Nat. Vent. equations from ASHRAE HoF 2001 Chapt. 26
@@ -891,7 +891,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Real64 const nu(15.66e-6);      // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
     Real64 const k(0.0267);         // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
     Real64 const Sigma(5.6697e-08); // Stefan-Boltzmann constant
-    static std::string const RoutineName("CalcPassiveExteriorBaffleGap");
+    static constexpr std::string_view RoutineName("CalcPassiveExteriorBaffleGap");
     // INTERFACE BLOCK SPECIFICATIONS:
 
     // DERIVED TYPE DEFINITIONS:
@@ -932,7 +932,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Real64 TmeanK;                // average of surface temps , for Beta in Grashoff no.
     Real64 Gr;                    // Grasshof number for natural convection calc
     Real64 VdotWind;              // volume flow rate of nat. vent due to wind
-    Real64 VdotThermal;           // Volume flow rate of nat. vent due to bouyancy
+    Real64 VdotThermal;           // Volume flow rate of nat. vent due to buoyancy
     Real64 VdotVent;              // total volume flow rate of nat vent
     Real64 MdotVent;              // total mass flow rate of nat vent
     Real64 NuPlen;                // Nusselt No. for plenum Gap
@@ -1070,7 +1070,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         VdotThermal = 0.0;
     } else {
         if ((std::abs(Tilt) < 5.0) || (std::abs(Tilt - 180.0) < 5.0)) {
-            VdotThermal = 0.0; // stable bouyancy situation
+            VdotThermal = 0.0; // stable buoyancy situation
         } else {
             VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (Tamb - TaGap) / (Tamb + DataGlobalConstants::KelvinConv));
         }
@@ -1097,7 +1097,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     if (present(IscRpt)) IscRpt = Isc;
     if (present(MdotVentRpt)) MdotVentRpt = MdotVent;
     if (present(VdotWindRpt)) VdotWindRpt = VdotWind;
-    if (present(VdotBouyRpt)) VdotBouyRpt = VdotThermal;
+    if (present(VdotBuoyRpt)) VdotBuoyRpt = VdotThermal;
 }
 
 //****************************************************************************
@@ -1393,19 +1393,21 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     ErrFound = false;
 
     print(state.files.bnd, "{}\n", "! ===============================================================");
-    static constexpr auto Format_700("! <#Supply Air Paths>,<Number of Supply Air Paths>");
+    static constexpr fmt::string_view Format_700("! <#Supply Air Paths>,<Number of Supply Air Paths>");
     print(state.files.bnd, "{}\n", Format_700);
     print(state.files.bnd, " #Supply Air Paths,{}\n", state.dataZoneEquip->NumSupplyAirPaths);
-    static constexpr auto Format_702("! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_702("! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_702);
-    static constexpr auto Format_703("! <#Components on Supply Air Path>,<Number of Components>");
+    static constexpr fmt::string_view Format_703("! <#Components on Supply Air Path>,<Number of Components>");
     print(state.files.bnd, "{}\n", Format_703);
-    static constexpr auto Format_704("! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_704(
+        "! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_704);
-    static constexpr auto Format_707("! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>");
+    static constexpr fmt::string_view Format_707("! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>");
     print(state.files.bnd, "{}\n", Format_707);
-    static constexpr auto Format_708("! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet "
-                                     "Node Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_708(
+        "! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet "
+        "Node Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_708);
 
     for (BCount = 1; BCount <= state.dataZoneEquip->NumSupplyAirPaths; ++BCount) {
@@ -1513,9 +1515,9 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
         }
 
         if (state.dataZoneEquip->SupplyAirPath(BCount).NumNodes > 0) {
-            static constexpr auto Format_705("! <#Nodes on Supply Air Path>,<Number of Nodes>");
+            static constexpr fmt::string_view Format_705("! <#Nodes on Supply Air Path>,<Number of Nodes>");
             print(state.files.bnd, "{}\n", Format_705);
-            static constexpr auto Format_706("! <Supply Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>");
+            static constexpr fmt::string_view Format_706("! <Supply Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>");
             print(state.files.bnd, "{}\n", Format_706);
             print(state.files.bnd, "#Nodes on Supply Air Path,{}\n", state.dataZoneEquip->SupplyAirPath(BCount).NumNodes);
             for (Count2 = 1; Count2 <= state.dataZoneEquip->SupplyAirPath(BCount).NumNodes; ++Count2) {
@@ -1702,19 +1704,21 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     NumErr = 0;
 
     print(state.files.bnd, "{}\n", "! ===============================================================");
-    static constexpr auto Format_700("! <#Return Air Paths>,<Number of Return Air Paths>");
+    static constexpr fmt::string_view Format_700("! <#Return Air Paths>,<Number of Return Air Paths>");
     print(state.files.bnd, "{}\n", Format_700);
     print(state.files.bnd, " #Return Air Paths,{}\n", state.dataZoneEquip->NumReturnAirPaths);
-    static constexpr auto Format_702("! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_702("! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_702);
-    static constexpr auto Format_703("! <#Components on Return Air Path>,<Number of Components>");
+    static constexpr fmt::string_view Format_703("! <#Components on Return Air Path>,<Number of Components>");
     print(state.files.bnd, "{}\n", Format_703);
-    static constexpr auto Format_704("! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_704(
+        "! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_704);
-    static constexpr auto Format_707("! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>");
+    static constexpr fmt::string_view Format_707("! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>");
     print(state.files.bnd, "{}\n", Format_707);
-    static constexpr auto Format_708("! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet "
-                                     "Node Name>,<AirLoopHVAC Name>");
+    static constexpr fmt::string_view Format_708(
+        "! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet "
+        "Node Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_708);
 
     AllNodes.allocate(state.dataLoopNodes->NumOfNodes);
@@ -1886,9 +1890,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
             }
         }
         if (CountNodes > 0) {
-            static constexpr auto Format_705("! <#Nodes on Return Air Path>,<Number of Nodes>");
+            static constexpr fmt::string_view Format_705("! <#Nodes on Return Air Path>,<Number of Nodes>");
             print(state.files.bnd, "{}\n", Format_705);
-            static constexpr auto Format_706("! <Return Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>");
+            static constexpr fmt::string_view Format_706("! <Return Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>");
             print(state.files.bnd, "{}\n", Format_706);
             print(state.files.bnd, "   #Nodes on Return Air Path,{}\n", CountNodes);
             for (Count2 = 1; Count2 <= CountNodes; ++Count2) {

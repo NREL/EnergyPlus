@@ -308,9 +308,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ProcessZoneData)
     EXPECT_FALSE(ErrorsFound);
 
     EXPECT_EQ("Zone One", state->dataHeatBal->Zone(1).Name);
-    EXPECT_EQ(AdaptiveConvectionAlgorithm, state->dataHeatBal->Zone(1).InsideConvectionAlgo);
+    EXPECT_EQ(ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm, state->dataHeatBal->Zone(1).InsideConvectionAlgo);
     EXPECT_EQ("Zone Two", state->dataHeatBal->Zone(2).Name);
-    EXPECT_EQ(ASHRAETARP, state->dataHeatBal->Zone(2).InsideConvectionAlgo);
+    EXPECT_EQ(ConvectionConstants::HcInt_ASHRAETARP, state->dataHeatBal->Zone(2).InsideConvectionAlgo);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
@@ -341,9 +341,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     state->dataMaterial->Material(3).Name = "GLASS";
 
     // Material layer group index
-    state->dataMaterial->Material(1).Group = 3; // WindowGlass
-    state->dataMaterial->Material(2).Group = 4; // WindowGas
-    state->dataMaterial->Material(3).Group = 3; // WindowGlass
+    state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(2).Group = DataHeatBalance::MaterialGroup::WindowGas;
+    state->dataMaterial->Material(3).Group = DataHeatBalance::MaterialGroup::WindowGlass;
 
     state->dataHeatBal->NominalRforNominalUCalculation.allocate(1);
     state->dataHeatBal->NominalRforNominalUCalculation(1) = 0.0;
@@ -1065,6 +1065,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1081,6 +1082,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1097,6 +1099,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1113,6 +1116,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1129,6 +1133,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR:LIVING,            !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Living:Floor,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1145,6 +1150,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
         "    ROOF,                 !- Surface Type",
         "    ROOF,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1237,13 +1243,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 
     state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
 
-    state->dataHeatBal->HConvIn.allocate(6);
-    state->dataHeatBal->HConvIn(1) = 0.5;
-    state->dataHeatBal->HConvIn(2) = 0.5;
-    state->dataHeatBal->HConvIn(3) = 0.5;
-    state->dataHeatBal->HConvIn(4) = 0.5;
-    state->dataHeatBal->HConvIn(5) = 0.5;
-    state->dataHeatBal->HConvIn(6) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt.allocate(6);
+    state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(3) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(4) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(5) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(6) = 0.5;
 
     state->dataGlobal->KickOffSimulation = true;
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
@@ -1472,6 +1478,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
         "  Wall,                    !- Surface Type",
         "  WallConstruction,        !- Construction Name",
         "  Zone,                    !- Zone Name",
+        "    ,                        !- Space Name",
         "  Outdoors,                !- Outside Boundary Condition",
         "  ,                        !- Outside Boundary Condition Object",
         "  SunExposed,              !- Sun Exposure",
@@ -1487,6 +1494,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
         "  Floor,                   !- Surface Type",
         "  WallConstruction,        !- Construction Name",
         "  Zone,                    !- Zone Name",
+        "    ,                        !- Space Name",
         "  Outdoors,                !- Outside Boundary Condition",
         "  ,                        !- Outside Boundary Condition Object",
         "  NoSun,                   !- Sun Exposure",
@@ -2065,6 +2073,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
         "  Wall,                    !- Surface Type",
         "  WallConstruction,        !- Construction Name",
         "  Zone,                    !- Zone Name",
+        "    ,                        !- Space Name",
         "  Outdoors,                !- Outside Boundary Condition",
         "  ,                        !- Outside Boundary Condition Object",
         "  SunExposed,              !- Sun Exposure",
@@ -2080,6 +2089,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
         "  Floor,                   !- Surface Type",
         "  WallConstruction,        !- Construction Name",
         "  Zone,                    !- Zone Name",
+        "    ,                        !- Space Name",
         "  Outdoors,                !- Outside Boundary Condition",
         "  ,                        !- Outside Boundary Condition Object",
         "  NoSun,                   !- Sun Exposure",

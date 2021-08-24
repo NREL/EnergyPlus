@@ -155,7 +155,7 @@ Material:NoMass,R13LAYER,  ! Material Name
 
 \subsection{Material:InfraredTransparent}\label{materialinfraredtransparent}
 
-A Infrared Transparent surface is similar to a resistance-only surface.~ The idd object for this type of surface is shown below.~ The surface will actually participate in the transfer of visible and solar radiation by doing a wavelength transformation and making all short wave length radiation that is incident on the surface into long wave length radiation and having it participate in the long wavelength radiant exchange.~ \textbf{Note the ConvectionCoefficient instructions that follow the Infrared Transparent construction object below}.
+A Infrared Transparent surface is similar to a resistance-only surface.~ The surface will actually participate in the transfer of visible and solar radiation by doing a wavelength transformation and making all short wave length radiation that is incident on the surface into long wave length radiation and having it participate in the long wavelength radiant exchange.~ \textbf{Note the ConvectionCoefficient instructions that follow the Infrared Transparent construction object below}.
 
 \subsubsection{Inputs}\label{inputs-2-040}
 
@@ -618,11 +618,11 @@ HeatBalanceAlgorithm,
 This object is used to describe an advanced level of physics belonging to phase change materials used in building envelopes.
 The base phase change input object describes a single process curve whereby a material moves from a crystallized to liquid state and back.
 This input object adds a hysteresis effect, allowing the melting/freezing process to follow different curves, representing an effect that is commonly seen in actual building envelope phase change material applications.
-This object also allows users to enter characteristic properties of the processes instead of a detailed temperature/enthalpy curve, making it more amenable for studies in which the user does not have the detailed test data required to generate the temperature/enthalpy curve.
+This object also allows users to enter characteristic properties of the processes instead of a detailed temperature/enthalpy curve, making it more amenable for studies in which the user does not have the detailed test data required to generate the temperature/enthalpy curve.  For more information on the use of phase change materials (PCM) with hysteresis, see the Conduction Finite Difference Solution Algorithm section of the EnergyPlus Engineering Reference document.
 
 \subsubsection{Inputs}\label{materialpropertyphasechangehysteresis-inputs}
 
-The \hyperref[materialpropertyphasechange]{MaterialProperty:PhaseChange}Hysteresis object includes the following inputs.  For the characteristic curve properties, see the engineering reference.
+The \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis} object includes the following inputs.  For the characteristic curve properties, see the engineering reference.
 
 \paragraph{Field: Name}\label{materialpropertyphasechangehysteresis-name}
 
@@ -647,15 +647,15 @@ This is the constant specific heat while the material is fully liquid, in J/kg-K
 
 \paragraph{Field: High Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-high-temperature-difference-of-melting-curve}
 
-This is the width of the enthalpy/specific heat melting curve, on the high side of the peak melting temperature, in Kelvin (technically it is ``change in Kelvin'').
+This is the width of the enthalpy/specific heat melting curve, on the high side of the peak melting temperature, in Celsius (technically it is ``change in Celsius'').
 
 \paragraph{Field: Peak Melting Temperature}\label{materialpropertyphasechangehysteresis-inputs-peak-melting-temperature}
 
-This is the center (peak) of the melting curve, in Kelvin.
+This is the center (peak) of the melting curve, in Celsius.
 
 \paragraph{Field: Low Temperature Difference of Melting Curve}\label{materialpropertyphasechangehysteresis-inputs-low-temperature-difference-of-melting-curve}
 
-This is the width of the enthalpy/specific heat melting curve, on the low side of the peak melting temperature, in Kelvin (technically it is ``change in Kelvin'').
+This is the width of the enthalpy/specific heat melting curve, on the low side of the peak melting temperature, in Celsius (technically it is ``change in Celsius'').
 
 \paragraph{Field: Solid State Thermal Conductivity}\label{materialpropertyphasechangehysteresis-inputs-solidk}
 
@@ -671,19 +671,17 @@ This is the constant specific heat while the material is fully crystallized, in 
 
 \paragraph{Field: High Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-high-temperature-difference-of-freezing-curve}
 
-This is the width of the enthalpy/specific heat freezing curve, on the high side of the peak freezing temperature, in Kelvin (technically it is ``change in Kelvin'').
+This is the width of the enthalpy/specific heat freezing curve, on the high side of the peak freezing temperature, in Celsius (technically it is ``change in Celsius'').
 
 \paragraph{Field: Peak Freezing Temperature}\label{materialpropertyphasechangehysteresis-inputs-peak-freezing-temperature}
 
-This is the center (peak) of the freezing curve, in Kelvin.  This will be higher than the peak melting temperature based on empirical data.
+This is the center (peak) of the freezing curve, in Celsius.  This will generally be lower than the peak melting temperature based on empirical data.  Note, however, that EnergyPlus does allow users to specify a peak freezing temperature that is higher than the peak melting temperature.
 
 \paragraph{Field: Low Temperature Difference of Freezing Curve}\label{materialpropertyphasechangehysteresis-inputs-low-temperature-difference-of-freezing-curve}
 
-This is the width of the enthalpy/specific heat freezing curve, on the low side of the peak freezing temperature, in Kelvin (technically it is ``change in Kelvin'').
+This is the width of the enthalpy/specific heat freezing curve, on the low side of the peak freezing temperature, in Celsius (technically it is ``change in Celsius'').
 
-Next is an IDF example showing how it is used in conjunction with the Material:
-
-Note, the following Heat Balance Algorithm is necessary (only specified once). Also, when using ConductionFiniteDifference, it is more efficient to set the zone timestep shorter than those used for the ConductionTransferFunction solution algorithm. It should be set to 12 timesteps per hour or greater, and can range up to 60.
+An IDF example using hysteresis in conjunction with an actual Material definition is shown below.  This example includes the specification of the Heat Balance Algorithm and Timestep to show appropriate values for these inputs when MaterialProperty:PhaseChangeHysteresis is used.  Heat Balance Algorithm and Timestep are only specified once in a particular idf file.  Note that when using ConductionFiniteDifference, it is more efficient to set the zone timestep shorter than those used for the ConductionTransferFunction solution algorithm.  It should be set to 12 timesteps per hour or greater and can range up to 60.
 
 \begin{lstlisting}
 
@@ -709,16 +707,68 @@ Note, the following Heat Balance Algorithm is necessary (only specified once). A
     1500,                    !- Liquid State Density {kg/m3}
     2000,                    !- Liquid State Specific Heat {J/kg-K}
     1,                       !- High Temperature Difference of Melting Curve {deltaC}
-    20,                      !- Peak Melting Temperature {C}
+    23,                      !- Peak Melting Temperature {C}
     1,                       !- Low Temperature Difference of Melting Curve {deltaC}
     0.5,                     !- Solid State Thermal Conductivity {W/m-K}
     1600,                    !- Solid State Density {kg/m3}
     2000,                    !- Solid State Specific Heat {J/kg-K}
     1,                       !- High Temperature Difference of Freezing Curve {deltaC}
-    23,                      !- Peak Freezing Temperature {C}
+    20,                      !- Peak Freezing Temperature {C}
     1;                       !- Low Temperature Difference of Freezing Curve {deltaC}
 
 \end{lstlisting}
+
+\subsubsection{Outputs}\label{materialpropertyphasechangehysteresis-outputs}
+
+The \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis} object also includes the following outputs.  The Conduction Finite Difference solution algorithm uses a finite difference solution technique where the surfaces are divided into a nodal arrangement. These outputs are specific to Conduction Finite Difference solution.
+
+The following output variables are applicable to all opaque heat transfer surfaces when using Solution Algorithms ConductionFiniteDifference.  Note that the ``X'' in the list and descriptions below must be replaced by a number that indicates the node at which the variables are being reported.  So, for example, to report the surface temperature for node 7, one would use ``CondFD Surface Temperature Node 7''.
+
+\begin{itemize}
+\item
+  Zone,Average,CondFD Phase Change State \textless{}X\textgreater{} {[]}
+\item
+  Zone,Average,CondFD Phase Change Previous State \textless{}X\textgreater{} {[]}
+\item
+  Zone,Average,CondFD Phase Change Node Temperature \textless{}X\textgreater{} {[}C{]}
+\item
+  Zone,Average,CondFD Phase Change Node Conductivity \textless{}X\textgreater{} {[}W/m-K{]}
+\item
+  Zone,Average,CondFD Phase Change Node Specific Heat \textless{}X\textgreater{} {[}J/kg-K{]}
+\end{itemize}
+
+\paragraph{CondFD Phase Change State {[]}}\label{condfd-phase-change-state}
+
+This outputs the current phase classification for the node.  The values for this output relate to the following phase categories:
+
+\begin{itemize}
+\item
+-2 = liquid
+\item
+-1 = melting
+\item
+0 = transition
+\item
+1 = freezing
+\item
+2 = crystallized 
+\end{itemize}
+
+\paragraph{CondFD Phase Change Previous State {[]}}\label{condfd-phase-change-previous-state}
+
+This outputs the previous phase classification for the node.  The values for this output are the same as for the output CondFD Phase Change State above.
+
+\paragraph{CondFD Phase Change Node Temperature \textless{}X\textgreater{} {[}C{]}}\label{condfd-phase-change-node-temperature-x-c}
+
+This will output temperatures for a node in the surfaces being simulated with ConductionFiniteDifference. The nodes are numbered from outside to inside of the surface.  The full listing will appear in the RDD file.  This output is specific to surfaces that use the Conduction Finite Difference solution technique and have a \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis} object in the input file.  The units for this output field are degrees Celsius.
+
+\paragraph{CondFD Phase Change Node Conductivity \textless{}X\textgreater{} {[}W/m-K{]}}\label{condfd-phase-change-node-conductivity-x-w-m-k}
+
+This will output the conductivity for a node in the surfaces being simulated with ConductionFiniteDifference.  The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file.  This output is specific to surfaces that use the Conduction Finite Difference solution technique and have a \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis} object in the input file.  The units for this output field are W/m-K.
+
+\paragraph{CondFD Phase Change Node Specific Heat \textless{}X\textgreater{} {[}J/kg-K{]}}\label{condfd-phase-change-node-specific-heat-x-j-kg-k}
+
+This will output the specific heat for a node in the surfaces being simulated with ConductionFiniteDifference.  The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file.  This output is specific to surfaces that use the Conduction Finite Difference solution technique and have a \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis} object in the input file.  The units for this output field are J/kg-K.
 
 \subsection{MaterialProperty:VariableThermalConductivity}\label{materialpropertyvariablethermalconductivity}
 
@@ -782,15 +832,21 @@ HeatBalanceAlgorithm,
 
 \subsubsection{Outputs}\label{outputs-1-026}
 
-The Conduction Finite Difference solution algorithm uses a finite difference solution technique, the surfaces are divided into a nodal arrangement. The only output specific to Conduction Finite Difference solution (that is not include in other surface outputs) is node temperatures.
+The Conduction Finite Difference solution algorithm uses a finite difference solution technique where the surfaces are divided into a nodal arrangement. These outputs are specific to Conduction Finite Difference solution.
 
-The following output variables are applicable to all opaque heat transfer surfaces when using Solution Algorithms ConductionFiniteDifference:
+The following output variables are applicable to all opaque heat transfer surfaces when using Solution Algorithms ConductionFiniteDifference.  Note that the ``X'' in the list and descriptions below must be replaced by a number that indicates the Node at which the variables are being reported.  So, for example, to report the surface temperature for node 7, one would use ``CondFD Surface Temperature Node 7''.
 
 \begin{itemize}
 \item
   Zone,Sum,CondFD Inner Solver Loop Iteration Count {[]}
 \item
-  Zone,Average,CondFD Surface Temperature Node \textless{}1\textgreater{} {[}C{]}
+  Zone,Average,CondFD Surface Temperature Node \textless{}X\textgreater{} {[}C{]}
+\item
+  Zone,Average,CondFD Surface Heat Flux Node \textless{}X\textgreater{} {[}W/m2{]}
+\item
+  Zone,Average,CondFD Surface Heat Capacitance Outer Half Node \textless{}X\textgreater{} {[}W/m2-K{]}
+\item
+  Zone,Average,CondFD Surface Heat Capacitance Inner Half Node \textless{}X\textgreater{} {[}W/m2-K{]}
 \end{itemize}
 
 \paragraph{CondFD Inner Solver Loop Iteration Count {[]}}\label{condfd-inner-solver-loop-iteration-count}
@@ -799,7 +855,7 @@ This outputs the count of iterations on the inner solver loop of CondFD for each
 
 \paragraph{CondFD Surface Temperature Node \textless{}X\textgreater{} {[}C{]}}\label{condfd-surface-temperature-node-x-c}
 
-This will output temperatures for a node in the surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file
+This will output temperatures for a node in the surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file.
 
 \paragraph{CondFD Surface Heat Flux Node \textless{}X\textgreater{} {[}W/m2{]}}\label{condfd-surface-heat-flux-node-x-wm2}
 
@@ -809,7 +865,7 @@ This will output heat flux at each node in surfaces being simulated with Conduct
 
 \paragraph{CondFD Surface Heat Capacitance Inner Half Node \textless{}X\textgreater{} {[}W/m2-K{]}}\label{condfd-surface-heat-capacitance-inner-half-node-x-wm2-k}
 
-These will output the half-node heat capacitance in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. For this output, the heat capacitance is defined as the product of specific heat, density, and node thickness. Zero is reported for R-layer half-nodes and for undefined half-nodes. There is no outer half-node for Node 1 which is the outside face of the surface, and there is no inner half-node for Node N which is the inside face of the surface. CondFD Surface Heat Capacitance is only available with Output:Diagnostics,DisplayAdvancedReportVariables.
+These will output the half-node heat capacitance in surfaces being simulated with ConductionFiniteDifference. The key values for this output variable are the surface name. The nodes are numbered from outside to inside of the surface. The full listing will appear in the RDD file. For this output, the heat capacitance is defined as the product of specific heat, density, and node thickness. Zero is reported for R-layer half-nodes and for undefined half-nodes. There is no outer half-node for Node 1 which is the outside face of the surface, and there is no inner half-node for Node N which is the inside face of the surface. CondFD Surface Heat Capacitance is only available when the user includes a Output:Diagnostics, DisplayAdvancedReportVariables designation in the input file.
 
 \subsection{MaterialProperty:HeatAndMoistureTransfer:Settings}\label{materialpropertyheatandmoisturetransfersettings}
 
@@ -1328,35 +1384,39 @@ IDF examples of Spectral average and using a Spectral data set:
 
 \begin{lstlisting}
 
-MATERIAL:WINDOWGLASS, GLASS - CLEAR SHEET 1 / 8 IN,
-    SpectralAverage, ! Optical data type
-    0.003, ! Thickness {m} 1/8"
-    0.850, ! Solar transmittance at normal incidence
-    0.075, ! Solar reflectance at normal incidence: front side
-    0.075, ! Solar reflectance at normal incidence: back side
-    0.901, ! Visible transmittance at normal incidence
-    0.081, ! Visible reflectance at normal incidence: front side
-    0.081, ! Visible reflectance at normal incidence: back side
-    0.0,   ! IR transmittance at normal incidence
-    0.84,  ! IR hemispherical emissivity: front side
-    0.84,  ! IR hemispherical emissivity: back side
-    0.9;   ! Conductivity {W/m-K}
+  WindowMaterial:Glazing,
+    CLEAR 3MM,       !- Name
+    SpectralAverage, !- Optical Data Type
+    ,                !- Window Glass Spectral Data Set Name
+    0.003,           !- Thickness {m}
+    0.837,           !- Solar Transmittance at Normal Incidence
+    0.075,           !- Front Side Solar Reflectance at Normal Incidence
+    0.075,           !- Back Side Solar Reflectance at Normal Incidence
+    0.898,           !- Visible Transmittance at Normal Incidence
+    0.081,           !- Front Side Visible Reflectance at Normal Incidence
+    0.081,           !- Back Side Visible Reflectance at Normal Incidence
+    0.0,             !- Infrared Transmittance at Normal Incidence
+    0.84,            !- Front Side Infrared Hemispherical Emissivity
+    0.84,            !- Back Side Infrared Hemispherical Emissivity
+    0.9;             !- Conductivity {W/m-K}
 
 
-  WindowMaterial:Glazing ,SPECTRAL GLASS INNER PANE, ! Material name
-      Spectral, ! Optical data type {SpectralAverage or Spectral}
-      TestSpectralDataSet, ! Name of spectral data set
-      0.0099, ! Thickness {m}
-      ,  ! Solar transmittance at normal incidence
-      ,  ! Solar reflectance at normal incidence: front side
-      ,  ! Solar reflectance at normal incidence: back side
-      ,  ! Visible transmittance at normal incidence
-      ,  ! Visible reflectance at normal incidence: front side
-      ,  ! Visible reflectance at normal incidence: back side
-      0.0,   ! IR transmittance at normal incidence
-      0.84,  ! IR emissivity: front side
-      0.84,  ! IR emissivity: back side
-      0.798; ! Conductivity {W/m-K}
+
+  WindowMaterial:Glazing,
+    SPECTRAL GLASS INNER PANE, ! Material name
+    Spectral,                  ! Optical data type {SpectralAverage or Spectral}
+    TestSpectralDataSet,       ! Name of spectral data set
+    0.0099,                    ! Thickness {m}
+    ,                          ! Solar transmittance at normal incidence
+    ,                          ! Solar reflectance at normal incidence: front side
+    ,                          ! Solar reflectance at normal incidence: back side
+    ,                          ! Visible transmittance at normal incidence
+    ,                          ! Visible reflectance at normal incidence: front side
+    ,                          ! Visible reflectance at normal incidence: back side
+    0.0,                       ! IR transmittance at normal incidence
+    0.84,                      ! IR emissivity: front side
+    0.84,                      ! IR emissivity: back side
+    0.798;                     ! Conductivity {W/m-K}
 
 \end{lstlisting}
 
@@ -1364,28 +1424,28 @@ IDF example using a SpectralAndAngle data set:
 
 \begin{lstlisting}
 
-  WindowMaterial:Glazing ,SPECTRAL AND ANGLE GLASS INNER PANE, ! Material name
+  WindowMaterial:Glazing,
+    SPECTRAL AND ANGLE GLASS INNER PANE, ! Material name
     SpectralAndAngle, ! Optical data type {SpectralAverage or Spectral}
-    , !- Name of spectral data set
-
-    0.0099, ! Thickness {m}
-    ,  !- Solar transmittance at normal incidence
-    ,  !- Solar reflectance at normal incidence: front side
-    ,  !- Solar reflectance at normal incidence: back side
-    ,  !- Visible transmittance at normal incidence
-    ,  !- Visible reflectance at normal incidence: front side
-    ,  !- Visible reflectance at normal incidence: back side
-    0.0,   !- IR transmittance at normal incidence
-    0.84,  !- IR emissivity: front side
-    0.84,  !- IR emissivity: back side
-    0.798, !- Conductivity {W/m-K}
-    ,      !- Dirt Correction Factor for Solar and Visible Transmittance
-    ,      !- Solar Diffusing
-    ,      !- Young's modulus
-    ,      !- Poisson's ratio
-    TranmittanceDataSet,  !- Window Glass Spectral and Incident Angle Transmittance Data Set Table Name
-    FrontReflectanceDataSet,      !- Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name
-    BackReflectanceDataSet;      !- Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name
+    ,                 !- Name of spectral data set
+    0.0099,           ! Thickness {m}
+    ,                 !- Solar transmittance at normal incidence
+    ,                 !- Solar reflectance at normal incidence: front side
+    ,                 !- Solar reflectance at normal incidence: back side
+    ,                 !- Visible transmittance at normal incidence
+    ,                 !- Visible reflectance at normal incidence: front side
+    ,                 !- Visible reflectance at normal incidence: back side
+    0.0,              !- IR transmittance at normal incidence
+    0.84,             !- IR emissivity: front side
+    0.84,             !- IR emissivity: back side
+    0.798,            !- Conductivity {W/m-K}
+    ,                 !- Dirt Correction Factor for Solar and Visible Transmittance
+    ,                 !- Solar Diffusing
+    ,                 !- Young's modulus
+    ,                 !- Poisson's ratio
+    TranmittanceDataSet,     !- Window Glass Spectral+Incident Angle Transmittance Data Set Table Name
+    FrontReflectanceDataSet, !- Window Glass Spectral+Incident Angle Front Reflectance Data Set Table Name
+    BackReflectanceDataSet;  !- Window Glass Spectral+Incident Angle Back Reflectance Data Set Table Name
 
 \end{lstlisting}
 
@@ -1545,7 +1605,9 @@ This object specifies a layer of thermochromic glass, part of a thermochromic wi
 
 A unique user assigned name for a particular thermochromic glass material.
 
-\paragraph{Field Set (Optical Data Temperature, Window Material Glazing Name) is extensible.}\label{field-set-optical-data-temperature-window-material-glazing-name-is-extensible.}
+\paragraph{Field Set (Optical Data Temperature, Window Material Glazing Name)}\label{field-set-optical-data-temperature-window-material-glazing-name-is-extensible.}
+
+This object is extensible, so additional sets of the next two fields can be added to the end of this object.
 
 \paragraph{Field:Optical Data Temperature \textless{}N\textgreater{}}\label{fieldoptical-data-temperature-n}
 
@@ -1858,7 +1920,7 @@ The thickness (m) of the gas layer.
 The following entries are used only if Gas Type = Custom. The A and B coefficients are those in the following expression that gives a property value as a function of temperature in degrees K:
 
 \begin{equation}
-Property = Coefficien{t_A} + Coefficien{t_B}*Temperatur{e_K}
+Property = Coefficien{t_A} + Coefficien{t_B}*Temperatur{e_K} + Coefficien{t_C}*Temperature_K^2
 \end{equation}
 
 \paragraph{Field: Conductivity Coefficient A}\label{field-conductivity-coefficient-a}
@@ -2251,7 +2313,7 @@ Shade material conductivity (W/m-K).
 
 \paragraph{Field: Shade to Glass Distance}\label{field-shade-to-glass-distance}
 
-Distance from shade to adjacent glass (m). This is denoted by \emph{s} in Figure~\ref{fig:vertical-section-a-and-perspective-view-b-of} and Figure~\ref{fig:examples-of-air-flow-openings-for-an-interior}, below. If the shade is not flat, such as for pleated pull-down shades or folded drapery, the average shade-to-glass distance should be used. (The shade-to-glass distance is used in calculating the natural convective air flow between glass and shade produced by buoyancy effects.). Note used for between-glass shades.
+Distance from shade to adjacent glass (m). This is denoted by \emph{s} in Figure~\ref{fig:vertical-section-a-and-perspective-view-b-of} and Figure~\ref{fig:examples-of-air-flow-openings-for-an-interior}, below. If the shade is not flat, such as for pleated pull-down shades or folded drapery, the average shade-to-glass distance should be used. (The shade-to-glass distance is used in calculating the natural convective air flow between glass and shade produced by buoyancy effects.). Not used for between-glass shades.
 
 In the following, \emph{H} is the glazing height and \emph{W} is the glazing width.
 
@@ -3569,7 +3631,7 @@ This field characterizes the thickness of the material layer in meters. This sho
 
 \paragraph{Field: Conductivity of Dry Soil}\label{field-conductivity-of-dry-soil}
 
-This field is used to enter the thermal conductivity of the material layer. Units for this parameter are W/(m-K). Thermal conductivity must be greater than zero. Typical soils have values from .3 to .5. Minimum is .2 (specified in IDD). Default is .35 and maximum (in IDD) is 1.5.
+This field is used to enter the thermal conductivity of the material layer. Units for this parameter are W/(m-K). Thermal conductivity must be greater than zero. Typical soils have values from .3 to .5. The minimum is .2, the default is .35, and the maximum is 1.5.
 
 \paragraph{Field: Density of Dry Soil}\label{field-density-of-dry-soil}
 

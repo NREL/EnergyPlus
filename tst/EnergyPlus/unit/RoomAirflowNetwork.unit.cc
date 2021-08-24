@@ -100,20 +100,23 @@ protected:
         state->dataSize->CurSysNum = 0;
         state->dataSize->CurOASysNum = 0;
         state->dataGlobal->NumOfZones = 1;
+        state->dataGlobal->numSpaces = 1;
         state->dataLoopNodes->NumOfNodes = 5;
         state->dataGlobal->BeginEnvrnFlag = true;
         int NumOfSurfaces = 2;
         state->dataRoomAirMod->RoomAirflowNetworkZoneInfo.allocate(state->dataGlobal->NumOfZones);
         state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+        state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
         state->dataHeatBal->ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
+        state->dataHeatBal->spaceIntGainDevices.allocate(state->dataGlobal->numSpaces);
         state->dataLoopNodes->NodeID.allocate(state->dataLoopNodes->NumOfNodes);
         state->dataLoopNodes->Node.allocate(state->dataLoopNodes->NumOfNodes);
         state->dataSurface->Surface.allocate(NumOfSurfaces);
         state->dataSurface->SurfTAirRef.allocate(NumOfSurfaces);
-        state->dataHeatBal->HConvIn.allocate(NumOfSurfaces);
-        state->dataHeatBalSurf->TempSurfInTmp.allocate(NumOfSurfaces);
+        state->dataHeatBalSurf->SurfHConvInt.allocate(NumOfSurfaces);
+        state->dataHeatBalSurf->SurfTempInTmp.allocate(NumOfSurfaces);
         state->dataMstBalEMPD->RVSurface.allocate(NumOfSurfaces);
         state->dataMstBalEMPD->RVSurfaceOld.allocate(NumOfSurfaces);
         state->dataMstBalEMPD->RVDeepLayer.allocate(NumOfSurfaces);
@@ -171,8 +174,14 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).HVAC(1).Name = "ZoneHVAC";
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsDeviceIndices.allocate(1);
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsDeviceIndices.allocate(1);
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).intGainsDeviceSpaces.allocate(1);
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).intGainsDeviceSpaces.allocate(1);
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).NumIntGains = 1;
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).NumIntGains = 1;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsDeviceIndices(1) = 1;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsDeviceIndices(1) = 1;
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).intGainsDeviceSpaces(1) = 1;
+    state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).intGainsDeviceSpaces(1) = 1;
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsFractions.allocate(1);
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(2).IntGainsFractions.allocate(1);
     state->dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(1).IntGainsFractions(1) = 0.4;
@@ -255,13 +264,14 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(ZoneNum).HTSurfaceLast = 2;
     state->dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist = 0;
+    state->dataHeatBal->Zone(ZoneNum).spaceIndexes.emplace_back(1);
 
-    state->dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices = 1;
-    state->dataHeatBal->ZoneIntGain(ZoneNum).Device.allocate(state->dataHeatBal->ZoneIntGain(1).NumberOfDevices);
-    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).CompObjectName = "PEOPLE";
-    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).CompTypeOfNum = IntGainTypeOf_People;
-    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).ConvectGainRate = 300.0;
-    state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).LatentGainRate = 200.0;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).numberOfDevices = 1;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device.allocate(state->dataHeatBal->spaceIntGainDevices(1).numberOfDevices);
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompObjectName = "PEOPLE";
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompTypeOfNum = IntGainTypeOf_People;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).ConvectGainRate = 300.0;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).LatentGainRate = 200.0;
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(2).HeatTransSurf = true;
@@ -286,22 +296,22 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01;
 
     state->dataHeatBalFanSys->MAT(1) = 20.0;
-    state->dataHeatBal->HConvIn(1) = 1.0;
-    state->dataHeatBal->HConvIn(2) = 1.0;
-    state->dataHeatBalSurf->TempSurfInTmp(1) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(2) = 30.0;
+    state->dataHeatBalSurf->SurfHConvInt(1) = 1.0;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 1.0;
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 30.0;
     state->dataMstBal->RhoVaporAirIn(1) =
         PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
     state->dataMstBal->RhoVaporAirIn(2) =
         PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
     state->dataMstBal->HMassConvInFD(1) =
-        state->dataHeatBal->HConvIn(1) /
+        state->dataHeatBalSurf->SurfHConvInt(1) /
         ((PsyRhoAirFnPbTdbW(
               *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
           state->dataMstBal->RhoVaporAirIn(1)) *
          PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
     state->dataMstBal->HMassConvInFD(2) =
-        state->dataHeatBal->HConvIn(2) /
+        state->dataHeatBalSurf->SurfHConvInt(2) /
         ((PsyRhoAirFnPbTdbW(
               *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
           state->dataMstBal->RhoVaporAirIn(2)) *
@@ -380,6 +390,7 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
         "    Wall,                    !- Surface Type",
         "    PARTITION,               !- Construction Name",
         "    living_unit1,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",

@@ -673,15 +673,15 @@ namespace Photovoltaics {
                                 "Generator Produced DC Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPhotovoltaic->PVarray(PVnum).Report.DCPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPhotovoltaic->PVarray(PVnum).Name);
             SetupOutputVariable(state,
                                 "Generator Produced DC Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPhotovoltaic->PVarray(PVnum).Report.DCEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPhotovoltaic->PVarray(PVnum).Name,
                                 _,
                                 "ElectricityProduced",
@@ -692,8 +692,8 @@ namespace Photovoltaics {
                                 "Generator PV Array Efficiency",
                                 OutputProcessor::Unit::None,
                                 state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayEfficiency,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPhotovoltaic->PVarray(PVnum).Name);
 
             // CurrentModuleObject='Equiv1Diode or Sandia Photovoltaics'
@@ -703,22 +703,22 @@ namespace Photovoltaics {
                                     "Generator PV Cell Temperature",
                                     OutputProcessor::Unit::C,
                                     state.dataPhotovoltaic->PVarray(PVnum).Report.CellTemp,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataPhotovoltaic->PVarray(PVnum).Name);
                 SetupOutputVariable(state,
                                     "Generator PV Short Circuit Current",
                                     OutputProcessor::Unit::A,
                                     state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayIsc,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataPhotovoltaic->PVarray(PVnum).Name);
                 SetupOutputVariable(state,
                                     "Generator PV Open Circuit Voltage",
                                     OutputProcessor::Unit::V,
                                     state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayVoc,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataPhotovoltaic->PVarray(PVnum).Name);
             }
 

@@ -143,33 +143,34 @@ namespace PVWatts {
         };
 
         // User inputs
-        std::string m_name;
-        Real64 m_dcSystemCapacity;
-        ModuleType m_moduleType;
-        ArrayType m_arrayType;
-        Real64 m_systemLosses;
-        GeometryType m_geometryType;
-        Real64 m_tilt;
-        Real64 m_azimuth;
-        int m_surfaceNum;
-        Real64 m_groundCoverageRatio;
-        Real64 m_DCtoACRatio;
-        Real64 m_inverterEfficiency;
+        std::string name_;
+        Real64 dcSystemCapacity_;
+        ModuleType moduleType_;
+        ArrayType arrayType_;
+        Real64 systemLosses_;
+        GeometryType geometryType_;
+        Real64 tilt_;
+        Real64 azimuth_;
+        int surfaceNum_;
+        Real64 groundCoverageRatio_;
+        Real64 DCtoACRatio_;
+        Real64 inverterEfficiency_;
 
         // Output variables
-        Real64 m_outputDCPower;
-        Real64 m_outputDCEnergy;
-        Real64 m_outputACPower;
-        Real64 m_outputACEnergy;
-        Real64 m_cellTemperature;
-        Real64 m_planeOfArrayIrradiance;
-        Real64 m_shadedPercent;
+        Real64 outputDCPower_;
+        Real64 outputDCEnergy_;
+        Real64 outputACPower_;
+        Real64 outputACEnergy_;
+        Real64 cellTemperature_;
+        Real64 planeOfArrayIrradiance_;
+        Real64 shadedPercent_;
 
-        ssc_module_t m_pvwattsModule;
-        ssc_data_t m_pvwattsData;
+        ssc_module_t pvwattsModule_;
+        ssc_data_t pvwattsData_;
+        Real64 NumTimeStepsToday_;
 
     public:
-        static PVWattsGenerator createFromIdfObj(EnergyPlusData &state, int objNum);
+        static std::unique_ptr<PVWattsGenerator> createFromIdfObj(EnergyPlusData &state, int objNum);
 
         PVWattsGenerator(EnergyPlusData &state,
                          const std::string &name,
@@ -208,20 +209,7 @@ namespace PVWatts {
         void getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy);
     };
 
-    PVWattsGenerator &GetOrCreatePVWattsGenerator(EnergyPlusData &state, std::string const &GeneratorName);
-
 } // namespace PVWatts
-
-struct PVWattsData : BaseGlobalStruct
-{
-
-    std::map<int, PVWatts::PVWattsGenerator> PVWattsGenerators;
-
-    void clear_state() override
-    {
-        this->PVWattsGenerators.clear();
-    }
-};
 
 } // namespace EnergyPlus
 

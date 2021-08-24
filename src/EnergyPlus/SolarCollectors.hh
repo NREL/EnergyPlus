@@ -288,6 +288,8 @@ namespace SolarCollectors {
         void update(EnergyPlusData &state);
 
         void report(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetSolarCollectorInput(EnergyPlusData &state);

@@ -3,59 +3,63 @@
 
 #include <memory>
 
+#include "EnvironmentConfigurations.hpp"
 #include "BaseLayer.hpp"
 
-namespace Tarcog {
+namespace Tarcog
+{
+    namespace ISO15099
+    {
+        class CEnvironment : public Tarcog::ISO15099::CBaseLayer, public CGasLayer
+        {
+        public:
+            CEnvironment(double t_Pressure,
+                         double t_AirSpeed,
+                         AirHorizontalDirection t_AirDirection);
+            CEnvironment(const CEnvironment & t_Environment);
+            CEnvironment & operator=(const CEnvironment & t_Environment);
 
-	class CSurface;
+            ~CEnvironment();
 
-	enum class BoundaryConditionsCoeffModel { CalculateH, HPrescribed, HcPrescribed };
+            void setHCoeffModel(BoundaryConditionsCoeffModel t_BCModel, double t_HCoeff = 0);
+            void setForcedVentilation(const ForcedVentilation & t_ForcedVentilation);
+            void setEnvironmentIR(double t_InfraRed);
+            void setEmissivity(double t_Emissivity);
 
-	enum class Environment { Indoor, Outdoor };
+            double getDirectSolarRadiation() const;
+            double getEnvironmentIR();
+            double getHc();
 
-	class CEnvironment : public CBaseLayer, public CGasLayer {
-	public:
-		CEnvironment( double t_Pressure, double t_AirSpeed, AirHorizontalDirection t_AirDirection );
-		CEnvironment( CEnvironment const & t_Environment );
-		CEnvironment & operator=( CEnvironment const & t_Environment );
+            double getAirTemperature();
+            double getAmbientTemperature();
 
-		~CEnvironment();
+            virtual void connectToIGULayer(const std::shared_ptr<CBaseLayer> & t_IGULayer);
 
-		void setHCoeffModel( BoundaryConditionsCoeffModel const t_BCModel, double const t_HCoeff = 0 );
-		void setForcedVentilation( ForcedVentilation const& t_ForcedVentilation );
-		void setPrescribedConvection( double const t_HInput );
-		void setEnvironmentIR( double const t_InfraRed );
-		void setEmissivity( double const t_Emissivity );
+            virtual std::shared_ptr<CEnvironment> cloneEnvironment() const = 0;
 
-		double getDirectSolarRadiation() const;
-		double getEnvironmentIR();
-		double getHc();
+        protected:
+            void initializeStateVariables() override;
+            void calculateRadiationFlow() override;
+            virtual double calculateIRFromVariables() = 0;
+            virtual double getHr() = 0;
+            virtual void setIRFromEnvironment(double t_IR) = 0;
+            virtual double getIRFromEnvironment() const = 0;
+            virtual double getRadiationTemperature() const = 0;
 
-		double getAirTemperature();
-		double getAmbientTemperature();
+            double m_DirectSolarRadiation;
+            double m_Emissivity;   // Emissivity from the environment
+            // double m_InfraredRadiation; // Infrared radiation from environment [W/m2]
+            // Input convection coefficient which type depends on selected BC model [W/m2*K]
+            double m_HInput;
+            // Model used to calculate BC coefficient
+            BoundaryConditionsCoeffModel m_HCoefficientModel;
 
-		virtual void connectToIGULayer( std::shared_ptr< CBaseLayer > const& t_IGULayer );
+            // Keep info if IR radiation is provided (calculated) outside
+            bool m_IRCalculatedOutside;
+        };
 
-		virtual std::shared_ptr< CEnvironment > cloneEnvironment() const = 0;
+    }   // namespace ISO15099
 
-	protected:
-		void initializeStateVariables();
-		void calculateRadiationFlow();
-		virtual double calculateIRFromVariables() = 0;
-		virtual double getHr() = 0;
-		virtual void setIRFromEnvironment( const double t_IR ) = 0;
-		virtual double getIRFromEnvironment() const = 0;
-		virtual double getRadiationTemperature() const = 0;
-
-		double m_DirectSolarRadiation;
-		double m_Emissivity; // Emissivity from the environment
-		// double m_InfraredRadiation; // Infrared radiation from environemnt [W/m2]
-		double m_HInput; // Input convection coefficient which type depends on selected BC model [W/m2*K]
-		BoundaryConditionsCoeffModel m_HCoefficientModel; // Model used to calculate BC coefficient
-		bool m_IRCalculatedOutside; // Keep info if IR radiation is provided (calculated) outside
-
-	};
-
-}
+}   // namespace Tarcog
 
 #endif

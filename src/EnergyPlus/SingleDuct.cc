@@ -125,11 +125,11 @@ using namespace FluidProperties;
 using namespace ScheduleManager;
 using namespace SteamCoils;
 
-static std::string const fluidNameSteam("STEAM");
-static std::string const fluidNameWater("WATER");
+static constexpr std::string_view fluidNameSteam("STEAM");
+static constexpr std::string_view fluidNameWater("WATER");
 
 void SimulateSingleDuct(
-    EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
+    EnergyPlusData &state, std::string_view CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
 {
 
     // SUBROUTINE INFORMATION:
@@ -158,7 +158,7 @@ void SimulateSingleDuct(
     if (CompIndex == 0) {
         SysNum = UtilityRoutines::FindItemInList(CompName, state.dataSingleDuct->sd_airterminal, &SingleDuctAirTerminal::SysName);
         if (SysNum == 0) {
-            ShowFatalError(state, "SimulateSingleDuct: System not found=" + CompName);
+            ShowFatalError(state, "SimulateSingleDuct: System not found=" + std::string{CompName});
         }
         CompIndex = SysNum;
     } else {
@@ -253,7 +253,7 @@ void GetSysInput(EnergyPlusData &state)
     using DataPlant::TypeOf_CoilSteamAirHeating;
     using DataPlant::TypeOf_CoilWaterSimpleHeating;
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetSysInput: "); // include trailing blank
+    static constexpr std::string_view RoutineName("GetSysInput: "); // include trailing blank
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -613,7 +613,7 @@ void GetSysInput(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum == 0) {
             ShowSevereError(state,
-                            RoutineName + "No matching Air Distribution Unit, for System = [" +
+                            std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysType + ',' +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName + "].");
             ShowContinueError(
@@ -750,15 +750,15 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             OutputProcessor::Unit::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
         SetupOutputVariable(state,
                             "Zone Air Terminal Minimum Air Flow Fraction",
                             OutputProcessor::Unit::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracReport,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
 
     } // end Number of Sys Loop
@@ -970,7 +970,7 @@ void GetSysInput(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum == 0) {
             ShowSevereError(state,
-                            RoutineName + "No matching Air Distribution Unit, for System = [" +
+                            std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysType + ',' +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName + "].");
             ShowContinueError(
@@ -1067,8 +1067,8 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             OutputProcessor::Unit::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
 
     } // end Number of VAVHeatandCool Sys Loop
@@ -1263,7 +1263,7 @@ void GetSysInput(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum == 0) {
             ShowSevereError(state,
-                            RoutineName + "No matching Air Distribution Unit, for System = [" +
+                            std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysType + ',' +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName + "].");
             ShowContinueError(
@@ -1436,7 +1436,7 @@ void GetSysInput(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum == 0) {
             ShowSevereError(state,
-                            RoutineName + "No matching Air Distribution Unit, for System = [" +
+                            std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysType + ',' +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName + "].");
             ShowContinueError(state,
@@ -1493,7 +1493,7 @@ void GetSysInput(EnergyPlusData &state)
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OARequirementsPtr =
                 UtilityRoutines::FindItemInList(Alphas(5), state.dataSize->OARequirements);
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OARequirementsPtr == 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                 ShowContinueError(state, "..invalid " + cAlphaFields(5) + "=\"" + Alphas(5) + "\".");
                 ErrorsFound = true;
             } else {
@@ -1510,7 +1510,7 @@ void GetSysInput(EnergyPlusData &state)
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OAPerPersonMode = DataZoneEquipment::PerPersonByDesignLevel;
             } else {
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                 ShowContinueError(state,
                                   "..invalid " + cAlphaFields(6) + "=\"" + Alphas(6) + "\". The default input of CurrentOccupancy is assigned");
             }
@@ -1698,7 +1698,7 @@ void GetSysInput(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum == 0) {
             ShowSevereError(state,
-                            RoutineName + "No matching Air Distribution Unit, for System = [" +
+                            std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysType + ',' +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName + "].");
             ShowContinueError(
@@ -1784,15 +1784,15 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             OutputProcessor::Unit::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
         SetupOutputVariable(state,
                             "Zone Air Terminal Minimum Air Flow Fraction",
                             OutputProcessor::Unit::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracReport,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
 
     } // end Number of Sys Loop
@@ -1908,7 +1908,7 @@ void GetSysInput(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum == 0) {
             ShowSevereError(state,
-                            RoutineName + "No matching Air Distribution Unit, for System = [" +
+                            std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysType + ',' +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName + "].");
             ShowContinueError(
@@ -1980,8 +1980,8 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             OutputProcessor::Unit::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
 
     } // end Number of VAVHeatandCool:NoReheat Sys Loop
@@ -2161,7 +2161,7 @@ void GetSysInput(EnergyPlusData &state)
         AirTermSysInletNodeName = state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum);
         if (!UtilityRoutines::SameString(Alphas(3), AirTermSysInletNodeName)) {
             ShowWarningError(state,
-                             RoutineName + "Invalid air terminal object air inlet node name in " +
+                             std::string{RoutineName} + "Invalid air terminal object air inlet node name in " +
                                  state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysType + " = " +
                                  state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
             ShowContinueError(state, " Specified air inlet node name is = " + Alphas(3) + ".");
@@ -2264,7 +2264,7 @@ void GetSysInput(EnergyPlusData &state)
             state.dataLoopNodes->NodeID(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode);
         if (!UtilityRoutines::SameString(Alphas(4), AirTermSysOutletNodeName)) {
             ShowWarningError(state,
-                             RoutineName + "Invalid air terminal object air outlet node name in " +
+                             std::string{RoutineName} + "Invalid air terminal object air outlet node name in " +
                                  state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysType + " = " +
                                  state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
             ShowContinueError(state, " Specified air outlet node name is = " + Alphas(4) + ".");
@@ -2306,7 +2306,7 @@ void GetSysInput(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ADUNum == 0) {
             ShowSevereError(state,
-                            RoutineName + "No matching Air Distribution Unit, for System = [" +
+                            std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysType + ',' +
                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName + "].");
             ShowContinueError(
@@ -2404,8 +2404,8 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             OutputProcessor::Unit::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
     }
 
@@ -2415,8 +2415,8 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal Outdoor Air Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataSingleDuct->sd_airterminal(sdIndex).OutdoorAirFlowRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataSingleDuct->sd_airterminal(sdIndex).SysName);
     }
 
@@ -2432,7 +2432,8 @@ void GetSysInput(EnergyPlusData &state)
                     if (state.dataSize->FinalZoneSizing(ZoneSizIndex).ActualZoneNum ==
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysIndexGSI).ActualZoneNum) {
                         if (state.dataSize->FinalZoneSizing(ZoneSizIndex).ZoneSecondaryRecirculation > 0.0) {
-                            ShowWarningError(state, RoutineName + "A zone secondary recirculation fraction is specified for zone served by ");
+                            ShowWarningError(state,
+                                             std::string{RoutineName} + "A zone secondary recirculation fraction is specified for zone served by ");
                             ShowContinueError(state,
                                               "...terminal unit \"" +
                                                   state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysIndexGSI).SysName +
@@ -2456,7 +2457,7 @@ void GetSysInput(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
     }
 }
 
@@ -2490,8 +2491,8 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("InitSys");
-    static std::string const RoutineNameFull("InitHVACSingleDuct");
+    static constexpr std::string_view RoutineName("InitSys");
+    static constexpr std::string_view RoutineNameFull("InitHVACSingleDuct");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InletNode;
@@ -2701,7 +2702,6 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
     Real64 mDotFromOARequirement(0.0);
 
     if (this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
-        /*Real64 mDotFromOARequirement( 0.0 );*/
         if (!this->NoOAFlowInputFromUser) {
             mDotFromOARequirement = this->AirMassFlowRateMax;
             int airLoopNum(0);
@@ -2868,8 +2868,8 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     using WaterCoils::SetCoilDesFlow;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("SizeSys");
-    static std::string const RoutineNameFull("SizeHVACSingleDuct");
+    static constexpr std::string_view RoutineName("SizeSys");
+    static constexpr std::string_view RoutineNameFull("SizeHVACSingleDuct");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -2885,7 +2885,10 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     Real64 rho; // local fluid density
     Real64 Cp;  // local fluid specific heat
     bool IsAutoSize;
+    bool IsMaxFlowAutoSize; // Indicate if the maximum terminal flow is autosize
     int ZoneNum(0);
+    int AirLoopNum;                           // Air loop number
+    int SysSizNum;                            // System sizing number
     Real64 MinMinFlowRatio(0.0);              // the minimum minimum flow ratio
     Real64 MaxAirVolFlowRateDes;              // Autosized maximum air flow rate for reporting
     Real64 MaxAirVolFlowRateUser;             // Hardsized maximum air flow rate for reporting
@@ -2908,6 +2911,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     DesMassFlow = 0.0;
     ErrorsFound = false;
     IsAutoSize = false;
+    IsMaxFlowAutoSize = false;
     MaxAirVolFlowRateDes = 0.0;
     MaxAirVolFlowRateUser = 0.0;
     MaxHeatAirVolFlowRateDes = 0.0;
@@ -2925,6 +2929,8 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     MaxReheatSteamVolFlowDes = 0.0;
     MaxReheatSteamVolFlowUser = 0.0;
     MinMinFlowRatio = 0.0;
+    AirLoopNum = 0;
+    SysSizNum = 0;
 
     ZoneNum = this->ActualZoneNum;
 
@@ -2952,6 +2958,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             }
             if (IsAutoSize) {
                 this->MaxAirVolFlowRate = MaxAirVolFlowRateDes;
+                IsMaxFlowAutoSize = true;
                 BaseSizer::reportSizerOutput(state, this->SysType, this->SysName, "Design Size Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateDes);
             } else { // Hard-size with sizing data
                 if (this->MaxAirVolFlowRate > 0.0 && MaxAirVolFlowRateDes > 0.0) {
@@ -3039,6 +3046,22 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         this->ZoneTurndownMinAirFrac = 1.0;
     }
 
+    // if a sizing run has been done, check if system sizing has been done for this system
+    bool SizingDesRunThisAirSys = false;
+    if (state.dataSize->SysSizingRunDone) {
+        AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
+        if (AirLoopNum > 0) {
+            CheckThisAirSystemForSizing(state, AirLoopNum, SizingDesRunThisAirSys);
+        }
+
+        // get system sizing id if a sizing run has been done for this system
+        if (SizingDesRunThisAirSys) {
+            SysSizNum = UtilityRoutines::FindItemInList(
+                state.dataSize->FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+            if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
+        }
+    }
+
     IsAutoSize = false;
     if (this->ZoneMinAirFracDes == AutoSize) {
         IsAutoSize = true;
@@ -3066,6 +3089,35 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                 MinAirFlowFracDes = 0.0;
             }
         }
+        if (SizingDesRunThisAirSys) {
+            if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                if (this->MaxAirVolFlowRate > 0.0) {
+                    MinAirFlowFracDes = 1.5 *
+                                        max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozClgByZone,
+                                            state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozHtgByZone) /
+                                        this->MaxAirVolFlowRate;
+
+                    // adjust maximum flow rate
+                    if (MinAirFlowFracDes > 1.0 && IsMaxFlowAutoSize) {
+                        this->MaxAirVolFlowRate *= MinAirFlowFracDes;
+                        MinAirFlowFracDes = 1.0;
+                        ShowWarningError(state,
+                                         "SingleDuctSystem:SizeSys: Autosized maximum air flow rate for " + this->SysName +
+                                             " was increased to meet the zone primary air flow determined according to the ASHRAE Standard 62.1 "
+                                             "Simplified Procedure.");
+                    } else if (MinAirFlowFracDes > 1.0) {
+                        ShowWarningError(state, "SingleDuctSystem:SizeSys: Maximum air flow rate for " + this->SysName + " is potentially too low.");
+                        ShowContinueError(
+                            state,
+                            "The flow is lower than the minimum flow rate calculated following the ASHRAE Standard 62.1 Simplified Procedure:");
+                        ShowContinueError(state, format(" User-specified maximum air flow rate: {:.3R} m3/s.", this->MaxAirVolFlowRate));
+                        ShowContinueError(state,
+                                          format(" Calculated minimum air flow rate: {:.3R} m3/s.", this->MaxAirVolFlowRate * MinAirFlowFracDes));
+                        MinAirFlowFracDes = 1.0;
+                    }
+                }
+            }
+        }
         if (IsAutoSize) {
             // report out autosized result and save value in Sys array
             BaseSizer::reportSizerOutput(state,
@@ -3073,6 +3125,11 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                                          this->SysName,
                                          "Design Size Constant Minimum Air Flow Fraction",
                                          MinAirFlowFracDes * this->ZoneTurndownMinAirFrac);
+            if (SizingDesRunThisAirSys) {
+                if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
+                    state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VpzMinByZoneSPSized = true;
+                }
+            }
             this->ZoneMinAirFracDes = MinAirFlowFracDes;
         } else {
             // report out hard (user set) value and issue warning if appropriate
@@ -3132,10 +3189,40 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                 MinAirFlowFracDes = 0.0;
             }
         }
+        if (SizingDesRunThisAirSys) {
+            if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                if (this->MaxAirVolFlowRate > 0.0) {
+                    FixedMinAirDes = 1.5 * max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozClgByZone,
+                                               state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozHtgByZone);
+
+                    // adjust maximum flow rate
+                    if (FixedMinAirDes > this->MaxAirVolFlowRate && IsMaxFlowAutoSize) {
+                        this->MaxAirVolFlowRate = FixedMinAirDes;
+                        ShowWarningError(state,
+                                         "SingleDuctSystem:SizeSys: Autosized maximum air flow rate for " + this->SysName +
+                                             " was increased to meet the zone primary air flow determined according to the ASHRAE Standard 62.1 "
+                                             "Simplified Procedure.");
+                    } else if (FixedMinAirDes > this->MaxAirVolFlowRate) {
+                        ShowWarningError(state, "SingleDuctSystem:SizeSys: Maximum air flow rate for " + this->SysName + " is potentially too low.");
+                        ShowContinueError(
+                            state,
+                            "The flow is lower than the minimum flow rate calculated following the ASHRAE Standard 62.1 Simplified Procedure:");
+                        ShowContinueError(state, format(" User-specified maximum air flow rate: {:.3R} m3/s.", this->MaxAirVolFlowRate));
+                        ShowContinueError(state, format(" Calculated minimum air flow rate: {:.3R} m3/s.", FixedMinAirDes));
+                        FixedMinAirDes = this->MaxAirVolFlowRate;
+                    }
+                }
+            }
+        }
         if (IsAutoSize) {
             // report out autosized result and save value in Sys array
             BaseSizer::reportSizerOutput(
                 state, this->SysType, this->SysName, "Design Size Fixed Minimum Air Flow Rate [m3/s]", FixedMinAirDes * this->ZoneTurndownMinAirFrac);
+            if (SizingDesRunThisAirSys) {
+                if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
+                    state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VpzMinByZoneSPSized = true;
+                }
+            }
             this->ZoneFixedMinAir = FixedMinAirDes;
         } else {
             // report out hard (user set) value and issue warning if appropriate
@@ -5976,12 +6063,12 @@ void GetATMixers(EnergyPlusData &state)
     int NumAlphas;  // Number of alphanumerics returned by GetObjectItem
     int ATMixerNum; // Index of inlet side mixer air terminal unit
     int IOStat;
-    static std::string const RoutineName("GetATMixers: "); // include trailing blank space
-    bool ErrorsFound(false);                               // Error flag
-    int NodeNum;                                           // Index to node number
-    int CtrlZone;                                          // Index to control zone
-    bool ZoneNodeNotFound;                                 // Flag for error checking
-    bool errFlag;                                          // error flag from component validation
+    static constexpr std::string_view RoutineName("GetATMixers: "); // include trailing blank space
+    bool ErrorsFound(false);                                        // Error flag
+    int NodeNum;                                                    // Index to node number
+    int CtrlZone;                                                   // Index to control zone
+    bool ZoneNodeNotFound;                                          // Flag for error checking
+    bool errFlag;                                                   // error flag from component validation
 
     if (!state.dataSingleDuct->GetATMixerFlag) {
         return;
@@ -6074,7 +6161,8 @@ void GetATMixers(EnergyPlusData &state)
             state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(8), state.dataSize->OARequirements);
             if (state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr == 0) {
-                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
                 ShowContinueError(state,
                                   "..invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + "=\"" + state.dataIPShortCut->cAlphaArgs(8) + "\".");
                 ErrorsFound = true;
@@ -6092,7 +6180,8 @@ void GetATMixers(EnergyPlusData &state)
                 state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonByDesignLevel;
             } else {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
-                ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
                 ShowContinueError(state,
                                   "..invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + "=\"" + state.dataIPShortCut->cAlphaArgs(9) +
                                       "\". The default input of CurrentOccupancy is assigned");
@@ -6135,7 +6224,7 @@ void GetATMixers(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum == 0) {
             ShowSevereError(state,
-                            RoutineName + "No matching Air Distribution Unit, for System = [" + cCurrentModuleObject + ',' +
+                            std::string{RoutineName} + "No matching Air Distribution Unit, for System = [" + cCurrentModuleObject + ',' +
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).Name + "].");
             ShowContinueError(
                 state, "...should have outlet node = " + state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode));
@@ -6173,14 +6262,48 @@ void GetATMixers(EnergyPlusData &state)
                 }
             ControlledZoneLoop_exit:;
                 if (ZoneNodeNotFound) {
-                    ShowSevereError(state,
-                                    cCurrentModuleObject + " = \"" + state.dataSingleDuct->SysATMixer(ATMixerNum).Name +
-                                        "\". Inlet Side Air Terminal Mixer air inlet node name must be the same as a zone exhaust node name.");
-                    ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state,
-                                      "..Inlet Side CONNECTED Air Terminal Mixer inlet node name = " +
-                                          state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode));
-                    ErrorsFound = true;
+                    bool ZoneNodeFoundAgain = false;
+                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
+                        for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
+                            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3),
+                                                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
+                                UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2),
+                                                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType(Num))) {
+                                state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum).ZoneEqNum = CtrlZone;
+                                state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneEqNum = CtrlZone;
+                                state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                                // Must wait until InitATMixer to fill other zone equip config data because ultimate zone inlet node is not known yet
+                                // for inlet side mixers
+                                if (!state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser) {
+                                    bool UseOccSchFlag = false;
+                                    bool UseMinOASchFlag = false;
+                                    state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate =
+                                        DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+                                            state,
+                                            state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
+                                            state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
+                                            UseOccSchFlag,
+                                            UseMinOASchFlag);
+                                }
+                                ZoneNodeFoundAgain = true;
+                                break;
+                            }
+                        }
+                        if (ZoneNodeFoundAgain) break;
+                    }
+                    if (!ZoneNodeFoundAgain) {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + " = \"" + state.dataSingleDuct->SysATMixer(ATMixerNum).Name +
+                                            "\". Inlet Side Air Terminal Mixer air inlet node name must be the same as either a zone exhaust node "
+                                            "name or an induced "
+                                            "air node in ZonePlenum.");
+                        ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                        ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
+                        ShowContinueError(state,
+                                          "..Inlet Side CONNECTED Air Terminal Mixer inlet node name = " +
+                                              state.dataLoopNodes->NodeID(state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode));
+                        ErrorsFound = true;
+                    }
                 }
             }
 
@@ -6238,7 +6361,8 @@ void GetATMixers(EnergyPlusData &state)
                     if (state.dataSize->ZoneSizingInput(SizingInputNum).ZoneNum == state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum) {
                         if (state.dataSize->ZoneSizingInput(SizingInputNum).ZoneDesignSpecOAIndex == 0) {
                             ShowWarningError(state,
-                                             RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                                 "\", invalid data.");
                             ShowContinueError(state,
                                               state.dataIPShortCut->cAlphaFieldNames(8) +
                                                   " is blank in both the mixer and the Sizing:Zone object for the same zone.");
@@ -6269,7 +6393,7 @@ void GetATMixers(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Program terminates.");
     }
 }
 

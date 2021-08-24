@@ -310,8 +310,7 @@ namespace CurveManager {
                                   Optional<Real64 const> Var2 = _, // 2nd independent variable
                                   Optional<Real64 const> Var3 = _, // 3rd independent variable
                                   Optional<Real64 const> Var4 = _, // 4th independent variable
-                                  Optional<Real64 const> Var5 = _, // 5th independent variable
-                                  Optional<Real64 const> Var6 = _  // 6th independent variable
+                                  Optional<Real64 const> Var5 = _  // 5th independent variable
     );
 
     Real64 BtwxtTableInterpolation(EnergyPlusData &state,
@@ -330,10 +329,10 @@ namespace CurveManager {
     bool CheckCurveDims(EnergyPlusData &state,
                         int CurveIndex,
                         std::vector<int> validDims,
-                        std::string_view routineName,
-                        const std::string &objectType,
-                        const std::string &objectName,
-                        const std::string &curveFieldText);
+                        const std::string_view routineName,
+                        std::string_view objectType,
+                        std::string_view objectName,
+                        std::string_view curveFieldText);
 
     std::string GetCurveName(EnergyPlusData &state, int CurveIndex); // index of curve in curve array
 
