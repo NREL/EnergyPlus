@@ -120,6 +120,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
         "    wall,                    !- Surface Type",
         "    Ext-Wall,                !- Construction Name",
         "    ZN1_S_Space_1,           !- Zone Name",
+        "    ,                        !- Space Name",
         "    OtherSideConditionsModel,!- Outside Boundary Condition",
         "    UTSC OSCM 1,             !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -136,6 +137,7 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
         "    wall,                    !- Surface Type",
         "    Ext-Wall,                !- Construction Name",
         "    ZN1_S_Space_1,           !- Zone Name",
+        "    ,                        !- Space Name",
         "    OtherSideConditionsModel,!- Outside Boundary Condition",
         "    UTSC OSCM 1,             !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -209,9 +211,6 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
 
     GetConstructData(*state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);             // expect no errors
-
-    GetZoneData(*state, ErrorsFound); // read zone data
-    EXPECT_FALSE(ErrorsFound);        // expect no errors
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
