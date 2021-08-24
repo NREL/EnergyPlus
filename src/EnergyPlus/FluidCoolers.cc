@@ -1911,7 +1911,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
 
     // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
     LoopMinTemp = state.dataPlnt->PlantLoop(this->LoopNum).MinTemp;
-    if (this->OutletWaterTemp<LoopMinTemp &&this->WaterMassFlowRate> 0.0) {
+    if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
         ++this->OutletWaterTempErrorCount;
 
         if (this->OutletWaterTempErrorCount < 2) {
