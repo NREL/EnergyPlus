@@ -74,7 +74,7 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
                             Real64 SpaceGainFraction,            // Fraction of gain value assigned to this space
                             std::string const &cComponentObject, // object class name for device contributing internal gain
                             std::string const &cComponentName,   // user unique name for device
-                            int IntGainComp_TypeOfNum,
+                            DataHeatBalance::IntGainTypeOf IntGainComp_TypeOfNum,
                             Real64 *ConvectionGainRate = nullptr, // pointer target for remote convection gain value to be accessed
                             Real64 *ReturnAirConvectionGainRate = nullptr,
                             Real64 *ThermalRadiationGainRate = nullptr, // pointer target for remote IR radiation gain value to be accessed
