@@ -330,6 +330,19 @@ namespace HeatBalanceManager {
         // Added SV 6/26/2013 to load scheduled surface gains
         GetScheduledSurfaceGains(state, ErrorsFound);
 
+        if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+            print(state.files.eio, "{}\n", "! <Representative Surface Assignment>,Surface Name,Representative Surface Name");
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+                auto &RepSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
+                if (SurfNum != RepSurfNum) {
+                    print(state.files.eio,
+                          " Representative Surface Assignment,{},{}\n",
+                          state.dataSurface->Surface(SurfNum).Name,
+                          state.dataSurface->Surface(RepSurfNum).Name);
+                }
+            }
+        }
+
         // Added TH 1/9/2009 to create thermochromic window constructions
         CreateTCConstructions(state, ErrorsFound);
 
@@ -8153,6 +8166,8 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->SurfIncSolSSG(Loop).SurfPtr = SurfNum;
+                    // Automatic Surface Multipliers: Do not use representative surfaces
+                    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
                 }
 
                 // Assign construction number
