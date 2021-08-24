@@ -4766,13 +4766,14 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-            state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) =
-                -state.dataHeatBalSurf->SurfHConvInt(surfNum) *
-                (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum));
             state.dataHeatBalSurf->QdotRadHVACInRepPerArea(surfNum) =
                 state.dataHeatBalFanSys->QHTRadSysSurf(surfNum) + state.dataHeatBalFanSys->QCoolingPanelSurf(surfNum) +
                 state.dataHeatBalFanSys->QHWBaseboardSurf(surfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(surfNum) +
                 state.dataHeatBalFanSys->QElecBaseboardSurf(surfNum);
+            if (state.dataSurface->Surface(surfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects. Inside temp is handled by TDD:DIFFUSER.
+            state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) =
+                -state.dataHeatBalSurf->SurfHConvInt(surfNum) *
+                (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum));
         }
     }
     // Opaque surfaces
@@ -5602,8 +5603,8 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
 
     // Heat transfer surfaces
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
-        int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+        int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
+        int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             auto &surface(state.dataSurface->Surface(surfNum));
             // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
