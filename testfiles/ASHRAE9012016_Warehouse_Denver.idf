@@ -2770,6 +2770,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone1 Office,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2790,6 +2791,7 @@
     Wall,                    !- Surface Type
     Interior Wall,           !- Construction Name
     Zone1 Office,            !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Zone2 Fine Storage,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2810,6 +2812,7 @@
     Wall,                    !- Surface Type
     Interior Wall,           !- Construction Name
     Zone1 Office,            !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Zone2 Fine Storage,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2829,6 +2832,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone1 Office,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2847,6 +2851,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2867,6 +2872,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2885,6 +2891,7 @@
     Wall,                    !- Surface Type
     semiheated_ext_wall,     !- Construction Name
     Zone3 Bulk Storage,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Zone2 Fine Storage,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2903,6 +2910,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2924,6 +2932,7 @@
     Wall,                    !- Surface Type
     semiheated_ext_wall,     !- Construction Name
     Zone3 Bulk Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2944,6 +2953,7 @@
     Wall,                    !- Surface Type
     semiheated_ext_wall,     !- Construction Name
     Zone3 Bulk Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2963,6 +2973,7 @@
     Wall,                    !- Surface Type
     semiheated_ext_wall,     !- Construction Name
     Zone3 Bulk Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2984,6 +2995,7 @@
     Roof,                    !- Surface Type
     InsulatedCeiling,        !- Construction Name
     Zone1 Office,            !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Zone2 Fine Storage,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3004,6 +3016,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3024,6 +3037,7 @@
     Roof,                    !- Surface Type
     semiheated_roof,         !- Construction Name
     Zone3 Bulk Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3043,6 +3057,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3063,6 +3078,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3081,6 +3097,7 @@
     Floor,                   !- Surface Type
     ext_slab_6in,            !- Construction Name
     Zone1 Office,            !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3100,6 +3117,7 @@
     Floor,                   !- Surface Type
     ext_slab_6in,            !- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3121,6 +3139,7 @@
     Floor,                   !- Surface Type
     ext_slab_6in,            !- Construction Name
     Zone3 Bulk Storage,      !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4432,7 +4451,8 @@
     Bulk Storage Products Surface,  !- Name
     Bulk Storage Products,   !- Construction Name
     Zone3 Bulk Storage,      !- Zone or ZoneList Name
-    6028.44715712782;        !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    6028.44715712782;        !- Extended Field
 
  !-   ===========  ALL OBJECTS IN CLASS: SURFACE:SHADING:ATTACHED ===========
  !No Overhang
@@ -8178,3 +8198,4 @@
     SET_Zone3_Bulk_Storage_Light_EMS_Program_Prog_Manager,  !- Name
     BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
     SET_Zone3_Bulk_Storage_Light_EMS_Program;  !- Program Name 1
+

@@ -781,11 +781,16 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum.allocate(NumNodes);
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow.allocate(NumNodes);
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum.allocate(NumNodes);
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode = 0;           // initialize to zero here
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeAirLoopNum = 0; // initialize to zero here
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum = 0;   // initialize to zero here
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow = false;  // initialize to false here
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum = 0;  // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeExhaustNodeNum.allocate(NumNodes);
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).SharedExhaustNode.allocate(NumNodes);
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode = 0;               // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeAirLoopNum = 0;     // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum = 0;       // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow = false;      // initialize to false here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum = 0;      // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeExhaustNodeNum = 0; // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).SharedExhaustNode =
+                iLightReturnExhaustConfig::NoExhast; // initialize to zero here
 
             for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(NodeNum) = NodeNums(NodeNum);
@@ -1324,13 +1329,37 @@ int GetReturnNumForZone(EnergyPlusData &state,
     return ReturnIndex;
 }
 
+bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum)
+{
+    bool exhaustNodeError;
+    int ExhaustNum;
+
+    exhaustNodeError = true;
+
+    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
+        GetZoneEquipmentData(state);
+        state.dataZoneEquip->ZoneEquipInputsFilled = true;
+    }
+
+    for (ExhaustNum = 1; ExhaustNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(ZoneNum).ZoneEqNum).NumExhaustNodes;
+         ++ExhaustNum) {
+        if (ZoneExhaustNodeNum == state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(ZoneNum).ZoneEqNum).ExhaustNode(ExhaustNum)) {
+            exhaustNodeError = false;
+            break;
+        }
+    }
+
+    return exhaustNodeError;
+}
+
 Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
                                          int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
                                          int const ActualZoneNum,    // Zone index
                                          bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
                                          bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
-                                         Optional_bool_const PerPersonNotSet, // when calculation should not include occupants (e.g., dual duct)
-                                         Optional_bool_const MaxOAVolFlowFlag // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
+                                         Optional_bool_const PerPersonNotSet,  // when calculation should not include occupants (e.g., dual duct)
+                                         Optional_bool_const MaxOAVolFlowFlag, // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
+                                         Optional_int_const spaceNum           // Space index (if applicable)
 )
 {
 
@@ -1372,8 +1401,6 @@ Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
     Real64 DSOAFlowPerZone; // Outdoor air volume flow rate (m3/s)
     Real64 DSOAFlowPerArea; // Outdoor air volume flow rate based on zone floor area (m3/s)
     Real64 DSOAFlowACH;     // Outdoor air volume flow rate based on air changes per hour (m3/s)
-    Real64 PeopleCount;     // total count of people in people objects
-    int Loop;               // index counter in LOOP
     bool PerPersonModeNotSet;
     bool MaxOAFlag;
     Real64 ZoneOAPeople;              // Zone OA flow rate based on number of occupants [m3/s]
@@ -1386,7 +1413,6 @@ Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
     Real64 ZoneMinCO2;                // Minimum CO2 concentration in zone
     Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
     Real64 CO2PeopleGeneration;       // CO2 generation from people at design level
-    int PeopleNum;
 
     OAVolumeFlowRate = 0.0;
     if (DSOAPtr == 0) return OAVolumeFlowRate;
@@ -1407,6 +1433,26 @@ Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
         MaxOAFlag = MaxOAVolFlowFlag;
     } else {
         MaxOAFlag = false;
+    }
+
+    Real64 floorArea = 0.0;
+    Real64 volume = 0.0;
+    Real64 nomTotOccupants = 0.0;
+    Real64 curNumOccupants = 0.0;
+    Real64 maxOccupants = 0.0;
+    if (present(spaceNum)) {
+        floorArea = state.dataHeatBal->space(spaceNum).floorArea;
+        // TODO MJW: For now just proportion space volume by floor area
+        volume = Zone(ActualZoneNum).Volume * state.dataHeatBal->space(spaceNum).floorArea / Zone(ActualZoneNum).FloorArea;
+        nomTotOccupants = state.dataHeatBal->space(spaceNum).totOccupants;
+        curNumOccupants = state.dataHeatBal->spaceIntGain(spaceNum).NOFOCC;
+        maxOccupants = state.dataHeatBal->space(spaceNum).maxOccupants;
+    } else {
+        floorArea = Zone(ActualZoneNum).FloorArea;
+        volume = Zone(ActualZoneNum).Volume;
+        nomTotOccupants = Zone(ActualZoneNum).TotOccupants;
+        curNumOccupants = state.dataHeatBal->ZoneIntGain(ActualZoneNum).NOFOCC;
+        maxOccupants = Zone(ActualZoneNum).maxOccupants;
     }
 
     if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_IAQP && state.dataZoneEquip->MyEnvrnFlag(DSOAPtr)) {
@@ -1448,23 +1494,17 @@ Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
                 if (MaxOAFlag) {
                     // OAPerPersonMode == PerPersonDCVByCurrentLevel (UseOccSchFlag = TRUE)
                     // for dual duct, get max people according to max schedule value when requesting MaxOAFlow
-                    PeopleCount = 0.0;
-                    for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
-                        if (ActualZoneNum != state.dataHeatBal->People(Loop).ZonePtr) continue;
-                        PeopleCount += state.dataHeatBal->People(Loop).NumberOfPeople *
-                                       GetScheduleMaxValue(state, state.dataHeatBal->People(Loop).NumberOfPeoplePtr);
-                    }
-                    DSOAFlowPeople = PeopleCount * OARequirements(DSOAPtr).OAFlowPerPerson;
+                    DSOAFlowPeople = maxOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
                 } else {
-                    DSOAFlowPeople = state.dataHeatBal->ZoneIntGain(ActualZoneNum).NOFOCC * OARequirements(DSOAPtr).OAFlowPerPerson;
+                    DSOAFlowPeople = curNumOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
                 }
             } else {
                 if (MaxOAFlag) {
                     // OAPerPersonMode == PerPersonByDesignLevel (UseOccSchFlag = FALSE)
                     // use total people when requesting MaxOAFlow
-                    DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
+                    DSOAFlowPeople = nomTotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
                 } else {
-                    DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
+                    DSOAFlowPeople = nomTotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
                 }
             }
             if (PerPersonModeNotSet) DSOAFlowPeople = 0.0; // for Dual Duct if Per Person Ventilation Rate Mode is not entered
@@ -1489,15 +1529,15 @@ Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
             OAVolumeFlowRate = OARequirements(DSOAPtr).OAFlowPerZone;
         } else if (SELECT_CASE_var == OAFlowPerArea) {
             // Multiplied by zone floor area
-            OAVolumeFlowRate = OARequirements(DSOAPtr).OAFlowPerArea * Zone(ActualZoneNum).FloorArea;
+            OAVolumeFlowRate = OARequirements(DSOAPtr).OAFlowPerArea * floorArea;
         } else if (SELECT_CASE_var == OAFlowACH) {
             // Multiplied by zone volume
-            OAVolumeFlowRate = OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
+            OAVolumeFlowRate = OARequirements(DSOAPtr).OAFlowACH * volume / 3600.0;
         } else if ((SELECT_CASE_var == OAFlowSum) || (SELECT_CASE_var == OAFlowMax)) {
             // Use sum or max of per person and the following
             DSOAFlowPerZone = OARequirements(DSOAPtr).OAFlowPerZone;
-            DSOAFlowPerArea = OARequirements(DSOAPtr).OAFlowPerArea * Zone(ActualZoneNum).FloorArea;
-            DSOAFlowACH = OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
+            DSOAFlowPerArea = OARequirements(DSOAPtr).OAFlowPerArea * floorArea;
+            DSOAFlowACH = OARequirements(DSOAPtr).OAFlowACH * volume / 3600.0;
             if (OARequirements(DSOAPtr).OAFlowMethod == OAFlowMax) {
                 OAVolumeFlowRate = max(DSOAFlowPeople, DSOAFlowPerZone, DSOAFlowPerArea, DSOAFlowACH);
             } else {
@@ -1505,10 +1545,10 @@ Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
             }
         } else if (SELECT_CASE_var == ZOAM_IAQP) {
             if (state.dataGlobal->DoingSizing) {
-                DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
+                DSOAFlowPeople = nomTotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
                 DSOAFlowPerZone = OARequirements(DSOAPtr).OAFlowPerZone;
-                DSOAFlowPerArea = OARequirements(DSOAPtr).OAFlowPerArea * Zone(ActualZoneNum).FloorArea;
-                DSOAFlowACH = OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
+                DSOAFlowPerArea = OARequirements(DSOAPtr).OAFlowPerArea * floorArea;
+                DSOAFlowACH = OARequirements(DSOAPtr).OAFlowACH * volume / 3600.0;
                 OAVolumeFlowRate = DSOAFlowPeople + DSOAFlowPerZone + DSOAFlowPerArea + DSOAFlowACH;
             } else {
                 OAVolumeFlowRate = state.dataContaminantBalance->ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP / state.dataEnvrn->StdRhoAir;
@@ -1517,24 +1557,27 @@ Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
         } else if (SELECT_CASE_var == ZOAM_ProportionalControlSchOcc || SELECT_CASE_var == ZOAM_ProportionalControlDesOcc) {
             ZoneOAPeople = 0.0;
             if (OARequirements(DSOAPtr).OAFlowMethod != ZOAM_ProportionalControlDesOcc) {
-                ZoneOAPeople = state.dataHeatBal->ZoneIntGain(ActualZoneNum).NOFOCC * Zone(ActualZoneNum).Multiplier *
-                               Zone(ActualZoneNum).ListMultiplier * OARequirements(DSOAPtr).OAFlowPerPerson;
+                ZoneOAPeople =
+                    curNumOccupants * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier * OARequirements(DSOAPtr).OAFlowPerPerson;
             } else {
-                ZoneOAPeople = Zone(ActualZoneNum).TotOccupants * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier *
-                               OARequirements(DSOAPtr).OAFlowPerPerson;
+                ZoneOAPeople =
+                    nomTotOccupants * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier * OARequirements(DSOAPtr).OAFlowPerPerson;
                 CO2PeopleGeneration = 0.0;
                 if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc) {
                     // Accumulate CO2 generation from people at design occupancy and current activity level
-                    for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-                        if (state.dataHeatBal->People(PeopleNum).ZonePtr != ActualZoneNum) continue;
+                    for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
+                        if (present(spaceNum)) {
+                            if (state.dataHeatBal->People(PeopleNum).spaceIndex != spaceNum) continue;
+                        } else {
+                            if (state.dataHeatBal->People(PeopleNum).ZonePtr != ActualZoneNum) continue;
+                        }
                         CO2PeopleGeneration += state.dataHeatBal->People(PeopleNum).NumberOfPeople *
                                                state.dataHeatBal->People(PeopleNum).CO2RateFactor *
                                                GetCurrentScheduleValue(state, state.dataHeatBal->People(PeopleNum).ActivityLevelPtr);
                     }
                 }
             }
-            ZoneOAArea = Zone(ActualZoneNum).FloorArea * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier *
-                         OARequirements(DSOAPtr).OAFlowPerArea;
+            ZoneOAArea = floorArea * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier * OARequirements(DSOAPtr).OAFlowPerArea;
             ZoneOAMin = ZoneOAArea;
             ZoneOAMax = (ZoneOAArea + ZoneOAPeople);
             if (Zone(ActualZoneNum).ZoneContamControllerSchedIndex > 0.0) {
@@ -1761,6 +1804,46 @@ Real64 EquipList::SequentialHeatingFraction(EnergyPlusData &state, const int equ
 Real64 EquipList::SequentialCoolingFraction(EnergyPlusData &state, const int equipNum)
 {
     return ScheduleManager::GetCurrentScheduleValue(state, SequentialCoolingFractionSchedPtr(equipNum));
+}
+
+int GetZoneEquipControlledZoneNum(EnergyPlusData &state, int const ZoneEquipTypeNum, std::string const &EquipmentName)
+{
+    int ControlZoneNum = 0;
+
+    for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
+        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+        for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
+            if (UtilityRoutines::SameString(EquipmentName, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
+                ZoneEquipTypeNum == state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType_Num(Num)) {
+                ControlZoneNum = CtrlZone;
+                break;
+            }
+        }
+        if (ControlZoneNum > 0) break;
+    }
+
+    return ControlZoneNum;
+}
+
+void CheckSharedExhaust(EnergyPlusData &state)
+{
+    int ExhastNodeNum = 0;
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes < 2) continue;
+        for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++nodeCount) {
+            if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) == iLightReturnExhaustConfig::Shared) continue;
+            ExhastNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeExhaustNodeNum(nodeCount);
+            if (ExhastNodeNum > 0) {
+                state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) = iLightReturnExhaustConfig::Single;
+                for (int nodeCount1 = nodeCount + 1; nodeCount1 <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++nodeCount1) {
+                    if (ExhastNodeNum == state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeExhaustNodeNum(nodeCount1)) {
+                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) = iLightReturnExhaustConfig::Multi;
+                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount1) = iLightReturnExhaustConfig::Shared;
+                    }
+                }
+            }
+        }
+    }
 }
 
 } // namespace EnergyPlus::DataZoneEquipment
