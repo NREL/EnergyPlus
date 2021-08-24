@@ -3,6 +3,20 @@
 
 Not all the influence for energy consumption in the building is due to envelope and ambient conditions. This group of objects describes other internal gains that may come into play (\hyperref[people]{People}, \hyperref[lights-000]{Lights}, Various Equipment Types).
 
+\subsection{Specifying Applicable Zone(s) or Space(s)}\label{specifying-applicable-zones-or-spaces}
+Each internal gains object has a field for " \hyperref[zone]{Zone} or  \hyperref[zonelist]{ZoneList} or \hyperref[space]{Space} or  \hyperref[spacelist]{SpaceList} Name". All internal gains are modeled at the Space level, so each internal gain input object may be expanded to multiple instances of that gain according to the following rules with names constructed using the \textless{}Object Name\textgreater{}, \textless{}Zone Name\textgreater{}, or \textless{}Space Name\textgreater{}. If the resulting concatenated name is greater than 100 characters a warning will be shown and it will be truncated. If the resulting name duplicates another such concatenated name, there will be a severe error and terminate the run. The concatenated name is used when referring to specific instances of internal gains for \hyperref[outputvariable]{Output:Variables}, \hyperref[group-energy-management-system-ems]{Energy Management System (EMS)} controls, and \hyperref[group-demand-limiting-controls]{Demand Limiting Controls}.
+
+\begin{description}
+  \item[Space Name] will result in one instance of the internal gain, named \textless{}Object Name\textgreater{}. The full magnitude of the gain will be applied to the Space using the Space floor area or occupancy as appropriate.
+  \item[SpaceList Name] will result in one instance of the internal gain for each Space in the SpaceList, named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. The full magnitude of the gain will be applied to each Space in the SpaceList using the Space floor area or occupancy as appropriate.
+  \item[Zone Name] will result in one instance of the internal gain for each Space in the Zone. If there is only one Space in the Zone, then the single instance will be named \textless{}Object Name\textgreater{}. If there is more than one Space in the Zone, then each instance will be named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. The full magnitude of the gain will be split between the Spaces in the Zone apportioned by the Space floor are or occupancy depending on the input method.
+  \item[ZoneList Name] will result in one instange of the internal gain for each Space in each Zone in the ZoneList. If there is only one Space in a Zone, then that instance will be named \textless{}Zone Name\textgreater{} \textless{}Object Name\textgreater{}. If there is more than one Space in a Zone, the each instance will be named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. 
+  The full magnitude of the gain will be applied to each Zone in the ZoneList then split between the Spaces in each Zone apportioned by the Space floor area or occupancy depending on the input method.
+\end{description}
+
+One exception to this is \hyperref[electricequipmentiteaircooled]{ElectricEquipment:ITE:AirCooled}
+which only allows Zone or Space Name. If a Zone Name is specified which contains more than one Space, the same rules apply.
+
 \subsection{People}\label{people}
 
 The people statement is used to model the occupant's effect on the space conditions. The following definition addresses the basic affects as well as providing information that can be used to report the thermal comfort of a group of occupants. The Fanger, Pierce Two-Node, Kansas State University Two-Node, ASHRAE Standard 55 Elevated Air Cooling Effect model, and ASHRAE Standard 55 Ankle Draft Risk thermal comfort models are available in EnergyPlus. A user may select any of these models for each People statement by simply adding the appropriate choice keyword after the air velocity schedule name. Thermal comfort calculations will only be made for people statements that include specific requests for these thermal comfort models. This object also requires input of carbon dioxide generation rate based on people activity level for zone carbon dioxide simulations.
@@ -13,7 +27,7 @@ The people statement is used to model the occupant's effect on the space conditi
 
 The name of the People object. Must be unique across all People objects.
 
-\paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-000}
+\paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{field-zone-or-zonelist-name-000}
 
 This field is the name of the zone (ref: Zone) or \hyperref[zonelist]{ZoneList} (ref: \hyperref[zonelist]{ZoneList}) and links a particular people statement to a thermal zone or set of thermal zones in the building. When the \hyperref[zonelist]{ZoneList} option is used then this people definition is applied to each of the zones in the zone list effecting a global definition for the number of people in the zone. The Zonelist option can be used effectively with the people/area and area/person options of the Number of People Calculation Method.
 

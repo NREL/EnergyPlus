@@ -1,6 +1,36 @@
 \section{Group -- Thermal Zone Description/Geometry}\label{group-thermal-zone-descriptiongeometry}
 
-Without thermal zones and surfaces, the building can't be simulated. This group of objects (Zone, BuildingSurface) describes the thermal zone characteristics as well as the details of each surface to be modeled. Included here are shading surfaces.
+Without spaces, thermal zones, and surfaces, the building can't be simulated. This group of objects (Space, Zone, BuildingSurface) describes the thermal zone characteristics as well as the details of each surface to be modeled. Included here are shading surfaces.
+
+\subsection{Space}\label{space}
+
+This element sets up the parameters to simulate each space within a thermal zone of the building.
+
+\subsection{SpaceList}\label{spacelist}
+
+The SpaceList object defines a list of Space objects. It is primarily used with \hyperref[group-internal-gains-people-lights-other-internal-zone-equipment]{Internal Gains} objects (People, Lights, etc.) to apply the same gain across a group of Spaces.
+
+Space lists are not exclusive. A Space can be referenced by more than one SpaceList object.
+
+\subsubsection{Inputs}\label{inputs-1-045space}
+
+\paragraph{Field: Space List Name}\label{field-space-list-name-000}
+
+The name of the SpaceList object. Must be unique across SpaceLists.
+
+\paragraph{Field: Space \textless{}\#\textgreater{} Name}\label{field-space-name}
+
+Reference to a Space object. This object is extensible, so additional fields of this type can be added to the end of this object.
+
+\begin{lstlisting}
+
+SpaceList,
+  Mid Floor List,  !- Name
+  Mid West Space,   !- Space 1 Name
+  Mid Center Space, !- Space 2 Name
+  Mid East Space;   !- Space 3 Name
+\end{lstlisting}
+
 
 \subsection{Zone}\label{zone}
 
