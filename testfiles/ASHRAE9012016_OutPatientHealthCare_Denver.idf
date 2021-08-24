@@ -50980,7 +50980,7 @@
     AHU-2_DCV,               !- Name
     BLDG_OA_SCH,             !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedure,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Floor 2 Conference,      !- Zone or ZoneList 1 Name
     CM DSOA Floor 2 Conference,  !- Design Specification Outdoor Air Object Name 1

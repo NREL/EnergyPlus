@@ -32185,7 +32185,7 @@
     VAV_1_DCV,               !- Name
     BLDG_OA_FRAC_SCH,        !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedure,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Basement,                !- Zone or ZoneList 1 Name
     CM DSOA Basement,        !- Design Specification Outdoor Air Object Name 1
@@ -32312,7 +32312,7 @@
     VAV_2_DCV,               !- Name
     BLDG_OA_FRAC_SCH,        !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedure,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Phystherapy_Flr_3,       !- Zone or ZoneList 1 Name
     CM DSOA Phystherapy_Flr_3,  !- Design Specification Outdoor Air Object Name 1
