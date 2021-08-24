@@ -271,17 +271,16 @@ bool processInput(std::string const &inputFilePath,
     auto idf_parser(std::make_unique<IdfParser>());
     json epJSON;
 
-    auto const inputFilePathNameOnly = EnergyPlus::FileSystem::removeFileExtension(EnergyPlus::FileSystem::getFileName(inputFilePath));
-    auto const inputDirPath = EnergyPlus::FileSystem::getParentDirectoryPath(inputFilePath);
+    auto const inputPath = fs::path(inputFilePath);
+
+    auto const inputFilePathNameOnly = EnergyPlus::FileSystem::removeFileExtension(EnergyPlus::FileSystem::getFileName(inputPath));
+    auto const inputDirPath = EnergyPlus::FileSystem::getParentDirectoryPath(inputPath);
 
     if (outputDirPath.empty()) {
         outputDirPath = inputDirPath;
     }
 
-    //    auto inputFileExt = EnergyPlus::FileSystem::getFileExtension(inputFilePath).string();
-    //    std::transform(inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper);
-
-    auto const inputFileType = EnergyPlus::FileSystem::getFileType(inputFilePath);
+    auto const inputFileType = EnergyPlus::FileSystem::getFileType(inputPath);
 
     bool isEpJSON = EnergyPlus::FileSystem::is_all_json_type(inputFileType);
     bool isCBOR = (inputFileType == EnergyPlus::FileSystem::FileTypes::CBOR);
@@ -316,20 +315,20 @@ bool processInput(std::string const &inputFilePath,
         return false;
     }
 
-    if (!EnergyPlus::FileSystem::fileExists(inputFilePath)) {
-        displayMessage("Input file path {} not found", inputFilePath);
+    if (!EnergyPlus::FileSystem::fileExists(inputPath)) {
+        displayMessage("Input file path {} not found", inputPath);
         return false;
     }
 
     try {
         if (!isEpJSON) {
-            auto input_file = EnergyPlus::FileSystem::readFile(inputFilePath);
+            auto input_file = EnergyPlus::FileSystem::readFile(inputPath);
 
             bool success = true;
             epJSON = idf_parser->decode(input_file, schema, success);
             cleanEPJSON(epJSON);
         } else {
-            epJSON = EnergyPlus::FileSystem::readJSON(inputFilePath, std::ios_base::in | std::ios_base::binary);
+            epJSON = EnergyPlus::FileSystem::readJSON(inputPath, std::ios_base::in | std::ios_base::binary);
         }
     } catch (const std::exception &e) {
         displayMessage(e.what());

@@ -46,11 +46,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // Standard C++ library
-#include <errno.h>
+#include <cerrno>
 #include <fstream>
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -68,6 +68,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -212,40 +213,9 @@ namespace FileSystem {
 
     FileTypes getFileType(fs::path const &filePath)
     {
-        std::string buffer{};
         auto extension = std::string_view(fs::path(filePath).extension().c_str());
-        std::transform(extension.begin(), extension.end(), buffer.begin(), ::toupper);
-        auto const buffer_view = std::string_view(buffer.data());
-        if (buffer_view.compare(".EPJSON") == 0) {
-            return FileTypes::EpJSON;
-        } else if (buffer_view.compare(".IDF") == 0) {
-            return FileTypes::IDF;
-        } else if (buffer_view.compare(".CBOR") == 0) {
-            return FileTypes::CBOR;
-        } else if (buffer_view.compare(".CSV") == 0) {
-            return FileTypes::CSV;
-        } else if (buffer_view.compare(".TSV") == 0) {
-            return FileTypes::TSV;
-        } else if (buffer_view.compare(".TXT") == 0) {
-            return FileTypes::TXT;
-        } else if (buffer_view.compare(".ESO") == 0) {
-            return FileTypes::ESO;
-        } else if (buffer_view.compare(".MTR") == 0) {
-            return FileTypes::MTR;
-        } else if (buffer_view.compare(".MSGPACK") == 0) {
-            return FileTypes::MsgPack;
-        } else if (buffer_view.compare(".UBJSON") == 0) {
-            return FileTypes::UBJSON;
-        } else if (buffer_view.compare(".BSON") == 0) {
-            return FileTypes::BSON;
-        } else if (buffer_view.compare(".IMF") == 0) {
-            return FileTypes::IMF;
-        } else if (buffer_view.compare(".JSON") == 0) {
-            return FileTypes::JSON;
-        } else if (buffer_view.compare(".GLHE") == 0) {
-            return FileTypes::GLHE;
-        }
-        return FileTypes::Unknown;
+        extension.remove_prefix(extension.find_last_of('.') + 1);
+        return static_cast<FileTypes>(getEnumerationValue(FileTypesExt, extension));
     }
 
     // TODO: remove for fs::path::replace_extension directly? Note that replace_extension mutates the object

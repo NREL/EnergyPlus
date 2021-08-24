@@ -17243,74 +17243,28 @@ std::string DateToString(int const codedDate) // word containing encoded month, 
     //   Convert the coded date format into a usable
     //   string
 
-    // Using/Aliasing
-    using General::DecodeMonDayHrMin;
-
-    // Return value
-    std::string StringOut;
-
-    // Locals
-    // ((month*100 + day)*100 + hour)*100 + minute
-
     int Month;  // month in integer format (1-12)
     int Day;    // day in integer format (1-31)
     int Hour;   // hour in integer format (1-24)
     int Minute; // minute in integer format (0:59)
-    std::string monthName;
+    static constexpr std::array<std::string_view, 12> Months{"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
 
     if (codedDate == 0) {
         return "-";
     }
 
-    DecodeMonDayHrMin(codedDate, Month, Day, Hour, Minute);
+    General::DecodeMonDayHrMin(codedDate, Month, Day, Hour, Minute);
+    if (Month < 1 || Month > 12) {
+        return "-";
+    }
+
     --Hour;
     if (Minute == 60) {
         ++Hour;
         Minute = 0;
     }
-    switch (Month) {
-    case 1:
-        monthName = "JAN";
-        break;
-    case 2:
-        monthName = "FEB";
-        break;
-    case 3:
-        monthName = "MAR";
-        break;
-    case 4:
-        monthName = "APR";
-        break;
-    case 5:
-        monthName = "MAY";
-        break;
-    case 6:
-        monthName = "JUN";
-        break;
-    case 7:
-        monthName = "JUL";
-        break;
-    case 8:
-        monthName = "AUG";
-        break;
-    case 9:
-        monthName = "SEP";
-        break;
-    case 10:
-        monthName = "OCT";
-        break;
-    case 11:
-        monthName = "NOV";
-        break;
-    case 12:
-        monthName = "DEC";
-        break;
-    default:
-        return "-"; // monthName = "***";
-    }
-    StringOut = fmt::format("{:02}-{:3}-{:02}:{:02}", Day, monthName, Hour, Minute);
 
-    return StringOut;
+    return fmt::format("{:02}-{:3}-{:02}:{:02}", Day, Months[Month - 1], Hour, Minute);
 }
 
 bool isNumber(std::string const &s)

@@ -87,41 +87,45 @@ void ConvertCaseToLower(std::string_view InputString, // Input string
                         std::string &OutputString     // Output string (in LowerCase)
 );
 
-int getEnumerationValue(gsl::span<std::string_view> sList, std::string_view s);
-
 std::string::size_type FindNonSpace(std::string const &String); // String to be scanned
 
-template <typename T> inline T pow2(T const &x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+inline constexpr T pow2(T x)
 {
     return x * x;
 }
 
-template <typename T> inline T pow3(T const &x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+inline constexpr T pow3(T x)
 {
     return x * x * x;
 }
 
-template <typename T> inline T pow4(T const &x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+inline constexpr T pow4(T x)
 {
     T y(x * x);
     return y * y;
 }
 
-template <typename T> inline T pow5(T const &x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+inline constexpr T pow5(T x)
 {
     T y(x * x);
     y *= y;
     return y * x;
 }
 
-template <typename T> inline T pow6(T const &x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+inline constexpr T pow6(T x)
 {
     T y(x * x);
     y *= y;
     return y * y;
 }
 
-template <typename T> inline T pow7(T const &x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+inline constexpr T pow7(T x)
 {
     T y(x * x);
     y *= y;
@@ -430,7 +434,7 @@ namespace UtilityRoutines {
 
     std::string MakeUPPERCase(std::string_view const InputString); // Input String
 
-    inline bool SameString(std::string_view const s, std::string_view const t)
+    inline constexpr bool SameString(std::string_view const s, std::string_view const t)
     {
         // case insensitive comparison
         return equali(s, t);
@@ -592,6 +596,14 @@ namespace UtilityRoutines {
                                                    bool &FuelTypeErrorsFound);
 
 } // namespace UtilityRoutines
+
+inline constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList, const std::string_view s)
+{
+    for (unsigned int i = 0; i < sList.size(); ++i) {
+        if (UtilityRoutines::SameString(sList[i], s)) return i;
+    }
+    return -1;
+}
 
 struct UtilityRoutinesData : BaseGlobalStruct
 {

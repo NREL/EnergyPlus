@@ -53,10 +53,9 @@ namespace EnergyPlus {
 
 namespace EmbeddedEpJSONSchema {
 
-    $
-    {
-        embedded_epJSON_schema
-    }
+// clang-format off
+    ${embedded_epJSON_schema}
+// clang-format on
 
     const gsl::span<const std::uint8_t> embeddedEpJSONSchema()
     {

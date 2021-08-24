@@ -90,26 +90,31 @@ namespace FileSystem {
 
     enum class FileTypes
     {
-        Unknown,
+        Unknown = -1,
         // JSON types should go first,
         EpJSON,
-        GLHE,
         JSON,
-        last_json_type = JSON,
+        GLHE,
+        last_json_type = GLHE,
         CBOR,
         MsgPack,
         UBJSON,
         BSON,
         last_binary_json_type = BSON,
+        IDF,
+        IMF,
         CSV,
         TSV,
         TXT,
         ESO,
         MTR,
-        IMF,
-        IDF,
-        last_flat_file_type = IDF
+        last_flat_file_type = MTR,
+        Num
     };
+
+    constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExt {"epJSON", "json", "glhe", "cbor", "msgpack", "ubjson", "bson", "idf", "imf", "csv", "tsv", "txt", "eso", "mtr"};
+    static_assert(FileTypesExt.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExt array.");
+    static_assert(!FileTypesExt.back().empty(), "Likely missing an enum from FileTypes in FileTypesExt array.");
 
     inline constexpr bool is_all_json_type(FileTypes t)
     {
@@ -211,7 +216,7 @@ namespace FileSystem {
         }
     }
 
-    template <class T, class... Ts> struct is_any : std::disjunction<std::is_same<T, Ts>...>
+    template <class T, class... Ts> struct is_any : std::disjunction<std::is_same<std::remove_cv_t<T>, std::remove_cv_t<Ts>>...>
     {
     };
 
@@ -221,8 +226,7 @@ namespace FileSystem {
 
     template <class T, FileTypes fileType>
     inline constexpr bool
-        enable_json_v = is_all_json_type(fileType) && is_any<T, nlohmann::json, const nlohmann::json>::value &&
-                        !is_any<T, std::string_view, std::string, const std::string_view, const std::string, char *, const char *>::value;
+        enable_json_v = is_all_json_type(fileType) && is_any<T, nlohmann::json>::value && !is_any<T, std::string_view, std::string, char *>::value;
 
     template <FileTypes fileType> void writeFile(fs::path const &filePath, const std::string_view data)
     {
@@ -250,7 +254,7 @@ namespace FileSystem {
     }
 
     template <class T, FileTypes fileType, typename = std::enable_if_t<enable_unique_ptr_v<T>>>
-    void writeFile(const T &os, const std::string_view data)
+    void writeFile(T &os, const std::string_view data)
     {
         static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
         if (os) {
@@ -287,7 +291,7 @@ namespace FileSystem {
     }
 
     template <FileTypes fileType, class T, class T2, typename = std::enable_if_t<enable_json_v<T2, fileType> && enable_unique_ptr_v<T>>>
-    void writeFile(const T &os, T2 &data, int const indent = 4)
+    void writeFile(T &os, T2 &data, int const indent = 4)
     {
         if (os) {
             auto const json_str = getJSON<fileType>(data, indent);
