@@ -142,6 +142,8 @@ namespace DataSizing {
     // System Outdoor Air Method
     constexpr int SOAM_ZoneSum(1); // Sum the outdoor air flow rates of all zones
     constexpr int SOAM_VRP(2);     // Use ASHRAE Standard 62.1-2007 to calculate the system level outdoor air flow rates
+    constexpr int SOAM_VRPL(10);   // Use ASHRAE Standard 62.1-2007 to calculate the system level outdoor air flow rates
+    constexpr int SOAM_SP(9);      // Use the ASHRAE Standard 62.1 Simplified Procedure to calculate the system level outdoor air flow rates
     //  considering the zone air distribution effectiveness and the system ventilation efficiency
     constexpr int SOAM_IAQP(3); // Use ASHRAE Standard 62.1-2007 IAQP to calculate the system level outdoor air flow rates
     // based on the CO2 setpoint
@@ -406,16 +408,17 @@ namespace DataSizing {
         Real64 SupplyAirAdjustFactor;       // supply air adjustment factor for next time step if OA is capped
         Real64 ZpzClgByZone;                // OA Std 62.1 required fraction in cooling mode ? should this be ZdzClgByZone
         Real64 ZpzHtgByZone;                // OA Std 62.1 required fraction in heating mode ? should this be ZdzHtgByZone
-        Real64 VozClgByZone;    // value of required cooling vent to zone, used in 62.1 tabular report, already includes people diversity term
-        Real64 VozHtgByZone;    // value of required heating vent to zone, used in 62.1 tabular report, already includes people diversity term
-        Real64 DOASHeatLoad;    // current heating load from DOAS supply air [W]
-        Real64 DOASCoolLoad;    // current cooling load from DOAS supply air [W]
-        Real64 DOASHeatAdd;     // current heat addition rate from DOAS supply air [W]
-        Real64 DOASLatAdd;      // current latent heat addition rate from DOAS supply air [W]
-        Real64 DOASSupMassFlow; // current mass flow rate of DOAS supply air [kg/s]
-        Real64 DOASSupTemp;     // current DOAS supply air temperature [C]
-        Real64 DOASSupHumRat;   // current DOAS supply air humidity ratio [kgWater/kgDryAir]
-        Real64 DOASTotCoolLoad; // current total cooling load imposed by DOAS supply air [W]
+        Real64 VozClgByZone;      // value of required cooling vent to zone, used in 62.1 tabular report, already includes people diversity term
+        Real64 VozHtgByZone;      // value of required heating vent to zone, used in 62.1 tabular report, already includes people diversity term
+        Real64 DOASHeatLoad;      // current heating load from DOAS supply air [W]
+        Real64 DOASCoolLoad;      // current cooling load from DOAS supply air [W]
+        Real64 DOASHeatAdd;       // current heat addition rate from DOAS supply air [W]
+        Real64 DOASLatAdd;        // current latent heat addition rate from DOAS supply air [W]
+        Real64 DOASSupMassFlow;   // current mass flow rate of DOAS supply air [kg/s]
+        Real64 DOASSupTemp;       // current DOAS supply air temperature [C]
+        Real64 DOASSupHumRat;     // current DOAS supply air humidity ratio [kgWater/kgDryAir]
+        Real64 DOASTotCoolLoad;   // current total cooling load imposed by DOAS supply air [W]
+        bool VpzMinByZoneSPSized; // is Vpz_min sized using the 62.1 Standard Simplified Procedure
         Array1D<Real64> DOASHeatLoadSeq;    // daily sequence of zone DOAS heating load (zone time step) [W]
         Array1D<Real64> DOASCoolLoadSeq;    // daily sequence of zone DOAS cooling load (zone time step) [W]
         Array1D<Real64> DOASHeatAddSeq;     // daily sequence of zone DOAS heat addition rate (zone time step) [W]
@@ -451,7 +454,7 @@ namespace DataSizing {
               ZoneOAFracCooling(0.0), ZoneOAFracHeating(0.0), TotalOAFromPeople(0.0), TotalOAFromArea(0.0), TotPeopleInZone(0.0),
               TotalZoneFloorArea(0.0), ZonePeakOccupancy(0.0), SupplyAirAdjustFactor(1.0), ZpzClgByZone(0.0), ZpzHtgByZone(0.0), VozClgByZone(0.0),
               VozHtgByZone(0.0), DOASHeatLoad(0.0), DOASCoolLoad(0.0), DOASHeatAdd(0.0), DOASLatAdd(0.0), DOASSupMassFlow(0.0), DOASSupTemp(0.0),
-              DOASSupHumRat(0.0), DOASTotCoolLoad(0.0)
+              DOASSupHumRat(0.0), DOASTotCoolLoad(0.0), VpzMinByZoneSPSized(false)
         {
         }
 
@@ -639,7 +642,7 @@ namespace DataSizing {
                                          // FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
         int ScaleHeatSAFMethod;          // choice of how to get system heating scalable air flow rates; // (FlowPerFloorArea,
                                          // FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
-        int SystemOAMethod;              // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
+        int SystemOAMethod;              // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
         Real64 MaxZoneOAFraction;        // maximum value of min OA for zones served by system
         bool OAAutoSized;                // Set to true if design OA vol flow is set to 'autosize' in Sizing:System
         int CoolingCapMethod;            // - Method for cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea,
@@ -658,6 +661,7 @@ namespace DataSizing {
         Real64 FlowPerHeatingCapacity;            // ratio of heating supply air flow rate to heating capacity of an airloop
         int CoolingPeakLoadType;                  // Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCoolingLoad
         int CoolCapControl;                       // type of control of cooling coil  1=VAV; 2=Bypass; 3=VT; 4=OnOff
+        Real64 OccupantDiversity;                 // occupant diversity
 
         // Default Constructor
         SystemSizingInputData()
@@ -776,7 +780,7 @@ namespace DataSizing {
         //   [kg water/kg dry air] [zone time step]
         Array1D<Real64> SysDOASHeatAddSeq; // daily sequence of heat addition rate from DOAS supply air [W]
         Array1D<Real64> SysDOASLatAddSeq;  // daily sequence of latent heat addition rate from DOAS supply air [W]
-        int SystemOAMethod;                // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
+        int SystemOAMethod;                // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP, 9 = SOAM_SP
         Real64 MaxZoneOAFraction;          // maximum value of min OA for zones served by system
         Real64 SysUncOA;                   // uncorrected system outdoor air flow based on zone people and zone area
         bool OAAutoSized;                  // Set to true if design OA vol flow is set to 'autosize'

@@ -84,6 +84,14 @@ For non 100\% outdoor air multi-zone systems, the system outdoor air flow:
 {V_{ot}} = {V_{ou}}/{E_v}
 \end{equation}
 
+For non 100\% outdoor air multi-zone systems, and when the ``Standard62.1VentilationRateProcedureWithLimit'' option is used, the system outdoor air flow:
+
+\begin{equation}
+{V_{ot}} = min(V_{{ot}_{design}}, {V_{ou}}/{E_v})
+\end{equation}
+
+The ``Standard62.1VentilationRateProcedureWithLimit'' option should be used when the system outdoor air intake must stay at or below the design minimum outdoor air flow rate. This option can be used to meet the ``Multiple-Zone VAV System Ventilation Optimization Control'' requirements in ASHRAE Standards 90.1-2010 (and onwards) as well as the ``Outdoor Airflow Set Point for ASHRAE Standard 62.1-2016 Ventilation'' in Section 5.16.3.1 in the ASHRAE Guideline 36-2018.
+
 where:
 
 \({V_{ou}}\) is the uncorrected system outdoor air flow (m\(^3\)/s)
@@ -392,11 +400,36 @@ Except for \({C_{s - min,i}}\) above, all other variables are already available 
 \item ``Outdoor air flow per person'' and ``Outdoor air flow per zone floor area'' in the corresponding ``DesignSpecification:OutdoorAir'' object must be greater than zero.
 \end{enumerate}
 
+\subsection{Simplified Procedure}\label{simplified-procedure}
+
+\subsubsection{System Ventilation Efficiency}\label{sp-calculation-of-system-ventilation-efficiency}
+
+The Simplified Procedure (SP) introduced in ASHRAE Standard 62.1-2019 provides an alternative way to determine the ventilation efficiency of a system (\({E_v}\)). The efficiency is calculated using equation \ref{eqn:ev-low-d} when the occupant diversity, \({D}\), is less than 0.6 and equation \ref{eqn:ev-high-d} otherwise. \({E_v}\) is then used in the same manner as in the VRP to determine the system design outdoor air intake.
+
+\begin{equation}\label{eqn:ev-low-d}
+{E_{v}} = 0.88 {D} + 0.22 \text{ for } D < 0.60
+\end{equation}
+
+\begin{equation}\label{eqn:ev-high-d}
+{E_{v}} = 0.75 \text{ for } D \geq 0.60
+\end{equation}
+
+\subsubsection{Zone Minimum Air Flow}\label{sp-zone-minimum-air-flow}
+When set to autosize, the minimum (primary) air flow (or fraction) for these terminals will be calculated using equation \ref{eqn:sp-zone-minimum-air-flow}: \emph{AirTerminal:SingleDuct:VAV:NoReheat} (Constant Minimum Air Flow Fraction or Fixed Minimum Air Flow Fraction), \emph{AirTerminal:SingleDuct:VAV:Reheat} (Constant Minimum Air Flow Fraction or Fixed Minimum Air Flow Fraction), \emph{AirTerminal:SingleDuct:SeriesPIU:Reheat}, \emph{AirTerminal:SingleDuct:ParallelPIU:Reheat}.
+
+\begin{equation}\label{eqn:sp-zone-minimum-air-flow}
+{V_{{pz}_{min}}} = 1.5 * {V_{oz}}
+\end{equation}
+
 \subsection{References}\label{references-018}
 
 ASHRAE. 2007. \emph{ANSI/ASHRAE Standard 62.1-2007, Ventilation for acceptable indoor air quality}. Atlanta: American Society of Heating, Refrigerating and Air-Conditioning Engineers, Inc.
 
 ASHRAE. 2010. \emph{ANSI/ASHRAE Standard 62.1-2010, Ventilation for acceptable indoor air quality}. Atlanta: American Society of Heating, Refrigerating and Air-Conditioning Engineers, Inc.
+
+ASHRAE. 2019. \emph{ANSI/ASHRAE Standard 62.1-2019, Ventilation for acceptable indoor air quality}. Atlanta: American Society of Heating, Refrigerating and Air-Conditioning Engineers, Inc.
+
+ASHRAE. 2018. \emph{ASHRAE Guideline 36-2018, High-performance sequences of operation for HVAC systems}. Atlanta: American Society of Heating, Refrigerating and Air-Conditioning Engineers, Inc.
 
 Emmerich, S.J. and A.K. Persily. 1997. Literature review on CO\(_{2}\)-based demand-controlled ventilation. \emph{ASHRAE Transactions} 103(2):229-243.
 
