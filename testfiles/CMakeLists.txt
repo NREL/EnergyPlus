@@ -531,6 +531,8 @@ add_simulation_test(IDF_FILE SolarShadingTest_DisableSelfShadingGroup.idf EPW_FI
 add_simulation_test(IDF_FILE SolarShadingTest_ImportedShading.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 add_simulation_test(IDF_FILE SpectralAngularOpticalProperties_TableData.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE StackedZonesWithInterzoneIRTLayers.idf EPW_FILE USA_IL_University.of.Illinois-Willard.AP.725315_TMY3.epw)
+add_simulation_test(IDF_FILE Standard621SimplifiedProcedure_PIUterminal.idf EPW_FILE USA_IL_Chicago-OHare_TMY2.epw)
+add_simulation_test(IDF_FILE Standard621SimplifiedProcedure_VAVterminal.idf EPW_FILE USA_IL_Chicago-OHare_TMY2.epw)
 add_simulation_test(IDF_FILE SteamSystemAutoSize.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE StormWindow.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE StripMallZoneEvapCooler.idf EPW_FILE USA_CO_Boulder-Broomfield-Jefferson.County.AP.724699_TMY3.epw)
