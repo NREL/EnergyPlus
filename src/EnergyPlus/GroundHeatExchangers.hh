@@ -315,6 +315,13 @@ namespace GroundHeatExchangers {
         void setupOutput(EnergyPlusData &state);
     };
 
+    enum class GFuncCalcMethod
+    {
+        Invalid = -1,
+        UniformHeatFlux,
+        UniformBoreholeWallTemp,
+    };
+
     struct GLHEVert : GLHEBase // LCOV_EXCL_LINE
     {
 
@@ -327,6 +334,7 @@ namespace GroundHeatExchangers {
         Real64 bhRadius;    // Radius of borehole {m}
         Real64 bhLength;    // Length of borehole {m}
         Real64 bhUTubeDist; // Distance between u-tube legs {m}
+        GFuncCalcMethod gFuncCalcMethod;
 
         // Parameters for the multipole method
         Real64 theta_1;
@@ -339,7 +347,9 @@ namespace GroundHeatExchangers {
         std::vector<Real64> GFNC_shortTimestep;
         std::vector<Real64> LNTTS_shortTimestep;
 
-        GLHEVert() : bhDiameter(0.0), bhRadius(0.0), bhLength(0.0), bhUTubeDist(0.0), theta_1(0.0), theta_2(0.0), theta_3(0.0), sigma(0.0)
+        GLHEVert()
+            : bhDiameter(0.0), bhRadius(0.0), bhLength(0.0), bhUTubeDist(0.0), gFuncCalcMethod(GFuncCalcMethod::Invalid), theta_1(0.0), theta_2(0.0),
+              theta_3(0.0), sigma(0.0)
         {
         }
 
@@ -358,6 +368,10 @@ namespace GroundHeatExchangers {
         void calcLongTimestepGFunctions(EnergyPlusData &state);
 
         void calcGFunctions(EnergyPlusData &state) override;
+
+        void calcUniformHeatFluxGFunctions(EnergyPlusData &state);
+
+        void calcUniformBHWallTempGFunctions(EnergyPlusData &state);
 
         Real64 calcHXResistance(EnergyPlusData &state) override;
 
@@ -394,6 +408,8 @@ namespace GroundHeatExchangers {
         void oneTimeInit(EnergyPlusData &state) override;
 
         void oneTimeInit_new(EnergyPlusData &state) override;
+
+        void setupTimeVectors();
     };
 
     struct GLHESlinky : GLHEBase // LCOV_EXCL_LINE
