@@ -7467,7 +7467,7 @@ namespace InternalHeatGains {
 
         for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
 
-            InternalHeatGains::SumAllInternalLatentGains(state, NZ, state.dataHeatBalFanSys->ZoneLatentGain(NZ));
+            state.dataHeatBalFanSys->ZoneLatentGain(NZ) = InternalHeatGains::SumAllInternalLatentGains(state, NZ);
             // Added for hybrid model
             if (state.dataHybridModel->FlagHybridModel_PC) {
                 InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ, state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ));
@@ -8646,7 +8646,7 @@ namespace InternalHeatGains {
         }
         if (ReSumLatentGains) {
             for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
-                InternalHeatGains::SumAllInternalLatentGains(state, NZ, state.dataHeatBalFanSys->ZoneLatentGain(NZ));
+                state.dataHeatBalFanSys->ZoneLatentGain(NZ) = InternalHeatGains::SumAllInternalLatentGains(state, NZ);
                 // Added for the hybrid model
                 if (state.dataHybridModel->FlagHybridModel_PC) {
                     InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ, state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ));
@@ -8695,7 +8695,7 @@ namespace InternalHeatGains {
     {
         // Return value
         Real64 SumConvGainRateExceptPeople(0.0);
-        
+
         std::string str_people = "PEOPLE";
 
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
@@ -8760,8 +8760,8 @@ namespace InternalHeatGains {
     }
 
     Real64 SumAllReturnAirConvectionGains(EnergyPlusData &state,
-                                        int const ZoneNum, // zone index pointer for which zone to sum gains for
-                                        int const ReturnNodeNum // return air node number
+                                          int const ZoneNum,      // zone index pointer for which zone to sum gains for
+                                          int const ReturnNodeNum // return air node number
     )
     {
 
@@ -8829,7 +8829,7 @@ namespace InternalHeatGains {
     }
 
     Real64 SumAllSpaceInternalRadiationGains(EnergyPlusData &state,
-                                           int const spaceNum  // space index pointer for which space to sum gains for
+                                             int const spaceNum // space index pointer for which space to sum gains for
     )
     {
 
@@ -8901,9 +8901,9 @@ namespace InternalHeatGains {
         return SumRadiationGainRate;
     }
 
-    void SumAllInternalLatentGains(EnergyPlusData &state,
-                                   int const ZoneNum, // zone index pointer for which zone to sum gains for
-                                   Real64 &SumLatentGainRate)
+    Real64 SumAllInternalLatentGains(EnergyPlusData &state,
+                                     int const ZoneNum // zone index pointer for which zone to sum gains for
+    )
     {
 
         // SUBROUTINE INFORMATION:
@@ -8913,7 +8913,8 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
 
-        Real64 tmpSumLatentGainRate = 0.0;
+        // Return value
+        Real64 SumLatentGainRate(0.0);
 
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
@@ -8921,10 +8922,10 @@ namespace InternalHeatGains {
             }
 
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                tmpSumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
+                SumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
             }
 
-            SumLatentGainRate = tmpSumLatentGainRate;
+            return SumLatentGainRate;
         }
     }
 
