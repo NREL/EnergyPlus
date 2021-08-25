@@ -182,9 +182,9 @@ namespace InternalHeatGains {
                                     int const ReturnNodeNum // return air node number
     );
 
-    void SumAllInternalCO2Gains(EnergyPlusData &state,
-                                int const ZoneNum, // zone index pointer for which zone to sum gains for
-                                Real64 &SumCO2GainRate);
+    Real64 SumAllInternalCO2Gains(EnergyPlusData &state,
+                                  int const ZoneNum // zone index pointer for which zone to sum gains for
+    );
 
     // Added for hybrid model -- Overload function for calculating CO2 gains except people
     void SumAllInternalCO2GainsExceptPeople(EnergyPlusData &state,
