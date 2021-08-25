@@ -6606,7 +6606,7 @@ void CalcZoneSums(EnergyPlusData &state,
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (Zone(ZoneNum).NoHeatToReturnAir) {
-        SumAllReturnAirConvectionGains(state, ZoneNum, RetAirGain, 0);
+        RetAirGain = SumAllReturnAirConvectionGains(state, ZoneNum, 0);
         SumIntGain += RetAirGain;
     }
 
@@ -6922,7 +6922,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (Zone(ZoneNum).NoHeatToReturnAir) {
-        SumAllReturnAirConvectionGains(state, ZoneNum, SumRetAirGains, 0);
+        SumRetAirGains = SumAllReturnAirConvectionGains(state, ZoneNum, 0);
         SumIntGains += SumRetAirGains;
     }
 

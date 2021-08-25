@@ -8760,9 +8760,8 @@ namespace InternalHeatGains {
         return SumConvGainRate;
     }
 
-    void SumAllReturnAirConvectionGains(EnergyPlusData &state,
+    Real64 SumAllReturnAirConvectionGains(EnergyPlusData &state,
                                         int const ZoneNum, // zone index pointer for which zone to sum gains for
-                                        Real64 &SumReturnAirGainRate,
                                         int const ReturnNodeNum // return air node number
     )
     {
@@ -8774,7 +8773,8 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
 
-        Real64 tmpSumRetAirGainRate = 0.0;
+        // Return value
+        Real64 SumReturnAirGainRate(0.0);
 
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
@@ -8784,12 +8784,12 @@ namespace InternalHeatGains {
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 // If ReturnNodeNum is zero, sum for entire zone, otherwise sum only for specified ReturnNodeNum
                 if ((ReturnNodeNum == 0) || (ReturnNodeNum == state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirNodeNum)) {
-                    tmpSumRetAirGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirConvGainRate;
+                    SumReturnAirGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirConvGainRate;
                 }
             }
         }
 
-        SumReturnAirGainRate = tmpSumRetAirGainRate;
+        return SumReturnAirGainRate;
     }
 
     Real64 SumReturnAirConvectionGainsByTypes(

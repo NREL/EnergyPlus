@@ -826,7 +826,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
         ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
         // RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
         // Add sensible heat gain from refrigerated cases with under case returns
-        SumAllReturnAirConvectionGains(state, ZoneNum, QRetAir, ReturnNode);
+        QRetAir = SumAllReturnAirConvectionGains(state, ZoneNum, ReturnNode);
 
         CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);
 
