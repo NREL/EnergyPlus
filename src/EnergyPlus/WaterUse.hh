@@ -251,6 +251,8 @@ namespace WaterUse {
         void ReportWaterUse(EnergyPlusData &state);
 
         void setupOutputVars([[maybe_unused]] EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void SimulateWaterUse(EnergyPlusData &state, bool FirstHVACIteration);

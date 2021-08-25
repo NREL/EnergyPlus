@@ -85237,6 +85237,7 @@
     WALL,                    !- Surface Type
     ExtWall_Const,           !- Construction Name
     COMFENZone,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -85256,6 +85257,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-1,                 !- Construction Name
     COMFENZone,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Floor-COMFENZone,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -85274,6 +85276,7 @@
     WALL,                    !- Surface Type
     INTWALL-1,               !- Construction Name
     COMFENZone,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     IntWall-Left,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -85292,6 +85295,7 @@
     WALL,                    !- Surface Type
     INTWALL-1,               !- Construction Name
     COMFENZone,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     IntWall-Back,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -85310,6 +85314,7 @@
     WALL,                    !- Surface Type
     INTWALL-1,               !- Construction Name
     COMFENZone,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     IntWall-Right,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -85328,6 +85333,7 @@
     CEILING,                 !- Surface Type
     CEILING-1,               !- Construction Name
     COMFENZone,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Ceiling-COMFENZone,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -85505,7 +85511,8 @@
     COMFENZone Internal Mass,!- Name
     InteriorFurnishings,     !- Construction Name
     COMFENZone,              !- Zone or ZoneList Name
-    55.753993988;            !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    55.753993988;            !- Extended Field
 
 ! Schedule.inc
 ! Office
@@ -86391,8 +86398,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     SYS-1 OA System,         !- Name
     SYS-1 OA System Controllers,  !- Controller List Name
-    SYS-1 OA System Equipment,  !- Outdoor Air Equipment List Name
-    SYS-1 Availability Managers;  !- Availability Manager List Name
+    SYS-1 OA System Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     SYS-1 OA System Controllers,  !- Name

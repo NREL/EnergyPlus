@@ -1040,6 +1040,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Steel-Framed_Ext-wall,  !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1071,6 +1072,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_2_Wall_4, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1087,6 +1089,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_5_Wall_1, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1103,6 +1106,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_4_Wall_1, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1119,6 +1123,7 @@
     floor,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Unheated_Ext-slab,  !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1135,6 +1140,7 @@
     ceiling,                 !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1150,7 +1156,8 @@
     ZN_1_FLR_1_SEC_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList Name
-    157.0784;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    157.0784;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_1_Infiltration,  !- Name
@@ -1419,6 +1426,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Steel-Framed_Ext-wall,  !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1450,6 +1458,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_3_Wall_2, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1466,6 +1475,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_5_Wall_2, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1482,6 +1492,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_1_Wall_2, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1498,6 +1509,7 @@
     floor,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Unheated_Ext-slab,  !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1514,6 +1526,7 @@
     ceiling,                 !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1529,7 +1542,8 @@
     ZN_1_FLR_1_SEC_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_2,        !- Zone or ZoneList Name
-    122.1516;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    122.1516;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_2_Infiltration,  !- Name
@@ -1798,6 +1812,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_5_Wall_3, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1814,6 +1829,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_2_Wall_2, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1830,6 +1846,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Steel-Framed_Ext-wall,  !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1861,6 +1878,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_4_Wall_3, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1877,6 +1895,7 @@
     floor,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Unheated_Ext-slab,  !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1893,6 +1912,7 @@
     ceiling,                 !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1908,7 +1928,8 @@
     ZN_1_FLR_1_SEC_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_3,        !- Zone or ZoneList Name
-    157.0784;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    157.0784;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_3_Infiltration,  !- Name
@@ -2177,6 +2198,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_1_Wall_4, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2193,6 +2215,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_5_Wall_4, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2209,6 +2232,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_3_Wall_4, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2225,6 +2249,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Steel-Framed_Ext-wall,  !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2256,6 +2281,7 @@
     floor,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Unheated_Ext-slab,  !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2272,6 +2298,7 @@
     ceiling,                 !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2287,7 +2314,8 @@
     ZN_1_FLR_1_SEC_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_4,        !- Zone or ZoneList Name
-    122.1516;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    122.1516;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_4_Infiltration,  !- Name
@@ -2556,6 +2584,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_1_Wall_3, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2572,6 +2601,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_2_Wall_3, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2588,6 +2618,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_3_Wall_1, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2604,6 +2635,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Interior Wall_Int-Wall,  !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN_1_FLR_1_SEC_4_Wall_2, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2620,6 +2652,7 @@
     floor,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_Unheated_Ext-slab,  !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2636,6 +2669,7 @@
     ceiling,                 !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-3ab_IEAD_Roof,  !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2651,7 +2685,8 @@
     ZN_1_FLR_1_SEC_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     ZN_1_FLR_1_SEC_5,        !- Zone or ZoneList Name
-    221.8999;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    221.8999;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     ZN_1_FLR_1_SEC_5_Infiltration,  !- Name
@@ -3004,8 +3039,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     ZN_1_FLR_1_SEC_1:Sys_OA, !- Name
     ZN_1_FLR_1_SEC_1:Sys_OAControllers,  !- Controller List Name
-    ZN_1_FLR_1_SEC_1:Sys_OAEquipment,  !- Outdoor Air Equipment List Name
-    ZN_1_FLR_1_SEC_1:Sys Availability Manager List;  !- Availability Manager List Name
+    ZN_1_FLR_1_SEC_1:Sys_OAEquipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     ZN_1_FLR_1_SEC_1:Sys_OANode List;  !- Node or NodeList Name 1
@@ -3282,8 +3316,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     ZN_1_FLR_1_SEC_2:Sys_OA, !- Name
     ZN_1_FLR_1_SEC_2:Sys_OAControllers,  !- Controller List Name
-    ZN_1_FLR_1_SEC_2:Sys_OAEquipment,  !- Outdoor Air Equipment List Name
-    ZN_1_FLR_1_SEC_2:Sys Availability Manager List;  !- Availability Manager List Name
+    ZN_1_FLR_1_SEC_2:Sys_OAEquipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     ZN_1_FLR_1_SEC_2:Sys_OANode List;  !- Node or NodeList Name 1
@@ -3560,8 +3593,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     ZN_1_FLR_1_SEC_3:Sys_OA, !- Name
     ZN_1_FLR_1_SEC_3:Sys_OAControllers,  !- Controller List Name
-    ZN_1_FLR_1_SEC_3:Sys_OAEquipment,  !- Outdoor Air Equipment List Name
-    ZN_1_FLR_1_SEC_3:Sys Availability Manager List;  !- Availability Manager List Name
+    ZN_1_FLR_1_SEC_3:Sys_OAEquipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     ZN_1_FLR_1_SEC_3:Sys_OANode List;  !- Node or NodeList Name 1
@@ -3838,8 +3870,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     ZN_1_FLR_1_SEC_4:Sys_OA, !- Name
     ZN_1_FLR_1_SEC_4:Sys_OAControllers,  !- Controller List Name
-    ZN_1_FLR_1_SEC_4:Sys_OAEquipment,  !- Outdoor Air Equipment List Name
-    ZN_1_FLR_1_SEC_4:Sys Availability Manager List;  !- Availability Manager List Name
+    ZN_1_FLR_1_SEC_4:Sys_OAEquipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     ZN_1_FLR_1_SEC_4:Sys_OANode List;  !- Node or NodeList Name 1
@@ -4116,8 +4147,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     ZN_1_FLR_1_SEC_5:Sys_OA, !- Name
     ZN_1_FLR_1_SEC_5:Sys_OAControllers,  !- Controller List Name
-    ZN_1_FLR_1_SEC_5:Sys_OAEquipment,  !- Outdoor Air Equipment List Name
-    ZN_1_FLR_1_SEC_5:Sys Availability Manager List;  !- Availability Manager List Name
+    ZN_1_FLR_1_SEC_5:Sys_OAEquipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     ZN_1_FLR_1_SEC_5:Sys_OANode List;  !- Node or NodeList Name 1

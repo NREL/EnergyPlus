@@ -1,43 +1,50 @@
-#ifndef FENESTRATIONSQUAREMATRIX_H
-#define FENESTRATIONSQUAREMATRIX_H
+#pragma once
 
 #include <vector>
-#include <memory>
 
-namespace FenestrationCommon {
+namespace FenestrationCommon
+{
+    // Works only with double
+    class SquareMatrix
+    {
+    public:
+        explicit SquareMatrix(const std::size_t tSize = 0);
+        explicit SquareMatrix(const std::initializer_list<std::vector<double>> & tInput);
+        explicit SquareMatrix(const std::vector<std::vector<double>> & tInput);
+        explicit SquareMatrix(const std::vector<std::vector<double>> && tInput);
 
-	class CSquareMatrix {
-	public:
-		explicit CSquareMatrix( size_t const aSize );
-		size_t getSize() const;
-		void setZeros();
-		// All diagonal items are one and all non diagonal are zero
-		void setIdentity();
-		// set diagonal values from vector
-		void setDiagonal( std::vector< double > const& t_Values );
-		std::vector< double >& operator[]( size_t const index );
-		std::vector< double > const& operator[]( size_t const index ) const;
-		//    double & operator[]( size_t i, size_t j );
-		std::shared_ptr< CSquareMatrix > add( CSquareMatrix const& t_Matrix ) const;
-		std::shared_ptr< CSquareMatrix > sub( CSquareMatrix const& t_Matrix ) const;
-		std::shared_ptr< CSquareMatrix > mult( CSquareMatrix const& t_Matrix ) const;
-		// Matrix multiplication with vector
-		std::shared_ptr< std::vector< double > > multMxV( std::vector< double > const& t_Vector ) const;
-		// Matrix multiplication with vector
-		std::shared_ptr< std::vector< double > > multVxM( std::vector< double > const& t_Vector ) const;
-		void copyFrom( CSquareMatrix const& t_Matrix );
-		// inverse matrix
-		std::shared_ptr< CSquareMatrix > inverse();
+        std::size_t size() const;
+        void setZeros();
+        void setIdentity();
+        void setDiagonal(const std::vector<double> & tInput);
 
-	private:
-		// LU decomposition of current matrix
-		std::shared_ptr< CSquareMatrix > LU();
+        std::vector<size_t> makeUpperTriangular();
 
-		size_t m_Size;
-		std::vector< std::vector< double > > m_Matrix;
+        SquareMatrix inverse() const;
 
-	};
-}
+        double operator()(const std::size_t i, const std::size_t j) const;
+        double & operator()(const std::size_t i, const std::size_t j);
 
+        SquareMatrix mmultRows(const std::vector<double> & tInput);
 
-#endif
+        std::vector<std::vector<double>> getMatrix() const;
+
+    private:
+        // explicit SquareMatrix(SquareMatrix && tMatrix);
+        SquareMatrix LU() const;
+        std::vector<double> checkSingularity() const;
+        std::size_t m_size;
+        std::vector<std::vector<double>> m_Matrix;
+    };
+
+    SquareMatrix operator*(const SquareMatrix & first, const SquareMatrix & second);
+    SquareMatrix operator*=(SquareMatrix & first, const SquareMatrix & second);
+    SquareMatrix operator+(const SquareMatrix & first, const SquareMatrix & second);
+    SquareMatrix operator+=(SquareMatrix & first, const SquareMatrix & second);
+    SquareMatrix operator-(const SquareMatrix & first, const SquareMatrix & second);
+    SquareMatrix operator-=(SquareMatrix & first, const SquareMatrix & second);
+
+    std::vector<double> operator*(const std::vector<double> & first, const SquareMatrix & second);
+    std::vector<double> operator*(const SquareMatrix & first, const std::vector<double> & second);
+
+}   // namespace FenestrationCommon

@@ -540,14 +540,19 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
 {
     std::string const ChillerName = this->Name;
 
-    SetupOutputVariable(
-        state, "Chiller Heater Evaporator Cooling Rate", OutputProcessor::Unit::W, this->CoolingLoad, "System", "Average", ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Evaporator Cooling Rate",
+                        OutputProcessor::Unit::W,
+                        this->CoolingLoad,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Evaporator Cooling Energy",
                         OutputProcessor::Unit::J,
                         this->CoolingEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
                         _,
                         "ENERGYTRANSFER",
@@ -555,13 +560,19 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(state, "Chiller Heater Heating Rate", OutputProcessor::Unit::W, this->HeatingLoad, "System", "Average", ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Heating Rate",
+                        OutputProcessor::Unit::W,
+                        this->HeatingLoad,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Heating Energy",
                         OutputProcessor::Unit::J,
                         this->HeatingEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
                         _,
                         "ENERGYTRANSFER",
@@ -569,14 +580,19 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Chiller Heater Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->TowerLoad, "System", "Average", ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Condenser Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->TowerLoad,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Condenser Heat Transfer Energy",
                         OutputProcessor::Unit::J,
                         this->TowerEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
                         _,
                         "ENERGYTRANSFER",
@@ -584,21 +600,43 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Chiller Heater Cooling Source Heat COP", OutputProcessor::Unit::W_W, this->ThermalEnergyCOP, "System", "Average", ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Cooling Source Heat COP",
+                        OutputProcessor::Unit::W_W,
+                        this->ThermalEnergyCOP,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
 
-    SetupOutputVariable(state, "Chiller Heater Electricity Rate", OutputProcessor::Unit::W, this->ElectricPower, "System", "Average", ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        this->ElectricPower,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
     // Do not include this on meters, this would duplicate the cool electric and heat electric
-    SetupOutputVariable(state, "Chiller Heater Electricity Energy", OutputProcessor::Unit::J, this->ElectricEnergy, "System", "Sum", ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        this->ElectricEnergy,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        ChillerName);
 
-    SetupOutputVariable(
-        state, "Chiller Heater Cooling Electricity Rate", OutputProcessor::Unit::W, this->CoolElectricPower, "System", "Average", ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Cooling Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        this->CoolElectricPower,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Cooling Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->CoolElectricEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
                         _,
                         "Electricity",
@@ -606,14 +644,19 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Chiller Heater Heating Electricity Rate", OutputProcessor::Unit::W, this->HeatElectricPower, "System", "Average", ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Heating Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        this->HeatElectricPower,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Heating Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->HeatElectricEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         ChillerName,
                         _,
                         "Electricity",
@@ -621,211 +664,307 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Chiller Heater Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->ChillReturnTemp, "System", "Average", ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->ChillSupplyTemp, "System", "Average", ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->ChillWaterFlowRate, "System", "Average", ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Evaporator Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->ChillReturnTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Evaporator Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->ChillSupplyTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Evaporator Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->ChillWaterFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
 
     if (this->isWaterCooled) {
-        SetupOutputVariable(
-            state, "Chiller Heater Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondReturnTemp, "System", "Average", ChillerName);
-        SetupOutputVariable(
-            state, "Chiller Heater Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondSupplyTemp, "System", "Average", ChillerName);
-        SetupOutputVariable(
-            state, "Chiller Heater Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondWaterFlowRate, "System", "Average", ChillerName);
+        SetupOutputVariable(state,
+                            "Chiller Heater Condenser Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->CondReturnTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            ChillerName);
+        SetupOutputVariable(state,
+                            "Chiller Heater Condenser Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->CondSupplyTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            ChillerName);
+        SetupOutputVariable(state,
+                            "Chiller Heater Condenser Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->CondWaterFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            ChillerName);
     } else {
-        SetupOutputVariable(
-            state, "Chiller Heater Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondReturnTemp, "System", "Average", ChillerName);
+        SetupOutputVariable(state,
+                            "Chiller Heater Condenser Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->CondReturnTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            ChillerName);
     }
 
-    SetupOutputVariable(
-        state, "Chiller Heater Heating Inlet Temperature", OutputProcessor::Unit::C, this->HotWaterReturnTemp, "System", "Average", ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Heating Outlet Temperature", OutputProcessor::Unit::C, this->HotWaterSupplyTemp, "System", "Average", ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Heating Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HotWaterFlowRate, "System", "Average", ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Heating Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->HotWaterReturnTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Heating Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->HotWaterSupplyTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Heating Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->HotWaterFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
 
-    SetupOutputVariable(
-        state, "Chiller Heater Cooling Part Load Ratio", OutputProcessor::Unit::None, this->CoolPartLoadRatio, "System", "Average", ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Maximum Cooling Rate", OutputProcessor::Unit::W, this->CoolingCapacity, "System", "Average", ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Heating Part Load Ratio", OutputProcessor::Unit::None, this->HeatPartLoadRatio, "System", "Average", ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Maximum Heating Rate", OutputProcessor::Unit::W, this->HeatingCapacity, "System", "Average", ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Cooling Part Load Ratio",
+                        OutputProcessor::Unit::None,
+                        this->CoolPartLoadRatio,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Maximum Cooling Rate",
+                        OutputProcessor::Unit::W,
+                        this->CoolingCapacity,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Heating Part Load Ratio",
+                        OutputProcessor::Unit::None,
+                        this->HeatPartLoadRatio,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Maximum Heating Rate",
+                        OutputProcessor::Unit::W,
+                        this->HeatingCapacity,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
 
-    SetupOutputVariable(
-        state, "Chiller Heater Runtime Fraction", OutputProcessor::Unit::None, this->FractionOfPeriodRunning, "System", "Average", ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Runtime Fraction",
+                        OutputProcessor::Unit::None,
+                        this->FractionOfPeriodRunning,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
 
-    SetupOutputVariable(
-        state, "Chiller Heater Source Exhaust Inlet Temperature", OutputProcessor::Unit::C, this->ExhaustInTemp, "System", "Average", ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Source Exhaust Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->ExhaustInTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Source Exhaust Inlet Mass Flow Rate",
                         OutputProcessor::Unit::kg_s,
                         this->ExhaustInFlow,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         ChillerName);
 
     SetupOutputVariable(state,
                         "Chiller Heater Heating Heat Recovery Potential Rate",
                         OutputProcessor::Unit::W,
                         this->ExhHeatRecPotentialHeat,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Cooling Heat Recovery Potential Rate",
                         OutputProcessor::Unit::W,
                         this->ExhHeatRecPotentialCool,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         ChillerName);
 
     SetupOutputVariable(state,
                         "Chiller Heater Cooling Source Heat Transfer Rate",
                         OutputProcessor::Unit::W,
                         this->CoolThermalEnergyUseRate,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Heating Source Heat Transfer Rate",
                         OutputProcessor::Unit::W,
                         this->HeatThermalEnergyUseRate,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         ChillerName);
 }
 
 void ExhaustAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
 {
-    bool errFlag = false;
-    PlantUtilities::ScanPlantLoopsForObject(state,
-                                            this->Name,
-                                            DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
-                                            this->CWLoopNum,
-                                            this->CWLoopSideNum,
-                                            this->CWBranchNum,
-                                            this->CWCompNum,
-                                            errFlag,
-                                            this->CHWLowLimitTemp,
-                                            _,
-                                            _,
-                                            this->ChillReturnNodeNum,
-                                            _);
-    if (errFlag) {
-        ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
-    }
+    if (this->oneTimeFlag) {
+        this->setupOutputVariables(state);
 
-    PlantUtilities::ScanPlantLoopsForObject(state,
-                                            this->Name,
-                                            DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
-                                            this->HWLoopNum,
-                                            this->HWLoopSideNum,
-                                            this->HWBranchNum,
-                                            this->HWCompNum,
-                                            errFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            this->HeatReturnNodeNum,
-                                            _);
-    if (errFlag) {
-        ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
-    }
-
-    if (this->isWaterCooled) {
+        bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
                                                 DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
-                                                this->CDLoopNum,
-                                                this->CDLoopSideNum,
-                                                this->CDBranchNum,
-                                                this->CDCompNum,
+                                                this->CWLoopNum,
+                                                this->CWLoopSideNum,
+                                                this->CWBranchNum,
+                                                this->CWCompNum,
                                                 errFlag,
+                                                this->CHWLowLimitTemp,
                                                 _,
                                                 _,
-                                                _,
-                                                this->CondReturnNodeNum,
+                                                this->ChillReturnNodeNum,
                                                 _);
         if (errFlag) {
             ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
         }
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_ExhFiredAbsorption, true);
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->HWLoopNum, this->HWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_ExhFiredAbsorption, true);
-    }
 
-    PlantUtilities::InterConnectTwoPlantLoopSides(
-        state, this->CWLoopNum, this->CWLoopSideNum, this->HWLoopNum, this->HWLoopSideNum, DataPlant::TypeOf_Chiller_ExhFiredAbsorption, true);
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
+                                                this->HWLoopNum,
+                                                this->HWLoopSideNum,
+                                                this->HWBranchNum,
+                                                this->HWCompNum,
+                                                errFlag,
+                                                _,
+                                                _,
+                                                _,
+                                                this->HeatReturnNodeNum,
+                                                _);
+        if (errFlag) {
+            ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
+        }
 
-    // check if outlet node of chilled water side has a setpoint.
-    if ((state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-        (state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
-        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            if (!this->ChillSetPointErrDone) {
-                ShowWarningError(state, "Missing temperature setpoint on cool side for chiller heater named " + this->Name);
-                ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");
-                ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                this->ChillSetPointErrDone = true;
-            }
-        } else {
-            // need call to EMS to check node
-            errFlag = false; // but not really fatal yet, but should be.
-            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->ChillSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
-            state.dataLoopNodes->NodeSetpointCheck(this->ChillSupplyNodeNum).needsSetpointChecking = false;
+        if (this->isWaterCooled) {
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
+                                                    this->CDLoopNum,
+                                                    this->CDLoopSideNum,
+                                                    this->CDBranchNum,
+                                                    this->CDCompNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    this->CondReturnNodeNum,
+                                                    _);
             if (errFlag) {
+                ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
+            }
+            PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                          this->CWLoopNum,
+                                                          this->CWLoopSideNum,
+                                                          this->CDLoopNum,
+                                                          this->CDLoopSideNum,
+                                                          DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
+                                                          true);
+            PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                          this->HWLoopNum,
+                                                          this->HWLoopSideNum,
+                                                          this->CDLoopNum,
+                                                          this->CDLoopSideNum,
+                                                          DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
+                                                          true);
+        }
+
+        PlantUtilities::InterConnectTwoPlantLoopSides(
+            state, this->CWLoopNum, this->CWLoopSideNum, this->HWLoopNum, this->HWLoopSideNum, DataPlant::TypeOf_Chiller_ExhFiredAbsorption, true);
+
+        // check if outlet node of chilled water side has a setpoint.
+        if ((state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+            (state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
+            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 if (!this->ChillSetPointErrDone) {
                     ShowWarningError(state, "Missing temperature setpoint on cool side for chiller heater named " + this->Name);
-                    ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller evaporator ");
-                    ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
-                    ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
+                    ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");
                     ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
                     this->ChillSetPointErrDone = true;
                 }
-            }
-        }
-        this->ChillSetPointSetToLoop = true;
-        state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint =
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
-        state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPointHi =
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
-    }
-    // check if outlet node of hot water side has a setpoint.
-    if ((state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-        (state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
-        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-            if (!this->HeatSetPointErrDone) {
-                ShowWarningError(state, "Missing temperature setpoint on heat side for chiller heater named " + this->Name);
-                ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");
-                ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
-                this->HeatSetPointErrDone = true;
-            }
-        } else {
-            // need call to EMS to check node
-            errFlag = false; // but not really fatal yet, but should be.
-            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
-            state.dataLoopNodes->NodeSetpointCheck(this->HeatSupplyNodeNum).needsSetpointChecking = false;
-            if (errFlag) {
-                if (!this->HeatSetPointErrDone) {
-                    ShowWarningError(state, "Missing temperature setpoint on heat side for chiller heater named " + this->Name);
-                    ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller heater ");
-                    ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the heater side outlet node ");
-                    ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
-                    ShowContinueError(state, "  The overall loop setpoint will be assumed for heater side. The simulation continues ... ");
-                    this->HeatSetPointErrDone = true;
+            } else {
+                // need call to EMS to check node
+                errFlag = false; // but not really fatal yet, but should be.
+                EMSManager::CheckIfNodeSetPointManagedByEMS(
+                    state, this->ChillSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
+                state.dataLoopNodes->NodeSetpointCheck(this->ChillSupplyNodeNum).needsSetpointChecking = false;
+                if (errFlag) {
+                    if (!this->ChillSetPointErrDone) {
+                        ShowWarningError(state, "Missing temperature setpoint on cool side for chiller heater named " + this->Name);
+                        ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller evaporator ");
+                        ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node ");
+                        ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
+                        ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                        this->ChillSetPointErrDone = true;
+                    }
                 }
             }
+            this->ChillSetPointSetToLoop = true;
+            state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint =
+                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPoint;
+            state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPointHi =
+                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
         }
-        this->HeatSetPointSetToLoop = true;
-        state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPoint =
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
-        state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPointLo =
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
+        // check if outlet node of hot water side has a setpoint.
+        if ((state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+            (state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
+            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                if (!this->HeatSetPointErrDone) {
+                    ShowWarningError(state, "Missing temperature setpoint on heat side for chiller heater named " + this->Name);
+                    ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller, use a SetpointManager");
+                    ShowContinueError(state, "  The overall loop setpoint will be assumed for chiller. The simulation continues ... ");
+                    this->HeatSetPointErrDone = true;
+                }
+            } else {
+                // need call to EMS to check node
+                errFlag = false; // but not really fatal yet, but should be.
+                EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
+                state.dataLoopNodes->NodeSetpointCheck(this->HeatSupplyNodeNum).needsSetpointChecking = false;
+                if (errFlag) {
+                    if (!this->HeatSetPointErrDone) {
+                        ShowWarningError(state, "Missing temperature setpoint on heat side for chiller heater named " + this->Name);
+                        ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of this chiller heater ");
+                        ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the heater side outlet node ");
+                        ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the outlet node ");
+                        ShowContinueError(state, "  The overall loop setpoint will be assumed for heater side. The simulation continues ... ");
+                        this->HeatSetPointErrDone = true;
+                    }
+                }
+            }
+            this->HeatSetPointSetToLoop = true;
+            state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPoint =
+                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
+            state.dataLoopNodes->Node(this->HeatSupplyNodeNum).TempSetPointLo =
+                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
+        }
+        this->oneTimeFlag = false;
     }
 }
 
@@ -846,7 +985,7 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
     // Uses the status flags to trigger initializations.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    std::string const RoutineName("InitExhaustAbsorber");
+    static constexpr std::string_view RoutineName("InitExhaustAbsorber");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CondInletNode;  // node number of water inlet node to the condenser
@@ -856,11 +995,7 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
     Real64 rho;         // local fluid density
     Real64 mdot;        // lcoal fluid mass flow rate
 
-    if (this->oneTimeFlag) {
-        this->setupOutputVariables(state);
-        this->oneTimeInit(state);
-        this->oneTimeFlag = false;
-    }
+    this->oneTimeInit(state);
 
     CondInletNode = this->CondReturnNodeNum;
     CondOutletNode = this->CondSupplyNodeNum;
@@ -999,7 +1134,7 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
     // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    std::string const RoutineName("SizeExhaustAbsorber");
+    static constexpr std::string_view RoutineName("SizeExhaustAbsorber");
 
     bool ErrorsFound; // If errors detected in input
     std::string equipName;
@@ -1378,7 +1513,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const AbsLeavingTemp(176.667); // C - Minimum temperature leaving the Chiller absorber (350 F)
-    std::string const RoutineName("CalcExhaustAbsorberChillerModel");
+    static constexpr std::string_view RoutineName("CalcExhaustAbsorberChillerModel");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // Local copies of ExhaustAbsorberSpecs Type
@@ -1827,7 +1962,7 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const AbsLeavingTemp(176.667); // C - Minimum temperature leaving the Chiller absorber (350 F)
-    static std::string const RoutineName("CalcExhaustAbsorberHeaterModel");
+    static constexpr std::string_view RoutineName("CalcExhaustAbsorberHeaterModel");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // Local copies of ExhaustAbsorberSpecs Type

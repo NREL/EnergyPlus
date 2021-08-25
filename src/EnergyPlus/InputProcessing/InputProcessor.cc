@@ -322,8 +322,9 @@ void InputProcessor::processInput(EnergyPlusData &state)
     bool is_valid = validation->validate(epJSON);
     bool hasErrors = processErrors(state);
     bool versionMatch = checkVersionMatch(state);
+    bool unsupportedFound = checkForUnsupportedObjects(state);
 
-    if (!is_valid || hasErrors) {
+    if (!is_valid || hasErrors || unsupportedFound) {
         ShowFatalError(state, "Errors occurred on processing input file. Preceding condition(s) cause termination.");
     }
 
@@ -381,6 +382,121 @@ bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
         }
     }
     return true;
+}
+
+bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
+{
+    bool errorsFound = false;
+    constexpr std::array<std::string_view, 32> hvacTemplateObjects = {"HVACTemplate:Thermostat",
+                                                                      "HVACTemplate:Zone:IdealLoadsAirSystem",
+                                                                      "HVACTemplate:Zone:BaseboardHeat",
+                                                                      "HVACTemplate:Zone:FanCoil",
+                                                                      "HVACTemplate:Zone:PTAC",
+                                                                      "HVACTemplate:Zone:PTHP",
+                                                                      "HVACTemplate:Zone:WaterToAirHeatPump",
+                                                                      "HVACTemplate:Zone:VRF",
+                                                                      "HVACTemplate:Zone:Unitary",
+                                                                      "HVACTemplate:Zone:VAV",
+                                                                      "HVACTemplate:Zone:VAV:FanPowered",
+                                                                      "HVACTemplate:Zone:VAV:HeatAndCool",
+                                                                      "HVACTemplate:Zone:ConstantVolume",
+                                                                      "HVACTemplate:Zone:DualDuct",
+                                                                      "HVACTemplate:System:VRF",
+                                                                      "HVACTemplate:System:Unitary",
+                                                                      "HVACTemplate:System:UnitaryHeatPump:AirToAir",
+                                                                      "HVACTemplate:System:UnitarySystem",
+                                                                      "HVACTemplate:System:VAV",
+                                                                      "HVACTemplate:System:PackagedVAV",
+                                                                      "HVACTemplate:System:ConstantVolume",
+                                                                      "HVACTemplate:System:DualDuct",
+                                                                      "HVACTemplate:System:DedicatedOutdoorAir",
+                                                                      "HVACTemplate:Plant:ChilledWaterLoop",
+                                                                      "HVACTemplate:Plant:Chiller",
+                                                                      "HVACTemplate:Plant:Chiller:ObjectReference",
+                                                                      "HVACTemplate:Plant:Tower",
+                                                                      "HVACTemplate:Plant:Tower:ObjectReference",
+                                                                      "HVACTemplate:Plant:HotWaterLoop",
+                                                                      "HVACTemplate:Plant:Boiler",
+                                                                      "HVACTemplate:Plant:Boiler:ObjectReference",
+                                                                      "HVACTemplate:Plant:MixedWaterLoop"};
+
+    // For EnergyPlus, there is no option to convert or allow these objects
+    bool objectFound = false;
+    std::string objectType;
+    for (size_t count = 0; count < hvacTemplateObjects.size(); ++count) {
+        objectType = hvacTemplateObjects[count];
+        auto it = epJSON.find(objectType);
+        if (it != epJSON.end()) {
+            objectFound = true;
+            break;
+        }
+    }
+    if (objectFound) {
+        ShowSevereError(state, "HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.");
+        ShowContinueError(state, "You must run the ExpandObjects program on this input.");
+        errorsFound = true;
+    }
+
+    constexpr std::array<std::string_view, 26> groundHTObjects = {"GroundHeatTransfer:Control",
+                                                                  "GroundHeatTransfer:Slab:Materials",
+                                                                  "GroundHeatTransfer:Slab:MatlProps",
+                                                                  "GroundHeatTransfer:Slab:BoundConds",
+                                                                  "GroundHeatTransfer:Slab:BldgProps",
+                                                                  "GroundHeatTransfer:Slab:Insulation",
+                                                                  "GroundHeatTransfer:Slab:EquivalentSlab",
+                                                                  "GroundHeatTransfer:Slab:AutoGrid",
+                                                                  "GroundHeatTransfer:Slab:ManualGrid",
+                                                                  "GroundHeatTransfer:Slab:XFACE",
+                                                                  "GroundHeatTransfer:Slab:YFACE",
+                                                                  "GroundHeatTransfer:Slab:ZFACE",
+                                                                  "GroundHeatTransfer:Basement:SimParameters",
+                                                                  "GroundHeatTransfer:Basement:MatlProps",
+                                                                  "GroundHeatTransfer:Basement:Insulation",
+                                                                  "GroundHeatTransfer:Basement:SurfaceProps",
+                                                                  "GroundHeatTransfer:Basement:BldgData",
+                                                                  "GroundHeatTransfer:Basement:Interior",
+                                                                  "GroundHeatTransfer:Basement:ComBldg",
+                                                                  "GroundHeatTransfer:Basement:EquivSlab",
+                                                                  "GroundHeatTransfer:Basement:EquivAutoGrid",
+                                                                  "GroundHeatTransfer:Basement:AutoGrid",
+                                                                  "GroundHeatTransfer:Basement:ManualGrid",
+                                                                  "GroundHeatTransfer:Basement:XFACE",
+                                                                  "GroundHeatTransfer:Basement:YFACE",
+                                                                  "GroundHeatTransfer:Basement:ZFACE"};
+
+    objectFound = false;
+    for (size_t count = 0; count < groundHTObjects.size(); ++count) {
+        objectType = groundHTObjects[count];
+        auto it = epJSON.find(objectType);
+        if (it != epJSON.end()) {
+            objectFound = true;
+            break;
+        }
+    }
+    if (objectFound) {
+        ShowSevereError(state, "GroundHeatTransfer:* objects found. These objects are not supported directly by EnergyPlus.");
+        ShowContinueError(state, "You must run the ExpandObjects program on this input.");
+        errorsFound = true;
+    }
+
+    constexpr std::array<std::string_view, 4> parametricObjects = {
+        "Parametric:SetValueForRun", "Parametric:Logic", "Parametric:RunControl", "Parametric:FileNameSuffix"};
+
+    objectFound = false;
+    for (size_t count = 0; count < parametricObjects.size(); ++count) {
+        objectType = parametricObjects[count];
+        auto it = epJSON.find(objectType);
+        if (it != epJSON.end()) {
+            objectFound = true;
+            break;
+        }
+    }
+    if (objectFound) {
+        ShowSevereError(state, "Parametric:* objects found. These objects are not supported directly by EnergyPlus.");
+        ShowContinueError(state, "You must run the ParametricPreprocesor program on this input.");
+        errorsFound = true;
+    }
+    return errorsFound;
 }
 
 bool InputProcessor::processErrors(EnergyPlusData &state)
@@ -540,6 +656,117 @@ bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &o
     auto const &sizing_factor_schema_field_obj = schema_obj_props.at(fieldName);
     bool defaultFound = findDefault(value, sizing_factor_schema_field_obj);
     return defaultFound;
+}
+
+std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+{
+    // Return the value of fieldName in ep_object as a string.
+    // If the field is not present in ep_object then return its default if there is one, or return an empty string
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+    bool isDefaulted = false;
+    std::string value;
+    auto it = ep_object.find(fieldName);
+    if (it != ep_object.end()) {
+        auto const &field_value = it.value();
+        if (field_value.is_string()) {
+            auto valuePair = getObjectItemValue(field_value.get<std::string>(), schema_field_obj);
+            value = valuePair.first;
+            isDefaulted = valuePair.second;
+        } else {
+            assert(false); // String value requested but field type is numeric
+        }
+    } else {
+        isDefaulted = findDefault(value, schema_field_obj);
+        if (!isDefaulted) {
+            value = "";
+        }
+    }
+    return value;
+}
+
+Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+{
+    // Return the value of fieldName in ep_object as a Real64.
+    // If the field value is a string, then assum autosize and return -99999.
+    // If the field is not present in ep_object then return its default if there is one, or return 0.0
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+    bool isDefaulted = false;
+    Real64 value = 0.0;
+    auto it = ep_object.find(fieldName);
+    if (it != ep_object.end()) {
+        auto const &field_value = it.value();
+        if (field_value.is_number()) {
+            if (field_value.is_number_integer()) {
+                value = field_value.get<std::int64_t>();
+            } else {
+                value = field_value.get<double>();
+            }
+        } else {
+            bool is_empty = field_value.get<std::string>().empty();
+            if (is_empty) {
+                isDefaulted = findDefault(value, schema_field_obj);
+            } else {
+                value = -99999; // autosize and autocalculate
+            }
+        }
+    } else {
+        isDefaulted = findDefault(value, schema_field_obj);
+        if (!isDefaulted) {
+            value = 0.0;
+        }
+    }
+    return value;
+}
+
+int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+{
+    // Return the value of fieldName in ep_object as an integer (rounded to nearest integer if the input value is real).
+    // If the field value is a string, then assume autosize or autocalulate and return -99999.
+    // If the field is not present in ep_object then return its default if there is one, or return 0
+
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+    bool isDefaulted = false;
+    int value = 0;
+    Real64 defaultValue = 0.0;
+    auto it = ep_object.find(fieldName);
+    if (it != ep_object.end()) {
+        auto const &field_value = it.value();
+        if (field_value.is_number()) {
+            if (field_value.is_number_integer()) {
+                value = field_value.get<std::int64_t>();
+            } else {
+                value = nint(field_value.get<double>());
+            }
+        } else {
+            bool is_empty = field_value.get<std::string>().empty();
+            if (is_empty) {
+                isDefaulted = findDefault(defaultValue, schema_field_obj);
+            } else {
+                value = -99999; // autosize and autocalculate
+            }
+        }
+    } else {
+        isDefaulted = findDefault(defaultValue, schema_field_obj);
+        if (isDefaulted) {
+            value = nint(defaultValue);
+        } else {
+            value = 0.0;
+        }
+    }
+    return value;
+}
+
+const json &InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord)
+{
+    auto const &schema_properties = schema.at("properties");
+    const json &object_schema = schema_properties.at(objectWord);
+    assert(!object_schema.empty()); // If this fails, the object type does not exist in the schema
+
+    auto const &schema_obj_props = getPatternProperties(state, object_schema);
+    return schema_obj_props;
 }
 
 std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string const &field_value, json const &schema_field_obj)
@@ -1047,7 +1274,7 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     for (auto it = obj->begin(); it != obj->end(); ++it) {
         auto it2 = it.value().find(NameTypeVal);
 
-        if ((it2 != it.value().end()) && (UtilityRoutines::MakeUPPERCase(it2.value()) == upperObjName)) {
+        if ((it2 != it.value().end()) && (UtilityRoutines::MakeUPPERCase(AsString(it2.value())) == upperObjName)) {
             found = true;
             break;
         }
@@ -1824,7 +2051,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    auto const report_name = UtilityRoutines::MakeUPPERCase(extensions.at("report_name"));
+                    auto const report_name = UtilityRoutines::MakeUPPERCase(AsString(extensions.at("report_name")));
                     if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
                         for (int i = 1; i <= DataOutputs::NumMonthlyReports; ++i) {
                             addVariablesForMonthlyReport(state, DataOutputs::MonthlyNamedReports(i));

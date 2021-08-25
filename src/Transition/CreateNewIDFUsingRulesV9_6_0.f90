@@ -384,20 +384,118 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                 CurArgs = CurArgs + 1
 
               ! If your original object starts with A, insert the rules here
+              CASE('AIRFLOWNETWORK:MULTIZONE:REFERENCECRACKCONDITIONS')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                  IF (InArgs(2) == Blank) THEN
+                  OutArgs(2)="20.0"
+                  END IF
+
+
+              CASE('AIRLOOPHVAC:OUTDOORAIRSYSTEM')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  CurArgs = CurArgs - 1
+
+              ! If your original object starts with B, insert the rules here
+              CASE('BUILDINGSURFACE:DETAILED')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:4)=InArgs(1:4)
+                  OutArgs(5) = ''
+                  OutArgs(6:CurArgs+1)=InArgs(5:CurArgs)
+                  CurArgs = CurArgs + 1
 
               ! If your original object starts with C, insert the rules here
+              CASE('CEILING:ADIABATIC')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              CASE('CEILING:INTERZONE')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              CASE('CONTROLLER:MECHANICALVENTILATION')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                IF (MakeUPPERCase(OutArgs(4)) == "VENTILATIONRATEPROCEDURE") THEN
+                  OutArgs(4) = "Standard62.1VentilationRateProcedure"
+                ENDIF
               
               ! If your original object starts with D, insert the rules here
 
               ! If your original object starts with E, insert the rules here
 
               ! If your original object starts with F, insert the rules here
+              CASE('FLOOR:DETAILED')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              CASE('FLOOR:GROUNDCONTACT')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              CASE('FLOOR:ADIABATIC')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              CASE('FLOOR:INTERZONE')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              ! If your original object starts with D, insert the rules here
 
               ! If your original object starts with G, insert the rules here
+
+          CASE('GROUNDHEATEXCHANGER:SYSTEM')
+              CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+              nodiff=.false.
+              OutArgs(1:9)=InArgs(1:9)
+              IF (CurArgs .gt. 9) THEN
+                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
+                  IF (InArgs(9) .eq. '') THEN
+                      OutArgs(10)='UHFCALC'
+                  ENDIF
+                  CurArgs=CurArgs+1
+              ENDIF
 
               ! If your original object starts with H, insert the rules here
 
               ! If your original object starts with I, insert the rules here
+              CASE('INTERNALMASS')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
 
               ! If your original object starts with L, insert the rules here
 
@@ -410,9 +508,42 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with P, insert the rules here
 
               ! If your original object starts with R, insert the rules here
+              CASE('ROOFCEILING:DETAILED')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
 
               ! If your original object starts with S, insert the rules here
+              
+              CASE('SIZING:SYSTEM')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                IF (MakeUPPERCase(OutArgs(27)) == "VENTILATIONRATEPROCEDURE") THEN
+                  OutArgs(27) = "Standard62.1VentilationRateProcedure"
+                ENDIF
 
+              CASE('ROOF')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              ! If your original object starts with S, insert the rules here
+              CASE('PERFORMANCEPRECISIONTRADEOFFS')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                  IF (MakeUPPERCase(InArgs(3)) == "MODE06") THEN
+                    OutArgs(3)='Mode07'
+                  ELSEIF (MakeUPPERCase(InArgs(3)) == "MODE07") THEN
+                    OutArgs(3)='Mode08'
+                  END IF
               ! If your original object starts with T, insert the rules here
 
               ! If your original object starts with U, insert the rules here
@@ -420,6 +551,45 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with V, insert the rules here
 
               ! If your original object starts with W, insert the rules here
+              CASE('WALL:DETAILED')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              CASE('WALL:EXTERIOR')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              CASE('WALL:ADIABATIC')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              CASE('WALL:UNDERGROUND')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              CASE('WALL:INTERZONE')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
 
               ! If your original object starts with Z, insert the rules here
 
