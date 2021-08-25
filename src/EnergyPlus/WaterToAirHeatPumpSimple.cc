@@ -1153,7 +1153,9 @@ namespace WaterToAirHeatPumpSimple {
             if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate < 0.25 * RatedAirMassFlowRate) {
                 ShowRecurringWarningErrorAtEnd(state,
                                                "Actual air mass flow rate is smaller than 25% of water-to-air heat pump coil rated air flow rate.",
-                                               state.dataWaterToAirHeatPumpSimple->AirflowErrPointer);
+                                               state.dataWaterToAirHeatPumpSimple->AirflowErrPointer,
+                                               state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate,
+                                               state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate);
             }
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterFlowMode = true;
         } else { // heat pump is off
