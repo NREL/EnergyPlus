@@ -1970,6 +1970,31 @@ bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
                              BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing));
 }
 
+Real64 ConstructionProps::setThicknessPerpendicular(EnergyPlusData &state, Real64 userValue)
+{
+    // Limits set here are similar to limits used in HydronicSystemBaseData::sizeRadiantSystemTubeLength
+    // which is for autosizing tube length.  The limits are not as strictly enforced here because they are
+    // not being used for autosizing so more latitude with the values is desired.  Warnings will still alert
+    // the user if values seem outside of the ordinary range anticipated.
+    Real64 returnValue = userValue / 2.0; // Divide by two because internally the half distance will be used to calculate CTFs
+    if (returnValue <= 0.001) {           // lowest reasonable value for "half" the tube spacing in meters
+        ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a tube spacing that is less than 2 mm.  This is not allowed.");
+        ShowContinueError(
+            state, "Construction=" + this->Name + " has this problem.  The tube spacing has been reset to 0.15m (~6 inches) for this construction.");
+        ShowContinueError(state, "As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing.");
+        returnValue = 0.075;          // default "half" tube spacing in meters (roughly equivalent to 15cm or 6 inches of tube spacing)
+    } else if (returnValue < 0.005) { // below this value for "half" the tube spacing in meters throw a warning
+        ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a tube spacing that is less than 1 cm (0.4 inch).");
+        ShowContinueError(state, "Construction=" + this->Name + " has this concern.  Please check this construction to make sure it is correct.");
+        ShowContinueError(state, "As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing.");
+    } else if (returnValue > 0.5) { // above this value for "half" the tube spacing in meters throw a warning
+        ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a tube spacing that is greater than 1 meter (39.4 inches) ");
+        ShowContinueError(state, "Construction=" + this->Name + " has this concern.  Please check this construction to make sure it is correct.");
+        ShowContinueError(state, "As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing.");
+    }
+    return returnValue;
+}
+
 Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue)
 {
     if (userValue < 0.0) {

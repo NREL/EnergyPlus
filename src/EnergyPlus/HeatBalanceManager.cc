@@ -4708,7 +4708,7 @@ namespace HeatBalanceManager {
                 thisConstruct.SourceAfterLayer = source_after_layer_number;
                 thisConstruct.TempAfterLayer = calculation_after_layer_number;
                 thisConstruct.SolutionDimensions = ctf_dimensions;
-                thisConstruct.ThicknessPerpend = tube_spacing / 2.0;
+                thisConstruct.ThicknessPerpend = thisConstruct.setThicknessPerpendicular(state, tube_spacing);
                 thisConstruct.userTemperatureLocationPerpendicular =
                     thisConstruct.setUserTemperatureLocationPerpendicular(state, calculation_position);
 
