@@ -425,7 +425,7 @@ namespace MundtSimMgr {
             state.dataMundtSimMgr->QsysCoolTot = -(SumSysMCpT - ZoneMassFlowRate * CpAir * state.dataHeatBalFanSys->MAT(ZoneNum));
         }
         // determine heat gains
-        SumAllInternalConvectionGains(state, ZoneNum, state.dataMundtSimMgr->ConvIntGain);
+        state.dataMundtSimMgr->ConvIntGain = SumAllInternalConvectionGains(state, ZoneNum);
         state.dataMundtSimMgr->ConvIntGain += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
                                               state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum) +
                                               state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult;

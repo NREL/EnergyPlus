@@ -913,7 +913,7 @@ namespace CrossVentMgr {
             }
         }
 
-        SumAllInternalConvectionGains(state, ZoneNum, ConvGains);
+        ConvGains = SumAllInternalConvectionGains(state, ZoneNum);
         ConvGains += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
                      state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum) + state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult;
 

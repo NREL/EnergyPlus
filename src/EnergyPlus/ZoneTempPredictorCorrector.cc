@@ -6600,7 +6600,7 @@ void CalcZoneSums(EnergyPlusData &state,
     auto &AirDistUnit = state.dataDefineEquipment->AirDistUnit;
 
     // Sum all convective internal gains: SumIntGain
-    SumAllInternalConvectionGains(state, ZoneNum, SumIntGain);
+    SumIntGain = SumAllInternalConvectionGains(state, ZoneNum);
     SumIntGain += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum);
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
@@ -6917,7 +6917,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     auto &AirDistUnit = state.dataDefineEquipment->AirDistUnit;
 
     // Sum all convective internal gains: SumIntGain
-    SumAllInternalConvectionGains(state, ZoneNum, SumIntGains);
+    SumIntGains = SumAllInternalConvectionGains(state, ZoneNum);
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)

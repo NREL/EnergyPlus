@@ -96,9 +96,8 @@ namespace InternalHeatGains {
 
     void UpdateInternalGainValues(EnergyPlusData &state, Optional_bool_const SuppressRadiationUpdate = _, Optional_bool_const SumLatentGains = _);
 
-    void SumAllInternalConvectionGains(EnergyPlusData &state,
-                                       int const ZoneNum,        // zone index pointer for which zone to sum gains for
-                                       Real64 &SumConvGainRate); // For HybridModel
+    Real64 SumAllInternalConvectionGains(EnergyPlusData &state,
+                                         int const ZoneNum); // zone index pointer for which zone to sum gains for
 
     void SumAllInternalConvectionGainsExceptPeople(EnergyPlusData &state,
                                                    int const ZoneNum, // zone index pointer for which zone to sum gains for
