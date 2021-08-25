@@ -8292,7 +8292,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZnRpt(ZoneLoop).TotVisHeatGain = state.dataHeatBal->ZnRpt(ZoneLoop).LtsVisGain;
             state.dataHeatBal->ZnRpt(ZoneLoop).TotVisHeatGainRate = state.dataHeatBal->ZnRpt(ZoneLoop).LtsVisGainRate;
 
-            SumInternalRadiationGainsByTypes(state, ZoneLoop, TradIntGainTypes, state.dataHeatBal->ZnRpt(ZoneLoop).TotRadiantGainRate);
+            state.dataHeatBal->ZnRpt(ZoneLoop).TotRadiantGainRate = SumInternalRadiationGainsByTypes(state, ZoneLoop, TradIntGainTypes);
             state.dataHeatBal->ZnRpt(ZoneLoop).TotRadiantGain =
                 state.dataHeatBal->ZnRpt(ZoneLoop).TotRadiantGainRate * state.dataGlobal->TimeStepZoneSec;
 
@@ -8461,7 +8461,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->spaceRpt(spaceNum).TotVisHeatGainRate = state.dataHeatBal->spaceRpt(spaceNum).LtsVisGainRate;
 
             int zoneNum = state.dataHeatBal->space(spaceNum).zoneNum;
-            SumInternalRadiationGainsByTypes(state, zoneNum, TradIntGainTypes, state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGainRate, spaceNum);
+            state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGainRate = SumInternalRadiationGainsByTypes(state, zoneNum, TradIntGainTypes, spaceNum);
             state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGain =
                 state.dataHeatBal->spaceRpt(spaceNum).TotRadiantGainRate * state.dataGlobal->TimeStepZoneSec;
 
@@ -8850,12 +8850,11 @@ namespace InternalHeatGains {
         sumRadGainRate = tmpSumRadGainRate;
     }
 
-    void
+    Real64
     SumInternalRadiationGainsByTypes(EnergyPlusData &state,
                                      int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
                                      const Array1D<DataHeatBalance::IntGainType> &GainTypeARR, // variable length 1-d array of enum valued gain types
-                                     Real64 &SumRadiationGainRate,
-                                     int const spaceIndex) // space index pointer, sum gains only for this space
+                                     int const spaceIndex)                                     // space index pointer, sum gains only for this space
     {
 
         // SUBROUTINE INFORMATION:
@@ -8865,15 +8864,17 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gain types
 
+        // Return value
+        Real64 SumRadiationGainRate(0.0);
+
         int NumberOfTypes = size(GainTypeARR);
-        Real64 tmpSumRadiationGainRate = 0.0;
 
         // TODO MJW: This could be refactored to avoid duplicate code, but for now . . . .
         if (spaceIndex > 0) {
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
                 for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
                     if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompType == GainTypeARR(TypeNum)) {
-                        tmpSumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).RadiantGainRate;
+                        SumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).RadiantGainRate;
                     }
                 }
             }
@@ -8885,14 +8886,14 @@ namespace InternalHeatGains {
                 for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                     for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
                         if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR(TypeNum)) {
-                            tmpSumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).RadiantGainRate;
+                            SumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).RadiantGainRate;
                         }
                     }
                 }
             }
         }
 
-        SumRadiationGainRate = tmpSumRadiationGainRate;
+        return SumRadiationGainRate;
     }
 
     void SumAllInternalLatentGains(EnergyPlusData &state,
@@ -9216,22 +9217,22 @@ namespace InternalHeatGains {
                     SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesPeople);
                 state.dataOutRptTab->peopleLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     SumInternalLatentGainsByTypes(state, iZone, IntGainTypesPeople);
-                SumInternalRadiationGainsByTypes(
-                    state, iZone, IntGainTypesPeople, state.dataOutRptTab->peopleRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                state.dataOutRptTab->peopleRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
+                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesPeople);
 
                 state.dataOutRptTab->lightInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesLight);
                 SumReturnAirConvectionGainsByTypes(
                     state, iZone, IntGainTypesLight, state.dataOutRptTab->lightRetAirSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalRadiationGainsByTypes(
-                    state, iZone, IntGainTypesLight, state.dataOutRptTab->lightLWRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                state.dataOutRptTab->lightLWRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
+                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesLight);
 
                 state.dataOutRptTab->equipInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesEquip);
                 state.dataOutRptTab->equipLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     SumInternalLatentGainsByTypes(state, iZone, IntGainTypesEquip);
-                SumInternalRadiationGainsByTypes(
-                    state, iZone, IntGainTypesEquip, state.dataOutRptTab->equipRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                state.dataOutRptTab->equipRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
+                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesEquip);
 
                 state.dataOutRptTab->refrigInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesRefrig);
@@ -9247,13 +9248,13 @@ namespace InternalHeatGains {
 
                 state.dataOutRptTab->hvacLossInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesHvacLoss);
-                SumInternalRadiationGainsByTypes(
-                    state, iZone, IntGainTypesHvacLoss, state.dataOutRptTab->hvacLossRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                state.dataOutRptTab->hvacLossRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
+                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesHvacLoss);
 
                 state.dataOutRptTab->powerGenInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesPowerGen);
-                SumInternalRadiationGainsByTypes(
-                    state, iZone, IntGainTypesPowerGen, state.dataOutRptTab->powerGenRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                state.dataOutRptTab->powerGenRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
+                    SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesPowerGen);
             }
         }
     }
