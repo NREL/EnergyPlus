@@ -1684,7 +1684,7 @@ namespace RoomAirModelManager {
                             TypeNum = getEnumerationValue(DataHeatBalance::ZoneIntGainDeviceTypes, state.dataIPShortCut->cAlphaArgs(gainsLoop * 2));
                             if (TypeNum > 0) {
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).TypeOfNum =
-                                    static_cast<DataHeatBalance::IntGainTypeOf>(TypeNum);
+                                    static_cast<DataHeatBalance::IntGainType>(TypeNum);
                             } else {
                                 ShowSevereError(state,
                                                 "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(gainsLoop * 2) +

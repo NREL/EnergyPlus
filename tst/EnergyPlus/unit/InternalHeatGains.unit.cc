@@ -661,7 +661,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
 
     // Set up a simple convective gain for each gain type
     int zoneNum = 1;
-    int numGainTypes = static_cast<int>(DataHeatBalance::IntGainTypeOf::NUM);
+    int numGainTypes = static_cast<int>(DataHeatBalance::IntGainType::NUM);
     Array1D<Real64> convGains({0, numGainTypes - 1});
     convGains = 0.0;
     Real64 totConvGains = 0.0;
@@ -674,7 +674,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
                               zoneNum,
                               format(DataHeatBalance::ccZoneIntGainDeviceTypes[gainType]),
                               "Gain",
-                              static_cast<DataHeatBalance::IntGainTypeOf>(gainType),
+                              static_cast<DataHeatBalance::IntGainType>(gainType),
                               &convGains(gainType));
     }
 
@@ -707,11 +707,11 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
 
     // Legitimate gain types excluded from this total
     expectedTotConvGains -=
-        convGains(static_cast<int>(DataHeatBalance::IntGainTypeOf::ZoneContaminantSourceAndSinkCarbonDioxide)); // this is only used for CO2
+        convGains(static_cast<int>(DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkCarbonDioxide)); // this is only used for CO2
     expectedTotConvGains -= convGains(
-        static_cast<int>(DataHeatBalance::IntGainTypeOf::ZoneContaminantSourceAndSinkGenericContam)); // this is only used for generic contaminants
+        static_cast<int>(DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam)); // this is only used for generic contaminants
     expectedTotConvGains -= convGains(
-        static_cast<int>(DataHeatBalance::IntGainTypeOf::DaylightingDeviceTubular)); // this is included in Fenestration Conduction - Sensible Instant
+        static_cast<int>(DataHeatBalance::IntGainType::DaylightingDeviceTubular)); // this is included in Fenestration Conduction - Sensible Instant
 
     // ** NOTE: If this unit test fails, the likely cause is that a new internal gain type was added, but it was not added to one of the subtotal
     // types in InternalHeatGains::GatherComponentLoadsIntGain() this also means that the new type may be missing from other places that collect

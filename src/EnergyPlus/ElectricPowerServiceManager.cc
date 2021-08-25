@@ -2676,7 +2676,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                                       zoneNum_,
                                       "ElectricLoadCenter:Inverter:Simple",
                                       name_,
-                                      DataHeatBalance::IntGainTypeOf::ElectricLoadCenterInverterSimple,
+                                      DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
                                       &qdotConvZone_,
                                       nullptr,
                                       &qdotRadZone_);
@@ -2687,7 +2687,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                                       zoneNum_,
                                       "ElectricLoadCenter:Inverter:FunctionOfPower",
                                       name_,
-                                      DataHeatBalance::IntGainTypeOf::ElectricLoadCenterInverterFunctionOfPower,
+                                      DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
                                       &qdotConvZone_,
                                       nullptr,
                                       &qdotRadZone_);
@@ -2698,7 +2698,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                                       zoneNum_,
                                       "ElectricLoadCenter:Inverter:LookUpTable",
                                       name_,
-                                      DataHeatBalance::IntGainTypeOf::ElectricLoadCenterInverterLookUpTable,
+                                      DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
                                       &qdotConvZone_,
                                       nullptr,
                                       &qdotRadZone_);
@@ -3133,7 +3133,7 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                                   zoneNum_,
                                   "ElectricLoadCenter:Storage:Converter",
                                   name_,
-                                  DataHeatBalance::IntGainTypeOf::ElectricLoadCenterConverter,
+                                  DataHeatBalance::IntGainType::ElectricLoadCenterConverter,
                                   &qdotConvZone_,
                                   nullptr,
                                   &qdotRadZone_);
@@ -3716,7 +3716,7 @@ ElectricStorage::ElectricStorage( // main constructor
                                       zoneNum_,
                                       "ElectricLoadCenter:Storage:Simple",
                                       name_,
-                                      DataHeatBalance::IntGainTypeOf::ElectricLoadCenterStorageSimple,
+                                      DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
                                       &qdotConvZone_,
                                       nullptr,
                                       &qdotRadZone_);
@@ -3727,7 +3727,7 @@ ElectricStorage::ElectricStorage( // main constructor
                                       zoneNum_,
                                       "ElectricLoadCenter:Storage:Battery",
                                       name_,
-                                      DataHeatBalance::IntGainTypeOf::ElectricLoadCenterStorageBattery,
+                                      DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
                                       &qdotConvZone_,
                                       nullptr,
                                       &qdotRadZone_);
@@ -3738,7 +3738,7 @@ ElectricStorage::ElectricStorage( // main constructor
                                       zoneNum_,
                                       "ElectricLoadCenter:Storage:LiIonNMCBattery",
                                       name_,
-                                      DataHeatBalance::IntGainTypeOf::ElectricLoadCenterStorageLiIonNmcBattery,
+                                      DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
                                       &qdotConvZone_,
                                       nullptr,
                                       &qdotRadZone_);
@@ -4869,7 +4869,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                   zoneNum_,
                                   "ElectricLoadCenter:Transformer",
                                   name_,
-                                  DataHeatBalance::IntGainTypeOf::ElectricLoadCenterTransformer,
+                                  DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
                                   &qdotConvZone_,
                                   nullptr,
                                   &qdotRadZone_);

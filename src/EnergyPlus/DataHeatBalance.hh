@@ -243,7 +243,7 @@ namespace DataHeatBalance {
         NoAdjustReturnAndMixing
     };
 
-    enum class IntGainTypeOf
+    enum class IntGainType
     {
         Unassigned = -1,
         People,
@@ -303,7 +303,7 @@ namespace DataHeatBalance {
         NUM
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainTypeOf::NUM)> ZoneIntGainDeviceTypes = {
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> ZoneIntGainDeviceTypes = {
         "PEOPLE",
         "LIGHTS",
         "ELECTRICEQUIPMENT",
@@ -359,7 +359,7 @@ namespace DataHeatBalance {
         "ELECTRICLOADCENTER:STORAGE:CONVERTER",
         "FAN:SYSTEMMODEL"};
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainTypeOf::NUM)> ccZoneIntGainDeviceTypes = {
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> ccZoneIntGainDeviceTypes = {
         "People",
         "Lights",
         "ElectricEquipment",
@@ -1317,7 +1317,7 @@ namespace DataHeatBalance {
         // Members
         std::string CompObjectType;         // device object class name
         std::string CompObjectName;         // device user unique name
-        IntGainTypeOf CompTypeOfNum;        // type of internal gain device identifier
+        IntGainType CompType;               // type of internal gain device identifier
         Real64 spaceGainFrac;               // Fraction of gain value assigned to this Space (because gain rate might be for an entire zone)
         Real64 *PtrConvectGainRate;         // POINTER to value of convection heat gain rate for device, watts
         Real64 ConvectGainRate;             // current timestep value of convection heat gain rate for device, watts
@@ -1337,7 +1337,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         GenericComponentZoneIntGainStruct()
-            : CompTypeOfNum(IntGainTypeOf::Unassigned), spaceGainFrac(1.0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0),
+            : CompType(IntGainType::Unassigned), spaceGainFrac(1.0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0),
               PtrReturnAirConvGainRate(nullptr), ReturnAirConvGainRate(0.0), PtrRadiantGainRate(nullptr), RadiantGainRate(0.0),
               PtrLatentGainRate(nullptr), LatentGainRate(0.0), PtrReturnAirLatentGainRate(nullptr), ReturnAirLatentGainRate(0.0),
               PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0), PtrGenericContamGainRate(nullptr), GenericContamGainRate(0.0),

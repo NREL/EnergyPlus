@@ -305,7 +305,7 @@ namespace DaylightingDevices {
                                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum),
                                           "DaylightingDevice:Tubular",
                                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name,
-                                          DataHeatBalance::IntGainTypeOf::DaylightingDeviceTubular,
+                                          DataHeatBalance::IntGainType::DaylightingDeviceTubular,
                                           &state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
 
                 } // TZoneNum

@@ -1209,7 +1209,7 @@ namespace FuelCellElectricGenerator {
                                   this->FCPM.ZoneID,
                                   "Generator:FuelCell",
                                   this->Name,
-                                  DataHeatBalance::IntGainTypeOf::GeneratorFuelCell,
+                                  DataHeatBalance::IntGainType::GeneratorFuelCell,
                                   &this->Report.SkinLossConvect,
                                   nullptr,
                                   &this->Report.SkinLossRadiat);

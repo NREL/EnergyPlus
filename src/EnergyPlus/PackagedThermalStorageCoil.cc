@@ -385,7 +385,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                                   ZoneIndexTrial,
                                   "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                   state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
-                                  DataHeatBalance::IntGainTypeOf::PackagedTESCoilTank,
+                                  DataHeatBalance::IntGainType::PackagedTESCoilTank,
                                   &state.dataPackagedThermalStorageCoil->TESCoil(item).QdotAmbient);
         }
 

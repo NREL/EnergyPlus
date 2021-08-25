@@ -60,7 +60,7 @@ void SetupZoneInternalGain(EnergyPlusData &state,
                            int const ZoneNum,
                            std::string const &cComponentObject, // object class name for device contributing internal gain
                            std::string const &cComponentName,   // user unique name for device
-                           DataHeatBalance::IntGainTypeOf const IntGainComp_TypeOfNum,
+                           DataHeatBalance::IntGainType const IntGainComp_TypeOfNum,
                            Real64 *ConvectionGainRate, // pointer target for remote convection gain value to be accessed
                            Real64 *ReturnAirConvectionGainRate,
                            Real64 *ThermalRadiationGainRate, // pointer target for remote IR radiation gain value to be accessed
@@ -98,7 +98,7 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
                             Real64 spaceGainFraction,            // Fraction of gain value assigned to this space
                             std::string const &cComponentObject, // object class name for device contributing internal gain
                             std::string const &cComponentName,   // user unique name for device
-                            DataHeatBalance::IntGainTypeOf const IntGainComp_TypeOfNum,
+                            DataHeatBalance::IntGainType const IntGainComp_TypeOfNum,
                             Real64 *ConvectionGainRate, // pointer target for remote convection gain value to be accessed
                             Real64 *ReturnAirConvectionGainRate,
                             Real64 *ThermalRadiationGainRate, // pointer target for remote IR radiation gain value to be accessed
@@ -151,7 +151,7 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     auto &thisIntGain = state.dataHeatBal->spaceIntGainDevices(spaceNum);
     for (IntGainsNum = 1; IntGainsNum <= thisIntGain.numberOfDevices; ++IntGainsNum) {
         if ((thisIntGain.device(IntGainsNum).CompObjectType == UpperCaseObjectType) &&
-            (thisIntGain.device(IntGainsNum).CompTypeOfNum == IntGainComp_TypeOfNum)) {
+            (thisIntGain.device(IntGainsNum).CompType == IntGainComp_TypeOfNum)) {
             FoundIntGainsType = true;
             if (thisIntGain.device(IntGainsNum).CompObjectName == UpperCaseObjectName) {
                 FoundDuplicate = true;
@@ -180,7 +180,7 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
 
     thisIntGain.device(thisIntGain.numberOfDevices).CompObjectType = UpperCaseObjectType;
     thisIntGain.device(thisIntGain.numberOfDevices).CompObjectName = UpperCaseObjectName;
-    thisIntGain.device(thisIntGain.numberOfDevices).CompTypeOfNum = IntGainComp_TypeOfNum;
+    thisIntGain.device(thisIntGain.numberOfDevices).CompType = IntGainComp_TypeOfNum;
     thisIntGain.device(thisIntGain.numberOfDevices).spaceGainFrac = spaceGainFraction;
 
     // note pointer assignments in code below!
