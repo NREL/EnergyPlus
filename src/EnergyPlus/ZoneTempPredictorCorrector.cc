@@ -3917,7 +3917,7 @@ void PredictSystemLoads(EnergyPlusData &state,
 
         // Sum all convective internal gains except for people: SumIntGainExceptPeople
         if (state.dataHybridModel->FlagHybridModel_PC) {
-            SumAllInternalConvectionGainsExceptPeople(state, ZoneNum, SumIntGainExceptPeople);
+            SumIntGainExceptPeople = SumAllInternalConvectionGainsExceptPeople(state, ZoneNum);
         }
 
         TempDepCoef = SumHA + SumMCp;
@@ -5261,7 +5261,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
 
         // Sum all convective internal gains except for people: SumIntGainExceptPeople
         if (state.dataHybridModel->FlagHybridModel_PC) {
-            SumAllInternalConvectionGainsExceptPeople(state, ZoneNum, SumIntGainExceptPeople);
+            SumIntGainExceptPeople = SumAllInternalConvectionGainsExceptPeople(state, ZoneNum);
         }
 
         //    ZoneTempHistoryTerm = (3.0D0 * ZTM1(ZoneNum) - (3.0D0/2.0D0) * ZTM2(ZoneNum) + (1.0D0/3.0D0) * ZTM3(ZoneNum))

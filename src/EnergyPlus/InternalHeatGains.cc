@@ -8692,9 +8692,11 @@ namespace InternalHeatGains {
     }
 
     // For HybridModel
-    void SumAllInternalConvectionGainsExceptPeople(EnergyPlusData &state, int const ZoneNum, Real64 &SumConvGainRateExceptPeople)
+    Real64 SumAllInternalConvectionGainsExceptPeople(EnergyPlusData &state, int const ZoneNum)
     {
-        Real64 tmpSumConvGainRateExceptPeople = 0.0;
+        // Return value
+        Real64 SumConvGainRateExceptPeople(0.0);
+        
         std::string str_people = "PEOPLE";
 
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
@@ -8704,12 +8706,12 @@ namespace InternalHeatGains {
 
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompObjectType != str_people) {
-                    tmpSumConvGainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ConvectGainRate;
+                    SumConvGainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ConvectGainRate;
                 }
             }
         }
 
-        SumConvGainRateExceptPeople = tmpSumConvGainRateExceptPeople;
+        return SumConvGainRateExceptPeople;
     }
 
     Real64
