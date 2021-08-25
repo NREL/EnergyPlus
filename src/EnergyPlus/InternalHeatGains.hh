@@ -171,12 +171,11 @@ namespace InternalHeatGains {
                                                int const ZoneNum, // zone index pointer for which zone to sum gains for
                                                Real64 &SumLatentGainRateExceptPeople);
 
-    void
+    Real64
     SumInternalLatentGainsByTypes(EnergyPlusData &state,
                                   int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
                                   const Array1D<DataHeatBalance::IntGainType> &GainTypeARR, // variable length 1-d array of enum valued gain types
-                                  Real64 &SumLatentGainRate,
-                                  int const spaceIndex = 0); // space index pointer, sum gains only for this space
+                                  int const spaceIndex = 0);                                // space index pointer, sum gains only for this space
 
     void SumAllReturnAirLatentGains(EnergyPlusData &state,
                                     int const ZoneNum, // zone index pointer for which zone to sum gains for
