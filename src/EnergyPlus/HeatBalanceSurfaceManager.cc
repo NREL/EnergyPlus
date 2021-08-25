@@ -4770,7 +4770,8 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional
                 state.dataHeatBalFanSys->QHTRadSysSurf(surfNum) + state.dataHeatBalFanSys->QCoolingPanelSurf(surfNum) +
                 state.dataHeatBalFanSys->QHWBaseboardSurf(surfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(surfNum) +
                 state.dataHeatBalFanSys->QElecBaseboardSurf(surfNum);
-            if (state.dataSurface->Surface(surfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects. Inside temp is handled by TDD:DIFFUSER.
+            if (state.dataSurface->Surface(surfNum).Class == SurfaceClass::TDD_Dome)
+                continue; // Skip TDD:DOME objects. Inside temp is handled by TDD:DIFFUSER.
             state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) =
                 -state.dataHeatBalSurf->SurfHConvInt(surfNum) *
                 (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum));

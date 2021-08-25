@@ -150,6 +150,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataHeatBal->Zone.allocate(ZoneNum);
     state->dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(ZoneNum).HTSurfaceLast = 1;
+    state->dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceFirst = 1;
+    state->dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast = 1;
+    state->dataHeatBal->Zone(ZoneNum).OpaqOrWinSurfaceFirst = 1;
+    state->dataHeatBal->Zone(ZoneNum).OpaqOrWinSurfaceLast = 1;
 
     CalcOutsideSurfTemp(*state, SurfNum, ZoneNum, ConstrNum, HMovInsul, TempExt, ErrorFlag);
 

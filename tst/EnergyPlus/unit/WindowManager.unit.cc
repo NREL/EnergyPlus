@@ -2738,17 +2738,22 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
 
-    EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
-
-    Psychrometrics::InitializePsychRoutines(*state);
-
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->TimeStepZoneSec = 3600.0;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 100000;
+
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    SolarShading::AllocateModuleArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
+
+    EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
+
+    Psychrometrics::InitializePsychRoutines(*state);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone";
@@ -2777,6 +2782,9 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataSurface->Surface(surfNum1).HeatTransSurf = true;
     state->dataSurface->Surface(surfNum2).HeatTransSurf = true;
     state->dataSurface->Surface(surfNum3).HeatTransSurf = true;
+    state->dataSurface->SurfActiveConstruction(surfNum1) = state->dataSurface->Surface(surfNum1).Construction;
+    state->dataSurface->SurfActiveConstruction(surfNum2) = state->dataSurface->Surface(surfNum2).Construction;
+    state->dataSurface->SurfActiveConstruction(surfNum3) = state->dataSurface->Surface(surfNum3).Construction;
     state->dataSurface->Surface(surfNum1).Area = 10.0;
     state->dataSurface->Surface(surfNum2).Area = 10.0;
     state->dataSurface->Surface(surfNum3).Area = 10.0;
@@ -2828,6 +2836,9 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     // Calculate temperature based on supply flow rate
 
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBalSurf->SurfHConvInt(surfNum2), inSurfTemp, outSurfTemp);
+
+    state->dataHeatBalSurf->SurfTempOut(surfNum2) = outSurfTemp;
+
     HeatBalanceSurfaceManager::ReportSurfaceHeatBalance(*state);
 
     // Test if LWR from surrounding surfaces correctly calculated
