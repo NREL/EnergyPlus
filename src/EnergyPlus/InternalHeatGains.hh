@@ -163,9 +163,9 @@ namespace InternalHeatGains {
     );
 
     // Added for hybrid model -- calculate the latent gain from all sources except for people
-    void SumAllInternalLatentGainsExceptPeople(EnergyPlusData &state,
-                                               int const ZoneNum, // zone index pointer for which zone to sum gains for
-                                               Real64 &SumLatentGainRateExceptPeople);
+    Real64 SumAllInternalLatentGainsExceptPeople(EnergyPlusData &state,
+                                                 int const ZoneNum // zone index pointer for which zone to sum gains for
+    );
 
     Real64
     SumInternalLatentGainsByTypes(EnergyPlusData &state,

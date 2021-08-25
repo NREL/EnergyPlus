@@ -7470,7 +7470,7 @@ namespace InternalHeatGains {
             state.dataHeatBalFanSys->ZoneLatentGain(NZ) = InternalHeatGains::SumAllInternalLatentGains(state, NZ);
             // Added for hybrid model
             if (state.dataHybridModel->FlagHybridModel_PC) {
-                InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ, state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ));
+                state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ) = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ);
             }
         }
 
@@ -8649,7 +8649,7 @@ namespace InternalHeatGains {
                 state.dataHeatBalFanSys->ZoneLatentGain(NZ) = InternalHeatGains::SumAllInternalLatentGains(state, NZ);
                 // Added for the hybrid model
                 if (state.dataHybridModel->FlagHybridModel_PC) {
-                    InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ, state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ));
+                    state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ) = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ);
                 }
             }
         }
@@ -8930,11 +8930,12 @@ namespace InternalHeatGains {
     }
 
     // Added for hybrid model -- calculate the latent gain from all sources except for people
-    void SumAllInternalLatentGainsExceptPeople(EnergyPlusData &state,
-                                               int const ZoneNum, // zone index pointer for which zone to sum gains for
-                                               Real64 &SumLatentGainRateExceptPeople)
+    Real64 SumAllInternalLatentGainsExceptPeople(EnergyPlusData &state,
+                                                 int const ZoneNum // zone index pointer for which zone to sum gains for
+    )
     {
-        Real64 tmpSumLatentGainRateExceptPeople = 0.0;
+        // Return value
+        Real64 SumLatentGainRateExceptPeople(0.0);
 
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
@@ -8943,12 +8944,12 @@ namespace InternalHeatGains {
 
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType != DataHeatBalance::IntGainType::People) {
-                    tmpSumLatentGainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
+                    SumLatentGainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
                 }
             }
         }
 
-        SumLatentGainRateExceptPeople = tmpSumLatentGainRateExceptPeople;
+        return SumLatentGainRateExceptPeople;
     }
 
     Real64
