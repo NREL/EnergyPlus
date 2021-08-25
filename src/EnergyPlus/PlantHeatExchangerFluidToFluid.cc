@@ -631,6 +631,8 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
 
     static constexpr std::string_view RoutineNameNoColon("InitFluidHeatExchanger");
 
+    this->oneTimeInit(state); // plant setup
+
     if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
         Real64 rho = FluidProperties::GetDensityGlycol(state,
@@ -2247,176 +2249,181 @@ Real64 HeatExchangerStruct::demandSideFlowResidual(EnergyPlusData &state,
 
     return Residuum;
 }
-void HeatExchangerStruct::oneTimeInit_new(EnergyPlusData &state)
+void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
 {
 
     static constexpr std::string_view RoutineName("InitFluidHeatExchanger: ");
 
-    this->setupOutputVars(state);
-    this->MyEnvrnFlag = true;
-
-    // locate the main two connections to the plant loops
-    bool errFlag = false;
-    PlantUtilities::ScanPlantLoopsForObject(state,
-                                            this->Name,
-                                            DataPlant::TypeOf_FluidToFluidPlantHtExchg,
-                                            this->DemandSideLoop.loopNum,
-                                            this->DemandSideLoop.loopSideNum,
-                                            this->DemandSideLoop.branchNum,
-                                            this->DemandSideLoop.compNum,
-                                            errFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            this->DemandSideLoop.inletNodeNum,
-                                            _);
-
-    if (this->DemandSideLoop.loopSideNum != DataPlant::DemandSide) { // throw error
-        ShowSevereError(state,
-                        format("{} Invalid connections for {} name = \"{}\"",
-                               RoutineName,
-                               DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
-                               this->Name));
-        ShowContinueError(state, "The \"Loop Demand Side\" connections are not on the Demand Side of a plant loop");
-        errFlag = true;
+    if (this->MyOneTimeFlag) {
+        this->setupOutputVars(state);
+        this->MyFlag = true;
+        this->MyEnvrnFlag = true;
+        this->MyOneTimeFlag = false;
     }
 
-    PlantUtilities::ScanPlantLoopsForObject(state,
-                                            this->Name,
-                                            DataPlant::TypeOf_FluidToFluidPlantHtExchg,
-                                            this->SupplySideLoop.loopNum,
-                                            this->SupplySideLoop.loopSideNum,
-                                            this->SupplySideLoop.branchNum,
-                                            this->SupplySideLoop.compNum,
-                                            errFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            this->SupplySideLoop.inletNodeNum,
-                                            _);
+    if (this->MyFlag) {
+        // locate the main two connections to the plant loops
+        bool errFlag = false;
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::TypeOf_FluidToFluidPlantHtExchg,
+                                                this->DemandSideLoop.loopNum,
+                                                this->DemandSideLoop.loopSideNum,
+                                                this->DemandSideLoop.branchNum,
+                                                this->DemandSideLoop.compNum,
+                                                errFlag,
+                                                _,
+                                                _,
+                                                _,
+                                                this->DemandSideLoop.inletNodeNum,
+                                                _);
 
-    if (this->SupplySideLoop.loopSideNum != DataPlant::SupplySide) { // throw error
-        ShowSevereError(state,
-                        format("{} Invalid connections for {} name = \"{}\"",
-                               RoutineName,
-                               DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
-                               this->Name));
-        ShowContinueError(state, "The \"Loop Supply Side\" connections are not on the Supply Side of a plant loop");
-        errFlag = true;
-    }
+        if (this->DemandSideLoop.loopSideNum != DataPlant::DemandSide) { // throw error
+            ShowSevereError(state,
+                            format("{} Invalid connections for {} name = \"{}\"",
+                                   RoutineName,
+                                   DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
+                                   this->Name));
+            ShowContinueError(state, "The \"Loop Demand Side\" connections are not on the Demand Side of a plant loop");
+            errFlag = true;
+        }
 
-    // make sure it is not the same loop on both sides.
-    if (this->SupplySideLoop.loopNum == this->DemandSideLoop.loopNum) { // user is being too tricky, don't allow
-        ShowSevereError(state,
-                        format("{} Invalid connections for {} name = \"{}\"",
-                               RoutineName,
-                               DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
-                               this->Name));
-        ShowContinueError(state, R"(The "Loop Supply Side" and "Loop Demand Side" need to be on different loops.)");
-        errFlag = true;
-    } else {
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::TypeOf_FluidToFluidPlantHtExchg,
+                                                this->SupplySideLoop.loopNum,
+                                                this->SupplySideLoop.loopSideNum,
+                                                this->SupplySideLoop.branchNum,
+                                                this->SupplySideLoop.compNum,
+                                                errFlag,
+                                                _,
+                                                _,
+                                                _,
+                                                this->SupplySideLoop.inletNodeNum,
+                                                _);
 
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->SupplySideLoop.loopNum,
-                                                      this->SupplySideLoop.loopSideNum,
-                                                      this->DemandSideLoop.loopNum,
-                                                      this->DemandSideLoop.loopSideNum,
-                                                      DataPlant::TypeOf_FluidToFluidPlantHtExchg,
-                                                      true);
-    }
+        if (this->SupplySideLoop.loopSideNum != DataPlant::SupplySide) { // throw error
+            ShowSevereError(state,
+                            format("{} Invalid connections for {} name = \"{}\"",
+                                   RoutineName,
+                                   DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
+                                   this->Name));
+            ShowContinueError(state, "The \"Loop Supply Side\" connections are not on the Supply Side of a plant loop");
+            errFlag = true;
+        }
 
-    // find remote component if control mode is of that type.
-    if (this->ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
+        // make sure it is not the same loop on both sides.
+        if (this->SupplySideLoop.loopNum == this->DemandSideLoop.loopNum) { // user is being too tricky, don't allow
+            ShowSevereError(state,
+                            format("{} Invalid connections for {} name = \"{}\"",
+                                   RoutineName,
+                                   DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
+                                   this->Name));
+            ShowContinueError(state, R"(The "Loop Supply Side" and "Loop Demand Side" need to be on different loops.)");
+            errFlag = true;
+        } else {
 
-        PlantUtilities::ScanPlantLoopsForNodeNum(state,
-                                                 RoutineName,
-                                                 this->OtherCompSupplySideLoop.inletNodeNum,
-                                                 this->OtherCompSupplySideLoop.loopNum,
-                                                 this->OtherCompSupplySideLoop.loopSideNum,
-                                                 this->OtherCompSupplySideLoop.branchNum,
-                                                 this->OtherCompSupplySideLoop.compNum);
+            PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                          this->SupplySideLoop.loopNum,
+                                                          this->SupplySideLoop.loopSideNum,
+                                                          this->DemandSideLoop.loopNum,
+                                                          this->DemandSideLoop.loopSideNum,
+                                                          DataPlant::TypeOf_FluidToFluidPlantHtExchg,
+                                                          true);
+        }
 
-        PlantUtilities::ScanPlantLoopsForNodeNum(state,
-                                                 RoutineName,
-                                                 this->OtherCompDemandSideLoop.inletNodeNum,
-                                                 this->OtherCompDemandSideLoop.loopNum,
-                                                 this->OtherCompDemandSideLoop.loopSideNum,
-                                                 this->OtherCompDemandSideLoop.branchNum,
-                                                 this->OtherCompDemandSideLoop.compNum);
+        // find remote component if control mode is of that type.
+        if (this->ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
 
-        // revise how loads served category for other controlled equipment
-        int LoopNum2 = this->OtherCompSupplySideLoop.loopNum;
-        int LoopSideNum = this->OtherCompSupplySideLoop.loopSideNum;
-        int BranchNum = this->OtherCompSupplySideLoop.branchNum;
-        int LoopCompNum = this->OtherCompSupplySideLoop.compNum;
+            PlantUtilities::ScanPlantLoopsForNodeNum(state,
+                                                     RoutineName,
+                                                     this->OtherCompSupplySideLoop.inletNodeNum,
+                                                     this->OtherCompSupplySideLoop.loopNum,
+                                                     this->OtherCompSupplySideLoop.loopSideNum,
+                                                     this->OtherCompSupplySideLoop.branchNum,
+                                                     this->OtherCompSupplySideLoop.compNum);
 
-        {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed);
+            PlantUtilities::ScanPlantLoopsForNodeNum(state,
+                                                     RoutineName,
+                                                     this->OtherCompDemandSideLoop.inletNodeNum,
+                                                     this->OtherCompDemandSideLoop.loopNum,
+                                                     this->OtherCompDemandSideLoop.loopSideNum,
+                                                     this->OtherCompDemandSideLoop.branchNum,
+                                                     this->OtherCompDemandSideLoop.compNum);
 
-            if (SELECT_CASE_var == DataPlant::HowMet_ByNominalCap) {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
-                    DataPlant::HowMet_ByNominalCapFreeCoolCntrl;
-            } else if (SELECT_CASE_var == DataPlant::HowMet_ByNominalCapLowOutLimit) {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
-                    DataPlant::HowMet_ByNominalCapLowOutLimitFreeCoolCntrl;
+            // revise how loads served category for other controlled equipment
+            int LoopNum2 = this->OtherCompSupplySideLoop.loopNum;
+            int LoopSideNum = this->OtherCompSupplySideLoop.loopSideNum;
+            int BranchNum = this->OtherCompSupplySideLoop.branchNum;
+            int LoopCompNum = this->OtherCompSupplySideLoop.compNum;
+
+            {
+                auto const SELECT_CASE_var(
+                    state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed);
+
+                if (SELECT_CASE_var == DataPlant::HowMet_ByNominalCap) {
+                    state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
+                        DataPlant::HowMet_ByNominalCapFreeCoolCntrl;
+                } else if (SELECT_CASE_var == DataPlant::HowMet_ByNominalCapLowOutLimit) {
+                    state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
+                        DataPlant::HowMet_ByNominalCapLowOutLimitFreeCoolCntrl;
+                }
+            }
+
+            {
+                auto const SELECT_CASE_var(this->ControlSignalTemp);
+                if (SELECT_CASE_var == iCtrlTemp::WetBulbTemperature) {
+                    state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
+                        DataPlant::iFreeCoolControlMode::WetBulb;
+                } else if (SELECT_CASE_var == iCtrlTemp::DryBulbTemperature) {
+                    state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
+                        DataPlant::iFreeCoolControlMode::DryBulb;
+                } else if (SELECT_CASE_var == iCtrlTemp::LoopTemperature) {
+                    state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
+                        DataPlant::iFreeCoolControlMode::Loop;
+                    state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlNodeNum =
+                        this->OtherCompDemandSideLoop.inletNodeNum;
+                }
+            }
+        }
+        if (this->ControlMode == iCtrlType::TrackComponentOnOff) {
+            if (this->OtherCompSupplySideLoop.inletNodeNum > 0) {
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->ComponentUserName,
+                                                        this->ComponentTypeOfNum,
+                                                        this->OtherCompSupplySideLoop.loopNum,
+                                                        this->OtherCompSupplySideLoop.loopSideNum,
+                                                        this->OtherCompSupplySideLoop.branchNum,
+                                                        this->OtherCompSupplySideLoop.compNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        this->OtherCompSupplySideLoop.inletNodeNum,
+                                                        _);
+            }
+            if (this->OtherCompDemandSideLoop.inletNodeNum > 0) {
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->ComponentUserName,
+                                                        this->ComponentTypeOfNum,
+                                                        this->OtherCompDemandSideLoop.loopNum,
+                                                        this->OtherCompDemandSideLoop.loopSideNum,
+                                                        this->OtherCompDemandSideLoop.branchNum,
+                                                        this->OtherCompDemandSideLoop.compNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        this->OtherCompDemandSideLoop.inletNodeNum,
+                                                        _);
             }
         }
 
-        {
-            auto const SELECT_CASE_var(this->ControlSignalTemp);
-            if (SELECT_CASE_var == iCtrlTemp::WetBulbTemperature) {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
-                    DataPlant::iFreeCoolControlMode::WetBulb;
-            } else if (SELECT_CASE_var == iCtrlTemp::DryBulbTemperature) {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
-                    DataPlant::iFreeCoolControlMode::DryBulb;
-            } else if (SELECT_CASE_var == iCtrlTemp::LoopTemperature) {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
-                    DataPlant::iFreeCoolControlMode::Loop;
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlNodeNum =
-                    this->OtherCompDemandSideLoop.inletNodeNum;
-            }
+        if (errFlag) {
+            ShowFatalError(state, format("{} Program terminated due to previous condition(s).", RoutineName));
         }
+        this->MyFlag = false;
     }
-    if (this->ControlMode == iCtrlType::TrackComponentOnOff) {
-        if (this->OtherCompSupplySideLoop.inletNodeNum > 0) {
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->ComponentUserName,
-                                                    this->ComponentTypeOfNum,
-                                                    this->OtherCompSupplySideLoop.loopNum,
-                                                    this->OtherCompSupplySideLoop.loopSideNum,
-                                                    this->OtherCompSupplySideLoop.branchNum,
-                                                    this->OtherCompSupplySideLoop.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->OtherCompSupplySideLoop.inletNodeNum,
-                                                    _);
-        }
-        if (this->OtherCompDemandSideLoop.inletNodeNum > 0) {
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->ComponentUserName,
-                                                    this->ComponentTypeOfNum,
-                                                    this->OtherCompDemandSideLoop.loopNum,
-                                                    this->OtherCompDemandSideLoop.loopSideNum,
-                                                    this->OtherCompDemandSideLoop.branchNum,
-                                                    this->OtherCompDemandSideLoop.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->OtherCompDemandSideLoop.inletNodeNum,
-                                                    _);
-        }
-    }
-
-    if (errFlag) {
-        ShowFatalError(state, format("{} Program terminated due to previous condition(s).", RoutineName));
-    }
-}
-void HeatExchangerStruct::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
 }
 
 } // namespace EnergyPlus::PlantHeatExchangerFluidToFluid
