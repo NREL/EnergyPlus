@@ -2617,7 +2617,7 @@ namespace FluidProperties {
         if (state.dataFluidProps->DebugReportRefrigerants) ReportAndTestRefrigerants(state);
     }
 
-    constexpr std::array<std::array<Real64, DefaultNumSteamSuperheatedTemps>, DefaultNumSteamSuperheatedPressure>
+    [[maybe_unused]] constexpr std::array<std::array<Real64, DefaultNumSteamSuperheatedTemps>, DefaultNumSteamSuperheatedPressure>
         DefaultSteamSuperheatedEnthalpyDataTable = {{
             {2501000.0, 2503000.0, 2510000.0, 2520000.0, 2529000.0, 2538000.0, 2548000.0, 2557000.0, 2566000.0, 2576000.0, 2585000.0, 2595000.0,
              2604000.0, 2613000.0, 2623000.0, 2632000.0, 2636000.0, 2640000.0, 2643000.0, 2647000.0, 2651000.0, 2655000.0, 2658000.0, 2662000.0,
@@ -3719,7 +3719,7 @@ namespace FluidProperties {
              0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3280000.0, 2512000.0, 2906000.0},
         }};
 
-    constexpr std::array<std::array<Real64, DefaultNumSteamSuperheatedTemps>, DefaultNumSteamSuperheatedPressure>
+    [[maybe_unused]] constexpr std::array<std::array<Real64, DefaultNumSteamSuperheatedTemps>, DefaultNumSteamSuperheatedPressure>
         DefaultSteamSuperheatedDensityDataTable = {{
             {4.855e-03, 4.837e-03, 4.767e-03, 4.683e-03, 4.601e-03, 4.522e-03, 4.446e-03, 4.373e-03, 4.302e-03, 4.233e-03, 4.167e-03, 4.102e-03,
              4.039e-03, 3.979e-03, 3.920e-03, 3.863e-03, 3.840e-03, 3.818e-03, 3.796e-03, 3.775e-03, 3.753e-03, 3.732e-03, 3.711e-03, 3.691e-03,
