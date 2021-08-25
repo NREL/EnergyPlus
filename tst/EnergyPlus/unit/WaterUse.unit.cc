@@ -52,6 +52,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
@@ -65,7 +66,7 @@ using namespace WaterUse;
 
 TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
 {
-    // This unit test checks checks warnings/errors associated with unreasonable temperatures in WaterUse:Equipment
+    // This unit test checks warnings/errors associated with unreasonable temperatures in WaterUse:Equipment
     bool ErrorsFound(false);
 
     std::string const idf_objects = R"IDF(
@@ -446,6 +447,7 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
 
     std::string const error_string1 = delimited_string({
         "   ** Warning ** CalcEquipmentFlowRates: Hot water temperature is less than the cold water temperature",
+        "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
         "   **   ~~~   ** ...hot water temperature       = 10.000 C",
         "   **   ~~~   ** ...cold water temperature       = 15.000 C",
         "   **   ~~~   ** ...Note: hot water temperature should be greater than or equal to the cold water temperature",
@@ -466,6 +468,7 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
 
     std::string const error_string2 = delimited_string({
         "   ** Warning ** CalcEquipmentFlowRates: Target water temperature is greater than the hot water temperature",
+        "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
         "   **   ~~~   ** ...target water temperature       = 50.000 C",
         "   **   ~~~   ** ...hot water temperature       = 43.300 C",
         "   **   ~~~   ** ...Note: target water temperature should be less than or equal to the hot water temperature",
@@ -483,6 +486,7 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
 
     std::string const error_string3 = delimited_string({
         "   ** Warning ** CalcEquipmentFlowRates: Target water temperature is less than the cold water temperature",
+        "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
         "   **   ~~~   ** ...target water temperature       = 0.000 C",
         "   **   ~~~   ** ...cold water temperature       = 15.000 C",
         "   **   ~~~   ** ...Note: target water temperature should be greater than or equal to the cold water temperature",
