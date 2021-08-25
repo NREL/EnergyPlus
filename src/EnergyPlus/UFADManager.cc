@@ -1134,7 +1134,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-        SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied, RetAirGains);
+        RetAirGains = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
         ConvGainsOccSubzone += RetAirGains;
     }
 
@@ -1146,7 +1146,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
     ConvGainsUpSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
     ConvGainsUpSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum);
     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-        SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone, RetAirGains);
+        RetAirGains = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
         ConvGainsUpSubzone += RetAirGains;
     }
     ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
@@ -1649,7 +1649,7 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-        SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied, RetAirGains);
+        RetAirGains = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
         ConvGainsOccSubzone += RetAirGains;
     }
 
@@ -1660,7 +1660,7 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
     ConvGainsUpSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
     ConvGainsUpSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum);
     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-        SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone, RetAirGains);
+        RetAirGains = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
         ConvGainsUpSubzone += RetAirGains;
     }
     ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);

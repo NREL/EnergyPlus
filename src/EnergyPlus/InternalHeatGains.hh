@@ -145,11 +145,11 @@ namespace InternalHeatGains {
                                         int const ReturnNodeNum // return air node number
     );
 
-    void SumReturnAirConvectionGainsByTypes(
-        EnergyPlusData &state,
-        int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
-        const Array1D<DataHeatBalance::IntGainType> &GainTypeARR, // variable length 1-d array of enum valued gain types
-        Real64 &SumReturnAirGainRate);
+    Real64
+    SumReturnAirConvectionGainsByTypes(EnergyPlusData &state,
+                                       int const ZoneNum,                                       // zone index pointer for which zone to sum gains for
+                                       const Array1D<DataHeatBalance::IntGainType> &GainTypeARR // variable length 1-d array of enum valued gain types
+    );
 
     void SumAllSpaceInternalRadiationGains(EnergyPlusData &state,
                                            int const SpaceNum, // space index pointer for which space to sum gains for
@@ -159,7 +159,7 @@ namespace InternalHeatGains {
     SumInternalRadiationGainsByTypes(EnergyPlusData &state,
                                      int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
                                      const Array1D<DataHeatBalance::IntGainType> &GainTypeARR, // variable length 1-d array of enum valued gain types
-                                     int const spaceIndex = 0); // space index pointer, sum gains only for this space
+                                     int const spaceIndex = 0);                                // space index pointer, sum gains only for this space
 
     void SumAllInternalLatentGains(EnergyPlusData &state,
                                    int const ZoneNum, // zone index pointer for which zone to sum gains for

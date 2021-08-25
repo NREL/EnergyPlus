@@ -8789,11 +8789,11 @@ namespace InternalHeatGains {
         SumReturnAirGainRate = tmpSumRetAirGainRate;
     }
 
-    void SumReturnAirConvectionGainsByTypes(
+    Real64 SumReturnAirConvectionGainsByTypes(
         EnergyPlusData &state,
-        int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
-        const Array1D<DataHeatBalance::IntGainType> &GainTypeARR, // variable length 1-d array of integer valued gain types
-        Real64 &SumReturnAirGainRate)
+        int const ZoneNum,                                       // zone index pointer for which zone to sum gains for
+        const Array1D<DataHeatBalance::IntGainType> &GainTypeARR // variable length 1-d array of integer valued gain types
+    )
     {
 
         // SUBROUTINE INFORMATION:
@@ -8803,8 +8803,10 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gain types
 
+        // Return value
+        Real64 SumReturnAirGainRate(0.0);
+
         int NumberOfTypes = size(GainTypeARR);
-        Real64 tmpSumRetAirConvGainRate = 0.0;
 
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
@@ -8815,13 +8817,13 @@ namespace InternalHeatGains {
                 for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
 
                     if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR(TypeNum)) {
-                        tmpSumRetAirConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirConvGainRate;
+                        SumReturnAirGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirConvGainRate;
                     }
                 }
             }
         }
 
-        SumReturnAirGainRate = tmpSumRetAirConvGainRate;
+        return SumReturnAirGainRate;
     }
 
     void SumAllSpaceInternalRadiationGains(EnergyPlusData &state,
@@ -9222,8 +9224,8 @@ namespace InternalHeatGains {
 
                 state.dataOutRptTab->lightInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesLight);
-                SumReturnAirConvectionGainsByTypes(
-                    state, iZone, IntGainTypesLight, state.dataOutRptTab->lightRetAirSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                state.dataOutRptTab->lightRetAirSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
+                    SumReturnAirConvectionGainsByTypes(state, iZone, IntGainTypesLight);
                 state.dataOutRptTab->lightLWRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesLight);
 
@@ -9236,8 +9238,8 @@ namespace InternalHeatGains {
 
                 state.dataOutRptTab->refrigInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesRefrig);
-                SumReturnAirConvectionGainsByTypes(
-                    state, iZone, IntGainTypesRefrig, state.dataOutRptTab->refrigRetAirSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                state.dataOutRptTab->refrigRetAirSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
+                    SumReturnAirConvectionGainsByTypes(state, iZone, IntGainTypesRefrig);
                 state.dataOutRptTab->refrigLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     SumInternalLatentGainsByTypes(state, iZone, IntGainTypesRefrig);
 
