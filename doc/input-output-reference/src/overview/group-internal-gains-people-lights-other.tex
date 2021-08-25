@@ -384,7 +384,7 @@ People,
 
 \subsubsection{Outputs}\label{outputs-017}
 
-People objects have output variables for individual objects and for zone totals.
+People objects have output variables for individual objects and for space and zone totals.
 
 People specific outputs include:
 
@@ -412,6 +412,28 @@ People specific outputs include:
 \item
   Zone,Average,People Total Heating Rate {[}W{]}
 \item
+  Zone,Average,Space People Occupant Count {[]}
+\item
+  Zone,Sum,Space People Radiant Heating Energy {[}J{]}
+\item
+  Zone,Average,Space People Radiant Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space People Convective Heating Energy {[}J{]}
+\item
+  Zone,Average,Space People Convective Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space People Sensible Heating Energy {[}J{]}
+\item
+  Zone,Average,Space People Sensible Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space People Latent Gain Energy {[}J{]}
+\item
+  Zone,Average,Space People Latent Gain Rate {[}W{]}
+\item
+  Zone,Sum,Space People Total Heating Energy {[}J{]}
+\item
+  Zone,Average,Space People Total Heating Rate {[}W{]}
+\item
   Zone,Average,Zone People Occupant Count {[]}
 \item
   Zone,Sum,Zone People Radiant Heating Energy {[}J{]}
@@ -432,11 +454,11 @@ People specific outputs include:
 \item
   Zone,Sum,Zone People Total Heating Energy {[}J{]}
 \item
+  Zone,Average,Zone People Total Heating Rate {[}W{]}
+\item
   Zone,Average,People Air Temperature {[}C{]}
 \item
   Zone,Average,People Air Relative Humidity {[}\%{]}
-\item
-  Zone,Average,Zone People Total Heating Rate {[}W{]}
 \item
   Zone,Average,Zone Thermal Comfort Mean Radiant Temperature {[}C{]}
 \item
@@ -531,39 +553,39 @@ This output variable represents the zone air temperature based on the Fanger the
 
 This output variable represents the zone air relative humidity based on the Fanger thermal comfort model.~ If there is a ZoneControl:Thermostat:ThermalComfort object specified and the thermal zone is occupied, then the value of ``People Air Relative Humidity'' is determined from the mean zone air temperature and zone air humidity ratio that satisfies the thermal comfort setpoint PMV value specified; otherwise, it is calculated from the zone air temperature and humidity ratio averaged over the time step.
 
-\paragraph{Zone People Occupant Count {[]}}\label{zone-people-occupant-count}
+\paragraph{Space or Zone People Occupant Count {[]}}\label{zone-people-occupant-count}
 
-This field is the total number of people within the zone during the timestep in question.
+This field is the total number of people within the space or zone during the timestep in question.
 
-\paragraph{Zone People Radiant Heating Rate {[}W{]}}\label{zone-people-radiant-heating-rate-w}
+\paragraph{Space or Zone People Radiant Heating Rate {[}W{]}}\label{zone-people-radiant-heating-rate-w}
 
-\paragraph{Zone People Radiant Heating Energy {[}J{]}}\label{zone-people-radiant-heating-energy-j}
+\paragraph{Space or Zone People Radiant Heating Energy {[}J{]}}\label{zone-people-radiant-heating-energy-j}
 
-These output variables are the amount of radiant heat gain from people within the zone in Watts (for rate) or Joules. This is determined by the current sensible heat gain from people to the zone and the ``Fraction Radiant'' specified in the input. The radiant gains from people are distributed to the surfaces using an area weighting scheme.
+These output variables are the amount of radiant heat gain from people within the space or zone in Watts (for rate) or Joules. This is determined by the current sensible heat gain from people to the space or zone and the ``Fraction Radiant'' specified in the input. The radiant gains from people are distributed to the surfaces using an area weighting scheme.
 
-\paragraph{Zone People Convective Heating Rate {[}W{]}}\label{zone-people-convective-heating-rate-w}
+\paragraph{Space or Zone People Convective Heating Rate {[}W{]}}\label{zone-people-convective-heating-rate-w}
 
-\paragraph{Zone People Convective Heating Energy {[}J{]}}\label{zone-people-convective-heating-energy-j}
+\paragraph{Space or Zone People Convective Heating Energy {[}J{]}}\label{zone-people-convective-heating-energy-j}
 
-These output variables are the amount of convective heat gain from people within the zone in Watts (for rate) or Joules. This is determined by the current sensible heat gain from people to the zone and the ``Fraction Radiant'' specified in input. Note that the radiant and convective gains should add up to the sensible heat gain from people. The convective heat gain from people is added to the zone air heat balance directly.
+These output variables are the amount of convective heat gain from people within the space or zone in Watts (for rate) or Joules. This is determined by the current sensible heat gain from people to the space or zone and the ``Fraction Radiant'' specified in input. Note that the radiant and convective gains should add up to the sensible heat gain from people. The convective heat gain from people is added to the space or zone air heat balance directly.
 
-\paragraph{Zone People Latent Gain Rate {[}W{]}}\label{zone-people-latent-gain-rate-w}
+\paragraph{Space or Zone People Latent Gain Rate {[}W{]}}\label{zone-people-latent-gain-rate-w}
 
-\paragraph{Zone People Latent Gain Energy {[}J{]}}\label{zone-people-latent-gain-energy-j}
+\paragraph{Space or Zone People Latent Gain Energy {[}J{]}}\label{zone-people-latent-gain-energy-j}
 
-These output variables are the amount of latent heat gain from people within the zone in Watts (for rate) or Joules. This amount is based on the number of people in the space as well as the total amount of energy produced by a typical person defined by the activity schedule in the input. An internal algorithm is used to determine what fraction of the total is sensible and what fraction is latent. Details about this split are included in the Engineering Reference document.
+These output variables are the amount of latent heat gain from people within the space or zone in Watts (for rate) or Joules. This amount is based on the number of people in the space as well as the total amount of energy produced by a typical person defined by the activity schedule in the input. An internal algorithm is used to determine what fraction of the total is sensible and what fraction is latent. Details about this split are included in the Engineering Reference document.
 
-\paragraph{Zone People Sensible Heating Rate {[}W{]}}\label{zone-people-sensible-heating-rate-w}
+\paragraph{Space or Zone People Sensible Heating Rate {[}W{]}}\label{zone-people-sensible-heating-rate-w}
 
-\paragraph{Zone People Sensible Heating Energy {[}J{]}}\label{zone-people-sensible-heating-energy-j}
+\paragraph{Space or Zone People Sensible Heating Energy {[}J{]}}\label{zone-people-sensible-heating-energy-j}
 
-These output variables are the amount of sensible heat gain from people within the zone in Watts (for rate) or Joules. This amount is based on the number of people in the space as well as the total amount of energy produced by a typical person defined by the activity schedule in the input. An internal algorithm (described in the Engineering Reference document) is used to determine what fraction of the total is sensible and what fraction is latent. The sensible plus the latent heat gain from people equals the total gain specified in the input.
+These output variables are the amount of sensible heat gain from people within the space or zone in Watts (for rate) or Joules. This amount is based on the number of people in the space as well as the total amount of energy produced by a typical person defined by the activity schedule in the input. An internal algorithm (described in the Engineering Reference document) is used to determine what fraction of the total is sensible and what fraction is latent. The sensible plus the latent heat gain from people equals the total gain specified in the input.
 
-\paragraph{Zone People Total Heating Rate {[}W{]}}\label{zone-people-total-heating-rate-w}
+\paragraph{Space or Zone People Total Heating Rate {[}W{]}}\label{zone-people-total-heating-rate-w}
 
-\paragraph{Zone People Total Heating Energy {[}J{]}}\label{zone-people-total-heating-energy-j}
+\paragraph{Space or Zone People Total Heating Energy {[}J{]}}\label{zone-people-total-heating-energy-j}
 
-These output variables are the total amount of heat gain from people within the zone in Watts (for rate) or Joules. Derived from the activity level times the number of occupants, this is summed for each people object within a zone.
+These output variables are the total amount of heat gain from people within the space or zone in Watts (for rate) or Joules. Derived from the activity level times the number of occupants, this is summed for each people object within a zone.
 
 \paragraph{Zone Thermal Comfort Mean Radiant Temperature {[}C{]}}\label{zone-thermal-comfort-mean-radiant-temperature-c}
 
@@ -955,7 +977,8 @@ Fixture No. & Luminaire Feature & Return Air Fraction & Fraction Radiant & Fract
 
 This field defines the daylighting control for the LIGHTS object.
 
-If \textbf{\hyperref[daylightingcontrols-000]{Daylighting:Controls}} is specified for the zone, this field is used as an on/off flag for dimming controls. If set to 0.0, the lights are not dimmed by the daylighting controls. If set to 1.0, the lights are allowed to be dimmed by the daylighting controls.
+If \textbf{\hyperref[daylightingcontrols-000]{Daylighting:Controls}} is specified for the space or zone, this field is used as an on/off flag for dimming controls. If set to 0.0, the lights are not dimmed by the daylighting controls. If set to 1.0, the lights are allowed to be dimmed by the applicable daylighting control. If daylighting controls are operating in the space or zone, all of the applicable Lights objects with a Fraction Replaceable greater than zero will be reduced by a multiplicative factor that accounts for how much the electric lighting is lowered due to daylighting (ref. \hyperref[daylighting-lighting-power-multiplier-1]{Daylighting Lighting Power Multiplier}).
+
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-002}
 
@@ -1047,9 +1070,9 @@ Lights,
 
 \subsubsection{Outputs}\label{outputs-2-012}
 
-If daylighting controls are operating in the zone, all of the Lights objects with a Fraction Replaceable greater than zero will be reduced by a multiplicative factor that accounts for how much the electric lighting is lowered due to daylighting.
+Lights objects have output variables for individual objects and for space and zone totals.
 
-Lights objects have output variables for individual objects and for zone totals.
+A related output is \hyperref[daylighting-lighting-power-multiplier-1]{Daylighting Lighting Power Multiplier}.
 
 \begin{itemize}
 \item
@@ -1077,7 +1100,35 @@ Lights objects have output variables for individual objects and for zone totals.
 \item
   Zone,Sum,Lights Electricity Energy {[}J{]}
 \item
+  Zone,Average,Space Lights Electricity Rate {[}W{]}
+\item
+  Zone,Average,Space Lights Electricity Energy {[}J{]}
+\item
+  Zone,Sum,Space Lights Radiant Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Lights Radiant Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Lights Visible Radiation Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Lights Visible Radiation Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Lights Convective Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Lights Convective Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Lights Return Air Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Lights Return Air Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Lights Total Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Lights Total Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Lights Electricity Energy {[}J{]}
+\item
   Zone,Average,Zone Lights Electricity Rate {[}W{]}
+\item
+  Zone,Average,Zone Lights Electricity Energy {[}J{]}
 \item
   Zone,Sum,Zone Lights Radiant Heating Energy {[}J{]}
 \item
@@ -1101,10 +1152,6 @@ Lights objects have output variables for individual objects and for zone totals.
 \item
   Zone,Sum,Zone Lights Electricity Energy {[}J{]}
 \end{itemize}
-
-\paragraph{Lights Electricity Rate {[}W{]}}\label{lights-electric-power-w}
-
-The electric power input for the lights.
 
 \paragraph{Lights Radiant Heating Rate {[}W{]}}\label{lights-radiant-heating-rate-w}
 
@@ -1136,86 +1183,62 @@ The amount of heat gain from lights that goes into the zone's return air (and, t
 
 The total heat gain from lights. It is the sum of the following four outputs, i.e., Total Heat Gain = Return Air Heat Gain + Radiant Heat Gain + Visible Heat Gain + Convective Heat Gain. It is also equal to the electrical input to the lights.
 
+\paragraph{Lights Electricity Rate {[}W{]}}\label{lights-electric-power-w}
+
+The electric power input for the lights.
+
 \paragraph{Lights Electricity Energy {[}J{]}}\label{lights-electric-energy-j}
 
-The lighting electrical consumption including ballasts, if present. These will have the same value as Lights Total Heating Energy (above).
+The lighting electrical consumption including ballasts, if present. This will have the same value as Lights Total Heating Energy (above).
+ The energy amount is also included in the following Electricity meters:
+\begin{lstlisting}
+Electricity:Facility
+Electricity:Building
+Electricity:Zone:<Zone Name>
+Electricity:SpaceType:<Space Type Name>
+InteriorLights:Electricity
+InteriorLights:Electricity:Zone:<Zone Name>
+InteriorLights:Electricity:SpaceType:<Space Type Name>
+<End-Use Subcategory>:InteriorLights:Electricity
+<End-Use Subcategory>:InteriorLights:Electricity:Zone:<Zone Name>
+<End-Use Subcategory>:InteriorLights:Electricity:SpaceType:<Space Type Name>
+\end{lstlisting}
 
-\paragraph{Zone Lights Electricity Rate {[}W{]}}\label{zone-lights-electric-power-w}
+\paragraph{Space or Zone Lights Radiant Heating Rate {[}W{]}}\label{zone-lights-radiant-heating-rate-w}
 
-The electric power input for all lights in the zone.
+\paragraph{Space or Zone Lights Radiant Heating Energy {[}J{]}}\label{zone-lights-radiant-heating-energy-j}
 
-\paragraph{Zone Lights Radiant Heating Rate {[}W{]}}\label{zone-lights-radiant-heating-rate-w}
+The amount of heat gain from all lights in the space or zone that is in the form of long-wave (thermal) radiation entering the space or zone. This heat is absorbed by the inside surfaces of the space or zone according to an area times long-wave absorptance weighting scheme.
 
-\paragraph{Zone Lights Radiant Heating Energy {[}J{]}}\label{zone-lights-radiant-heating-energy-j}
+\paragraph{Space or Zone Lights Visible Radiation Heating Rate {[}W{]}}\label{zone-lights-visible-radiation-heating-rate-w}
 
-The amount of heat gain from all lights in the zone that is in the form of long-wave (thermal) radiation entering the zone. This heat is absorbed by the inside surfaces of the zone according to an area times long-wave absorptance weighting scheme.
+\paragraph{Space or Zone Lights Visible Radiation Heating Energy {[}J{]}}\label{zone-lights-visible-radiation-heating-energy-j}
 
-\paragraph{Zone Lights Visible Radiation Heating Rate {[}W{]}}\label{zone-lights-visible-radiation-heating-rate-w}
+The amount of heat gain from all lights in the space or zone that is in the form of visible (short-wave) radiation entering the space or zone. This heat is absorbed by the inside surfaces of the space or zone according~ to an area times short-wave absorptance weighting scheme.
 
-\paragraph{Zone Lights Visible Radiation Heating Energy {[}J{]}}\label{zone-lights-visible-radiation-heating-energy-j}
+\paragraph{Space or Zone Lights Convective Heating Rate {[}W{]}}\label{zone-lights-convective-heating-rate-w}
 
-The amount of heat gain from all lights in the zone that is in the form of visible (short-wave) radiation entering the zone. This heat is absorbed by the inside surfaces of the zone according~ to an area times short-wave absorptance weighting scheme.
+\paragraph{Space or Zone Lights Convective Heating Energy {[}J{]}}\label{zone-lights-convective-heating-energy-j}
 
-\paragraph{Zone Lights Convective Heating Rate {[}W{]}}\label{zone-lights-convective-heating-rate-w}
+The amount of heat gain from all lights in the space or zone that is convected to the space or zone air.
 
-\paragraph{Zone Lights Convective Heating Energy {[}J{]}}\label{zone-lights-convective-heating-energy-j}
+\paragraph{Space or Zone Lights Return Air Heating Rate {[}W{]}}\label{zone-lights-return-air-heating-rate-w}
 
-The amount of heat gain from all lights in the zone that is convected to the zone air.
+\paragraph{Space or Zone Lights Return Air Heating Energy {[}J{]}}\label{zone-lights-return-air-heating-energy-j}
 
-\paragraph{Zone Lights Return Air Heating Rate {[}W{]}}\label{zone-lights-return-air-heating-rate-w}
+The amount of heat gain from all lights in the space or zone that goes into the space or zone's return air (and, therefore, does not directly contribute to the space or zone load). If the space or zone has no return air system or the space or zone's air system is off, this heat will be added to the space or zone air.
 
-\paragraph{Zone Lights Return Air Heating Energy {[}J{]}}\label{zone-lights-return-air-heating-energy-j}
+\paragraph{Space or Zone Lights Total Heating Rate {[}W{]}}\label{zone-lights-total-heating-rate-w}
 
-The amount of heat gain from all lights in the zone that goes into the zone's return air (and, therefore, does not directly contribute to the zone load). If the zone has no return air system or the zone's air system is off, this heat will be added to the zone air.
+\paragraph{Space or Zone Lights Total Heating Energy {[}J{]}}\label{zone-lights-total-heating-energy-j}
 
-\paragraph{Zone Lights Total Heating Rate {[}W{]}}\label{zone-lights-total-heating-rate-w}
+The total heat gain from all lights in the space or zone. It is the sum of the following four outputs, i.e., Total Heat Gain = Return Air Heat Gain + Radiant Heat Gain + Visible Heat Gain + Convective Heat Gain. It is also equal to the electrical input to the lights.
 
-\paragraph{Zone Lights Total Heating Energy {[}J{]}}\label{zone-lights-total-heating-energy-j}
+\paragraph{Space or Zone Lights Electricity Rate {[}W{]}}\label{zone-lights-electric-power-w}
 
-The total heat gain from all lights in the zone. It is the sum of the following four outputs, i.e., Total Heat Gain = Return Air Heat Gain + Radiant Heat Gain + Visible Heat Gain + Convective Heat Gain. It is also equal to the electrical input to the lights.
+\paragraph{Space or Zone Lights Electricity Energy {[}J{]}}\label{zone-lights-electric-energy-j}
 
-\paragraph{Zone Lights Electricity Energy {[}J{]}}\label{zone-lights-electric-energy-j}
-
-The lighting electrical consumption for all lights in the zone including ballasts, if present. This will have the same value as Zone Lights Total Heating Energy (above). However, this amount is also shown in the Electricity meters that are associated with the zone:
-
-Electricity:Facility,
-
-Electricity:Building,
-
-Electricity:Zone:\textless{}Zone Name\textgreater{}.
-
-In addition, depending on use, it will be shown in:
-
-InteriorLights: Electricity and
-
-InteriorLights:Electricity:Zone :\textless{}Zone Name\textgreater{}.
-
-\subsubsection{Outputs}\label{outputs-3-010}
-
-As described in the Lights Outputs, values for lights will show up on the following meters:
-
-% table 15
-\begin{longtable}[c]{>{\raggedright}p{3.0in}p{1.5in}p{1.5in}}
-\caption{Distribution of Lights to Meters \label{table:distribution-of-lights-to-meters}} \tabularnewline
-\toprule
-Meter Name & Scope & Lights Specifics \tabularnewline
-\midrule
-\endfirsthead
-
-\caption[]{Distribution of Lights to Meters} \tabularnewline
-\toprule
-Meter Name & Scope & Lights Specfics \tabularnewline
-\midrule
-\endhead
-
-Electricity:Facility & Entire Facility & All \tabularnewline
-Electricity:Building & All Zones & All \tabularnewline
-Electricity:Zone: <Zone Name> & Specific Zone & All \tabularnewline
-InteriorLights:Electricity & All Zones & Lights Use \tabularnewline
-InteriorLights:Electricity:Zone: <Zone Name> & Specific Zone & Lights Use \tabularnewline
-<End-Use Subcategory> :InteriorLights:Electricity & Specific Subcategory & Lights Use \tabularnewline
-\bottomrule
-\end{longtable}
+The electric power input for all lights in the space or zone. This will have the same value as Zone Lights Total Heating Rate or Energy (above).
 
 \subsection{ElectricEquipment}\label{electricequipment}
 
@@ -1682,256 +1705,6 @@ SteamEquipment,
   Laundry;           !- End-Use Subcategory
 \end{lstlisting}
 
-\subsection{SwimmingPool:Indoor}\label{swimmingpoolindoor}
-
-The Indoor Swimming Pool object is used to describe the indoor swimming pools that are exposed to the internal environment. There are several rules that should be noted regarding the specification of an indoor pool in EnergyPlus. First, the pool is linked to a surface that must be a floor. The pool is assumed to cover the entire floor to which it is linked. If the pool only covers part of the floor in the actual building, then the user must break the floor up into multiple sections.
-
-As pools attempt to achieve a particular water temperature and have a variety of heat losses, heating equipment is necessary to maintain the proper setpoint temperature. In EnergyPlus, the pool itself becomes part of the demand side of a plant loop with heating equipment on the supply side providing whatever heating is needed to maintain the desired temperature. This heating equipment as well as the loop connections must be entered separately and the input shown in this section only details what is needed to specify the pool itself.
-
-There are a variety of rules that limit the application of indoor swimming pools in EnergyPlus.  The following are a list of these rules:
-
-\begin{itemize}
-  \item The pool must reference a valid surface in the input file.  This surface must be a floor and cannot be other surface types like ceilings, walls, windows, etc.
-  \item The pool cannot refer to a surface that is also a radiant system, ventilated slab, or another pool.
-  \item The surface that the pool references must be modeled using conduction transfer functions (CTF).
-  \item The pool cannot utilize movable insulation or have a heat source or sink associated with it (something used to model low temperature radiant systems).
-\end{itemize}
-
-The following information is useful for defining and modeling an indoor pool in EnergyPlus. For more information on the algorithm used for this model or details on some of the input parameters, please reference the indoor pool section of the EnergyPlus Engineering Reference document.
-
-\subsubsection{Inputs}\label{inputs-7-012}
-
-\paragraph{Field: Name}\label{field-name-7-008}
-
-This is a unique name associated with the indoor swimming pool.
-
-\paragraph{Field: Surface Name}\label{field-surface-name-1-000}
-
-This is the name of the surface (floor) where the pool is located. Pools are not allowed on any surfaces other than a floor.  For more rules on surfaces that can be used for pools, please see the information in this section on indoor pools above.
-
-\paragraph{Field: Average Depth}\label{field-average-depth}
-
-This field is the average depth of the pool in meters. If the pool has variable depth, the average depth should be specified to achieve the proper volume of water in the pool.
-
-\paragraph{Field: Activity Factor Schedule Name}\label{field-activity-factor-schedule-name}
-
-This field references a schedule that contains values for pool activity. This parameter can be varied using the schedule named here, and it has an impact on the amount of evaporation that will take place from the pool to the surrounding zone air. For example values of the activity factor and what impact it will have on the evaporation of water from the pool, please refer to the Indoor Swimming Pool section of the EnergyPlus Engineering Reference document. If left blank, the activity factor will be assumed to be unity. Note that the activity factor should not be set equal to an occupancy schedule since an activity factor of zero means that no evaporation will take place from the pool.
-
-\paragraph{Field: Make-up Water Supply Schedule Name}\label{field-make-up-water-supply-schedule-name}
-
-The scheduled named by this field establishes a cold water temperature {[}C{]} for the water that replaces the water which is lost from the pool due to evaporation. If blank, water temperatures are calculated by the \hyperref[sitewatermainstemperature]{Site:WaterMainsTemperature} object. This field (even if blank) overrides the Cold Water Supply Temperature Schedule in all of the listed \hyperref[wateruseequipment]{WaterUse:Equipment} objects.
-
-\paragraph{Field: Cover Schedule Name}\label{field-cover-schedule-name}
-
-This schedule defines when the pool water cover is available and affects the evaporation, convection, and radiation rate calculations. A schedule value of 0.0 means that the pool is not covered. A schedule value of 1.0 means the pool is 100\% covered. The pool may be fully covered, fully open (uncovered), or partially covered (a value between 0.0 and 1.0). The user also has the option to control the evaporation, convection, short-wavelength radiation, and long-wavelength radiation factors when the pool is covered. These terms are discussed in the next four fields.
-
-\paragraph{Field: Cover Evaporation Factor}\label{field-cover-evaporation-factor}
-
-This input field can optionally be used to modify the pool evaporation rate and is used in conjunction with the pool cover factor defined by the Pool Cover Schedule field (see above). The value for this parameter can normally range from 0.0 to 1.0, where 1 means that the pool cover completely eliminates evaporation from the pool surface, 0 means the pool cover has no effect on evaporation, and fractions in between 0 and 1 result in a fractional reduction in evaporation by the pool cover. So, if this parameter is 0.5 and the pool is 50\% covered, the overall reduction in evaporation from a fully uncovered pool is 25\% or 0.25.
-
-\paragraph{Field: Cover Convection Factor}\label{field-cover-convection-factor}
-
-This input field can optionally be used to modify the pool convection rate and is used in conjunction with the pool cover factor defined by the Pool Cover Schedule field (see above). The value for this parameter can normally range from 0.0 to 1.0, where 1 means that the pool cover completely eliminates convection from the pool surface, 0 means the pool cover has no effect on convection, and fractions in between 0 and 1 result in a fractional reduction in convection by the pool cover. So, if this parameter is 0.5 and the pool is 50\% covered, the overall reduction in convection from a fully uncovered pool is 25\% or 0.25.
-
-\paragraph{Field: Cover Short-Wavelength Radiation Factor}\label{field-cover-short-wavelength-radiation-factor}
-
-This input field can optionally be used to modify the pool short-wavelength radiation rate and is used in conjunction with the pool cover factor defined by the Pool Cover Schedule field (see above). The value for this parameter can normally range from 0.0 to 1.0, where 1 means that the pool cover completely eliminates short-wavelength radiation from the pool surface, 0 means the pool cover has no effect on short-wavelength radiation, and fractions in between 0 and 1 result in a fractional reduction in short-wavelength radiation by the pool cover. So, if this parameter is 0.5 and the pool is 50\% covered, the overall reduction in short-wavelength radiation from a fully uncovered pool is 25\% or 0.25. Note that with radiation terms that whatever portion of the short-wavelength radiation is blocked by the cover is transferred via convection to the surrounding zone air.
-
-\paragraph{Field: Cover Long-Wavelength Radiation Factor}\label{field-cover-long-wavelength-radiation-factor}
-
-This input field can optionally be used to modify the pool long-wavelength radiation rate and is used in conjunction with the pool cover factor defined by the Pool Cover Schedule field (see above). The value for this parameter can normally range from 0.0 to 1.0, where 1 means that the pool cover completely eliminates long-wavelength radiation from the pool surface, 0 means the pool cover has no effect on long-wavelength radiation, and fractions in between 0 and 1 result in a fractional reduction in long-wavelength radiation by the pool cover. So, if this parameter is 0.5 and the pool is 50\% covered, the overall reduction in long-wavelength radiation from a fully uncovered pool is 25\% or 0.25. Note that with radiation terms that whatever portion of the long-wavelength radiation is blocked by the cover is transferred via convection to the surrounding zone air.
-
-\paragraph{Field: Pool Water Inlet Node}\label{field-pool-water-inlet-node}
-
-This input is the name of the node on the demand side of a plant loop that leads into the pool. From the standpoint of an EnergyPlus input file, the pool sits on a plant demand loop, and the pump and heater reside on the plant supply loop. The pool heater and pump must be defined by other existing EnergyPlus input.
-
-\paragraph{Field: Pool Water Outlet Node}\label{field-pool-water-outlet-node}
-
-This input is the name of the node on the demand side of a plant loop that leads out of the pool. From the standpoint of an EnergyPlus input file, the pool sits on a plant demand loop, and the pump and heater reside on the plant supply loop. The pool heater and pump must be defined by other existing EnergyPlus input.
-
-\paragraph{Field: Pool Water Maximum Flow Rate}\label{field-pool-water-maximum-flow-rate}
-
-This input is the maximum water volumetric flow rate in m3/s going between the pool and the water heating equipment. This along with the pool setpoint temperature and the heating plant equipment outlet temperature will establish the maximum heat addition to the pool. This flow rate to the pool will be varied in an attempt to reach the desired pool water setpoint temperature (see Setpoint Temperature Schedule below).
-
-\paragraph{Field: Pool Miscellaneous Equipment Power}\label{field-pool-miscellaneous-equipment-power}
-
-This input defines the power consumption rate of miscellaneous equipment such as the filtering and chlorination technology associated with the pool. The units for this input are in power consumption per flow rate of water through the pool from the heater or W/(m3/s). This field will be multiplied by the flow rate of water through the pool to determine the power consumption of this equipment. Any heat generated by this equipment is assumed to have no effect on the pool water itself.
-
-\paragraph{Field: Setpoint Temperature Schedule}\label{field-setpoint-temperature-schedule}
-
-Pools attempt to maintain a particular water temperature. In EnergyPlus, this field defines the setpoint temperature for the desired pool water temperature. It is input as a schedule to allow the user to vary the pool setpoint temperature as desired. The equipment defined to provide heating for the pool will deliver the necessary hot water to the pool, up to the capacity of that equipment defined by other input by the user.
-
-\paragraph{Field: Maximum Number of People}\label{field-maximum-number-of-people}
-
-This field defines the maximum occupancy of people actually in the pool and thus will be used with the next two inputs to determine how much heat people contribute to the pool heat balance. \hyperref[people]{People} who are not in the pool should be modeled separately using the standard \hyperref[people]{People} description for zones.
-
-\paragraph{Field: People Schedule}\label{field-people-schedule}
-
-This field defines a schedule that establishes how many people are in the pool at any given time. The current value of this schedule is multiplied by the maximum number of people in the previous field determines how many people are currently in the pool.
-
-\paragraph{Field: People Heat Gain Schedule}\label{field-people-heat-gain-schedule}
-
-This field defines the amount of heat given off by an average person in the pool in Watts. This field is a schedule so that this heat gain can be allowed to vary as the type of activity in a pool can vary greatly and thus the amount of heat gain per person also varies. This parameter times the number of people in the pool determines how much heat is added to the pool. All heat given off by people is added to the heat balance of the pool water.
-
-An example of an indoor swimming pool definition is:
-
-\begin{lstlisting}
-
-SwimmingPool:Indoor,
-  Test Pool,             !- Name
-  F1-1,                  !- Surface Name
-  1.5,                   !- Average Depth {m}
-  PoolActivitySched,     !- Pool Activity Schedule
-  MakeUpWaterSched,      !- MakeUp Water Temperature Schedule
-  PoolCoverSched,        !- Pool Cover Schedule
-  0.0,                   !- Cover Evaporation Factor
-  0.2,                   !- Cover Convection Factor
-  0.9,                   !- Cover Short-Wavelength Radiation Factor
-  0.5,                   !- Cover Long-Wavelength Radiation Factor
-  Pool Water Inlet Node,    !- Water Inlet Node (Plant/Heater)
-  Pool Water Outlet Node,   !- Water Outlet Node (Plant/Heater)
-  0.1,                   !- Maximum flow rate from water heating system {m3/s}
-  0.6,                   !- Miscellaneous Equipment Power Factor {W/(m3/s)}
-  PoolSetpointTempSched, !- Pool Water Setpoint Temperature Schedule
-  15,                    !- Maximum Number of People in Pool
-  PoolOccupancySched,    !- Pool People Schedule
-  PoolOccHeatGainSched;  !- Pool People Heat Gain Schedule
-\end{lstlisting}
-
-\subsubsection{Outputs}\label{outputs-4-007}
-
-\begin{itemize}
-\tightlist
-\item
-  HVAC, Average, Indoor Pool Makeup Water Rate {[}m3/s{]}
-\item
-  HVAC, Sum, Indoor Pool Makeup Water Volume {[}m3{]}
-\item
-  HVAC, Average, Indoor Pool Makeup Water Temperature {[}C{]}
-\item
-  HVAC, Average, Indoor Pool Water Temperature {[}C{]}
-\item
-  HVAC, Average, Indoor Pool Inlet Water Temperature {[}C{]}
-\item
-  HVAC, Average, Indoor Pool Inlet Water Mass Flow Rate {[}kg/s{]}
-\item
-  HVAC, Average, Indoor Pool Miscellaneous Equipment Power {[}W{]}
-\item
-  HVAC, Sum, Indoor Pool Miscellaneous Equipment Energy {[}J{]}
-\item
-  HVAC, Average, Indoor Pool Water Heating Rate {[}W{]}
-\item
-  HVAC, Sum, Indoor Pool Water Heating Energy {[}J{]}
-\item
-  HVAC, Average, Indoor Pool Radiant to Convection by Cover {[}W{]}
-\item
-  HVAC, Average, Indoor Pool People Heat Gain {[}W{]}
-\item
-  HVAC, Average, Indoor Pool Current Activity Factor {[]}
-\item
-  HVAC, Average, Indoor Pool Current Cover Factor {[]}
-\item
-  HVAC, Average, Indoor Pool Evaporative Heat Loss Rate {[}W{]}
-\item
-  HVAC, Sum, Indoor Pool Evaporative Heat Loss Energy {[}J{]}
-\item
-  HVAC, Average, Indoor Pool Saturation Pressure at Pool Temperature {[}Pa{]}
-\item
-  HVAC, Average, Indoor Pool Partial Pressure of Water Vapor in Air {[}Pa{]}
-\item
-  HVAC, Average, Indoor Pool Current Cover Evaporation Factor {[]}
-\item
-  HVAC, Average, Indoor Pool Current Cover Convective Factor {[]}
-\item
-  HVAC, Average, Indoor Pool Current Cover SW Radiation Factor {[]}
-\item
-  HVAC, Average, Indoor Pool Current Cover LW Radiation Factor {[]}
-\end{itemize}
-
-\paragraph{Indoor Pool Makeup Water Rate {[}m3/s{]}}\label{indoor-pool-makeup-water-rate-m3s}
-
-The water consumption rate for the makeup water of indoor swimming pool.
-
-\paragraph{Indoor Pool Makeup Water Volume {[}m3{]}}\label{indoor-pool-makeup-water-volume-m3}
-
-The water consumption for the makeup water of indoor swimming pool.
-
-\paragraph{Indoor Pool Makeup Water Temperature {[}C{]}}\label{indoor-pool-makeup-water-temperature-c}
-
-The temperature of the makeup water of indoor swimming pool.
-
-\paragraph{Indoor Pool Water Temperature {[}C{]}}\label{indoor-pool-water-temperature-c}
-
-The average calculated pool water temperature during the simulation at the time frequency requested.
-
-\paragraph{Indoor Pool Inlet Water Temperature {[}C{]}}\label{indoor-pool-inlet-water-temperature-c}
-
-The temperature of the water being sent to the pool from the plant heating equipment.
-
-\paragraph{Indoor Pool Inlet Water Mass Flow Rate {[}kg/s{]}}\label{indoor-pool-inlet-water-mass-flow-rate-kgs}
-
-The mass flow rate of water being sent to the pool from the plant heating equipment. Typically this water is being passed through a heater and miscellaneous equipment.
-
-\paragraph{Indoor Pool Miscellaneous Equipment Power {[}W{]}}\label{indoor-pool-miscellaneous-equipment-power-w}
-
-The miscellaneous equipment power includes the power consumption of pool filter and chlorinator in Watts.
-
-\paragraph{Indoor Pool Miscellaneous Equipment Energy {[}J{]}}\label{indoor-pool-miscellaneous-equipment-energy-j}
-
-The miscellaneous equipment power consumption includes the energy consumption of pool filter and chlorinator in Joules.
-
-\paragraph{Indoor Pool Water Heating Rate {[}W{]}}\label{indoor-pool-water-heating-rate-w}
-
-This is the rate of heating provided by the plant loop to the pool in Watts.
-
-\paragraph{Indoor Pool Water Heating Energy {[}J{]}}\label{indoor-pool-water-heating-energy-j}
-
-This is the amount of heating provided by the plant loop to the pool in Joules over the time step requested.
-
-\paragraph{Indoor Pool Radiant to Convection by Cover {[}W{]}}\label{indoor-pool-radiant-to-convection-by-cover-w}
-
-The pool cover may block some or all of short- and long-wavelength radiation incident on the pool. To account for this and to not have the cover result in energy that is not accounted for by the model, the radiation that is blocked by the cover is converted to a convective gain (or loss) to/from the zone air. This output field reports this value.
-
-\paragraph{Indoor Pool Current Activity Factor {[]}}\label{indoor-pool-current-activity-factor}
-
-This is the current activity factor as defined by the user input schedule.
-
-\paragraph{Indoor Pool Current Cover Factor {[]}}\label{indoor-pool-current-cover-factor}
-
-This is the current cover factor as defined by the user input schedule.
-
-\paragraph{Indoor Pool Evaporative Heat Loss Rate {[}W{]}}\label{indoor-pool-evaporative-heat-loss-rate-w}
-
-This is the rate of evaporative heat loss (latent) to the zone from the pool in Watts.
-
-\paragraph{Indoor Pool Evaporative Heat Loss Energy {[}J{]}}\label{indoor-pool-evaporative-heat-loss-energy-j}
-
-This is the amount of evaporative heat loss (latent) to the zone from the pool in in Joules over the time step requested.
-
-\paragraph{Indoor Pool Saturation Pressure at Pool Temperature {[}Pa{]}}\label{indoor-pool-saturation-pressure-at-pool-temperature-pa}
-
-This is the saturation pressure of water vapor in air at the pool water temperature.
-
-\paragraph{Indoor Pool Partial Pressure of Water Vapor in Air {[}Pa{]}}\label{indoor-pool-partia-pressure-of-water-vapor-in-air-pa}
-
-This is the partial pressure of water vapor in air at the current zone air conditions for dry bulb temperature and humidity ratio.
-
-\paragraph{Indoor Pool Current Cover Evaporation Factor {[]}}\label{indoor-pool-current-cover-evaporation-factor}
-
-This is the current value of the cover evaporation factor that is used as a modifier for the actual evaporation.  A value of zero means no evaporation will take place while a value of unity means the maximum allowed evaporation will take place.  This value is based on the current cover condition as well as the user input for the cover evaporation factor.
-
-\paragraph{Indoor Pool Current Cover Convective Factor {[]}}\label{indoor-pool-current-cover-convective-factor}
-
-This is the current value of the cover convective factor that is used as a modifier for the actual convection.  A value of zero means the cover will block all convection while a value of unity means that the cover will not affect convection from the water surface at all.  This value is based on the current cover condition as well as the user input for the cover convective factor.
-
-\paragraph{Indoor Pool Current Cover SW Radiation Factor {[]}}\label{indoor-pool-current-cover-sw-radiation-factor}
-
-This is the current value of the cover short wavelength radiation factor that is used as a modifier for the actual short wavelength radiation.  A value of zero means the cover will block all short wavelength radiation while a value of unity means that the cover will not affect short wavelength radiation from the water surface at all.  This value is based on the current cover condition as well as the user input for the cover short wavelength radiation factor.
-
-\paragraph{Indoor Pool Current Cover LW Radiation Factor {[]}}\label{indoor-pool-current-cover-lw-radiation-factor}
-
-This is the current value of the cover long wavelength radiation factor that is used as a modifier for the actual long wavelength radiation.  A value of zero means the cover will block all long wavelength radiation while a value of unity means that the cover will not affect long wavelength radiation from the water surface at all.  This value is based on the current cover condition as well as the user input for the cover long wavelength radiation factor.
-
 \subsection{OtherEquipment}\label{otherequipment}
 
 Other Equipment object is provided as an additional source for heat gains or losses directly to the zone with a fuel type that is configurable. If a fuel type is specified, the energy is attributed to the appropriate end use. Otherwise, a loss can be entered by putting a negative value into the Design Level field and this object will not have an end-use component -- gains or losses do not show up in the bottom energy lines (except as influencing overall zone gains or losses).
@@ -2044,9 +1817,9 @@ OtherEquipment,
 	SubCategory1; !- End-Use Subcategory
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs-5-004}
+\subsubsection{Internal Gain Equipment Outputs}\label{outputs-5-004}
 
-Each type of equipment object has output variables for individual objects and for zone totals.
+Each type of equipment object has output variables for individual objects and for space and zone totals.
 
 \textbf{Electric Equipment}
 
@@ -2075,6 +1848,30 @@ Each type of equipment object has output variables for individual objects and fo
   Zone,Sum,Electric Equipment Total Heating Energy {[}J{]}
 \item
   Zone,Average,Electric Equipment Total Heating Rate {[}W{]}
+\item
+  Zone,Average,Space Electric Equipment Electricity Rate {[}W{]}
+\item
+  Zone,Sum,Space Electric Equipment Electricity Energy {[}J{]}
+\item
+  Zone,Sum,Space Electric Equipment Radiant Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Electric Equipment Radiant Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Electric Equipment Convective Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Electric Equipment Convective Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Electric Equipment Latent Gain Energy {[}J{]}
+\item
+  Zone,Average,Space Electric Equipment Latent Gain Rate {[}W{]}
+\item
+  Zone,Sum,Space Electric Equipment Lost Heat Energy {[}J{]}
+\item
+  Zone,Average,Space Electric Equipment Lost Heat Rate {[}W{]}
+\item
+  Zone,Sum,Space Electric Equipment Total Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Electric Equipment Total Heating Rate {[}W{]}
 \item
   Zone,Average,Zone Electric Equipment Electricity Rate {[}W{]}
 \item
@@ -2129,6 +1926,30 @@ Each type of equipment object has output variables for individual objects and fo
 \item
   Zone,Average,Gas Equipment Total Heating Rate {[}W{]}
 \item
+  Zone,Average,Space Gas Equipment Gas Rate {[}W{]}
+\item
+  Zone,Sum,Space Gas Equipment Gas Energy {[}J{]}
+\item
+  Zone,Sum,Space Gas Equipment Radiant Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Gas Equipment Radiant Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Gas Equipment Convective Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Gas Equipment Convective Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Gas Equipment Latent Gain Energy {[}J{]}
+\item
+  Zone,Average,Space Gas Equipment Latent Gain Rate {[}W{]}
+\item
+  Zone,Sum,Space Gas Equipment Lost Heat Energy {[}J{]}
+\item
+  Zone,Average,Space Gas Equipment Lost Heat Rate {[}W{]}
+\item
+  Zone,Sum,Space Gas Equipment Total Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Gas Equipment Total Heating Rate {[}W{]}
+\item
   Zone,Average,Zone Gas Equipment Gas Rate {[}W{]}
 \item
   Zone,Sum,Zone Gas Equipment Gas Energy {[}J{]}
@@ -2181,6 +2002,30 @@ Each type of equipment object has output variables for individual objects and fo
   Zone,Sum,Hot Water Equipment Total Heating Energy {[}J{]}
 \item
   Zone,Average,Hot Water Equipment Total Heating Rate {[}W{]}
+\item
+  Zone,Average,Space Hot Water Equipment District Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Hot Water Equipment District Heating Energy {[}J{]}
+\item
+  Zone,Sum,Space Hot Water Equipment Radiant Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Hot Water Equipment Radiant Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Hot Water Equipment Convective Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Hot Water Equipment Convective Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Hot Water Equipment Latent Gain Energy {[}J{]}
+\item
+  Zone,Average,Space Hot Water Equipment Latent Gain Rate {[}W{]}
+\item
+  Zone,Sum,Space Hot Water Equipment Lost Heat Energy {[}J{]}
+\item
+  Zone,Average,Space Hot Water Equipment Lost Heat Rate {[}W{]}
+\item
+  Zone,Sum,Space Hot Water Equipment Total Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Hot Water Equipment Total Heating Rate {[}W{]}
 \item
   Zone,Average,Zone Hot Water Equipment District Heating Rate {[}W{]}
 \item
@@ -2235,6 +2080,30 @@ Each type of equipment object has output variables for individual objects and fo
 \item
   Zone,Average,Steam Equipment Total Heating Rate {[}W{]}
 \item
+  Zone,Average,Space Steam Equipment District Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Steam Equipment District Heating Energy {[}J{]}
+\item
+  Zone,Sum,Space Steam Equipment Radiant Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Steam Equipment Radiant Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Steam Equipment Convective Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Steam Equipment Convective Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Steam Equipment Latent Gain Energy {[}J{]}
+\item
+  Zone,Average,Space Steam Equipment Latent Gain Rate {[}W{]}
+\item
+  Zone,Sum,Space Steam Equipment Lost Heat Energy {[}J{]}
+\item
+  Zone,Average,Space Steam Equipment Lost Heat Rate {[}W{]}
+\item
+  Zone,Sum,Space Steam Equipment Total Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Steam Equipment Total Heating Rate {[}W{]}
+\item
   Zone,Average,Zone Steam Equipment District Heating Rate {[}W{]}
 \item
   Zone,Sum,Zone Steam Equipment District Heating Energy {[}J{]}
@@ -2288,6 +2157,26 @@ Each type of equipment object has output variables for individual objects and fo
 \item
   Zone,Average,Other Equipment Total Heating Rate {[}W{]}
 \item
+  Zone,Sum,Space Other Equipment Radiant Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Other Equipment Radiant Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Other Equipment Convective Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Other Equipment Convective Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Other Equipment Latent Gain Energy {[}J{]}
+\item
+  Zone,Average,Space Other Equipment Latent Gain Rate {[}W{]}
+\item
+  Zone,Sum,Space Other Equipment Lost Heat Energy {[}J{]}
+\item
+  Zone,Average,Space Other Equipment Lost Heat Rate {[}W{]}
+\item
+  Zone,Sum,Space Other Equipment Total Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Other Equipment Total Heating Rate {[}W{]}
+\item
   Zone,Sum,Zone Other Equipment Radiant Heating Energy {[}J{]}
 \item
   Zone,Average,Zone Other Equipment Radiant Heating Rate {[}W{]}
@@ -2338,6 +2227,38 @@ The steam equipment district heating consumption in Watts (for power) or Joules 
 \paragraph{Other Equipment Fuel Energy {[}J{]}}\label{otherequip-fuel-energy}
 
 The other equipment fuel consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the appropriate fuel meters that are associated with the zone -- \textless{}Fuel Type\textgreater{}:Facility, \textless{}Fuel Type\textgreater{}:Buidling, \textless{}Fuel Type\textgreater{}:Zone:\textless{}Zone Name\textgreater{}, InteriorEquipment:\textless{}Fuel Type\textgreater{}: :Zone:\textless{}Zone Name\textgreater{}, and \textless{}End-Use Subcategory\textgreater{}:InteriorEquipment:\textless{}Fuel Type\textgreater{}.
+
+\subsubsection{Outputs}\label{outputs-15-001}
+
+As described in each of the equipment sections, values for specific equipments will show up on the following meters:
+
+% table 17
+\begin{longtable}[c]{>{\raggedright}p{2.8in}>{\raggedright}p{1.2in}>{\raggedright}p{2.0in}}
+\caption{Distribution of Equipment to Meters \label{table:distribution-of-equipment-to-meters}} \tabularnewline
+\toprule
+Meter Name & Scope & Equipment Specfics \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Distribution of Equipment to Meters} \tabularnewline
+\toprule
+Meter Name & Scope & Equipment Specfics \tabularnewline
+\midrule
+\endhead
+
+Electricity:\-Facility & Entire Facility & Electric Equipment, OTC Baseboard Heat \tabularnewline
+Electricity:\-Building & All Zones & Electric Equipment, OTC Baseboard Heat \tabularnewline
+Electricity:\-Zone: <Zone Name> & Specific Zone & Electric Equipment, OTC Baseboard Heat \tabularnewline
+Interior\-Equipment:\-Electricity & AllZones & Electric Equipment, OTC Baseboard Heat \tabularnewline
+<End-Use Subcategory> :\-Interior\-Equipment:\-Electricity & Specific Subcategory & Electric Equipment, OTC Baseboard Heat \tabularnewline
+Gas:\-Facility & Entire Facility & Gas Equipment \tabularnewline
+Gas:\-Building & All Zones & Gas Equipment \tabularnewline
+Gas:\-Zone: <Zone Name> & Specific Zone & Gas Equipment \tabularnewline
+Interior\-Equipment:\-Gas & AllZones & Gas Equipment \tabularnewline
+<End-Use Subcategory> :Interior\-Equipment:\-Gas & Specific Subcategory & Gas Equipment \tabularnewline
+\bottomrule
+\end{longtable}
+
 
 \subsection{ElectricEquipment:ITE:AirCooled}\label{electricequipmentiteaircooled}
 
@@ -2875,6 +2796,446 @@ The temperature difference (in degrees DeltaC) between the air inlet relative hu
 \paragraph{Zone ITE Adjusted Return Air Temperature [C]}
 
 Return air temperature after adjustment by ITE objects.
+
+\subsection{ZoneBaseboard:OutdoorTemperatureControlled}\label{zonebaseboardoutdoortemperaturecontrolled}
+
+This object specifies outside temperature-controlled (OTC) baseboard heating. The capacities (high and low) are specified in W at the temperatures specified. The schedule allows both capacities to change hourly on a proportional basis. This baseboard heater does not operate if the outdoor dry-bulb is above the high temperature limit. Between the high temperature and the low temperature, the capacity is interpolated (linear) between the high and the low capacity values. Below the low temperature, the capacity is set at the low capacity value. This allows the user to add baseboard heat to a perimeter zone starting at a prescribed temperature and then slowly increases this capacity to a max value.
+
+\textbf{Example:}
+
+\begin{center}
+  \begin{tabular}{@{}ll@{}}
+    Temperature High = 10 C & Capacity High = 100,000 W \\
+    Temperature Low = 0 C & Capacity Low = 500,000 W
+  \end{tabular}
+\end{center}
+
+% table 16
+\begin{longtable}[c]{@{}ll@{}}
+\caption{Outdoor Temperature Controlled Baseboard Heat Temperature vs. Capacity \label{table:outdoor-temperature-controlled-baseboard-heat}} \tabularnewline
+\toprule
+Outdoor Dry-bulb(C) & Baseboard Output \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Outdoor Temperature Controlled Baseboard Heat Temperature vs. Capacity} \tabularnewline
+\toprule
+Outdoor Dry-bulb(C) & Baseboard Output \tabularnewline
+\midrule
+\endhead
+
+> 10 & 0 \tabularnewline
+10 & 100,000 \tabularnewline
+8 & 180,000 \tabularnewline
+6 & 260,000 \tabularnewline
+4 & 340,000 \tabularnewline
+2 & 420,000 \tabularnewline
+0 & 500,000 \tabularnewline
+< 0 & 500,000 \tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsubsection{Inputs}\label{inputs-18-003}
+
+\paragraph{Field: Name}\label{field-name-18-003}
+
+The name of the ZoneBaseboard:OutdoorTemperatureControlled object.
+
+\paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{bbheat-field-zone-or-zonelist-name-000}
+
+This field applies this ZoneBaseboard:OutdoorTemperatureControlled object to one or more thermal zones or spaces in the building. The names of the actual baseboard heat objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}ZoneBaseboard Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
+
+\paragraph{Field: Schedule Name}\label{field-schedule-name-11}
+
+This field is the name of the schedule that modifies the capacities (high and low) for baseboard heat equipment (see next four fields). The schedule values can be any positive number. The actual energy input for the baseboard equipment in a zone as defined by this statement depends on the actual outdoor temperature and where that temperature is in the range of Low Temperature to High Temperature..
+
+\paragraph{Field: Capacity at Low Temperature}\label{field-capacity-at-low-temperature}
+
+This is the baseboard equipment capacity (Watts) at the low temperature limit. This is the maximum capacity of the baseboard equipment in full load operation. This field is autosizable.
+
+\paragraph{Field: Low Temperature}\label{field-low-temperature}
+
+If the outdoor dry-bulb temperature (degrees Celsius) is at or below the low temperature the baseboard heater operates at the low temperature capacity. This field is autosizable. The lowest design outdoor dry bulb temperature is chosen, if autosized.
+
+\paragraph{Field: Capacity at High Temperature}\label{field-capacity-at-high-temperature}
+
+This is the baseboard equipment capacity (Watts) at the high temperature limit. This field is autosizable. The capacity at low temperature is prorated against the reference low and high temperature fields, if autosized.
+
+\paragraph{Field: High Temperature}\label{field-high-temperature}
+
+If the outdoor dry-bulb temperature (degrees Celsius) is greater than the high temperature the baseboard heater will not operate. This field is autosizable. If autosized, this is equal to the design zone heating setpoint temperature described below, so that the capacity at high temperature is zero.
+
+\paragraph{Field: Fraction Radiant}\label{field-fraction-radiant-7}
+
+This field is a decimal number between 0.0 and 1.0 and is used to characterize the type of heat being given off by baseboard heat equipment in a zone.~ The number specified in this field will be multiplied by the total energy consumed by the baseboard heat equipment to give the amount of long wavelength radiation gain to the zone.
+
+\paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-5}
+
+Allows you to specify a user-defined end-use subcategory, e.g., ``Perimeter Baseboards'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. If this field is omitted or blank, the baseboard equipment will be assigned to the ``General'' end-use subcategory.
+
+\paragraph{Field: Design Zone Heating Setpoint}\label{field-design-zone-heating-setpoint}
+
+This is heating setpoint temperature in the zone where the unit serves. This is used to autosize high temperature and capacity at high temperature fields. The default value is 20°C.
+
+An IDF example:
+
+\begin{lstlisting}
+ZoneBaseboard:OutdoorTemperatureControlled,
+  SPACE4-1 BBHeat 1,  !- Name
+  SPACE4-1,           !- Zone Name
+  EQUIP-1,            !- SCHEDULE Name
+  1500,               !- Capacity at low temperature {W}
+  0,                  !- Low Temperature {C}
+  500,                !- Capacity at high temperature {W}
+  10,                 !- High Temperature {C}
+  0.5,                !- Fraction Radiant
+  Baseboard Heat,     !- End-Use Subcategory
+  20;                 !- Design Zone Heating Setpoint {C}
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-14-002}
+
+ZoneBaseboard:OutdoorTemperatureControlled objects have output variables for individual objects and for zone totals. The following outputs are available:
+
+\begin{itemize}
+\tightlist
+\item
+  Zone,Average,Baseboard Electricity Rate {[}W{]}
+\item
+  Zone,Sum,Baseboard Electricity Energy {[}J{]}
+\item
+  Zone,Sum,Baseboard Radiant Heating Energy {[}J{]}
+\item
+  Zone,Average,Baseboard Radiant Heating Rate {[}W{]}
+\item
+  Zone,Sum,Baseboard Convective Heating Energy {[}J{]}
+\item
+  Zone,Average,Baseboard Convective Heating Rate {[}W{]}
+\item
+  Zone,Sum,Baseboard Total Heating Energy {[}J{]}
+\item
+  Zone,Average,Baseboard Total Heating Rate {[}W{]}
+\item
+  Zone,Average,Zone Baseboard Electricity Rate {[}W{]}
+\item
+  Zone,Sum,Zone Baseboard Electricity Energy {[}J{]}
+\item
+  Zone,Sum,Zone Baseboard Radiant Heating Energy {[}J{]}
+\item
+  Zone,Average,Zone Baseboard Radiant Heating Rate {[}W{]}
+\item
+  Zone,Sum,Zone Baseboard Convective Heating Energy {[}J{]}
+\item
+  Zone,Average,Zone Baseboard Convective Heating Rate {[}W{]}
+\item
+  Zone,Sum,Zone Baseboard Total Heating Energy {[}J{]}
+\item
+  Zone,Average,Zone Baseboard Total Heating Rate {[}W{]}
+\end{itemize}
+
+\paragraph{Baseboard Electricity Rate {[}W{]}}\label{baseboard-electric-power-w}
+
+This field is the electric power for the ZoneBaseboard:OutdoorTemperatureControlled object in Watts.
+
+\paragraph{Baseboard Electricity Energy {[}J{]}}\label{baseboard-electric-energy-j}
+
+The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules.
+
+\paragraph{Baseboard Radiant Heating Rate {[}W{]}}\label{baseboard-radiant-heating-rate-w}
+
+\paragraph{Baseboard Radiant Heating Energy {[}J{]}}\label{baseboard-radiant-heating-energy-j}
+
+These output variables are the amount of radiant heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
+
+\paragraph{Baseboard Convective Heating Rate {[}W{]}}\label{baseboard-convective-heating-rate-w}
+
+\paragraph{Baseboard Convective Heating Energy {[}J{]}}\label{baseboard-convective-heating-energy-j}
+
+These output variables are the amount of convective heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the zone air heat balance directly.
+
+\paragraph{Baseboard Total Heating Rate {[}W{]}}\label{baseboard-total-heating-rate-w}
+
+\paragraph{Baseboard Total Heating Energy {[}J{]}}\label{baseboard-total-heating-energy-j}
+
+These output variables are the amount of heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
+
+\paragraph{Zone Baseboard Electricity Rate {[}W{]}}\label{zone-baseboard-electric-power-w}
+
+This field is the electric power for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts.
+
+\paragraph{Zone Baseboard Electricity Energy {[}J{]}}\label{zone-baseboard-electric-energy-j}
+
+The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. However, this amount is also shown in the Electricity meters that are associated with the zone -- Electricity:\-Facility, Electricity:\-Buidling, Electricity:\-Zone:\-\textless{}Zone Name\textgreater{}, and Interior\-Equipment:\-Electricity.
+
+\paragraph{Zone Baseboard Radiant Heating Rate {[}W{]}}\label{zone-baseboard-radiant-heating-rate-w}
+
+\paragraph{Zone Baseboard Radiant Heating Energy {[}J{]}}\label{zone-baseboard-radiant-heating-energy-j}
+
+These output variables are the amount of radiant heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
+
+\paragraph{Zone Baseboard Convective Heating Rate {[}W{]}}\label{zone-baseboard-convective-heating-rate-w}
+
+\paragraph{Zone Baseboard Convective Heating Energy {[}J{]}}\label{zone-baseboard-convective-heating-energy-j}
+
+These output variables are the amount of convective heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the zone air heat balance directly.
+
+\paragraph{Zone Baseboard Total Heating Rate {[}W{]}}\label{zone-baseboard-total-heating-rate-w}
+
+\paragraph{Zone Baseboard Total Heating Energy {[}J{]}}\label{zone-baseboard-total-heating-energy-j}
+
+These output variables are the amount of heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
+
+
+\subsection{SwimmingPool:Indoor}\label{swimmingpoolindoor}
+
+The Indoor Swimming Pool object is used to describe the indoor swimming pools that are exposed to the internal environment. There are several rules that should be noted regarding the specification of an indoor pool in EnergyPlus. First, the pool is linked to a surface that must be a floor. The pool is assumed to cover the entire floor to which it is linked. If the pool only covers part of the floor in the actual building, then the user must break the floor up into multiple sections.
+
+As pools attempt to achieve a particular water temperature and have a variety of heat losses, heating equipment is necessary to maintain the proper setpoint temperature. In EnergyPlus, the pool itself becomes part of the demand side of a plant loop with heating equipment on the supply side providing whatever heating is needed to maintain the desired temperature. This heating equipment as well as the loop connections must be entered separately and the input shown in this section only details what is needed to specify the pool itself.
+
+There are a variety of rules that limit the application of indoor swimming pools in EnergyPlus.  The following are a list of these rules:
+
+\begin{itemize}
+  \item The pool must reference a valid surface in the input file.  This surface must be a floor and cannot be other surface types like ceilings, walls, windows, etc.
+  \item The pool cannot refer to a surface that is also a radiant system, ventilated slab, or another pool.
+  \item The surface that the pool references must be modeled using conduction transfer functions (CTF).
+  \item The pool cannot utilize movable insulation or have a heat source or sink associated with it (something used to model low temperature radiant systems).
+\end{itemize}
+
+The following information is useful for defining and modeling an indoor pool in EnergyPlus. For more information on the algorithm used for this model or details on some of the input parameters, please reference the indoor pool section of the EnergyPlus Engineering Reference document.
+
+\subsubsection{Inputs}\label{inputs-7-012}
+
+\paragraph{Field: Name}\label{field-name-7-008}
+
+This is a unique name associated with the indoor swimming pool.
+
+\paragraph{Field: Surface Name}\label{field-surface-name-1-000}
+
+This is the name of the surface (floor) where the pool is located. Pools are not allowed on any surfaces other than a floor.  For more rules on surfaces that can be used for pools, please see the information in this section on indoor pools above.
+
+\paragraph{Field: Average Depth}\label{field-average-depth}
+
+This field is the average depth of the pool in meters. If the pool has variable depth, the average depth should be specified to achieve the proper volume of water in the pool.
+
+\paragraph{Field: Activity Factor Schedule Name}\label{field-activity-factor-schedule-name}
+
+This field references a schedule that contains values for pool activity. This parameter can be varied using the schedule named here, and it has an impact on the amount of evaporation that will take place from the pool to the surrounding zone air. For example values of the activity factor and what impact it will have on the evaporation of water from the pool, please refer to the Indoor Swimming Pool section of the EnergyPlus Engineering Reference document. If left blank, the activity factor will be assumed to be unity. Note that the activity factor should not be set equal to an occupancy schedule since an activity factor of zero means that no evaporation will take place from the pool.
+
+\paragraph{Field: Make-up Water Supply Schedule Name}\label{field-make-up-water-supply-schedule-name}
+
+The scheduled named by this field establishes a cold water temperature {[}C{]} for the water that replaces the water which is lost from the pool due to evaporation. If blank, water temperatures are calculated by the \hyperref[sitewatermainstemperature]{Site:WaterMainsTemperature} object. This field (even if blank) overrides the Cold Water Supply Temperature Schedule in all of the listed \hyperref[wateruseequipment]{WaterUse:Equipment} objects.
+
+\paragraph{Field: Cover Schedule Name}\label{field-cover-schedule-name}
+
+This schedule defines when the pool water cover is available and affects the evaporation, convection, and radiation rate calculations. A schedule value of 0.0 means that the pool is not covered. A schedule value of 1.0 means the pool is 100\% covered. The pool may be fully covered, fully open (uncovered), or partially covered (a value between 0.0 and 1.0). The user also has the option to control the evaporation, convection, short-wavelength radiation, and long-wavelength radiation factors when the pool is covered. These terms are discussed in the next four fields.
+
+\paragraph{Field: Cover Evaporation Factor}\label{field-cover-evaporation-factor}
+
+This input field can optionally be used to modify the pool evaporation rate and is used in conjunction with the pool cover factor defined by the Pool Cover Schedule field (see above). The value for this parameter can normally range from 0.0 to 1.0, where 1 means that the pool cover completely eliminates evaporation from the pool surface, 0 means the pool cover has no effect on evaporation, and fractions in between 0 and 1 result in a fractional reduction in evaporation by the pool cover. So, if this parameter is 0.5 and the pool is 50\% covered, the overall reduction in evaporation from a fully uncovered pool is 25\% or 0.25.
+
+\paragraph{Field: Cover Convection Factor}\label{field-cover-convection-factor}
+
+This input field can optionally be used to modify the pool convection rate and is used in conjunction with the pool cover factor defined by the Pool Cover Schedule field (see above). The value for this parameter can normally range from 0.0 to 1.0, where 1 means that the pool cover completely eliminates convection from the pool surface, 0 means the pool cover has no effect on convection, and fractions in between 0 and 1 result in a fractional reduction in convection by the pool cover. So, if this parameter is 0.5 and the pool is 50\% covered, the overall reduction in convection from a fully uncovered pool is 25\% or 0.25.
+
+\paragraph{Field: Cover Short-Wavelength Radiation Factor}\label{field-cover-short-wavelength-radiation-factor}
+
+This input field can optionally be used to modify the pool short-wavelength radiation rate and is used in conjunction with the pool cover factor defined by the Pool Cover Schedule field (see above). The value for this parameter can normally range from 0.0 to 1.0, where 1 means that the pool cover completely eliminates short-wavelength radiation from the pool surface, 0 means the pool cover has no effect on short-wavelength radiation, and fractions in between 0 and 1 result in a fractional reduction in short-wavelength radiation by the pool cover. So, if this parameter is 0.5 and the pool is 50\% covered, the overall reduction in short-wavelength radiation from a fully uncovered pool is 25\% or 0.25. Note that with radiation terms that whatever portion of the short-wavelength radiation is blocked by the cover is transferred via convection to the surrounding zone air.
+
+\paragraph{Field: Cover Long-Wavelength Radiation Factor}\label{field-cover-long-wavelength-radiation-factor}
+
+This input field can optionally be used to modify the pool long-wavelength radiation rate and is used in conjunction with the pool cover factor defined by the Pool Cover Schedule field (see above). The value for this parameter can normally range from 0.0 to 1.0, where 1 means that the pool cover completely eliminates long-wavelength radiation from the pool surface, 0 means the pool cover has no effect on long-wavelength radiation, and fractions in between 0 and 1 result in a fractional reduction in long-wavelength radiation by the pool cover. So, if this parameter is 0.5 and the pool is 50\% covered, the overall reduction in long-wavelength radiation from a fully uncovered pool is 25\% or 0.25. Note that with radiation terms that whatever portion of the long-wavelength radiation is blocked by the cover is transferred via convection to the surrounding zone air.
+
+\paragraph{Field: Pool Water Inlet Node}\label{field-pool-water-inlet-node}
+
+This input is the name of the node on the demand side of a plant loop that leads into the pool. From the standpoint of an EnergyPlus input file, the pool sits on a plant demand loop, and the pump and heater reside on the plant supply loop. The pool heater and pump must be defined by other existing EnergyPlus input.
+
+\paragraph{Field: Pool Water Outlet Node}\label{field-pool-water-outlet-node}
+
+This input is the name of the node on the demand side of a plant loop that leads out of the pool. From the standpoint of an EnergyPlus input file, the pool sits on a plant demand loop, and the pump and heater reside on the plant supply loop. The pool heater and pump must be defined by other existing EnergyPlus input.
+
+\paragraph{Field: Pool Water Maximum Flow Rate}\label{field-pool-water-maximum-flow-rate}
+
+This input is the maximum water volumetric flow rate in m3/s going between the pool and the water heating equipment. This along with the pool setpoint temperature and the heating plant equipment outlet temperature will establish the maximum heat addition to the pool. This flow rate to the pool will be varied in an attempt to reach the desired pool water setpoint temperature (see Setpoint Temperature Schedule below).
+
+\paragraph{Field: Pool Miscellaneous Equipment Power}\label{field-pool-miscellaneous-equipment-power}
+
+This input defines the power consumption rate of miscellaneous equipment such as the filtering and chlorination technology associated with the pool. The units for this input are in power consumption per flow rate of water through the pool from the heater or W/(m3/s). This field will be multiplied by the flow rate of water through the pool to determine the power consumption of this equipment. Any heat generated by this equipment is assumed to have no effect on the pool water itself.
+
+\paragraph{Field: Setpoint Temperature Schedule}\label{field-setpoint-temperature-schedule}
+
+Pools attempt to maintain a particular water temperature. In EnergyPlus, this field defines the setpoint temperature for the desired pool water temperature. It is input as a schedule to allow the user to vary the pool setpoint temperature as desired. The equipment defined to provide heating for the pool will deliver the necessary hot water to the pool, up to the capacity of that equipment defined by other input by the user.
+
+\paragraph{Field: Maximum Number of People}\label{field-maximum-number-of-people}
+
+This field defines the maximum occupancy of people actually in the pool and thus will be used with the next two inputs to determine how much heat people contribute to the pool heat balance. \hyperref[people]{People} who are not in the pool should be modeled separately using the standard \hyperref[people]{People} description for zones.
+
+\paragraph{Field: People Schedule}\label{field-people-schedule}
+
+This field defines a schedule that establishes how many people are in the pool at any given time. The current value of this schedule is multiplied by the maximum number of people in the previous field determines how many people are currently in the pool.
+
+\paragraph{Field: People Heat Gain Schedule}\label{field-people-heat-gain-schedule}
+
+This field defines the amount of heat given off by an average person in the pool in Watts. This field is a schedule so that this heat gain can be allowed to vary as the type of activity in a pool can vary greatly and thus the amount of heat gain per person also varies. This parameter times the number of people in the pool determines how much heat is added to the pool. All heat given off by people is added to the heat balance of the pool water.
+
+An example of an indoor swimming pool definition is:
+
+\begin{lstlisting}
+
+SwimmingPool:Indoor,
+  Test Pool,             !- Name
+  F1-1,                  !- Surface Name
+  1.5,                   !- Average Depth {m}
+  PoolActivitySched,     !- Pool Activity Schedule
+  MakeUpWaterSched,      !- MakeUp Water Temperature Schedule
+  PoolCoverSched,        !- Pool Cover Schedule
+  0.0,                   !- Cover Evaporation Factor
+  0.2,                   !- Cover Convection Factor
+  0.9,                   !- Cover Short-Wavelength Radiation Factor
+  0.5,                   !- Cover Long-Wavelength Radiation Factor
+  Pool Water Inlet Node,    !- Water Inlet Node (Plant/Heater)
+  Pool Water Outlet Node,   !- Water Outlet Node (Plant/Heater)
+  0.1,                   !- Maximum flow rate from water heating system {m3/s}
+  0.6,                   !- Miscellaneous Equipment Power Factor {W/(m3/s)}
+  PoolSetpointTempSched, !- Pool Water Setpoint Temperature Schedule
+  15,                    !- Maximum Number of People in Pool
+  PoolOccupancySched,    !- Pool People Schedule
+  PoolOccHeatGainSched;  !- Pool People Heat Gain Schedule
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-4-007}
+
+\begin{itemize}
+\tightlist
+\item
+  HVAC, Average, Indoor Pool Makeup Water Rate {[}m3/s{]}
+\item
+  HVAC, Sum, Indoor Pool Makeup Water Volume {[}m3{]}
+\item
+  HVAC, Average, Indoor Pool Makeup Water Temperature {[}C{]}
+\item
+  HVAC, Average, Indoor Pool Water Temperature {[}C{]}
+\item
+  HVAC, Average, Indoor Pool Inlet Water Temperature {[}C{]}
+\item
+  HVAC, Average, Indoor Pool Inlet Water Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC, Average, Indoor Pool Miscellaneous Equipment Power {[}W{]}
+\item
+  HVAC, Sum, Indoor Pool Miscellaneous Equipment Energy {[}J{]}
+\item
+  HVAC, Average, Indoor Pool Water Heating Rate {[}W{]}
+\item
+  HVAC, Sum, Indoor Pool Water Heating Energy {[}J{]}
+\item
+  HVAC, Average, Indoor Pool Radiant to Convection by Cover {[}W{]}
+\item
+  HVAC, Average, Indoor Pool People Heat Gain {[}W{]}
+\item
+  HVAC, Average, Indoor Pool Current Activity Factor {[]}
+\item
+  HVAC, Average, Indoor Pool Current Cover Factor {[]}
+\item
+  HVAC, Average, Indoor Pool Evaporative Heat Loss Rate {[}W{]}
+\item
+  HVAC, Sum, Indoor Pool Evaporative Heat Loss Energy {[}J{]}
+\item
+  HVAC, Average, Indoor Pool Saturation Pressure at Pool Temperature {[}Pa{]}
+\item
+  HVAC, Average, Indoor Pool Partial Pressure of Water Vapor in Air {[}Pa{]}
+\item
+  HVAC, Average, Indoor Pool Current Cover Evaporation Factor {[]}
+\item
+  HVAC, Average, Indoor Pool Current Cover Convective Factor {[]}
+\item
+  HVAC, Average, Indoor Pool Current Cover SW Radiation Factor {[]}
+\item
+  HVAC, Average, Indoor Pool Current Cover LW Radiation Factor {[]}
+\end{itemize}
+
+\paragraph{Indoor Pool Makeup Water Rate {[}m3/s{]}}\label{indoor-pool-makeup-water-rate-m3s}
+
+The water consumption rate for the makeup water of indoor swimming pool.
+
+\paragraph{Indoor Pool Makeup Water Volume {[}m3{]}}\label{indoor-pool-makeup-water-volume-m3}
+
+The water consumption for the makeup water of indoor swimming pool.
+
+\paragraph{Indoor Pool Makeup Water Temperature {[}C{]}}\label{indoor-pool-makeup-water-temperature-c}
+
+The temperature of the makeup water of indoor swimming pool.
+
+\paragraph{Indoor Pool Water Temperature {[}C{]}}\label{indoor-pool-water-temperature-c}
+
+The average calculated pool water temperature during the simulation at the time frequency requested.
+
+\paragraph{Indoor Pool Inlet Water Temperature {[}C{]}}\label{indoor-pool-inlet-water-temperature-c}
+
+The temperature of the water being sent to the pool from the plant heating equipment.
+
+\paragraph{Indoor Pool Inlet Water Mass Flow Rate {[}kg/s{]}}\label{indoor-pool-inlet-water-mass-flow-rate-kgs}
+
+The mass flow rate of water being sent to the pool from the plant heating equipment. Typically this water is being passed through a heater and miscellaneous equipment.
+
+\paragraph{Indoor Pool Miscellaneous Equipment Power {[}W{]}}\label{indoor-pool-miscellaneous-equipment-power-w}
+
+The miscellaneous equipment power includes the power consumption of pool filter and chlorinator in Watts.
+
+\paragraph{Indoor Pool Miscellaneous Equipment Energy {[}J{]}}\label{indoor-pool-miscellaneous-equipment-energy-j}
+
+The miscellaneous equipment power consumption includes the energy consumption of pool filter and chlorinator in Joules.
+
+\paragraph{Indoor Pool Water Heating Rate {[}W{]}}\label{indoor-pool-water-heating-rate-w}
+
+This is the rate of heating provided by the plant loop to the pool in Watts.
+
+\paragraph{Indoor Pool Water Heating Energy {[}J{]}}\label{indoor-pool-water-heating-energy-j}
+
+This is the amount of heating provided by the plant loop to the pool in Joules over the time step requested.
+
+\paragraph{Indoor Pool Radiant to Convection by Cover {[}W{]}}\label{indoor-pool-radiant-to-convection-by-cover-w}
+
+The pool cover may block some or all of short- and long-wavelength radiation incident on the pool. To account for this and to not have the cover result in energy that is not accounted for by the model, the radiation that is blocked by the cover is converted to a convective gain (or loss) to/from the zone air. This output field reports this value.
+
+\paragraph{Indoor Pool Current Activity Factor {[]}}\label{indoor-pool-current-activity-factor}
+
+This is the current activity factor as defined by the user input schedule.
+
+\paragraph{Indoor Pool Current Cover Factor {[]}}\label{indoor-pool-current-cover-factor}
+
+This is the current cover factor as defined by the user input schedule.
+
+\paragraph{Indoor Pool Evaporative Heat Loss Rate {[}W{]}}\label{indoor-pool-evaporative-heat-loss-rate-w}
+
+This is the rate of evaporative heat loss (latent) to the zone from the pool in Watts.
+
+\paragraph{Indoor Pool Evaporative Heat Loss Energy {[}J{]}}\label{indoor-pool-evaporative-heat-loss-energy-j}
+
+This is the amount of evaporative heat loss (latent) to the zone from the pool in in Joules over the time step requested.
+
+\paragraph{Indoor Pool Saturation Pressure at Pool Temperature {[}Pa{]}}\label{indoor-pool-saturation-pressure-at-pool-temperature-pa}
+
+This is the saturation pressure of water vapor in air at the pool water temperature.
+
+\paragraph{Indoor Pool Partial Pressure of Water Vapor in Air {[}Pa{]}}\label{indoor-pool-partia-pressure-of-water-vapor-in-air-pa}
+
+This is the partial pressure of water vapor in air at the current zone air conditions for dry bulb temperature and humidity ratio.
+
+\paragraph{Indoor Pool Current Cover Evaporation Factor {[]}}\label{indoor-pool-current-cover-evaporation-factor}
+
+This is the current value of the cover evaporation factor that is used as a modifier for the actual evaporation.  A value of zero means no evaporation will take place while a value of unity means the maximum allowed evaporation will take place.  This value is based on the current cover condition as well as the user input for the cover evaporation factor.
+
+\paragraph{Indoor Pool Current Cover Convective Factor {[]}}\label{indoor-pool-current-cover-convective-factor}
+
+This is the current value of the cover convective factor that is used as a modifier for the actual convection.  A value of zero means the cover will block all convection while a value of unity means that the cover will not affect convection from the water surface at all.  This value is based on the current cover condition as well as the user input for the cover convective factor.
+
+\paragraph{Indoor Pool Current Cover SW Radiation Factor {[]}}\label{indoor-pool-current-cover-sw-radiation-factor}
+
+This is the current value of the cover short wavelength radiation factor that is used as a modifier for the actual short wavelength radiation.  A value of zero means the cover will block all short wavelength radiation while a value of unity means that the cover will not affect short wavelength radiation from the water surface at all.  This value is based on the current cover condition as well as the user input for the cover short wavelength radiation factor.
+
+\paragraph{Indoor Pool Current Cover LW Radiation Factor {[]}}\label{indoor-pool-current-cover-lw-radiation-factor}
+
+This is the current value of the cover long wavelength radiation factor that is used as a modifier for the actual long wavelength radiation.  A value of zero means the cover will block all long wavelength radiation while a value of unity means that the cover will not affect long wavelength radiation from the water surface at all.  This value is based on the current cover condition as well as the user input for the cover long wavelength radiation factor.
+
 
 \subsection{ZoneContaminantSourceAndSink:CarbonDioxide}\label{zonecontaminantsourceandsinkcarbondioxide}
 
@@ -3414,221 +3775,3 @@ When the ZoneContaminantSourceAndSink:Generic:DepositionRateSink object is speci
 
 This output is the average generic contaminant generation rate from each Zone\-Contaminant\-Source\-And\-Sink:\-Generic:\-Deposition\-Rate\-Sink object.
 
-\subsection{ZoneBaseboard:OutdoorTemperatureControlled}\label{zonebaseboardoutdoortemperaturecontrolled}
-
-This object specifies outside temperature-controlled (OTC) baseboard heating. The capacities (high and low) are specified in W at the temperatures specified. The schedule allows both capacities to change hourly on a proportional basis. This baseboard heater does not operate if the outdoor dry-bulb is above the high temperature limit. Between the high temperature and the low temperature, the capacity is interpolated (linear) between the high and the low capacity values. Below the low temperature, the capacity is set at the low capacity value. This allows the user to add baseboard heat to a perimeter zone starting at a prescribed temperature and then slowly increases this capacity to a max value.
-
-\textbf{Example:}
-
-\begin{center}
-  \begin{tabular}{@{}ll@{}}
-    Temperature High = 10 C & Capacity High = 100,000 W \\
-    Temperature Low = 0 C & Capacity Low = 500,000 W
-  \end{tabular}
-\end{center}
-
-% table 16
-\begin{longtable}[c]{@{}ll@{}}
-\caption{Outdoor Temperature Controlled Baseboard Heat Temperature vs. Capacity \label{table:outdoor-temperature-controlled-baseboard-heat}} \tabularnewline
-\toprule
-Outdoor Dry-bulb(C) & Baseboard Output \tabularnewline
-\midrule
-\endfirsthead
-
-\caption[]{Outdoor Temperature Controlled Baseboard Heat Temperature vs. Capacity} \tabularnewline
-\toprule
-Outdoor Dry-bulb(C) & Baseboard Output \tabularnewline
-\midrule
-\endhead
-
-> 10 & 0 \tabularnewline
-10 & 100,000 \tabularnewline
-8 & 180,000 \tabularnewline
-6 & 260,000 \tabularnewline
-4 & 340,000 \tabularnewline
-2 & 420,000 \tabularnewline
-0 & 500,000 \tabularnewline
-< 0 & 500,000 \tabularnewline
-\bottomrule
-\end{longtable}
-
-\subsubsection{Inputs}\label{inputs-18-003}
-
-\paragraph{Field: Name}\label{field-name-18-003}
-
-The name of the ZoneBaseboard:OutdoorTemperatureControlled object.
-
-\paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{bbheat-field-zone-or-zonelist-name-000}
-
-This field applies this ZoneBaseboard:OutdoorTemperatureControlled object to one or more thermal zones or spaces in the building. The names of the actual baseboard heat objects may be concatenated as \textless{}Space Name\textgreater{} \textless{}ZoneBaseboard Object Name\textgreater{}. See \hyperref[specifying-applicable-zones-or-spaces]{Specifying Applicable Zone(s) or Space(s)} for more details.
-
-\paragraph{Field: Schedule Name}\label{field-schedule-name-11}
-
-This field is the name of the schedule that modifies the capacities (high and low) for baseboard heat equipment (see next four fields). The schedule values can be any positive number. The actual energy input for the baseboard equipment in a zone as defined by this statement depends on the actual outdoor temperature and where that temperature is in the range of Low Temperature to High Temperature..
-
-\paragraph{Field: Capacity at Low Temperature}\label{field-capacity-at-low-temperature}
-
-This is the baseboard equipment capacity (Watts) at the low temperature limit. This is the maximum capacity of the baseboard equipment in full load operation. This field is autosizable.
-
-\paragraph{Field: Low Temperature}\label{field-low-temperature}
-
-If the outdoor dry-bulb temperature (degrees Celsius) is at or below the low temperature the baseboard heater operates at the low temperature capacity. This field is autosizable. The lowest design outdoor dry bulb temperature is chosen, if autosized.
-
-\paragraph{Field: Capacity at High Temperature}\label{field-capacity-at-high-temperature}
-
-This is the baseboard equipment capacity (Watts) at the high temperature limit. This field is autosizable. The capacity at low temperature is prorated against the reference low and high temperature fields, if autosized.
-
-\paragraph{Field: High Temperature}\label{field-high-temperature}
-
-If the outdoor dry-bulb temperature (degrees Celsius) is greater than the high temperature the baseboard heater will not operate. This field is autosizable. If autosized, this is equal to the design zone heating setpoint temperature described below, so that the capacity at high temperature is zero.
-
-\paragraph{Field: Fraction Radiant}\label{field-fraction-radiant-7}
-
-This field is a decimal number between 0.0 and 1.0 and is used to characterize the type of heat being given off by baseboard heat equipment in a zone.~ The number specified in this field will be multiplied by the total energy consumed by the baseboard heat equipment to give the amount of long wavelength radiation gain to the zone.
-
-\paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-5}
-
-Allows you to specify a user-defined end-use subcategory, e.g., ``Perimeter Baseboards'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary table EAp2-4/5 Performance Rating Method Compliance. If this field is omitted or blank, the baseboard equipment will be assigned to the ``General'' end-use subcategory.
-
-\paragraph{Field: Design Zone Heating Setpoint}\label{field-design-zone-heating-setpoint}
-
-This is heating setpoint temperature in the zone where the unit serves. This is used to autosize high temperature and capacity at high temperature fields. The default value is 20°C.
-
-An IDF example:
-
-\begin{lstlisting}
-ZoneBaseboard:OutdoorTemperatureControlled,
-  SPACE4-1 BBHeat 1,  !- Name
-  SPACE4-1,           !- Zone Name
-  EQUIP-1,            !- SCHEDULE Name
-  1500,               !- Capacity at low temperature {W}
-  0,                  !- Low Temperature {C}
-  500,                !- Capacity at high temperature {W}
-  10,                 !- High Temperature {C}
-  0.5,                !- Fraction Radiant
-  Baseboard Heat,     !- End-Use Subcategory
-  20;                 !- Design Zone Heating Setpoint {C}
-\end{lstlisting}
-
-\subsubsection{Outputs}\label{outputs-14-002}
-
-ZoneBaseboard:OutdoorTemperatureControlled objects have output variables for individual objects and for zone totals. The following outputs are available:
-
-\begin{itemize}
-\tightlist
-\item
-  Zone,Average,Baseboard Electricity Rate {[}W{]}
-\item
-  Zone,Sum,Baseboard Electricity Energy {[}J{]}
-\item
-  Zone,Sum,Baseboard Radiant Heating Energy {[}J{]}
-\item
-  Zone,Average,Baseboard Radiant Heating Rate {[}W{]}
-\item
-  Zone,Sum,Baseboard Convective Heating Energy {[}J{]}
-\item
-  Zone,Average,Baseboard Convective Heating Rate {[}W{]}
-\item
-  Zone,Sum,Baseboard Total Heating Energy {[}J{]}
-\item
-  Zone,Average,Baseboard Total Heating Rate {[}W{]}
-\item
-  Zone,Average,Zone Baseboard Electricity Rate {[}W{]}
-\item
-  Zone,Sum,Zone Baseboard Electricity Energy {[}J{]}
-\item
-  Zone,Sum,Zone Baseboard Radiant Heating Energy {[}J{]}
-\item
-  Zone,Average,Zone Baseboard Radiant Heating Rate {[}W{]}
-\item
-  Zone,Sum,Zone Baseboard Convective Heating Energy {[}J{]}
-\item
-  Zone,Average,Zone Baseboard Convective Heating Rate {[}W{]}
-\item
-  Zone,Sum,Zone Baseboard Total Heating Energy {[}J{]}
-\item
-  Zone,Average,Zone Baseboard Total Heating Rate {[}W{]}
-\end{itemize}
-
-\paragraph{Baseboard Electricity Rate {[}W{]}}\label{baseboard-electric-power-w}
-
-This field is the electric power for the ZoneBaseboard:OutdoorTemperatureControlled object in Watts.
-
-\paragraph{Baseboard Electricity Energy {[}J{]}}\label{baseboard-electric-energy-j}
-
-The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules.
-
-\paragraph{Baseboard Radiant Heating Rate {[}W{]}}\label{baseboard-radiant-heating-rate-w}
-
-\paragraph{Baseboard Radiant Heating Energy {[}J{]}}\label{baseboard-radiant-heating-energy-j}
-
-These output variables are the amount of radiant heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
-
-\paragraph{Baseboard Convective Heating Rate {[}W{]}}\label{baseboard-convective-heating-rate-w}
-
-\paragraph{Baseboard Convective Heating Energy {[}J{]}}\label{baseboard-convective-heating-energy-j}
-
-These output variables are the amount of convective heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the zone air heat balance directly.
-
-\paragraph{Baseboard Total Heating Rate {[}W{]}}\label{baseboard-total-heating-rate-w}
-
-\paragraph{Baseboard Total Heating Energy {[}J{]}}\label{baseboard-total-heating-energy-j}
-
-These output variables are the amount of heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
-
-\paragraph{Zone Baseboard Electricity Rate {[}W{]}}\label{zone-baseboard-electric-power-w}
-
-This field is the electric power for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts.
-
-\paragraph{Zone Baseboard Electricity Energy {[}J{]}}\label{zone-baseboard-electric-energy-j}
-
-The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. However, this amount is also shown in the Electricity meters that are associated with the zone -- Electricity:\-Facility, Electricity:\-Buidling, Electricity:\-Zone:\-\textless{}Zone Name\textgreater{}, and Interior\-Equipment:\-Electricity.
-
-\paragraph{Zone Baseboard Radiant Heating Rate {[}W{]}}\label{zone-baseboard-radiant-heating-rate-w}
-
-\paragraph{Zone Baseboard Radiant Heating Energy {[}J{]}}\label{zone-baseboard-radiant-heating-energy-j}
-
-These output variables are the amount of radiant heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
-
-\paragraph{Zone Baseboard Convective Heating Rate {[}W{]}}\label{zone-baseboard-convective-heating-rate-w}
-
-\paragraph{Zone Baseboard Convective Heating Energy {[}J{]}}\label{zone-baseboard-convective-heating-energy-j}
-
-These output variables are the amount of convective heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the zone air heat balance directly.
-
-\paragraph{Zone Baseboard Total Heating Rate {[}W{]}}\label{zone-baseboard-total-heating-rate-w}
-
-\paragraph{Zone Baseboard Total Heating Energy {[}J{]}}\label{zone-baseboard-total-heating-energy-j}
-
-These output variables are the amount of heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
-
-\subsubsection{Outputs}\label{outputs-15-001}
-
-As described in each of the equipment sections, values for specific equipments will show up on the following meters:
-
-% table 17
-\begin{longtable}[c]{>{\raggedright}p{2.8in}>{\raggedright}p{1.2in}>{\raggedright}p{2.0in}}
-\caption{Distribution of Equipment to Meters \label{table:distribution-of-equipment-to-meters}} \tabularnewline
-\toprule
-Meter Name & Scope & Equipment Specfics \tabularnewline
-\midrule
-\endfirsthead
-
-\caption[]{Distribution of Equipment to Meters} \tabularnewline
-\toprule
-Meter Name & Scope & Equipment Specfics \tabularnewline
-\midrule
-\endhead
-
-Electricity:\-Facility & Entire Facility & Electric Equipment, OTC Baseboard Heat \tabularnewline
-Electricity:\-Building & All Zones & Electric Equipment, OTC Baseboard Heat \tabularnewline
-Electricity:\-Zone: <Zone Name> & Specific Zone & Electric Equipment, OTC Baseboard Heat \tabularnewline
-Interior\-Equipment:\-Electricity & AllZones & Electric Equipment, OTC Baseboard Heat \tabularnewline
-<End-Use Subcategory> :\-Interior\-Equipment:\-Electricity & Specific Subcategory & Electric Equipment, OTC Baseboard Heat \tabularnewline
-Gas:\-Facility & Entire Facility & Gas Equipment \tabularnewline
-Gas:\-Building & All Zones & Gas Equipment \tabularnewline
-Gas:\-Zone: <Zone Name> & Specific Zone & Gas Equipment \tabularnewline
-Interior\-Equipment:\-Gas & AllZones & Gas Equipment \tabularnewline
-<End-Use Subcategory> :Interior\-Equipment:\-Gas & Specific Subcategory & Gas Equipment \tabularnewline
-\bottomrule
-\end{longtable}

@@ -412,22 +412,6 @@ Daylighting:DELight:ComplexFenestration,
       0.0;            !- Fenestration Rotation {deg}
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs-006}
-
-In addition to the daylighting-specific outputs for DElight listed below, two ASCII text files are created during an EnergyPlus run that includes DElight analysis.~ Following completion of an EnergyPlus run, these files are given names that consist of the project name appended with DElight.in and DElight.out.~ The format of these files is described in the Output Details and Examples document.
-
-Zone,Average,Daylighting Reference Point Illuminance {[}lux{]}
-
-Zone,Average,Daylighting Lighting Power Multiplier {[]}
-
-\paragraph{Daylighting Reference Point Illuminance {[}lux{]}}\label{daylighting-reference-point-illuminance-lux}
-
-The total daylight illuminance at a DElight reference point from all of the exterior windows in a daylit zone.
-
-\paragraph{Daylighting Lighting Power Multiplier {[]}}\label{daylighting-lighting-power-multiplier}
-
-The amount by which the overhead electric lighting power in a zone is multiplied due to usage of DElight calculated daylighting to dim or switch electric lights. For example, if the multiplier is M and the electric power without dimming is P, then the electric power with dimming is M*P. The multiplier varies from 0.0, which corresponds to maximum dimming (zero electric lighting), to 1.0, which corresponds to no dimming.
-
 \subsubsection{Outputs}\label{outputs-1-004}
 
 The following daylighting-specific outputs are available for Daylighting:Controls:
@@ -517,7 +501,7 @@ The number of hours when the calculated daylight illuminance at the first refere
 
 \paragraph{Daylighting Lighting Power Multiplier {[]}}\label{daylighting-lighting-power-multiplier-1}
 
-The amount by which the overhead electric lighting power in a zone is multiplied due to usage of daylighting to dim or switch electric lights. For example, if the multiplier is M and the electric power without dimming is P, then the electric power with dimming is M*P. The multiplier varies from 0.0, which corresponds to maximum dimming (zero electric lighting), to 1.0, which corresponds to no dimming.
+The amount by which the overhead electric lighting power in a space or zone is multiplied due to usage of daylighting to dim or switch electric lights. For example, if the multiplier is M and the electric power without dimming is P, then the electric power with dimming is M*P. The multiplier varies from 0.0, which corresponds to maximum dimming (zero electric lighting), to 1.0, which corresponds to no dimming.
 
 \subsection{Output:IlluminanceMap}\label{outputilluminancemap}
 
