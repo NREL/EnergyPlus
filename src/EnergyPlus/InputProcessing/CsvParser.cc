@@ -283,6 +283,9 @@ void CsvParser::parse_line(std::string_view csv, size_t &index, json &columns)
 json CsvParser::parse_value(std::string_view csv, size_t &index)
 {
     eat_whitespace(csv, index);
+    if (index != csv_size && csv[index] == '+') {
+        ++index;
+    }
     size_t save_i = index;
 
     while (true) {

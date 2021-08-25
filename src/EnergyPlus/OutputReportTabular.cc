@@ -17222,7 +17222,11 @@ Real64 StrToReal(std::string_view stringIn)
     // PURPOSE OF THIS SUBROUTINE:
     //   Abstract away the internal read concept
 
-    // Return value
+    auto first_char = stringIn.find_first_not_of(' ');
+    if (first_char != std::string_view::npos) {
+        stringIn.remove_prefix(first_char);
+    }
+
     Real64 realValue = -99999.0;
     auto answer = fast_float::from_chars(stringIn.data(), stringIn.data() + stringIn.size(), realValue);
     if (answer.ec != std::errc()) {

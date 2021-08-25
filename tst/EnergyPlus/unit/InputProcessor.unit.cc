@@ -1862,6 +1862,11 @@ TEST_F(InputProcessorFixture, parse_number)
     size_t index = 0;
     json output;
 
+    output = parse_number("+0.5,", index);
+    EXPECT_EQ(0.5, output.get<double>());
+    EXPECT_EQ(4ul, index);
+
+    index = 0;
     output = parse_number("4.5,", index);
     EXPECT_EQ(4.5, output.get<double>());
     EXPECT_EQ(3ul, index);

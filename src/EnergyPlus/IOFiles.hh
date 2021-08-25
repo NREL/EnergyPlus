@@ -62,13 +62,13 @@
 #include <EnergyPlus/FileSystem.hh>
 
 // Third Party Headers
-#include "nlohmann/json.hpp"
 #include <fmt/compile.h>
 #include <fmt/format.h>
 #include <fmt/os.h>
 #include <fmt/ostream.h>
-#include <fmt/ranges.h>
 #include <fmt/printf.h>
+#include <fmt/ranges.h>
+#include <nlohmann/json.hpp>
 
 namespace {
 struct DoubleWrapper

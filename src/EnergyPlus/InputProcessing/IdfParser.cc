@@ -438,6 +438,10 @@ json IdfParser::parse_object(
 json IdfParser::parse_number(std::string_view idf, size_t &index)
 {
     eat_whitespace(idf, index);
+
+    if (index != idf_size && idf[index] == '+') {
+        ++index;
+    }
     size_t save_i = index;
 
     bool running = true;

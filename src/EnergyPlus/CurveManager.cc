@@ -2030,7 +2030,7 @@ namespace CurveManager {
                             axis.erase(std::unique(axis.begin(), axis.end()), axis.end());
 
                         } else if (indVarInstance.count("values")) {
-                            for (auto value : indVarInstance.at("values")) {
+                            for (auto const & value : indVarInstance.at("values")) {
                                 axis.push_back(value.at("value").get<Real64>());
                             }
                         } else {
@@ -2389,6 +2389,10 @@ namespace CurveManager {
             std::vector<double> array(numRows - row);
             std::transform(content.begin() + row, content.end(), array.begin(), [](std::string_view str) {
                 // Convert strings to double
+                auto first_char = str.find_first_not_of(' ');
+                if (first_char != std::string_view::npos) {
+                    str.remove_prefix(first_char);
+                }
                 double result = 0;
                 auto answer = fast_float::from_chars(str.data(), str.data() + str.size(), result);
                 if (answer.ec != std::errc()) {

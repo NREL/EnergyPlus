@@ -68,12 +68,6 @@ template <typename T> from_chars_result from_chars(const char *first, const char
 
     from_chars_result answer{};
 
-#if __has_include(<charconv>)
-    auto const result = std::from_chars(first, last, value);
-    answer.ptr = result.ptr;
-    answer.ec = result.ec;
-    return answer;
-#else
     while (first != last) {
         if (*first == ' ') {
             ++first;
@@ -81,13 +75,18 @@ template <typename T> from_chars_result from_chars(const char *first, const char
             break;
         }
     }
-
     if (first == last) {
         answer.ec = std::errc::invalid_argument;
         answer.ptr = first;
         return answer;
     }
 
+#if __has_include(<charconv>)
+    auto const result = std::from_chars(first, last, value);
+    answer.ptr = result.ptr;
+    answer.ec = result.ec;
+    return answer;
+#else
     char *pEnd;
     value = std::strtol(first, &pEnd, 10);
 

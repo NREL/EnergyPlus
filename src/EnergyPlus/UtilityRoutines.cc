@@ -125,10 +125,15 @@ namespace UtilityRoutines {
         Real64 rProcessNumber = 0.0;
         ErrorFlag = false;
 
-        auto last_non_space = String.find_last_not_of(' ');
-        String.remove_suffix(String.size() - last_non_space - 1);
-
         if (String.empty()) return rProcessNumber;
+
+        auto const front_trim(String.find_first_not_of(' '));
+        auto const back_trim(String.find_last_not_of(' '));
+        if (front_trim == std::string::npos || back_trim == std::string::npos) {
+            return rProcessNumber;
+        } else {
+            String = String.substr(front_trim, back_trim - front_trim + 1);
+        }
 
         auto result = fast_float::from_chars(String.data(), String.data() + String.size(), rProcessNumber);
         size_t remaining_size = result.ptr - String.begin();

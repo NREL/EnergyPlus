@@ -67,6 +67,11 @@ inline bool readListItem(std::string_view input, size_t &index, char delimiter, 
     if (index >= input.size()) return false;
 
     input.remove_prefix(index);
+
+    auto first_char = input.find_first_not_of(' ');
+    if (first_char != std::string_view::npos) {
+        input.remove_prefix(first_char);
+    }
     auto pos = input.find(delimiter);
 
     if (pos == std::string_view::npos) {
@@ -77,7 +82,7 @@ inline bool readListItem(std::string_view input, size_t &index, char delimiter, 
     if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
         return false;
     }
-    index += (pos + 1);
+    index += (pos + first_char + 1);
     return true;
 }
 
@@ -86,6 +91,11 @@ inline bool readListItem(std::string_view input, size_t &index, char delimiter, 
     if (index >= input.size()) return false;
 
     input.remove_prefix(index);
+
+    auto first_char = input.find_first_not_of(' ');
+    if (first_char != std::string_view::npos) {
+        input.remove_prefix(first_char);
+    }
     auto pos = input.find(delimiter);
 
     if (pos == std::string_view::npos) {
@@ -96,7 +106,7 @@ inline bool readListItem(std::string_view input, size_t &index, char delimiter, 
     if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
         return false;
     }
-    index += (pos + 1);
+    index += (pos + first_char + 1);
     return true;
 }
 
