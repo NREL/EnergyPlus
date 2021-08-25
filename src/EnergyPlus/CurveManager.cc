@@ -2030,7 +2030,7 @@ namespace CurveManager {
                             axis.erase(std::unique(axis.begin(), axis.end()), axis.end());
 
                         } else if (indVarInstance.count("values")) {
-                            for (auto const & value : indVarInstance.at("values")) {
+                            for (auto const &value : indVarInstance.at("values")) {
                                 axis.push_back(value.at("value").get<Real64>());
                             }
                         } else {

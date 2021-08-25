@@ -94,8 +94,16 @@ private:
 namespace fmt {
 template <> struct formatter<DoubleWrapper>
 {
+private:
     fmt::detail::dynamic_format_specs<char> specs_;
+    const char* format_str_;
     fmt::memory_buffer buffer = fmt::memory_buffer();
+
+    struct null_handler : detail::error_handler {
+        void on_align(align_t) {}
+        void on_sign(sign_t) {}
+        void on_hash() {}
+    };
 
     static constexpr bool should_be_fixed_output(const double value)
     {
@@ -203,16 +211,25 @@ template <> struct formatter<DoubleWrapper>
         return {buffer.data(), buffer.size()};
     }
 
+    template <typename Context> void handle_specs(Context& ctx) {
+        detail::handle_dynamic_spec<detail::width_checker>(specs_.width,
+                                                           specs_.width_ref, ctx);
+        detail::handle_dynamic_spec<detail::precision_checker>(
+                specs_.precision, specs_.precision_ref, ctx);
+    }
+
+public:
     template <typename ParseContext> constexpr auto parse(ParseContext &ctx)
     {
         auto begin = ctx.begin(), end = ctx.end();
+        format_str_ = begin;
         if (begin == end) return begin;
         using handler_type = fmt::detail::dynamic_specs_handler<ParseContext>;
         auto it = fmt::detail::parse_format_specs(begin, end, handler_type(specs_, ctx));
         return it;
     }
 
-    template <typename FormatContext> auto format(const DoubleWrapper doubleWrapper, FormatContext &ctx)
+    template <typename FormatContext> auto format(const DoubleWrapper &doubleWrapper, FormatContext &ctx)
     {
         const auto next_float = [](const double value) {
             if (std::signbit(value)) {
@@ -231,6 +248,14 @@ template <> struct formatter<DoubleWrapper>
         };
 
         double val = doubleWrapper;
+
+        handle_specs(ctx);
+        detail::specs_checker<null_handler> checker(
+                null_handler(), detail::mapped_type_constant<double, FormatContext>::value);
+        checker.on_align(specs_.align);
+        if (specs_.sign != sign::none) checker.on_sign(specs_.sign);
+        if (specs_.alt) checker.on_hash();
+        if (specs_.precision >= 0) checker.end_precision();
 
         // matches Fortran's 'E' format
         if (specs_.type == 'Z') {

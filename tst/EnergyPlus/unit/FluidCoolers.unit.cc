@@ -269,7 +269,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test4)
         "     46.0,                    !- Design Entering Water Temperature {C}",
         "     35.0,                    !- Design Entering Air Temperature {C}",
         "     25.5,                    !- Design Entering Air Wetbulb Temperature {C}",
-        "     5.05-03,                 !- Design Water Flow Rate {m3/s}",
+        "     5.05e-03,                 !- Design Water Flow Rate {m3/s}",
         "     autosize,                !- Design Air Flow Rate {m3/s}",
         "     autosize;                !- Design Air Flow Rate Fan Power {W}",
     });
