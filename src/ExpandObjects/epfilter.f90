@@ -1434,58 +1434,62 @@ INTEGER,PARAMETER :: buildSurfNameOff = 1
 INTEGER,PARAMETER :: buildSurfTypeOff = 2
 INTEGER,PARAMETER :: buildSurfConstructionOff = 3
 INTEGER,PARAMETER :: buildSurfZoneOff = 4
-INTEGER,PARAMETER :: buildSurfOutBndCondOff = 5
-INTEGER,PARAMETER :: buildSurfOutBndCondNameOff = 6
-INTEGER,PARAMETER :: buildSurfSunExpOff = 7
-INTEGER,PARAMETER :: buildSurfWindExpOff = 8 !last required field
-INTEGER,PARAMETER :: buildSurfViewGroundOff = 9
-INTEGER,PARAMETER :: buildSurfNumVertOff = 10
-INTEGER,PARAMETER :: buildSurfX1Off = 11
-INTEGER,PARAMETER :: buildSurfY1Off = 12
-INTEGER,PARAMETER :: buildSurfZ1Off = 13
-INTEGER,PARAMETER :: buildSurfLastZVertexOff = 370 !up to 120 vertices
+INTEGER,PARAMETER :: buildSurfSpaceOff = 5
+INTEGER,PARAMETER :: buildSurfOutBndCondOff = 6
+INTEGER,PARAMETER :: buildSurfOutBndCondNameOff = 7
+INTEGER,PARAMETER :: buildSurfSunExpOff = 8
+INTEGER,PARAMETER :: buildSurfWindExpOff = 9 !last required field
+INTEGER,PARAMETER :: buildSurfViewGroundOff = 10
+INTEGER,PARAMETER :: buildSurfNumVertOff = 11
+INTEGER,PARAMETER :: buildSurfX1Off = 12
+INTEGER,PARAMETER :: buildSurfY1Off = 13
+INTEGER,PARAMETER :: buildSurfZ1Off = 14
+INTEGER,PARAMETER :: buildSurfLastZVertexOff = 371 !up to 120 vertices
 
 INTEGER,PARAMETER :: wallDetlNameOff = 1
 INTEGER,PARAMETER :: wallDetlConstructionOff = 2
 INTEGER,PARAMETER :: wallDetlZoneOff = 3
-INTEGER,PARAMETER :: wallDetlOutBndCondOff = 4
-INTEGER,PARAMETER :: wallDetlOutBndCondNameOff = 5
-INTEGER,PARAMETER :: wallDetlSunExpOff = 6
-INTEGER,PARAMETER :: wallDetlWindExpOff = 7 !last required field
-INTEGER,PARAMETER :: wallDetlViewGroundOff = 8
-INTEGER,PARAMETER :: wallDetlNumVertOff = 9
-INTEGER,PARAMETER :: wallDetlX1Off = 10
-INTEGER,PARAMETER :: wallDetlY1Off = 11
-INTEGER,PARAMETER :: wallDetlZ1Off = 12
-INTEGER,PARAMETER :: wallDetlLastZVertexOff = 39 !up to 10 vertices
+INTEGER,PARAMETER :: wallDetlSpaceOff = 4
+INTEGER,PARAMETER :: wallDetlOutBndCondOff = 5
+INTEGER,PARAMETER :: wallDetlOutBndCondNameOff = 6
+INTEGER,PARAMETER :: wallDetlSunExpOff = 7
+INTEGER,PARAMETER :: wallDetlWindExpOff = 8 !last required field
+INTEGER,PARAMETER :: wallDetlViewGroundOff = 9
+INTEGER,PARAMETER :: wallDetlNumVertOff = 10
+INTEGER,PARAMETER :: wallDetlX1Off = 11
+INTEGER,PARAMETER :: wallDetlY1Off = 12
+INTEGER,PARAMETER :: wallDetlZ1Off = 13
+INTEGER,PARAMETER :: wallDetlLastZVertexOff = 40 !up to 10 vertices
 
 INTEGER,PARAMETER :: rfClDetlNameOff = 1
 INTEGER,PARAMETER :: rfClDetlConstructionOff = 2
 INTEGER,PARAMETER :: rfClDetlZoneOff = 3
-INTEGER,PARAMETER :: rfClDetlOutBndCondOff = 4
-INTEGER,PARAMETER :: rfClDetlOutBndCondNameOff = 5
-INTEGER,PARAMETER :: rfClDetlSunExpOff = 6
-INTEGER,PARAMETER :: rfClDetlWindExpOff = 7 !last required field
-INTEGER,PARAMETER :: rfClDetlViewGroundOff = 8
-INTEGER,PARAMETER :: rfClDetlNumVertOff = 9
-INTEGER,PARAMETER :: rfClDetlX1Off = 10
-INTEGER,PARAMETER :: rfClDetlY1Off = 11
-INTEGER,PARAMETER :: rfClDetlZ1Off = 12
-INTEGER,PARAMETER :: rfClDetlLastZVertexOff = 39 !up to 10 vertices
+INTEGER,PARAMETER :: rfClDetlSpaceOff = 4
+INTEGER,PARAMETER :: rfClDetlOutBndCondOff = 5
+INTEGER,PARAMETER :: rfClDetlOutBndCondNameOff = 6
+INTEGER,PARAMETER :: rfClDetlSunExpOff = 7
+INTEGER,PARAMETER :: rfClDetlWindExpOff = 8 !last required field
+INTEGER,PARAMETER :: rfClDetlViewGroundOff = 9
+INTEGER,PARAMETER :: rfClDetlNumVertOff = 10
+INTEGER,PARAMETER :: rfClDetlX1Off = 11
+INTEGER,PARAMETER :: rfClDetlY1Off = 12
+INTEGER,PARAMETER :: rfClDetlZ1Off = 13
+INTEGER,PARAMETER :: rfClDetlLastZVertexOff = 40 !up to 10 vertices
 
 INTEGER,PARAMETER :: flrDetlNameOff = 1
 INTEGER,PARAMETER :: flrDetlConstructionOff = 2
 INTEGER,PARAMETER :: flrDetlZoneOff = 3
-INTEGER,PARAMETER :: flrDetlOutBndCondOff = 4
-INTEGER,PARAMETER :: flrDetlOutBndCondNameOff = 5
-INTEGER,PARAMETER :: flrDetlSunExpOff = 6
-INTEGER,PARAMETER :: flrDetlWindExpOff = 7 !last required field
-INTEGER,PARAMETER :: flrDetlViewGroundOff = 8
-INTEGER,PARAMETER :: flrDetlNumVertOff = 9
-INTEGER,PARAMETER :: flrDetlX1Off = 10
-INTEGER,PARAMETER :: flrDetlY1Off = 11
-INTEGER,PARAMETER :: flrDetlZ1Off = 12
-INTEGER,PARAMETER :: flrDetlLastZVertexOff = 39 !up to 10 vertices
+INTEGER,PARAMETER :: flrDetlSpaceOff = 4
+INTEGER,PARAMETER :: flrDetlOutBndCondOff = 5
+INTEGER,PARAMETER :: flrDetlOutBndCondNameOff = 6
+INTEGER,PARAMETER :: flrDetlSunExpOff = 7
+INTEGER,PARAMETER :: flrDetlWindExpOff = 8 !last required field
+INTEGER,PARAMETER :: flrDetlViewGroundOff = 9
+INTEGER,PARAMETER :: flrDetlNumVertOff = 10
+INTEGER,PARAMETER :: flrDetlX1Off = 11
+INTEGER,PARAMETER :: flrDetlY1Off = 12
+INTEGER,PARAMETER :: flrDetlZ1Off = 13
+INTEGER,PARAMETER :: flrDetlLastZVertexOff = 40 !up to 10 vertices
 
 INTEGER,PARAMETER :: gndTempSurfJanOff = 1
 INTEGER,PARAMETER :: gndTempSurfFebOff = 2
@@ -2311,10 +2315,10 @@ CALL AddObjToProcess('CoolingTower:VariableSpeed',.FALSE.,          twrvsOutletN
 ! Ground Heat Transfer
 CALL AddObjToProcess('GroundHeatTransfer:Control',.TRUE.,           ghtCtrlNameOff,              ghtCtrlSlabOff,             3)
 IF (doGatherSurfaces) THEN !only gather these surfaces if groundheattransfer has been found.
-  CALL AddObjToProcess('BuildingSurface:Detailed',.TRUE.,             buildSurfWindExpOff,         buildSurfLastZVertexOff,  370)
-  CALL AddObjToProcess('Wall:Detailed',.TRUE.,                        wallDetlWindExpOff,          wallDetlLastZVertexOff,    39)
-  CALL AddObjToProcess('RoofCeiling:Detailed',.TRUE.,                 rfClDetlWindExpOff,          rfClDetlLastZVertexOff,    39)
-  CALL AddObjToProcess('Floor:Detailed',.TRUE.,                       flrDetlWindExpOff,           flrDetlLastZVertexOff,     39)
+  CALL AddObjToProcess('BuildingSurface:Detailed',.TRUE.,             buildSurfWindExpOff,         buildSurfLastZVertexOff,  371)
+  CALL AddObjToProcess('Wall:Detailed',.TRUE.,                        wallDetlWindExpOff,          wallDetlLastZVertexOff,    40)
+  CALL AddObjToProcess('RoofCeiling:Detailed',.TRUE.,                 rfClDetlWindExpOff,          rfClDetlLastZVertexOff,    40)
+  CALL AddObjToProcess('Floor:Detailed',.TRUE.,                       flrDetlWindExpOff,           flrDetlLastZVertexOff,     40)
 END IF
 CALL AddObjToProcess('Site:GroundTemperature:BuildingSurface',.TRUE.,gndTempSurfJanOff,          gndTempSurfDecOff,         12)
 ! Items to echo to basement or slab input files
@@ -33092,6 +33096,7 @@ DO iSurface = 1, numSurfBldgDetl
   CALL AddToObjFld('Surface Type', base + buildSurfTypeOff,'')
   CALL AddToObjFld('Construction Name', base + buildSurfConstructionOff,'')
   CALL AddToObjFld('Zone Name', base + buildSurfZoneOff,'')
+  CALL AddToObjFld('Space Name', base + buildSurfSpaceOff,'')
   outBndCond = FldVal(base + buildSurfOutBndCondOff)
   IF (SameString(outBndCond,'GroundSlabPreprocessorAverage')) THEN
     CALL AddToObjStr('Outside Boundary Condition', 'OtherSideCoefficients')
@@ -33154,6 +33159,7 @@ DO iSurface = 1, numSurfWallDetl
   CALL AddToObjFld('Name', base + wallDetlNameOff,'')
   CALL AddToObjFld('Construction Name', base + wallDetlConstructionOff,'')
   CALL AddToObjFld('Zone Name', base + wallDetlZoneOff,'')
+  CALL AddToObjFld('Space Name', base + wallDetlSpaceOff,'')
   outBndCond = FldVal(base + wallDetlOutBndCondOff)
   IF (SameString(outBndCond,'GroundSlabPreprocessorAverage')) THEN
     CALL AddToObjStr('Outside Boundary Condition', 'OtherSideCoefficients')
@@ -33216,6 +33222,7 @@ DO iSurface = 1, numSurfRfClDetl
   CALL AddToObjFld('Name', base + rfClDetlNameOff,'')
   CALL AddToObjFld('Construction Name', base + rfClDetlConstructionOff,'')
   CALL AddToObjFld('Zone Name', base + rfClDetlZoneOff,'')
+  CALL AddToObjFld('Space Name', base + rfClDetlSpaceOff,'')
   outBndCond = FldVal(base + rfClDetlOutBndCondOff)
   IF (SameString(outBndCond,'GroundSlabPreprocessorAverage')) THEN
     CALL AddToObjStr('Outside Boundary Condition', 'OtherSideCoefficients')
@@ -33278,6 +33285,7 @@ DO iSurface = 1, numSurfFlrDetl
   CALL AddToObjFld('Name', base + flrDetlNameOff,'')
   CALL AddToObjFld('Construction Name', base + flrDetlConstructionOff,'')
   CALL AddToObjFld('Zone Name', base + flrDetlZoneOff,'')
+  CALL AddToObjFld('Space Name', base + flrDetlSpaceOff,'')
   outBndCond = FldVal(base + flrDetlOutBndCondOff)
   IF (SameString(outBndCond,'GroundSlabPreprocessorAverage')) THEN
     CALL AddToObjStr('Outside Boundary Condition', 'OtherSideCoefficients')
