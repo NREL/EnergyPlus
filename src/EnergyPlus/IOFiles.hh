@@ -96,13 +96,20 @@ template <> struct formatter<DoubleWrapper>
 {
 private:
     fmt::detail::dynamic_format_specs<char> specs_;
-    const char* format_str_;
+    const char *format_str_;
     fmt::memory_buffer buffer = fmt::memory_buffer();
 
-    struct null_handler : detail::error_handler {
-        void on_align(align_t) {}
-        void on_sign(sign_t) {}
-        void on_hash() {}
+    struct null_handler : detail::error_handler
+    {
+        void on_align(align_t)
+        {
+        }
+        void on_sign(sign_t)
+        {
+        }
+        void on_hash()
+        {
+        }
     };
 
     static constexpr bool should_be_fixed_output(const double value)
@@ -211,11 +218,10 @@ private:
         return {buffer.data(), buffer.size()};
     }
 
-    template <typename Context> void handle_specs(Context& ctx) {
-        detail::handle_dynamic_spec<detail::width_checker>(specs_.width,
-                                                           specs_.width_ref, ctx);
-        detail::handle_dynamic_spec<detail::precision_checker>(
-                specs_.precision, specs_.precision_ref, ctx);
+    template <typename Context> void handle_specs(Context &ctx)
+    {
+        detail::handle_dynamic_spec<detail::width_checker>(specs_.width, specs_.width_ref, ctx);
+        detail::handle_dynamic_spec<detail::precision_checker>(specs_.precision, specs_.precision_ref, ctx);
     }
 
 public:
@@ -250,8 +256,7 @@ public:
         double val = doubleWrapper;
 
         handle_specs(ctx);
-        detail::specs_checker<null_handler> checker(
-                null_handler(), detail::mapped_type_constant<double, FormatContext>::value);
+        detail::specs_checker<null_handler> checker(null_handler(), detail::mapped_type_constant<double, FormatContext>::value);
         checker.on_align(specs_.align);
         if (specs_.sign != sign::none) checker.on_sign(specs_.sign);
         if (specs_.alt) checker.on_hash();
