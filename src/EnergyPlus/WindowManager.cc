@@ -7105,27 +7105,21 @@ namespace WindowManager {
 
         if (WinterSummerFlag == 1) {
             state.dataHeatBal->NominalUBeforeAdjusted(ConstrNum) = NominalConductance;
-            if (inputU > 0) { // only compute adjustment ratio when there is valid user input U
-                Real64 CoeffAdjRatio = 1;
-                Real64 hcinRated = state.dataWindowManager->hcin;
+            if (inputU > 0) {                  // only compute adjustment ratio when there is valid user input U
+                Real64 wettedAreaAdjRatio = 1; // Adjustment ratio for the wetted area
                 Real64 hcoutRated = state.dataWindowManager->hcout;
                 // Adjustment ratio applies to convective film coefficients when input U value is above the limit of the simple glazing nominal U
                 // Representing the nominal highly conductive frame effects. Solved iteratively.
-                int MaxIter = 100;
-                while (std::abs(inputU - NominalConductance) > 0.01 && MaxIter > 0) {
-                    CoeffAdjRatio = inputU / NominalConductance;
-                    state.dataWindowManager->hcout *= CoeffAdjRatio;
-                    WindowTempsForNominalCond(state, ConstrNum, hgap, CoeffAdjRatio);
-                    std::cout << inputU << "," << NominalConductance << "," << CoeffAdjRatio << "," << state.dataWindowManager->hcout << ","
-                              << state.dataWindowManager->hcin << "," << state.dataWindowManager->thetas(1) << "," << NominalConductance << std::endl;
+                while (wettedAreaAdjRatio < 1.5) {
+                    if (inputU - NominalConductance < 0.01) break;
+                    wettedAreaAdjRatio += 0.001;
+                    WindowTempsForNominalCond(
+                        state, ConstrNum, hgap, wettedAreaAdjRatio); // reeval hcout at each iteration, hcin is not linear to wetted area
+                    state.dataWindowManager->hcout = hcoutRated * wettedAreaAdjRatio; // reeval hcout
                     EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
-                    MaxIter -= 1;
                 }
-                std::cout << state.dataWindowManager->hcin / hcinRated << "," << state.dataWindowManager->hcout / hcoutRated << ","
-                          << NominalConductance << std::endl;
-
-                state.dataHeatBal->CoeffAdjRatioIn(ConstrNum) = state.dataWindowManager->hcin / hcinRated;
-                state.dataHeatBal->CoeffAdjRatioOut(ConstrNum) = state.dataWindowManager->hcout / hcoutRated;
+                state.dataHeatBal->CoeffAdjRatioIn(ConstrNum) = wettedAreaAdjRatio;
+                state.dataHeatBal->CoeffAdjRatioOut(ConstrNum) = wettedAreaAdjRatio;
             }
         }
 
