@@ -148,9 +148,9 @@ namespace InternalHeatGains {
                                        const Array1D<DataHeatBalance::IntGainType> &GainTypeARR // variable length 1-d array of enum valued gain types
     );
 
-    void SumAllSpaceInternalRadiationGains(EnergyPlusData &state,
-                                           int const SpaceNum, // space index pointer for which space to sum gains for
-                                           Real64 &SumRadGainRate);
+    Real64 SumAllSpaceInternalRadiationGains(EnergyPlusData &state,
+                                             int const SpaceNum // space index pointer for which space to sum gains for
+    );
 
     Real64
     SumInternalRadiationGainsByTypes(EnergyPlusData &state,

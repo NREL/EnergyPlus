@@ -7479,8 +7479,7 @@ namespace InternalHeatGains {
             auto &thisEnclosure(state.dataViewFactor->EnclRadInfo(enclosureNum));
             state.dataHeatBal->EnclRadQThermalRad(enclosureNum) = 0.0;
             for (int const spaceNum : thisEnclosure.spaceNums) {
-                Real64 spaceQL;
-                InternalHeatGains::SumAllSpaceInternalRadiationGains(state, spaceNum, spaceQL);
+                Real64 spaceQL = SumAllSpaceInternalRadiationGains(state, spaceNum);
                 state.dataHeatBal->EnclRadQThermalRad(enclosureNum) += spaceQL;
             }
         }
@@ -8829,9 +8828,9 @@ namespace InternalHeatGains {
         return SumReturnAirGainRate;
     }
 
-    void SumAllSpaceInternalRadiationGains(EnergyPlusData &state,
-                                           int const spaceNum, // space index pointer for which space to sum gains for
-                                           Real64 &sumRadGainRate)
+    Real64 SumAllSpaceInternalRadiationGains(EnergyPlusData &state,
+                                           int const spaceNum  // space index pointer for which space to sum gains for
+    )
     {
 
         // SUBROUTINE INFORMATION:
@@ -8841,7 +8840,8 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
 
-        Real64 tmpSumRadGainRate = 0.0;
+        // Return value
+        Real64 sumRadGainRate(0.0);
 
         if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
             sumRadGainRate = 0.0;
@@ -8849,10 +8849,10 @@ namespace InternalHeatGains {
         }
 
         for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-            tmpSumRadGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).RadiantGainRate;
+            sumRadGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).RadiantGainRate;
         }
 
-        sumRadGainRate = tmpSumRadGainRate;
+        return sumRadGainRate;
     }
 
     Real64
