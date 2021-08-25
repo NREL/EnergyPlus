@@ -1682,7 +1682,7 @@ namespace RoomAirModelManager {
                         int numGainsFound = 0;
                         for (gainsLoop = 1; gainsLoop <= numInputGains; ++gainsLoop) {
                             TypeNum = getEnumerationValue(DataHeatBalance::ZoneIntGainDeviceTypes, state.dataIPShortCut->cAlphaArgs(gainsLoop * 2));
-                            if (TypeNum > 0) {
+                            if (TypeNum >= 0) {
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Type =
                                     static_cast<DataHeatBalance::IntGainType>(TypeNum);
                             } else {
