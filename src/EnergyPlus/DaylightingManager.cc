@@ -147,7 +147,7 @@ namespace EnergyPlus::DaylightingManager {
 using namespace DataHeatBalance;
 using namespace DataSurfaces;
 
-void DayltgAveInteriorReflectance(EnergyPlusData &state, int const ZoneNum) // Enclosure number
+void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // Enclosure number
 {
 
     // SUBROUTINE INFORMATION:
@@ -195,7 +195,6 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const ZoneNum) // E
     state.dataDaylightingManager->ARH = 0.0;
     // Loop over surfaces in the zone's enclosure
 
-    int const enclNum = Zone(ZoneNum).zoneFirstSpaceSolEnclosure;
     auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclNum));
     for (int ISurf : thisEnclosure.SurfacePtr) {
         IType = state.dataSurface->Surface(ISurf).Class;
@@ -474,22 +473,23 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
         state.dataDaylightingManager->TDDFluxTrans.allocate(24, 4, state.dataDaylightingDevicesData->NumOfTDDPipes);
 
         // Warning if detailed daylighting has been requested for a zone with no associated exterior windows.
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 &&
-                state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins == 0) {
-                ShowWarningError(state, "Detailed daylighting will not be done for zone=" + Zone(ZoneNum).Name);
-                ShowContinueError(state, "because it has no associated exterior windows.");
-            }
-        }
+        for (int daylightCtrl = 1; daylightCtrl <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrl) {
+            int enclNum = state.dataDaylightingData->daylightControl(daylightCtrl).enclIndex;
+            if (state.dataDaylightingData->daylightControl(daylightCtrl).TotalDaylRefPoints > 0) {
+                if (state.dataDaylightingData->enclDaylight(enclNum).NumOfDayltgExtWins == 0) {
+                    ShowWarningError(state,
+                                     "Detailed daylighting will not be done for Daylighting:Controls=" +
+                                         state.dataDaylightingData->daylightControl(daylightCtrl).Name);
+                    ShowContinueError(state, "because it has no associated exterior windows.");
+                }
 
-        // Find area and reflectance quantities used in calculating inter-reflected illuminance.
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            // TH 9/10/2009. Need to calculate for zones without daylighting controls (TotalDaylRefPoints = 0)
-            // but with adjacent zones having daylighting controls.
-            if ((state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 &&
-                 state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0) ||
-                state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjZoneHasDayltgCtrl) {
-                DayltgAveInteriorReflectance(state, ZoneNum);
+                // Find area and reflectance quantities used in calculating inter-reflected illuminance.
+                // TH 9/10/2009. Need to calculate for zones without daylighting controls (TotalDaylRefPoints = 0)
+                // but with adjacent zones having daylighting controls.
+                if ((state.dataDaylightingData->enclDaylight(enclNum).NumOfDayltgExtWins > 0) ||
+                    state.dataDaylightingData->enclDaylight(enclNum).adjEnclHasDayltgCtrl) {
+                    DayltgAveInteriorReflectance(state, enclNum);
+                }
             }
         }
     }
@@ -4228,6 +4228,7 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
     TotDaylightingControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     if (TotDaylightingControls > 0) {
         state.dataDaylightingData->enclDaylight.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataDaylightingData->totDaylightingControls = TotDaylightingControls;
         GetInputDayliteRefPt(state, ErrorsFound);
         GetDaylightingControls(state, TotDaylightingControls, ErrorsFound);
         GeometryTransformForDaylighting(state);
@@ -4995,6 +4996,7 @@ void GetDaylightingControls(EnergyPlusData &state,
     constexpr Real64 FractionTolerance(0.001);
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "Daylighting:Controls";
+    state.dataDaylightingData->daylightControl.allocate(TotDaylightingControls);
     for (int iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl) {
         state.dataIPShortCut->cAlphaArgs = "";
         state.dataIPShortCut->rNumericArgs = 0.0;
@@ -5018,16 +5020,16 @@ void GetDaylightingControls(EnergyPlusData &state,
             ErrorsFound = true;
             continue;
         }
-        auto &zone_daylight(state.dataDaylightingData->ZoneDaylight(ZoneFound));
-        zone_daylight.Name = state.dataIPShortCut->cAlphaArgs(1);     // Field: Name
-        zone_daylight.ZoneName = state.dataIPShortCut->cAlphaArgs(2); // Field: Zone Name
+        auto &daylightControl(state.dataDaylightingData->daylightControl(iDaylCntrl));
+        daylightControl.Name = state.dataIPShortCut->cAlphaArgs(1);     // Field: Name
+        daylightControl.ZoneName = state.dataIPShortCut->cAlphaArgs(2); // Field: Zone Name
 
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "SPLITFLUX")) { // Field: Daylighting Method
-            zone_daylight.DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+            daylightControl.DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "DELIGHT")) {
-            zone_daylight.DaylightMethod = DataDaylighting::iDaylightingMethod::DElightDaylighting;
+            daylightControl.DaylightMethod = DataDaylighting::iDaylightingMethod::DElightDaylighting;
         } else if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-            zone_daylight.DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+            daylightControl.DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
         } else {
             ShowWarningError(state,
                              "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3) + ", occurs in " +
@@ -5036,27 +5038,27 @@ void GetDaylightingControls(EnergyPlusData &state,
         }
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) { // Field: Availability Schedule Name
-            zone_daylight.AvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
-            if (zone_daylight.AvailSchedNum == 0) {
+            daylightControl.AvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
+            if (daylightControl.AvailSchedNum == 0) {
                 ShowWarningError(state,
                                  "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4) +
                                      ", occurs in " + cCurrentModuleObject + "object for " + cCurrentModuleObject + "=\"" +
                                      state.dataIPShortCut->cAlphaArgs(1));
                 ShowContinueError(state, "Schedule was not found so controls will always be available, and the simulation continues.");
-                zone_daylight.AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
+                daylightControl.AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
             }
         } else {
-            zone_daylight.AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
+            daylightControl.AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
         }
 
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "CONTINUOUS")) { // Field: Lighting Control Type
-            zone_daylight.LightControlType = DataDaylighting::iLtgCtrlType::Continuous;
+            daylightControl.LightControlType = DataDaylighting::iLtgCtrlType::Continuous;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "STEPPED")) {
-            zone_daylight.LightControlType = DataDaylighting::iLtgCtrlType::Stepped;
+            daylightControl.LightControlType = DataDaylighting::iLtgCtrlType::Stepped;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "CONTINUOUSOFF")) {
-            zone_daylight.LightControlType = DataDaylighting::iLtgCtrlType::ContinuousOff;
+            daylightControl.LightControlType = DataDaylighting::iLtgCtrlType::ContinuousOff;
         } else if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-            zone_daylight.LightControlType = DataDaylighting::iLtgCtrlType::Continuous;
+            daylightControl.LightControlType = DataDaylighting::iLtgCtrlType::Continuous;
         } else {
             ShowWarningError(state,
                              "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5) + ", occurs in " +
@@ -5064,43 +5066,45 @@ void GetDaylightingControls(EnergyPlusData &state,
             ShowContinueError(state, "Continuous assumed, and the simulation continues.");
         }
 
-        zone_daylight.MinPowerFraction = state.dataIPShortCut->rNumericArgs(1); // Field: Minimum Input Power Fraction for Continuous Dimming Control
-        zone_daylight.MinLightFraction = state.dataIPShortCut->rNumericArgs(2); // Field: Minimum Light Output Fraction for Continuous Dimming Control
-        zone_daylight.LightControlSteps = state.dataIPShortCut->rNumericArgs(3); // Field: Number of Stepped Control Steps
-        zone_daylight.LightControlProbability =
+        daylightControl.MinPowerFraction =
+            state.dataIPShortCut->rNumericArgs(1); // Field: Minimum Input Power Fraction for Continuous Dimming Control
+        daylightControl.MinLightFraction =
+            state.dataIPShortCut->rNumericArgs(2); // Field: Minimum Light Output Fraction for Continuous Dimming Control
+        daylightControl.LightControlSteps = state.dataIPShortCut->rNumericArgs(3); // Field: Number of Stepped Control Steps
+        daylightControl.LightControlProbability =
             state.dataIPShortCut->rNumericArgs(4); // Field: Probability Lighting will be Reset When Needed in Manual Stepped Control
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) { // Field: Glare Calculation Daylighting Reference Point Name
-            zone_daylight.glareRefPtNumber =
+            daylightControl.glareRefPtNumber =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6),
                                                 state.dataDaylightingData->DaylRefPt,
                                                 &DataDaylighting::RefPointData::Name); // Field: Glare Calculation Daylighting Reference Point Name
-            if (zone_daylight.glareRefPtNumber == 0) {
+            if (daylightControl.glareRefPtNumber == 0) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" +
                                     state.dataIPShortCut->cAlphaArgs(6) + "\" for object named: " + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
                 continue;
             }
-        } else if (zone_daylight.DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
+        } else if (daylightControl.DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
             ShowWarningError(
                 state, "No " + state.dataIPShortCut->cAlphaFieldNames(6) + " provided for object named: " + state.dataIPShortCut->cAlphaArgs(1));
             ShowContinueError(state, "No glare calculation performed, and the simulation continues.");
         }
 
         if (!state.dataIPShortCut->lNumericFieldBlanks(5)) {
-            zone_daylight.ViewAzimuthForGlare =
+            daylightControl.ViewAzimuthForGlare =
                 state.dataIPShortCut->rNumericArgs(5); // Field: Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
         } else {
-            zone_daylight.ViewAzimuthForGlare = 0.;
+            daylightControl.ViewAzimuthForGlare = 0.;
         }
 
-        zone_daylight.MaxGlareallowed = state.dataIPShortCut->rNumericArgs(6);           // Field: Maximum Allowable Discomfort Glare Index
-        zone_daylight.DElightGriddingResolution = state.dataIPShortCut->rNumericArgs(7); // Field: DElight Gridding Resolution
+        daylightControl.MaxGlareallowed = state.dataIPShortCut->rNumericArgs(6);           // Field: Maximum Allowable Discomfort Glare Index
+        daylightControl.DElightGriddingResolution = state.dataIPShortCut->rNumericArgs(7); // Field: DElight Gridding Resolution
 
         int curTotalDaylRefPts = NumAlpha - 6; // first six alpha fields are not part of extensible group
-        zone_daylight.TotalDaylRefPoints = curTotalDaylRefPts;
-        if ((NumNumber - 7) / 2 != zone_daylight.TotalDaylRefPoints) {
+        daylightControl.TotalDaylRefPoints = curTotalDaylRefPts;
+        if ((NumNumber - 7) / 2 != daylightControl.TotalDaylRefPoints) {
             ShowSevereError(state,
                             cCurrentModuleObject + "The number of extensible numeric fields and alpha fields is inconsistent for: " +
                                 state.dataIPShortCut->cAlphaArgs(1));
@@ -5110,39 +5114,41 @@ void GetDaylightingControls(EnergyPlusData &state,
                     " there needs to be the following fields: Fraction Controlled by Reference Point and Illuminance Setpoint at Reference Point");
             ErrorsFound = true;
         }
-        zone_daylight.DaylRefPtNum.allocate(curTotalDaylRefPts);
-        zone_daylight.DaylRefPtNum = 0;
-        zone_daylight.FracZoneDaylit.allocate(curTotalDaylRefPts);
-        zone_daylight.FracZoneDaylit = 0.0;
-        zone_daylight.IllumSetPoint.allocate(curTotalDaylRefPts);
-        zone_daylight.IllumSetPoint = 0.0;
-        zone_daylight.DaylIllumAtRefPt.allocate(curTotalDaylRefPts);
-        zone_daylight.DaylIllumAtRefPt = 0.0;
-        zone_daylight.GlareIndexAtRefPt.allocate(curTotalDaylRefPts);
-        zone_daylight.GlareIndexAtRefPt = 0.0;
+        daylightControl.DaylRefPtNum.allocate(curTotalDaylRefPts);
+        daylightControl.FracZoneDaylit.allocate(curTotalDaylRefPts);
+        daylightControl.IllumSetPoint.allocate(curTotalDaylRefPts);
+        daylightControl.DaylIllumAtRefPt.allocate(curTotalDaylRefPts);
+        daylightControl.GlareIndexAtRefPt.allocate(curTotalDaylRefPts);
+        daylightControl.DaylRefPtAbsCoord.allocate(3, curTotalDaylRefPts);
+        daylightControl.DaylRefPtInBounds.allocate(curTotalDaylRefPts);
+        daylightControl.RefPtPowerReductionFactor.allocate(curTotalDaylRefPts);
+        daylightControl.BacLum.allocate(curTotalDaylRefPts);
+        daylightControl.TimeExceedingGlareIndexSPAtRefPt.allocate(curTotalDaylRefPts);
+        daylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt.allocate(curTotalDaylRefPts);
 
-        zone_daylight.DaylRefPtAbsCoord.allocate(3, curTotalDaylRefPts);
-        zone_daylight.DaylRefPtAbsCoord = 0.0;
-        zone_daylight.DaylRefPtInBounds.allocate(curTotalDaylRefPts);
-        zone_daylight.DaylRefPtInBounds = true;
-        zone_daylight.RefPtPowerReductionFactor.allocate(curTotalDaylRefPts);
-        zone_daylight.RefPtPowerReductionFactor = 1.0;
-        zone_daylight.BacLum.allocate(curTotalDaylRefPts);
-        zone_daylight.BacLum = 0.0;
-
-        zone_daylight.TimeExceedingGlareIndexSPAtRefPt.allocate(curTotalDaylRefPts);
-        zone_daylight.TimeExceedingGlareIndexSPAtRefPt = 0.0;
-
-        zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt.allocate(curTotalDaylRefPts);
-        zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt = 0.0;
+        for (int refPt = 1; refPt <= curTotalDaylRefPts; ++refPt) {
+            daylightControl.DaylRefPtNum(refPt) = 0;
+            daylightControl.FracZoneDaylit(refPt) = 0.0;
+            daylightControl.IllumSetPoint(refPt) = 0.0;
+            daylightControl.DaylIllumAtRefPt(refPt) = 0.0;
+            daylightControl.GlareIndexAtRefPt(refPt) = 0.0;
+            daylightControl.DaylRefPtInBounds(refPt) = true;
+            daylightControl.RefPtPowerReductionFactor(refPt) = 1.0;
+            daylightControl.BacLum(refPt) = 0.0;
+            daylightControl.TimeExceedingGlareIndexSPAtRefPt(refPt) = 0.0;
+            daylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt(refPt) = 0.0;
+            for (int coord = 1; coord <= 3; ++coord) {
+                daylightControl.DaylRefPtAbsCoord(coord, refPt) = 0.0;
+            }
+        }
 
         int countRefPts = 0;
         for (int refPtNum = 1; refPtNum <= curTotalDaylRefPts; ++refPtNum) {
-            zone_daylight.DaylRefPtNum(refPtNum) =
+            daylightControl.DaylRefPtNum(refPtNum) =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6 + refPtNum),
                                                 state.dataDaylightingData->DaylRefPt,
                                                 &DataDaylighting::RefPointData::Name); // Field: Daylighting Reference Point Name
-            if (zone_daylight.DaylRefPtNum(refPtNum) == 0) {
+            if (daylightControl.DaylRefPtNum(refPtNum) == 0) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(6 + refPtNum) + "=\"" +
                                     state.dataIPShortCut->cAlphaArgs(6 + refPtNum) + "\" for object named: " + state.dataIPShortCut->cAlphaArgs(1));
@@ -5151,79 +5157,79 @@ void GetDaylightingControls(EnergyPlusData &state,
             } else {
                 ++countRefPts;
             }
-            zone_daylight.FracZoneDaylit(refPtNum) =
+            daylightControl.FracZoneDaylit(refPtNum) =
                 state.dataIPShortCut->rNumericArgs(6 + refPtNum * 2); // Field: Fraction Controlled by Reference Point
-            zone_daylight.IllumSetPoint(refPtNum) =
+            daylightControl.IllumSetPoint(refPtNum) =
                 state.dataIPShortCut->rNumericArgs(7 + refPtNum * 2); // Field: Illuminance Setpoint at Reference Point
 
-            if (zone_daylight.DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
+            if (daylightControl.DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Illuminance", refPtNum),
                                     OutputProcessor::Unit::lux,
-                                    zone_daylight.DaylIllumAtRefPt(refPtNum),
+                                    daylightControl.DaylIllumAtRefPt(refPtNum),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
-                                    zone_daylight.Name);
+                                    daylightControl.Name);
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Daylight Illuminance Setpoint Exceeded Time", refPtNum),
                                     OutputProcessor::Unit::hr,
-                                    zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt(refPtNum),
+                                    daylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt(refPtNum),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Summed,
-                                    zone_daylight.Name);
+                                    daylightControl.Name);
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Glare Index", refPtNum),
                                     OutputProcessor::Unit::None,
-                                    zone_daylight.GlareIndexAtRefPt(refPtNum),
+                                    daylightControl.GlareIndexAtRefPt(refPtNum),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Average,
-                                    zone_daylight.Name);
+                                    daylightControl.Name);
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Glare Index Setpoint Exceeded Time", refPtNum),
                                     OutputProcessor::Unit::hr,
-                                    zone_daylight.TimeExceedingGlareIndexSPAtRefPt(refPtNum),
+                                    daylightControl.TimeExceedingGlareIndexSPAtRefPt(refPtNum),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Summed,
-                                    zone_daylight.Name);
+                                    daylightControl.Name);
             }
         }
         // Register Error if 0 DElight RefPts have been input for valid DElight object
         if (countRefPts < 1) {
-            ShowSevereError(state, "No Reference Points input for " + cCurrentModuleObject + " zone =" + zone_daylight.ZoneName);
+            ShowSevereError(state, "No Reference Points input for " + cCurrentModuleObject + " zone =" + daylightControl.ZoneName);
             ErrorsFound = true;
         }
 
-        Real64 sumFracs = sum(zone_daylight.FracZoneDaylit);
+        Real64 sumFracs = sum(daylightControl.FracZoneDaylit);
         if ((1.0 - sumFracs) > FractionTolerance) {
             ShowWarningError(state, "GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is < 1.0.");
             ShowContinueError(state,
                               format("..discovered in \"{}\" for Zone=\"{}\", only {:.3R} of the zone is controlled.",
                                      cCurrentModuleObject,
                                      state.dataIPShortCut->cAlphaArgs(2),
-                                     sum(zone_daylight.FracZoneDaylit)));
+                                     sum(daylightControl.FracZoneDaylit)));
         } else if ((sumFracs - 1.0) > FractionTolerance) {
             ShowSevereError(state, "GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.");
             ShowContinueError(state,
                               format("..discovered in \"{}\" for Zone=\"{}\", trying to control {:.3R} of the zone.",
                                      cCurrentModuleObject,
                                      state.dataIPShortCut->cAlphaArgs(2),
-                                     sum(zone_daylight.FracZoneDaylit)));
+                                     sum(daylightControl.FracZoneDaylit)));
             ErrorsFound = true;
         }
 
-        if (zone_daylight.LightControlType == DataDaylighting::iLtgCtrlType::Stepped && zone_daylight.LightControlSteps <= 0) {
+        if (daylightControl.LightControlType == DataDaylighting::iLtgCtrlType::Stepped && daylightControl.LightControlSteps <= 0) {
             ShowWarningError(state, "GetDaylightingControls: For Stepped Control, the number of steps must be > 0");
             ShowContinueError(
                 state, "..discovered in \"" + cCurrentModuleObject + "\" for Zone=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\", will use 1");
-            zone_daylight.LightControlSteps = 1;
+            daylightControl.LightControlSteps = 1;
         }
         SetupOutputVariable(state,
                             "Daylighting Lighting Power Multiplier",
                             OutputProcessor::Unit::None,
-                            zone_daylight.ZonePowerReductionFactor,
+                            daylightControl.ZonePowerReductionFactor,
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Average,
-                            zone_daylight.Name);
+                            daylightControl.Name);
     }
 }
 
