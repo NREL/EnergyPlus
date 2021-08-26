@@ -189,7 +189,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = HWBaseboard(1).EquipID;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_enum = HWBaseboard(1).EquipType;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = HWBaseboard(1).EquipType;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = HWBaseboard(1).WaterInletNode;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = HWBaseboard(1).WaterOutletNode;
 

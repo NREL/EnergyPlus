@@ -71,7 +71,7 @@ namespace PlantLoadProfile {
 
         // Members
         std::string Name;                      // Name of Plant Load Profile object
-        DataPlant::PlantEquipmentType TypeNum; // Plant Side Connection: 'TypeOf_enum' assigned in DataPlant
+        DataPlant::PlantEquipmentType TypeNum; // Plant Side Connection: 'Type' assigned in DataPlant
         int WLoopNum;                          // water plant loop index number
         int WLoopSideNum;                      // water plant loop side index
         int WLoopBranchNum;                    // water plant loop branch index

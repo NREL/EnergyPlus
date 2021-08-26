@@ -121,7 +121,7 @@ namespace PhotovoltaicThermalCollectors {
     {
         // Members
         std::string Name;                      // Name of PVT collector
-        DataPlant::PlantEquipmentType TypeNum; // Plant Side Connection: 'TypeOf_enum' assigned in DataPlant
+        DataPlant::PlantEquipmentType TypeNum; // Plant Side Connection: 'Type' assigned in DataPlant
         int WLoopNum;                          // Water plant loop index number
         int WLoopSideNum;                      // Water plant loop side index
         int WLoopBranchNum;                    // Water plant loop branch index

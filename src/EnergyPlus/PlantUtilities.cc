@@ -1696,7 +1696,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
                 auto &this_branch(this_loop_side.Branch(BranchCtr));
                 for (CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr) {
                     auto &this_component(this_branch.Comp(CompCtr));
-                    if (this_component.TypeOf_enum == CompType) {
+                    if (this_component.Type == CompType) {
                         if (UtilityRoutines::SameString(CompName, this_component.Name)) {
                             FoundCompName = true;
                             if (present(InletNodeNumber)) {

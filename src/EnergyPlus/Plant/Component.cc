@@ -54,15 +54,15 @@ namespace DataPlant {
 
     bool CompData::isPump()
     {
-        if (this->TypeOf_enum == DataPlant::PlantEquipmentType::PumpConstantSpeed) {
+        if (this->Type == DataPlant::PlantEquipmentType::PumpConstantSpeed) {
             return true;
-        } else if (this->TypeOf_enum == DataPlant::PlantEquipmentType::PumpVariableSpeed) {
+        } else if (this->Type == DataPlant::PlantEquipmentType::PumpVariableSpeed) {
             return true;
-        } else if (this->TypeOf_enum == DataPlant::PlantEquipmentType::PumpBankConstantSpeed) {
+        } else if (this->Type == DataPlant::PlantEquipmentType::PumpBankConstantSpeed) {
             return true;
-        } else if (this->TypeOf_enum == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) {
+        } else if (this->Type == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) {
             return true;
-        } else if (this->TypeOf_enum == DataPlant::PlantEquipmentType::PumpCondensate) {
+        } else if (this->Type == DataPlant::PlantEquipmentType::PumpCondensate) {
             return true;
         }
         return false;

@@ -467,7 +467,7 @@ namespace DataPlant {
             ComponentInletNode = this_comp.NodeNumIn;
             ComponentOutletNode = this_comp.NodeNumOut;
             MassFlowRateFound = state.dataLoopNodes->Node(ComponentOutletNode).MassFlowRate;
-            ComponentTypeOfNum = this_comp.TypeOf_enum;
+            ComponentTypeOfNum = this_comp.Type;
 
             //~ Push the values through
             state.dataLoopNodes->Node(ComponentOutletNode).MassFlowRate = MassFlow;
@@ -645,7 +645,7 @@ namespace DataPlant {
             Real64 totalDispatchedLoadOnBranch = 0.0;
             for (int compNum = 1; compNum <= branch.TotalComponents; ++compNum) {
                 auto &component = branch.Comp(compNum);
-                auto &t = component.TypeOf_enum;
+                auto &t = component.Type;
                 if (t == DataPlant::PlantEquipmentType::PumpConstantSpeed || t == DataPlant::PlantEquipmentType::PumpBankConstantSpeed ||
                     t == DataPlant::PlantEquipmentType::PumpVariableSpeed || t == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) {
                     // don't do anything
@@ -938,7 +938,7 @@ namespace DataPlant {
                             // special primary side flow request for two way common pipe
                             int const CompIndex = component.CompNum;
                             {
-                                auto const SELECT_CASE_var(component.TypeOf_enum);
+                                auto const SELECT_CASE_var(component.Type);
                                 // remove var speed pumps from this case statement if can set MassFlowRateRequest
                                 if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpConstantSpeed) ||
                                     (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpVariableSpeed) ||
@@ -962,7 +962,7 @@ namespace DataPlant {
                                    (loop.CommonPipeType == DataPlant::iCommonPipeType::Single)) {
                             int const CompIndex = component.CompNum;
                             {
-                                auto const SELECT_CASE_var(component.TypeOf_enum);
+                                auto const SELECT_CASE_var(component.Type);
                                 // remove var speed pumps from this case statement if can set MassFlowRateRequest
                                 if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpConstantSpeed) ||
                                     (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpVariableSpeed) ||
@@ -984,7 +984,7 @@ namespace DataPlant {
                         } else {
                             int const CompIndex = component.CompNum;
                             {
-                                auto const SELECT_CASE_var(component.TypeOf_enum);
+                                auto const SELECT_CASE_var(component.Type);
                                 if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpConstantSpeed) {
                                     if (CompIndex > 0) {
                                         auto &this_pump(state.dataPumps->PumpEquip(CompIndex));
@@ -1165,7 +1165,7 @@ namespace DataPlant {
                     int const NumCompsOnThisBranch = branch.TotalComponents;
                     for (int CompCounter = 1; CompCounter <= NumCompsOnThisBranch; ++CompCounter) {
                         auto const &component(branch.Comp(CompCounter));
-                        auto const SELECT_CASE_var(component.TypeOf_enum);
+                        auto const SELECT_CASE_var(component.Type);
                         if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpVariableSpeed) ||
                             (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) ||
                             (SELECT_CASE_var == DataPlant::PlantEquipmentType::PumpCondensate)) {
@@ -1613,8 +1613,8 @@ namespace DataPlant {
                             auto &this_comp(this_splitter_outlet_branch.Comp(CompCounter));
 
                             // if this isn't a variable speed pump then just keep cycling
-                            if ((this_comp.TypeOf_enum != PlantEquipmentType::PumpVariableSpeed) &&
-                                (this_comp.TypeOf_enum != PlantEquipmentType::PumpBankVariableSpeed)) {
+                            if ((this_comp.Type != PlantEquipmentType::PumpVariableSpeed) &&
+                                (this_comp.Type != PlantEquipmentType::PumpBankVariableSpeed)) {
                                 continue;
                             }
 

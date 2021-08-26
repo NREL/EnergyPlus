@@ -4772,7 +4772,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                      ++CompNum) {
                                     // Check if cooling tower is single speed and generate and error
                                     state.dataSetPointManager->InitSetPointManagerTypeOf_Num =
-                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).TypeOf_enum;
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).Type;
                                     if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num == PlantEquipmentType::CoolingTower_SingleSpd) {
                                         ShowSevereError(state,
                                                         cSetPointManagerType + "=\"" + state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).Name +
@@ -4792,7 +4792,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                      CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).TotalComponents;
                                      ++CompNum) {
                                     state.dataSetPointManager->InitSetPointManagerTypeOf_Num =
-                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_enum;
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).Type;
                                     if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num == PlantEquipmentType::Chiller_Absorption ||
                                         state.dataSetPointManager->InitSetPointManagerTypeOf_Num == PlantEquipmentType::Chiller_Indirect_Absorption ||
                                         state.dataSetPointManager->InitSetPointManagerTypeOf_Num == PlantEquipmentType::Chiller_CombTurbine ||
@@ -4804,7 +4804,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                         state.dataSetPointManager->InitSetPointManagerTypeOf_Num == PlantEquipmentType::Chiller_EngineDriven) {
                                         // Scan the supply side to find the chiller index and branch index on plantloop
                                         state.dataSetPointManager->InitSetPointManagerTypeNum =
-                                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_enum;
+                                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).Type;
                                         for (LoopNum2 = 1; LoopNum2 <= state.dataHVACGlobal->NumCondLoops + state.dataHVACGlobal->NumPlantLoops;
                                              ++LoopNum2) {
                                             for (BranchNumPlantSide = 1;
@@ -4819,7 +4819,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                             .LoopSide(SupplySide)
                                                             .Branch(BranchNumPlantSide)
                                                             .Comp(CompNumPlantSide)
-                                                            .TypeOf_enum == state.dataSetPointManager->InitSetPointManagerTypeNum) {
+                                                            .Type == state.dataSetPointManager->InitSetPointManagerTypeNum) {
                                                         state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).LoopIndexPlantSide = LoopNum2;
                                                         state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).ChillerIndexPlantSide =
                                                             CompNumPlantSide;
@@ -4859,7 +4859,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                      ++CompNum) {
                                     // Check if cooling tower is single speed and generate and error
                                     state.dataSetPointManager->InitSetPointManagerTypeOf_Num =
-                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).TypeOf_enum;
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).Type;
                                     if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num == PlantEquipmentType::CoolingTower_SingleSpd) {
                                         ShowSevereError(state,
                                                         cSetPointManagerType + "=\"" +
@@ -4891,7 +4891,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                      CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).TotalComponents;
                                      ++CompNum) {
                                     state.dataSetPointManager->InitSetPointManagerTypeOf_Num =
-                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_enum;
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).Type;
                                     if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num == PlantEquipmentType::Chiller_Absorption ||
                                         state.dataSetPointManager->InitSetPointManagerTypeOf_Num == PlantEquipmentType::Chiller_Indirect_Absorption ||
                                         state.dataSetPointManager->InitSetPointManagerTypeOf_Num == PlantEquipmentType::Chiller_CombTurbine ||
@@ -4903,7 +4903,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                         state.dataSetPointManager->InitSetPointManagerTypeOf_Num == PlantEquipmentType::Chiller_EngineDriven) {
                                         // Scan the supply side to find the chiller index and branch index on plantloop
                                         state.dataSetPointManager->InitSetPointManagerTypeNum =
-                                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_enum;
+                                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).Type;
                                         for (LoopNum2 = 1; LoopNum2 <= state.dataHVACGlobal->NumCondLoops + state.dataHVACGlobal->NumPlantLoops;
                                              ++LoopNum2) {
                                             for (BranchNumPlantSide = 1;
@@ -4918,7 +4918,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                                                                                    .LoopSide(SupplySide)
                                                                                                                    .Branch(BranchNumPlantSide)
                                                                                                                    .Comp(CompNumPlantSide)
-                                                                                                                   .TypeOf_enum;
+                                                                                                                   .Type;
                                                     if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num ==
                                                         state.dataSetPointManager->InitSetPointManagerTypeNum) {
                                                         ++state.dataSetPointManager->InitSetPointManagerNumChiller;
@@ -4941,7 +4941,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                                         .LoopSide(SupplySide)
                                                                         .Branch(BranchNum2)
                                                                         .Comp(CompNum2)
-                                                                        .TypeOf_enum;
+                                                                        .Type;
                                                                 if (state.dataSetPointManager->InitSetPointManagerTypeOf_Num ==
                                                                         PlantEquipmentType::PumpVariableSpeed ||
                                                                     state.dataSetPointManager->InitSetPointManagerTypeOf_Num ==

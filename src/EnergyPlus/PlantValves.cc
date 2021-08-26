@@ -317,7 +317,7 @@ namespace PlantValves {
                             branchCtr++;
                             for (auto &thisComp : thisBranch.Comp) {
 
-                                if ((thisComp.TypeOf_enum == DataPlant::PlantEquipmentType::ValveTempering) &&
+                                if ((thisComp.Type == DataPlant::PlantEquipmentType::ValveTempering) &&
                                     (thisComp.Name == this->Name)) { // we found it.
 
                                     // is branch control type 'Active'

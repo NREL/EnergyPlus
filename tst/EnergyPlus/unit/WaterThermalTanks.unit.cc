@@ -2682,7 +2682,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     auto &CoilBranch(SupplySideloop.Branch(BranchNum));
     CoilBranch.TotalComponents = 1;
     CoilBranch.Comp.allocate(CompNum);
-    CoilBranch.Comp(CompNum).TypeOf_enum = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
+    CoilBranch.Comp(CompNum).Type = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
     CoilBranch.Comp(CompNum).Name = "GSHP_COIL1";
 
     state->dataGlobal->BeginEnvrnFlag = true;

@@ -1243,8 +1243,8 @@ void SetupCommonPipes(EnergyPlusData &state)
     for (CurLoopNum = 1; CurLoopNum <= state.dataPlnt->TotNumLoops; ++CurLoopNum) {
 
         // reference to easily lookup the first item once
-        auto &first_demand_component_typenum(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(DemandSide).Branch(1).Comp(1).TypeOf_enum);
-        auto &first_supply_component_typenum(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(SupplySide).Branch(1).Comp(1).TypeOf_enum);
+        auto &first_demand_component_typenum(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(DemandSide).Branch(1).Comp(1).Type);
+        auto &first_supply_component_typenum(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(SupplySide).Branch(1).Comp(1).Type);
 
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(CurLoopNum).CommonPipeType);

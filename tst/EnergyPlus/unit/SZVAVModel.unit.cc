@@ -701,7 +701,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     CWLoop.FluidIndex = 1;
     CWLoop.FluidName = "WATER";
     CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_enum = DataPlant::PlantEquipmentType::CoilWaterCooling;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
     CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
     CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
 

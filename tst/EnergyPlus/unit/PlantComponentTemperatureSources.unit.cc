@@ -84,7 +84,7 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_enum = DataPlant::PlantEquipmentType::WaterSource;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::WaterSource;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "FLUIDSOURCE";
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
 
