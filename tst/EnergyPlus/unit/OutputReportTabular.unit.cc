@@ -10049,7 +10049,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_Standard62_1_W
     EXPECT_FALSE(has_err_output(true));
 }
 
-
 TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
 {
     // Test for #8921
@@ -10059,35 +10058,35 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
 
     std::string const idf_objects = delimited_string({
 
-      "Output:Table:Monthly,",
-      "  MONTHLY EXAMPLE,                        !- Name",
-      "  ,                                       !- Digits After Decimal",
-      "  Electricity:Facility,                   !- Variable or Meter Name 1",
-      "  SumOrAverage,                           !- Aggregation Type for Variable or Meter 1",
-      "  Electricity:Facility,                   !- Variable or Meter Name 2",
-      "  Maximum,                                !- Aggregation Type for Variable or Meter 2",
-      "  Electricity:Facility,                   !- Variable or Meter Name 3",
-      "  Minimum,                                !- Aggregation Type for Variable or Meter 3",
-      "  Electricity:Facility,                   !- Variable or Meter Name 4",
-      "  ValueWhenMaximumOrMinimum,              !- Aggregation Type for Variable or Meter 4",
-      "  Electricity:Facility,                   !- Variable or Meter Name 5",
-      "  HoursNonZero,                           !- Aggregation Type for Variable or Meter 5",
-      "  Electricity:Facility,                   !- Variable or Meter Name 6",
-      "  HoursZero,                              !- Aggregation Type for Variable or Meter 6",
-      "  Electricity:Facility,                   !- Variable or Meter Name 7",
-      "  HoursPositive,                          !- Aggregation Type for Variable or Meter 7",
-      "  Electricity:Facility,                   !- Variable or Meter Name 8",
-      "  HoursNonPositive,                       !- Aggregation Type for Variable or Meter 8",
-      "  Electricity:Facility,                   !- Variable or Meter Name 9",
-      "  HoursNegative,                          !- Aggregation Type for Variable or Meter 9",
-      "  Electricity:Facility,                   !- Variable or Meter Name 10",
-      "  HoursNonNegative,                       !- Aggregation Type for Variable or Meter 10",
-      "  Electricity:Facility,                   !- Variable or Meter Name 11",
-      "  SumOrAverageDuringHoursShown,           !- Aggregation Type for Variable or Meter 11",
-      "  Electricity:Facility,                   !- Variable or Meter Name 12",
-      "  MaximumDuringHoursShown,                !- Aggregation Type for Variable or Meter 12",
-      "  Electricity:Facility,                   !- Variable or Meter Name 13",
-      "  MinimumDuringHoursShown;                !- Aggregation Type for Variable or Meter 13",
+        "Output:Table:Monthly,",
+        "  MONTHLY EXAMPLE,                        !- Name",
+        "  ,                                       !- Digits After Decimal",
+        "  Electricity:Facility,                   !- Variable or Meter Name 1",
+        "  SumOrAverage,                           !- Aggregation Type for Variable or Meter 1",
+        "  Electricity:Facility,                   !- Variable or Meter Name 2",
+        "  Maximum,                                !- Aggregation Type for Variable or Meter 2",
+        "  Electricity:Facility,                   !- Variable or Meter Name 3",
+        "  Minimum,                                !- Aggregation Type for Variable or Meter 3",
+        "  Electricity:Facility,                   !- Variable or Meter Name 4",
+        "  ValueWhenMaximumOrMinimum,              !- Aggregation Type for Variable or Meter 4",
+        "  Electricity:Facility,                   !- Variable or Meter Name 5",
+        "  HoursNonZero,                           !- Aggregation Type for Variable or Meter 5",
+        "  Electricity:Facility,                   !- Variable or Meter Name 6",
+        "  HoursZero,                              !- Aggregation Type for Variable or Meter 6",
+        "  Electricity:Facility,                   !- Variable or Meter Name 7",
+        "  HoursPositive,                          !- Aggregation Type for Variable or Meter 7",
+        "  Electricity:Facility,                   !- Variable or Meter Name 8",
+        "  HoursNonPositive,                       !- Aggregation Type for Variable or Meter 8",
+        "  Electricity:Facility,                   !- Variable or Meter Name 9",
+        "  HoursNegative,                          !- Aggregation Type for Variable or Meter 9",
+        "  Electricity:Facility,                   !- Variable or Meter Name 10",
+        "  HoursNonNegative,                       !- Aggregation Type for Variable or Meter 10",
+        "  Electricity:Facility,                   !- Variable or Meter Name 11",
+        "  SumOrAverageDuringHoursShown,           !- Aggregation Type for Variable or Meter 11",
+        "  Electricity:Facility,                   !- Variable or Meter Name 12",
+        "  MaximumDuringHoursShown,                !- Aggregation Type for Variable or Meter 12",
+        "  Electricity:Facility,                   !- Variable or Meter Name 13",
+        "  MinimumDuringHoursShown;                !- Aggregation Type for Variable or Meter 13",
 
     });
 
@@ -10108,26 +10107,24 @@ TEST_F(SQLiteFixture, OutputReportTabularMonthly_CurlyBraces)
 
     OutputReportTabular::WriteMonthlyTables(*state);
 
-    auto columnHeaders = queryResult(R"(
-        SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
-            WHERE ReportName LIKE "MONTHLY EXAMPLE%"
-        )", "TabularDataWithStrings"
-    );
+    auto columnHeaders = queryResult(
+        R"(SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
+             WHERE ReportName LIKE "MONTHLY EXAMPLE%")",
+        "TabularDataWithStrings");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // 13 agg types for the same variable requested above + the {TIMESTAMP} ones (but distinct, so counts as 1)
     EXPECT_EQ(14, columnHeaders.size());
 
-    auto missingBracesHeaders = queryResult(R"(
-        SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
-            WHERE ReportName LIKE "MONTHLY EXAMPLE%"
-            AND ColumnName LIKE "%{%" AND ColumnName NOT LIKE "%}%"
-        )", "TabularDataWithStrings"
-    );
+    auto missingBracesHeaders = queryResult(
+        R"(SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
+             WHERE ReportName LIKE "MONTHLY EXAMPLE%"
+             AND ColumnName LIKE "%{%" AND ColumnName NOT LIKE "%}%")",
+        "TabularDataWithStrings");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // Should be none!
-    for (auto& col: missingBracesHeaders) {
+    for (auto &col : missingBracesHeaders) {
         std::string colHeader = col[0];
         EXPECT_TRUE(false) << "Missing braces in monthly table for : " << colHeader;
     }
