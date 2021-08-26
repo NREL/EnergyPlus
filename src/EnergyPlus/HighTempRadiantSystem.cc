@@ -1324,17 +1324,16 @@ namespace HighTempRadiantSystem {
         // Initialize arrays
         state.dataHeatBalFanSys->SumConvHTRadSys = 0.0;
         state.dataHeatBalFanSys->SumLatentHTRadSys = 0.0;
-        state.dataHeatBalFanSys->QHTRadSysToPerson = 0.0;
+        state.dataHeatBalFanSys->SurfQHTRadSys = 0.0;
+        state.dataHeatBalFanSys->SurfQHTRadSysToPerson = 0.0;
 
         for (RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
 
             ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
 
-            state.dataHeatBalFanSys->QHTRadSysToPerson(ZoneNum) = state.dataHighTempRadSys->QHTRadSource(RadSysNum) *
-                                                                  state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
-                                                                  state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribPerson;
-
-            state.dataHeatBalFanSys->QdotRadHVACToPerson(ZoneNum) += state.dataHeatBalFanSys->QHTRadSysToPerson(ZoneNum);
+            state.dataHeatBalFanSys->SurfQHTRadSysToPerson(ZoneNum) = state.dataHighTempRadSys->QHTRadSource(RadSysNum) *
+                                                                      state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
+                                                                      state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribPerson;
 
             state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) +=
                 state.dataHighTempRadSys->QHTRadSource(RadSysNum) * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracConvect;
@@ -1349,7 +1348,7 @@ namespace HighTempRadiantSystem {
                         (state.dataHighTempRadSys->QHTRadSource(RadSysNum) * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
                          state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribToSurf(RadSurfNum) /
                          state.dataSurface->Surface(SurfNum).Area);
-                    state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalFanSys->SurfQHTRadSys(SurfNum) += ThisSurfIntensity;
 
                     if (ThisSurfIntensity > MaxRadHeatFlux) { // CR 8074, trap for excessive intensity (throws off surface balance )
                         ShowSevereError(state, "DistributeHTRadGains:  excessive thermal radiation heat flux intensity detected");
@@ -1381,7 +1380,7 @@ namespace HighTempRadiantSystem {
         // that all energy radiated to people is converted to convective energy is
         // not very precise, but at least it conserves energy.
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) += state.dataHeatBalFanSys->QHTRadSysToPerson(ZoneNum);
+            state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) += state.dataHeatBalFanSys->SurfQHTRadSysToPerson(ZoneNum);
         }
     }
 

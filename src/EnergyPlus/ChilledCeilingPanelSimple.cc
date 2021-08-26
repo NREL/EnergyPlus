@@ -1695,13 +1695,17 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
     int ZoneNum;              // Pointer to the Zone derived type
     Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
+    // Initialize arrays
+    state.dataHeatBalFanSys->SurfQCoolingPanel = 0.0;
+    state.dataHeatBalFanSys->SurfQCoolingPanelToPerson = 0.0;
+
     for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
 
         auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
 
         ZoneNum = ThisCP.ZonePtr;
         if (ZoneNum <= 0) continue;
-        state.dataHeatBalFanSys->QdotRadHVACToPerson(ZoneNum) +=
+        state.dataHeatBalFanSys->SurfQCoolingPanelToPerson(ZoneNum) +=
             state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribPerson;
 
         for (RadSurfNum = 1; RadSurfNum <= ThisCP.TotSurfToDistrib; ++RadSurfNum) {
@@ -1710,7 +1714,7 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
             if (ThisSurf.Area > SmallestArea) {
                 ThisSurfIntensity =
                     (state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribToSurf(RadSurfNum) / ThisSurf.Area);
-                state.dataHeatBalSurf->QdotRadHVACInPerArea(SurfNum) += ThisSurfIntensity;
+                state.dataHeatBalFanSys->SurfQCoolingPanel(SurfNum) += ThisSurfIntensity;
                 // CR 8074, trap for excessive intensity (throws off surface balance )
                 if (ThisSurfIntensity > MaxRadHeatFlux) {
                     ShowSevereError(state, "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");
