@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <tuple>
+#include <string>
 
 namespace gt::coordinates {
 

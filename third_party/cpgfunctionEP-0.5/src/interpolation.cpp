@@ -2,6 +2,8 @@
 // Created by jackcook on 7/15/20.
 //
 
+#include <stdexcept>
+
 #include <cpgfunction/interpolation.h>
 
 namespace jcc::interpolation {
@@ -96,5 +98,3 @@ namespace jcc::interpolation {
     }  // interp1d();
 
 } // jcc::interpolation
-
-
