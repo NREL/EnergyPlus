@@ -1108,6 +1108,9 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
     Real64 Cp;
     int DummyWaterIndex(1);
     bool IsAutoSize;               // Indicator to autosize
+    bool IsMaxPriFlowAutoSize;     // Indicate if the maximum terminal flow is autosize
+    int AirLoopNum;                // Air loop number
+    int SysSizNum;                 // System sizing number
     Real64 MaxPriAirVolFlowDes;    // Autosized maximum primary air flow for reporting
     Real64 MaxPriAirVolFlowUser;   // Hardsized maximum primary air flow for reporting
     Real64 MaxTotAirVolFlowDes;    // Autosized maximum air flow for reporting
@@ -1128,6 +1131,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
     DesCoilLoad = 0.0;
     ErrorsFound = false;
     IsAutoSize = false;
+    IsMaxPriFlowAutoSize = false;
     MaxPriAirVolFlowDes = 0.0;
     MaxPriAirVolFlowUser = 0.0;
     MaxTotAirVolFlowDes = 0.0;
@@ -1142,6 +1146,8 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
     MaxVolHotWaterFlowUser = 0.0;
     MaxVolHotSteamFlowDes = 0.0;
     MaxVolHotSteamFlowUser = 0.0;
+    AirLoopNum = 0;
+    SysSizNum = 0;
 
     auto &TermUnitSizing(state.dataSize->TermUnitSizing);
     auto &CurTermUnitSizingNum(state.dataSize->CurTermUnitSizingNum);
@@ -1168,6 +1174,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
 
             if (IsAutoSize) {
                 state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow = MaxPriAirVolFlowDes;
+                IsMaxPriFlowAutoSize = true;
                 BaseSizer::reportSizerOutput(state,
                                              state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                              state.dataPowerInductionUnits->PIU(PIUNum).Name,
@@ -1254,6 +1261,23 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
         }
     }
 
+    // if a sizing run has been done, check if system sizing has been done for this system
+    bool SizingDesRunThisAirSys = false;
+    if (state.dataSize->SysSizingRunDone) {
+        AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(state.dataPowerInductionUnits->PIU(PIUNum).CtrlZoneNum)
+                         .InletNodeAirLoopNum(state.dataPowerInductionUnits->PIU(PIUNum).ctrlZoneInNodeIndex);
+        if (AirLoopNum > 0) {
+            CheckThisAirSystemForSizing(state, AirLoopNum, SizingDesRunThisAirSys);
+        }
+
+        // get system sizing id if a sizing run has been done for this system
+        if (SizingDesRunThisAirSys) {
+            SysSizNum = UtilityRoutines::FindItemInList(
+                state.dataSize->FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+            if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
+        }
+    }
+
     IsAutoSize = false;
     if (state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirVolFlow == AutoSize) {
         IsAutoSize = true;
@@ -1331,7 +1355,47 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
             } else {
                 MinPriAirFlowFracDes = 0.0;
             }
+            if (SizingDesRunThisAirSys) {
+                if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                    if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow > 0.0) {
+                        MinPriAirFlowFracDes = 1.5 *
+                                               max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozClgByZone,
+                                                   state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozHtgByZone) /
+                                               state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
+
+                        // adjust maximum flow rate
+                        if (MinPriAirFlowFracDes > 1.0 && IsMaxPriFlowAutoSize) {
+                            state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow *= MinPriAirFlowFracDes;
+                            MinPriAirFlowFracDes = 1.0;
+                            ShowWarningError(state,
+                                             "SingleDuctSystem:SizeSys: Autosized maximum air flow rate for " +
+                                                 state.dataPowerInductionUnits->PIU(PIUNum).Name +
+                                                 " was increased to meet the zone primary air flow determined according to the ASHRAE Standard 62.1 "
+                                                 "Simplified Procedure.");
+                        } else if (MinPriAirFlowFracDes > 1.0) {
+                            ShowWarningError(state,
+                                             "SingleDuctSystem:SizeSys: Maximum primary air flow rate for " +
+                                                 state.dataPowerInductionUnits->PIU(PIUNum).Name + " is potentially too low.");
+                            ShowContinueError(state,
+                                              "The flow is lower than the minimum primary air flow rate calculated following the ASHRAE Standard "
+                                              "62.1 Simplified Procedure:");
+                            ShowContinueError(state,
+                                              format(" User-specified maximum primary air flow rate: {:.3R} m3/s.",
+                                                     state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow));
+                            ShowContinueError(state,
+                                              format(" Calculated minimum primary air flow rate: {:.3R} m3/s.",
+                                                     state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow * MinPriAirFlowFracDes));
+                            MinPriAirFlowFracDes = 1.0;
+                        }
+                    }
+                }
+            }
             if (IsAutoSize) {
+                if (SizingDesRunThisAirSys) {
+                    if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
+                        state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VpzMinByZoneSPSized = true;
+                    }
+                }
                 state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac = MinPriAirFlowFracDes;
                 BaseSizer::reportSizerOutput(state,
                                              state.dataPowerInductionUnits->PIU(PIUNum).UnitType,

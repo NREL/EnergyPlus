@@ -12144,7 +12144,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
 
             std::string tags;
             bool firstTag = true;
-            for (std::string const tag : curSpace.tags) {
+            for (std::string const &tag : curSpace.tags) {
                 if (firstTag) {
                     tags += tag;
                     firstTag = false;
