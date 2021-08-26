@@ -67,16 +67,16 @@ The C++ code that is used to solve for \(T_i\) and \(T_{mi}\) for cases where mo
 \begin{lstlisting}
 F1 = HMovInsul / (HMovInsul + HConvIn_surf + IterDampConst);
 
-SurfTempIn(SurfNum) = (SurfCTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + construct.CTFCross(0) * TH11 +
-                       F1 * (QRadThermInAbs(SurfNum) + HConvIn_surf * RefAirTemp(SurfNum) +
-                       NetLWRadToSurf(SurfNum) + QdotRadHVACInPerArea(SurfNum) +
+SurfTempIn(SurfNum) = (SurfCTFConstInPart(SurfNum) + SurfOpaqQRadSWInAbs(SurfNum) + construct.CTFCross(0) * TH11 +
+                       F1 * (SurfQRadThermInAbs(SurfNum) + HConvIn_surf * RefAirTemp(SurfNum) +
+                       SurfNetLWRadToSurf(SurfNum) + QdotRadHVACInPerArea(SurfNum) +
                        QAdditionalHeatSourceInside(SurfNum) +
                        IterDampConst * SurfTempInsOld(SurfNum)))
                        / (construct.CTFInside(0) + HMovInsul - F1 * HMovInsul); 
 
 SurfTempInTmp(SurfNum) = (construct.CTFInside(0) * SurfTempIn(SurfNum) +
                           HMovInsul * SurfTempIn(SurfNum) -
-                          QRadSWInAbs(SurfNum) - SurfCTFConstInPart(SurfNum) -
+                          SurfOpaqQRadSWInAbs(SurfNum) - SurfCTFConstInPart(SurfNum) -
                           construct.CTFCross(0) * TH11) / (HMovInsul);
 \end{lstlisting}
 
@@ -268,8 +268,8 @@ From Equation~\ref{eq:HeatBalanceEquationCase5}:
 \begin{lstlisting}
 // Outside heat balance case: Movable insulation, slow conduction, simple convection
    F2 = HMovInsul / (HMovInsul + HExtSurf(SurfNum) );
-   TH(1, 1, SurfNum) = (-SurfCTFConstOutPart(SurfNum) + QRadSWOutAbs(SurfNum) + construct.CTFCross(0) * SurfTempIn(SurfNum) +
-                       F2 * (QRadSWOutMvIns(SurfNum) + (HExtSurf(SurfNum)) * TempExt) /
+   TH(1, 1, SurfNum) = (-SurfCTFConstOutPart(SurfNum) + SurfOpaqQRadSWOutAbs(SurfNum) + construct.CTFCross(0) * SurfTempIn(SurfNum) +
+                       F2 * (SurfQRadSWOutMvIns(SurfNum) + (HExtSurf(SurfNum)) * TempExt) /
                        (construct.CTFOutside(0) + HMovInsul - F2 * HMovInsul);
 \end{lstlisting}
 
@@ -281,10 +281,10 @@ From Equation~\ref{eq:HeatBalanceEquationCase6}:
 // Outside heat balance case: Movable insulation, quick conduction, simple convection
    F1 = construct.CTFCross(0) / (construct.CTFInside(0) + HConvIn(SurfNum));
    F2 = HMovInsul / (HMovInsul + HExtSurf(SurfNum) );
-   TH(1, 1, SurfNum) = (-SurfCTFConstOutPart(SurfNum) + QRadSWOutAbs(SurfNum) + QRadLWOutSrdSurfs(SurfNum) +
-                       F1 * (SurfCTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + QRadThermInAbs(SurfNum) +
-                       HConvIn(SurfNum) * MAT(ZoneNum) + NetLWRadToSurf(SurfNum)) +
-                       F2 * (QRadSWOutMvIns(SurfNum) + (HExtSurf(SurfNum)) * TempExt) /
+   TH(1, 1, SurfNum) = (-SurfCTFConstOutPart(SurfNum) + SurfOpaqQRadSWOutAbs(SurfNum) + SurfQRadLWOutSrdSurfs(SurfNum) +
+                       F1 * (SurfCTFConstInPart(SurfNum) + SurfOpaqQRadSWInAbs(SurfNum) + SurfQRadThermInAbs(SurfNum) +
+                       HConvIn(SurfNum) * MAT(ZoneNum) + SurfNetLWRadToSurf(SurfNum)) +
+                       F2 * (SurfQRadSWOutMvIns(SurfNum) + (HExtSurf(SurfNum)) * TempExt) /
                       (construct.CTFOutside(0) + HMovInsul - F2 * HMovInsul - F1 * construct.CTFCross(0));
 \end{lstlisting}
 
@@ -295,8 +295,8 @@ From Equation~\ref{eq:HeatBalanceEquationCase7}:
 \begin{lstlisting}
 // Outside heat balance case: Movable insulation, slow conduction, detailed convection
    F2 = HMovInsul / (HMovInsul + SurfHcExt(SurfNum) + SurfHAirExt(SurfNum) + SurfHSkyExt(SurfNum) + SurfHGrdExt(SurfNum));
-   TH(1, 1, SurfNum) = (-SurfCTFConstOutPart(SurfNum) + QRadSWOutAbs(SurfNum) + QRadLWOutSrdSurfs(SurfNum) + construct.CTFCross(0) * SurfTempIn(SurfNum) +
-                       F2 * (QRadSWOutMvIns(SurfNum) + (SurfHcExt(SurfNum) + SurfHAirExt(SurfNum)) *
+   TH(1, 1, SurfNum) = (-SurfCTFConstOutPart(SurfNum) + SurfOpaqQRadSWOutAbs(SurfNum) + SurfQRadLWOutSrdSurfs(SurfNum) + construct.CTFCross(0) * SurfTempIn(SurfNum) +
+                       F2 * (SurfQRadSWOutMvIns(SurfNum) + (SurfHcExt(SurfNum) + SurfHAirExt(SurfNum)) *
                        TempExt + QAdditionalHeatSourceOutside(SurfNum) +
                        SurfHSkyExt(SurfNum) * TSky + SurfHGrdExt(SurfNum) * TGround)) /
                        (construct.CTFOutside(0) + HMovInsul - F2 * HMovInsul);
@@ -310,10 +310,10 @@ From Equation~\ref{eq:HeatBalanceEquationCase8}:
 // Outside heat balance case: Movable insulation, quick conduction, detailed convection
    F1 = construct.CTFCross(0) / (construct.CTFInside(0) + HConvIn(SurfNum));
    F2 = HMovInsul / (HMovInsul + SurfHcExt(SurfNum) + SurfHAirExt(SurfNum) + SurfHSkyExt(SurfNum) + SurfHGrdExt(SurfNum));
-   TH(1, 1, SurfNum) = (-SurfCTFConstOutPart(SurfNum) + QRadSWOutAbs(SurfNum) + QRadLWOutSrdSurfs(SurfNum) +
-                       F1 * (SurfCTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + QRadThermInAbs(SurfNum) +
-                       HConvIn(SurfNum) * MAT(ZoneNum) + NetLWRadToSurf(SurfNum)) +
-                       F2 * (QRadSWOutMvIns(SurfNum) + (SurfHcExt(SurfNum) + SurfHAirExt(SurfNum)) *
+   TH(1, 1, SurfNum) = (-SurfCTFConstOutPart(SurfNum) + SurfOpaqQRadSWOutAbs(SurfNum) + SurfQRadLWOutSrdSurfs(SurfNum) +
+                       F1 * (SurfCTFConstInPart(SurfNum) + SurfOpaqQRadSWInAbs(SurfNum) + SurfQRadThermInAbs(SurfNum) +
+                       HConvIn(SurfNum) * MAT(ZoneNum) + SurfNetLWRadToSurf(SurfNum)) +
+                       F2 * (SurfQRadSWOutMvIns(SurfNum) + (SurfHcExt(SurfNum) + SurfHAirExt(SurfNum)) *
                        TempExt + QAdditionalHeatSourceOutside(SurfNum) +
                        SurfHSkyExt(SurfNum) * TSky + SurfHGrdExt(SurfNum) * TGround)) /
                        (construct.CTFOutside(0) + HMovInsul - F2 * HMovInsul - F1 * construct.CTFCross(0));
@@ -351,11 +351,11 @@ HGround & Radiant exchange (linearized) coefficient & HG & W/m  K & Radiative co
 HmovInsul & Conductance or "h" value of movable insulation & UM & W/m  K & Conductance of Movable insulation \tabularnewline
 HSky & Radiant exchange (linearized) coefficient & HS & W/m  K & Radiative conductance (outside surface to sky radiant temperature \tabularnewline
 MAT(ZoneNum) & Zone temperature & TZ & C & Temperature of zone air \tabularnewline
-NetLWRadToSurf(SurfNum) & Net interior longwave radiation to a surface from other surfaces & HR*TR & W/m & Net surface to surface radiant exchange \tabularnewline
-QRadSWInAbs(SurfNum) & Short-wave radiation absorbed on inside of opaque surface & QSI & W/m & Short wave radiant flux absorbed at inside of surface \tabularnewline
-QRadSWOutAbs(SurfNum) & Short wave radiation absorbed on outside opaque surface & QSO & W/m & Short wave radiant flux absorbed at outside of surface \tabularnewline
-QRadSWOutMvIns(SurfNum) & Short wave radiation absorbed on outside of movable insulation & QSM & W/m & Short wave radiant flux absorbed at surface of movable insulation \tabularnewline
-QRadThermInAbs(SurfNum) & Thermal Radiation absorbed on inside surfaces & ~ & W/m & Longwave radiant flux from internal gains \tabularnewline
+SurfNetLWRadToSurf(SurfNum) & Net interior longwave radiation to a surface from other surfaces & HR*TR & W/m & Net surface to surface radiant exchange \tabularnewline
+SurfOpaqQRadSWInAbs(SurfNum) & Short-wave radiation absorbed on inside of opaque surface & QSI & W/m & Short wave radiant flux absorbed at inside of surface \tabularnewline
+SurfOpaqQRadSWOutAbs(SurfNum) & Short wave radiation absorbed on outside opaque surface & QSO & W/m & Short wave radiant flux absorbed at outside of surface \tabularnewline
+SurfQRadSWOutMvIns(SurfNum) & Short wave radiation absorbed on outside of movable insulation & QSM & W/m & Short wave radiant flux absorbed at surface of movable insulation \tabularnewline
+SurfQRadThermInAbs(SurfNum) & Thermal Radiation absorbed on inside surfaces & ~ & W/m & Longwave radiant flux from internal gains \tabularnewline
 SkyTemp & Sky temperature & T & C & Sky temp \tabularnewline
 TempExt & Exterior surface temperature or exterior air temperature & TM, T & C & Temperature of external surface of movable insulation or outside ambient air temperature \tabularnewline
 SurfTempIn(SurfNum) & Temperature of inside surface for each heat transfer surface & TI & C & Temperature of inside of surface I at time t-1 \tabularnewline

@@ -645,7 +645,7 @@ namespace WindowManager {
         // Creates outdoor environment object from surface properties in EnergyPlus
         double tout = m_Surface.getOutsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv;
         double IR = m_Surface.getOutsideIR(state, m_SurfNum);
-        // double dirSolRad = QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
+        // double dirSolRad = SurfQRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
         double swRadiation = m_Surface.getSWIncident(state, m_SurfNum);
         double tSky = state.dataEnvrn->SkyTempKelvin;
         double airSpeed = 0.0;
