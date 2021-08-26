@@ -882,12 +882,12 @@ namespace RoomAirModelAirflowNetwork {
         SumLinkMW = 0.0;
 
         // Sum all convective internal gains: SumIntGain
-        SumInternalConvectionGainsByIndices(state,
-                                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).NumIntGains,
-                                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).intGainsDeviceSpaces,
-                                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsDeviceIndices,
-                                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsFractions,
-                                            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumIntSensibleGain);
+        state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SumIntSensibleGain =
+            SumInternalConvectionGainsByIndices(state,
+                                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).NumIntGains,
+                                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).intGainsDeviceSpaces,
+                                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsDeviceIndices,
+                                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).IntGainsFractions);
 
         SumInternalLatentGainsByIndices(state,
                                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).NumIntGains,

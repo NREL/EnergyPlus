@@ -9303,13 +9303,13 @@ namespace InternalHeatGains {
         return DeviceIndex;
     }
 
-    void SumInternalConvectionGainsByIndices(
+    Real64 SumInternalConvectionGainsByIndices(
         EnergyPlusData &state,
-        int const numGains,                 // number of device gains to sum
-        const Array1D_int &deviceSpaceARR,  // variable length 1-d array of integer space index pointers to include in summation
-        const Array1D_int &deviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
-        const Array1D<Real64> &fractionARR, // array of fractional multipliers to apply to devices
-        Real64 &sumConvGainRate)
+        int const numGains,                // number of device gains to sum
+        const Array1D_int &deviceSpaceARR, // variable length 1-d array of integer space index pointers to include in summation
+        const Array1D_int &deviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
+        const Array1D<Real64> &fractionARR // array of fractional multipliers to apply to devices
+    )
     {
 
         // SUBROUTINE INFORMATION:
@@ -9319,19 +9319,20 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gains by index
 
+        // Return value
+        Real64 sumConvGainRate(0.0);
+
         assert(numGains <= isize(deviceSpaceARR));
         assert(numGains <= isize(deviceIndexARR));
         assert(numGains <= isize(fractionARR));
-
-        Real64 tmpSumConvGainRate = 0.0;
 
         for (int loop = 1; loop <= numGains; ++loop) {
             int spaceNum = deviceSpaceARR(loop);
             int deviceNum = deviceIndexARR(loop);
             Real64 deviceFraction = fractionARR(loop);
-            tmpSumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(deviceNum).ConvectGainRate * deviceFraction;
+            sumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(deviceNum).ConvectGainRate * deviceFraction;
         }
-        sumConvGainRate = tmpSumConvGainRate;
+        return sumConvGainRate;
     }
 
     void SumInternalLatentGainsByIndices(
