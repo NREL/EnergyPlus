@@ -8845,7 +8845,7 @@ namespace InternalHeatGains {
 
         if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
             sumRadGainRate = 0.0;
-            return;
+            return sumRadGainRate;
         }
 
         for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
@@ -8924,9 +8924,10 @@ namespace InternalHeatGains {
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 SumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
             }
-
-            return SumLatentGainRate;
         }
+
+        return SumLatentGainRate;
+
     }
 
     // Added for hybrid model -- calculate the latent gain from all sources except for people
