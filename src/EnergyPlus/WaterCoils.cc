@@ -6829,7 +6829,7 @@ Real64 GetWaterCoilCapacity(EnergyPlusData &state,
 }
 
 void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
-                                         DataPlant::PlantEquipmentType const CoilTypeNum,
+                                         DataPlant::PlantEquipmentType const CoilType,
                                          std::string const &CoilName,
                                          [[maybe_unused]] int const EquipFlowCtrl, // Flow control mode for the equipment
                                          int const LoopNum,                        // Plant loop index for where called from
@@ -6884,13 +6884,13 @@ void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
                            CoilName,
                            state.dataWaterCoils->WaterCoil(CoilNum).Name));
             }
-            if (CoilTypeNum != state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType) {
+            if (CoilType != state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType) {
                 ShowFatalError(
                     state,
                     format("UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
                            CoilNum,
                            CoilName,
-                           ccSimPlantEquipTypes[static_cast<int>(CoilTypeNum)]));
+                           ccSimPlantEquipTypes[static_cast<int>(CoilType)]));
             }
         }
     }

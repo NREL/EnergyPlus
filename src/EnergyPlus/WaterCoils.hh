@@ -513,7 +513,7 @@ namespace WaterCoils {
     );
 
     void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
-                                             DataPlant::PlantEquipmentType const CoilTypeNum,
+                                             DataPlant::PlantEquipmentType const CoilType,
                                              std::string const &CoilName,
                                              int const EquipFlowCtrl, // Flow control mode for the equipment
                                              int const LoopNum,       // Plant loop index for where called from
