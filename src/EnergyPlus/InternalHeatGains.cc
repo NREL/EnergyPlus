@@ -9368,13 +9368,13 @@ namespace InternalHeatGains {
         return sumLatentGainRate;
     }
 
-    void SumReturnAirConvectionGainsByIndices(
+    Real64 SumReturnAirConvectionGainsByIndices(
         EnergyPlusData &state,
-        int const numGains,                 // number of device gains to sum
-        const Array1D_int &deviceSpaceARR,  // variable length 1-d array of integer space index pointers to include in summation
-        const Array1D_int &deviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
-        const Array1D<Real64> &fractionARR, // array of fractional multipliers to apply to devices
-        Real64 &sumReturnAirGainRate)
+        int const numGains,                // number of device gains to sum
+        const Array1D_int &deviceSpaceARR, // variable length 1-d array of integer space index pointers to include in summation
+        const Array1D_int &deviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
+        const Array1D<Real64> &fractionARR // array of fractional multipliers to apply to devices
+    )
     {
 
         // SUBROUTINE INFORMATION:
@@ -9384,20 +9384,21 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gains by index
 
+        // Return value
+        Real64 sumReturnAirGainRate(0.0);
+
         assert(numGains <= isize(deviceSpaceARR));
         assert(numGains <= isize(deviceIndexARR));
         assert(numGains <= isize(fractionARR));
-
-        Real64 tmpSumReturnAirGainRate = 0.0;
 
         for (int loop = 1; loop <= numGains; ++loop) {
             int spaceNum = deviceSpaceARR(loop);
             int deviceNum = deviceIndexARR(loop);
             Real64 deviceFraction = fractionARR(loop);
-            tmpSumReturnAirGainRate =
-                tmpSumReturnAirGainRate + state.dataHeatBal->spaceIntGainDevices(spaceNum).device(deviceNum).ReturnAirConvGainRate * deviceFraction;
+            sumReturnAirGainRate =
+                sumReturnAirGainRate + state.dataHeatBal->spaceIntGainDevices(spaceNum).device(deviceNum).ReturnAirConvGainRate * deviceFraction;
         }
-        sumReturnAirGainRate = tmpSumReturnAirGainRate;
+        return sumReturnAirGainRate;
     }
 
 } // namespace InternalHeatGains

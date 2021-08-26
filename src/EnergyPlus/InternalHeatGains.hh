@@ -129,13 +129,13 @@ namespace InternalHeatGains {
         const Array1D<Real64> &FractionARR // array of fractional multipliers to apply to devices
     );
 
-    void SumReturnAirConvectionGainsByIndices(
+    Real64 SumReturnAirConvectionGainsByIndices(
         EnergyPlusData &state,
-        int const NumGains,                 // number of device gains to sum
-        const Array1D_int &DeviceSpaceARR,  // variable length 1-d array of integer space index pointers to include in summation
-        const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
-        const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
-        Real64 &SumReturnAirGainRate);
+        int const NumGains,                // number of device gains to sum
+        const Array1D_int &DeviceSpaceARR, // variable length 1-d array of integer space index pointers to include in summation
+        const Array1D_int &DeviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
+        const Array1D<Real64> &FractionARR // array of fractional multipliers to apply to devices
+    );
 
     Real64 SumAllReturnAirConvectionGains(EnergyPlusData &state,
                                           int const ZoneNum,      // zone index pointer for which zone to sum gains for
