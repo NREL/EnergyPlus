@@ -1817,7 +1817,7 @@ OtherEquipment,
 	SubCategory1; !- End-Use Subcategory
 \end{lstlisting}
 
-\subsubsection{Internal Gain Equipment Outputs}\label{outputs-5-004}
+\subsection{Internal Gain Equipment Outputs}\label{outputs-5-004}
 
 Each type of equipment object has output variables for individual objects and for space and zone totals.
 
@@ -2202,62 +2202,165 @@ Each type of equipment object has output variables for individual objects and fo
 
 \paragraph{Electric Equipment Electricity Energy {[}J{]}}\label{electric-equipment-electric-energy-j}
 
-The electric equipment electric power consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the electricity meters that are associated with the zone -- Electricity:Facility, Electricity:Buidling, Electricity:Zone:\textless{}Zone Name\textgreater{}, InteriorEquipment:Electricity: :Zone:\textless{}Zone Name\textgreater{}, and \textless{}End-Use Subcategory\textgreater{}:InteriorEquipment:Electricity.
+\paragraph{Space or Zone Electric Equipment Electricity Rate {[}W{]}}\label{zone-electric-equipment-electric-power-w}
+
+\paragraph{Space or Zone Electric Equipment Electricity Energy {[}J{]}}\label{zone-electric-equipment-electric-energy-j}
+
+The electric equipment electric power consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. Electric Equipment Electricity Energy is added to the following electricity meters:
+\begin{lstlisting}
+Electricity:Facility
+Electricity:Building
+Electricity:Zone:<Zone Name>
+Electricity:SpaceType:<Space Type Name>
+InteriorEquipment:Electricity
+InteriorEquipment:Electricity:Zone:<Zone Name>
+InteriorEquipment:Electricity:SpaceType:<Space Type Name>
+<End-Use Subcategory>:InteriorEquipment:Electricity
+<End-Use Subcategory>:InteriorEquipment:Electricity:Zone:<Zone Name>
+<End-Use Subcategory>:InteriorEquipment:Electricity:SpaceType:<Space Type Name>
+\end{lstlisting}
 
 \paragraph{Gas Equipment NaturalGas Rate {[}W{]}}\label{gas-equipment-gas-rate-w}
 
 \paragraph{Gas Equipment NaturalGas Energy {[}J{]}}\label{gas-equipment-gas-energy-j}
 
-The gas equipment natural gas consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the Natural Gas meters that are associated with the zone -- NaturalGas:Facility, NaturalGas:Buidling, NaturalGas:Zone:\textless{}Zone Name\textgreater{}, InteriorEquipment:NaturalGas: :Zone:\textless{}Zone Name\textgreater{}, and \textless{}End-Use Subcategory\textgreater{}:InteriorEquipment:NaturalGas.
+\paragraph{Space or Zone Gas Equipment NaturalGas Rate {[}W{]}}\label{zone-gas-equipment-gas-rate-w}
+
+\paragraph{Space or Zone Gas Equipment NaturalGas Energy {[}J{]}}\label{zone-gas-equipment-gas-energy-j}
+
+The gas equipment natural gas consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. Gas Equipment NaturalGas Energy is added to the following NaturalGas meters:
+
+\begin{lstlisting}
+NaturalGas:Facility
+NaturalGas:Building
+NaturalGas:Zone:<Zone Name>
+NaturalGas:SpaceType:<Space Type Name>
+InteriorEquipment:NaturalGas
+InteriorEquipment:NaturalGas:Zone:<Zone Name>
+InteriorEquipment:NaturalGas:SpaceType:<Space Type Name>
+<End-Use Subcategory>:InteriorEquipment:NaturalGas
+<End-Use Subcategory>:InteriorEquipment:NaturalGas:Zone:<Zone Name>
+<End-Use Subcategory>:InteriorEquipment:NaturalGas:SpaceType:<Space Type Name>
+\end{lstlisting}
 
 \paragraph{Hot Water Equipment District Heating Rate {[}W{]}}\label{hot-water-equipment-district-heating-rate-w}
 
 \paragraph{Hot Water Equipment District Heating Energy {[}J{]}}\label{hot-water-equipment-district-heating-energy-j}
 
-The hot water equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the district heating meters that are associated with the zone -- DistrictHeating:Facility, DistrictHeating:Buidling, DistrictHeating:Zone:\textless{}Zone Name\textgreater{}, InteriorEquipment: DistrictHeating: :Zone:\textless{}Zone Name\textgreater{}, and \textless{}End-Use Subcategory\textgreater{}:InteriorEquipment: DistrictHeating.
+\paragraph{Space or Zone Hot Water Equipment District Heating Rate {[}W{]}}\label{zone-hot-water-equipment-district-heating-rate-w}
+
+\paragraph{Space or Zone Hot Water Equipment District Heating Energy {[}J{]}}\label{zone-hot-water-equipment-district-heating-energy-j}
+
+The hot water equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. Hot Water Equipment District Heating Energy is added to the following district heating meters:.
+
+\begin{lstlisting}
+DistrictHeating:Facility
+DistrictHeating:Building
+DistrictHeating:Zone:<Zone Name>
+DistrictHeating:SpaceType:<Space Type Name>
+InteriorEquipment:DistrictHeating
+InteriorEquipment:DistrictHeating:Zone:<Zone Name>
+InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
+<End-Use Subcategory>:InteriorEquipment:DistrictHeating
+<End-Use Subcategory>:InteriorEquipment:DistrictHeating:Zone:<Zone Name>
+<End-Use Subcategory>:InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
+\end{lstlisting}
 
 \paragraph{Steam Equipment District Heating Rate {[}W{]}}\label{steam-equipment-district-heating-rate-w}
 
 \paragraph{Steam Equipment District Heating Energy {[}J{]}}\label{steam-equipment-district-heating-energy-j}
 
-The steam equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the district heating meters that are associated with the zone -- DistrictHeating:Facility, DistrictHeating:Buidling, DistrictHeating:Zone:\textless{}Zone Name\textgreater{}, InteriorEquipment: DistrictHeating: :Zone:\textless{}Zone Name\textgreater{}, and \textless{}End-Use Subcategory\textgreater{}:InteriorEquipment: DistrictHeating.
+\paragraph{Space or Zone Steam Equipment District Heating Rate {[}W{]}}\label{zone-steam-equipment-district-heating-rate-w}
+
+\paragraph{Space or Zone Steam Equipment District Heating Energy {[}J{]}}\label{zone-steam-equipment-district-heating-energy-j}
+
+The steam equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. Steam Equipment District Heating Energy is added to the following :
+
+\begin{lstlisting}
+DistrictHeating:Facility
+DistrictHeating:Building
+DistrictHeating:Zone:<Zone Name>
+DistrictHeating:SpaceType:<Space Type Name>
+InteriorEquipment:DistrictHeating
+InteriorEquipment:DistrictHeating:Zone:<Zone Name>
+InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
+<End-Use Subcategory>:InteriorEquipment:DistrictHeating
+<End-Use Subcategory>:InteriorEquipment:DistrictHeating:Zone:<Zone Name>
+<End-Use Subcategory>:InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
+\end{lstlisting}
 
 \paragraph{Other Equipment Fuel Rate {[}W{]}}\label{otherequip-fuel-rate}
 
 \paragraph{Other Equipment Fuel Energy {[}J{]}}\label{otherequip-fuel-energy}
 
-The other equipment fuel consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the appropriate fuel meters that are associated with the zone -- \textless{}Fuel Type\textgreater{}:Facility, \textless{}Fuel Type\textgreater{}:Buidling, \textless{}Fuel Type\textgreater{}:Zone:\textless{}Zone Name\textgreater{}, InteriorEquipment:\textless{}Fuel Type\textgreater{}: :Zone:\textless{}Zone Name\textgreater{}, and \textless{}End-Use Subcategory\textgreater{}:InteriorEquipment:\textless{}Fuel Type\textgreater{}.
+\paragraph{Space or Zone Other Equipment Fuel Rate {[}W{]}}\label{zone-otherequip-fuel-rate}
 
-\subsubsection{Outputs}\label{outputs-15-001}
+\paragraph{Space or Zone Other Equipment Fuel Energy {[}J{]}}\label{zone-otherequip-fuel-energy}
 
-As described in each of the equipment sections, values for specific equipments will show up on the following meters:
+The other equipment fuel consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. Other Equipment Fuel Energy is added to the following fuel meters corresponding to the Fuel Type input. If Fuel Type = None, this energy is not metered.
 
-% table 17
-\begin{longtable}[c]{>{\raggedright}p{2.8in}>{\raggedright}p{1.2in}>{\raggedright}p{2.0in}}
-\caption{Distribution of Equipment to Meters \label{table:distribution-of-equipment-to-meters}} \tabularnewline
-\toprule
-Meter Name & Scope & Equipment Specfics \tabularnewline
-\midrule
-\endfirsthead
+\begin{lstlisting}
+<Fuel Type>:Facility
+<Fuel Type>:Building
+<Fuel Type>:Zone:<Zone Name>
+<Fuel Type>:SpaceType:<Space Type Name>
+InteriorEquipment:<Fuel Type>
+InteriorEquipment:<Fuel Type>:Zone:<Zone Name>
+InteriorEquipment:<Fuel Type>:SpaceType:<Space Type Name>
+<End-Use Subcategory>:InteriorEquipment:<Fuel Type>
+<End-Use Subcategory>:InteriorEquipment:<Fuel Type>:Zone:<Zone Name>
+<End-Use Subcategory>:InteriorEquipment:<Fuel Type>:SpaceType:<Space Type Name>
+\end{lstlisting}
 
-\caption[]{Distribution of Equipment to Meters} \tabularnewline
-\toprule
-Meter Name & Scope & Equipment Specfics \tabularnewline
-\midrule
-\endhead
+\paragraph{<Type> Equipment Radiant Heating Rate {[}W{]}}\label{equipment-radiant-heating-rate-w}
 
-Electricity:\-Facility & Entire Facility & Electric Equipment, OTC Baseboard Heat \tabularnewline
-Electricity:\-Building & All Zones & Electric Equipment, OTC Baseboard Heat \tabularnewline
-Electricity:\-Zone: <Zone Name> & Specific Zone & Electric Equipment, OTC Baseboard Heat \tabularnewline
-Interior\-Equipment:\-Electricity & AllZones & Electric Equipment, OTC Baseboard Heat \tabularnewline
-<End-Use Subcategory> :\-Interior\-Equipment:\-Electricity & Specific Subcategory & Electric Equipment, OTC Baseboard Heat \tabularnewline
-Gas:\-Facility & Entire Facility & Gas Equipment \tabularnewline
-Gas:\-Building & All Zones & Gas Equipment \tabularnewline
-Gas:\-Zone: <Zone Name> & Specific Zone & Gas Equipment \tabularnewline
-Interior\-Equipment:\-Gas & AllZones & Gas Equipment \tabularnewline
-<End-Use Subcategory> :Interior\-Equipment:\-Gas & Specific Subcategory & Gas Equipment \tabularnewline
-\bottomrule
-\end{longtable}
+\paragraph{<Type> Equipment Radiant Heating Energy {[}J{]}}\label{equipment-radiant-heating-energy-j}
+
+\paragraph{Space or Zone <Type> Equipment Radiant Heating Rate {[}W{]}}\label{zone-equipment-radiant-heating-rate-w}
+
+\paragraph{Space or Zone <Type> Equipment Radiant Heating Energy {[}J{]}}\label{zone-equipment-radiant-heating-energy-j}
+
+The amount of heat gain from equipment that is in the form of long-wave (thermal) radiation entering the zone. This heat is absorbed by the inside surfaces of the space or zone according to an area times long-wave absorptance weighting scheme.
+
+\paragraph{<Type> Equipment Convective Heating Rate {[}W{]}}\label{equipment-convective-heating-rate-w}
+
+\paragraph{<Type> Equipment Convective Heating Energy {[}J{]}}\label{equipment-convective-heating-energy-j}
+
+\paragraph{Space or Zone <Type> Equipment Convective Heating Rate {[}W{]}}\label{zone-equipment-convective-heating-rate-w}
+
+\paragraph{Space or Zone <Type> Equipment Convective Heating Energy {[}J{]}}\label{zone-equipment-convective-heating-energy-j}
+
+The amount of heat gain from equipment that is convected to the space or zone air.
+
+\paragraph{<Type> Latent Gain Rate {[}W{]}}\label{equipment-latent-heating-rate-w}
+
+\paragraph{<Type> Equipment Latent Gain Energy {[}J{]}}\label{equipment-latent-heating-energy-j}
+
+\paragraph{Space or Zone <Type> Latent Gain Rate {[}W{]}}\label{zone-equipment-latent-heating-rate-w}
+
+\paragraph{Space or Zone <Type> Equipment Latent Gain Energy {[}J{]}}\label{zone-equipment-latent-heating-energy-j}
+
+The amount of heat gain from equipment that goes added to the space or zone air as a latent (moisture) gain.
+
+\paragraph{<Type> Lost Heat Rate {[}W{]}}\label{equipment-lost-heating-rate-w}
+
+\paragraph{<Type> Equipment Lost Heat Energy {[}J{]}}\label{equipment-lost-heating-energy-j}
+
+\paragraph{Space or Zone <Type> Lost Heat Rate {[}W{]}}\label{zone-equipment-lost-heating-rate-w}
+
+\paragraph{Space or Zone <Type> Equipment Lost Heat Energy {[}J{]}}\label{zone-equipment-lost-heating-energy-j}
+
+The amount of energy input to the equipment that is removed (exhausted) and does not add any heat gain to the space or zone.
+
+\paragraph{<Type> Equipment Total Heating Rate {[}W{]}}\label{equipment-total-heating-rate-w}
+
+\paragraph{<Type> Equipment Total Heating Energy {[}J{]}}\label{equipment-total-heating-energy-j}
+
+\paragraph{Space or Zone <Type> Equipment Total Heating Rate {[}W{]}}\label{zone-equipment-total-heating-rate-w}
+
+\paragraph{Space or Zone <Type> Equipment Total Heating Energy {[}J{]}}\label{zone-equipment-total-heating-energy-j}
+
+The total heat gain from equipment. It is the sum of the following components: Total Heat Gain = Radiant Heat Gain + Convective Heat Gain + Latent Heat Gain. It is also equal to the power input to the equipment minus any Lost Heat.
 
 
 \subsection{ElectricEquipment:ITE:AirCooled}\label{electricequipmentiteaircooled}
@@ -2566,6 +2669,54 @@ ElectricEquipment:ITE:AirCooled Outputs
 \item
   Zone,Average,ITE Air Inlet Relative Humidity Difference Below Operating Range {[}\%{]}
 \item
+  Zone,Average,Space ITE CPU Electricity Rate {[}W{]}
+\item
+  Zone,Average,Space ITE Fan Electricity Rate {[}W{]}
+\item
+  Zone,Average,Space ITE UPS Electricity Rate {[}W{]}
+\item
+  Zone,Average,Space ITE CPU Electricity Rate at Design Inlet Conditions {[}W{]}
+\item
+  Zone,Average,Space ITE Fan Electricity Rate at Design Inlet Conditions {[}W{]}
+\item
+  Zone,Average,Space ITE UPS Heat Gain to Zone Rate {[}W{]}
+\item
+  Zone,Average,Space ITE Total Heat Gain to Zone Rate {[}W{]}
+\item
+  Zone,Sum,Space ITE CPU Electricity Energy {[}J{]}
+\item
+  Zone,Sum,Space ITE Fan Electricity Energy {[}J{]}
+\item
+  Zone,Sum,Space ITE UPS Electricity Energy {[}J{]}
+\item
+  Zone,Sum,Space ITE CPU Electricity Energy at Design Inlet Conditions {[}J{]}
+\item
+  Zone,Sum,Space ITE Fan Electricity Energy at Design Inlet Conditions {[}J{]}
+\item
+  Zone,Sum,Space ITE UPS Heat Gain to Zone Energy {[}J{]}
+\item
+  Zone,Sum,Space ITE Total Heat Gain to Zone Energy {[}J{]}
+\item
+  Zone,Average,Space ITE Standard Density Air Volume Flow Rate {[}m3/s{]}
+\item
+  Zone,Average,Space ITE Air Mass Flow Rate {[}kg/s{]}
+\item
+  Zone,Average,Space ITE Average Supply Heat Index {[]}
+\item
+  Zone,Sum,Space ITE Any Air Inlet Operating Range Exceeded Time {[}hr{]}
+\item
+  Zone,Sum,Space ITE Any Air Inlet Dry-Bulb Temperature Above Operating Range Time {[}hr{]}
+\item
+  Zone,Sum,Space ITE Any Air Inlet Dry-Bulb Temperature Below Operating Range Time {[}hr{]}
+\item
+  Zone,Sum,Space ITE Any Air Inlet Dewpoint Temperature Above Operating Range Time {[}hr{]}
+\item
+  Zone,Sum,Space ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time {[}hr{]}
+\item
+  Zone,Sum,Space ITE Any Air Inlet Relative Humidity Above Operating Range Time {[}hr{]}
+\item
+  Zone,Sum,Space ITE Any Air Inlet Relative Humidity Below Operating Range Time {[}hr{]}
+\item
   Zone,Average,Zone ITE Adjusted Return Air Temperature {[}C{]}
 \item
   Zone,Average,Zone ITE CPU Electricity Rate {[}W{]}
@@ -2617,89 +2768,105 @@ ElectricEquipment:ITE:AirCooled Outputs
   Zone,Sum,Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time {[}hr{]}
 \end{itemize}
 
-\paragraph{Zone ITE CPU Electricity Rate {[}W{]}}\label{zone-ite-cpu-electric-power-w}
+\paragraph{Space or Zone ITE CPU Electricity Rate {[}W{]}}\label{zone-ite-cpu-electric-power-w}
 
-ITE CPU Electricity Rate {[}W{]}
+\paragraph{ITE CPU Electricity Rate {[}J{]}}\label{ite-cpu-electric-rate-w}
 
-\paragraph{Zone ITE CPU Electricity Energy {[}J{]}}\label{zone-ite-cpu-electric-energy-j}
+\paragraph{Space or Zone ITE CPU Electricity Energy {[}J{]}}\label{zone-ite-cpu-electric-energy-j}
 
 \paragraph{ITE CPU Electricity Energy {[}J{]}}\label{ite-cpu-electric-energy-j}
 
 The electric power (or energy) input to the ITE equipment CPU (total power input less cooling fan power). The ITE CPU Electricity Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object).
 
-\paragraph{Zone ITE CPU Electricity Rate at Design Inlet Conditions {[}W{]}}\label{zone-ite-cpu-electric-power-at-design-inlet-conditions-w}
+\paragraph{Space or Zone ITE CPU Electricity Rate at Design Inlet Conditions {[}W{]}}\label{zone-ite-cpu-electric-power-at-design-inlet-conditions-w}
 
 \paragraph{ITE CPU Electricity Rate at Design Inlet Conditions {[}W{]}}\label{ite-cpu-electric-power-at-design-inlet-conditions-w}
 
-\paragraph{Zone ITE CPU Electricity Energy at Design Inlet Conditions {[}J{]}}\label{zone-ite-cpu-electric-energy-at-design-inlet-conditions-j}
+\paragraph{Space or Zone ITE CPU Electricity Energy at Design Inlet Conditions {[}J{]}}\label{zone-ite-cpu-electric-energy-at-design-inlet-conditions-j}
 
 \paragraph{ITE CPU Electricity Energy at Design Inlet Conditions {[}J{]}}\label{ite-cpu-electric-energy-at-design-inlet-conditions-j}
 
 The electric power (or energy) input to the ITE equipment CPU (total power input less cooling fan power) if the air inlet temperature were held at the design condition. May be used to calculate ``IT efficiency'', the ratio of (IT energy consumed in the facility) / (IT energy that would have been consumed in the facility if the ITE were held at the reference temperature).
 
-\paragraph{Zone ITE Fan Electricity Rate {[}W{]}}\label{zone-ite-fan-electric-power-w}
+\paragraph{Space or Zone ITE Fan Electricity Rate {[}W{]}}\label{zone-ite-fan-electric-power-w}
 
 \paragraph{ITE Fan Electricity Rate {[}W{]}}\label{ite-fan-electric-power-w}
 
-\paragraph{Zone ITE Fan Electricity Energy {[}J{]}}\label{zone-ite-fan-electric-energy-j}
+\paragraph{Space or Zone ITE Fan Electricity Energy {[}J{]}}\label{zone-ite-fan-electric-energy-j}
 
 \paragraph{ITE Fan Electricity Energy {[}J{]}}\label{ite-fan-electric-energy-j}
 
 The electric power (or energy) input to the ITE cooling fan. The ITE Fan Electricity Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object).
 
-\paragraph{Zone ITE Fan Electricity Rate at Design Inlet Conditions {[}W{]}}\label{zone-ite-fan-electric-power-at-design-inlet-conditions-w}
+\paragraph{Space or Zone ITE Fan Electricity Rate at Design Inlet Conditions {[}W{]}}\label{zone-ite-fan-electric-power-at-design-inlet-conditions-w}
 
 \paragraph{ITE Fan Electricity Rate at Design Inlet Conditions {[}W{]}}\label{ite-fan-electric-power-at-design-inlet-conditions-w}
 
-\paragraph{Zone ITE Fan Electricity Energy at Design Inlet Conditions {[}J{]}}\label{zone-ite-fan-electric-energy-at-design-inlet-conditions-j}
+\paragraph{Space or Zone ITE Fan Electricity Energy at Design Inlet Conditions {[}J{]}}\label{zone-ite-fan-electric-energy-at-design-inlet-conditions-j}
 
 \paragraph{ITE Fan Electricity Energy at Design Inlet Conditions {[}J{]}}\label{ite-fan-electric-energy-at-design-inlet-conditions-j}
 
 The electric power (or energy) input to the ITE cooling fan if the air inlet temperature were held at the design condition. May be used to calculate ``IT efficiency'', the ratio of (IT energy consumed in the facility) / (IT energy that would have been consumed in the facility if the ITE were held at the reference temperature).
 
-\paragraph{Zone ITE UPS Electricity Rate {[}W{]}}\label{zone-ite-ups-electric-power-w}
+\paragraph{Space or Zone ITE UPS Electricity Rate {[}W{]}}\label{zone-ite-ups-electric-power-w}
 
 \paragraph{ITE UPS Electricity Rate {[}W{]}}\label{ite-ups-electric-power-w}
 
-\paragraph{Zone ITE UPS Electricity Energy {[}J{]}}\label{zone-ite-ups-electric-energy-j}
+\paragraph{Space or Zone ITE UPS Electricity Energy {[}J{]}}\label{zone-ite-ups-electric-energy-j}
 
 \paragraph{ITE UPS Electricity Energy {[}J{]}}\label{ite-ups-electric-energy-j}
 
 The net electric power (or energy) input to the ITE equipment UPS (total power input less power delivered to ITE). The ITE UPS Electricity Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object).
 
-\paragraph{Zone ITE UPS Heat Gain to Zone Rate {[}W{]}}\label{zone-ite-ups-heat-gain-to-zone-rate-w}
+\paragraph{ITE Electricity Meters}\label{ite-electricity-meters}
+
+ The ITE CPU Electricity Energy, ITE Fan Electricity Energy, and ITE UPS Electricity Energy are each included separately in the following Electricity meters, with their respective end-use subcategory:
+\begin{lstlisting}
+Electricity:Facility
+Electricity:Building
+Electricity:Zone:<Zone Name>
+Electricity:SpaceType:<Space Type Name>
+InteriorEquipment:Electricity
+InteriorEquipment:Electricity:Zone:<Zone Name>
+InteriorEquipment:Electricity:SpaceType:<Space Type Name>
+<End-Use Subcategory>:InteriorEquipment:Electricity
+<End-Use Subcategory>:InteriorEquipment:Electricity:Zone:<Zone Name>
+<End-Use Subcategory>:InteriorEquipment:Electricity:SpaceType:<Space Type Name>
+\end{lstlisting}
+
+\paragraph{Space or Zone ITE UPS Heat Gain to Zone Rate {[}W{]}}\label{zone-ite-ups-heat-gain-to-zone-rate-w}
 
 \paragraph{ITE UPS Heat Gain to Zone Rate {[}W{]}}\label{ite-ups-heat-gain-to-zone-rate-w}
 
-\paragraph{Zone ITE UPS Heat Gain to Zone Energy {[}J{]}}\label{zone-ite-ups-heat-gain-to-zone-energy-j}
+\paragraph{Space or Zone ITE UPS Heat Gain to Zone Energy {[}J{]}}\label{zone-ite-ups-heat-gain-to-zone-energy-j}
 
 \paragraph{ITE UPS Heat Gain to Zone Energy {[}J{]}}\label{ite-ups-heat-gain-to-zone-energy-j}
 
 The heat gain rate (or energy) to the zone from the UPS.
 
-\paragraph{Zone ITE Total Heat Gain to Zone Rate {[}W{]}}\label{zone-ite-total-heat-gain-to-zone-rate-w}
+\paragraph{Space or Zone ITE Total Heat Gain to Zone Rate {[}W{]}}\label{zone-ite-total-heat-gain-to-zone-rate-w}
 
 \paragraph{ITE Total Heat Gain to Zone Rate {[}W{]}}\label{ite-total-heat-gain-to-zone-rate-w}
 
-\paragraph{Zone ITE Total Heat Gain to Zone Energy {[}J{]}}\label{zone-ite-total-heat-gain-to-zone-energy-j}
+\paragraph{Space or Zone ITE Total Heat Gain to Zone Energy {[}J{]}}\label{zone-ite-total-heat-gain-to-zone-energy-j}
 
 \paragraph{ITE Total Heat Gain to Zone Energy {[}J{]}}\label{ite-total-heat-gain-to-zone-energy-j}
 
 The heat gain rate (or energy) to the zone from the UPS and from the CPU and fans if the ITE. Air Inlet Connection Type is AdjustedSupply or ZoneAirNode. If RoomAirModel is selected, then only the heat gain from the UPS is added directly to the zone air heat balance, the heat gain from the CPU and fans will be added to the ITE air Outlet Room Air Model Node
 
-\paragraph{Zone ITE Standard Density Air Volume Flow Rate {[}m3/s{]}}\label{zone-ite-standard-density-air-volume-flow-rate-m3s}
+\paragraph{Space or Zone ITE Standard Density Air Volume Flow Rate {[}m3/s{]}}\label{zone-ite-standard-density-air-volume-flow-rate-m3s}
 
 \paragraph{ITE Standard Density Air Volume Flow Rate {[}m3/s{]}}\label{ite-standard-density-air-volume-flow-rate-m3s}
 
 Reports the average air volume flow rate through the ITE over the reporting interval. Standard density in EnergyPlus corresponds to 20ºC dry bulb, dry air, and nominally adjusted for elevation.
 
-\paragraph{Zone ITE Current Density Air Volume Flow Rate {[}m3/s{]}}\label{zone-ite-current-density-air-volume-flow-rate-m3s}
+\paragraph{Space or Zone ITE Current Density Air Volume Flow Rate {[}m3/s{]}}\label{zone-ite-current-density-air-volume-flow-rate-m3s}
 
 \paragraph{ITE Current Density Air Volume Flow Rate {[}m3/s{]}}\label{ite-current-density-air-volume-flow-rate-m3s}
 
 Reports the average air volume flow rate through the ITE over the reporting interval, calculated using the current density at the air inlet node.
 
-\paragraph{Zone ITE Air Mass Flow Rate {[}kg/s{]}}\label{zone-ite-air-mass-flow-rate-kgs}
+\paragraph{Space or Zone ITE Air Mass Flow Rate {[}kg/s{]}}\label{zone-ite-air-mass-flow-rate-kgs}
 
 \paragraph{ITE Air Mass Flow Rate {[}kg/s{]}}\label{ite-air-mass-flow-rate-kgs}
 
@@ -2721,19 +2888,19 @@ The dewpoint temperature of the air entering the ITE.
 
 The dry-bulb temperature of the air leaving the ITE.
 
-\paragraph{Zone ITE Average Supply Heat Index {[]}}\label{zone-ite-average-supply-heat-index}
+\paragraph{Space or Zone ITE Average Supply Heat Index {[]}}\label{zone-ite-average-supply-heat-index}
 
 \paragraph{ITE Supply Heat Index {[]}}\label{ite-supply-heat-index}
 
 The supply heat index (SHI) for this equipment. SHI is a dimensionless measure of recirculation of hot air into the cold air intake of the ITE. SHI = (Tin -- Tsupply)/(Tout-Tsupply) where Tin is the dry-bulb temperature of the air entering the ITE, Tout is the dry-bulb temperature of the air leaving the ITE, and Tsupply is the dry-bulb temperature at the Supply Air Node. If a Supply Air Node Name is not specified for this object, then this output will not be reported.
 
-\paragraph{Zone ITE Any Air Inlet Operating Range Exceeded Time {[}hr{]}}\label{zone-ite-any-air-inlet-operating-range-exceeded-time-hr}
+\paragraph{Space or Zone ITE Any Air Inlet Operating Range Exceeded Time {[}hr{]}}\label{zone-ite-any-air-inlet-operating-range-exceeded-time-hr}
 
 \paragraph{ITE Air Inlet Operating Range Exceeded Time {[}hr{]}}\label{ite-air-inlet-operating-range-exceeded-time-hr}
 
 Hours when the dry-bulb and/or dewpoint temperature of the air entering the ITE is outside the range specified by the ITE Environmental Class.
 
-\paragraph{Zone ITE Any Air Inlet Dry-Bulb Temperature Above Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dry-bulb-temperature-above-operating-range-time-hr}
+\paragraph{Space or Zone ITE Any Air Inlet Dry-Bulb Temperature Above Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dry-bulb-temperature-above-operating-range-time-hr}
 
 \paragraph{ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time {[}hr{]}}\label{ite-air-inlet-dry-bulb-temperature-above-operating-range-time-hr}
 
@@ -2743,7 +2910,7 @@ Hours when the dry-bulb temperature of the air entering the ITE is above the ran
 
 The temperature difference (in degrees DeltaC) between the air inlet dry-bulb temperature and the maximum allowable dry-bulb temperature specified by the ITE Environmental Class. Only positive values are reported. When the dry-bulb temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
-\paragraph{Zone ITE Any Air Inlet Dry-Bulb Temperature Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dry-bulb-temperature-below-operating-range-time-hr}
+\paragraph{Space or Zone ITE Any Air Inlet Dry-Bulb Temperature Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dry-bulb-temperature-below-operating-range-time-hr}
 
 \paragraph{ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time {[}hr{]}}\label{ite-air-inlet-dry-bulb-temperature-below-operating-range-time-hr}
 
@@ -2753,7 +2920,7 @@ Hours when the dry-bulb temperature of the air entering the ITE is above the ran
 
 The temperature difference (in degrees DeltaC) between the air inlet dry-bulb temperature and the minimum allowable dry-bulb temperature specified by the ITE Environmental Class. Only negative values are reported. When the dry-bulb temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
-\paragraph{Zone ITE Any Air Inlet Dewpoint Temperature Above Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dewpoint-temperature-above-operating-range-time-hr}
+\paragraph{Space or Zone ITE Any Air Inlet Dewpoint Temperature Above Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dewpoint-temperature-above-operating-range-time-hr}
 
 \paragraph{ITE Air Inlet Dewpoint Temperature Above Operating Range Time {[}hr{]}}\label{ite-air-inlet-dewpoint-temperature-above-operating-range-time-hr}
 
@@ -2763,7 +2930,7 @@ Hours when the dewpoint temperature of the air entering the ITE is above the ran
 
 The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the maximum allowable dewpoint temperature specified by the ITE Environmental Class. Only positive values are reported. When the dewpoint temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
-\paragraph{Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dewpoint-temperature-below-operating-range-time-hr}
+\paragraph{Space or Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-dewpoint-temperature-below-operating-range-time-hr}
 
 \paragraph{ITE Air Inlet Dewpoint Temperature Below Operating Range Time {[}hr{]}}\label{ite-air-inlet-dewpoint-temperature-below-operating-range-time-hr}
 
@@ -2773,7 +2940,7 @@ Hours when the dewpoint temperature of the air entering the ITE is above the ran
 
 The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the minimum allowable dewpoint temperature specified by the ITE Environmental Class. Only negative values are reported. When the dewpoint temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
-\paragraph{Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-relative-humidity-above-operating-range-time-hr}
+\paragraph{Space or Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-relative-humidity-above-operating-range-time-hr}
 
 \paragraph{ITE Air Inlet Relative Humidity Above Operating Range Time {[}hr{]}}\label{ite-air-inlet-relative-humidity-above-operating-range-time-hr}
 
@@ -2783,7 +2950,7 @@ Hours when the relative humidity of the air entering the ITE is above the range 
 
 The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the maximum allowable relative humidity specified by the ITE Environmental Class. Only positive values are reported. When the relative humidity of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
 
-\paragraph{Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-relative-humidity-below-operating-range-time-hr}
+\paragraph{Space or Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time {[}hr{]}}\label{zone-ite-any-air-inlet-relative-humidity-below-operating-range-time-hr}
 
 \paragraph{ITE Air Inlet Relative Humidity Below Operating Range Time {[}hr{]}}\label{ite-air-inlet-relative-humidity-below-operating-range-time-hr}
 
@@ -2916,6 +3083,22 @@ ZoneBaseboard:OutdoorTemperatureControlled objects have output variables for ind
 \item
   Zone,Average,Baseboard Total Heating Rate {[}W{]}
 \item
+  Zone,Average,Space Baseboard Electricity Rate {[}W{]}
+\item
+  Zone,Sum,Space Baseboard Electricity Energy {[}J{]}
+\item
+  Zone,Sum,Space Baseboard Radiant Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Baseboard Radiant Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Baseboard Convective Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Baseboard Convective Heating Rate {[}W{]}
+\item
+  Zone,Sum,Space Baseboard Total Heating Energy {[}J{]}
+\item
+  Zone,Average,Space Baseboard Total Heating Rate {[}W{]}
+\item
   Zone,Average,Zone Baseboard Electricity Rate {[}W{]}
 \item
   Zone,Sum,Zone Baseboard Electricity Energy {[}J{]}
@@ -2939,7 +3122,19 @@ This field is the electric power for the ZoneBaseboard:OutdoorTemperatureControl
 
 \paragraph{Baseboard Electricity Energy {[}J{]}}\label{baseboard-electric-energy-j}
 
-The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules.
+The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. This energy is included in the following meters:
+\begin{lstlisting}
+Electricity:Facility
+Electricity:Building
+Electricity:Zone:<Zone Name>
+Electricity:SpaceType:<Space Type Name>
+InteriorEquipment:Electricity
+InteriorEquipment:Electricity:Zone:<Zone Name>
+InteriorEquipment:Electricity:SpaceType:<Space Type Name>
+<End-Use Subcategory>:InteriorEquipment:Electricity
+<End-Use Subcategory>:InteriorEquipment:Electricity:Zone:<Zone Name>
+<End-Use Subcategory>:InteriorEquipment:Electricity:SpaceType:<Space Type Name>
+\end{lstlisting}
 
 \paragraph{Baseboard Radiant Heating Rate {[}W{]}}\label{baseboard-radiant-heating-rate-w}
 
@@ -2959,31 +3154,31 @@ These output variables are the amount of convective heat gain for the Zone\-Base
 
 These output variables are the amount of heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
 
-\paragraph{Zone Baseboard Electricity Rate {[}W{]}}\label{zone-baseboard-electric-power-w}
+\paragraph{Space or Zone Baseboard Electricity Rate {[}W{]}}\label{zone-baseboard-electric-power-w}
 
-This field is the electric power for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts.
+This field is the electric power for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts.
 
-\paragraph{Zone Baseboard Electricity Energy {[}J{]}}\label{zone-baseboard-electric-energy-j}
+\paragraph{Space or Zone Baseboard Electricity Energy {[}J{]}}\label{zone-baseboard-electric-energy-j}
 
-The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. However, this amount is also shown in the Electricity meters that are associated with the zone -- Electricity:\-Facility, Electricity:\-Buidling, Electricity:\-Zone:\-\textless{}Zone Name\textgreater{}, and Interior\-Equipment:\-Electricity.
+The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. 
 
-\paragraph{Zone Baseboard Radiant Heating Rate {[}W{]}}\label{zone-baseboard-radiant-heating-rate-w}
+\paragraph{Space or Zone Baseboard Radiant Heating Rate {[}W{]}}\label{zone-baseboard-radiant-heating-rate-w}
 
-\paragraph{Zone Baseboard Radiant Heating Energy {[}J{]}}\label{zone-baseboard-radiant-heating-energy-j}
+\paragraph{Space or Zone Baseboard Radiant Heating Energy {[}J{]}}\label{zone-baseboard-radiant-heating-energy-j}
 
-These output variables are the amount of radiant heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
+These output variables are the amount of radiant heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the space or zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
 
-\paragraph{Zone Baseboard Convective Heating Rate {[}W{]}}\label{zone-baseboard-convective-heating-rate-w}
+\paragraph{Space or Zone Baseboard Convective Heating Rate {[}W{]}}\label{zone-baseboard-convective-heating-rate-w}
 
-\paragraph{Zone Baseboard Convective Heating Energy {[}J{]}}\label{zone-baseboard-convective-heating-energy-j}
+\paragraph{Space or Zone Baseboard Convective Heating Energy {[}J{]}}\label{zone-baseboard-convective-heating-energy-j}
 
-These output variables are the amount of convective heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the zone air heat balance directly.
+These output variables are the amount of convective heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the space or zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the space or zone air heat balance directly.
 
-\paragraph{Zone Baseboard Total Heating Rate {[}W{]}}\label{zone-baseboard-total-heating-rate-w}
+\paragraph{Space or Zone Baseboard Total Heating Rate {[}W{]}}\label{zone-baseboard-total-heating-rate-w}
 
-\paragraph{Zone Baseboard Total Heating Energy {[}J{]}}\label{zone-baseboard-total-heating-energy-j}
+\paragraph{Space or Zone Baseboard Total Heating Energy {[}J{]}}\label{zone-baseboard-total-heating-energy-j}
 
-These output variables are the amount of heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
+These output variables are the amount of heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
 
 
 \subsection{SwimmingPool:Indoor}\label{swimmingpoolindoor}
