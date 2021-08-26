@@ -4995,7 +4995,7 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
             // Include impact of under case returns for refrigerated display case when updating the return air node humidity
             if (!state.dataHeatBal->Zone(ActualZoneNum).NoHeatToReturnAir) {
                 if (MassFlowRA > 0) {
-                    SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                    SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
                     H2OHtOfVap = PsyHgAirFnWTdb(state.dataLoopNodes->Node(ZoneNode).HumRat, state.dataLoopNodes->Node(ReturnNode).Temp);
                     state.dataLoopNodes->Node(ReturnNode).HumRat =
                         state.dataLoopNodes->Node(ZoneNode).HumRat + (SumRetAirLatentGainRate / (H2OHtOfVap * MassFlowRA));
@@ -5005,7 +5005,7 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
                     state.dataHeatBal->RefrigCaseCredit(ActualZoneNum).LatCaseCreditToZone +=
                         state.dataHeatBal->RefrigCaseCredit(ActualZoneNum).LatCaseCreditToHVAC;
                     // shouldn't the HVAC term be zeroed out then?
-                    SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                    SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
                     state.dataHeatBalFanSys->ZoneLatentGain(ActualZoneNum) += SumRetAirLatentGainRate;
                 }
             } else {
@@ -5013,7 +5013,7 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
                 state.dataHeatBal->RefrigCaseCredit(ActualZoneNum).LatCaseCreditToZone +=
                     state.dataHeatBal->RefrigCaseCredit(ActualZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
-                SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
                 state.dataHeatBalFanSys->ZoneLatentGain(ActualZoneNum) += SumRetAirLatentGainRate;
             }
 
