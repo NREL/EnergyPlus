@@ -1961,7 +1961,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     for (int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum) {
                         auto &this_equip(this_equip_list.Comp(EquipNum));
                         ThisType = static_cast<DataPlant::PlantEquipmentType>(
-                            UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes));
+                            UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, static_cast<int>(PlantEquipmentType::Num)));
                         errFlag1 = false;
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 this_equip.Name,

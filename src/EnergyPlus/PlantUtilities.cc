@@ -1733,7 +1733,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
     }
 
     if (!FoundComponent) {
-        if (static_cast<int>(CompType) >= 1 && static_cast<int>(CompType) <= DataPlant::NumSimPlantEquipTypes) {
+        if (static_cast<int>(CompType) >= 1 && static_cast<int>(CompType) <= static_cast<int>(DataPlant::PlantEquipmentType::Num)) {
             if (!present(SingleLoopSearch)) {
                 ShowSevereError(state,
                                 format("Plant Component {} called \"{}\" was not found on any plant loops.",
@@ -1760,7 +1760,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
             errFlag = true;
         } else {
             ShowSevereError(state, format("ScanPlantLoopsForObject: Invalid CompType passed [{}], Name={}", CompType, CompName));
-            ShowContinueError(state, format("Valid CompTypes are in the range [1 - {}].", DataPlant::NumSimPlantEquipTypes));
+            ShowContinueError(state, format("Valid CompTypes are in the range [1 - {}].", static_cast<int>(DataPlant::PlantEquipmentType::Num)));
             ShowFatalError(state, "Previous error causes program termination");
         }
     }

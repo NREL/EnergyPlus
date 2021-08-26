@@ -59,7 +59,7 @@ namespace EnergyPlus::DataPlant {
 // Condenser Loops.
 
 // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
-Array1D_string const SimPlantEquipTypes(NumSimPlantEquipTypes,
+Array1D_string const SimPlantEquipTypes(static_cast<int>(PlantEquipmentType::Num),
                                         {"BOILER:HOTWATER",
                                          "BOILER:STEAM",
                                          "CHILLER:ABSORPTION",
@@ -158,7 +158,7 @@ Array1D_string const SimPlantEquipTypes(NumSimPlantEquipTypes,
                                          "HEATPUMP:PLANTLOOP:EIR:HEATING"});
 
 Array1D<LoopType> const ValidLoopEquipTypes(
-    NumSimPlantEquipTypes,
+    static_cast<int>(PlantEquipmentType::Num),
     {LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant,
      LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant,
      LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
