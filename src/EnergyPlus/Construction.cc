@@ -1988,7 +1988,7 @@ Real64 ConstructionProps::setThicknessPerpendicular(EnergyPlusData &state, Real6
         ShowContinueError(state, "Construction=" + this->Name + " has this concern.  Please check this construction to make sure it is correct.");
         ShowContinueError(state, "As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing.");
     } else if (returnValue > 0.5) { // above this value for "half" the tube spacing in meters throw a warning
-        ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a tube spacing that is greater than 1 meter (39.4 inches) ");
+        ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a tube spacing that is greater than 1 meter (39.4 inches).");
         ShowContinueError(state, "Construction=" + this->Name + " has this concern.  Please check this construction to make sure it is correct.");
         ShowContinueError(state, "As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing.");
     }
