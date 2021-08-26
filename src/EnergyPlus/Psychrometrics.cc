@@ -745,28 +745,28 @@ namespace Psychrometrics {
 
             // If below freezing, calculate saturation pressure over ice.
         } else if (Tkel < DataGlobalConstants::TriplePointOfWaterTempKelvin) { // Tkel >= 173.15, Tkel < 273.16 (0.01°C)
-            Real64 const C1(-5674.5359);                                       // Coefficient for TKel < KelvinConvK
-            Real64 const C2(6.3925247);                                        // Coefficient for TKel < KelvinConvK
-            Real64 const C3(-0.9677843e-2);                                    // Coefficient for TKel < KelvinConvK
-            Real64 const C4(0.62215701e-6);                                    // Coefficient for TKel < KelvinConvK
-            Real64 const C5(0.20747825e-8);                                    // Coefficient for TKel < KelvinConvK
-            Real64 const C6(-0.9484024e-12);                                   // Coefficient for TKel < KelvinConvK
-            Real64 const C7(4.1635019);                                        // Coefficient for TKel < KelvinConvK
+            Real64 constexpr C1(-5674.5359);
+            Real64 constexpr C2(6.3925247);
+            Real64 constexpr C3(-0.9677843e-2);
+            Real64 constexpr C4(0.62215701e-6);
+            Real64 constexpr C5(0.20747825e-8);
+            Real64 constexpr C6(-0.9484024e-12);
+            Real64 constexpr C7(4.1635019);
             Pascal = std::exp(C1 / Tkel + C2 + Tkel * (C3 + Tkel * (C4 + Tkel * (C5 + C6 * Tkel))) + C7 * std::log(Tkel));
 
             // If above freezing, calculate saturation pressure over liquid water.
         } else if (Tkel <= 473.15) { // Tkel >= 173.15 // Tkel >= TriplePointOfWaterTempKelvin
 #ifndef EP_IF97
-            Real64 constexpr C8(-5800.2206);      // Coefficient for TKel >= KelvinConvK
-            Real64 constexpr C9(1.3914993);       // Coefficient for TKel >= KelvinConvK
-            Real64 constexpr C10(-0.048640239);   // Coefficient for TKel >= KelvinConvK
-            Real64 constexpr C11(0.41764768e-4);  // Coefficient for TKel >= KelvinConvK
-            Real64 constexpr C12(-0.14452093e-7); // Coefficient for TKel >= KelvinConvK
-            Real64 constexpr C13(6.5459673);      // Coefficient for TKel >= KelvinConvK
+            Real64 constexpr C8(-5800.2206);
+            Real64 constexpr C9(1.3914993);
+            Real64 constexpr C10(-0.048640239);
+            Real64 constexpr C11(0.41764768e-4);
+            Real64 constexpr C12(-0.14452093e-7);
+            Real64 constexpr C13(6.5459673);
             Pascal = std::exp(C8 / Tkel + C9 + Tkel * (C10 + Tkel * (C11 + Tkel * C12)) + C13 * std::log(Tkel));
 
             // If above 200C, set value of Pressure corresponding to Saturation Temperature of 200C.
-        } else { // Tkel >= 173.15 // Tkel >= KelvinConv // Tkel > 473.15
+        } else { // Tkel >= 173.15 // Tkel >= TriplePointOfWaterTempKelvin // Tkel > 473.15
             Pascal = 1555073.745636215;
         }
 #else
