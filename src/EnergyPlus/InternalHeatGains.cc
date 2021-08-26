@@ -8927,7 +8927,6 @@ namespace InternalHeatGains {
         }
 
         return SumLatentGainRate;
-
     }
 
     // Added for hybrid model -- calculate the latent gain from all sources except for people
