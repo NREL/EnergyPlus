@@ -183,9 +183,9 @@ namespace InternalHeatGains {
     );
 
     // Added for hybrid model -- Overload function for calculating CO2 gains except people
-    void SumAllInternalCO2GainsExceptPeople(EnergyPlusData &state,
-                                            int const ZoneNum, // zone index pointer for which zone to sum gains for
-                                            Real64 &SumCO2GainRateExceptPeople);
+    Real64 SumAllInternalCO2GainsExceptPeople(EnergyPlusData &state,
+                                              int const ZoneNum // zone index pointer for which zone to sum gains for
+    );
 
     void
     SumInternalCO2GainsByTypes(EnergyPlusData &state,

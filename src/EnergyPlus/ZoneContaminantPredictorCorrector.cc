@@ -1653,7 +1653,7 @@ void InitZoneContSetPoints(EnergyPlusData &state)
         for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
             state.dataContaminantBalance->ZoneCO2Gain(Loop) = SumAllInternalCO2Gains(state, Loop);
             if (state.dataHybridModel->FlagHybridModel_PC) {
-                SumAllInternalCO2GainsExceptPeople(state, Loop, state.dataContaminantBalance->ZoneCO2GainExceptPeople(Loop));
+                state.dataContaminantBalance->ZoneCO2GainExceptPeople(Loop) = SumAllInternalCO2GainsExceptPeople(state, Loop);
             }
             SumInternalCO2GainsByTypes(state,
                                        Loop,
