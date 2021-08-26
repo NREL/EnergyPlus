@@ -141,6 +141,14 @@ namespace UtilityRoutines {
             rProcessNumber = 0.0;
             ErrorFlag = true;
         } else if (remaining_size != String.size()) {
+            if (*result.ptr == '+' || *result.ptr == '-') {
+                ++result.ptr;
+                remaining_size = result.ptr - String.begin();
+                if (remaining_size == String.size()) {
+                    rProcessNumber = 0.0;
+                    ErrorFlag = true;
+                }
+            }
             if (*result.ptr == 'd' || *result.ptr == 'D') {
                 // make FORTRAN floating point number (containing 'd' or 'D')
                 // standardized by replacing 'd' or 'D' with 'e'
@@ -148,10 +156,23 @@ namespace UtilityRoutines {
                 std::replace_if(
                     str.begin(), str.end(), [](const char c) { return c == 'D' || c == 'd'; }, 'e');
                 return ProcessNumber(str, ErrorFlag);
+            } else if (*result.ptr == 'e' || *result.ptr == 'E') {
+                ++result.ptr;
+                remaining_size = result.ptr - String.begin();
+                for (size_t i = remaining_size; i < String.size(); ++i, ++result.ptr) {
+                    if (!std::isdigit(*result.ptr)) {
+                        rProcessNumber = 0.0;
+                        ErrorFlag = true;
+                        return rProcessNumber;
+                    }
+                }
             } else {
                 rProcessNumber = 0.0;
                 ErrorFlag = true;
             }
+        } else if (!std::isfinite(rProcessNumber)) {
+            rProcessNumber = 0.0;
+            ErrorFlag = true;
         }
 
         return rProcessNumber;

@@ -570,7 +570,7 @@ void ManageHVAC(EnergyPlusData &state)
             }
             for (NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
                 static constexpr std::string_view Format_20{
-                    " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#8.0F}  {:11.2F}  {:9.5F}  {}\n"};
+                    " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#7.0F}  {:11.2F}  {:9.5F}  {}\n"};
 
                 print(state.files.debug,
                       Format_20,

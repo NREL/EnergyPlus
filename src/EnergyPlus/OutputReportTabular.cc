@@ -17180,7 +17180,7 @@ std::string RealToStr(Real64 const RealIn, int const numDigits)
 
     // FUNCTION PARAMETER DEFINITIONS:
     static constexpr std::array<const char *, 10> formDigitsA{
-        "{:#12.0F}", "{:12.1F}", "{:12.2F}", "{:12.3F}", "{:12.4F}", "{:12.5F}", "{:12.6F}", "{:12.7F}", "{:12.8F}", "{:12.9F}"};
+        "{:#11.0F}", "{:12.1F}", "{:12.2F}", "{:12.3F}", "{:12.4F}", "{:12.5F}", "{:12.6F}", "{:12.7F}", "{:12.8F}", "{:12.9F}"};
 
     static constexpr std::array<Real64, 10> maxvalDigitsA(
         {9999999999.0, 999999999.0, 99999999.0, 9999999.0, 999999.0, 99999.0, 9999.0, 999.0, 99.0, 9.0});

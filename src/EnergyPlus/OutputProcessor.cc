@@ -4673,14 +4673,14 @@ namespace OutputProcessor {
 
         if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface && !state.dataSysVars->ReportDuringWarmup) return;
 
-        //        dtoa(repValue, state.dataOutputProcessor->s_WriteNumericData);
+        dtoa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
-            print<FormatSyntax::FMT>(state.files.eso, "{},{}\n", creportID, repValue);
+            print<FormatSyntax::FMT>(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
         }
     }
 
