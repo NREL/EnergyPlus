@@ -506,6 +506,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataLoopNodes->Node.allocate(4);
     state->dataHeatBal->SurfTempEffBulkAir.allocate(3);
     state->dataHeatBalSurf->SurfTempInTmp.allocate(3);
+    state->dataHeatBalSurf->SurfHAirExt.allocate(3);
 
     int surfNum1 = UtilityRoutines::FindItemInList("WALL", state->dataSurface->Surface);
     int surfNum2 = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
