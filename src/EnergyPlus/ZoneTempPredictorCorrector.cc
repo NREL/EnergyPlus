@@ -78,6 +78,7 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
@@ -6876,16 +6877,13 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     bool ZoneRetPlenumAirFlag;
     bool ZoneSupPlenumAirFlag;
     Real64 RhoAir;
-    Real64 CpAir;      // Specific heat of air
-    int SurfNum;       // Surface number
-    Real64 Area;       // Effective surface area
-    Real64 RefAirTemp; // Reference air temperature for surface convection calculations
+    Real64 CpAir; // Specific heat of air
+    int SurfNum;  // Surface number
+    Real64 Area;  // Effective surface area
     int ADUListIndex;
     int ADUNum;
     int ADUInNode;
     int ADUOutNode;
-    Real64 SumSysMCp;
-    Real64 SumSysMCpT;
     Real64 Threshold;
     Real64 SumRetAirGains;
     Real64 ADUHeatAddRate;
@@ -6901,8 +6899,6 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     imBalance = 0.0;
     SumEnthalpyM = 0.0;
     SumEnthalpyH = 0.0;
-    SumSysMCp = 0.0;
-    SumSysMCpT = 0.0;
     ADUHeatAddRate = 0.0;
     ADUNum = 0;
     QSensRate = 0;
@@ -7033,44 +7029,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
         Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
-        // determine reference air temperature for this surface's convective heat transfer model
-        {
-            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
-            if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                // The zone air is the reference temperature
-                RefAirTemp = MAT(ZoneNum);
-            } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
-            } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
-                // check whether this zone is a controlled zone or not
-                if (!ControlledZoneAirFlag) {
-                    ShowFatalError(state,
-                                   "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
-                    return;
-                }
-                // determine supply air temperature as a weighted average of the inlet temperatures.
-                for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                    // Get node conditions
-                    NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                    MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
-
-                    SumSysMCp += MassFlowRate * CpAir;
-                    SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-
-                } // NodeNum
-                if (SumSysMCp > 0.0) {
-                    RefAirTemp = SumSysMCpT / SumSysMCp;
-                } else {
-                    // no system flow (yet) so just use last value for zone air temp
-                    RefAirTemp = MAT(ZoneNum);
-                }
-
-            } else {
-                // currently set to mean air temp but should add error warning here
-                RefAirTemp = MAT(ZoneNum);
-            }
-        }
+        Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
 
         if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
 
