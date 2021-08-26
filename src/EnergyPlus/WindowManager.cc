@@ -7110,13 +7110,21 @@ namespace WindowManager {
                 Real64 hcoutRated = state.dataWindowManager->hcout;
                 // Adjustment ratio applies to convective film coefficients when input U value is above the limit of the simple glazing nominal U
                 // Representing the nominal highly conductive frame effects. Solved iteratively.
-                while (wettedAreaAdjRatio < 1.5) {
-                    if (inputU - NominalConductance < 0.01) break;
-                    wettedAreaAdjRatio += 0.001;
+                Real64 adjLower = 1.0;
+                Real64 adjUpper = 2.0;
+                int MaxIter = 100;
+                while (std::abs(inputU - NominalConductance) > 0.01 && MaxIter > 0) {
+                    wettedAreaAdjRatio = (adjLower + adjUpper) / 2;
                     WindowTempsForNominalCond(
                         state, ConstrNum, hgap, wettedAreaAdjRatio); // reeval hcout at each iteration, hcin is not linear to wetted area
                     state.dataWindowManager->hcout = hcoutRated * wettedAreaAdjRatio; // reeval hcout
                     EvalNominalWindowCond(state, AbsBeamShadeNorm, AbsBeamNorm, hgap, NominalConductance, SHGC, TSolNorm);
+                    if (NominalConductance < inputU) {
+                        adjLower = wettedAreaAdjRatio;
+                    } else {
+                        adjUpper = wettedAreaAdjRatio;
+                    }
+                    MaxIter -= 1;
                 }
                 state.dataHeatBal->CoeffAdjRatioIn(ConstrNum) = wettedAreaAdjRatio;
                 state.dataHeatBal->CoeffAdjRatioOut(ConstrNum) = wettedAreaAdjRatio;
