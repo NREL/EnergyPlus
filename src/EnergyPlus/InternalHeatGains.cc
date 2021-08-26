@@ -9079,11 +9079,11 @@ namespace InternalHeatGains {
         return SumCO2GainRateExceptPeople;
     }
 
-    void
+    Real64
     SumInternalCO2GainsByTypes(EnergyPlusData &state,
-                               int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
-                               const Array1D<DataHeatBalance::IntGainType> &GainTypeARR, // variable length 1-d array of integer valued gain types
-                               Real64 &SumCO2GainRate)
+                               int const ZoneNum,                                       // zone index pointer for which zone to sum gains for
+                               const Array1D<DataHeatBalance::IntGainType> &GainTypeARR // variable length 1-d array of integer valued gain types
+    )
     {
 
         // SUBROUTINE INFORMATION:
@@ -9093,8 +9093,10 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing a subset of the internal gain types
 
+        // Return value
+        Real64 SumCO2GainRate(0.0);
+
         int NumberOfTypes = size(GainTypeARR);
-        Real64 tmpSumCO2GainRate = 0.0;
 
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
@@ -9105,13 +9107,13 @@ namespace InternalHeatGains {
                 for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
 
                     if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR(TypeNum)) {
-                        tmpSumCO2GainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CarbonDioxideGainRate;
+                        SumCO2GainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CarbonDioxideGainRate;
                     }
                 }
             }
         }
 
-        SumCO2GainRate = tmpSumCO2GainRate;
+        return SumCO2GainRate;
     }
 
     void SumAllInternalGenericContamGains(EnergyPlusData &state,

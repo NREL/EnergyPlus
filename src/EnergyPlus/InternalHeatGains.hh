@@ -187,11 +187,11 @@ namespace InternalHeatGains {
                                               int const ZoneNum // zone index pointer for which zone to sum gains for
     );
 
-    void
+    Real64
     SumInternalCO2GainsByTypes(EnergyPlusData &state,
-                               int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
-                               const Array1D<DataHeatBalance::IntGainType> &GainTypeARR, // variable length 1-d array of integer valued gain types
-                               Real64 &SumCO2GainRate);
+                               int const ZoneNum,                                       // zone index pointer for which zone to sum gains for
+                               const Array1D<DataHeatBalance::IntGainType> &GainTypeARR // variable length 1-d array of integer valued gain types
+    );
 
     void SumAllInternalGenericContamGains(EnergyPlusData &state,
                                           int const ZoneNum, // zone index pointer for which zone to sum gains for
