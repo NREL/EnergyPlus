@@ -1366,7 +1366,6 @@ void InitZoneContSetPoints(EnergyPlusData &state)
     // Using/Aliasing
     using InternalHeatGains::SumAllInternalCO2Gains;
     using InternalHeatGains::SumAllInternalCO2GainsExceptPeople; // Added for hybrid model
-    using InternalHeatGains::SumAllInternalGenericContamGains;
     using InternalHeatGains::SumInternalCO2GainsByTypes;
     using ScheduleManager::GetCurrentScheduleValue;
 
