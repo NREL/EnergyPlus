@@ -58,7 +58,7 @@
 namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
 {
-//    EXPECT_EQ(format("{:#12.{}F}", 123.456, 0), "        123."); // valid for fmt <=7.0.0 but not >=7.1.3, changed sometime in between
+    // EXPECT_EQ(format("{:#12.{}F}", 123.456, 0), "        123."); // valid for fmt <=7.0.0 but not >=7.1.3, changed sometime in between
     EXPECT_EQ(format("{:#11.{}F}", 123.456, 0), "        123.");
     EXPECT_EQ(format("{:#12.{}F}", 0.85505055394102414, 3), "       0.855");
     EXPECT_EQ(format("{:#12.{}F}", 18229.761511696095, 2), "    18229.76");

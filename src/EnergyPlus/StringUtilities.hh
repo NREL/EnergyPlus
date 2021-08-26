@@ -62,51 +62,36 @@ inline std::stringstream stringReader(std::string_view str)
     return result;
 }
 
-inline bool readListItem(std::string_view input, size_t &index, char delimiter, int &param)
+template <class T, typename = std::enable_if_t<std::is_same_v<T, double> || std::is_same_v<T, int>>>
+bool readListItem(std::string_view input, size_t &index, T &param)
 {
     if (index >= input.size()) return false;
 
     input.remove_prefix(index);
 
-    auto first_char = input.find_first_not_of(' ');
-    if (first_char != std::string_view::npos) {
-        input.remove_prefix(first_char);
+    auto first_comma = input.find_first_not_of(',');
+    if (first_comma != std::string_view::npos) {
+        input.remove_prefix(first_comma);
     }
-    auto pos = input.find(delimiter);
-
-    if (pos == std::string_view::npos) {
-        pos = input.size();
-    }
-
-    auto result = FromChars::from_chars(input.data(), input.data() + pos, param);
-    if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
-        return false;
-    }
-    index += (pos + first_char + 1);
-    return true;
-}
-
-inline bool readListItem(std::string_view input, size_t &index, char delimiter, double &param)
-{
-    if (index >= input.size()) return false;
-
-    input.remove_prefix(index);
 
     auto first_char = input.find_first_not_of(' ');
     if (first_char != std::string_view::npos) {
         input.remove_prefix(first_char);
     }
-    auto pos = input.find(delimiter);
 
-    if (pos == std::string_view::npos) {
-        pos = input.size();
+    FromChars::from_chars_result result{};
+    if constexpr(std::is_same_v<T, int>) {
+        result = FromChars::from_chars(input.data(), input.data() + input.size(), param);
+    } else if constexpr(std::is_same_v<T, double>) {
+        auto fast_float_result = fast_float::from_chars(input.data(), input.data() + input.size(), param);
+        result.ptr = fast_float_result.ptr;
+        result.ec = fast_float_result.ec;
     }
-
-    auto result = fast_float::from_chars(input.data(), input.data() + pos, param);
     if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
         return false;
     }
-    index += (pos + first_char + 1);
+    size_t pos = result.ptr - input.begin();
+    index += (pos + first_comma + first_char);
     return true;
 }
 
@@ -174,8 +159,7 @@ template <typename... Param> bool readList(std::string_view input, Param &&... p
 {
     if constexpr (std::conjunction_v<std::is_same<double &, Param>...> || std::conjunction_v<std::is_same<int &, Param>...>) {
         size_t index = 0;
-        char delimiter = ',';
-        return ((readListItem(input, index, delimiter, param)), ...);
+        return ((readListItem(input, index, param)), ...);
     } else {
         auto reader = stringReader(input);
         return ((readListItem(reader, param)), ...);
