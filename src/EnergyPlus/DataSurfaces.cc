@@ -254,7 +254,12 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             }
             // a weighted average of the inlet temperatures.
-            RefAirTemp = SumSysMCpT / SumSysMCp;
+            if (SumSysMCp > 0.0) {
+                // a weighted average of the inlet temperatures.
+                RefAirTemp = SumSysMCpT / SumSysMCp;
+            } else {
+                RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
+            }
         } else {
             // currently set to mean air temp but should add error warning here
             RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);

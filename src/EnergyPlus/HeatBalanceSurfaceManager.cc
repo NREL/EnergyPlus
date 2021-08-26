@@ -6661,54 +6661,12 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
     // determine reference air temperatures
     for (int SurfNum : HTSurfs) {
-        int ZoneNum = Surface(SurfNum).Zone;
 
         // These conditions are not used in every SurfNum loop here so we don't use them to skip surfaces
         if (Surface(SurfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
-
-        {
-            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
-            if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) = state.dataHeatBalFanSys->MAT(ZoneNum);
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataHeatBalFanSys->MAT(ZoneNum); // for reporting surf adjacent air temp
-            } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
-            } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
-                // determine ZoneEquipConfigNum for this zone
-                int ZoneEquipConfigNum = ZoneNum;
-                // check whether this zone is a controlled zone or not
-                if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
-                    ShowFatalError(state,
-                                   "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                       state.dataHeatBal->Zone(ZoneNum).Name);
-                    return;
-                }
-                // determine supply air conditions
-                Real64 SumSysMCp = 0.0;
-                Real64 SumSysMCpT = 0.0;
-                Real64 const CpAir = Psychrometrics::PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
-                for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                    Real64 NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                    Real64 MassFlowRate =
-                        state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                    // Real64 CpAir2 = PsyCpAirFnW(ZoneAirHumRat(ZoneNum), NodeTemp);
-                    SumSysMCp += MassFlowRate * CpAir;
-                    SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-                }
-                // a weighted average of the inlet temperatures.
-                if (SumSysMCp > 0.0) {                                                      // protect div by zero
-                    state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) = SumSysMCpT / SumSysMCp; // BG changed 02-16-2005 to add index (SurfNum)
-                } else {
-                    state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) = state.dataHeatBalFanSys->MAT(ZoneNum);
-                }
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) =
-                    state.dataHeatBalSurfMgr->RefAirTemp(SurfNum); // for reporting surf adjacent air temp
-            } else {
-                // currently set to mean air temp but should add error warning here
-                state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) = state.dataHeatBalFanSys->MAT(ZoneNum);
-                state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataHeatBalFanSys->MAT(ZoneNum); // for reporting surf adjacent air temp
-            }
-        }
+        Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
+        state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) = RefAirTemp;
+        state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataHeatBalSurfMgr->RefAirTemp(SurfNum);
     }
 
     // Following variables must be reset due to possible recall of this routine by radiant and Resimulate routines.
@@ -7591,46 +7549,9 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                     state.dataHeatBalSurf->SurfIsOperatingPool(surfNum) = 0;
                 }
             }
-            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(surfNum));
-            if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                state.dataHeatBalSurfMgr->RefAirTemp(surfNum) = state.dataHeatBalFanSys->MAT(zoneNum);
-                state.dataHeatBal->SurfTempEffBulkAir(surfNum) = state.dataHeatBalFanSys->MAT(zoneNum); // for reporting surf adjacent air temp
-            } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                state.dataHeatBalSurfMgr->RefAirTemp(surfNum) = state.dataHeatBal->SurfTempEffBulkAir(surfNum);
-            } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
-                // determine ZoneEquipConfigNum for this zone
-                int ZoneEquipConfigNum = zoneNum;
-                // check whether this zone is a controlled zone or not
-                if (!state.dataHeatBal->Zone(zoneNum).IsControlled) {
-                    ShowFatalError(state,
-                                   "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                       state.dataHeatBal->Zone(zoneNum).Name);
-                    return;
-                }
-                // determine supply air conditions
-                Real64 SumSysMCp = 0.0;
-                Real64 SumSysMCpT = 0.0;
-                Real64 const CpAir = Psychrometrics::PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(zoneNum));
-                for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                    Real64 NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                    Real64 MassFlowRate =
-                        state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                    SumSysMCp += MassFlowRate * CpAir;
-                    SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-                }
-                // a weighted average of the inlet temperatures.
-                if (SumSysMCp > 0.0) {                                                      // protect div by zero
-                    state.dataHeatBalSurfMgr->RefAirTemp(surfNum) = SumSysMCpT / SumSysMCp; // BG changed 02-16-2005 to add index (SurfNum)
-                } else {
-                    state.dataHeatBalSurfMgr->RefAirTemp(surfNum) = state.dataHeatBalFanSys->MAT(zoneNum);
-                }
-                state.dataHeatBal->SurfTempEffBulkAir(surfNum) =
-                    state.dataHeatBalSurfMgr->RefAirTemp(surfNum); // for reporting surf adjacent air temp
-            } else {
-                // currently set to mean air temp but should add error warning here
-                state.dataHeatBalSurfMgr->RefAirTemp(surfNum) = state.dataHeatBalFanSys->MAT(zoneNum);
-                state.dataHeatBal->SurfTempEffBulkAir(surfNum) = state.dataHeatBalFanSys->MAT(zoneNum); // for reporting surf adjacent air temp
-            }
+            Real64 RefAirTemp = state.dataSurface->Surface(surfNum).getInsideAirTemperature(state, surfNum);
+            state.dataHeatBalSurfMgr->RefAirTemp(surfNum) = RefAirTemp;
+            state.dataHeatBal->SurfTempEffBulkAir(surfNum) = state.dataHeatBalSurfMgr->RefAirTemp(surfNum);
         }
 
         // Following variables must be reset due to possible recall of this routine by radiant and Resimulate routines.
