@@ -316,7 +316,12 @@ bool processInput(std::string const &inputFilePath,
     }
 
     if (!EnergyPlus::FileSystem::fileExists(inputPath)) {
+#ifdef _WIN32
+        displayMessage("Input file path {} not found", inputPath.string());
+#else
         displayMessage("Input file path {} not found", inputPath);
+#endif
+        
         return false;
     }
 

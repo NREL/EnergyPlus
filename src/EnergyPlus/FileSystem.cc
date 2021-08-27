@@ -213,7 +213,13 @@ namespace FileSystem {
 
     FileTypes getFileType(fs::path const &filePath)
     {
+#ifdef _WIN32
+        auto const filePathStr = fs::path(filePath).extension().string();
+        auto extension = std::string_view(filePathStr.c_str());
+#else
         auto extension = std::string_view(fs::path(filePath).extension().c_str());
+#endif
+        
         extension.remove_prefix(extension.find_last_of('.') + 1);
         return static_cast<FileTypes>(getEnumerationValue(FileTypesExt, extension));
     }
@@ -318,8 +324,15 @@ namespace FileSystem {
 
     std::string readFile(fs::path const &filePath, std::ios_base::openmode mode)
     {
+#ifdef _WIN32
+        auto filePathStr = filePath.string();
+        auto path = filePathStr.c_str();
+#else
+        auto path = filePath.c_str();
+#endif
+
         if (!fileExists(filePath)) {
-            throw FatalError(fmt::format("File does not exists: {}", filePath.c_str()));
+            throw FatalError(fmt::format("File does not exists: {}", path));
         }
 
         std::string_view fopen_mode;
@@ -334,9 +347,9 @@ namespace FileSystem {
         }
 
         auto close_file = [](FILE *f) { fclose(f); };
-        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(filePath.c_str(), fopen_mode.data()), close_file);
+        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, fopen_mode.data()), close_file);
         if (!holder) {
-            throw FatalError(fmt::format("Could not open file: {}", filePath.c_str()));
+            throw FatalError(fmt::format("Could not open file: {}", path));
         }
 
         auto f = holder.get();
@@ -351,15 +364,22 @@ namespace FileSystem {
             return result;
         }
         if (has_error != 0 || bytes_read != size) {
-            throw FatalError(fmt::format("Error reading file: {}", filePath.c_str()));
+            throw FatalError(fmt::format("Error reading file: {}", path));
         }
         return result;
     }
 
     nlohmann::json readJSON(fs::path const &filePath, std::ios_base::openmode mode)
     {
+#ifdef _WIN32
+        auto filePathStr = filePath.string();
+        auto path = filePathStr.c_str();
+#else
+        auto path = filePath.c_str();
+#endif
+
         if (!fileExists(filePath)) {
-            throw FatalError(fmt::format("File does not exists: {}", filePath.c_str()));
+            throw FatalError(fmt::format("File does not exists: {}", path));
         }
 
         std::string_view fopen_mode;
@@ -374,9 +394,9 @@ namespace FileSystem {
         }
 
         auto close_file = [](FILE *f) { fclose(f); };
-        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(filePath.c_str(), fopen_mode.data()), close_file);
+        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, fopen_mode.data()), close_file);
         if (!holder) {
-            throw FatalError(fmt::format("Could not open file: {}", filePath.c_str()));
+            throw FatalError(fmt::format("Could not open file: {}", path));
         }
         auto f = holder.get();
 

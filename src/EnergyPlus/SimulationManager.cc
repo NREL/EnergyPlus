@@ -1678,8 +1678,14 @@ namespace SimulationManager {
     std::unique_ptr<fmt::ostream> OpenFmtStreamFile(EnergyPlusData &state, const fs::path &filePath)
     {
         std::unique_ptr<fmt::ostream> result = nullptr;
+#ifdef _WIN32
+        auto filePathStr = filePath.string();
+        auto path = filePathStr.c_str();
+#else
+        auto path = filePath.c_str();
+#endif
         try {
-            auto f = fmt::output_file(filePath.c_str(), fmt::buffer_size = (2 << 17));
+            auto f = fmt::output_file(path, fmt::buffer_size = (2 << 17));
             result = std::make_unique<fmt::ostream>(std::move(f));
         } catch (const std::system_error &error) {
             ShowSevereError(state, error.what());

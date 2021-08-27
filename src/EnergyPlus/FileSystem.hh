@@ -233,7 +233,13 @@ namespace FileSystem {
     template <FileTypes fileType> void writeFile(fs::path const &filePath, const std::string_view data)
     {
         static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
-        auto f = fmt::output_file(filePath.c_str(), fmt::buffer_size = (2 << 17));
+#ifdef _WIN32
+        auto filePathStr = filePath.string();
+        auto path = filePathStr.c_str();
+#else
+        auto path = filePath.c_str();
+#endif
+        auto f = fmt::output_file(path, fmt::buffer_size = (2 << 17));
         f.print("{}", data);
     }
 
