@@ -5379,8 +5379,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         } else {
             HydraulicDiameter = std::sqrt(state.dataSurface->SurfOutConvFaceArea(SurfNum));
         }
-        Hn = CalcAlamdariHammondStableHorizontal(
-            state, (SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
+        Hn = CalcAlamdariHammondStableHorizontal(state, (SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
         break;
     case ConvectionConstants::HcExt_AlamdariHammondUnstableHorizontal:
         if (state.dataSurface->SurfOutConvFacePerimeter(SurfNum) > 0.0) {
@@ -5388,8 +5387,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
         } else {
             HydraulicDiameter = std::sqrt(state.dataSurface->SurfOutConvFaceArea(SurfNum));
         }
-        Hn = CalcAlamdariHammondUnstableHorizontal(
-            state, (SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
+        Hn = CalcAlamdariHammondUnstableHorizontal(state, (SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)), HydraulicDiameter, SurfNum);
         break;
     }
 
@@ -6916,17 +6914,18 @@ void CalcUserDefinedInsideHcModel(EnergyPlusData &state, int const SurfNum, int 
     Real64 HcFnTempDiff(0.0), HcFnTempDiffDivHeight(0.0), HcFnACH(0.0), HcFnACHDivPerimLength(0.0);
     Kiva::ConvectionAlgorithm HcFnTempDiffFn(KIVA_CONST_CONV(0.0)), HcFnTempDiffDivHeightFn(KIVA_CONST_CONV(0.0));
     if (UserCurve.HcFnTempDiffCurveNum > 0) {
-        HcFnTempDiff = CurveValue(state, UserCurve.HcFnTempDiffCurveNum, std::abs(state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) - tmpAirTemp));
+        HcFnTempDiff =
+            CurveValue(state, UserCurve.HcFnTempDiffCurveNum, std::abs(state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) - tmpAirTemp));
         HcFnTempDiffFn = [&](double Tsurf, double Tamb, double, double, double) -> double {
             return CurveValue(state, UserCurve.HcFnTempDiffCurveNum, std::abs(Tsurf - Tamb));
         };
     }
 
     if (UserCurve.HcFnTempDiffDivHeightCurveNum > 0) {
-        HcFnTempDiffDivHeight =
-            CurveValue(state,
-                       UserCurve.HcFnTempDiffDivHeightCurveNum,
-                       (std::abs(state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) - tmpAirTemp) / state.dataSurface->SurfIntConvZoneWallHeight(SurfNum)));
+        HcFnTempDiffDivHeight = CurveValue(
+            state,
+            UserCurve.HcFnTempDiffDivHeightCurveNum,
+            (std::abs(state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) - tmpAirTemp) / state.dataSurface->SurfIntConvZoneWallHeight(SurfNum)));
         HcFnTempDiffDivHeightFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
             return CurveValue(
                 state, UserCurve.HcFnTempDiffDivHeightCurveNum, std::abs(Tsurf - Tamb) / state.dataSurface->SurfIntConvZoneWallHeight(SurfNum));
