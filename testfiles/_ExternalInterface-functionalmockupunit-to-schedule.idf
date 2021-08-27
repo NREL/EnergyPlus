@@ -411,6 +411,7 @@
     Wall,                    !- Surface Type
     PARWALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE SOUTH,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -427,6 +428,7 @@
     Wall,                    !- Surface Type
     HWWALL,                  !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -468,6 +470,7 @@
     Wall,                    !- Surface Type
     PARWALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE NORTH,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -484,6 +487,7 @@
     Wall,                    !- Surface Type
     HWWALL,                  !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -525,6 +529,7 @@
     Floor,                   !- Surface Type
     HWFLOOR,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE CEILING,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -541,6 +546,7 @@
     Roof,                    !- Surface Type
     HWCEILING,               !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE FLOOR,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -559,7 +565,8 @@
     HALLWAY WALL,            !- Name
     INTWALL,                 !- Construction Name
     ZONE ONE,                !- Zone or ZoneList Name
-    54.24;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    54.24;                   !- Extended Field
 
 ! 54.24 = 4 * ( 2.7 * 6 - 2.2 * 1.2 )
 ! ===========================================================
