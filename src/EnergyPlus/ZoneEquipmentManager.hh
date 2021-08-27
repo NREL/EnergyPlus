@@ -159,6 +159,8 @@ namespace ZoneEquipmentManager {
 
     void AutoCalcDOASControlStrategy(EnergyPlusData &state);
 
+    void ReportInfiltrations(EnergyPlusData &state);
+
     void ReportZoneSizingDOASInputs(EnergyPlusData &state,
                                     std::string const &ZoneName,         // the name of the zone
                                     std::string const &DOASCtrlStrategy, // DOAS control strategy

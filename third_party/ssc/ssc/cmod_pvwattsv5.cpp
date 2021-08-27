@@ -644,6 +644,8 @@ static var_info _cm_vtab_pvwattsv5_1ts_outputs[] = {
 
 class cm_pvwattsv5_1ts : public cm_pvwattsv5_base
 {
+private:
+    bool system_inputs_are_setup;
 public:
 
     cm_pvwattsv5_1ts()
@@ -651,11 +653,15 @@ public:
         add_var_info(_cm_vtab_pvwattsv5_1ts_weather);
         add_var_info(_cm_vtab_pvwattsv5_common);
         add_var_info(_cm_vtab_pvwattsv5_1ts_outputs);
+        system_inputs_are_setup = false;
     }
 
     void exec()
     {
-        setup_system_inputs();
+        if (!system_inputs_are_setup) {
+            setup_system_inputs();
+            system_inputs_are_setup = true;
+        }
         double ts = as_number("time_step");
         if (is_assigned("tcell") && is_assigned("poa"))
             initialize_cell_temp(ts, as_double("tcell"), as_double("poa"));
