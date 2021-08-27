@@ -1230,6 +1230,7 @@ namespace WaterToAirHeatPumpSimple {
         // Outlet variables
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Power = 0.0;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal = 0.0;
+        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotalReport = 0.0;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSensible = 0.0;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLatent = 0.0;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSource = 0.0;
@@ -2634,6 +2635,11 @@ namespace WaterToAirHeatPumpSimple {
 
         // scale heat transfer rates to PLR and power to RTF
         state.dataWaterToAirHeatPumpSimple->QLoadTotal *= PartLoadRatio;
+        state.dataWaterToAirHeatPumpSimple->QLoadTotalReport =
+            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate *
+            (state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth -
+             PsyHFnTdbW(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirDBTemp,
+                        state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).OutletAirHumRat));
         state.dataWaterToAirHeatPumpSimple->QSensible *= PartLoadRatio;
         state.dataWaterToAirHeatPumpSimple->Winput *= RuntimeFrac;
         state.dataWaterToAirHeatPumpSimple->QSource = state.dataWaterToAirHeatPumpSimple->QLoadTotal + state.dataWaterToAirHeatPumpSimple->Winput;
@@ -2660,7 +2666,7 @@ namespace WaterToAirHeatPumpSimple {
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSource = state.dataWaterToAirHeatPumpSimple->QSource;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Energy = state.dataWaterToAirHeatPumpSimple->Winput * ReportingConstant;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergyLoadTotal =
-            state.dataWaterToAirHeatPumpSimple->QLoadTotal * ReportingConstant;
+            state.dataWaterToAirHeatPumpSimple->QLoadTotalReport * ReportingConstant;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergySensible =
             state.dataWaterToAirHeatPumpSimple->QSensible * ReportingConstant;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergyLatent =
