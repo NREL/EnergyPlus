@@ -3013,11 +3013,6 @@ namespace ThermalComfort {
                     DaysInYear = 365;
                 }
 
-                // Borrowed from OpenEPlusWeatherFile
-                // state.files.inputWeatherFile.close();
-                // state.files.inputWeatherFile.fileName = state.files.inputWeatherFileName.fileName;
-                // state.files.inputWeatherFile.open();
-                // WeatherManager::SkipEPlusWFHeader(state);
                 WeatherManager::OpenEPlusWeatherFile(state, ErrorsFound, false);
 
                 jStartDay = state.dataEnvrn->DayOfYear - 1;
