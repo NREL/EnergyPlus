@@ -398,10 +398,9 @@ json IdfParser::parse_object(
                 return root;
             }
             if (schema_obj_extensions == nullptr) {
-                errors_.emplace_back(
-                    fmt::format("Line: {} Index: {} - Object does not have extensible fields but should. Likely a parsing error.",
-                                cur_line_num,
-                                index_into_cur_line));
+                errors_.emplace_back(fmt::format("Line: {} Index: {} - Object does not have extensible fields but should. Likely a parsing error.",
+                                                 cur_line_num,
+                                                 index_into_cur_line));
                 success = false;
                 return root;
             }

@@ -321,7 +321,7 @@ bool processInput(std::string const &inputFilePath,
 #else
         displayMessage("Input file path {} not found", inputPath);
 #endif
-        
+
         return false;
     }
 

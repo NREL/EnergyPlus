@@ -219,7 +219,7 @@ namespace FileSystem {
 #else
         auto extension = std::string_view(fs::path(filePath).extension().c_str());
 #endif
-        
+
         extension.remove_prefix(extension.find_last_of('.') + 1);
         return static_cast<FileTypes>(getEnumerationValue(FileTypesExt, extension));
     }

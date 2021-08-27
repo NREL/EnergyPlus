@@ -78,7 +78,6 @@ using namespace Psychrometrics;
 using namespace DataHeatBalFanSys;
 using namespace DataHeatBalance;
 
-
 TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
 {
     // locals
