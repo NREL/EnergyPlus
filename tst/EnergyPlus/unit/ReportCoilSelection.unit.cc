@@ -554,7 +554,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
                                                                                 DXFlowPerCapMinRatio,
                                                                                 DXFlowPerCapMaxRatio);
     EXPECT_NEAR(RatedCoilTotCap * coilCapFunTempFac, c1->coilTotCapAtPeak, 0.000001);
-    EXPECT_LT(RatedCoilTotCap, c1->coilTotCapAtPeak, 0.000001);
+    EXPECT_LT(RatedCoilTotCap, c1->coilTotCapAtPeak);
 }
 
 TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoolingCoil)
@@ -803,5 +803,5 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoolingCoil)
                                                                                 DXFlowPerCapMinRatio,
                                                                                 DXFlowPerCapMaxRatio);
     EXPECT_NEAR(RatedCoilTotCap * coilCapFunTempFac, c1->coilTotCapAtPeak, 0.000001);
-    EXPECT_LT(RatedCoilTotCap, c1->coilTotCapAtPeak, 0.000001);
+    EXPECT_LT(RatedCoilTotCap, c1->coilTotCapAtPeak);
 }
