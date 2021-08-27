@@ -408,15 +408,7 @@ TYPED_TEST(numeric_arg_test, make_and_visit) {
   CHECK_ARG_SIMPLE(std::numeric_limits<TypeParam>::max());
 }
 
-namespace fmt {
-template <> struct is_char<wchar_t> : std::true_type {};
-}  // namespace fmt
-
-TEST(arg_test, char_arg) {
-  CHECK_ARG(char, 'a', 'a');
-  CHECK_ARG(wchar_t, L'a', 'a');
-  CHECK_ARG(wchar_t, L'a', L'a');
-}
+TEST(arg_test, char_arg) { CHECK_ARG(char, 'a', 'a'); }
 
 TEST(arg_test, string_arg) {
   char str_data[] = "test";
@@ -711,10 +703,61 @@ TEST(core_test, has_formatter) {
                 "");
 }
 
+struct const_formattable {};
+struct nonconst_formattable {};
+
+FMT_BEGIN_NAMESPACE
+template <> struct formatter<const_formattable> {
+  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    return ctx.begin();
+  }
+
+  auto format(const const_formattable&, format_context& ctx)
+      -> decltype(ctx.out()) {
+    auto test = string_view("test");
+    return std::copy_n(test.data(), test.size(), ctx.out());
+  }
+};
+
+template <> struct formatter<nonconst_formattable> {
+  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    return ctx.begin();
+  }
+
+  auto format(nonconst_formattable&, format_context& ctx)
+      -> decltype(ctx.out()) {
+    auto test = string_view("test");
+    return std::copy_n(test.data(), test.size(), ctx.out());
+  }
+};
+FMT_END_NAMESPACE
+
 TEST(core_test, is_formattable) {
+  static_assert(fmt::is_formattable<signed char*>::value, "");
+  static_assert(fmt::is_formattable<unsigned char*>::value, "");
+  static_assert(fmt::is_formattable<const signed char*>::value, "");
+  static_assert(fmt::is_formattable<const unsigned char*>::value, "");
+  static_assert(!fmt::is_formattable<wchar_t>::value, "");
+  static_assert(!fmt::is_formattable<const wchar_t*>::value, "");
+  static_assert(!fmt::is_formattable<const wchar_t[3]>::value, "");
+  static_assert(!fmt::is_formattable<fmt::basic_string_view<wchar_t>>::value,
+                "");
   static_assert(fmt::is_formattable<enabled_formatter>::value, "");
   static_assert(!fmt::is_formattable<disabled_formatter>::value, "");
   static_assert(fmt::is_formattable<disabled_formatter_convertible>::value, "");
+
+  static_assert(fmt::is_formattable<const_formattable&>::value, "");
+  static_assert(fmt::is_formattable<const const_formattable&>::value, "");
+
+  static_assert(fmt::is_formattable<nonconst_formattable&>::value, "");
+#if !FMT_MSC_VER || FMT_MSC_VER >= 1910
+  static_assert(!fmt::is_formattable<const nonconst_formattable&>::value, "");
+#endif
+
+  static_assert(!fmt::is_formattable<signed char*, wchar_t>::value, "");
+  static_assert(!fmt::is_formattable<unsigned char*, wchar_t>::value, "");
+  static_assert(!fmt::is_formattable<const signed char*, wchar_t>::value, "");
+  static_assert(!fmt::is_formattable<const unsigned char*, wchar_t>::value, "");
 }
 
 TEST(core_test, format) { EXPECT_EQ(fmt::format("{}", 42), "42"); }
@@ -847,35 +890,6 @@ TEST(core_test, adl) {
   fmt::print("{}", s);
   fmt::print(stdout, "{}", s);
 }
-
-struct const_formattable {};
-struct nonconst_formattable {};
-
-FMT_BEGIN_NAMESPACE
-template <> struct formatter<const_formattable> {
-  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
-    return ctx.begin();
-  }
-
-  auto format(const const_formattable&, format_context& ctx)
-      -> decltype(ctx.out()) {
-    auto test = string_view("test");
-    return std::copy_n(test.data(), test.size(), ctx.out());
-  }
-};
-
-template <> struct formatter<nonconst_formattable> {
-  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
-    return ctx.begin();
-  }
-
-  auto format(nonconst_formattable&, format_context& ctx)
-      -> decltype(ctx.out()) {
-    auto test = string_view("test");
-    return std::copy_n(test.data(), test.size(), ctx.out());
-  }
-};
-FMT_END_NAMESPACE
 
 TEST(core_test, is_const_formattable) {
   EXPECT_TRUE((fmt::detail::is_const_formattable<const_formattable,
