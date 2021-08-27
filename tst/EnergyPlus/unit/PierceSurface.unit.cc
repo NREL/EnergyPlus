@@ -61,7 +61,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSurfaces;
-using namespace ObjexxFCL;
 using DataVectorTypes::Vector;
 using Vector2D = DataSurfaces::Surface2D::Vector2D;
 

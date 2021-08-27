@@ -83,7 +83,6 @@ using namespace EnergyPlus::OutputReportTabular;
 using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::WaterCoils;
-using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 

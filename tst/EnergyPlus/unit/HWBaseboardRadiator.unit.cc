@@ -71,7 +71,6 @@ using namespace DataLoopNode;
 using namespace FluidProperties;
 using namespace DataPlant;
 
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 {

@@ -78,7 +78,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::ZoneEquipmentManager;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataZoneEquipment;

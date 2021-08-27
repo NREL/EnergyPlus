@@ -82,7 +82,6 @@ using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataRuntimeLanguage;
 using namespace EnergyPlus::PlantUtilities;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, EMSManager_TestForUniqueEMSActuators)
 {

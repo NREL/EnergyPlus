@@ -62,7 +62,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::FluidCoolers;
 using namespace EnergyPlus::DataSizing;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test1)
 {

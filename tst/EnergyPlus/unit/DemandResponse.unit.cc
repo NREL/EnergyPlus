@@ -57,7 +57,6 @@
 #include <EnergyPlus/MixedAir.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::MixedAir;
 using namespace EnergyPlus::DemandManager;
 

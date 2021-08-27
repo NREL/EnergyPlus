@@ -69,7 +69,6 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHVACGlobals;

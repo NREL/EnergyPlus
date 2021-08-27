@@ -77,7 +77,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::LowTempRadiantSystem;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataZoneEquipment;

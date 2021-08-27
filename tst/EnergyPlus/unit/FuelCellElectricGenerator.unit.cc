@@ -74,7 +74,6 @@
 #include <EnergyPlus/SizingManager.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, FuelCellTest)
 {

@@ -81,7 +81,6 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalSurface;
 // using namespace EnergyPlus::ScheduleManager;
 using namespace SimulationManager;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 {

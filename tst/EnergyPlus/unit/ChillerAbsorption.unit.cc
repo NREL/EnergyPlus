@@ -68,7 +68,6 @@ using namespace EnergyPlus::ChillerAbsorption;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::SimulationManager;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 {

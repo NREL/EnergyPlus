@@ -67,7 +67,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest)
 {

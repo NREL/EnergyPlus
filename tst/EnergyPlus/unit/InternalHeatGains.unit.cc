@@ -74,7 +74,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 {
