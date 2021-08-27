@@ -3472,7 +3472,7 @@ ElectricStorage::ElectricStorage( // main constructor
             break;
         }
         case StorageModelType::liIonNmcBattery: {
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "KandlerSmith") or state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "KandlerSmith") || state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                 lifeCalculation_ = BatteryDegradationModelType::lifeCalculationYes;
             } else {
                 lifeCalculation_ = BatteryDegradationModelType::lifeCalculationNo;
@@ -3488,7 +3488,7 @@ ElectricStorage::ElectricStorage( // main constructor
             liIon_Vfull_ = state.dataIPShortCut->lNumericFieldBlanks(10) ? 4.2 : state.dataIPShortCut->rNumericArgs(10);
             liIon_Vexp_ = state.dataIPShortCut->lNumericFieldBlanks(11) ? 3.53 : state.dataIPShortCut->rNumericArgs(11);
             liIon_Vnom_ = state.dataIPShortCut->lNumericFieldBlanks(12) ? 3.342 : state.dataIPShortCut->rNumericArgs(12);
-            if (liIon_Vfull_ < liIon_Vexp_ or liIon_Vexp_ < liIon_Vnom_) {
+            if (liIon_Vfull_ < liIon_Vexp_ || liIon_Vexp_ < liIon_Vnom_) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\", invalid entry.");
@@ -3585,7 +3585,7 @@ ElectricStorage::ElectricStorage( // main constructor
 
         } // switch storage model type
 
-        if (storageModelMode_ == StorageModelType::kiBaMBattery or storageModelMode_ == StorageModelType::liIonNmcBattery) {
+        if (storageModelMode_ == StorageModelType::kiBaMBattery || storageModelMode_ == StorageModelType::liIonNmcBattery) {
             SetupOutputVariable(state,
                                 "Electric Storage Operating Mode Index",
                                 OutputProcessor::Unit::None,

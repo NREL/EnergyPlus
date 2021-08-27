@@ -428,7 +428,7 @@ namespace UtilityRoutines {
 
     std::string MakeUPPERCase(std::string_view const InputString); // Input String
 
-    inline constexpr bool SameString(std::string_view const s, std::string_view const t)
+    constexpr bool SameString(std::string_view const s, std::string_view const t)
     {
         // case insensitive comparison
         return equali(s, t);
@@ -591,7 +591,7 @@ namespace UtilityRoutines {
 
 } // namespace UtilityRoutines
 
-inline constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList, const std::string_view s)
+constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList, const std::string_view s)
 {
     for (unsigned int i = 0; i < sList.size(); ++i) {
         if (UtilityRoutines::SameString(sList[i], s)) return i;

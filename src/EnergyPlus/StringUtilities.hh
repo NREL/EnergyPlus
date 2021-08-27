@@ -80,9 +80,9 @@ bool readListItem(std::string_view input, size_t &index, T &param)
     }
 
     FromChars::from_chars_result result{};
-    if constexpr(std::is_same_v<T, int>) {
+    if constexpr (std::is_same_v<T, int>) {
         result = FromChars::from_chars(input.data(), input.data() + input.size(), param);
-    } else if constexpr(std::is_same_v<T, double>) {
+    } else if constexpr (std::is_same_v<T, double>) {
         auto fast_float_result = fast_float::from_chars(input.data(), input.data() + input.size(), param);
         result.ptr = fast_float_result.ptr;
         result.ec = fast_float_result.ec;

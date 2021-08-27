@@ -397,6 +397,14 @@ json IdfParser::parse_object(
                 success = false;
                 return root;
             }
+            if (schema_obj_extensions == nullptr) {
+                errors_.emplace_back(
+                    fmt::format("Line: {} Index: {} - Object does not have extensible fields but should. Likely a parsing error.",
+                                cur_line_num,
+                                index_into_cur_line));
+                success = false;
+                return root;
+            }
             auto const &legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
             auto const size = legacy_idd_extensibles_array.size();
             std::string const &field_name = legacy_idd_extensibles_array[extensible_index % size].get<std::string>();

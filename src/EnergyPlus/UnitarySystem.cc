@@ -7976,7 +7976,7 @@ namespace UnitarySystems {
                 // here we need to deal with sequenced zone equip
                 state.dataUnitarySystems->HeatingLoad = false;
                 state.dataUnitarySystems->CoolingLoad = false;
-                if (this->m_ZoneSequenceCoolingNum > 0 && this->m_ZoneSequenceHeatingNum > 0 and this->m_AirLoopEquipment) {
+                if (this->m_ZoneSequenceCoolingNum > 0 && this->m_ZoneSequenceHeatingNum > 0 && this->m_AirLoopEquipment) {
                     // air loop equipment uses sequenced variables
                     state.dataUnitarySystems->QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum)
                                                                  .SequencedOutputRequiredToCoolingSP(this->m_ZoneSequenceCoolingNum);

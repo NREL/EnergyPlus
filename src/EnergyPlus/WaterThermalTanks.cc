@@ -7872,22 +7872,22 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
             }
 
             // Make adjustments to A and B to account for heaters being on or off now
-            if (this->HeaterOn1 and !PrevHeaterOn1) {
+            if (this->HeaterOn1 && !PrevHeaterOn1) {
                 // If heater 1 is on now and wasn't before add the heat rate to the B term
                 B[this->HeaterNode1 - 1] += Qheater1 / (this->Node(this->HeaterNode1).Mass * Cp);
-            } else if (!this->HeaterOn1 and PrevHeaterOn1) {
+            } else if (!this->HeaterOn1 && PrevHeaterOn1) {
                 // If heater 1 is off now and was on before, remove the heat rate from the B term
                 B[this->HeaterNode1 - 1] -= this->MaxCapacity / (this->Node(this->HeaterNode1).Mass * Cp);
             }
-            if (this->HeaterOn2 and !PrevHeaterOn2) {
+            if (this->HeaterOn2 && !PrevHeaterOn2) {
                 // If heater 2 is on now and wasn't before add the heat rate to the B term
                 B[this->HeaterNode2 - 1] += Qheater2 / (this->Node(this->HeaterNode2).Mass * Cp);
-            } else if (!this->HeaterOn2 and PrevHeaterOn2) {
+            } else if (!this->HeaterOn2 && PrevHeaterOn2) {
                 // If heater 1 is off now and was on before, remove the heat rate from the B term
                 B[this->HeaterNode2 - 1] -= this->MaxCapacity / (this->Node(this->HeaterNode2).Mass * Cp);
             }
 
-            if ((this->HeaterOn1 || this->HeaterOn2) and !(PrevHeaterOn1 || PrevHeaterOn2)) {
+            if ((this->HeaterOn1 || this->HeaterOn2) && !(PrevHeaterOn1 || PrevHeaterOn2)) {
                 // Remove off cycle loads
                 // Apply on cycle loads
                 for (int i = 0; i < nTankNodes; i++) {
@@ -7897,7 +7897,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
                     B[i] += (-node.OffCycParaLoad + node.OnCycParaLoad + (node.OnCycLossCoeff - node.OffCycLossCoeff) * this->AmbientTemp) /
                             NodeCapacitance;
                 }
-            } else if (!(this->HeaterOn1 || this->HeaterOn2) and (PrevHeaterOn1 || PrevHeaterOn2)) {
+            } else if (!(this->HeaterOn1 || this->HeaterOn2) && (PrevHeaterOn1 || PrevHeaterOn2)) {
                 // Remove on cycle loads
                 // Apply off cycle loads
                 for (int i = 0; i < nTankNodes; i++) {
@@ -8040,7 +8040,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
                     for (m = j; m < nTankNodes; ++m) {
                         Tmixed += Tfinal[m] * this->Node[m].Mass;
                         MassMixed += this->Node[m].Mass;
-                        if ((m == nTankNodes - 1) or (Tmixed / MassMixed > Tfinal[m + 1])) break;
+                        if ((m == nTankNodes - 1) || (Tmixed / MassMixed > Tfinal[m + 1])) break;
                     }
                     Tmixed /= MassMixed;
 
