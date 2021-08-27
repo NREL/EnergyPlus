@@ -136,14 +136,14 @@ namespace UtilityRoutines {
         }
 
         auto result = fast_float::from_chars(String.data(), String.data() + String.size(), rProcessNumber);
-        size_t remaining_size = result.ptr - String.begin();
+        size_t remaining_size = result.ptr - String.data();
         if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
             rProcessNumber = 0.0;
             ErrorFlag = true;
         } else if (remaining_size != String.size()) {
             if (*result.ptr == '+' || *result.ptr == '-') {
                 ++result.ptr;
-                remaining_size = result.ptr - String.begin();
+                remaining_size = result.ptr - String.data();
                 if (remaining_size == String.size()) {
                     rProcessNumber = 0.0;
                     ErrorFlag = true;
@@ -158,7 +158,7 @@ namespace UtilityRoutines {
                 return ProcessNumber(str, ErrorFlag);
             } else if (*result.ptr == 'e' || *result.ptr == 'E') {
                 ++result.ptr;
-                remaining_size = result.ptr - String.begin();
+                remaining_size = result.ptr - String.data();
                 for (size_t i = remaining_size; i < String.size(); ++i, ++result.ptr) {
                     if (!std::isdigit(*result.ptr)) {
                         rProcessNumber = 0.0;

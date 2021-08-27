@@ -90,7 +90,7 @@ bool readListItem(std::string_view input, size_t &index, T &param)
     if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
         return false;
     }
-    size_t pos = result.ptr - input.begin();
+    size_t pos = result.ptr - input.data();
     index += (pos + first_comma + first_char);
     return true;
 }

@@ -305,21 +305,23 @@ json CsvParser::parse_value(std::string_view csv, size_t &index)
     index_into_cur_line += diff;
     index = save_i;
 
+    auto const value_end = value.data() + value.size(); // have to do this for MSVC
+
     double val;
     auto result = fast_float::from_chars(value.data(), value.data() + value.size(), val);
     if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range) {
         return rtrim(value);
-    } else if (result.ptr != value.end()) {
+    } else if (result.ptr != value_end) {
         auto const initial_ptr = result.ptr;
-        while (delimiter != ' ' && result.ptr != value.end()) {
+        while (delimiter != ' ' && result.ptr != value_end) {
             if (*result.ptr != ' ') {
                 break;
             }
             ++result.ptr;
         }
-        if (result.ptr == value.end()) {
-            index -= (value.end() - initial_ptr);
-            index_into_cur_line -= (value.end() - initial_ptr);
+        if (result.ptr == value_end) {
+            index -= (value_end - initial_ptr);
+            index_into_cur_line -= (value_end - initial_ptr);
             return val;
         }
         return rtrim(value);
