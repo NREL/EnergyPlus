@@ -1537,6 +1537,7 @@ namespace SteamBaseboardRadiator {
                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) /
                                          state.dataSurface->Surface(SurfNum).Area);
                     state.dataHeatBalFanSys->SurfQSteamBaseboard(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalSurf->AnyRadiantSystems = true;
 
                     if (ThisSurfIntensity > MaxRadHeatFlux) { // CR 8074, trap for excessive intensity (throws off surface balance )
                         ShowSevereError(state, "DistributeBBSteamRadGains:  excessive thermal radiation heat flux intensity detected");

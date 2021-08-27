@@ -140,7 +140,8 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> QRadIntGainsInReport;        // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> QdotRadIntGainsInRep;        // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> QdotRadIntGainsInRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf
-    // these next three all are for Radiative HVAC sources of radiation gains on inside face
+    // these next five all are for Radiative HVAC sources of radiation gains on inside face
+    Array1D<bool> AnyRadiantSystems;          // True if there are any radiant systems
     Array1D<Real64> SurfQRadHVACInReport;     // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadHVACInRep;     // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> SurfQdotRadHVACInPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf
@@ -285,6 +286,7 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->QRadIntGainsInReport.deallocate();
         this->QdotRadIntGainsInRep.deallocate();
         this->QdotRadIntGainsInRepPerArea.deallocate();
+        this->AnyRadiantSystems.deallocate();
         this->SurfQRadHVACInReport.deallocate();
         this->SurfQdotRadHVACInRep.deallocate();
         this->SurfQdotRadHVACInPerArea.deallocate();
