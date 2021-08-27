@@ -6164,7 +6164,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
     // now finish out specific model eq for this surface
 
-    int iDeltaTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
+    int iDeltaTemp = DeltaTempLambda(state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
     int iConvOrient = int(Surface(SurfNum).ConvOrientation);
 
     switch (FinalFlowRegime) {
