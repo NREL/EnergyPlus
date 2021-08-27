@@ -1221,8 +1221,6 @@ namespace WaterUse {
         //       MODIFIED       Brent Griffith 2010, demand side update
         //       RE-ENGINEERED  na
 
-        this->oneTimeInit(state);
-
         // Set the cold water temperature
         if (this->SupplyTankNum > 0) {
             this->ColdSupplyTemp = state.dataWaterData->WaterStorage(this->SupplyTankNum).Twater;
@@ -1607,15 +1605,12 @@ namespace WaterUse {
         this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->RecoveryEnergy = this->RecoveryRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
-    void WaterConnectionsType::oneTimeInit(EnergyPlusData &state)
+    void WaterConnectionsType::oneTimeInit_new(EnergyPlusData &state)
     {
 
-        if (this->setupMyOutputVars) {
-            this->setupOutputVars(state);
-            this->setupMyOutputVars = false;
-        }
+        this->setupOutputVars(state);
 
-        if (this->plantScanFlag && allocated(state.dataPlnt->PlantLoop) && !this->StandAlone) {
+        if (allocated(state.dataPlnt->PlantLoop) && !this->StandAlone) {
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
@@ -1633,8 +1628,10 @@ namespace WaterUse {
             if (errFlag) {
                 ShowFatalError(state, "InitConnections: Program terminated due to previous condition(s).");
             }
-            this->plantScanFlag = false;
         }
+    }
+    void WaterConnectionsType::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
     }
 
     void CalcWaterUseZoneGains(EnergyPlusData &state)
