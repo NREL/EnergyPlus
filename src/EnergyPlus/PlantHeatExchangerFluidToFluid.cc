@@ -2770,7 +2770,7 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
                 // this->DemandSideLoop.OutletEnthalpy = this->DemandSideLoop.InletEnthalpy - HeatingLoad / SteamMassFlowRate;
                 state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).MassFlowRate = SteamMassFlowRate;
                 state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).MassFlowRate = SteamMassFlowRate;
-            } else { 
+            } else {
                 WaterOutletTemp = WaterInletTemp + QHXCap / (WaterMassFlowRate * CpWaterInlet);
 
                 // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
@@ -2875,7 +2875,7 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
 
     this->SupplySideLoop.InletTemp = WaterInletTemp;
     this->DemandSideLoop.InletTemp = SteamInletTemp;
-    
+
     // Set the outlet conditions
     this->HeatTransferRate = HeatingLoad;
     this->HeatTransferEnergy = this->HeatTransferRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
