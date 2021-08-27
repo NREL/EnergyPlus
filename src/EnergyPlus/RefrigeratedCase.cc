@@ -11064,6 +11064,9 @@ void RefrigCondenserData::UpdateCondenser(EnergyPlusData &state)
 void RefrigCondenserData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
+void RefrigCondenserData::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 void RefrigRackData::UpdateCondenser(EnergyPlusData &state)
 {
@@ -11084,6 +11087,10 @@ void RefrigRackData::UpdateCondenser(EnergyPlusData &state)
     state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
 }
 void RefrigRackData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
+
+void RefrigRackData::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
 {
 }
 

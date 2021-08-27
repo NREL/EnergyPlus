@@ -7908,7 +7908,7 @@ namespace AirflowNetworkBalanceManager {
 
                             int ZoneSurfNum = VFObj.LinkageSurfaceData(j).SurfaceNum;
 
-                            Real64 TSurfj = state.dataHeatBalSurf->TH(1, 1, ZoneSurfNum);
+                            Real64 TSurfj = state.dataHeatBalSurf->SurfOutsideTempHist(1)(ZoneSurfNum);
                             Real64 TSurfj_K = TSurfj + DataGlobalConstants::KelvinConv;
 
                             Real64 ZoneSurfEmissivity =
@@ -7948,7 +7948,7 @@ namespace AirflowNetworkBalanceManager {
 
                     for (int j = 1; j <= VFObj.LinkageSurfaceData.u(); ++j) {
                         int ZoneSurfNum = VFObj.LinkageSurfaceData(j).SurfaceNum;
-                        Real64 TSurfj = state.dataHeatBalSurf->TH(1, 1, ZoneSurfNum);
+                        Real64 TSurfj = state.dataHeatBalSurf->SurfOutsideTempHist(1)(ZoneSurfNum);
                         Real64 TSurfj_K = TSurfj + DataGlobalConstants::KelvinConv;
                         VFObj.LinkageSurfaceData(j).SurfaceRadLoad = VFObj.LinkageSurfaceData(j).SurfaceResistanceFactor *
                                                                      (pow_4(TDuctSurf_K) - pow_4(TSurfj_K)); // Radiant load for this surface [W]

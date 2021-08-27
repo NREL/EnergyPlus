@@ -15564,6 +15564,9 @@ void VRFCondenserEquipment::VRFOU_PipeLossH(
 void VRFCondenserEquipment::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
+void VRFCondenserEquipment::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
                                                       int const VRFTUNum,            // index of vrf terminal unit

@@ -574,10 +574,12 @@ namespace HeatBalFiniteDiffManager {
         QHeatOutFlux.allocate(state.dataSurface->TotSurfaces);
 
         // And then initialize
-        QHeatInFlux = 0.0;
-        QHeatOutFlux = 0.0;
-        state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux = 0.0;
-        state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux = 0.0;
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            QHeatInFlux(SurfNum) = 0.0;
+            QHeatOutFlux(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum) = 0.0;
+        }
 
         // Setup Output Variables
 
@@ -1500,7 +1502,7 @@ namespace HeatBalFiniteDiffManager {
                 SurfaceFD(Surf).CpDelXRhoS2(i) = surfaceFDEBC.CpDelXRhoS1(TotNodesPlusOne); // Save this for computing node flux values
             }
 
-            Real64 const QNetSurfFromOutside(state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(surface_ExtBoundCond)); // filled in InteriorBCEqns
+            Real64 const QNetSurfFromOutside(state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surface_ExtBoundCond)); // filled in InteriorBCEqns
             //    QFluxOutsideToOutSurf(Surf)       = QnetSurfFromOutside
             state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf) = -QNetSurfFromOutside;
             state.dataHeatBalSurf->SurfOpaqOutFaceCond(Surf) = surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf);
@@ -2313,9 +2315,9 @@ namespace HeatBalFiniteDiffManager {
 
         Real64 const QNetSurfInside(-(QFac + hconvi * (-TDT_i + Tia)));
         //  Pass inside conduction Flux [W/m2] to DataHeatBalanceSurface array
-        state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(Surf) = QNetSurfInside;
+        state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(Surf) = QNetSurfInside;
         //  QFluxZoneToInSurf(Surf) = QNetSurfInside
-        state.dataHeatBalSurf->SurfOpaqInsFaceConduction(Surf) = QNetSurfInside * surface.Area; // for reporting as in CTF, PT
+        state.dataHeatBalSurf->SurfOpaqInsFaceCond(Surf) = QNetSurfInside * surface.Area; // for reporting as in CTF, PT
     }
 
     // todo - function not used
@@ -2482,7 +2484,7 @@ namespace HeatBalFiniteDiffManager {
         // so the arrays are all allocated to Totodes+1
 
         // Heat flux at the inside face node (TotNodes+1)
-        surfaceFD.QDreport(TotNodes + 1) = state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(Surf);
+        surfaceFD.QDreport(TotNodes + 1) = state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(Surf);
 
         // Heat flux for remaining nodes.
         for (node = TotNodes; node >= 1; --node) {
