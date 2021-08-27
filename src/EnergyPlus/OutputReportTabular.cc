@@ -7795,9 +7795,9 @@ void WriteBEPSTable(EnergyPlusData &state)
     Array2D<Real64> normalVal(14, 4);
     Array1D<Real64> collapsedTotal(14);
     Array2D<Real64> collapsedEndUse(14, DataGlobalConstantsData::iEndUseSize);
-    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 13);
+    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 14);
     Array2D<Real64> endUseSubOther(14, DataGlobalConstantsData::iEndUseSize);
-    Array3D<Real64> collapsedEndUseSpType(state.dataOutputProcessor->maxNumEndUseSpaceTypes, DataGlobalConstantsData::iEndUseSize, 13);
+    Array3D<Real64> collapsedEndUseSpType(state.dataOutputProcessor->maxNumEndUseSpaceTypes, DataGlobalConstantsData::iEndUseSize, 14);
     Real64 totalOnsiteHeat;
     Real64 totalOnsiteWater;
     Real64 totalWater;
@@ -7970,7 +7970,9 @@ void WriteBEPSTable(EnergyPlusData &state)
                     collapsedEndUseSpType(kEndUseSpType, jEndUse, 12) =
                         ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 4) +
                         ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 5); // district heating <- purch heating | <- steam
-                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 13) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 7); // water
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 13) =
+                        ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 15); // district heating steam
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 14) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 7); // water
                 }
             }
             // unit conversion - all values are used as divisors
@@ -9806,7 +9808,7 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
         }
     }
 
-    for (int iResource = 1; iResource <= 13; ++iResource) {
+    for (int iResource = 1; iResource <= 14; ++iResource) {
         i = 1;
         for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
             if (tableType == endUseSubTableType::bySubCategory) {
@@ -10280,8 +10282,8 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
     Array2D<Real64> collapsedEndUse(14, DataGlobalConstantsData::iEndUseSize);
     Array2D<Real64> collapsedIndEndUse(14, DataGlobalConstantsData::iEndUseSize);
     Array1D_int collapsedTimeStep(14);
-    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 13);
-    Array3D<Real64> collapsedIndEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 13);
+    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 14);
+    Array3D<Real64> collapsedIndEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 14);
     Array2D<Real64> endUseSubOther(14, DataGlobalConstantsData::iEndUseSize);
     int iResource;
     int kEndUseSub;
