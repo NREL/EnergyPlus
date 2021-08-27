@@ -133,7 +133,8 @@ namespace DataHeatBalance {
     {
         Unassigned = -1,
         Isotropic,
-        Anisotropic
+        Anisotropic,
+        NUM
     };
 
     // Parameters for ZoneAirSolutionAlgo
@@ -142,7 +143,8 @@ namespace DataHeatBalance {
         Unassigned = -1,
         ThirdOrder,
         AnalyticalSolution,
-        EulerMethod
+        EulerMethod,
+        NUM
     };
 
     // Parameter for MRT calculation type
@@ -151,7 +153,8 @@ namespace DataHeatBalance {
         Unassigned = -1,
         ZoneAveraged,
         SurfaceWeighted,
-        AngleFactor
+        AngleFactor,
+        NUM
     };
 
     // Parameters for Ventilation
@@ -161,7 +164,8 @@ namespace DataHeatBalance {
         Natural,
         Intake,
         Exhaust,
-        Balanced
+        Balanced,
+        NUM
     };
 
     // Parameters for hybrid ventilation using Ventilation and Mixing objects
@@ -170,7 +174,8 @@ namespace DataHeatBalance {
         Unassigned = -1,
         Indiv,
         Close,
-        Global
+        Global,
+        NUM
     };
 
     // System type, detailed refrigeration or refrigerated case rack
@@ -178,7 +183,8 @@ namespace DataHeatBalance {
     {
         Unassigned = -1,
         Detailed,
-        Rack
+        Rack,
+        NUM
     };
 
     // Refrigeration condenser type
@@ -189,7 +195,8 @@ namespace DataHeatBalance {
         Evap,
         Water,
         Cascade,
-        WaterHeater
+        WaterHeater,
+        NUM
     };
 
     // Parameters for type of infiltration model
@@ -198,7 +205,8 @@ namespace DataHeatBalance {
         Unassigned = -1,
         DesignFlowRate,
         ShermanGrimsrud,
-        AIM2
+        AIM2,
+        NUM
     };
 
     // Parameters for type of ventilation model
@@ -206,29 +214,35 @@ namespace DataHeatBalance {
     {
         Unassigned = -1,
         DesignFlowRate,
-        WindAndStack
+        WindAndStack,
+        NUM
     };
 
     // Parameters for type of zone air balance model
     enum class AirBalance
     {
-        None = -1,
-        Quadrature
+        Unassigned = -1,
+        None,
+        Quadrature,
+        NUM
     };
 
     // Parameter for source zone air flow mass balance infiltration treatment
     enum class InfiltrationFlow
     {
-        No = -1,
+        Unassigned = -1,
+        No,
         Add,
-        Adjust
+        Adjust,
+        NUM
     };
 
     enum class InfiltrationZone
     {
         Unassigned = -1,
         MixingSourceZonesOnly,
-        AllZones
+        AllZones,
+        NUM
     };
 
     // zone air flow balancing method
@@ -239,7 +253,8 @@ namespace DataHeatBalance {
         AdjustReturnOnly,
         AdjustMixingThenReturn,
         AdjustReturnThenMixing,
-        NoAdjustReturnAndMixing
+        NoAdjustReturnAndMixing,
+        NUM
     };
 
     enum class IntGainType
