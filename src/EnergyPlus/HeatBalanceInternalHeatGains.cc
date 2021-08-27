@@ -140,11 +140,11 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     UpperCaseObjectName = UtilityRoutines::MakeUPPERCase(cComponentName);
 
     // Check if IntGainComp_TypeOfNum and cComponentObject are consistent
-    if (!UtilityRoutines::SameString(UpperCaseObjectType, ZoneIntGainDeviceTypes[static_cast<int>(IntGainComp_TypeOfNum)])) {
+    if (!UtilityRoutines::SameString(UpperCaseObjectType, IntGainTypeNamesUC[static_cast<int>(IntGainComp_TypeOfNum)])) {
         ShowSevereError(state,
                         "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain");
         ShowContinueError(state, "Object type character = " + cComponentObject);
-        ShowContinueError(state, "Type of Num object name = " + format(ZoneIntGainDeviceTypes[static_cast<int>(IntGainComp_TypeOfNum)]));
+        ShowContinueError(state, "Type of Num object name = " + format(IntGainTypeNamesUC[static_cast<int>(IntGainComp_TypeOfNum)]));
         return;
     }
 

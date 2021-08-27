@@ -317,7 +317,7 @@ namespace DataHeatBalance {
         NUM
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> ZoneIntGainDeviceTypes = {
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> IntGainTypeNamesUC = {
         "PEOPLE",
         "LIGHTS",
         "ELECTRICEQUIPMENT",
@@ -373,7 +373,7 @@ namespace DataHeatBalance {
         "ELECTRICLOADCENTER:STORAGE:CONVERTER",
         "FAN:SYSTEMMODEL"};
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> ccZoneIntGainDeviceTypes = {
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> IntGainTypeNamesCC = {
         "People",
         "Lights",
         "ElectricEquipment",
