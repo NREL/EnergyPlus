@@ -2263,11 +2263,17 @@ namespace ThermalComfort {
         }
 
         // If high temperature radiant heater present and on, then must account for this in MRT calculation
-        if (state.dataHeatBalSurf->SurfQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) > 0.0) {
+        state.dataHeatBalFanSys->SurfQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) =
+            state.dataHeatBalFanSys->SurfQHTRadSysToPerson(state.dataThermalComforts->ZoneNum) +
+            state.dataHeatBalFanSys->SurfQCoolingPanelToPerson(state.dataThermalComforts->ZoneNum) +
+            state.dataHeatBalFanSys->SurfQHWBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
+            state.dataHeatBalFanSys->SurfQSteamBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
+            state.dataHeatBalFanSys->SurfQElecBaseboardToPerson(state.dataThermalComforts->ZoneNum);
+        if (state.dataHeatBalFanSys->SurfQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) > 0.0) {
             state.dataThermalComforts->RadTemp += DataGlobalConstants::KelvinConv; // Convert to Kelvin
             state.dataThermalComforts->RadTemp =
                 root_4(pow_4(state.dataThermalComforts->RadTemp) +
-                       (state.dataHeatBalSurf->SurfQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) / AreaEff / StefanBoltzmannConst));
+                       (state.dataHeatBalFanSys->SurfQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) / AreaEff / StefanBoltzmannConst));
             state.dataThermalComforts->RadTemp -= DataGlobalConstants::KelvinConv; // Convert back to Celsius
         }
 

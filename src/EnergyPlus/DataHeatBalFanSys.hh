@@ -104,6 +104,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> SumLatentHTRadSys;           // Sum of latent gains from hi temp radiant heaters
     Array1D<Real64> SumConvPool;                 // Sum of convection to zone air from pools
     Array1D<Real64> SumLatentPool;               // Sum of latent gains from pools
+    Array1D<Real64> SurfQdotRadHVACToPerson;     // Sum of radiant gains to people from all radiant HVAC sources
     Array1D<Real64> SurfQHTRadSysToPerson;       // Sum of radiant gains to people from hi temp radiant heaters
     Array1D<Real64> SurfQHWBaseboardToPerson;    // Sum of radiant gains to people from hot water baseboard heaters
     Array1D<Real64> SurfQSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
@@ -280,6 +281,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
         this->SumLatentHTRadSys.deallocate();
         this->SumConvPool.deallocate();
         this->SumLatentPool.deallocate();
+        this->SurfQdotRadHVACToPerson.deallocate();
         this->SurfQHTRadSysToPerson.deallocate();
         this->SurfQHWBaseboardToPerson.deallocate();
         this->SurfQSteamBaseboardToPerson.deallocate();
