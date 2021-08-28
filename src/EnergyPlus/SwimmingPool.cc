@@ -943,8 +943,8 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     Real64 Cp =
         FluidProperties::GetSpecificHeatGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName); // specific heat of pool water
 
-    Real64 TH22 =
-        state.dataHeatBalSurf->TH(2, 2, SurfNum); // inside surface temperature at the previous time step equals the old pool water temperature
+    Real64 TH22 = state.dataHeatBalSurf->SurfInsideTempHist(2)(
+        SurfNum); // inside surface temperature at the previous time step equals the old pool water temperature
     Real64 TInSurf =
         this->CurSetPtTemp; // Setpoint temperature for pool which is also the goal temperature and also the inside surface face temperature
     Real64 Tmuw = this->CurMakeupWaterTemp;                                       // Inlet makeup water temperature
@@ -1037,6 +1037,9 @@ void SwimmingPoolData::update(EnergyPlusData &state)
 
     Real64 WaterMassFlow = state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate; // water mass flow rate
     if (WaterMassFlow > 0.0) state.dataLoopNodes->Node(this->WaterOutletNode).Temp = this->PoolWaterTemp;
+}
+void SwimmingPoolData::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+{
 }
 void SwimmingPoolData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
@@ -1179,7 +1182,7 @@ void ReportSwimmingPool(EnergyPlusData &state)
         int SurfNum = state.dataSwimmingPools->Pool(PoolNum).SurfacePtr; // surface number index
 
         // First transfer the surface inside temperature data to the current pool water temperature
-        state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp = state.dataHeatBalSurf->TH(2, 1, SurfNum);
+        state.dataSwimmingPools->Pool(PoolNum).PoolWaterTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
 
         // Next calculate the amount of heating done by the plant loop
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,

@@ -1135,7 +1135,7 @@ namespace TranspiredCollector {
                 state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
             AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
-            TsoK = state.dataHeatBalSurf->TH(1, 1, SurfPtr) + DataGlobalConstants::KelvinConv;
+            TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + DataGlobalConstants::KelvinConv;
             TscollK = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast + DataGlobalConstants::KelvinConv;
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
         }
@@ -1177,7 +1177,7 @@ namespace TranspiredCollector {
               AreaSum; // Autodesk:F2C++ Functions handle array subscript usage
         //        Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array
         // subscript usage: Replaced by below
-        Tso = sum_product_sub(state.dataHeatBalSurf->TH(1, 1, _),
+        Tso = sum_product_sub(state.dataHeatBalSurf->SurfOutsideTempHist(1),
                               state.dataSurface->Surface,
                               &SurfaceData::Area,
                               state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /

@@ -987,7 +987,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
             state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
         AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
-        TsoK = state.dataHeatBalSurf->TH(1, 1, SurfPtr) + DataGlobalConstants::KelvinConv;
+        TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + DataGlobalConstants::KelvinConv;
         TsBaffK = TmpTsBaf + DataGlobalConstants::KelvinConv;
         if (TsBaffK == TsoK) {        // avoid divide by zero
             HPlenARR(ThisSurf) = 0.0; // no net heat transfer if same temperature
@@ -1047,7 +1047,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     if (state.dataEnvrn->IsRain) HExt = 1000.0;
 
     //    Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    Tso = sum_product_sub(state.dataHeatBalSurf->TH(1, 1, _), state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) /
+    Tso = sum_product_sub(state.dataHeatBalSurf->SurfOutsideTempHist(1), state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) /
           A; // Autodesk:F2C++ Functions handle array subscript usage
     //    Isc = sum( SurfQRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) /
