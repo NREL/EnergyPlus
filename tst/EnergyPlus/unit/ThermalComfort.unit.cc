@@ -966,6 +966,11 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataRoomAirMod->IsZoneDV.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneUI.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->SurfQdotRadHVACToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->SurfQHTRadSysToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->SurfQCoolingPanelToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->SurfQHWBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->SurfQSteamBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->SurfQElecBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
 
     state->dataHeatBal->People(1).ZonePtr = 1;
     state->dataHeatBal->People(1).NumberOfPeoplePtr = -1;
@@ -985,6 +990,11 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
 
     state->dataRoomAirMod->IsZoneDV(1) = state->dataRoomAirMod->IsZoneUI(1) = false;
     state->dataHeatBalFanSys->SurfQdotRadHVACToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->SurfQHTRadSysToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->SurfQCoolingPanelToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->SurfQHWBaseboardToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->SurfQSteamBaseboardToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->SurfQElecBaseboardToPerson(1) = 0.0;
     Real64 BodySurfaceArea = 1.8258;
     state->dataEnvrn->OutBaroPress = 101325.;
     Real64 WorkEff = 0.0;
