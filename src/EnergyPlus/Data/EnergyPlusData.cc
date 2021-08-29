@@ -199,7 +199,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataOutputReports = std::make_unique<OutputReportsData>();
     this->dataOutsideEnergySrcs = std::make_unique<OutsideEnergySourcesData>();
     this->dataPTHP = std::make_unique<PackagedTerminalHeatPumpData>();
-    this->dataPVWatts = std::make_unique<PVWattsData>();
     this->dataPackagedThermalStorageCoil = std::make_unique<PackagedThermalStorageCoilData>();
     this->dataPhotovoltaic = std::make_unique<PhotovoltaicsData>();
     this->dataPhotovoltaicState = std::make_unique<PhotovoltaicStateData>();
@@ -458,7 +457,6 @@ void EnergyPlusData::clear_state()
     this->dataOutputReports->clear_state();
     this->dataOutsideEnergySrcs->clear_state();
     this->dataPTHP->clear_state();
-    this->dataPVWatts->clear_state();
     this->dataPackagedThermalStorageCoil->clear_state();
     this->dataPhotovoltaic->clear_state();
     this->dataPhotovoltaicState->clear_state();
