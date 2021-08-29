@@ -88,6 +88,7 @@
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
+#include <EnergyPlus/IndoorIceRink.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MicroCHPElectricGenerator.hh>
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>
@@ -1202,6 +1203,9 @@ void GetPlantInput(EnergyPlusData &state)
                     } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Detailed")) {
                         this_comp.TypeOf_Num = TypeOf_TS_IceDetailed;
                         this_comp.compPtr = IceThermalStorage::DetailedIceStorageData::factory(state, CompNames(CompNum));
+                    } else if (UtilityRoutines::SameString(this_comp_type, "IceRink:Indoor")) {
+                        this_comp.TypeOf_Num = TypeOf_IceRink;
+                        this_comp.compPtr = IceRink::IceRinkData::factory(state, CompNames(CompNum));
                     } else if (UtilityRoutines::SameString(this_comp_type, "TemperingValve")) {
                         this_comp.compPtr = PlantValves::TemperValveData::factory(state, CompNames(CompNum));
                         this_comp.TypeOf_Num = TypeOf_ValveTempering;
@@ -1384,6 +1388,10 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.TypeOf_Num = TypeOf_SwimmingPool_Indoor;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
                         this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
+                    } else if (UtilityRoutines::SameString(this_comp_type, "IceRink:Indoor")){
+                        this_comp.TypeOf_Num = TypeOf_IceRink;
+                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else {
                         // discover unsupported equipment on branches.
                         ShowSevereError(state, "GetPlantInput: Branch=\"" + BranchNames(BranchNum) + "\", invalid component on branch.");
@@ -1794,9 +1802,7 @@ void GetPlantInput(EnergyPlusData &state)
                 this_vent_cond_supply_comp.NodeNameOut = this_cond_supply_comp.NodeNameOut;
                 this_vent_cond_supply_comp.NodeNumIn = this_cond_supply_comp.NodeNumIn;
                 this_vent_cond_supply_comp.NodeNumOut = this_cond_supply_comp.NodeNumOut;
-
             } // loop over components in branches on the loop (ventilation report data)
-
         } // loop over branches on the loop (ventilation report data)
 
         this_vent_cond_demand.Name = this_cond_loop.Name;
@@ -3706,7 +3712,6 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                                 this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                                 this_component.HowLoadServed = HowMet_ByNominalCap;
                             }
-
                         } else if (SELECT_CASE_var == TypeOf_HPWaterEFHeating) { //                 = 18
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
@@ -4118,6 +4123,10 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                                 this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
                                 this_component.HowLoadServed = HowMet_ByNominalCap;
                             }
+                        } else if (SELECT_CASE_var == TypeOf_IceRink) { //                   = 97 (demand side component)
+                            this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
+                            this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+                            this_component.HowLoadServed = HowMet_NoneDemand;
                         } else {
                             ShowSevereError(state, "SetBranchControlTypes: Caught unexpected equipment type of number");
                         }

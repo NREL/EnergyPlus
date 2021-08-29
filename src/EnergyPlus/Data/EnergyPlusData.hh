@@ -185,6 +185,7 @@ struct HybridModelData;
 struct HybridUnitaryAirConditionersData;
 struct HysteresisPhaseChangeData;
 struct ICEngineElectricGeneratorData;
+struct IceRinkData;
 struct IPShortCutsData;
 struct IceThermalStorageData;
 struct IntegratedHeatPumpGlobalData;
@@ -446,6 +447,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<HybridUnitaryAirConditionersData> dataHybridUnitaryAC;
     std::unique_ptr<HysteresisPhaseChangeData> dataHysteresisPhaseChange;
     std::unique_ptr<ICEngineElectricGeneratorData> dataICEngElectGen;
+    std::unique_ptr<IceRinkData> dataIceRink;
     std::unique_ptr<IPShortCutsData> dataIPShortCut;
     std::unique_ptr<IceThermalStorageData> dataIceThermalStorage;
     std::unique_ptr<IntegratedHeatPumpGlobalData> dataIntegratedHP;

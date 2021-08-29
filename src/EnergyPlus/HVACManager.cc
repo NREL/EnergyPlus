@@ -79,6 +79,7 @@
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/IndoorIceRink.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/NonZoneEquipmentManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
