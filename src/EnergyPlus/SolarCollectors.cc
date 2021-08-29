@@ -922,8 +922,6 @@ namespace SolarCollectors {
         static constexpr std::string_view RoutineName("InitSolarCollector");
         Real64 const BigNumber(9999.9); // Component desired mass flow rate
 
-        this->oneTimeInit(state); // Do the one time initializations
-
         if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
             PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNode, this->VolFlowRateMax);
             this->InitSizing = false;
@@ -2196,13 +2194,10 @@ namespace SolarCollectors {
             VentCavIndex = CavNum;
         }
     }
-    void CollectorData::oneTimeInit(EnergyPlusData &state)
+    void CollectorData::oneTimeInit_new(EnergyPlusData &state)
     {
 
-        if (this->MyOneTimeFlag) {
-            this->setupOutputVars(state);
-            this->MyOneTimeFlag = false;
-        }
+        this->setupOutputVars(state);
 
         if (this->SetLoopIndexFlag) {
             if (allocated(state.dataPlnt->PlantLoop)) {
@@ -2226,6 +2221,9 @@ namespace SolarCollectors {
                 this->SetLoopIndexFlag = false;
             }
         }
+    }
+    void CollectorData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
     }
 
 } // namespace SolarCollectors

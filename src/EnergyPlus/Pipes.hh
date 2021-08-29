@@ -80,14 +80,13 @@ namespace Pipes {
         int LoopSide;                         // Index of plant loop side where this pipe resides
         int BranchIndex;                      // Index of plant Branch index where this pipe resides
         int CompIndex;                        // Index of plant Comp index where this pipe resides
-        bool OneTimeInit;
         bool CheckEquipName;
         bool EnvrnFlag;
 
         // Default Constructor
         LocalPipeData()
             : TypeOf(DataPlant::PlantEquipmentType::Invalid), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(0), BranchIndex(0),
-              CompIndex(0), OneTimeInit(true), CheckEquipName(true), EnvrnFlag(true)
+              CompIndex(0), CheckEquipName(true), EnvrnFlag(true)
         {
         }
 
@@ -97,6 +96,7 @@ namespace Pipes {
                       bool FirstHVACIteration,
                       Real64 &CurLoad,
                       bool RunFlag) override;
+        void oneTimeInit_new(EnergyPlusData &state) override;
         void oneTimeInit(EnergyPlusData &state) override;
         void initEachEnvironment(EnergyPlusData &state) const;
     };

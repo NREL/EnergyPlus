@@ -833,8 +833,11 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         ChillerName);
 }
 
-void GasAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
+void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
 {
+
+    this->setupOutputVariables(state);
+
     // Locate the chillers on the plant loops for later usage
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(state,
@@ -988,16 +991,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
     Real64 rho = 0.0;  // local fluid density
     Real64 mdot = 0.0; // lcoal fluid mass flow rate
 
-    if (this->oneTimeFlag) {
-        this->setupOutputVariables(state);
-        this->oneTimeFlag = false;
-    }
-
     // Init more variables
-    if (this->plantScanFlag) {
-        this->oneTimeInit(state);
-        this->plantScanFlag = false;
-    }
 
     int CondInletNode = this->CondReturnNodeNum;
     int CondOutletNode = this->CondSupplyNodeNum;
@@ -1095,7 +1089,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
             state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPointLo;
     }
 
-    if ((this->isWaterCooled) && ((this->InHeatingMode) || (this->InCoolingMode)) && (!this->plantScanFlag)) {
+    if ((this->isWaterCooled) && ((this->InHeatingMode) || (this->InCoolingMode))) {
         mdot = this->DesCondMassFlowRate;
 
         PlantUtilities::SetComponentFlowRate(
@@ -2123,6 +2117,10 @@ void GasAbsorberSpecs::updateHeatRecords(EnergyPlusData &state,
     this->HeatFuelEnergy = this->HeatFuelUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     this->ElectricEnergy = this->ElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     this->HeatElectricEnergy = this->HeatElectricPower * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+}
+
+void GasAbsorberSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::ChillerGasAbsorption

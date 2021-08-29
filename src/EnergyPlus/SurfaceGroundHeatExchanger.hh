@@ -262,6 +262,8 @@ namespace SurfaceGroundHeatExchanger {
         //==============================================================================
 
         void oneTimeInit(EnergyPlusData &state) override; // Empty function for pure virtual oneTimeInitFlag function
+
+        void oneTimeInit_new(EnergyPlusData &state) override; // Empty function for pure virtual oneTimeInitFlag function
     };
 
     void GetSurfaceGroundHeatExchanger(EnergyPlusData &state);

@@ -289,8 +289,6 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
     // The mass flow rate could be an inter-connected-loop side trigger. This is not really the type of
     //  interconnect that that routine was written for, but it is the clearest example of using it.
 
-    this->oneTimeInit(state);
-
     // begin environment inits
     if (state.dataGlobal->BeginEnvrnFlag && this->BeginEnvrnInitFlag) {
         // component model has not design flow rates, using data for overall plant loop
@@ -457,90 +455,90 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
     this->EnergyRate = std::abs(MyLoad);
     this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 }
-void OutsideEnergySourceSpecs::oneTimeInit(EnergyPlusData &state)
+
+void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
 {
 
-    if (this->OneTimeInitFlag) {
-        // Locate the unit on the plant loops for later usage
-        bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(
-            state, this->Name, this->EnergyType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
-        if (errFlag) {
-            ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
-        }
-        // set limits on outlet node temps to plant loop limits
-        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MinOutletTemp =
-            state.dataPlnt->PlantLoop(this->LoopNum).MinTemp;
-        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MaxOutletTemp =
-            state.dataPlnt->PlantLoop(this->LoopNum).MaxTemp;
-        // Register design flow rate for inlet node (helps to autosize comp setpoint op scheme flows
-        PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, state.dataPlnt->PlantLoop(this->LoopNum).MaxVolFlowRate);
-
-        this->OneTimeInitFlag = false;
-
-        // this may need some help, if the objects change location later, due to a push_back,
-        //  then the pointers to these output variables will be bad
-        // for (int EnergySourceNum = 1; EnergySourceNum <= NumDistrictUnits; ++EnergySourceNum) {
-        std::string hotOrChilled = "Hot ";
-        std::string reportVarPrefix = "District Heating ";
-        std::string heatingOrCooling = "Heating";
-        std::string_view typeName = DataPlant::ccSimPlantEquipTypes[static_cast<int>(DataPlant::PlantEquipmentType::PurchHotWater)];
-        if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
-            hotOrChilled = "Chilled ";
-            reportVarPrefix = "District Cooling ";
-            heatingOrCooling = "Cooling";
-            typeName = DataPlant::ccSimPlantEquipTypes[static_cast<int>(DataPlant::PlantEquipmentType::PurchChilledWater)];
-        }
-
-        SetupOutputVariable(state,
-                            reportVarPrefix + hotOrChilled + "Water Energy",
-                            OutputProcessor::Unit::J,
-                            this->EnergyTransfer,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
-                            this->Name,
-                            _,
-                            typeName,
-                            heatingOrCooling,
-                            _,
-                            "Plant");
-        SetupOutputVariable(state,
-                            reportVarPrefix + hotOrChilled + "Water Rate",
-                            OutputProcessor::Unit::W,
-                            this->EnergyRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            this->Name);
-
-        SetupOutputVariable(state,
-                            reportVarPrefix + "Rate",
-                            OutputProcessor::Unit::W,
-                            this->EnergyRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            this->Name);
-        SetupOutputVariable(state,
-                            reportVarPrefix + "Inlet Temperature",
-                            OutputProcessor::Unit::C,
-                            this->InletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            this->Name);
-        SetupOutputVariable(state,
-                            reportVarPrefix + "Outlet Temperature",
-                            OutputProcessor::Unit::C,
-                            this->OutletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            this->Name);
-        SetupOutputVariable(state,
-                            reportVarPrefix + "Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
-                            this->MassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
-                            this->Name);
+    // Locate the unit on the plant loops for later usage
+    bool errFlag = false;
+    PlantUtilities::ScanPlantLoopsForObject(
+        state, this->Name, this->EnergyType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+    if (errFlag) {
+        ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
     }
+    // set limits on outlet node temps to plant loop limits
+    state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MinOutletTemp =
+        state.dataPlnt->PlantLoop(this->LoopNum).MinTemp;
+    state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MaxOutletTemp =
+        state.dataPlnt->PlantLoop(this->LoopNum).MaxTemp;
+    // Register design flow rate for inlet node (helps to autosize comp setpoint op scheme flows
+    PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, state.dataPlnt->PlantLoop(this->LoopNum).MaxVolFlowRate);
+
+    // this may need some help, if the objects change location later, due to a push_back,
+    //  then the pointers to these output variables will be bad
+    // for (int EnergySourceNum = 1; EnergySourceNum <= NumDistrictUnits; ++EnergySourceNum) {
+    std::string hotOrChilled = "Hot ";
+    std::string reportVarPrefix = "District Heating ";
+    std::string heatingOrCooling = "Heating";
+    std::string_view typeName = DataPlant::ccSimPlantEquipTypes[static_cast<int>(DataPlant::PlantEquipmentType::PurchHotWater)];
+    if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
+        hotOrChilled = "Chilled ";
+        reportVarPrefix = "District Cooling ";
+        heatingOrCooling = "Cooling";
+        typeName = DataPlant::ccSimPlantEquipTypes[static_cast<int>(DataPlant::PlantEquipmentType::PurchChilledWater)];
+    }
+    SetupOutputVariable(state,
+                        reportVarPrefix + hotOrChilled + "Water Energy",
+                        OutputProcessor::Unit::J,
+                        this->EnergyTransfer,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
+                        this->Name,
+                        _,
+                        typeName,
+                        heatingOrCooling,
+                        _,
+                        "Plant");
+    SetupOutputVariable(state,
+                        reportVarPrefix + hotOrChilled + "Water Rate",
+                        OutputProcessor::Unit::W,
+                        this->EnergyRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+
+    SetupOutputVariable(state,
+                        reportVarPrefix + "Rate",
+                        OutputProcessor::Unit::W,
+                        this->EnergyRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        reportVarPrefix + "Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->InletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        reportVarPrefix + "Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->OutletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        reportVarPrefix + "Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->MassFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+}
+
+void OutsideEnergySourceSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::OutsideEnergySources

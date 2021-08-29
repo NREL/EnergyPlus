@@ -950,5 +950,8 @@ void GshpPeHeatingSpecs::update(EnergyPlusData &state)
 void GshpPeHeatingSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
+void GshpPeHeatingSpecs::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 } // namespace EnergyPlus::HeatPumpWaterToWaterHEATING

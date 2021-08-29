@@ -758,31 +758,16 @@ bool FluidCoolerspecs::validateTwoSpeedInputs(EnergyPlusData &state,
     return ErrorsFound;
 }
 
-void FluidCoolerspecs::oneTimeInit(EnergyPlusData &state)
+void FluidCoolerspecs::oneTimeInit_new(EnergyPlusData &state)
 {
-    if (this->oneTimeInitFlag) {
+    this->setupOutputVars(state);
+    bool ErrorsFound = false;
+    // Locate the tower on the plant loops for later usage
+    PlantUtilities::ScanPlantLoopsForObject(
+        state, this->Name, this->FluidCoolerType_enum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
 
-        this->setupOutputVars(state);
-        bool ErrorsFound = false;
-        // Locate the tower on the plant loops for later usage
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                this->FluidCoolerType_enum,
-                                                this->LoopNum,
-                                                this->LoopSideNum,
-                                                this->BranchNum,
-                                                this->CompNum,
-                                                ErrorsFound,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                _);
-
-        if (ErrorsFound) {
-            ShowFatalError(state, "InitFluidCooler: Program terminated due to previous condition(s).");
-        }
-        this->oneTimeInitFlag = false;
+    if (ErrorsFound) {
+        ShowFatalError(state, "InitFluidCooler: Program terminated due to previous condition(s).");
     }
 }
 
@@ -826,8 +811,6 @@ void FluidCoolerspecs::initialize(EnergyPlusData &state)
     // Based on InitTower subroutine by Don Shirey Sept/Oct 2002, F Buhl Oct 2002
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    this->oneTimeInit(state);
 
     // Begin environment initializations
     if (this->beginEnvrnInit && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
@@ -1976,6 +1959,9 @@ void FluidCoolerspecs::report(EnergyPlusData &state, bool const RunFlag)
         this->InletWaterTemp = state.dataLoopNodes->Node(waterInletNode).Temp;
         this->FanEnergy = this->FanPower * ReportingConstant;
     }
+}
+void FluidCoolerspecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::FluidCoolers

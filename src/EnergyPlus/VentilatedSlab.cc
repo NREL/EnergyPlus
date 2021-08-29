@@ -2915,7 +2915,7 @@ namespace VentilatedSlab {
             } else if (SELECT_CASE_var == state.dataVentilatedSlab->OWBControl) {
                 SetPointTemp = state.dataEnvrn->OutWetBulbTemp;
             } else if (SELECT_CASE_var == state.dataVentilatedSlab->SURControl) {
-                SetPointTemp = state.dataHeatBalSurf->TH(2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum));
+                SetPointTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum));
             } else if (SELECT_CASE_var == state.dataVentilatedSlab->DPTZControl) {
                 SetPointTemp = PsyTdpFnWPb(
                     state, state.dataHeatBalFanSys->ZoneAirHumRat(state.dataVentilatedSlab->VentSlab(Item).ZonePtr), state.dataEnvrn->OutBaroPress);
@@ -2961,7 +2961,8 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->HCoilOn = false;
 
             // Node condition
-            state.dataLoopNodes->Node(InletNode).Temp = state.dataHeatBalSurf->TH(2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(1));
+            state.dataLoopNodes->Node(InletNode).Temp =
+                state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(1));
             state.dataLoopNodes->Node(FanOutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
             state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(FanOutletNode).Temp;
 
@@ -4031,7 +4032,7 @@ namespace VentilatedSlab {
                             if (state.dataVentilatedSlab->VentSlab(Item).SysConfg == state.dataVentilatedSlab->SlabOnly) {
                                 //            state.dataLoopNodes->Node(Returnairnode)%Temp = MAT(Zonenum)
                                 state.dataLoopNodes->Node(ReturnAirNode).Temp =
-                                    state.dataHeatBalSurf->TH(2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum));
+                                    state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum));
                                 state.dataLoopNodes->Node(FanOutletNode).Temp = state.dataLoopNodes->Node(ReturnAirNode).Temp;
                                 state.dataLoopNodes->Node(SlabInNode).Temp = state.dataLoopNodes->Node(FanOutletNode).Temp;
                             } else if (state.dataVentilatedSlab->VentSlab(Item).SysConfg == state.dataVentilatedSlab->SlabAndZone) {
@@ -4055,7 +4056,7 @@ namespace VentilatedSlab {
                                                    state.dataHeatBalFanSys->ZoneAirHumRat(state.dataVentilatedSlab->VentSlab(Item).ZonePtr),
                                                    state.dataEnvrn->OutBaroPress);
                         for (RadSurfNum2 = 1; RadSurfNum2 <= state.dataVentilatedSlab->VentSlab(Item).NumOfSurfaces; ++RadSurfNum2) {
-                            if (state.dataHeatBalSurf->TH(2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2)) <
+                            if (state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2)) <
                                 (DewPointTemp + CondDeltaTemp)) {
                                 // Condensation warning--must shut off radiant system
                                 state.dataLoopNodes->Node(SlabInNode).MassFlowRate = 0.0;
@@ -4089,8 +4090,8 @@ namespace VentilatedSlab {
                                         ShowContinueError(state, "Flow to the ventilated slab system will be shut-off to avoid condensation");
                                         ShowContinueError(state,
                                                           format("Predicted radiant system surface temperature = {:.2R}",
-                                                                 state.dataHeatBalSurf->TH(
-                                                                     2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2))));
+                                                                 state.dataHeatBalSurf->SurfInsideTempHist(1)(
+                                                                     state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2))));
                                         ShowContinueError(
                                             state, format("Zone dew-point temperature + safety factor delta= {:.2R}", DewPointTemp + CondDeltaTemp));
                                         ShowContinueErrorTimeStamp(state, "");
@@ -4325,7 +4326,7 @@ namespace VentilatedSlab {
                                         0.0; // Also zero the other side of an interzone
                             }
                             state.dataLoopNodes->Node(ReturnAirNode).Temp =
-                                state.dataHeatBalSurf->TH(2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(1));
+                                state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(1));
                             state.dataLoopNodes->Node(FanOutletNode).Temp = state.dataLoopNodes->Node(ReturnAirNode).Temp;
                             state.dataLoopNodes->Node(SlabInNode).Temp = state.dataLoopNodes->Node(FanOutletNode).Temp;
                             // Each Internal node is reseted at the surface temperature
@@ -4344,7 +4345,7 @@ namespace VentilatedSlab {
                                                    state.dataHeatBalFanSys->ZoneAirHumRat(state.dataVentilatedSlab->VentSlab(Item).ZPtr(RadSurfNum)),
                                                    state.dataEnvrn->OutBaroPress);
                         for (RadSurfNum2 = 1; RadSurfNum2 <= state.dataVentilatedSlab->VentSlab(Item).NumOfSurfaces; ++RadSurfNum2) {
-                            if (state.dataHeatBalSurf->TH(2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2)) <
+                            if (state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2)) <
                                 (DewPointTemp + CondDeltaTemp)) {
                                 // Condensation warning--must shut off radiant system
                                 state.dataLoopNodes->Node(SlabInNode).MassFlowRate = 0.0;
@@ -4377,8 +4378,8 @@ namespace VentilatedSlab {
                                         ShowContinueError(state, "Flow to the ventilated slab system will be shut-off to avoid condensation");
                                         ShowContinueError(state,
                                                           format("Predicted radiant system surface temperature = {:.2R}",
-                                                                 state.dataHeatBalSurf->TH(
-                                                                     2, 1, state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2))));
+                                                                 state.dataHeatBalSurf->SurfInsideTempHist(1)(
+                                                                     state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum2))));
                                         ShowContinueError(
                                             state, format("Zone dew-point temperature + safety factor delta= {:.2R}", DewPointTemp + CondDeltaTemp));
                                         ShowContinueErrorTimeStamp(state, "");
