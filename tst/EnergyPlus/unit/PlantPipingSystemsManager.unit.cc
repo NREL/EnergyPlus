@@ -1979,7 +1979,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
         ",				!- Perimeter insulation width (m)",
         "Yes,			!- Vertical Insulation (Yes/No)",
         "Dummy Material,	!- Vertical Insulation Name",
-        ",			!- Vertical perimeter insulation depth from surface (m)",
+        "0.3,			!- Vertical perimeter insulation depth from surface (m)",
         "Hourly;		!- Domain Simulation Interval. (Timestep/Hourly)",
         "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
         "KATemps,		!- Name of object",
@@ -1992,6 +1992,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
         "SurfaceProperty:OtherSideConditionsModel,",
         "GroundCoupledOSCM,		!- Name",
         "GroundCoupledSurface;	!- Type of Modeling",
+
         "Material,",
         "Dummy Material, !- Name",
         "MediumRough,	!- Roughness",
@@ -2020,5 +2021,37 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
     state->dataPlantPipingSysMgr->domains.resize(1);
     ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
-    EXPECT_TRUE(errorsFound);
+    // 2021-08: revised the case so no more error complains
+    EXPECT_FALSE(errorsFound);
+
+    auto &theDomain = state->dataPlantPipingSysMgr->domains[0];
+
+    // theDomain.developMesh(*state);
+    theDomain.createPartitionCenterList(*state);
+
+    // Take the logic in the code about how the partition positions were calculated
+    // and how they were affected by the horizontal thickness
+    Real64 insyLoc = theDomain.Extents.yMax - theDomain.VertInsDepth + theDomain.HorizInsThickness / 2.0;
+    Real64 slabBot = theDomain.Extents.yMax - theDomain.SlabThickness - theDomain.HorizInsThickness / 2.0;
+    Real64 totalWid = theDomain.HorizInsThickness;
+
+    int partySize = theDomain.Partitions.Y.size();
+
+    // check horizontal partitions for this case
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, 4.76985, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, insyLoc, 1e-4);
+    
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, 0.13970, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, totalWid, 1e-4);
+
+    EXPECT_TRUE(theDomain.Partitions.Y[partySize - 2].partitionType == PartitionType::VertInsLowerEdge);
+
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, 4.79045, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, slabBot, 1e-4);
+
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, 0.13970, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, totalWid, 1e-4);
+
+    EXPECT_TRUE(theDomain.Partitions.Y[partySize - 1].partitionType == PartitionType::UnderFloor);
+
 }
