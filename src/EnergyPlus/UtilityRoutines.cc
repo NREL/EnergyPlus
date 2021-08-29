@@ -327,7 +327,7 @@ namespace UtilityRoutines {
         int FindItem = UtilityRoutines::aFindItemInList(String, ListOfItems);
         if (FindItem != 0) return FindItem;
 
-        for (int Count = 0; Count < ListOfItems.size(); ++Count) {
+        for (uint Count = 0; Count < ListOfItems.size(); ++Count) {
             if (equali(String, ListOfItems[Count])) return Count;
         }
         return 0; // Not found
