@@ -225,18 +225,15 @@ namespace IceRink {
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int NumArgs;                    // Unused variable that is part of a subroutine call
         int MaxAlphas;                  // Maximum number of alphas for these input keywords
-        int MaxNumbers;  
+        int MaxNumbers;
         // struct IceRinkData OutputData;
 
         MaxAlphas = 0;
         MaxNumbers = 0;
 
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
-            state, "IceRink:Indoor", NumArgs, NumAlphas, NumNumbers);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "IceRink:Indoor", NumArgs, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
-
-
 
         NumOfRinks = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cRink);
 
@@ -854,8 +851,8 @@ namespace IceRink {
             ShowFatalError(state, "Preceding condition causes termination");
         }
 
-        this->Tsurfin1 = state.dataHeatBalSurf->TH(2, 1, SurfNum);
-        //this->Tsurfin2 = state.dataHeatBalSurf->TH(2, 2, SurfNum); // Current
+        this->Tsurfin1 = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
+        // this->Tsurfin2 = state.dataHeatBalSurf->TH(2, 2, SurfNum); // Current
         // this->Tsurfin2 = state.dataHeatBalSurf->TempSurfIn(SurfNum); // Current
         // this->IceTemperature = state.dataHeatBalSurf->TempSurfIn(SurfNum);
         this->Tsrc = state.dataHeatBalSurf->SurfTempSource(SurfNum);
@@ -905,8 +902,10 @@ namespace IceRink {
         Real64 RhoIce(917);
         Real64 QFusion(333550.00);
         Real64 EpsMdotCp;
-        Real64 RhoWater = FluidProperties::GetDensityGlycol(state, "WATER", this->InitialWaterTemp, this->WaterIndex, RoutineName); //this is used in resurfacer heating water operation
-        Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state, "WATER", this->InitialWaterTemp, this->WaterIndex, RoutineName); //this is used in resurfacer heating water operation
+        Real64 RhoWater = FluidProperties::GetDensityGlycol(
+            state, "WATER", this->InitialWaterTemp, this->WaterIndex, RoutineName); // this is used in resurfacer heating water operation
+        Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(
+            state, "WATER", this->InitialWaterTemp, this->WaterIndex, RoutineName); // this is used in resurfacer heating water operation
         this->ResurfaceON = ScheduleManager::GetCurrentScheduleValue(state, this->ResurfacingSchedPtr);
 
         if (this->operation == 1) { // If schedule's value equals to 1 then Ice Rink is ON.
@@ -947,11 +946,13 @@ namespace IceRink {
                         this->Effectiveness = calcEffectiveness(state, this->RefrigTempIn, this->RefrigMassFlow);
                         EpsMdotCp = this->Effectiveness * this->RefrigMassFlow * this->CpRefrig;
                         this->Q = EpsMdotCp * (this->RefrigTempIn - this->coeffs.Ck) / (1.0 + (EpsMdotCp * this->coeffs.Cl / PipeArea));
-                        //this->Q2 =
-                        //    ((((1 - (this->coeffs.Cb * this->coeffs.Ce)) * this->Tsurfin2) - this->coeffs.Ca - (this->coeffs.Cb * this->coeffs.Cd)) /
+                        // this->Q2 =
+                        //    ((((1 - (this->coeffs.Cb * this->coeffs.Ce)) * this->Tsurfin2) - this->coeffs.Ca - (this->coeffs.Cb * this->coeffs.Cd))
+                        //    /
                         //     (this->coeffs.Cc + (this->coeffs.Cb * this->coeffs.Cf)));
-                       // this->Q3 = this->RefrigTempIn - this->coeffs.Ck / ((this->coeffs.Cl / PipeArea) + (1 / (EpsMdotCp)));
-                        state.dataHeatBalFanSys->QRadSysSource(SurfNum) = this->QResurface + (this->Q); // This the Q to updtate the EnergyPlus heat balance to get new surface temperatures
+                        // this->Q3 = this->RefrigTempIn - this->coeffs.Ck / ((this->coeffs.Cl / PipeArea) + (1 / (EpsMdotCp)));
+                        state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
+                            this->QResurface + (this->Q); // This the Q to updtate the EnergyPlus heat balance to get new surface temperatures
                     }
 
                 } else {
@@ -978,7 +979,7 @@ namespace IceRink {
 
                             EpsMdotCp = this->Effectiveness * this->RefrigMassFlow * this->CpRefrig;
                             this->Q = EpsMdotCp * (this->RefrigTempIn - this->coeffs.Ck) / (1.0 + (EpsMdotCp * this->coeffs.Cl / PipeArea));
-                            //this->Q3 = this->RefrigTempIn - this->coeffs.Ck / ((this->coeffs.Cl / PipeArea) + (1 / (EpsMdotCp)));
+                            // this->Q3 = this->RefrigTempIn - this->coeffs.Ck / ((this->coeffs.Cl / PipeArea) + (1 / (EpsMdotCp)));
 
                             state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
                                 this->QResurface + (this->Q); // This the Q to updtate the EnergyPlus heat balance to get new surface temperatures
