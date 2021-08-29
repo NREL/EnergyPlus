@@ -435,7 +435,7 @@ namespace OutputProcessor {
         Array1D_int OnCustomMeters; // Forward pointer to Custom Meter Numbers
 
         // Default Constructor
-        MeterArrayType() : NumOnMeters(0), RepVariable(0), OnMeters(6, 0), NumOnCustomMeters(0)
+        MeterArrayType() : NumOnMeters(0), RepVariable(0), OnMeters(10, 0), NumOnCustomMeters(0)
         {
         }
     };
@@ -564,13 +564,10 @@ namespace OutputProcessor {
         // Members
         std::string Name;        // End use category name
         std::string DisplayName; // Display name for output table
-        int NumSubcategories;
+        int NumSubcategories = 0;
         Array1D_string SubcategoryName; // Array of subcategory names
-
-        // Default Constructor
-        EndUseCategoryType() : NumSubcategories(0)
-        {
-        }
+        int numSpaceTypes = 0;
+        Array1D_string spaceTypeName; // Array of space type names
     };
 
     void InitializeOutput(EnergyPlusData &state);
@@ -653,15 +650,16 @@ namespace OutputProcessor {
     );
 
     void AttachMeters(EnergyPlusData &state,
-                      Unit const &MtrUnits,        // Units for this meter
-                      std::string &ResourceType,   // Electricity, Gas, etc.
-                      std::string &EndUse,         // End-use category (Lights, Heating, etc.)
-                      std::string &EndUseSub,      // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
-                      std::string &Group,          // Group key (Facility, Zone, Building, etc.)
-                      std::string const &ZoneName, // Zone key only applicable for Building group
-                      int RepVarNum,               // Number of this report variable
-                      int &MeterArrayPtr,          // Output set of Pointers to Meters
-                      bool &ErrorsFound            // True if errors in this call
+                      Unit const &MtrUnits,             // Units for this meter
+                      std::string &ResourceType,        // Electricity, Gas, etc.
+                      std::string &EndUse,              // End-use category (Lights, Heating, etc.)
+                      std::string &EndUseSub,           // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
+                      std::string &Group,               // Group key (Facility, Zone, Building, etc.)
+                      std::string const &ZoneName,      // Zone key only applicable for Building group
+                      std::string const &SpaceTypeName, // Space Type key only applicable for Building group
+                      int RepVarNum,                    // Number of this report variable
+                      int &MeterArrayPtr,               // Output set of Pointers to Meters
+                      bool &ErrorsFound                 // True if errors in this call
     );
 
     void AttachCustomMeters(EnergyPlusData &state,
@@ -677,7 +675,8 @@ namespace OutputProcessor {
                                          std::string &EndUseSub,                // End Use Sub Type (General Lights, Task Lights, etc.)
                                          std::string &Group,                    // Group key (Facility, Zone, Building, etc.)
                                          bool &ErrorsFound,                     // True if errors in this call
-                                         Optional_string_const ZoneName = _     // ZoneName when Group=Building
+                                         const std::string &ZoneName,           // Zone Name when Group=Building
+                                         const std::string &SpaceType           // Space Type when Group=Building
     );
 
     void DetermineMeterIPUnits(EnergyPlusData &state,
@@ -744,8 +743,9 @@ namespace OutputProcessor {
     // End of routines for Energy Meters implementation in EnergyPlus.
     // *****************************************************************************
 
-    void
-    AddEndUseSubcategory(EnergyPlusData &state, std::string const &ResourceName, std::string const &EndUseName, std::string const &EndUseSubName);
+    void addEndUseSubcategory(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSubName);
+
+    void addEndUseSpaceType(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSpTypeName);
 
     void WriteTimeStampFormatData(EnergyPlusData &state,
                                   InputOutputFile &outputFile,
@@ -916,7 +916,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Optional_int_const ZoneMult = _,                  // Zone Multiplier, defaults to 1
                          Optional_int_const ZoneListMult = _,              // Zone List Multiplier, defaults to 1
                          Optional_int_const indexGroupKey = _,             // Group identifier for SQL output
-                         Optional_string_const customUnitName = _          // the custom name for the units from EMS definition of units
+                         Optional_string_const customUnitName = _,         // the custom name for the units from EMS definition of units
+                         Optional_string_const SpaceType = _               // Space type (applicable for Building group only)
 );
 
 void SetupOutputVariable(EnergyPlusData &state,
@@ -1084,6 +1085,7 @@ struct OutputProcessorData : BaseGlobalStruct
     Real64 TimeStepZoneSec = 0;              // Seconds from NumTimeStepInHour
     bool ErrorsLogged = false;
     int MaxNumSubcategories = 1;
+    int maxNumEndUseSpaceTypes = 1;
     bool isFinalYear = false;
     bool GetOutputInputFlag = true;
     OutputProcessor::ReportingFrequency minimumReportFrequency = OutputProcessor::ReportingFrequency::EachCall;
@@ -1180,6 +1182,7 @@ struct OutputProcessorData : BaseGlobalStruct
         this->TimeStepZoneSec = 0;
         this->ErrorsLogged = false;
         this->MaxNumSubcategories = 1;
+        this->maxNumEndUseSpaceTypes = 1;
         this->isFinalYear = false;
         this->GetOutputInputFlag = true;
         this->minimumReportFrequency = OutputProcessor::ReportingFrequency::EachCall;

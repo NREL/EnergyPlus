@@ -19,11 +19,12 @@ We can call these ``modes'', with each clarified here:
     \item[Plugin Mode] In plugin mode, a (typically) small Python script is written, then by specifying parameters in an input file, the client runs EnergyPlus(.exe) in a traditional fashion, and that EnergyPlus run will call out to the Python script as needed.
 \end{description}
 
-These two operation modes cannot be mixed.
-In plugin mode, EnergyPlus creates a new Python instance internally to allow processing the user-defined scripts.
-When EnergyPlus is run in an API mode, it cannot create a new Python session internally, as it may be in an existing Python session.
-Thus, if a plugin object is found in input during an API call, the program will abort.
-In the future, this limitation may be lifted, but for most use cases, if you are calling EnergyPlus as a library (API), you can simply register API callbacks to execute user-defined code at runtime, and don't need to worry about also writing Python Plugins.
+The initial versions of the Plugin and API systems could not work together, however as of EnergyPlus version 9.6, they can now be combined!
+During plugin execution, EnergyPlus creates a new Python instance internally to allow processing the user-defined scripts.
+When EnergyPlus is run in an API mode, it can actively call back to your client script, as well as do all the normal things EnergyPlus does.
+One caveat is that if you run multiple EnergyPlus runs in parallel threads in the same process, and they all utilize Python Plugins as well, you will notice a small slowdown based on how many you run in parallel.
+This is due to having to access Python's global interpreter lock during the Python portion of the simulation, and will be investigated to avoid this in a later version, however it is a small effect unless the number of runs grows substantially.
+Also, this problem is only realized if you are running multiple EnergyPlus threads in the same API process space.
 
 The API section has information about how to access output variable data, meters, internal variable data, simulation parameters, and actuators, so these do not need additional information here.
 However, plugin objects have additional ways to interact with the simulation, and the plugins themselves need description, which is here.
