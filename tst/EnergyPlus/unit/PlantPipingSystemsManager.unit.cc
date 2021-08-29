@@ -2040,7 +2040,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
     // check horizontal partitions for this case
     EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, 4.76985, 1e-4);
     EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, insyLoc, 1e-4);
-    
+
     EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, 0.13970, 1e-4);
     EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, totalWid, 1e-4);
 
@@ -2053,5 +2053,4 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
     EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, totalWid, 1e-4);
 
     EXPECT_TRUE(theDomain.Partitions.Y[partySize - 1].partitionType == PartitionType::UnderFloor);
-
 }
