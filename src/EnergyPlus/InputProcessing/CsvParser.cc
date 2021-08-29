@@ -283,9 +283,7 @@ void CsvParser::parse_line(std::string_view csv, size_t &index, json &columns)
 json CsvParser::parse_value(std::string_view csv, size_t &index)
 {
     eat_whitespace(csv, index);
-    if (index != csv_size && csv[index] == '+') {
-        ++index;
-    }
+
     size_t save_i = index;
 
     while (true) {
@@ -305,10 +303,15 @@ json CsvParser::parse_value(std::string_view csv, size_t &index)
     index_into_cur_line += diff;
     index = save_i;
 
+    size_t plus_sign = 0;
+    if (value.front() == '+') {
+        plus_sign = 1;
+    }
+
     auto const value_end = value.data() + value.size(); // have to do this for MSVC
 
     double val;
-    auto result = fast_float::from_chars(value.data(), value.data() + value.size(), val);
+    auto result = fast_float::from_chars(value.data() + plus_sign, value.data() + value.size(), val);
     if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range) {
         return rtrim(value);
     } else if (result.ptr != value_end) {

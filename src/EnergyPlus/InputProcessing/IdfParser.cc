@@ -446,9 +446,6 @@ json IdfParser::parse_number(std::string_view idf, size_t &index)
 {
     eat_whitespace(idf, index);
 
-    if (index != idf_size && idf[index] == '+') {
-        ++index;
-    }
     size_t save_i = index;
 
     bool running = true;
@@ -477,9 +474,13 @@ json IdfParser::parse_number(std::string_view idf, size_t &index)
     index = save_i;
 
     auto const convert_double = [&index, this](std::string_view str) -> json {
+        size_t plus_sign = 0;
+        if (str.front() == '+') {
+            plus_sign = 1;
+        }
         auto const str_end = str.data() + str.size(); // have to do this for MSVC
         double val;
-        auto result = fast_float::from_chars(str.data(), str.data() + str.size(), val);
+        auto result = fast_float::from_chars(str.data() + plus_sign, str.data() + str.size(), val);
         if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range) {
             return rtrim(str);
         } else if (result.ptr != str_end) {

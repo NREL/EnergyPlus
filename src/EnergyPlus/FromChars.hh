@@ -51,6 +51,8 @@
 #if __has_include(<charconv>)
 #include <charconv>
 #endif
+#include <cstdlib>
+#include <limits>
 #include <system_error>
 
 namespace FromChars {
@@ -88,7 +90,7 @@ template <typename T> from_chars_result from_chars(const char *first, const char
     return answer;
 #else
     char *pEnd;
-    value = std::strtol(first, &pEnd, 10);
+    auto const ret_val = std::strtol(first, &pEnd, 10);
 
     if (errno == ERANGE) {
         errno = 0;
@@ -101,9 +103,18 @@ template <typename T> from_chars_result from_chars(const char *first, const char
         answer.ptr = pEnd;
         return answer;
     }
+    if constexpr (std::is_same_v<T, int>) {
+        if (ret_val > std::numeric_limits<int>::max()) {
+            answer.ec = std::errc::result_out_of_range;
+            answer.ptr = pEnd;
+            value = 0;
+            return answer;
+        }
+    }
 
     answer.ptr = pEnd;
     answer.ec = std::errc();
+    value = ret_val;
     return answer;
 #endif
 }
