@@ -3343,8 +3343,8 @@ ElectricStorage::ElectricStorage( // main constructor
         switch (storageModelMode_) {
 
         case StorageModelType::simpleBucketStorage: {
-            energeticEfficCharge_ = state.dataIPShortCut->rNumericArgs(2);
-            energeticEfficDischarge_ = state.dataIPShortCut->rNumericArgs(3);
+            energeticEfficCharge_ = checkUserEfficiencyInput(state, state.dataIPShortCut->rNumericArgs(2), "CHARGING", name_);
+            energeticEfficDischarge_ = checkUserEfficiencyInput(state, state.dataIPShortCut->rNumericArgs(3), "DISCHARGING", name_);
             maxEnergyCapacity_ = state.dataIPShortCut->rNumericArgs(4);
             maxPowerDraw_ = state.dataIPShortCut->rNumericArgs(5);
             maxPowerStore_ = state.dataIPShortCut->rNumericArgs(6);
@@ -3760,6 +3760,35 @@ ElectricStorage::ElectricStorage( // main constructor
     }
 }
 
+Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, std::string whichType, std::string deviceName)
+{
+    Real64 const minChargeEfficiency = 0.001;
+    Real64 const minDischargeEfficiency = 0.001;
+
+    // Fix for Defect #8867.  Do not allow either efficiency to be zero as it will lead to a divide by zero (NaN).
+    if (UtilityRoutines::SameString(whichType, "CHARGING")) {
+        if (userInputValue < minChargeEfficiency) {
+            ShowWarningError(state,
+                             format("ElectricStorage charge efficiency was too low.  This occurred for electric storage unit named " + deviceName));
+            ShowContinueError(state, format("The value has been reset to {:.3R}.  Please check your input values.", minChargeEfficiency));
+            return minChargeEfficiency;
+        } else {
+            return userInputValue;
+        }
+    } else if (UtilityRoutines::SameString(whichType, "DISCHARGING")) {
+        if (userInputValue < minDischargeEfficiency) {
+            ShowWarningError(
+                state, format("ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named " + deviceName));
+            ShowContinueError(state, format("The value has been reset to {:.3R}.  Please check your input values.", minDischargeEfficiency));
+            return minDischargeEfficiency;
+        } else {
+            return userInputValue;
+        }
+    } else { // This shouldn't happen but this will still allow a value to be returned.
+        return userInputValue;
+    }
+}
+
 void ElectricStorage::reinitAtBeginEnvironment()
 {
     pelNeedFromStorage_ = 0.0;
@@ -3952,22 +3981,6 @@ void ElectricStorage::simulateSimpleBucketModel(EnergyPlusData &state,
                                                 Real64 const controlSOCMaxFracLimit,
                                                 Real64 const controlSOCMinFracLimit)
 {
-    Real64 const minChargeEfficiency = 0.001;
-    Real64 const minDischargeEfficiency = 0.001;
-
-    // make sure that there will be no divide by zero that lead to NaN values for electric (Defect #8867)
-    if (energeticEfficCharge_ < minChargeEfficiency) {
-        energeticEfficCharge_ = minChargeEfficiency;
-        ShowWarningError(state, "ElectricStorage::simulateSimpleBucketModel charge efficiency was too low.");
-        ShowContinueError(state, format("This occured for electric storage unit named " + name_));
-        ShowContinueError(state, format("The value has been reset to {:.3R}.  Please check your input values.", minChargeEfficiency));
-    }
-    if (energeticEfficDischarge_ < minDischargeEfficiency) {
-        energeticEfficDischarge_ = minDischargeEfficiency;
-        ShowWarningError(state, "ElectricStorage::simulateSimpleBucketModel discharge efficiency was too low.");
-        ShowContinueError(state, format("This occured for electric storage unit named " + name_));
-        ShowContinueError(state, format("The value has been reset to {:.3R}.  Please check your input values.", minDischargeEfficiency));
-    }
 
     // given arguments for how the storage operation would like to run storage charge or discharge
     // apply model constraints and adjust arguments accordingly

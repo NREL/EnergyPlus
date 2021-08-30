@@ -1176,108 +1176,45 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Simulate)
     ASSERT_NEAR(battery.stateOfChargeFraction(), 0.95, 0.1);
 }
 
-TEST_F(EnergyPlusFixture, simulateSimpleBucketModelTest)
+TEST_F(EnergyPlusFixture, Battery_checkUserEfficiencyInputTest)
 {
-    Real64 powerCharge;
-    Real64 powerDischarge;
-    bool charging;
-    bool discharging;
-    Real64 controlSOCMaxFracLimit;
-    Real64 controlSOCMinFracLimit;
-    Real64 ExpectedResult;
+    Real64 userInputEfficiencyCharge;
+    Real64 userInputEfficiencyDischarge;
+    Real64 functionResult;
+    Real64 expectedResult;
 
-    std::string const idf_objects = delimited_string({
-        "ElectricLoadCenter:Storage:Simple,",
-        "  BatterySimple,  !- Name",
-        "  ,               !- Availability Schedule Name",
-        "  ,               !- Zone Name",
-        "  ,               !- Radiative Fraction for Zone Heat Gains",
-        "  0.7,            !- Nominal Energetic Efficiency for Charging",
-        "  0.7,            !- Nominal Discharging Energetic Efficiency",
-        "  3600000.0,      !- Maximum Storage Capacity {J}",
-        "  10000.0,        !- Maximum Power for Discharging {W}",
-        "  10000.0,        !- Maximum Power for Charging {W}",
-        "  1800000.0;      !- Initial State of Charge {J}",
-    });
-    ASSERT_TRUE(process_idf(idf_objects));
+    // Fix for Defect #8867: EnergyPlus was allowing zero efficiency which led to a divide by zero in ElectricPowerServiceManager.cc.
+    // Input is now tested to make sure that a zero value is not allowed.
 
-    ElectricStorage battery{*state, "BatterySimple"};
+    // Test 1: charging, charging efficiency zero-->gets reset to minimum (0.001)
+    userInputEfficiencyCharge = 0.0;
+    expectedResult = 0.001;
+    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyCharge, "CHARGING", "Tatooine");
+    EXPECT_NEAR(functionResult, expectedResult, 0.00001);
+    std::string const error_string1 =
+        delimited_string({"   ** Warning ** ElectricStorage charge efficiency was too low.  This occurred for electric storage unit named Tatooine",
+                          "   **   ~~~   ** The value has been reset to 1.000E-003.  Please check your input values."});
+    EXPECT_TRUE(compare_err_stream(error_string1, true));
 
-    // Test 1: charging, charging amount zero
-    charging = true;
-    discharging = false;
-    powerCharge = 0.0;
-    powerDischarge = 0.0;
-    controlSOCMinFracLimit = 0.0;
-    controlSOCMaxFracLimit = 1.0;
-    state->dataHVACGlobal->TimeStepSys = 0.25;
-    ExpectedResult = 0.0;
-    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
-    EXPECT_NEAR(powerCharge, ExpectedResult, 0.01);
+    // Test 2: charging, value greater than minimum (0.001)-->just keep the user input value
+    userInputEfficiencyCharge = 0.7;
+    expectedResult = 0.7;
+    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyCharge, "CHARGING", "Tatooine");
+    EXPECT_NEAR(functionResult, expectedResult, 0.00001);
 
-    // Test 2: charging, charging amount less than maximum
-    charging = true;
-    discharging = false;
-    powerCharge = 5000.0;
-    powerDischarge = 0.0;
-    controlSOCMinFracLimit = 0.0;
-    controlSOCMaxFracLimit = 1.0;
-    state->dataHVACGlobal->TimeStepSys = 0.25;
-    ExpectedResult = 5000.0;
-    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
-    EXPECT_NEAR(powerCharge, ExpectedResult, 0.01);
+    // Test 3: discharging, discharging efficiency less than minimum allowed-->gets reset to minimum (0.001)
+    userInputEfficiencyDischarge = -1.0;
+    expectedResult = 0.001;
+    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyDischarge, "DISCHARGING", "Tatooine");
+    EXPECT_NEAR(functionResult, expectedResult, 0.00001);
+    std::string const error_string2 = delimited_string(
+        {"   ** Warning ** ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named Tatooine",
+         "   **   ~~~   ** The value has been reset to 1.000E-003.  Please check your input values."});
+    EXPECT_TRUE(compare_err_stream(error_string2, true));
 
-    // Test 3: charging, charging amount higher than maximum
-    charging = true;
-    discharging = false;
-    powerCharge = 11000.0;
-    powerDischarge = 0.0;
-    controlSOCMinFracLimit = 0.0;
-    controlSOCMaxFracLimit = 1.0;
-    state->dataHVACGlobal->TimeStepSys = 0.25;
-    ExpectedResult = 5714.29;
-    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
-    EXPECT_NEAR(powerCharge, ExpectedResult, 0.01);
-
-    // Test 4: discharging, discharging amount zero
-    state->dataGlobal->HourOfDay = 1;
-    battery.timeCheckAndUpdate(*state);
-    charging = false;
-    discharging = true;
-    powerCharge = 0.0;
-    powerDischarge = 0.0;
-    controlSOCMinFracLimit = 0.0;
-    controlSOCMaxFracLimit = 1.0;
-    state->dataHVACGlobal->TimeStepSys = 0.25;
-    ExpectedResult = 0.0;
-    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
-    EXPECT_NEAR(powerDischarge, ExpectedResult, 0.01);
-
-    // Test 5: discharging, discharging amount less than maximum
-    // state->dataGlobal->HourOfDay = 1;
-    // battery.timeCheckAndUpdate(*state);
-    charging = false;
-    discharging = true;
-    powerCharge = 0.0;
-    powerDischarge = 1000.0;
-    controlSOCMinFracLimit = 0.0;
-    controlSOCMaxFracLimit = 1.0;
-    state->dataHVACGlobal->TimeStepSys = 0.25;
-    ExpectedResult = 1000.0;
-    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
-    EXPECT_NEAR(powerDischarge, ExpectedResult, 0.01);
-
-    // Test 6: discharging, discharging amount more than maximum
-    state->dataGlobal->HourOfDay = 1;
-    battery.timeCheckAndUpdate(*state);
-    charging = false;
-    discharging = true;
-    powerCharge = 0.0;
-    powerDischarge = 11000.0;
-    controlSOCMinFracLimit = 0.0;
-    controlSOCMaxFracLimit = 1.0;
-    state->dataHVACGlobal->TimeStepSys = 0.25;
-    ExpectedResult = 2800.0;
-    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
-    EXPECT_NEAR(powerDischarge, ExpectedResult, 0.01);
+    // Test 4: discharging, value greater than minimum (0.001)-->just keep the user input value
+    userInputEfficiencyDischarge = 0.9;
+    expectedResult = 0.9;
+    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyDischarge, "DISCHARGING", "Tatooine");
+    EXPECT_NEAR(functionResult, expectedResult, 0.00001);
 }
