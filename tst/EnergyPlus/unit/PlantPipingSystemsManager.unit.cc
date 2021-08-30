@@ -1972,14 +1972,14 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
         "1,				!- Evapotranspiration Ground Cover Parameter",
         "GroundCoupledOSCM,	!- Name of Floor Boundary Condition Model",
         "InGrade,		!- Slab Location (InGrade/OnGrade)",
-        "Dummy Material,	!- Slab Material Name",
+        "SlabMaterial,	!- Slab Material Name",
         "Yes,			!- Horizontal Insulation (Yes/No)",
-        "Dummy Material,	!- Horizontal Insulation Material Name",
+        "HorizInsulation,	!- Horizontal Insulation Material Name",
         "Full,			!- Full Horizontal or Perimeter Only (Full/Perimeter)",
         ",				!- Perimeter insulation width (m)",
         "Yes,			!- Vertical Insulation (Yes/No)",
-        "Dummy Material,	!- Vertical Insulation Name",
-        "0.3,			!- Vertical perimeter insulation depth from surface (m)",
+        "VertiInsulation,	!- Vertical Insulation Name",
+        "0.5,			!- Vertical perimeter insulation depth from surface (m)",
         "Hourly;		!- Domain Simulation Interval. (Timestep/Hourly)",
         "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
         "KATemps,		!- Name of object",
@@ -1994,15 +1994,37 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
         "GroundCoupledSurface;	!- Type of Modeling",
 
         "Material,",
-        "Dummy Material, !- Name",
+        "SlabMaterial, !- Name",
         "MediumRough,	!- Roughness",
-        "0.1397,		!- Thickness {m}",
+        "0.2,		!- Thickness {m}",
         "1.8,			!- Conductivity {W/m-K}",
         "2400,			!- Density {kg/m3}",
         "750,			!- Specific Heat {J/kg-K}",
         "0.9,			!- Thermal Absorptance",
         "0.65,			!- Solar Absorptance",
         "0.65;			!- Visible Absorptance",
+
+        "Material,",
+        "HorizInsulation,           !- Name",
+        "Rough,                   !- Roughness",
+        "0.1,                     !- Thickness {m}",
+        "0.04,                    !- Conductivity {W/m-K}",
+        "15,                      !- Density {kg/m3}",
+        "1300,                    !- Specific Heat {J/kg-K}",
+        "0.9,                     !- Thermal Absorptance",
+        "0.6,                     !- Solar Absorptance",
+        "0.6;                     !- Visible Absorptance",
+
+        "Material,",
+        "VertiInsulation,           !- Name",
+        "Rough,                   !- Roughness",
+        "0.15,                     !- Thickness {m}",
+        "0.04,                    !- Conductivity {W/m-K}",
+        "15,                      !- Density {kg/m3}",
+        "1300,                    !- Specific Heat {J/kg-K}",
+        "0.9,                     !- Thermal Absorptance",
+        "0.6,                     !- Solar Absorptance",
+        "0.6;                     !- Visible Absorptance",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2038,18 +2060,18 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
     int partySize = theDomain.Partitions.Y.size();
 
     // check horizontal partitions for this case
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, 4.76985, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, 4.55, 1e-4);
     EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, insyLoc, 1e-4);
 
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, 0.13970, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, 0.10, 1e-4);
     EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, totalWid, 1e-4);
 
     EXPECT_TRUE(theDomain.Partitions.Y[partySize - 2].partitionType == PartitionType::VertInsLowerEdge);
 
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, 4.79045, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, 4.75, 1e-4);
     EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, slabBot, 1e-4);
 
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, 0.13970, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, 0.10, 1e-4);
     EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, totalWid, 1e-4);
 
     EXPECT_TRUE(theDomain.Partitions.Y[partySize - 1].partitionType == PartitionType::UnderFloor);
