@@ -121,6 +121,8 @@ namespace PlantManager {
         }
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
 } // namespace PlantManager
