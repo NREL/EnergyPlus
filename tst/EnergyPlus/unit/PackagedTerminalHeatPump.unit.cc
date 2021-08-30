@@ -1960,6 +1960,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1976,6 +1977,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1992,6 +1994,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2008,6 +2011,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2024,6 +2028,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    ROOF,                    !- Surface Type",
         "    ROOF-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2040,6 +2045,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C1-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2056,6 +2062,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C2-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2072,6 +2079,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C3-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2088,6 +2096,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C4-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2104,6 +2113,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C5-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2120,6 +2130,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2136,6 +2147,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C1-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2152,6 +2164,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2168,6 +2181,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB21,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2184,6 +2198,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB41,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2200,6 +2215,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB51,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2216,6 +2232,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2232,6 +2249,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C2-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2248,6 +2266,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2264,6 +2283,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB12,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2280,6 +2300,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB32,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2296,6 +2317,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB52,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2312,6 +2334,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2328,6 +2351,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C3-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2344,6 +2368,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2360,6 +2385,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB23,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2376,6 +2402,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB43,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2392,6 +2419,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB53,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2408,6 +2436,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2424,6 +2453,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C4-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2440,6 +2470,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2456,6 +2487,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB14,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2472,6 +2504,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB34,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2488,6 +2521,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB54,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2504,6 +2538,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C5-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2520,6 +2555,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2536,6 +2572,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB15,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2552,6 +2589,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB25,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2568,6 +2606,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB35,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2584,6 +2623,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB45,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -3810,16 +3850,16 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     state->dataGlobal->CurrentTime = 12.0;
 
     ProcessScheduleInput(*state); // read schedules
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
+    // HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    // EXPECT_FALSE(ErrorsFound);
+    // HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
+    // EXPECT_FALSE(ErrorsFound);
+    // HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    // EXPECT_FALSE(ErrorsFound);
+    // HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    // EXPECT_FALSE(ErrorsFound);
+    // SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
+    // EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(*state);
 
     HeatBalanceManager::AllocateHeatBalArrays(*state);
@@ -3905,7 +3945,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     bool FirstHVACIteration = true;
     // re-simulate the zone HVAC equipment per the priority order
     InternalHeatGains::UpdateInternalGainValues(*state);
-    state->dataHeatBal->ZoneIntGain(2).Device(2).ReturnAirConvGainRate = 50.0;
+    state->dataHeatBal->spaceIntGainDevices(2).device(2).ReturnAirConvGainRate = 50.0;
     state->dataGlobal->BeginEnvrnFlag = true;
     ZoneEquipmentManager::ManageZoneEquipment(*state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
     SimAirServingZones::InitAirLoops(*state, FirstHVACIteration);

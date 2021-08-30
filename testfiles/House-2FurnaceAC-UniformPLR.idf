@@ -466,6 +466,7 @@
     Wall,                    !- Surface Type
     EXTWALL:LIVING,          !- Construction Name
     LIVING ZONE,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -482,6 +483,7 @@
     Wall,                    !- Surface Type
     EXTWALL:LIVING,          !- Construction Name
     LIVING ZONE,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -498,6 +500,7 @@
     Wall,                    !- Surface Type
     EXTWALL:LIVING,          !- Construction Name
     LIVING ZONE,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -514,6 +517,7 @@
     Wall,                    !- Surface Type
     EXTWALL:LIVING,          !- Construction Name
     LIVING ZONE,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -530,6 +534,7 @@
     WALL,                    !- Surface Type
     INTERIORWall,            !- Construction Name
     GARAGE ZONE,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Living:Interior,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -546,6 +551,7 @@
     WALL,                    !- Surface Type
     INTERIORWall,            !- Construction Name
     LIVING ZONE,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Garage:Interior,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -562,6 +568,7 @@
     FLOOR,                   !- Surface Type
     FLOOR:LIVING,            !- Construction Name
     LIVING ZONE,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Living:Floor,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -578,6 +585,7 @@
     CEILING,                 !- Surface Type
     CEILING:LIVING,          !- Construction Name
     LIVING ZONE,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Attic:LivingFloor,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -594,6 +602,7 @@
     FLOOR,                   !- Surface Type
     reverseCEILING:LIVING,   !- Construction Name
     ATTIC ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Living:Ceiling,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -610,6 +619,7 @@
     ROOF,                    !- Surface Type
     ROOF,                    !- Construction Name
     ATTIC ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -626,6 +636,7 @@
     ROOF,                    !- Surface Type
     ROOF,                    !- Construction Name
     ATTIC ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -642,6 +653,7 @@
     ROOF,                    !- Surface Type
     ROOF,                    !- Construction Name
     ATTIC ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -658,6 +670,7 @@
     ROOF,                    !- Surface Type
     ROOF,                    !- Construction Name
     ATTIC ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -674,6 +687,7 @@
     ROOF,                    !- Surface Type
     ROOF,                    !- Construction Name
     ATTIC ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -689,6 +703,7 @@
     WALL,                    !- Surface Type
     GABLE,                   !- Construction Name
     ATTIC ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -704,6 +719,7 @@
     WALL,                    !- Surface Type
     GABLE,                   !- Construction Name
     ATTIC ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -719,6 +735,7 @@
     ROOF,                    !- Surface Type
     ROOF,                    !- Construction Name
     ATTIC ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -735,6 +752,7 @@
     ROOF,                    !- Surface Type
     ROOF,                    !- Construction Name
     ATTIC ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -751,6 +769,7 @@
     WALL,                    !- Surface Type
     GABLE,                   !- Construction Name
     ATTIC ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -766,6 +785,7 @@
     WALL,                    !- Surface Type
     EXTWALL:GARAGE,          !- Construction Name
     GARAGE ZONE,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -782,6 +802,7 @@
     WALL,                    !- Surface Type
     EXTWALL:GARAGE,          !- Construction Name
     GARAGE ZONE,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -798,6 +819,7 @@
     WALL,                    !- Surface Type
     Garage:SteelDoor,        !- Construction Name
     GARAGE ZONE,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -814,6 +836,7 @@
     FLOOR,                   !- Surface Type
     CEILING:Garage,          !- Construction Name
     ATTIC ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Garage:Ceiling,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -830,6 +853,7 @@
     CEILING,                 !- Surface Type
     CEILING:Garage,          !- Construction Name
     GARAGE ZONE,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Attic:GarageFloor,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -846,6 +870,7 @@
     FLOOR,                   !- Surface Type
     FLOOR:GARAGE,            !- Construction Name
     GARAGE ZONE,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Garage:Floor,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure

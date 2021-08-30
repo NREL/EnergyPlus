@@ -336,6 +336,36 @@ namespace DataHeatBalance {
         }
     };
 
+    struct SpaceData
+    {
+        std::string Name = "";                        // Space name
+        int zoneNum = 0;                              // Pointer to Zone wich contains this space
+        Real64 userEnteredFloorArea = 0.0;            // User input floor area for this space
+        std::string spaceType = "General";            // Space type tag
+        int spaceTypeNum = 0;                         // Points to spaceType for this space
+        EPVector<std::string> tags;                   // Optional tags for reporting
+        EPVector<int> surfaces;                       // Pointers to surfaces in this space
+        Real64 calcFloorArea = 0.0;                   // Calculated floor area used for this space
+        Real64 floorArea = 0.0;                       // Floor area used for this space
+        bool hasFloor = false;                        // Has "Floor" surface
+        Real64 extWindowArea = 0.0;                   // Exterior Window Area for Zone
+        Real64 totalSurfArea = 0.0;                   // Total surface area for Zone
+        int radiantEnclosureNum = 0;                  // Radiant exchange enclosure this space belongs to
+        int solarEnclosureNum = 0;                    // Solar distribution enclosure this space belongs to
+        Real64 totOccupants = 0.0;                    // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
+        Real64 minOccupants = 0.0;                    // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
+        Real64 maxOccupants = 0.0;                    // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
+        std::vector<std::string> otherEquipFuelTypes; // List of fuel types used by other equipment in this space
+    };
+
+    struct SpaceListData
+    {
+        std::string Name = "";                          // Space List name
+        int numOfSpaces = 0;                            // Number of spaces in the list
+        std::string::size_type maxSpaceNameLength = 0u; // Max Name length of Spaces in the list
+        EPVector<int> spaces;                           // Pointers to Spaces in the list
+    };
+
     struct ZoneData
     {
         // Members
@@ -409,8 +439,9 @@ namespace DataHeatBalance {
         std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneExtSolarSurfaceList;    // List of exterior solar surfaces in a zone
-        int RadiantEnclosureNum;                     // Radiant exchange enclosure this zone belongs to (related to air boundaries)
-        int SolarEnclosureNum;                       // Solar distribution enclosure this zone belongs to (related to air boundaries)
+        int zoneRadEnclosureFirst;                   // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
+        int zoneRadEnclosureLast;                    // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
+        int zoneFirstSpaceSolEnclosure; // TODO: For daylighting, this is a punt, it's the solar enclosure number of the first space in the zone
 
         Real64 OutDryBulbTemp;                 // Zone outside dry bulb air temperature (C)
         bool OutDryBulbTempEMSOverrideOn;      // if true, EMS is calling to override the surface's outdoor air temp
@@ -428,11 +459,12 @@ namespace DataHeatBalance {
         bool HasLinkedOutAirNode; // true if an OutdoorAir::Node is linked to the surface
         int LinkedOutAirNode;     // Index of the an OutdoorAir:Node
 
-        bool isPartOfTotalArea;   // Count the zone area when determining the building total floor area
-        bool isNominalOccupied;   // has occupancy nominally specified
-        bool isNominalControlled; // has Controlled Zone Equip Configuration reference
-        Real64 TotOccupants;      // total design occupancy
-        // (sum of NumberOfPeople for the zone from People object)
+        bool isPartOfTotalArea;          // Count the zone area when determining the building total floor area
+        bool isNominalOccupied;          // has occupancy nominally specified
+        bool isNominalControlled;        // has Controlled Zone Equip Configuration reference
+        Real64 TotOccupants;             // total design occupancy (sum of NumberOfPeople for the zone People objects, not multiplied)
+        Real64 minOccupants;             // minimum occupancy (sum of NomMinNumberPeople for the zone People objects, not multiplied)
+        Real64 maxOccupants;             // maximum occupancy (sum of NomMaxNumberPeople for the zone People objects, not multiplied)
         int AirHBimBalanceErrIndex;      // error management counter
         bool NoHeatToReturnAir;          // TRUE means that heat to return air should be added to the zone load
         bool RefrigCaseRA;               // TRUE means there is potentially heat removal from return air
@@ -442,16 +474,16 @@ namespace DataHeatBalance {
         bool HasLtsRetAirGain;       // TRUE means that zone lights return air heat > 0.0 calculated from plenum temperature
         bool HasAirFlowWindowReturn; // TRUE means that zone has return air flow from windows
         // from refrigeration cases for this zone
-        Real64 InternalHeatGains;     // internal loads (W)
-        Real64 NominalInfilVent;      // internal infiltration/ventilation
-        Real64 NominalMixing;         // internal mixing/cross mixing
-        bool TempOutOfBoundsReported; // if any temp out of bounds errors, first will show zone details.
-        bool EnforcedReciprocity;     // if zone required forced reciprocity --
-        //   less out of bounds temperature errors allowed
-        int ZoneMinCO2SchedIndex;           // Index for the schedule the schedule which determines minimum CO2 concentration
-        int ZoneMaxCO2SchedIndex;           // Index for the schedule the schedule which determines maximum CO2 concentration
-        int ZoneContamControllerSchedIndex; // Index for this schedule
-        bool FlagCustomizedZoneCap;         // True if customized Zone Capacitance Multiplier is used
+        Real64 InternalHeatGains;                     // internal loads (W)
+        Real64 NominalInfilVent;                      // internal infiltration/ventilation
+        Real64 NominalMixing;                         // internal mixing/cross mixing
+        bool TempOutOfBoundsReported;                 // if any temp out of bounds errors, first will show zone details.
+        bool EnforcedReciprocity;                     // if zone/space required forced reciprocity -- less out of bounds temp errors allowed
+        int ZoneMinCO2SchedIndex;                     // Index for the schedule the schedule which determines minimum CO2 concentration
+        int ZoneMaxCO2SchedIndex;                     // Index for the schedule the schedule which determines maximum CO2 concentration
+        int ZoneContamControllerSchedIndex;           // Index for this schedule
+        bool FlagCustomizedZoneCap;                   // True if customized Zone Capacitance Multiplier is used
+        std::vector<std::string> otherEquipFuelTypes; // List of fuel types used by other equipment in this zone
 
         // Hybrid Modeling
         Real64 ZoneMeasuredTemperature;               // Measured zone air temperature input by user
@@ -478,6 +510,12 @@ namespace DataHeatBalance {
         Real64 delta_T;                               // Indoor and outdoor temperature
         Real64 delta_HumRat;                          // Indoor and outdoor humidity ratio delta
 
+        // Spaces
+        bool anySurfacesWithoutSpace; // True if any surfaces in a zone do not have a space assigned in input
+        bool anySurfacesWithSpace;    // True if any surfaces in a zone have a space assigned in input
+        EPVector<int> spaceIndexes;   // Indexes to spaces in this zone
+        int numSpaces;                // Number of spaces in this zone
+
         // Default Constructor
         ZoneData()
             : Multiplier(1), ListMultiplier(1), ListGroup(0), RelNorth(0.0), OriginX(0.0), OriginY(0.0), OriginZ(0.0),
@@ -491,23 +529,25 @@ namespace DataHeatBalance {
               OpaqOrIntMassSurfaceLast(-1), WindowSurfaceFirst(0), WindowSurfaceLast(-1), OpaqOrWinSurfaceFirst(0), OpaqOrWinSurfaceLast(-1),
               TDDDomeFirst(0), TDDDomeLast(-1), InsideConvectionAlgo(ConvectionConstants::HcInt_ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0),
               NumShadingSurfaces(0), OutsideConvectionAlgo(ConvectionConstants::HcExt_ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0),
-              MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0), RadiantEnclosureNum(0), SolarEnclosureNum(0),
+              MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0), zoneRadEnclosureFirst(-1), zoneRadEnclosureLast(-1),
+              zoneFirstSpaceSolEnclosure(0),
 
               OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0),
               OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),
               WindSpeedEMSOverrideValue(0.0), WindDir(0.0), WindDirEMSOverrideOn(false), WindDirEMSOverrideValue(0.0), HasLinkedOutAirNode(false),
               LinkedOutAirNode(0.0), isPartOfTotalArea(true), isNominalOccupied(false), isNominalControlled(false), TotOccupants(0.0),
-              AirHBimBalanceErrIndex(0), NoHeatToReturnAir(false), RefrigCaseRA(false), HasAdjustedReturnTempByITE(false),
-              AdjustedReturnTempByITE(0.0), HasLtsRetAirGain(false), HasAirFlowWindowReturn(false), InternalHeatGains(0.0), NominalInfilVent(0.0),
-              NominalMixing(0.0), TempOutOfBoundsReported(false), EnforcedReciprocity(false), ZoneMinCO2SchedIndex(0), ZoneMaxCO2SchedIndex(0),
-              ZoneContamControllerSchedIndex(0), FlagCustomizedZoneCap(false),
+              minOccupants(0.0), maxOccupants(0.0), AirHBimBalanceErrIndex(0), NoHeatToReturnAir(false), RefrigCaseRA(false),
+              HasAdjustedReturnTempByITE(false), AdjustedReturnTempByITE(0.0), HasLtsRetAirGain(false), HasAirFlowWindowReturn(false),
+              InternalHeatGains(0.0), NominalInfilVent(0.0), NominalMixing(0.0), TempOutOfBoundsReported(false), EnforcedReciprocity(false),
+              ZoneMinCO2SchedIndex(0), ZoneMaxCO2SchedIndex(0), ZoneContamControllerSchedIndex(0), FlagCustomizedZoneCap(false),
               // Hybrid Modeling
               ZoneMeasuredTemperature(0.0), ZoneMeasuredHumidityRatio(0.0), ZoneMeasuredCO2Concentration(0.0), ZoneMeasuredSupplyAirTemperature(0.0),
               ZoneMeasuredSupplyAirFlowRate(0.0), ZoneMeasuredSupplyAirHumidityRatio(0.0), ZoneMeasuredSupplyAirCO2Concentration(0.0),
               ZonePeopleActivityLevel(0.0), ZonePeopleSensibleHeatFraction(0.0), ZonePeopleRadiantHeatFraction(0.0), ZoneVolCapMultpSens(1.0),
               ZoneVolCapMultpMoist(1.0), ZoneVolCapMultpCO2(1.0), ZoneVolCapMultpGenContam(1.0), ZoneVolCapMultpSensHM(1.0),
               ZoneVolCapMultpSensHMSum(0.0), ZoneVolCapMultpSensHMCountSum(0.0), ZoneVolCapMultpSensHMAverage(1.0), MCPIHM(0.0),
-              InfilOAAirChangeRateHM(0.0), NumOccHM(0.0), delta_T(0.0), delta_HumRat(0.0)
+              InfilOAAirChangeRateHM(0.0), NumOccHM(0.0), delta_T(0.0), delta_HumRat(0.0), anySurfacesWithoutSpace(false),
+              anySurfacesWithSpace(false), numSpaces(0)
         {
         }
 
@@ -548,23 +588,25 @@ namespace DataHeatBalance {
     struct GlobalInternalGainMiscObject
     {
         // Members
-        std::string Name;
-        int ZoneOrZoneListPtr;
-        int NumOfZones;
-        int StartPtr;
-        bool ZoneListActive;
-
-        // Default Constructor
-        GlobalInternalGainMiscObject() : ZoneOrZoneListPtr(0), NumOfZones(0), StartPtr(0), ZoneListActive(false)
-        {
-        }
+        std::string Name = "";
+        int ZoneOrZoneListPtr = 0;
+        int NumOfZones = 0;
+        int StartPtr = 0;
+        bool ZoneListActive = false;
+        int spaceOrSpaceListPtr = 0;
+        int numOfSpaces = 0;
+        int spaceStartPtr = 0;
+        bool spaceListActive = false;
+        EPVector<int> spaceNums;     // Indexes to spaces associated with this input object
+        EPVector<std::string> names; // Names for each instance created from this input object
     };
 
     struct PeopleData
     {
         // Members
         std::string Name;         // PEOPLE object name
-        int ZonePtr;              // Pointer to the zone number for this people statement
+        int ZonePtr;              // Zone index for this people statement
+        int spaceIndex;           // Space index for this people statement
         Real64 NumberOfPeople;    // Maximum number of people for this statement
         int NumberOfPeoplePtr;    // Pointer to schedule for number of people
         bool EMSPeopleOn;         // EMS actuating number of people if .TRUE.
@@ -626,7 +668,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         PeopleData()
-            : ZonePtr(0), NumberOfPeople(0.0), NumberOfPeoplePtr(-1), EMSPeopleOn(false), EMSNumberOfPeople(0.0), ActivityLevelPtr(-1),
+            : ZonePtr(0), spaceIndex(0), NumberOfPeople(0.0), NumberOfPeoplePtr(-1), EMSPeopleOn(false), EMSNumberOfPeople(0.0), ActivityLevelPtr(-1),
               FractionRadiant(0.0), FractionConvected(0.0), NomMinNumberPeople(0.0), NomMaxNumberPeople(0.0), WorkEffPtr(-1), ClothingPtr(-1),
               ClothingMethodPtr(-1), ClothingType(-1), AirVelocityPtr(-1), AnkleAirVelocityPtr(-1), Fanger(false), Pierce(false), KSU(false),
               AdaptiveASH55(false), AdaptiveCEN15251(false), CoolingEffectASH55(false), AnkleDraftASH55(false),
@@ -644,6 +686,7 @@ namespace DataHeatBalance {
         // Members
         std::string Name;           // LIGHTS object name
         int ZonePtr;                // Which zone lights are in
+        int spaceIndex;             // Space index for this lights instance
         int SchedPtr;               // Schedule for lights
         Real64 DesignLevel;         // design level for lights [W]
         bool EMSLightsOn;           // EMS actuating Lighting power if .TRUE.
@@ -682,8 +725,8 @@ namespace DataHeatBalance {
 
         // Default Constructor
         LightsData()
-            : ZonePtr(0), SchedPtr(-1), DesignLevel(0.0), EMSLightsOn(false), EMSLightingPower(0.0), FractionReturnAir(0.0), FractionRadiant(0.0),
-              FractionShortWave(0.0), FractionReplaceable(0.0), FractionConvected(0.0), FractionReturnAirIsCalculated(false),
+            : ZonePtr(0), spaceIndex(0), SchedPtr(-1), DesignLevel(0.0), EMSLightsOn(false), EMSLightingPower(0.0), FractionReturnAir(0.0),
+              FractionRadiant(0.0), FractionShortWave(0.0), FractionReplaceable(0.0), FractionConvected(0.0), FractionReturnAirIsCalculated(false),
               FractionReturnAirPlenTempCoeff1(0.0), FractionReturnAirPlenTempCoeff2(0.0), ZoneReturnNum(1), ZoneExhaustNodeNum(0),
               NomMinDesignLevel(0.0), NomMaxDesignLevel(0.0), ManageDemand(false), DemandLimit(0.0), Power(0.0), RadGainRate(0.0), VisGainRate(0.0),
               ConGainRate(0.0), RetAirGainRate(0.0), TotGainRate(0.0), Consumption(0.0), RadGainEnergy(0.0), VisGainEnergy(0.0), ConGainEnergy(0.0),
@@ -697,6 +740,7 @@ namespace DataHeatBalance {
         // Members
         std::string Name;            // EQUIPMENT object name
         int ZonePtr;                 // Which zone internal gain is in
+        int spaceIndex;              // Space index for this equipment instance
         int SchedPtr;                // Schedule for internal gain
         Real64 DesignLevel;          // design level for internal gain [W]
         bool EMSZoneEquipOverrideOn; // EMS actuating equipment power if .TRUE.
@@ -726,15 +770,16 @@ namespace DataHeatBalance {
         Real64 LostEnergy;                                       // Lost energy (converted to work) [J]
         Real64 TotGainEnergy;                                    // Total heat gain [J]
         std::string EndUseSubcategory;                           // user defined name for the end use category
+        std::string otherEquipFuelTypeString;                    // Fuel Type string for Other Equipment
         ExteriorEnergyUse::ExteriorFuelUsage OtherEquipFuelType; // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
 
         // Default Constructor
         ZoneEquipData()
-            : ZonePtr(0), SchedPtr(0), DesignLevel(0.0), EMSZoneEquipOverrideOn(false), EMSEquipPower(0.0), FractionLatent(0.0), FractionRadiant(0.0),
-              FractionLost(0.0), FractionConvected(0.0), CO2DesignRate(0.0), CO2RateFactor(0.0), NomMinDesignLevel(0.0), NomMaxDesignLevel(0.0),
-              ManageDemand(false), DemandLimit(0.0), Power(0.0), RadGainRate(0.0), ConGainRate(0.0), LatGainRate(0.0), LostRate(0.0),
-              TotGainRate(0.0), CO2GainRate(0.0), Consumption(0.0), RadGainEnergy(0.0), ConGainEnergy(0.0), LatGainEnergy(0.0), LostEnergy(0.0),
-              TotGainEnergy(0.0), OtherEquipFuelType(ExteriorEnergyUse::ExteriorFuelUsage::Unknown)
+            : ZonePtr(0), spaceIndex(0), SchedPtr(0), DesignLevel(0.0), EMSZoneEquipOverrideOn(false), EMSEquipPower(0.0), FractionLatent(0.0),
+              FractionRadiant(0.0), FractionLost(0.0), FractionConvected(0.0), CO2DesignRate(0.0), CO2RateFactor(0.0), NomMinDesignLevel(0.0),
+              NomMaxDesignLevel(0.0), ManageDemand(false), DemandLimit(0.0), Power(0.0), RadGainRate(0.0), ConGainRate(0.0), LatGainRate(0.0),
+              LostRate(0.0), TotGainRate(0.0), CO2GainRate(0.0), Consumption(0.0), RadGainEnergy(0.0), ConGainEnergy(0.0), LatGainEnergy(0.0),
+              LostEnergy(0.0), TotGainEnergy(0.0), OtherEquipFuelType(ExteriorEnergyUse::ExteriorFuelUsage::Unknown)
         {
         }
     };
@@ -744,6 +789,7 @@ namespace DataHeatBalance {
         // Members
         std::string Name;                  // EQUIPMENT object name
         int ZonePtr;                       // Which zone internal gain is in
+        int spaceIndex;                    // Space index for this equipment instance
         bool FlowControlWithApproachTemps; // True if using supply and return approach temperature for ITE object.
         Real64 DesignTotalPower;           // Design level for internal gain [W]
         Real64 NomMinDesignLevel;          // Nominal Minimum Design Level (min sch X design level)
@@ -824,7 +870,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         ITEquipData()
-            : ZonePtr(0), FlowControlWithApproachTemps(false), DesignTotalPower(0.0), NomMinDesignLevel(0.0), NomMaxDesignLevel(0.0),
+            : ZonePtr(0), spaceIndex(0), FlowControlWithApproachTemps(false), DesignTotalPower(0.0), NomMinDesignLevel(0.0), NomMaxDesignLevel(0.0),
               DesignFanPowerFrac(0.0), OperSchedPtr(0), CPULoadSchedPtr(0), SizingTAirIn(0.0), DesignTAirIn(0.0), DesignFanPower(0.0),
               DesignCPUPower(0.0), DesignAirVolFlowRate(0.0), Class(0), AirFlowFLTCurve(0), CPUPowerFLTCurve(0), FanPowerFFCurve(0),
               AirConnectionType(0), InletRoomAirNodeNum(0), OutletRoomAirNodeNum(0), SupplyAirNodeNum(0), DesignRecircFrac(0.0), RecircFLTCurve(0),
@@ -846,6 +892,7 @@ namespace DataHeatBalance {
         // Members
         std::string Name; // BASEBOARD HEAT object name
         int ZonePtr;
+        int spaceIndex; // Space index for this equipment instance
         int SchedPtr;
         Real64 CapatLowTemperature;
         Real64 LowTemperature;
@@ -870,7 +917,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         BBHeatData()
-            : ZonePtr(0), SchedPtr(0), CapatLowTemperature(0.0), LowTemperature(0.0), CapatHighTemperature(0.0), HighTemperature(0.0),
+            : ZonePtr(0), spaceIndex(0), SchedPtr(0), CapatLowTemperature(0.0), LowTemperature(0.0), CapatHighTemperature(0.0), HighTemperature(0.0),
               EMSZoneBaseboardOverrideOn(false), EMSZoneBaseboardPower(0.0), FractionRadiant(0.0), FractionConvected(0.0), ManageDemand(false),
               DemandLimit(0.0), Power(0.0), RadGainRate(0.0), ConGainRate(0.0), TotGainRate(0.0), Consumption(0.0), RadGainEnergy(0.0),
               ConGainEnergy(0.0), TotGainEnergy(0.0)
@@ -896,24 +943,41 @@ namespace DataHeatBalance {
         Real64 BasicStackCoefficient; // "Cs" Stack coefficient
         Real64 BasicWindCoefficient;  // "Cw" wind coefficient
         // Flow Coefficient, AIM-2, Walker and Wilson terms
-        Real64 FlowCoefficient;      // "c" Flow coefficient
-        Real64 AIM2StackCoefficient; // "Cs" stack coefficient
-        Real64 AIM2WindCoefficient;  // "Cw" wind coefficient
-        Real64 PressureExponent;     // "n" pressure power law exponent
-        Real64 ShelterFactor;        // "s" shelter factor
-        bool EMSOverrideOn;          // if true then EMS is requesting to override
-        Real64 EMSAirFlowRateValue;  // value EMS is setting for air flow rate
-        bool QuadratureSum;          // If quadrature sum of zone air balance method is used
-        int OABalancePtr;            // A pointer to ZoneAirBalance If quadrature is true
-        Real64 VolumeFlowRate;       // infiltration air volume flow rate
-        Real64 MassFlowRate;         // infiltration air mass flow rate
+        Real64 FlowCoefficient;       // "c" Flow coefficient
+        Real64 AIM2StackCoefficient;  // "Cs" stack coefficient
+        Real64 AIM2WindCoefficient;   // "Cw" wind coefficient
+        Real64 PressureExponent;      // "n" pressure power law exponent
+        Real64 ShelterFactor;         // "s" shelter factor
+        bool EMSOverrideOn;           // if true then EMS is requesting to override
+        Real64 EMSAirFlowRateValue;   // value EMS is setting for air flow rate
+        bool QuadratureSum;           // If quadrature sum of zone air balance method is used
+        int OABalancePtr;             // A pointer to ZoneAirBalance If quadrature is true
+        Real64 VolumeFlowRate;        // infiltration air volume flow rate
+        Real64 MassFlowRate;          // infiltration air mass flow rate
+        Real64 MCpI_temp;             // INFILTRATION MASS FLOW * AIR SPECIFIC HEAT
+        Real64 InfilHeatGain;         // Heat Gain {J} due to infiltration
+        Real64 InfilHeatLoss;         // Heat Loss {J} due to infiltration
+        Real64 InfilLatentGain;       // Latent Gain {J} due to infiltration
+        Real64 InfilLatentLoss;       // Latent Loss {J} due to infiltration
+        Real64 InfilTotalGain;        // Total Gain {J} due to infiltration (sensible+latent)
+        Real64 InfilTotalLoss;        // Total Loss {J} due to infiltration (sensible+latent)
+        Real64 InfilVolumeCurDensity; // Volume of Air {m3} due to infiltration at current zone air density
+        Real64 InfilVolumeStdDensity; // Volume of Air {m3} due to infiltration at standard density (adjusted for elevation)
+        Real64 InfilVdotCurDensity;   // Volume flow rate of Air {m3/s} due to infiltration at current zone air density
+        Real64 InfilVdotStdDensity;   // Volume flow rate of Air {m3/s} due to infiltration standard density (adjusted elevation)
+        Real64 InfilMdot;             // Mass flow rate {kg/s} due to infiltration for reporting
+        Real64 InfilMass;             // Mass of Air {kg} due to infiltration
+        Real64 InfilAirChangeRate;    // Infiltration air change rate {ach}
 
         // Default Constructor
         InfiltrationData()
             : ZonePtr(0), SchedPtr(0), ModelType(0), DesignLevel(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0),
               VelocitySQTermCoef(0.0), LeakageArea(0.0), BasicStackCoefficient(0.0), BasicWindCoefficient(0.0), FlowCoefficient(0.0),
               AIM2StackCoefficient(0.0), AIM2WindCoefficient(0.0), PressureExponent(0.0), ShelterFactor(0.0), EMSOverrideOn(false),
-              EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0), MassFlowRate(0.0)
+              EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0), MassFlowRate(0.0), MCpI_temp(0.0),
+              InfilHeatGain(0.0), InfilHeatLoss(0.0), InfilLatentGain(0.0), InfilLatentLoss(0.0), InfilTotalGain(0.0), InfilTotalLoss(0.0),
+              InfilVolumeCurDensity(0.0), InfilVolumeStdDensity(0.0), InfilVdotCurDensity(0.0), InfilVdotStdDensity(0.0), InfilMdot(0.0),
+              InfilMass(0.0), InfilAirChangeRate(0.0)
         {
         }
     };
@@ -1120,6 +1184,7 @@ namespace DataHeatBalance {
         std::string CompObjectType;         // device object class name
         std::string CompObjectName;         // device user unique name
         int CompTypeOfNum;                  // type of internal gain device identifier
+        Real64 spaceGainFrac;               // Fraction of gain value assigned to this Space (because gain rate might be for an entire zone)
         Real64 *PtrConvectGainRate;         // POINTER to value of convection heat gain rate for device, watts
         Real64 ConvectGainRate;             // current timestep value of convection heat gain rate for device, watts
         Real64 *PtrReturnAirConvGainRate;   // POINTER to value of return air convection heat gain rate for device, W
@@ -1138,18 +1203,18 @@ namespace DataHeatBalance {
 
         // Default Constructor
         GenericComponentZoneIntGainStruct()
-            : CompTypeOfNum(0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0), PtrReturnAirConvGainRate(nullptr), ReturnAirConvGainRate(0.0),
-              PtrRadiantGainRate(nullptr), RadiantGainRate(0.0), PtrLatentGainRate(nullptr), LatentGainRate(0.0), PtrReturnAirLatentGainRate(nullptr),
-              ReturnAirLatentGainRate(0.0), PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0), PtrGenericContamGainRate(nullptr),
-              GenericContamGainRate(0.0), ReturnAirNodeNum(0)
+            : CompTypeOfNum(0), spaceGainFrac(1.0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0), PtrReturnAirConvGainRate(nullptr),
+              ReturnAirConvGainRate(0.0), PtrRadiantGainRate(nullptr), RadiantGainRate(0.0), PtrLatentGainRate(nullptr), LatentGainRate(0.0),
+              PtrReturnAirLatentGainRate(nullptr), ReturnAirLatentGainRate(0.0), PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0),
+              PtrGenericContamGainRate(nullptr), GenericContamGainRate(0.0), ReturnAirNodeNum(0)
         {
         }
     };
 
-    struct ZoneSimData // Calculated data by Zone during each time step/hour
+    struct SpaceZoneSimData // Calculated data by Space or Zone during each time step/hour
     {
         // Members
-        Real64 NOFOCC;  // Number of Occupants, zone total
+        Real64 NOFOCC;  // Number of Occupants
         Real64 QOCTOT;  // Total Energy from Occupants
         Real64 QOCSEN;  // Sensible Energy from Occupants
         Real64 QOCCON;  // ENERGY CONVECTED FROM OCCUPANTS (WH)
@@ -1182,18 +1247,22 @@ namespace DataHeatBalance {
         Real64 QSELAT;  // LATENT ENERGY FROM Steam Equipment
         Real64 QBBCON;  // ENERGY CONVECTED FROM BASEBOARD HEATING
         Real64 QBBRAD;  // ENERGY RADIATED FROM BASEBOARD HEATING
-        int NumberOfDevices;
-        int MaxNumberOfDevices;
-        Array1D<GenericComponentZoneIntGainStruct> Device;
 
         // Default Constructor
-        ZoneSimData()
+        SpaceZoneSimData()
             : NOFOCC(0.0), QOCTOT(0.0), QOCSEN(0.0), QOCCON(0.0), QOCRAD(0.0), QOCLAT(0.0), QLTTOT(0.0), QLTCON(0.0), QLTRAD(0.0), QLTCRA(0.0),
               QLTSW(0.0), QEECON(0.0), QEERAD(0.0), QEELost(0.0), QEELAT(0.0), QGECON(0.0), QGERAD(0.0), QGELost(0.0), QGELAT(0.0), QOECON(0.0),
               QOERAD(0.0), QOELost(0.0), QOELAT(0.0), QHWCON(0.0), QHWRAD(0.0), QHWLost(0.0), QHWLAT(0.0), QSECON(0.0), QSERAD(0.0), QSELost(0.0),
-              QSELAT(0.0), QBBCON(0.0), QBBRAD(0.0), NumberOfDevices(0), MaxNumberOfDevices(0)
+              QSELAT(0.0), QBBCON(0.0), QBBRAD(0.0)
         {
         }
+    };
+
+    struct SpaceIntGainDeviceData
+    {
+        int numberOfDevices = 0;
+        int maxNumberOfDevices = 0;
+        Array1D<GenericComponentZoneIntGainStruct> device;
     };
 
     struct WindowBlindProperties
@@ -1714,7 +1783,7 @@ namespace DataHeatBalance {
         }
     };
 
-    struct ZoneReportVars // Zone level.
+    struct ZoneReportVars // Zone and Space report variables
     {
         // Members
         // People
@@ -2003,13 +2072,15 @@ struct HeatBalanceData : BaseGlobalStruct
     int NumSteamEqStatements = 0;       // number of Steam Equipment objects in input. - possibly global assignments
     int NumOtherEqStatements = 0;       // number of Other Equipment objects in input. - possibly global assignments
     int NumZoneITEqStatements = 0;      // number of Other Equipment objects in input. - possibly global assignments
-    int TotPeople = 0;                  // Total People Statements in input and extrapolated from global assignments
-    int TotLights = 0;                  // Total Lights Statements in input and extrapolated from global assignments
-    int TotElecEquip = 0;               // Total Electric Equipment Statements in input and extrapolated from global assignments
-    int TotGasEquip = 0;                // Total Gas Equipment Statements in input
-    int TotOthEquip = 0;                // Total Other Equipment Statements in input
-    int TotHWEquip = 0;                 // Total Hot Water Equipment Statements in input
-    int TotStmEquip = 0;                // Total Steam Equipment Statements in input
+    int NumZoneBBHeatStatements = 0;    // number of ZoneBaseboard heat objects in input. - possibly global assignments
+    int TotPeople = 0;                  // Total People instances after expansion to spaces
+    int TotLights = 0;                  // Total Lights instances after expansion to spaces
+    int TotElecEquip = 0;               // Total Electric Equipment instances after expansion to spaces
+    int TotGasEquip = 0;                // Total Gas Equipment instances after expansion to spaces
+    int TotOthEquip = 0;                // Total Other Equipment instances after expansion to spaces
+    int TotHWEquip = 0;                 // Total Hot Water Equipment instances after expansion to spaces
+    int TotStmEquip = 0;                // Total Steam Equipment instances after expansion to spaces
+    int TotITEquip = 0;                 // Total IT Equipment instances after expansion to spaces
     int TotInfiltration = 0;            // Total Infiltration Statements in input and extrapolated from global assignments
     int TotDesignFlowInfiltration = 0;  // number of Design Flow rate ZoneInfiltration in input
     int TotShermGrimsInfiltration = 0;  // number of Sherman Grimsrud (ZoneInfiltration:ResidentialBasic) in input
@@ -2020,7 +2091,7 @@ struct HeatBalanceData : BaseGlobalStruct
     int TotMixing = 0;                  // Total Mixing Statements in input
     int TotCrossMixing = 0;             // Total Cross Mixing Statements in input
     int TotRefDoorMixing = 0;           // Total RefrigerationDoor Mixing Statements in input
-    int TotBBHeat = 0;                  // Total BBHeat Statements in input
+    int TotBBHeat = 0;                  // Total BBHeat Statements instances after expansion to spaces
     int TotMaterials = 0;               // Total number of unique materials (layers) in this simulation
     int TotConstructs = 0;              // Total number of unique constructions in this simulation
     int TotSpectralData = 0;            // Total window glass spectral data sets
@@ -2052,6 +2123,8 @@ struct HeatBalanceData : BaseGlobalStruct
     bool CalcWindowRevealReflection = false; // True if window reveal reflection is to be calculated for at least one exterior window
     bool StormWinChangeThisDay = false; // True if a storm window has been added or removed from any window during the current day; can only be true
                                         // for first time step of the day.
+    bool SimpleCTFOnly = true;          // true if all constructions are simple CTF construction (CTFTimestep = TimeStepZone) with no internal sources
+    int MaxCTFTerms = 0;                // Maximum CTF terms to shift for all surfaces in the simulation
     bool AnyInternalHeatSourceInInput = false;        // true if the user has entered any constructions with internal sources
     bool AdaptiveComfortRequested_CEN15251 = false;   // true if people objects have adaptive comfort requests. CEN15251
     bool AdaptiveComfortRequested_ASH55 = false;      // true if people objects have adaptive comfort requests. ASH55
@@ -2091,7 +2164,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> ZoneWinHeatLossRep;             // = -ZoneWinHeatGain when ZoneWinHeatGain < 0
     Array1D<Real64> ZoneBmSolFrExtWinsRep;          // Beam solar into zone from exterior windows [W]
     Array1D<Real64> ZoneBmSolFrIntWinsRep;          // Beam solar into zone from interior windows [W]
-    Array1D<Real64> ZoneInitialDifSolReflW;         // Initial diffuse solar in zone from ext and int windows reflected from interior surfaces [W]
+    Array1D<Real64> EnclSolInitialDifSolReflW;      // Initial diffuse solar in zone from ext and int windows reflected from interior surfaces [W]
     Array1D<Real64> ZoneDifSolFrExtWinsRep;         // Diffuse solar into zone from exterior windows [W]
     Array1D<Real64> ZoneDifSolFrIntWinsRep;         // Diffuse solar into zone from interior windows [W]
     Array1D<Real64> ZoneOpaqSurfInsFaceCond;        // Zone inside face opaque surface conduction (W)
@@ -2174,7 +2247,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> EnclSolVMULT;        // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
     Array1D<Real64> EnclRadQThermalRad;  // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
     Array1D<Real64> EnclRadThermAbsMult; // EnclRadThermAbsMult  - MULTIPLIER TO COMPUTE 'ITABSF'
-    Array1D<bool> ZoneSolAbsFirstCalc;   // for error message
+    Array1D<bool> EnclSolAbsFirstCalc;   // for error message
     Array1D<bool> EnclRadReCalc;         // Enclosure solar or thermal radiation properties needs to be recalc due to window/shading status change
 
     bool EnclRadAlwaysReCalc = false; // Enclosure solar or thermal radiation properties always needs to be recalc at any time step
@@ -2197,10 +2270,14 @@ struct HeatBalanceData : BaseGlobalStruct
     std::vector<Real64> AirBoundaryMixingVol; // Air boundary simple mixing volume flow rate [m3/s]
     EPVector<DataHeatBalance::ZonePreDefRepType> ZonePreDefRep;
     DataHeatBalance::ZonePreDefRepType BuildingPreDefRep;
-    EPVector<DataHeatBalance::ZoneSimData> ZoneIntGain;
+    EPVector<DataHeatBalance::SpaceZoneSimData> ZoneIntGain;
+    EPVector<DataHeatBalance::SpaceZoneSimData> spaceIntGain;
+    EPVector<DataHeatBalance::SpaceIntGainDeviceData> spaceIntGainDevices;
     EPVector<DataHeatBalance::GapSupportPillar> SupportPillar;
     EPVector<DataHeatBalance::GapDeflectionState> DeflectionState;
     EPVector<DataHeatBalance::SpectralDataProperties> SpectralData;
+    EPVector<DataHeatBalance::SpaceData> space;
+    EPVector<DataHeatBalance::SpaceListData> spaceList;
     EPVector<DataHeatBalance::ZoneData> Zone;
     EPVector<DataHeatBalance::ZoneListData> ZoneList;
     EPVector<DataHeatBalance::ZoneGroupData> ZoneGroup;
@@ -2241,13 +2318,17 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> HotWaterEqObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> SteamEqObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> OtherEqObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ITEqObjects;
+    EPVector<DataHeatBalance::GlobalInternalGainMiscObject> ZoneBBHeatObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> InfiltrationObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> VentilationObjects;
     EPVector<DataHeatBalance::ZoneReportVars> ZnRpt;
+    EPVector<DataHeatBalance::ZoneReportVars> spaceRpt;
     EPVector<DataHeatBalance::ZoneMassConservationData> MassConservation;
     DataHeatBalance::ZoneAirMassFlowConservation ZoneAirMassFlow;
     EPVector<DataHeatBalance::ZoneLocalEnvironmentData> ZoneLocalEnvironment;
     bool MundtFirstTimeFlag = true;
+    EPVector<std::string> spaceTypes;
 
     void clear_state() override
     {
@@ -2296,6 +2377,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->NumSteamEqStatements = 0;
         this->NumOtherEqStatements = 0;
         this->NumZoneITEqStatements = 0;
+        this->NumZoneBBHeatStatements = 0;
         this->TotPeople = 0;
         this->TotLights = 0;
         this->TotElecEquip = 0;
@@ -2303,6 +2385,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->TotOthEquip = 0;
         this->TotHWEquip = 0;
         this->TotStmEquip = 0;
+        this->TotITEquip = 0;
         this->TotInfiltration = 0;
         this->TotDesignFlowInfiltration = 0;
         this->TotShermGrimsInfiltration = 0;
@@ -2344,6 +2427,8 @@ struct HeatBalanceData : BaseGlobalStruct
         this->TotCO2Gen = 0;
         this->CalcWindowRevealReflection = false;
         this->StormWinChangeThisDay = false;
+        this->SimpleCTFOnly = true;
+        this->MaxCTFTerms = 0;
         this->AnyInternalHeatSourceInInput = false;
         this->AdaptiveComfortRequested_CEN15251 = false;
         this->AdaptiveComfortRequested_ASH55 = false;
@@ -2380,7 +2465,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->ZoneWinHeatLossRep.deallocate();
         this->ZoneBmSolFrExtWinsRep.deallocate();
         this->ZoneBmSolFrIntWinsRep.deallocate();
-        this->ZoneInitialDifSolReflW.deallocate();
+        this->EnclSolInitialDifSolReflW.deallocate();
         this->ZoneDifSolFrExtWinsRep.deallocate();
         this->ZoneDifSolFrIntWinsRep.deallocate();
         this->ZoneOpaqSurfInsFaceCond.deallocate();
@@ -2447,7 +2532,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->EnclSolVMULT.deallocate();
         this->EnclRadQThermalRad.deallocate();
         this->EnclRadThermAbsMult.deallocate();
-        this->ZoneSolAbsFirstCalc.deallocate();
+        this->EnclSolAbsFirstCalc.deallocate();
         this->EnclRadReCalc.deallocate();
         this->SurfCosIncidenceAngle.deallocate();
         this->SurfSunlitFracHR.deallocate();
@@ -2466,9 +2551,13 @@ struct HeatBalanceData : BaseGlobalStruct
         this->ZonePreDefRep.deallocate();
         this->BuildingPreDefRep = DataHeatBalance::ZonePreDefRepType();
         this->ZoneIntGain.deallocate();
+        this->spaceIntGain.deallocate();
+        this->spaceIntGainDevices.deallocate();
         this->SupportPillar.deallocate();
         this->DeflectionState.deallocate();
         this->SpectralData.deallocate();
+        this->space.deallocate();
+        this->spaceList.deallocate();
         this->Zone.deallocate();
         this->ZoneList.deallocate();
         this->ZoneGroup.deallocate();
@@ -2509,13 +2598,17 @@ struct HeatBalanceData : BaseGlobalStruct
         this->HotWaterEqObjects.deallocate();
         this->SteamEqObjects.deallocate();
         this->OtherEqObjects.deallocate();
+        this->ITEqObjects.deallocate();
+        this->ZoneBBHeatObjects.deallocate();
         this->InfiltrationObjects.deallocate();
         this->VentilationObjects.deallocate();
         this->ZnRpt.deallocate();
+        this->spaceRpt.deallocate();
         this->MassConservation.deallocate();
         this->ZoneAirMassFlow = DataHeatBalance::ZoneAirMassFlowConservation();
         this->ZoneLocalEnvironment.deallocate();
         this->MundtFirstTimeFlag = true;
+        this->spaceTypes.deallocate();
     }
 };
 
