@@ -121,7 +121,7 @@ public:
     void addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string const &surfaceClass);
     void addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData const &zoneGroupData);
     void addMaterialData(int const number, Material::MaterialProperties const &materialData);
-    void addConstructionData(int const number, Construction::ConstructionProps const &constructionData, double const &constructionUValue);
+    void addConstructionData(int const number, Construction::ConstructionProps const &constructionData, double constructionUValue);
     void addNominalLightingData(int const number, DataHeatBalance::LightsData const &nominalLightingData);
     void addNominalPeopleData(int const number, DataHeatBalance::PeopleData const &nominalPeopleData);
     void addNominalElectricEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalElectricEquipmentData);
@@ -213,9 +213,9 @@ public:
     void addSQLiteSystemSizingRecord(std::string const &SysName,      // the name of the system
                                      std::string const &LoadType,     // either "Cooling" or "Heating"
                                      std::string const &PeakLoadType, // either "Sensible" or "Total"
-                                     Real64 const &UserDesCap,        // User  Design Capacity
-                                     Real64 const &CalcDesVolFlow,    // Calculated Cooling Design Air Flow Rate
-                                     Real64 const &UserDesVolFlow,    // User Cooling Design Air Flow Rate
+                                     Real64 UserDesCap,               // User  Design Capacity
+                                     Real64 CalcDesVolFlow,           // Calculated Cooling Design Air Flow Rate
+                                     Real64 UserDesVolFlow,           // User Cooling Design Air Flow Rate
                                      std::string const &DesDayName,   // the name of the design day that produced the peak
                                      std::string const &PeakHrMin     // time stamp of the peak
     );
@@ -597,7 +597,7 @@ private:
                      std::shared_ptr<sqlite3> const &db,
                      int const constructionNumber,
                      EnergyPlus::Construction::ConstructionProps const &constructionData,
-                     double const &constructionUValue)
+                     double constructionUValue)
             : SQLiteData(errorStream, db), number(constructionNumber), name(constructionData.Name), totLayers(constructionData.TotLayers),
               totSolidLayers(constructionData.TotSolidLayers), totGlassLayers(constructionData.TotGlassLayers),
               insideAbsorpVis(constructionData.InsideAbsorpVis), outsideAbsorpVis(constructionData.OutsideAbsorpVis),
@@ -637,9 +637,9 @@ private:
         public:
             ConstructionLayer(std::shared_ptr<std::ostream> const &errorStream,
                               std::shared_ptr<sqlite3> const &db,
-                              int const &constructNumber,
+                              int constructNumber,
                               int const layerNumber,
-                              int const &layerPoint)
+                              int layerPoint)
                 : SQLiteData(errorStream, db), constructNumber(constructNumber), layerNumber(layerNumber), layerPoint(layerPoint)
             {
             }

@@ -382,7 +382,7 @@ namespace PurchasedAirManager {
 
     Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int PurchAirNum);
 
-    bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int const &ReturnPlenumIndex);
+    bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int ReturnPlenumIndex);
 
     void InitializePlenumArrays(EnergyPlusData &state, int PurchAirNum);
 

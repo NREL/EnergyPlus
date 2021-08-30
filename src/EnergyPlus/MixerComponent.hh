@@ -144,7 +144,7 @@ namespace MixerComponent {
     void GetZoneMixerIndex(
         EnergyPlusData &state, std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType = std::string());
 
-    int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
+    int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int InNodeNum);
 
     // End of Utility subroutines for the Mixer Component
     // *****************************************************************************

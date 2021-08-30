@@ -6636,7 +6636,7 @@ void GetATMixer(EnergyPlusData &state,
                 int &ATMixerPriNode,              // air terminal mixer primary air node number
                 int &ATMixerSecNode,              // air terminal mixer secondary air node number
                 int &ATMixerOutNode,              // air terminal mixer outlet air node number
-                int const &ZoneEquipOutletNode    // zone equipment outlet node (used with inlet side mixers)
+                int const ZoneEquipOutletNode     // zone equipment outlet node (used with inlet side mixers)
 )
 {
 
@@ -6726,9 +6726,9 @@ void SetATMixerPriFlow(EnergyPlusData &state,
 }
 
 void setATMixerSizingProperties(EnergyPlusData &state,
-                                int const &inletATMixerIndex, // index to ATMixer at inlet of zone equipment
-                                int const &controlledZoneNum, // controlled zone number
-                                int const &curZoneEqNum       // current zone equipment being simulated
+                                int const inletATMixerIndex, // index to ATMixer at inlet of zone equipment
+                                int const controlledZoneNum, // controlled zone number
+                                int const curZoneEqNum       // current zone equipment being simulated
 )
 {
     auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);

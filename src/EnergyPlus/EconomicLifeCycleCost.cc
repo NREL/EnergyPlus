@@ -1003,7 +1003,7 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
     }
 }
 
-int MonthToMonthNumber(std::string const &inMonthString, int const &inDefaultMonth)
+int MonthToMonthNumber(std::string const &inMonthString, int const inDefaultMonth)
 {
 
     // FUNCTION INFORMATION:
@@ -1025,7 +1025,7 @@ int MonthToMonthNumber(std::string const &inMonthString, int const &inDefaultMon
     // na
 
     // Return value
-    int MonthToMonthNumber;
+    int MonthToMonthNumber = inDefaultMonth;
 
     // Locals
     // FUNCTION ARGUMENT DEFINITIONS:
@@ -1065,8 +1065,6 @@ int MonthToMonthNumber(std::string const &inMonthString, int const &inDefaultMon
         MonthToMonthNumber = 11;
     } else if (UtilityRoutines::SameString(inMonthString, "December")) {
         MonthToMonthNumber = 12;
-    } else {
-        MonthToMonthNumber = inDefaultMonth;
     }
     return MonthToMonthNumber;
 }

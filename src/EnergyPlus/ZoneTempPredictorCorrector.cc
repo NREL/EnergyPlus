@@ -8371,7 +8371,7 @@ void FillPredefinedTableOnThermostatSetpoints(EnergyPlusData &state)
 
 // returns the temperature value from a schedule at a certain time for the first day of the week in either January or July
 std::tuple<Real64, int, std::string>
-temperatureAndCountInSch(EnergyPlusData &state, int const &scheduleIndex, bool const &isSummer, int const &dayOfWeek, int const &hourOfDay)
+temperatureAndCountInSch(EnergyPlusData &state, int const scheduleIndex, bool const isSummer, int const dayOfWeek, int const hourOfDay)
 {
     // J.Glazer - Aug 2017
 

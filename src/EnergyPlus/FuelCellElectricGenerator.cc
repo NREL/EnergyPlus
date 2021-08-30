@@ -2332,8 +2332,8 @@ namespace FuelCellElectricGenerator {
     }
 
     Real64 FCDataStruct::FuelCellProductGasEnthResidual(EnergyPlusData &state,
-                                                        Real64 const TprodGas,           // temperature, this is "x" being searched
-                                                        std::array<Real64, 2> const &Par // par(1) = Generator Number
+                                                        Real64 const TprodGas,          // temperature, this is "x" being searched
+                                                        std::array<Real64, 2> const Par // par(1) = Generator Number
     )
     {
 

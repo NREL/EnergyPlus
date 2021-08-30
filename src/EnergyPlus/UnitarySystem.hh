@@ -666,8 +666,7 @@ namespace UnitarySystems {
                                             std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        void initUnitarySystems(
-            EnergyPlusData &state, int const &AirLoopNum, bool const &FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp);
+        void initUnitarySystems(EnergyPlusData &state, int AirLoopNum, bool FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp);
 
         void checkNodeSetPoint(EnergyPlusData &state,
                                int const AirLoopNum,       // number of the current air loop being simulated
@@ -845,7 +844,7 @@ namespace UnitarySystems {
         void simulateSys(EnergyPlusData &state,
                          std::string_view Name,
                          bool const firstHVACIteration,
-                         int const &AirLoopNum,
+                         int AirLoopNum,
                          int &CompIndex,
                          bool &HeatActive,
                          bool &CoolActive,
@@ -887,7 +886,7 @@ namespace UnitarySystems {
         void simulate(EnergyPlusData &state,
                       std::string_view Name,
                       bool const firstHVACIteration,
-                      int const &AirLoopNum,
+                      int AirLoopNum,
                       int &CompIndex,
                       bool &HeatActive,
                       bool &CoolActive,

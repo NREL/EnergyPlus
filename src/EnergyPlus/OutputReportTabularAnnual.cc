@@ -1190,7 +1190,7 @@ void AnnualTable::addTableOfContents(std::ostream &nameOfStream)
                  << "</a>    |   \n";
 }
 
-void AnnualTable::computeBinColumns(EnergyPlusData &state, OutputReportTabular::iUnitsStyle const &unitsStyle_para)
+void AnnualTable::computeBinColumns(EnergyPlusData &state, OutputReportTabular::iUnitsStyle const unitsStyle_para)
 {
     std::vector<AnnualFieldSet>::iterator fldStIt;
     Real64 const veryLarge = 1.0E280;

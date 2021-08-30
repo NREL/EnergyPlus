@@ -9256,9 +9256,9 @@ namespace InternalHeatGains {
     }
 
     int GetInternalGainDeviceIndex(EnergyPlusData &state,
-                                   int const spaceNum,                  // space index pointer for which space to sum gains for
-                                   int const intGainTypeOfNum,          // space internal gain type number
-                                   std::string_view const &intGainName) // Internal gain name
+                                   int const spaceNum,                 // space index pointer for which space to sum gains for
+                                   int const intGainTypeOfNum,         // space internal gain type number
+                                   std::string_view const intGainName) // Internal gain name
     {
 
         // SUBROUTINE INFORMATION:

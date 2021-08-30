@@ -94,46 +94,46 @@ namespace SZVAVModel {
 
     void calcSZVAVModel(EnergyPlusData &state,
                         PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
-                        int const &SysIndex,
-                        bool const &FirstHVACIteration,
-                        bool const &CoolingLoad,
-                        bool const &HeatingLoad,
-                        Real64 const &ZoneLoad,
+                        int SysIndex,
+                        bool FirstHVACIteration,
+                        bool CoolingLoad,
+                        bool HeatingLoad,
+                        Real64 ZoneLoad,
                         Real64 &OnOffAirFlowRatio,
-                        bool const &HXUnitOn,
-                        int const &AirLoopNum,
+                        bool HXUnitOn,
+                        int AirLoopNum,
                         Real64 &PartLoadFrac,
-                        int const &CompressorONFlag
+                        int CompressorONFlag
 
     );
 
     void calcSZVAVModel(EnergyPlusData &state,
                         FanCoilUnits::FanCoilData &SZVAVModel,
-                        int const &SysIndex,
-                        bool const &FirstHVACIteration,
-                        bool const &CoolingLoad,
-                        bool const &HeatingLoad,
-                        Real64 const &ZoneLoad,
+                        int SysIndex,
+                        bool FirstHVACIteration,
+                        bool CoolingLoad,
+                        bool HeatingLoad,
+                        Real64 ZoneLoad,
                         Real64 &OnOffAirFlowRatio,
-                        bool const &HXUnitOn,
-                        int const &AirLoopNum,
+                        bool HXUnitOn,
+                        int AirLoopNum,
                         Real64 &PartLoadFrac,
-                        int const &CompressorONFlag
+                        int CompressorONFlag
 
     );
 
     void calcSZVAVModel(EnergyPlusData &state,
                         UnitarySystems::UnitarySys &SZVAVModel,
-                        int const &SysIndex,
-                        bool const &FirstHVACIteration,
-                        bool const &CoolingLoad,
-                        bool const &HeatingLoad,
-                        Real64 const &ZoneLoad,
+                        int SysIndex,
+                        bool FirstHVACIteration,
+                        bool CoolingLoad,
+                        bool HeatingLoad,
+                        Real64 ZoneLoad,
                         Real64 &OnOffAirFlowRatio,
-                        bool const &HXUnitOn,
-                        int const &AirLoopNum,
+                        bool HXUnitOn,
+                        int AirLoopNum,
                         Real64 &PartLoadFrac,
-                        int const &CompressorONFlag);
+                        int CompressorONFlag);
 
 } // namespace SZVAVModel
 

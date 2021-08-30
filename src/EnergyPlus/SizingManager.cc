@@ -4523,12 +4523,12 @@ void ReportSysSizing(EnergyPlusData &state,
                      std::string const &SysName,      // the name of the zone
                      std::string const &LoadType,     // either "Cooling" or "Heating"
                      std::string const &PeakLoadKind, // either "Sensible" or "Total"
-                     Real64 const &UserDesCap,        // User  Design Capacity
-                     Real64 const &CalcDesVolFlow,    // Calculated  Design Air Flow Rate
-                     Real64 const &UserDesVolFlow,    // User Design Air Flow Rate
+                     Real64 const UserDesCap,         // User  Design Capacity
+                     Real64 const CalcDesVolFlow,     // Calculated  Design Air Flow Rate
+                     Real64 const UserDesVolFlow,     // User Design Air Flow Rate
                      std::string const &DesDayName,   // the name of the design day that produced the peak
                      std::string const &DesDayDate,   // the date that produced the peak
-                     int const &TimeStepIndex         // time step of the peak
+                     int const TimeStepIndex          // time step of the peak
 )
 {
 

@@ -261,7 +261,7 @@ struct BaseSizer
     virtual void initializeWithinEP(EnergyPlusData &state,
                                     std::string_view const _compType,
                                     std::string_view const _compName,
-                                    bool const &_printWarningFlag,
+                                    bool _printWarningFlag,
                                     std::string_view const _callingRoutine);
 
     virtual Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) = 0;
@@ -300,17 +300,17 @@ public:
                                   Optional_string_const UsrDesc = _,
                                   Optional<Real64 const> UsrValue = _);
 
-    Real64 setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
-    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+    Real64 setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
+    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 outAirFrac,
                                                DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 outAirFrac,
                                                  DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                  DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 outAirFrac,
                                                DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 outAirFrac,
                                                  DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                  DataSizing::ZoneSizingData const &finalZoneSizing);
 };

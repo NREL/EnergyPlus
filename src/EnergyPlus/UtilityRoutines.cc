@@ -466,7 +466,7 @@ namespace UtilityRoutines {
                           std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
                           bool &FuelTypeErrorsFound,
-                          bool const &AllowSteamAndDistrict)
+                          bool const AllowSteamAndDistrict)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dareum Nam

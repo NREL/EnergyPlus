@@ -762,13 +762,13 @@ namespace DXCoils {
     );
 
     int getCoilInNodeIndex(EnergyPlusData &state,
-                           int const &CoilIndex, // coil index
-                           bool &ErrorsFound     // set to true if problem
+                           int CoilIndex,    // coil index
+                           bool &ErrorsFound // set to true if problem
     );
 
     int getCoilOutNodeIndex(EnergyPlusData &state,
-                            int const &CoilIndex, // coil index
-                            bool &ErrorsFound     // set to true if problem
+                            int CoilIndex,    // coil index
+                            bool &ErrorsFound // set to true if problem
     );
 
     int GetCoilCondenserInletNode(EnergyPlusData &state,

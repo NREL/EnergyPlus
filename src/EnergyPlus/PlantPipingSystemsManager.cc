@@ -2553,7 +2553,7 @@ namespace PlantPipingSystemsManager {
     }
 
     CartesianPipeCellInformation::CartesianPipeCellInformation(Real64 const GridCellWidth,
-                                                               RadialSizing const &PipeSizes,
+                                                               PlantPipingSystemsManager::RadialSizing const PipeSizes,
                                                                int const NumRadialNodes,
                                                                Real64 const CellDepth,
                                                                Real64 const InsulationThickness,

@@ -573,8 +573,8 @@ namespace OutputProcessor {
     void InitializeOutput(EnergyPlusData &state);
 
     void SetupTimePointers(EnergyPlusData &state,
-                           OutputProcessor::SOVTimeStepType const &IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
-                           Real64 &TimeStep                                  // The timestep variable.  Used to get the address
+                           OutputProcessor::SOVTimeStepType IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
+                           Real64 &TimeStep                           // The timestep variable.  Used to get the address
     );
 
     void CheckReportVariable(EnergyPlusData &state,
@@ -620,12 +620,12 @@ namespace OutputProcessor {
     inline void ReallocateIVar(EnergyPlusData &state);
 
     TimeStepType ValidateTimeStepType(EnergyPlusData &state,
-                                      OutputProcessor::SOVTimeStepType const &TimeStepTypeKey // Index type (Zone, HVAC) for variables
+                                      OutputProcessor::SOVTimeStepType TimeStepTypeKey // Index type (Zone, HVAC) for variables
     );
 
     std::string StandardTimeStepTypeKey(TimeStepType timeStepType);
 
-    StoreType validateVariableType(EnergyPlusData &state, OutputProcessor::SOVStoreType const &VariableTypeKey);
+    StoreType validateVariableType(EnergyPlusData &state, OutputProcessor::SOVStoreType VariableTypeKey);
 
     std::string standardVariableTypeKey(StoreType VariableType);
 
@@ -641,25 +641,25 @@ namespace OutputProcessor {
     GetStandardMeterResourceType(EnergyPlusData &state, std::string &OutResourceType, std::string const &UserInputResourceType, bool &ErrorsFound);
 
     void AddMeter(EnergyPlusData &state,
-                  std::string const &Name,               // Name for the meter
-                  OutputProcessor::Unit const &MtrUnits, // Units for the meter
-                  std::string const &ResourceType,       // ResourceType for the meter
-                  std::string const &EndUse,             // EndUse for the meter
-                  std::string const &EndUseSub,          // EndUse subcategory for the meter
-                  std::string const &Group               // Group for the meter
+                  std::string const &Name,         // Name for the meter
+                  OutputProcessor::Unit MtrUnits,  // Units for the meter
+                  std::string const &ResourceType, // ResourceType for the meter
+                  std::string const &EndUse,       // EndUse for the meter
+                  std::string const &EndUseSub,    // EndUse subcategory for the meter
+                  std::string const &Group         // Group for the meter
     );
 
     void AttachMeters(EnergyPlusData &state,
-                      Unit const &MtrUnits,             // Units for this meter
-                      std::string &ResourceType,        // Electricity, Gas, etc.
-                      std::string &EndUse,              // End-use category (Lights, Heating, etc.)
-                      std::string &EndUseSub,           // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
-                      std::string &Group,               // Group key (Facility, Zone, Building, etc.)
-                      std::string const &ZoneName,      // Zone key only applicable for Building group
-                      std::string const &SpaceTypeName, // Space Type key only applicable for Building group
-                      int RepVarNum,                    // Number of this report variable
-                      int &MeterArrayPtr,               // Output set of Pointers to Meters
-                      bool &ErrorsFound                 // True if errors in this call
+                      EnergyPlus::OutputProcessor::Unit MtrUnits, // Units for this meter
+                      std::string &ResourceType,                  // Electricity, Gas, etc.
+                      std::string &EndUse,                        // End-use category (Lights, Heating, etc.)
+                      std::string &EndUseSub,                     // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
+                      std::string &Group,                         // Group key (Facility, Zone, Building, etc.)
+                      std::string const &ZoneName,                // Zone key only applicable for Building group
+                      std::string const &SpaceTypeName,           // Space Type key only applicable for Building group
+                      int RepVarNum,                              // Number of this report variable
+                      int &MeterArrayPtr,                         // Output set of Pointers to Meters
+                      bool &ErrorsFound                           // True if errors in this call
     );
 
     void AttachCustomMeters(EnergyPlusData &state,
@@ -669,20 +669,20 @@ namespace OutputProcessor {
     );
 
     void ValidateNStandardizeMeterTitles(EnergyPlusData &state,
-                                         OutputProcessor::Unit const &MtrUnits, // Units for the meter
-                                         std::string &ResourceType,             // Electricity, Gas, etc.
-                                         std::string &EndUse,                   // End Use Type (Lights, Heating, etc.)
-                                         std::string &EndUseSub,                // End Use Sub Type (General Lights, Task Lights, etc.)
-                                         std::string &Group,                    // Group key (Facility, Zone, Building, etc.)
-                                         bool &ErrorsFound,                     // True if errors in this call
-                                         const std::string &ZoneName,           // Zone Name when Group=Building
-                                         const std::string &SpaceType           // Space Type when Group=Building
+                                         OutputProcessor::Unit MtrUnits, // Units for the meter
+                                         std::string &ResourceType,      // Electricity, Gas, etc.
+                                         std::string &EndUse,            // End Use Type (Lights, Heating, etc.)
+                                         std::string &EndUseSub,         // End Use Sub Type (General Lights, Task Lights, etc.)
+                                         std::string &Group,             // Group key (Facility, Zone, Building, etc.)
+                                         bool &ErrorsFound,              // True if errors in this call
+                                         const std::string &ZoneName,    // Zone Name when Group=Building
+                                         const std::string &SpaceType    // Space Type when Group=Building
     );
 
     void DetermineMeterIPUnits(EnergyPlusData &state,
                                OutputProcessor::RT_IPUnits &CodeForIPUnits, // Output Code for IP Units
                                std::string const &ResourceType,             // Resource Type
-                               OutputProcessor::Unit const &MtrUnits,       // Meter units
+                               OutputProcessor::Unit MtrUnits,              // Meter units
                                bool &ErrorsFound                            // true if errors found during subroutine
     );
 
@@ -779,21 +779,21 @@ namespace OutputProcessor {
                                            std::string const &keyedValue,   // The key name for the data
                                            std::string const &variableName, // The variable's actual name
                                            TimeStepType timeStepType,
-                                           OutputProcessor::Unit const &unitsForVar, // The variables units
+                                           OutputProcessor::Unit unitsForVar, // The variables units
                                            Optional_string_const customUnitName = _,
                                            Optional_string_const ScheduleName = _);
 
     void WriteMeterDictionaryItem(EnergyPlusData &state,
                                   ReportingFrequency reportingInterval, // The reporting interval (e.g., hourly, daily)
                                   StoreType storeType,
-                                  int reportID,                      // The reporting ID in for the variable
-                                  int indexGroupKey,                 // The reporting group for the variable
-                                  std::string const &indexGroup,     // The reporting group for the variable
-                                  std::string const &reportIDChr,    // The reporting ID in for the variable
-                                  std::string const &meterName,      // The variable's meter name
-                                  OutputProcessor::Unit const &unit, // The variables units
-                                  bool cumulativeMeterFlag,          // A flag indicating cumulative data
-                                  bool meterFileOnlyFlag             // A flag indicating whether the data is to be written to standard output
+                                  int reportID,                   // The reporting ID in for the variable
+                                  int indexGroupKey,              // The reporting group for the variable
+                                  std::string const &indexGroup,  // The reporting group for the variable
+                                  std::string const &reportIDChr, // The reporting ID in for the variable
+                                  std::string const &meterName,   // The variable's meter name
+                                  OutputProcessor::Unit unit,     // The variables units
+                                  bool cumulativeMeterFlag,       // A flag indicating cumulative data
+                                  bool meterFileOnlyFlag          // A flag indicating whether the data is to be written to standard output
     );
 
     void WriteRealVariableOutput(EnergyPlusData &state,
@@ -873,16 +873,14 @@ namespace OutputProcessor {
                                   int SetIntVal                          // integer value to set if type is integer
     );
 
-    std::string unitEnumToStringBrackets(Unit const &unitIn);
+    std::string unitEnumToStringBrackets(EnergyPlus::OutputProcessor::Unit unitIn);
 
-    std::string unitEnumToString(OutputProcessor::Unit const &unitIn);
+    std::string unitEnumToString(OutputProcessor::Unit unitIn);
 
     OutputProcessor::Unit unitStringToEnum(std::string const &unitIn);
 
     std::string unitStringFromDDitem(EnergyPlusData &state, int ddItemPtr // index provided for DDVariableTypes
     );
-
-    std::string timeStepTypeEnumToString(OutputProcessor::TimeStepType const &t_timeStepType);
 
     struct APIOutputVariableRequest
     {

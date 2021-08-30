@@ -242,7 +242,7 @@ namespace DataSurfaces {
         VerySmooth
     };
 
-    inline std::string HeatTransferModelNames(iHeatTransferModel const &m)
+    inline std::string HeatTransferModelNames(EnergyPlus::DataSurfaces::iHeatTransferModel m)
     {
         switch (m) {
         case iHeatTransferModel::CTF:

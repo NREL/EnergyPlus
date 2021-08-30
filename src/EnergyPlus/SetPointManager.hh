@@ -1028,7 +1028,7 @@ namespace SetPointManager {
                                       int SchedPtrCharge,
                                       Real64 NonChargeCHWTemp,
                                       Real64 ChargeCHWTemp,
-                                      DataPlant::iCtrlType const &CompOpType,
+                                      DataPlant::iCtrlType CompOpType,
                                       int ControlNodeNum);
 
     bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int MixedAirSPMNum);

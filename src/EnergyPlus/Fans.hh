@@ -289,8 +289,8 @@ namespace Fans {
     );
 
     int getFanInNodeIndex(EnergyPlusData &state,
-                          int const &FanIndex, // fan index
-                          bool &ErrorsFound    // set to true if problem
+                          int FanIndex,     // fan index
+                          bool &ErrorsFound // set to true if problem
     );
 
     int GetFanOutletNode(EnergyPlusData &state,
@@ -340,7 +340,7 @@ namespace Fans {
     void SetFanAirLoopNumber(EnergyPlusData &state, int FanIndex, int AirLoopNum);
 
     void FanInputsForDesHeatGain(EnergyPlusData &state,
-                                 int const &fanIndex,
+                                 int fanIndex,
                                  Real64 &deltaP,
                                  Real64 &motEff,
                                  Real64 &totEff,

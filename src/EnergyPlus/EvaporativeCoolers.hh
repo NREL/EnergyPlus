@@ -474,8 +474,8 @@ namespace EvaporativeCoolers {
     );
 
     Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state,
-                                    Real64 PartLoadRatio,            // zone evap unit part load ratiod
-                                    std::array<Real64, 2> const &Par // parameters
+                                    Real64 PartLoadRatio,     // zone evap unit part load ratiod
+                                    std::array<Real64, 2> Par // parameters
     );
 
     void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,

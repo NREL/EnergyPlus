@@ -310,7 +310,7 @@ namespace GroundHeatExchangers {
 
         virtual void getAnnualTimeConstant() = 0;
 
-        virtual void initEnvironment(EnergyPlusData &state, Real64 const &CurTime) = 0;
+        virtual void initEnvironment(EnergyPlusData &state, Real64 CurTime) = 0;
 
         void setupOutput(EnergyPlusData &state);
     };
@@ -357,11 +357,11 @@ namespace GroundHeatExchangers {
 
         static std::vector<Real64> distances(MyCartesian const &point_i, MyCartesian const &point_j);
 
-        Real64 calcResponse(std::vector<Real64> const &dists, Real64 const &currTime);
+        Real64 calcResponse(std::vector<Real64> const &dists, Real64 currTime);
 
-        Real64 integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime);
+        Real64 integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 currTime);
 
-        Real64 doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime);
+        Real64 doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 currTime);
 
         void calcShortTimestepGFunctions(EnergyPlusData &state);
 
@@ -403,7 +403,7 @@ namespace GroundHeatExchangers {
 
         void combineShortAndLongTimestepGFunctions();
 
-        void initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime) override;
+        void initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 CurTime) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
 
@@ -472,7 +472,7 @@ namespace GroundHeatExchangers {
 
         void readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state) override;
 
-        void initEnvironment(EnergyPlusData &state, Real64 const &CurTime) override;
+        void initEnvironment(EnergyPlusData &state, Real64 CurTime) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
 

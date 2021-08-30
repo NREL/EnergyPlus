@@ -72,7 +72,7 @@ public:
     virtual void simulate(EnergyPlusData &state,
                           std::string_view Name,
                           bool const firstHVACIteration,
-                          int const &AirLoopNum,
+                          int AirLoopNum,
                           int &CompIndex,
                           bool &HeatActive,
                           bool &CoolActive,

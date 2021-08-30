@@ -148,7 +148,7 @@ namespace EconomicLifeCycleCost {
         NotComputed,
     };
 
-    constexpr const char *MonthNames(int const &i)
+    constexpr const char *MonthNames(int i)
     {
         switch (i) {
         case 1:
@@ -304,7 +304,7 @@ namespace EconomicLifeCycleCost {
 
     void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state);
 
-    int MonthToMonthNumber(std::string const &inMonthString, int const &inDefaultMonth);
+    int MonthToMonthNumber(std::string const &inMonthString, int inDefaultMonth);
 
     //======================================================================================================================
     //======================================================================================================================

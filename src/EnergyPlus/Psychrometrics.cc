@@ -1444,9 +1444,9 @@ namespace Psychrometrics {
 
         return Temp;
     }
-    Real64 CSplineint(int const n,     // sample data size
-                      const Real64 &x) // given value of x
-    {                                  // Cubic Spline interpolation
+    Real64 CSplineint(int const n,    // sample data size
+                      Real64 const x) // given value of x
+    {                                 // Cubic Spline interpolation
         // Reference: Numerical Recipies in C (pp.97)
         Real64 A, B, y;
         // find location of x in arrays without searching since array bins are equally sized
