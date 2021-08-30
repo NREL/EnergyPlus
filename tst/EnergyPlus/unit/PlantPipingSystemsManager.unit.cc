@@ -1994,9 +1994,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
         "GroundCoupledSurface;	!- Type of Modeling",
 
         "Material,",
-        "SlabMaterial, !- Name",
+        "SlabMaterial,  !- Name",
         "MediumRough,	!- Roughness",
-        "0.2,		!- Thickness {m}",
+        "0.2,		    !- Thickness {m}",
         "1.8,			!- Conductivity {W/m-K}",
         "2400,			!- Density {kg/m3}",
         "750,			!- Specific Heat {J/kg-K}",
@@ -2005,7 +2005,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
         "0.65;			!- Visible Absorptance",
 
         "Material,",
-        "HorizInsulation,           !- Name",
+        "HorizInsulation,         !- Name",
         "Rough,                   !- Roughness",
         "0.1,                     !- Thickness {m}",
         "0.04,                    !- Conductivity {W/m-K}",
@@ -2016,9 +2016,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
         "0.6;                     !- Visible Absorptance",
 
         "Material,",
-        "VertiInsulation,           !- Name",
+        "VertiInsulation,         !- Name",
         "Rough,                   !- Roughness",
-        "0.15,                     !- Thickness {m}",
+        "0.15,                    !- Thickness {m}",
         "0.04,                    !- Conductivity {W/m-K}",
         "15,                      !- Density {kg/m3}",
         "1300,                    !- Specific Heat {J/kg-K}",
@@ -2048,7 +2048,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
 
     auto &theDomain = state->dataPlantPipingSysMgr->domains[0];
 
-    // theDomain.developMesh(*state);
     theDomain.createPartitionCenterList(*state);
 
     // Take the logic in the code about how the partition positions were calculated
@@ -2059,20 +2058,22 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
 
     int partySize = theDomain.Partitions.Y.size();
 
-    // check horizontal partitions for this case
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, 4.55, 1e-4);
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, insyLoc, 1e-4);
+    Real64 err_tol = 1.0e-4;
 
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, 0.10, 1e-4);
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, totalWid, 1e-4);
+    // check horizontal partitions for this case
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, 4.55, err_tol);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, insyLoc, err_tol);
+
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, 0.10, err_tol);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, totalWid, err_tol);
 
     EXPECT_TRUE(theDomain.Partitions.Y[partySize - 2].partitionType == PartitionType::VertInsLowerEdge);
 
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, 4.75, 1e-4);
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, slabBot, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, 4.75, err_tol);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, slabBot, err_tol);
 
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, 0.10, 1e-4);
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, totalWid, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, 0.10, err_tol);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, totalWid, err_tol);
 
     EXPECT_TRUE(theDomain.Partitions.Y[partySize - 1].partitionType == PartitionType::UnderFloor);
 }
@@ -2121,9 +2122,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth_Test2)
         "GroundCoupledSurface;	!- Type of Modeling",
 
         "Material,",
-        "SlabMaterial, !- Name",
+        "SlabMaterial,  !- Name",
         "MediumRough,	!- Roughness",
-        "0.2,		!- Thickness {m}",
+        "0.2,		    !- Thickness {m}",
         "1.8,			!- Conductivity {W/m-K}",
         "2400,			!- Density {kg/m3}",
         "750,			!- Specific Heat {J/kg-K}",
@@ -2132,7 +2133,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth_Test2)
         "0.65;			!- Visible Absorptance",
 
         "Material,",
-        "HorizInsulation,           !- Name",
+        "HorizInsulation,         !- Name",
         "Rough,                   !- Roughness",
         "0.2,                     !- Thickness {m}",
         "0.04,                    !- Conductivity {W/m-K}",
@@ -2143,9 +2144,9 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth_Test2)
         "0.6;                     !- Visible Absorptance",
 
         "Material,",
-        "VertiInsulation,           !- Name",
+        "VertiInsulation,         !- Name",
         "Rough,                   !- Roughness",
-        "0.15,                     !- Thickness {m}",
+        "0.15,                    !- Thickness {m}",
         "0.04,                    !- Conductivity {W/m-K}",
         "15,                      !- Density {kg/m3}",
         "1300,                    !- Specific Heat {J/kg-K}",
@@ -2175,7 +2176,6 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth_Test2)
 
     auto &theDomain = state->dataPlantPipingSysMgr->domains[0];
 
-    // theDomain.developMesh(*state);
     theDomain.createPartitionCenterList(*state);
 
     // Take the logic in the code about how the partition positions were calculated
@@ -2186,24 +2186,29 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth_Test2)
 
     int partySize = theDomain.Partitions.Y.size();
 
+    Real64 err_tol = 1.0e-4;
+
     // check horizontal partitions for the new case
     // and expect that the results should be different from the previous case
 
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, insyLoc, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, insyLoc, err_tol);
     // This is expected to be different from Test 1
-    EXPECT_FALSE((insyLoc - 4.55) <= 1e-4 && (insyLoc - 4.55) >= -1e-4);
+    Real64 insyLoc_case1 = 4.55;
+    EXPECT_FALSE((insyLoc - insyLoc_case1) <= err_tol && (insyLoc - insyLoc_case1) >= -err_tol);
 
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, totalWid, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, totalWid, err_tol);
+    Real64 totalWid_case1 = 0.10;
     // This is expected to be different from Test 1
-    EXPECT_FALSE((totalWid - 0.10) <= 1e-4 && (totalWid - 0.10) >= -1e-4);
+    EXPECT_FALSE((totalWid - totalWid_case1) <= err_tol && (totalWid - totalWid_case1) >= -err_tol);
 
     EXPECT_TRUE(theDomain.Partitions.Y[partySize - 2].partitionType == PartitionType::VertInsLowerEdge);
 
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, slabBot, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, slabBot, err_tol);
     // This is expected to be different from Test 1
-    EXPECT_FALSE((slabBot - 4.75) <= 1e-4 && (slabBot - 4.75) >= -1e-4);
+    Real64 slabBot_case1 = 4.75;
+    EXPECT_FALSE((slabBot - slabBot_case1) <= err_tol && (slabBot - slabBot_case1) >= -err_tol);
 
-    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, totalWid, 1e-4);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, totalWid, err_tol);
 
     EXPECT_TRUE(theDomain.Partitions.Y[partySize - 1].partitionType == PartitionType::UnderFloor);
 }
