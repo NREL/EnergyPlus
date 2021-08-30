@@ -251,7 +251,6 @@ namespace SimulationManager {
 
         PostIPProcessing(state);
 
-
         state.dataGlobal->BeginSimFlag = true;
         state.dataGlobal->BeginFullSimFlag = false;
         state.dataGlobal->DoOutputReporting = false;
