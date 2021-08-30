@@ -89,6 +89,7 @@ template <typename T> from_chars_result from_chars(const char *first, const char
     answer.ec = result.ec;
     return answer;
 #else
+    errno = 0;
     char *pEnd;
     auto const ret_val = std::strtol(first, &pEnd, 10);
 

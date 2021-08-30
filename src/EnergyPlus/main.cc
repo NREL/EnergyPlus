@@ -61,7 +61,7 @@ int main(int argc, const char *argv[])
     date_and_time(datestring, _, _, value);
     if (!datestring.empty()) {
         state.dataStrGlobals->CurrentDateTime =
-            EnergyPlus::format(" YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));
+            fmt::format(" YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));
     } else {
         state.dataStrGlobals->CurrentDateTime = " unknown date/time";
     }

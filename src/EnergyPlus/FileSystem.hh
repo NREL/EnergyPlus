@@ -192,7 +192,8 @@ namespace FileSystem {
     void linkFile(fs::path const &filePath, fs::path const &linkPath);
 
     // Reads the full file if it exists
-    std::string readFile(fs::path const &filePath, std::ios_base::openmode mode = std::ios_base::in);
+    // On Windows, this must be binary input to have \r\n in the read file otherwise it will be converted to \n
+    std::string readFile(fs::path const &filePath, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::binary);
 
     // Reads the full json file if it exists
     nlohmann::json readJSON(fs::path const &filePath, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::binary);
