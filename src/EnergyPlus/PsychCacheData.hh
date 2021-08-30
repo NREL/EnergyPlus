@@ -170,7 +170,7 @@ struct PsychrometricCacheData : BaseGlobalStruct
 #endif
 #ifdef EP_cache_PsyTsatFnPb
     std::array<cached_tsat_h_pb, tsatcache_size> cached_Tsat;
-    int tsatprecision_bits = 24; // 20
+    int tsatprecision_bits = 24;
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
     std::array<cached_tsat_h_pb, tsat_hbp_cache_size> cached_Tsat_HPb;
@@ -186,6 +186,9 @@ struct PsychrometricCacheData : BaseGlobalStruct
 #ifdef EP_psych_stats
         NumTimesCalled.fill(0);
         NumIterations.fill(0);
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+        tsatprecision_bits = 24;
 #endif
     }
 };
