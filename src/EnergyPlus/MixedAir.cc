@@ -316,7 +316,7 @@ void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const Firs
     //  END DO
     state.dataSize->CurOASysNum = OASysNum;
     auto &CurrentOASystem(state.dataAirLoop->OutsideAirSys(OASysNum));
-    if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
+    if (CurrentOASystem.AirLoopDOASNum == -1) {
         SimOAController(state, CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
     }
     SimOASysComponents(state, OASysNum, FirstHVACIteration, AirLoopNum);
@@ -381,7 +381,7 @@ void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const Firs
     }
 
     state.dataSize->CurOASysNum = 0;
-    if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
+    if (CurrentOASystem.AirLoopDOASNum == -1) {
         state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated = true;
     }
 }

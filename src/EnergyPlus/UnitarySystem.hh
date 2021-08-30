@@ -424,6 +424,8 @@ namespace UnitarySystems {
         Real64 m_minWaterLoopTempForHR; // water coil heat recovery loops
         bool m_waterSideEconomizerFlag; // user input to enable lockout with economizer
         bool m_WaterHRPlantLoopModel;   // signifies water heat recovery loop for this CoilSystem
+        int m_OASysNum;                 // index to OA system for air loop equipment
+        int m_OAMixerReturnNodeNum;     // return node number for air loop OA mixer
 
     public:
         // SZVAV variables

@@ -80,6 +80,7 @@
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -175,15 +176,15 @@ namespace UnitarySystems {
           m_airLoopPassCounter(0), m_airLoopReturnCounter(0), m_FanCompNotSetYet(true), m_CoolCompNotSetYet(true), m_HeatCompNotSetYet(true),
           m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), m_IsDXCoil(true), m_SmallLoadTolerance(5.0), m_TemperatureOffsetControlActive(false),
           m_minAirToWaterTempOffset(0.0), m_HRcoolCoilFluidInletNode(0), m_HRcoolCoilAirInNode(0), m_minWaterLoopTempForHR(0.0),
-          m_waterSideEconomizerFlag(false), m_WaterHRPlantLoopModel(false), UnitarySystemType_Num(0), MaxIterIndex(0), RegulaFalsiFailedIndex(0),
-          NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0),
-          AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0),
-          DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0),
-          CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0), CoolCoilLoopSide(0),
-          CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0),
-          HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0),
-          ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr), LoadSHR(0.0),
-          CoilSHR(0.0), temperatureOffsetControlStatus(0)
+          m_waterSideEconomizerFlag(false), m_WaterHRPlantLoopModel(false), m_OASysNum(-1), m_OAMixerReturnNodeNum(-1), UnitarySystemType_Num(0),
+          MaxIterIndex(0), RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
+          HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
+          MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
+          MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0),
+          CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0),
+          HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0),
+          HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0),
+          m_CompPointerMSHP(nullptr), LoadSHR(0.0), CoilSHR(0.0), temperatureOffsetControlStatus(0)
     {
     }
 
@@ -526,6 +527,12 @@ namespace UnitarySystems {
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
                     DXCoils::SetCoilSystemCoolingData(state, this->m_CoolingCoilName, this->Name);
                 }
+                this->m_OASysNum = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysNum;
+                int OAMixerNum = MixedAir::FindOAMixerMatchForOASystem(state, this->m_OASysNum);
+                if (OAMixerNum > 0) {
+                    this->m_OAMixerReturnNodeNum = MixedAir::GetOAMixerReturnNodeNumber(state, OAMixerNum);
+                }
+
                 // open this up to include UnitarySystem on a future commit
                 if (!this->m_FanExists && this->m_sysType == SysType::CoilCoolingDX) {
                     if (this->m_CoolCoilExists) { // copy this block for heating coil also on future commit
@@ -10691,6 +10698,7 @@ namespace UnitarySystems {
         // This subroutine calculates the resulting performance of the unitary system given
         // the operating PLR. System output is calculated with respect to zone condition.
 
+        const std::string compName = "";
         Real64 CoilCoolHeatRat = 0.0; // ratio of cooling to heating PLR for cycling fan RH control
 
         int InletNode = this->AirInNode;
@@ -10718,6 +10726,10 @@ namespace UnitarySystems {
             this->setOnOffMassFlowRate(state, OnOffAirFlowRatio, max(CoolPLR, HeatPLR));
         } else {
             this->setAverageAirFlow(state, max(CoolPLR, HeatPLR), OnOffAirFlowRatio);
+        }
+        if (FirstHVACIteration && this->m_OAMixerReturnNodeNum > -1) {
+            state.dataLoopNodes->Node(this->m_OAMixerReturnNodeNum).MassFlowRate = state.dataLoopNodes->Node(this->AirInNode).MassFlowRate;
+            MixedAir::ManageOutsideAirSystem(state, compName, FirstHVACIteration, AirLoopNum, this->m_OASysNum);
         }
 
         // Call the series of components that simulate a Unitary System
