@@ -2148,7 +2148,7 @@ void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, [[maybe_u
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Dareum Nam
-    //       DATE WRITTEN   Aug 2021
+    //       DATE WRITTEN   July 2021
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
@@ -2185,14 +2185,25 @@ void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, [[maybe_u
 
         if (this->ControlMode == iCtrlType::LoadControl) {
             if (std::abs(MyLoad) > DataHVACGlobals::SmallLoad) {
+                mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
+                PlantUtilities::SetComponentFlowRate(state,
+                                                     mdotWaterSide,
+                                                     this->SupplySideLoop.inletNodeNum,
+                                                     this->SupplySideLoop.outletNodeNum,
+                                                     this->SupplySideLoop.loopNum,
+                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.branchNum,
+                                                     this->SupplySideLoop.compNum);
+
                 Real64 cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
                                                                    this->SupplySideLoop.InletTemp,
                                                                    state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                                    RoutineName);
                 Real64 TargetLeavingTemp = this->SupplySideLoop.InletTemp + std::abs(MyLoad) / (cp * mdotWaterSide);
+
                 if (mdotWaterSide > DataBranchAirLoopPlant::MassFlowTolerance && (TargetLeavingTemp > this->SupplySideLoop.InletTemp)) {
-                    mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
+
                     PlantUtilities::SetComponentFlowRate(state,
                                                          mdotWaterSide,
                                                          this->SupplySideLoop.inletNodeNum,
@@ -2201,6 +2212,8 @@ void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, [[maybe_u
                                                          this->SupplySideLoop.loopSideNum,
                                                          this->SupplySideLoop.branchNum,
                                                          this->SupplySideLoop.compNum);
+
+
                 } else { // no flow on supply side so do not request flow on steam side
                     mdotSteamSide = 0.0;
                     PlantUtilities::SetComponentFlowRate(state,
