@@ -3956,8 +3956,18 @@ void ElectricStorage::simulateSimpleBucketModel(EnergyPlusData &state,
     Real64 const minDischargeEfficiency = 0.001;
 
     // make sure that there will be no divide by zero that lead to NaN values for electric (Defect #8867)
-    if (energeticEfficCharge_ < minChargeEfficiency) energeticEfficCharge_ = minChargeEfficiency;
-    if (energeticEfficDischarge_ < minDischargeEfficiency) energeticEfficDischarge_ = minDischargeEfficiency;
+    if (energeticEfficCharge_ < minChargeEfficiency) {
+        energeticEfficCharge_ = minChargeEfficiency;
+        ShowWarningError(state, "ElectricStorage::simulateSimpleBucketModel charge efficiency was too low.");
+        ShowContinueError(state, format("This occured for electric storage unit named " + name_));
+        ShowContinueError(state, format("The value has been reset to {:.3R}.  Please check your input values.", minChargeEfficiency));
+    }
+    if (energeticEfficDischarge_ < minDischargeEfficiency) {
+        energeticEfficDischarge_ = minDischargeEfficiency;
+        ShowWarningError(state, "ElectricStorage::simulateSimpleBucketModel discharge efficiency was too low.");
+        ShowContinueError(state, format("This occured for electric storage unit named " + name_));
+        ShowContinueError(state, format("The value has been reset to {:.3R}.  Please check your input values.", minDischargeEfficiency));
+    }
 
     // given arguments for how the storage operation would like to run storage charge or discharge
     // apply model constraints and adjust arguments accordingly
