@@ -6850,7 +6850,7 @@ void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
     // update sim routine called from plant
 
     // Using/Aliasing
-    using DataPlant::ccSimPlantEquipTypes;
+    using DataPlant::PlantEquipTypeNamesCC;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -6890,7 +6890,7 @@ void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
                     format("UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
                            CoilNum,
                            CoilName,
-                           ccSimPlantEquipTypes[static_cast<int>(CoilType)]));
+                           PlantEquipTypeNamesCC[static_cast<int>(CoilType)]));
             }
         }
     }

@@ -112,7 +112,7 @@ namespace DataPlant {
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
     extern Array1D<LoopType> const ValidLoopEquipTypes;
 
-    constexpr std::array<std::string_view, static_cast<int>(PlantEquipmentType::Num)> ccSimPlantEquipTypes{
+    constexpr std::array<std::string_view, static_cast<int>(PlantEquipmentType::Num)> PlantEquipTypeNamesCC{
         "Invalid",
         "Boiler:HotWater",
         "Boiler:Steam",
@@ -211,7 +211,7 @@ namespace DataPlant {
         "HeatPump:PlantLoop:EIR:Cooling",
         "HeatPump:PlantLoop:EIR:Heating"};
 
-    constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> SimPlantEquipTypes{
+    constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNames{
         "INVALID",
         "BOILER:HOTWATER",
         "BOILER:STEAM",

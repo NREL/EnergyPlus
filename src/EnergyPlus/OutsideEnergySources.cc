@@ -480,12 +480,12 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
     std::string hotOrChilled = "Hot ";
     std::string reportVarPrefix = "District Heating ";
     std::string heatingOrCooling = "Heating";
-    std::string_view typeName = DataPlant::ccSimPlantEquipTypes[static_cast<int>(DataPlant::PlantEquipmentType::PurchHotWater)];
+    std::string_view typeName = DataPlant::PlantEquipTypeNamesCC[static_cast<int>(DataPlant::PlantEquipmentType::PurchHotWater)];
     if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
         hotOrChilled = "Chilled ";
         reportVarPrefix = "District Cooling ";
         heatingOrCooling = "Cooling";
-        typeName = DataPlant::ccSimPlantEquipTypes[static_cast<int>(DataPlant::PlantEquipmentType::PurchChilledWater)];
+        typeName = DataPlant::PlantEquipTypeNamesCC[static_cast<int>(DataPlant::PlantEquipmentType::PurchChilledWater)];
     }
     SetupOutputVariable(state,
                         reportVarPrefix + hotOrChilled + "Water Energy",

@@ -528,8 +528,8 @@ Add component type for 'CoilSystem:Cooling:Water' in Primary Air Loop
 ### DataPlant.cc ###
     Add "CoilSystem:Cooling:Water" system cooling coil to the 1D String lists:
 
-	SimPlantEquipTypes
-	ccSimPlantEquipTypes
+	PlantEquipTypeNames
+	PlantEquipTypeNamesCC
 	ValidLoopEquipTypes
 
 	Change NumSimPlantEquipTypes(96) to NumSimPlantEquipTypes(97);
