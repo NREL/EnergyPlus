@@ -5336,3 +5336,34 @@ TEST_F(EnergyPlusFixture, PlantMassFlowRatesFuncTest)
                                          setPtTemp);
     EXPECT_NEAR(result, expected, answerTolerance);
 }
+
+TEST_F(EnergyPlusFixture, setBackupElementCapacityTest)
+{
+    Real64 originalBackupElementCapacity;
+    Real64 originalTankMaxCapacity;
+    Real64 expectedAnswer;
+    Real64 allowedTolerance = 0.001;
+
+    // Test for #9001: Make sure BackupElementCapacity is not set to DataSizing::Autosize which is -99999.0
+    // because this results in negative electricity consumption because BackupElementCapacity is never reset.
+    // Test 1: TankMaxCapacity is still set to DataSizing::AutoSize, BackupElementCapacity set to 0.0
+    originalTankMaxCapacity = DataSizing::AutoSize;
+    originalBackupElementCapacity = 0.0;
+    setBackupElementCapacity(HPWH.originalBackupElementCapacity, TankoriginalTankMaxCapacityMaxCapacity);
+    expectedAnswer = 0.0;
+    EXPECT_NEAR(originalBackupElementCapacity, expectedAnswer, allowedTolerance);
+
+    // Test 2: TankMaxCapacity is still set to DataSizing::AutoSize, BackupElementCapacity is negative, reset to 0.0
+    originalTankMaxCapacity = DataSizing::AutoSize;
+    originalBackupElementCapacity = -100.0;
+    setBackupElementCapacity(HPWH.originalBackupElementCapacity, TankoriginalTankMaxCapacityMaxCapacity);
+    expectedAnswer = 0.0;
+    EXPECT_NEAR(originalBackupElementCapacity, expectedAnswer, allowedTolerance);
+
+    // Test 3: TankMaxCapacity is not DataSizing::AutoSize, BackupElementCapacity gets set to TankMaxCapacity
+    originalTankMaxCapacity = 100.0;
+    originalBackupElementCapacity = 0.0;
+    setBackupElementCapacity(HPWH.originalBackupElementCapacity, TankoriginalTankMaxCapacityMaxCapacity);
+    expectedAnswer = 100.0;
+    EXPECT_NEAR(originalBackupElementCapacity, expectedAnswer, allowedTolerance);
+}

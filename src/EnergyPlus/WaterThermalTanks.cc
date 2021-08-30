@@ -4228,12 +4228,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     if (!(UtilityRoutines::SameString(HPWH.TankName, Tank.Name) && UtilityRoutines::SameString(HPWH.TankType, Tank.Type))) continue;
 
                     // save backup element and on/off-cycle parasitic properties for use during standard rating procedure
-                    if (Tank.MaxCapacity !=
-                        DataSizing::AutoSize) { // Defect 9001 fix to avoid BackupElementCapacity being set to DataSizing::AutoSize
-                        HPWH.BackupElementCapacity = Tank.MaxCapacity;
-                    } else {
-                        if (HPWH.BackupElementCapacity < 0.0) HPWH.BackupElementCapacity = 0.0;
-                    }
+                    setBackupElementCapacity(HPWH.BackupElementCapacity, Tank.MaxCapacity);
                     HPWH.BackupElementEfficiency = Tank.Efficiency;
                     HPWH.WHOnCycParaLoad = Tank.OnCycParaLoad;
                     HPWH.WHOffCycParaLoad = Tank.OffCycParaLoad;
@@ -4865,6 +4860,15 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
     } // get input flag
 
     return ErrorsFound;
+}
+
+void setBackupElementCapacity(Real64 &BackElCap, Real64 MaxTankCap)
+{
+    if (MaxTankCap != DataSizing::AutoSize) { // Defect 9001 fix to avoid BackupElementCapacity being set to DataSizing::AutoSize
+        BackElCap = MaxTankCap;
+    } else { // Only reset BackupElementCapacity if it's less than zero
+        if (BackElCap < 0.0) BackElCap = 0.0;
+    }
 }
 
 void WaterThermalTankData::setupOutputVars(EnergyPlusData &state)

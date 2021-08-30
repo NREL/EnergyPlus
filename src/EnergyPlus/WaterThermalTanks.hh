@@ -905,6 +905,8 @@ namespace WaterThermalTanks {
 
     bool GetWaterThermalTankInput(EnergyPlusData &state);
 
+    void setBackupElementCapacity(Real64 &BackElCap, Real64 MaxTankCap);
+
     void CalcWaterThermalTankZoneGains(EnergyPlusData &state);
 
     int getTankIDX(EnergyPlusData &state, std::string_view CompName, int &CompIndex);
