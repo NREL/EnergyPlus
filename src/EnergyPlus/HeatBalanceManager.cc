@@ -330,6 +330,19 @@ namespace HeatBalanceManager {
         // Added SV 6/26/2013 to load scheduled surface gains
         GetScheduledSurfaceGains(state, ErrorsFound);
 
+        if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+            print(state.files.eio, "{}\n", "! <Representative Surface Assignment>,Surface Name,Representative Surface Name");
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+                auto &RepSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
+                if (SurfNum != RepSurfNum) {
+                    print(state.files.eio,
+                          " Representative Surface Assignment,{},{}\n",
+                          state.dataSurface->Surface(SurfNum).Name,
+                          state.dataSurface->Surface(RepSurfNum).Name);
+                }
+            }
+        }
+
         // Added TH 1/9/2009 to create thermochromic window constructions
         CreateTCConstructions(state, ErrorsFound);
 
@@ -4907,29 +4920,9 @@ namespace HeatBalanceManager {
         // METHODOLOGY EMPLOYED:
         // The GetObjectItem routines are employed to retrieve the data.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace SurfaceGeometry;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         GetZoneData(state, ErrorsFound); // Read Zone data from input file
 
-        SetupZoneGeometry(state, ErrorsFound);
+        SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     }
 
     void GetZoneData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
@@ -4982,8 +4975,6 @@ namespace HeatBalanceManager {
         state.dataGlobal->NumOfZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataHeatBal->Zone.allocate(state.dataGlobal->NumOfZones);
-        state.dataViewFactor->ZoneRadiantInfo.allocate(state.dataGlobal->NumOfZones);
-        state.dataViewFactor->ZoneSolarInfo.allocate(state.dataGlobal->NumOfZones);
         state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
 
         ZoneLoop = 0;
@@ -5192,6 +5183,9 @@ namespace HeatBalanceManager {
 
         // allocate the array the holds the predefined report data
         state.dataHeatBal->ZonePreDefRep.allocate(state.dataGlobal->NumOfZones);
+
+        // Now get Space data after Zones are set up, because Space is optional, Zones are not
+        GetSpaceData(state, ErrorsFound);
     }
 
     void GetZoneLocalEnvData(EnergyPlusData &state, bool &ErrorsFound) // Error flag indicator (true if errors found)
@@ -5474,6 +5468,161 @@ namespace HeatBalanceManager {
                             state.dataHeatBal->Zone(ZoneLoop).Name);
     }
 
+    void GetSpaceData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
+    {
+        constexpr const char *RoutineName("GetSpaceData: ");
+        std::string cCurrentModuleObject = "Space";
+        auto &ip = state.dataInputProcessing->inputProcessor;
+        auto const instances = ip->epJSON.find(cCurrentModuleObject);
+        if (instances != ip->epJSON.end()) {
+            auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
+            auto &instancesValue = instances.value();
+            int numSpaces = instancesValue.size();
+            int spaceNum = 0;
+            // Allow for one additional Space per zone if some surfaces do not have a Space assigned in input
+            state.dataHeatBal->space.allocate(size_t(numSpaces + state.dataGlobal->NumOfZones));
+            // Allow for one additional "General" space type for auto-generated spaces
+            state.dataHeatBal->spaceTypes.allocate(size_t(numSpaces + 1));
+
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                ++spaceNum;
+                auto const &objectFields = instance.value();
+                auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                thisSpace.Name = UtilityRoutines::MakeUPPERCase(instance.key());
+                ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
+                std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
+                thisSpace.userEnteredFloorArea = ip->getRealFieldValue(objectFields, objectSchemaProps, "floor_area");
+                int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
+                if (zoneNum > 0) {
+                    thisSpace.zoneNum = zoneNum;
+                    state.dataHeatBal->Zone(zoneNum).spaceIndexes.emplace_back(spaceNum);
+                    ++state.dataHeatBal->Zone(zoneNum).numSpaces;
+                } else {
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpace.Name);
+                    ShowContinueError(state, "Zone Name =" + zoneName + "not found.");
+                    ErrorsFound = true;
+                }
+                thisSpace.spaceType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_type");
+                bool spaceTypeFound = false;
+                for (int spaceTypePtr = 1; spaceTypePtr <= state.dataGlobal->numSpaceTypes; ++spaceTypePtr) {
+                    if (UtilityRoutines::SameString(thisSpace.spaceType, state.dataHeatBal->spaceTypes(spaceTypePtr))) {
+                        thisSpace.spaceTypeNum = spaceTypePtr;
+                        spaceTypeFound = true;
+                        break;
+                    }
+                }
+                if (!spaceTypeFound) {
+                    ++state.dataGlobal->numSpaceTypes;
+                    state.dataHeatBal->spaceTypes(state.dataGlobal->numSpaceTypes) = thisSpace.spaceType;
+                    thisSpace.spaceTypeNum = state.dataGlobal->numSpaceTypes;
+                }
+
+                auto extensibles = objectFields.find("tags");
+                auto const &extensionSchemaProps = objectSchemaProps["tags"]["items"]["properties"];
+                if (extensibles != objectFields.end()) {
+                    auto extensiblesArray = extensibles.value();
+                    for (auto extensibleInstance : extensiblesArray) {
+                        thisSpace.tags.emplace_back(ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "tag"));
+                    }
+                }
+            }
+            state.dataGlobal->numSpaces = spaceNum;
+        } else {
+            // If no Spaces are defined, then allow for one Space per zone, and one spaceType
+            state.dataHeatBal->space.allocate(state.dataGlobal->NumOfZones);
+            state.dataHeatBal->spaceTypes.allocate(1);
+        }
+
+        cCurrentModuleObject = "SpaceList";
+        auto const instances2 = ip->epJSON.find(cCurrentModuleObject);
+        if (instances2 != ip->epJSON.end()) {
+            auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
+            auto &instancesValue = instances2.value();
+            int numSpaceLists = instancesValue.size();
+            int spaceListNum = 0;
+            state.dataHeatBal->spaceList.allocate(numSpaceLists);
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                ++spaceListNum;
+                auto const &objectFields = instance.value();
+                auto &thisSpaceList = state.dataHeatBal->spaceList(spaceListNum);
+                thisSpaceList.Name = UtilityRoutines::MakeUPPERCase(instance.key());
+                ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
+
+                if (UtilityRoutines::FindItemInList(thisSpaceList.Name, state.dataHeatBal->Zone) > 0) {
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + thisSpaceList.Name + "\":  is a duplicate of a zone name.");
+                    ErrorsFound = true;
+                }
+                if (UtilityRoutines::FindItemInList(thisSpaceList.Name, state.dataHeatBal->space) > 0) {
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + thisSpaceList.Name + "\":  is a duplicate of a space name.");
+                    ErrorsFound = true;
+                }
+
+                // List of spaces
+                auto extensibles = objectFields.find("spaces");
+                auto const &extensionSchemaProps = objectSchemaProps["spaces"]["items"]["properties"];
+                if (extensibles != objectFields.end()) {
+                    auto extensiblesArray = extensibles.value();
+                    for (auto extensibleInstance : extensiblesArray) {
+                        std::string thisSpaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
+                        int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
+                        if (thisSpaceNum > 0) {
+                            thisSpaceList.spaces.emplace_back(thisSpaceNum);
+                        } else {
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpaceList.Name);
+                            ShowContinueError(state, "Space Name =" + thisSpaceName + "not found.");
+                            ErrorsFound = true;
+                        }
+                        thisSpaceList.maxSpaceNameLength = max(thisSpaceList.maxSpaceNameLength, len(thisSpaceName));
+                        // Check for duplicate spaces
+                        for (int loop = 1; loop <= int(thisSpaceList.spaces.size()) - 1; ++loop) {
+                            if (thisSpaceNum == thisSpaceList.spaces(loop)) {
+                                ShowSevereError(state,
+                                                RoutineName + cCurrentModuleObject + "=\"" + thisSpaceList.Name + "\":  Space Name " + thisSpaceName +
+                                                    " appears more than once in list.");
+                                ErrorsFound = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Make sure every zone has at least one space
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            auto &thisZone = state.dataHeatBal->Zone(zoneNum);
+            if (thisZone.spaceIndexes.empty()) {
+                ++state.dataGlobal->numSpaces;
+                state.dataHeatBal->space(state.dataGlobal->numSpaces).zoneNum = zoneNum;
+                state.dataHeatBal->space(state.dataGlobal->numSpaces).Name = thisZone.Name;
+                state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceType = "GENERAL";
+                state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceTypeNum = GetGeneralSpaceTypeNum(state);
+                // Add to zone's list of spaces
+                thisZone.spaceIndexes.emplace_back(state.dataGlobal->numSpaces);
+                ++state.dataHeatBal->Zone(zoneNum).numSpaces;
+            }
+        }
+    }
+
+    int GetGeneralSpaceTypeNum(EnergyPlusData &state)
+    {
+        // If "General" exists as a space type return the index
+        bool generalSpaceTypeExists = false;
+        int generalSpaceTypeNum = 0;
+        for (int spaceTypePtr = 1; spaceTypePtr <= state.dataGlobal->numSpaceTypes; ++spaceTypePtr) {
+            if (UtilityRoutines::SameString(state.dataHeatBal->spaceTypes(spaceTypePtr), "GENERAL")) {
+                generalSpaceTypeNum = spaceTypePtr;
+                generalSpaceTypeExists = true;
+                break;
+            }
+        }
+        // Add General space type if it doesn't exist yet
+        if (!generalSpaceTypeExists) {
+            ++state.dataGlobal->numSpaceTypes;
+            state.dataHeatBal->spaceTypes(state.dataGlobal->numSpaceTypes) = "GENERAL";
+            generalSpaceTypeNum = state.dataGlobal->numSpaceTypes;
+        }
+        return generalSpaceTypeNum;
+    }
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
 
@@ -5716,14 +5865,18 @@ namespace HeatBalanceManager {
     {
         // Allocate zone / encl hb arrays
 
+        // TODO MJW: Punt for now, sometimes unit test will get here and need these to be allocated, but simulations need them sooner
+        if (!state.dataHeatBal->ZoneIntGain.allocated()) {
+            state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
+            state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
+            state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
+        }
         state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBal->ZoneSolAbsFirstCalc.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBal->EnclRadReCalc.allocate(state.dataGlobal->NumOfZones);
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             state.dataHeatBal->ZoneMRT(zoneNum) = 0.0;
-            state.dataHeatBal->ZoneSolAbsFirstCalc(zoneNum) = true;
-            state.dataHeatBal->EnclRadReCalc(zoneNum) = false;
         }
+        state.dataHeatBal->EnclSolAbsFirstCalc.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataHeatBal->EnclRadReCalc.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQSDifSol.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQD.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQDforDaylight.allocate(state.dataViewFactor->NumOfSolarEnclosures);
@@ -5736,6 +5889,8 @@ namespace HeatBalanceManager {
         state.dataHeatBal->EnclSolQSWRadLights.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolVMULT.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+            state.dataHeatBal->EnclSolAbsFirstCalc(enclosureNum) = true;
+            state.dataHeatBal->EnclRadReCalc(enclosureNum) = false;
             state.dataHeatBal->EnclSolQSDifSol(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolQD(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolQDforDaylight(enclosureNum) = 0.0;
@@ -6307,9 +6462,9 @@ namespace HeatBalanceManager {
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF) {
-                    state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, 1) = state.dataHeatBalSurf->TH(1, 1, SurfNum);
+                    state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, 1) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
                     state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, state.dataConstruction->Construct(thisConstruct).TotLayers) =
-                        state.dataHeatBalSurf->TH(2, 1, SurfNum);
+                        state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
                 }
             }
         }
@@ -8011,6 +8166,8 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->SurfIncSolSSG(Loop).SurfPtr = SurfNum;
+                    // Automatic Surface Multipliers: Do not use representative surfaces
+                    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
                 }
 
                 // Assign construction number
@@ -10001,6 +10158,15 @@ namespace HeatBalanceManager {
         bool DoCTFErrorReport(false);
         for (auto &construction : state.dataConstruction->Construct) {
             construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);
+            if (construction.NumHistories > 1) {
+                state.dataHeatBal->SimpleCTFOnly = false;
+            }
+            if (construction.NumCTFTerms > state.dataHeatBal->MaxCTFTerms) {
+                state.dataHeatBal->MaxCTFTerms = construction.NumCTFTerms;
+            }
+        }
+        if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
+            state.dataHeatBal->SimpleCTFOnly = false;
         }
 
         bool InitCTFDoReport;

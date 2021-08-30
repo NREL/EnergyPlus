@@ -5,7 +5,7 @@
 The following background on building energy modeling (BEM) will provide
 a foundation before learning the essentials of EnergyPlus. If you
 are already familiar with BEM, you may wish to skip to Section 1.4
-describing the EnergyPlus QuickStart Guide. 
+describing the EnergyPlus QuickStart Guide.
 
 \section{What is BEM?}
 
@@ -82,7 +82,7 @@ their operation accounts for a large portion of the energy consumed
 in a building. For these reasons and more, what might first appear
 as something that can be calculated with just a few formulas in a
 spreadsheet is instead a software program and, in the case of EnergyPlus,
-with over 500,000 lines of code. 
+with over 500,000 lines of code.
 
 \section{Questions that BEM can answer}
 
@@ -190,7 +190,7 @@ In addition:
 \begin{itemize}
 \item ASCII text-based weather, input, and output files that include hourly
 or sub-hourly environmental conditions, and standard and user definable
-reports, respectively. 
+reports, respectively.
 \item Transient heat conduction through building elements such as walls,
 roofs, floors, etc. using conduction transfer functions.
 \item Thermal comfort models based on activity, inside dry-bulb temperature,
@@ -204,7 +204,7 @@ remote energy conversion.
 equipment and uses the heat balance method recommended in the \href{https://www.ashrae.org/technical-resources/ashrae-handbook}{ASHRAE Handbook Fundamentals}.
 Proper sizing of equipment without oversizing, generally saves energy
 as the equipment is operated nearer to optimal loads.
-\item EnergyPlus runs on Windows, MacOS, and Linux computers. 
+\item EnergyPlus runs on Windows, MacOS, and Linux computers.
 \end{itemize}
 Integration of Loads, Systems, and Plants: One of the strong points
 of EnergyPlus is the integration of all aspects of the simulation---loads,
@@ -213,7 +213,7 @@ impact the building thermal response rather than calculating all loads
 first, then simulating systems and plants. The simulation is coupled
 allowing the designer to more accurately investigate the effect of
 undersizing fans and equipment and what impact that might have on
-the thermal comfort of occupants within the building. 
+the thermal comfort of occupants within the building.
 
 \section{Open Source}
 
@@ -225,7 +225,7 @@ does not provide enough details to you, you can review the source
 code itself. \href{https://github.com/NREL/EnergyPlus/wiki/BuildingEnergyPlus}{Instructions to build the code}
 (compile the source code into an executable application) are available
 in the source code repository wiki if you see something that needs
-to be enhanced or fixed, please also see the \href{https://energyplus.net/contributing}{contribution policy}. 
+to be enhanced or fixed, please also see the \href{https://energyplus.net/contributing}{contribution policy}.
 
 \section{Brief History}
 
@@ -287,7 +287,7 @@ and hot water plant systems within EnergyPlus.
 \item Using EnergyPlus for Compliance Guide: Contains information specific
 to using EnergyPlus in compliance and standard rating systems.
 \item Tips \& Tricks for Using EnergyPlus: Contains short tips and tricks
-for using various parts of EnergyPlus. 
+for using various parts of EnergyPlus.
 \end{itemize}
 
 \section{Example Files }
@@ -303,7 +303,7 @@ file which lists every type of input object that EnergyPlus uses and
 then the first three files that use that input object. It is possible
 that many other files also use a particular input object so if the
 first three files do not help, a text search of files in the ExampleFiles
-folder may find more. 
+folder may find more.
 
 \chapter{The EnergyPlus Ecosystem }
 
@@ -315,7 +315,7 @@ come with the installation package. More information on that can be
 found in section \ref{sec:Using-EnergyPlus}. In addition, EnergyPlus is often
 the simulation engine for graphical user interfaces. To see a list,
 see the \href{https://www.buildingenergysoftwaretools.com/}{BEST (Building Energy Software Tools) Directory}
-that is operated by \href{https://www.ibpsa.us/}{IBPSA-USA}. 
+that is operated by \href{https://www.ibpsa.us/}{IBPSA-USA}.
 
 \section{Approaches to Implement Measures }
 
@@ -352,7 +352,7 @@ be included when desired, and for specific entries that are normally
 fixed values to change programmatically. EP-Macro is documented in
 the AuxiliaryPrograms documentation. A file with lines starting ``\#\#''
 or with the ``imf'' file extension is likely to be a file using
-EP-Macro commands. 
+EP-Macro commands.
 
 The EnergyPlus ParametricPreprocessor uses special input objects in
 EnergyPlus to set values for any field in any other input object for
@@ -400,7 +400,7 @@ files contain a specific year of weather data and generally used for
 calibration or verification studies where the simulation results are
 compared to actual utility bills or other measured data.
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/WeatherFileLocations.png}
 \caption{EnergyPlus.net Weather File Locations}
@@ -424,9 +424,9 @@ of the sub-systems is performed by a master algorithm which is responsible
 for linking the sub-systems at run-time for data-exchange. EnergyPlus
 implements three mechanisms to support co-simulation.
 \begin{itemize}
-\item EnergyPlus implements the Building Controls Virtual Test Bed ( \href{https://www.tandfonline.com/doi/abs/10.1080/19401493.2010.518631}{BCVTB}) API. 
-This API leverages the BCVTB to enable the co-simulation of EnergyPlus with various simulation programs such as \href{http://www.trnsys.com/}{TRNSYS}, 
-\href{http://www.esru.strath.ac.uk/Programs/ESP-r.htm}{ESP-r}, \href{http://radsite.lbl.gov/radiance/HOME.html}{Radiance}, or 
+\item EnergyPlus implements the Building Controls Virtual Test Bed ( \href{https://www.tandfonline.com/doi/abs/10.1080/19401493.2010.518631}{BCVTB}) API.
+This API leverages the BCVTB to enable the co-simulation of EnergyPlus with various simulation programs such as \href{http://www.trnsys.com/}{TRNSYS},
+\href{http://www.esru.strath.ac.uk/Programs/ESP-r.htm}{ESP-r}, \href{http://radsite.lbl.gov/radiance/HOME.html}{Radiance}, or
 \href{https://www.3ds.com/products-services/catia/products/dymola/}{DYMOLA}.
 \item EnergyPlus provides an interface which allows it to import, link,
 and exchange data with simulation models which implement the Functional
@@ -490,7 +490,7 @@ a simulation with EnergyPlus:
 \item EP-Launch
 \end{itemize}
 In each case, a building model will be simulated in combination with
-a weather file for the appropriate building location. 
+a weather file for the appropriate building location.
 
 \subsection*{Graphical User Interface}
 
@@ -509,12 +509,12 @@ Windows. Basic usage using the command line approach is well documented
 in the QuickStart Guide. To learn more about the command line mode,
 you can type:
 \begin{verbatim}
-energyplus --help 
+energyplus --help
 \end{verbatim}
 when in the EnergyPlus folder. This will give the following display
 of options:
 \begin{verbatim}
-EnergyPlus, Version 9.0.1-bb7ca4f0da
+EnergyPlus, Version 9.6.0-ec0190a2fc
 Usage: energyplus [options] [input-file]
 Options:
   -a, --annual                 Force annual simulation
@@ -526,6 +526,8 @@ Options:
   -h, --help                   Display help information
   -i, --idd ARG                Input data dictionary path (default: Energy+.idd
                                in executable directory)
+  -j, --jobs ARG               Multi-thread with N threads; 1 thread with no
+                               arg.
   -m, --epmacro                Run EPMacro prior to simulation
   -p, --output-prefix ARG      Prefix for output file names (default: eplus)
   -r, --readvars               Run ReadVarsESO after simulation
@@ -537,6 +539,8 @@ Options:
   -w, --weather ARG            Weather file path (default: in.epw in current
                                directory)
   -x, --expandobjects          Run ExpandObjects prior to simulation
+--convert-only                 Only convert IDF->epJSON or epJSON->IDF,
+                               dependent on input file type. No simulation
 Example: energyplus -w weather.epw -r input.idf
 \end{verbatim}
 EnergyPlus can be run by specifying a number of options followed by
@@ -549,7 +553,7 @@ descriptive string of characters preceded by double dashes, e.g.,
 \textquotedbl -{}-help\textquotedbl ). Several of these options
 are commonly used including the weather, output-prefix, expandobjects,
 and readvars options. The following are some examples of using the
-command line options. 
+command line options.
 
 Pre-processing using EPMacro and ExpandObjects:
 \begin{verbatim}
@@ -575,12 +579,12 @@ EP-Launch provides this and more. In addition, EP-Launch can help
 open a text editor for the input and output files, open a spreadsheet
 for the result files, a web browser for the tabular results file,
 and start up a viewer for the selected drawing file. There are two
-different versions of EP-Launch currently part of the EnergyPlus system. 
+different versions of EP-Launch currently part of the EnergyPlus system.
 
 The main screen of EP-Launch 2 is shown below:
 
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/eplaunch2.png}
 \caption{EP-Launch 2}
@@ -591,11 +595,11 @@ It is a Windows program only. EP-Launch 2 is included in the EnergyPlus
 installation package when installing on Windows, so no additional
 steps are needed to run it. It is located in the main ``root'' folder
 of EnergyPlus, usually, a folder named EnergyPlusVx-x-x, where the
-x's are the version number. 
+x's are the version number.
 
 In 2018, EP-Launch 3 was developed, and its main screen is shown below:
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/eplaunch3.png}
 \caption{EP-Launch 3}
@@ -623,7 +627,7 @@ EnergyPlus has two different input file formats that can be used to
 describe the building and system that is simulated. The file extensions
 for the two formats are IDF and epJSON. For both input files, the
 numeric inputs are in SI units (International System of Units often
-called metric units). 
+called metric units).
 
 \subsection*{IDF}
 
@@ -637,7 +641,7 @@ object is spread over many lines in the file with one value for each
 field per line. The names of each field are not required but are usually
 shown after the value and the comma or semicolon as a special comment
 using ``!-'' as an indicator. The input objects can be in any order.
-An example of an input object in an IDF file is shown below: 
+An example of an input object in an IDF file is shown below:
 \begin{verbatim}
   Building,
     Simple One Zone,   !- Name
@@ -692,13 +696,52 @@ input object shown above in IDF format is shown below in epJSON format:
     }
 }
 \end{verbatim}
+
+
+\subsection*{Converting between IDF and epJSON}
+
 While the IDF and epJSON file formats are quite different, they contain
 the same information, and either may be used. In general, if producing
 EnergyPlus input files using a programming language, the epJSON format
 might make more sense while, at this point, if producing IDF files
-using a GUI, they are likely to use the IDF format. EnergyPlus, when
+using a GUI, they are likely to use the IDF format. 
+
+EnergyPlus, when
 used on the command line, can convert from IDF to epJSON and from
 epJSON to IDF using the -c or -{}-convert option.
+
+There is also a separate conversion utility ConvertInputFormat.exe in the root EnergyPlus folder.
+It takes the name of an IDF or epJSON input file (with extension) as an argument. For additional options,
+type 
+\begin{verbatim}
+ConvertInputFormat --help.
+\end{verbatim}
+when in the EnergyPlus folder. This will give the following display
+of options:
+\begin{verbatim}
+Usage: ConvertInputFormat [OPTIONS] input_file [input_file ..]
+Options:
+  -f, --format ARG                 Output format.
+                                   Default means IDF->epJSON or epJSON->IDF
+                                   Select one (case insensitive):
+                                   default,idf,epjson,json,cbor,msgpack,ubjson,bson
+  -h,   -help,   --help, --usage   Display usage instructions.
+  -i, --input ARG                  Text file with list of input files to convert
+                                   (newline delimited)
+  -j ARG                           Number of threads
+  -n, --noHVACTemplate             Do not convert HVACTemplate objects.
+  -o, --output ARG                 Output directory. Will use input file
+                                   location by default.
+  -v, --version                    Display version information
+Example: ConvertInputFormat in.idf
+\end{verbatim}
+
+On Windows, you can also drag a file (IDF or epJSON) onto ConvertInputFormat.exe.
+Note that ConvertInputFormat is version-specific and will not convert an epJSON file that is not the same version.
+
+There are three groups of special input objects which are preprocessor commands: GroundHeatTransfer:*,
+HVACTemplate:* Parametric:*. ConverInputFormat converts HVACTemplate objects.  EnergyPlus does not convert any of these.
+
 
 \section{Creating and Editing Input Files}
 
@@ -723,7 +766,7 @@ range are used. The main screen of the IDF editor is shown below.
 Full details of the IDF Editor can be found in the Auxiliary Programs
 document under the ``Creating Input Files'' section.
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/idfeditor.png}
 \caption{IDF Editor}
@@ -744,11 +787,11 @@ process. The process will probably be in the form of:
 Don't expect that an initial model is ever correct; it is probably
 not. Initially, errors are likely to exist. The .ERR file should be
 the first file checked each time EnergyPlus is run. The .ERR file
-has several levels of messages: 
+has several levels of messages:
 \begin{itemize}
 \item Warning
 \item Severe
-\item Fatal 
+\item Fatal
 \end{itemize}
 A Fatal error means that EnergyPlus has stopped during the simulation
 and the input file needs to be fixed before the simulation can be
@@ -897,37 +940,37 @@ and scheduling of the boilers, chillers and other plant equipment.
 The installation of EnergyPlus includes many different files in different
 folders:
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/energyplusfolder.png}
 \caption{EnergyPlus Installation Folders}
 \end{figure}
 
 Many of these folders include valuable resources for using and learning
-EnergyPlus. 
+EnergyPlus.
 \begin{itemize}
 \item The main folder includes the EnergyPlus executable which can be used
 on the command line and EP-Launch 2, a program that makes it easier
 to use EnergyPlus and the Energy+.IDD that describes each possible
 EnergyPlus input object and the default, minimum, maximum, and options
-for each field within each input object. 
+for each field within each input object.
 \item The Documentation folder includes this document as well as the InputOutputReference,
 EngineeringReference, AuxiliaryPrograms, OutputDetailsAndExamples
 which are very important to understand. If you haven't looked through
-the documentation yet, take a few minutes and get familiar with it. 
+the documentation yet, take a few minutes and get familiar with it.
 \item The DataSets and MacroDataSets folders include files containing libraries
 of input objects that may be useful in constructing your own input
 files. The ASHRAE\_2005\_HOF\_Materials.idf and WindowConstructs.idf
-files, for example, will help with defining walls and windows. 
+files, for example, will help with defining walls and windows.
 \item The ExampleFiles folder includes a huge number of example files that
 are indexed in the two HTML files in that folder or can be searched
-through using most text editors. 
+through using most text editors.
 \item The Preprocess and PostProcess folders include many utilities that
 can be used directly or as part of EP-Launch that can aid in the setting
 up input files or extracting or converting results. The WeatherData
 folder includes a small sample of the many weather files that are
 available. For other weather files, please see the previous section
-on \ref{subsec:Weather-Files}. 
+on \ref{subsec:Weather-Files}.
 \end{itemize}
 
 \section{What Are All These Output Files?}
@@ -944,14 +987,14 @@ comma delimited, or XML format. This is one of the primary otuput
 files.
 \item CSV, TAB, or TXT -- time series output from the Output:Variable input
 object in a comma, tab, or space delimited format (generated by the
-ReadVarsESO postprocessor) 
+ReadVarsESO postprocessor)
 \item METER.CSV, METER.TAB, or METER.CSV File -- time series output from
 the Output:Meter input object in a comma, tab, or space delimited
 format (generated by the ReadVarsESO postprocessor)
 \item SQL - sqlite3 output database format
 \item EIO -- additional EnergyPlus results
 \item RDD -- list of output variables available from the run
-\item MDD -- list of output meters available from the run 
+\item MDD -- list of output meters available from the run
 \item MTD -- list of meter component variables
 \item DXF -- drawing file in AutoCAD DXF format
 \item AUDIT -- input file echo with input processor errors and warnings
@@ -1021,7 +1064,7 @@ titled ``Using Older Version Input Files - Transition'' in the AuxiliaryPrograms
 document.
 \end{itemize}
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/IDFVersionUpdater.png}
 \caption{IDFVersionUpdater}
@@ -1080,7 +1123,7 @@ application. It reads one of the EnergyPlus output files (eplusout.bnd)
 and produces a Scalable Vector Graphics (SVG) file. Many web browsers
 and other drawing programs can open SVG files. This utility runs automatically
 with EP-Launch. More information on the HVAC Diagram program is found
-in the Auxiliary Programs document. 
+in the Auxiliary Programs document.
 \item convertESOMTR - This simple post-processing program can be used seamlessly
 with EP-Launch to provide IP (inch-pound) unit output files rather
 than SI units. This program is described more fully in the Auxiliary
@@ -1162,7 +1205,7 @@ to the full year. When debugging a file, a shorter period of time
 can be used to speed up the simulation portion of the Run-Check-Edit
 cycle.
 \item RunPeriodControl:SpecialDays - allows specfication of holidays and
-a good example can be seen in 5ZoneCostEst.idf. 
+a good example can be seen in 5ZoneCostEst.idf.
 \item RunPeriodControl:DaylightSavingTime - allows the specification of
 the start and ending period for daylight savings time. This will impact
 when schedules operate but please note that output reporting timesteps
@@ -1224,7 +1267,7 @@ as the values of the schedule. A variation of this input object allows
 input specifically for shading.
 \end{itemize}
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/officeSchedules.png}
 \caption{Various Office Schedules}
@@ -1279,7 +1322,7 @@ and Solar Heat Gain Coefficient (SHGC) they can be specified in this
 input object.
 \end{itemize}
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/EnvelopeHierarchy.png}
 \caption{Envelope Component Hierarchy}
@@ -1303,7 +1346,7 @@ vacuum glazing, movable portions of the window assembly such as shades
 and blinds and screens, alternative ways of specifying fenestration
 such as equivalent layers or refraction extinction method or ASHWAT
 model or from a WINDOW program export/data file or specifying wavelength-by-wavelength
-properties. 
+properties.
 
 The input objects described in this section are further explained
 in the InputOutputReference under the heading ``Group-Surface Construction
@@ -1332,7 +1375,7 @@ EnergyPlus uses a right-hand coordinate system as shown in Figure
 X with three dimensions. The X-axis points east, the Y-axis points
 north, and the Z-axis points up.
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/coordinatesystem.png}
 \caption{EnergyPlus Coordinate System}
@@ -1361,7 +1404,7 @@ This input object supports any shape surface with three or more corners
 (vertices). In addition, this input object defines what is on the
 other side of the surface from the zone, whether that is outside,
 another zone in the building, or the ground. Other inputs indicate
-if the outside of the surface is exposed to the sun or the wind. 
+if the outside of the surface is exposed to the sun or the wind.
 \item FenestrationSurface:Detailed - describes windows, doors, and special
 daylighting tubes and it references the wall that it is part of. It
 also requires the specification of vertices (usually four but three
@@ -1397,7 +1440,7 @@ buildings or mountains and includes the vertex of one corner as well
 as the length and width. For deciduous trees, and other situations
 that shading changes over time, the schedule for the transmittance
 can vary, otherwise, it should always be set to zero or leave the
-schedule name blank. 
+schedule name blank.
 \item Shading:Zone:Detailed - describes an attachment to the building that
 casts a shadow such as an overhang or fin. It also includes a reference
 to a transmittance schedule. The wall that the fin or overhang is
@@ -1463,7 +1506,7 @@ is the glazed area without the frame. The frame extends beyond the
 glazed area. See the PurchAirWithDaylighting.idf example file.
 \end{itemize}
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/window_frame_and_divider.png}
 \caption{A window with frame and divider}
@@ -1506,22 +1549,22 @@ peak value. For almost all buildings, it is rare that the peak occupancy
 occurs for more than a few hours per year if at all and this is especially
 the case for retail stores, theaters, and sports complexes. Even office
 buildings when counting vacations and people out of the building for
-meetings will rarely have peak occupancy. 
+meetings will rarely have peak occupancy.
 
 The most common internal gain input objects that are shown in almost
-all the example files are: 
+all the example files are:
 \begin{itemize}
 \item People -- specifies not only the sensible, latent and radiant heat
 from people but also includes ways of reporting the comfort of occupants
 using a variety of thermal comfort models. The DynamicClothing.idf
 example file shows how to use the thermal comfort models.
-\item Lights -- describes the heat related to lighting systems. 
+\item Lights -- describes the heat related to lighting systems.
 \item ElectricEquipment -- describes the heat related to electrical appliances,
-office equipment, and other heat sources that are powered by electricity. 
+office equipment, and other heat sources that are powered by electricity.
 \item GasEquipment - specifies the heat related to cooking appliances and
 other equipment that uses natural gas.
 \end{itemize}
-Less common internal gains input objects include: 
+Less common internal gains input objects include:
 \begin{itemize}
 \item OtherEquipment - describes any heat gain or loss (sensible, radiant,
 and/or latent) that impacts the space but does not consume utility
@@ -1531,7 +1574,7 @@ is not to be included in the overall building energy consumption.
 example file.
 \item SwimmingPool:Indoor - see the 5ZoneSwimmingPool.idf example file.
 \end{itemize}
-Other 
+Other
 \begin{itemize}
 \item ComfortViewFactorAngles -- allows the specification of how different
 surfaces impact the thermal comfort calculations for the occupants.
@@ -1553,11 +1596,11 @@ and skylights is called daylighting. Automatics daylighting control
 systems are a very common energy efficiency measure in buildings and
 are often required for new building designs depending on the energy
 code that applies to the building location. The most common input
-objects related to daylighting are: 
+objects related to daylighting are:
 \begin{itemize}
 \item Daylighting:Controls -- specifies the algorithm used for daylighting,
 the dimming of lights is continuous or stepped, and how glare calculations
-are performed. 
+are performed.
 \item Daylighting:ReferencePoint -- specifies the location of the sensors
 for the daylighting control system.
 \end{itemize}
@@ -1565,14 +1608,14 @@ The InputOutputReference includes not only a description of these
 input objects but also extra guidance on how they should be applied.
 The PurchAirWithDaylighting.idf contains examples of these input objects.
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/DaylightingContinuous.png}
 \caption{Daylighting with Continuous Dimming}
 \end{figure}
 
 
-Three different devices can be used with daylighting: 
+Three different devices can be used with daylighting:
 \begin{itemize}
 \item DaylightingDevice:Tubular - see the DaylightingDeviceTubular.idf example
 file.
@@ -1583,10 +1626,10 @@ file.
 An input object called Daylighting:DELight:ComplexFenestration is
 used with one of the two control methods specified in the Daylighting:Controls
 input object when used in conjunction with complex fenestration systems
-such as prismatic and holographic glass. 
+such as prismatic and holographic glass.
 
 Some flexibility is given to provide extra output related to daylighting
-and includes: 
+and includes:
 \begin{itemize}
 \item Output:DaylightFactors -- creates a special report on the factors
 used in daylighting. See the ReportDaylightFactors.idf example file.
@@ -1620,7 +1663,7 @@ surfaces that are fully under the building and not along the perimeter
 are not expected to have any heat transfer with the environment.
 \end{itemize}
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/kiva-2d-elements.png}
 \caption{Structural and insulation components of Foundation:Kiva input objects}
@@ -1771,7 +1814,7 @@ water-cooled chillers
 systems
 \end{itemize}
 The Input Output Reference includes a list of exactly which input
-objects are needed for each of these configurations 
+objects are needed for each of these configurations
 \begin{itemize}
 \item HVACTemplate:Thermostat - describes the heating and cooling setpoints
 for a thermostat. This input object can be referenced by multiple
@@ -1880,9 +1923,9 @@ a generic example of the loop-node concept. Loop nodes are a key defining
 feature in EnergyPlus. As a result, it is recommended that one of
 the first steps taken in defining an HVAC system in EnergyPlus be
 the definition of a node diagram or map. This is helpful for visualization
-of the entire system. 
+of the entire system.
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/NodeDiagram.png}
 \caption{Example Node Diagram}
@@ -1933,7 +1976,7 @@ the demand side, this loop can also include a splitter, a mixer, and
 a bypass.
 \end{itemize}
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/HvacHeatLoop.png}
 \caption{Detailed HVAC Heat Loop Line Diagram}
@@ -2199,7 +2242,7 @@ month's demand but also compensate for the highest demand in recent
 months, and this input object allows the specification of such a structure.
 \end{itemize}
 
-\begin{figure}[hbtp] 
+\begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/tariff-charges.png}
 \caption{Hierarchy of Economic Charges}
@@ -2212,7 +2255,7 @@ variable to be used in the calculation of the tariff.
 \item UtilityCost:Computation - provides the step-by-step specification
 of the steps needed to compute the tariff. The output report tariff
 summary includes the default computation steps for the input objects
-specified. 
+specified.
 \end{itemize}
 Life-cycle costing allows the combination of initial and future costs
 (typically energy bills) to be understood using a single metric so
@@ -2248,7 +2291,7 @@ All of these are described in the \textquotedblleft Input/Output Reference\textq
 but note that this group is described in Chapter 3 ``EnergyPlus Economics''
 while most of the other groups of input objects are described in Chapter
 1. The OutputDetailsAndExamples documentation provides even more details
-on the tabular outputs created in the section labeled ``eplustbl.<ext>''. 
+on the tabular outputs created in the section labeled ``eplustbl.<ext>''.
 
 \section{Other Groups of Input Objects}
 
@@ -2287,7 +2330,7 @@ Network in the InputOutputReference).
 of the building when used for compliance purposes.
 \item Parametrics - allows for simple parametric cases to be defined within
 an input file using input objects. Makes use of the ParametricPreprocessor
-as described in the AuxiliaryPrograms document. 
+as described in the AuxiliaryPrograms document.
 \item Refrigeration - describes supermarket and warehouse refrigeration
 systems.
 \item Electric Load Center-Generator Specifications - allows the specification

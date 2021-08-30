@@ -480,18 +480,35 @@ void SimOAComponent(EnergyPlusData &state,
             // get water coil and controller data if not called previously
             if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
             // iterate on OA sys controller and water coil at the same time
-            SolveWaterCoilController(state,
-                                     FirstHVACIteration,
-                                     AirLoopNum,
-                                     CompName,
-                                     CompIndex,
-                                     state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
-                                     state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
-                                     false);
-            // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-            state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+            if (!state.dataWaterCoils->WaterCoil(CompIndex).heatRecoveryCoil) {
+                SolveWaterCoilController(state,
+                                         FirstHVACIteration,
+                                         AirLoopNum,
+                                         CompName,
+                                         CompIndex,
+                                         state.dataWaterCoils->WaterCoil(CompIndex).ControllerName,
+                                         state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
+                                         false);
+                // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
+                state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+            } else {
+                WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
+            }
+        } else {
+            // This is not working as intended ... don't want to include the HR coil in sizing.
+            // But if the water coil is called to get this index, then the controller is called to set the
+            // controller index and the simulation sizes the controller before the cooling coil.
+            // Pushing this aspect forward to a follow up issue where the
+            // controller index call is moved out of water coils getInput.
+            // if (CompIndex == 0) {
+            //    bool errFound = false;
+            //    CompIndex = WaterCoils::GetWaterCoilIndex(state, CompType, CompName, errFound);
+            //    if (errFound) ShowFatalError(state, "SimOAComponent: Program terminates for preceding reason.");
+            // }
+            // if (!state.dataWaterCoils->WaterCoil(CompIndex).heatRecoveryCoil) OACoolingCoil = true;
+            // should not include heat recovery coils in sizing since heat transfer at peak cooling is minimal.
+            OACoolingCoil = true;
         }
-        OACoolingCoil = true;
     } else if (CompTypeNum == SimAirServingZones::CompType::WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
         if (Sim) {
             // get water coil and controller data if not called previously
@@ -589,6 +606,34 @@ void SimOAComponent(EnergyPlusData &state,
                                                                                       ZoneEquipFlag,
                                                                                       sensOut,
                                                                                       latOut);
+        }
+        OACoolingCoil = true;
+    } else if (CompTypeNum == SimAirServingZones::CompType::CoilSystemWater) { // "CoilSystem:Cooling:Water"
+        if (state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] == nullptr) {
+            UnitarySystems::UnitarySys thisSys;
+            state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] =
+                thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+            UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
+        }
+        if (Sim) {
+            bool HeatingActive = false;
+            bool CoolingActive = false;
+            Real64 OAUCoilOutTemp = 0.0;
+            bool ZoneEquipFlag = false;
+            Real64 sensOut = 0.0;
+            Real64 latOut = 0.0;
+            state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(state,
+                                                                                        CompName,
+                                                                                        FirstHVACIteration,
+                                                                                        AirLoopNum,
+                                                                                        CompIndex,
+                                                                                        HeatingActive,
+                                                                                        CoolingActive,
+                                                                                        CompIndex,
+                                                                                        OAUCoilOutTemp,
+                                                                                        ZoneEquipFlag,
+                                                                                        sensOut,
+                                                                                        latOut);
         }
         OACoolingCoil = true;
     } else if (CompTypeNum == SimAirServingZones::CompType::UnitarySystemModel) { // AirLoopHVAC:UnitarySystem
@@ -1110,6 +1155,12 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                     // CheckDXCoolingCoilInOASysExists(state, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum));
                 } else if (SELECT_CASE_var == "COILSYSTEM:HEATING:DX") {
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::DXHeatPumpSystem;
+                } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:WATER") {
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::CoilSystemWater;
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
+                    UnitarySystems::UnitarySys thisSys;
+                    state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = thisSys.factory(
+                        state, DataHVACGlobals::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
                 } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::UnitarySystemModel;
                     UnitarySystems::UnitarySys thisSys;
@@ -1420,8 +1471,13 @@ void GetOAControllerInputs(EnergyPlusData &state)
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(AlphArray(4)));
                 if (SELECT_CASE_var == "ZONESUM") { // Simplify sum the zone OA flow rates
                     thisVentilationMechanical.SystemOAMethod = SOAM_ZoneSum;
-                } else if ((SELECT_CASE_var == "VENTILATIONRATEPROCEDURE")) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
+                } else if ((SELECT_CASE_var ==
+                            "STANDARD62.1VENTILATIONRATEPROCEDURE")) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
                     thisVentilationMechanical.SystemOAMethod = SOAM_VRP;
+                } else if ((SELECT_CASE_var ==
+                            "STANDARD62.1VENTILATIONRATEPROCEDUREWITHLIMIT")) { // Ventilation Rate Procedure based on ASHRAE Standard 62.1-2007
+                                                                                // capped at the design outdoor air flow rate
+                    thisVentilationMechanical.SystemOAMethod = SOAM_VRPL;
                 } else if ((SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURE")) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
                     thisVentilationMechanical.SystemOAMethod = SOAM_IAQP;
                     if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
@@ -1942,7 +1998,9 @@ void GetOAControllerInputs(EnergyPlusData &state)
             if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ZoneSum) {
                 print(state.files.eio, "ZoneSum,");
             } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRP) {
-                print(state.files.eio, "VentilationRateProcedure,");
+                print(state.files.eio, "Standard62.1VentilationRateProcedure,");
+            } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRPL) {
+                print(state.files.eio, "Standard62.1VentilationRateProcedureWithLimit,");
             } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQP) {
                 print(state.files.eio, "IndoorAirQualityProcedure,");
             } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlSchOcc) {
@@ -2872,6 +2930,16 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 // If difference is tiny, reset silently
                 thisOAController.MaxOA = DesSupplyVolFlowRate;
             }
+
+            // Check if system has a Sizing:System object and a sizing run has been done
+            bool SizingDesRunThisAirSys = false;
+            CheckThisAirSystemForSizing(state, AirLoopNum, SizingDesRunThisAirSys);
+
+            // Get design outdoor air flow rate
+            if (SizingDesRunThisAirSys && thisOAController.VentMechObjectNum > 0) {
+                state.dataMixedAir->VentilationMechanical(thisOAController.VentMechObjectNum).SysDesOA =
+                    state.dataSize->FinalSysSizing(AirLoopNum).DesOutAirVolFlow;
+            }
         }
 
         OAControllerMySizeFlag(OAControllerNum) = false;
@@ -3711,6 +3779,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         } else {
             SysSA = curAirLoopFlow.SupFlow;
         }
+
         state.dataMixedAir->VentilationMechanical(this->VentMechObjectNum).CalcMechVentController(state, SysSA, MechVentOAMassFlow);
         MechVentOutsideAirMinFrac = MechVentOAMassFlow / curAirLoopFlow.DesSupply;
         if (curAirLoopFlow.FanPLR > 0.0) {
@@ -4086,7 +4155,8 @@ void VentilationMechanicalProps::CalcMechVentController(
 
             // get system supply air flow rate
             if (this->SystemOAMethod == SOAM_VRP || this->SystemOAMethod == SOAM_ProportionalControlSchOcc ||
-                this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
+                this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate ||
+                this->SystemOAMethod == SOAM_VRPL) {
 
                 // System supply air flow rate is always greater than or equal the system outdoor air flow rate
                 if ((SysSA > 0.0) && (SysSA < (SysOAuc * state.dataEnvrn->StdRhoAir))) SysSA = SysOAuc * state.dataEnvrn->StdRhoAir;
@@ -4186,7 +4256,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                     }
 
                     // Calc zone supply OA flow rate
-                    if (this->SystemOAMethod == SOAM_VRP) {
+                    if (this->SystemOAMethod == SOAM_VRP || this->SystemOAMethod == SOAM_VRPL) {
                         // the VRP case
                         ZoneOA = ZoneOABZ / ZoneEz;
 
@@ -4270,7 +4340,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                                ZoneMinCO2));
                                                     ShowContinueError(state,
                                                                       "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. "
-                                                                      "Default \"VentilationRateProcedure\" will be modeled. Simulation "
+                                                                      "Default \"Standard62.1VentilationRateProcedure\" will be modeled. Simulation "
                                                                       "continues...");
                                                     ShowContinueErrorTimeStamp(state, "");
                                                 } else {
@@ -4296,7 +4366,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                                ZoneMinCO2));
                                                     ShowContinueError(state,
                                                                       "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. "
-                                                                      "Default \"VentilationRateProcedure\" will be modeled. Simulation "
+                                                                      "Default \"Standard62.1VentilationRateProcedure\" will be modeled. Simulation "
                                                                       "continues...");
                                                     ShowContinueErrorTimeStamp(state, "");
                                                 } else {
@@ -4320,9 +4390,10 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                                "concentration ({:.2R}).",
                                                                ZoneMaxCO2,
                                                                ZoneMinCO2));
-                                                    ShowContinueError(state,
-                                                                      "\"ProportionalControlBasedOnDesignOARate\" will not be modeled. Default "
-                                                                      "\"VentilationRateProcedure\" will be modeled. Simulation continues...");
+                                                    ShowContinueError(
+                                                        state,
+                                                        "\"ProportionalControlBasedOnDesignOARate\" will not be modeled. Default "
+                                                        "\"Standard62.1VentilationRateProcedure\" will be modeled. Simulation continues...");
                                                     ShowContinueErrorTimeStamp(state, "");
                                                 } else {
                                                     ShowRecurringWarningErrorAtEnd(state,
@@ -4368,7 +4439,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                                           curZone.Name + "\". ");
                                                     ShowContinueError(state,
                                                                       "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. "
-                                                                      "Default \"VentilationRateProcedure\" will be modeled. Simulation "
+                                                                      "Default \"Standard62.1VentilationRateProcedure\" will be modeled. Simulation "
                                                                       "continues...");
                                                     ShowContinueErrorTimeStamp(state, "");
                                                 } else {
@@ -4391,7 +4462,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                                                                           curZone.Name + "\". ");
                                                     ShowContinueError(state,
                                                                       "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. "
-                                                                      "Default \"VentilationRateProcedure\" will be modeled. Simulation "
+                                                                      "Default \"Standard62.1VentilationRateProcedure\" will be modeled. Simulation "
                                                                       "continues...");
                                                     ShowContinueErrorTimeStamp(state, "");
                                                 } else {
@@ -4472,7 +4543,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                     // only for VRP system OA method
                     curZoneSysEnergyDemand.SupplyAirAdjustFactor = 1.0;
 
-                    if (this->SystemOAMethod == SOAM_VRP) {
+                    if (this->SystemOAMethod == SOAM_VRP || this->SystemOAMethod == SOAM_VRPL) {
                         if (ZoneOAFrac > this->ZoneMaxOAFraction) {
                             if (this->ZoneMaxOAFraction > 0.0) {
                                 curZoneSysEnergyDemand.SupplyAirAdjustFactor = ZoneOAFrac / this->ZoneMaxOAFraction;
@@ -4517,6 +4588,10 @@ void VentilationMechanicalProps::CalcMechVentController(
                 if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOcc ||
                     this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
                     SysOA = SysOA / SysEv;
+                } else if (this->SystemOAMethod == SOAM_VRPL && this->SysDesOA > 0.0) {
+                    // Limit system OA to design OA minimum flow rate, as per ASHRAE Guideline 36-2018 Section 5.16.3.1
+                    // If no system sizing run is done (i.e. no Sizing:System) the design outdoor air flow rate is not known
+                    SysOA = min(SysOAuc / SysEv, this->SysDesOA);
                 } else {
                     SysOA = SysOAuc / SysEv;
                 }
