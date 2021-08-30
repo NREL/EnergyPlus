@@ -3,7 +3,9 @@
 //
 
 #include <LU-Decomposition/lu.h>
+#include <stdexcept>
 
+using namespace std;
 
 void jcc::decomposition(vector<vector<double> > &A, int &n, vector<int> &indx,
                    double &d) {

@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <cmath>
 #include <cpgfunction/utilities.h>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 
