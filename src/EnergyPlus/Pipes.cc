@@ -100,10 +100,6 @@ void LocalPipeData::simulate(EnergyPlusData &state,
                              [[maybe_unused]] Real64 &CurLoad,
                              [[maybe_unused]] bool const RunFlag)
 {
-    if (this->OneTimeInit) {
-        this->oneTimeInit(state);
-        this->OneTimeInit = false;
-    }
 
     if (state.dataGlobal->BeginEnvrnFlag && this->EnvrnFlag) {
         this->initEachEnvironment(state);
@@ -115,7 +111,7 @@ void LocalPipeData::simulate(EnergyPlusData &state,
     PlantUtilities::SafeCopyPlantNode(state, this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
 }
 
-void LocalPipeData::oneTimeInit(EnergyPlusData &state)
+void LocalPipeData::oneTimeInit_new(EnergyPlusData &state)
 {
     int FoundOnLoop = 0;
     bool errFlag = false;
@@ -144,6 +140,9 @@ void LocalPipeData::initEachEnvironment(EnergyPlusData &state) const
                                        this->LoopSide,
                                        this->BranchIndex,
                                        this->CompIndex);
+}
+void LocalPipeData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 void GetPipeInput(EnergyPlusData &state)
