@@ -1954,3 +1954,262 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest)
 
     EXPECT_EQ(TestResult, ExpectedResult);
 }
+
+TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth)
+{
+    std::string const idf_objects = delimited_string({
+        "Site:GroundDomain:Slab,",
+        "CoupledSlab,	!- Name",
+        "5,				!- Ground Domain Depth {m}",
+        "1,				!- Aspect Ratio",
+        "5,				!- Domain Perimeter Offset {m}",
+        "1.8,			!- Soil Thermal Conductivity {W/m-K}",
+        "3200,			!- Soil Density {kg/m3}",
+        "836,			!- Soil Specific Heat {J/kg-K}",
+        "30,			!- Soil Moisture Content Volume Fraction {percent}",
+        "50,			!- Soil Moisture Content Volume Fraction at Saturation {percent}",
+        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,	!- Type of Undisturbed Ground Temperature Model",
+        "KATemps,		!- Name of Undisturbed Ground Temperature Model",
+        "1,				!- Evapotranspiration Ground Cover Parameter",
+        "GroundCoupledOSCM,	!- Name of Floor Boundary Condition Model",
+        "InGrade,		!- Slab Location (InGrade/OnGrade)",
+        "SlabMaterial,	!- Slab Material Name",
+        "Yes,			!- Horizontal Insulation (Yes/No)",
+        "HorizInsulation,	!- Horizontal Insulation Material Name",
+        "Full,			!- Full Horizontal or Perimeter Only (Full/Perimeter)",
+        ",				!- Perimeter insulation width (m)",
+        "Yes,			!- Vertical Insulation (Yes/No)",
+        "VertiInsulation,	!- Vertical Insulation Name",
+        "0.5,			!- Vertical perimeter insulation depth from surface (m)",
+        "Hourly;		!- Domain Simulation Interval. (Timestep/Hourly)",
+        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+        "KATemps,		!- Name of object",
+        "1.8,			!- Soil Thermal Conductivity {W/m-K}",
+        "3200,			!- Soil Density {kg/m3}",
+        "836,			!- Soil Specific Heat {J/kg-K}",
+        "15.5,			!- Annual average surface temperature {C}",
+        "12.8,			!- Annual amplitude of surface temperature {delta C}",
+        "17.3;			!- Phase shift of minimum surface temperature {days}",
+        "SurfaceProperty:OtherSideConditionsModel,",
+        "GroundCoupledOSCM,		!- Name",
+        "GroundCoupledSurface;	!- Type of Modeling",
+
+        "Material,",
+        "SlabMaterial,  !- Name",
+        "MediumRough,	!- Roughness",
+        "0.2,		    !- Thickness {m}",
+        "1.8,			!- Conductivity {W/m-K}",
+        "2400,			!- Density {kg/m3}",
+        "750,			!- Specific Heat {J/kg-K}",
+        "0.9,			!- Thermal Absorptance",
+        "0.65,			!- Solar Absorptance",
+        "0.65;			!- Visible Absorptance",
+
+        "Material,",
+        "HorizInsulation,         !- Name",
+        "Rough,                   !- Roughness",
+        "0.1,                     !- Thickness {m}",
+        "0.04,                    !- Conductivity {W/m-K}",
+        "15,                      !- Density {kg/m3}",
+        "1300,                    !- Specific Heat {J/kg-K}",
+        "0.9,                     !- Thermal Absorptance",
+        "0.6,                     !- Solar Absorptance",
+        "0.6;                     !- Visible Absorptance",
+
+        "Material,",
+        "VertiInsulation,         !- Name",
+        "Rough,                   !- Roughness",
+        "0.15,                    !- Thickness {m}",
+        "0.04,                    !- Conductivity {W/m-K}",
+        "15,                      !- Density {kg/m3}",
+        "1300,                    !- Specific Heat {J/kg-K}",
+        "0.9,                     !- Thermal Absorptance",
+        "0.6,                     !- Solar Absorptance",
+        "0.6;                     !- Visible Absorptance",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // Dummy surface
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
+
+    bool errorsFound = false;
+
+    // Other necessary inputs
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
+
+    state->dataPlantPipingSysMgr->domains.resize(1);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
+
+    // 2021-08: revised the case so no more error complains
+    EXPECT_FALSE(errorsFound);
+
+    auto &theDomain = state->dataPlantPipingSysMgr->domains[0];
+
+    theDomain.createPartitionCenterList(*state);
+
+    // Take the logic in the code about how the partition positions were calculated
+    // and how they were affected by the horizontal thickness
+    Real64 insyLoc = theDomain.Extents.yMax - theDomain.VertInsDepth + theDomain.HorizInsThickness / 2.0;
+    Real64 slabBot = theDomain.Extents.yMax - theDomain.SlabThickness - theDomain.HorizInsThickness / 2.0;
+    Real64 totalWid = theDomain.HorizInsThickness;
+
+    int partySize = theDomain.Partitions.Y.size();
+
+    Real64 err_tol = 1.0e-4;
+
+    // check horizontal partitions for this case
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, 4.55, err_tol);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, insyLoc, err_tol);
+
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, 0.10, err_tol);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, totalWid, err_tol);
+
+    EXPECT_TRUE(theDomain.Partitions.Y[partySize - 2].partitionType == PartitionType::VertInsLowerEdge);
+
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, 4.75, err_tol);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, slabBot, err_tol);
+
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, 0.10, err_tol);
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, totalWid, err_tol);
+
+    EXPECT_TRUE(theDomain.Partitions.Y[partySize - 1].partitionType == PartitionType::UnderFloor);
+}
+
+TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_Fix_HorizInsDepth_Test2)
+{
+
+    // Test another configuration using a different Horizontal Insulation thickness
+    // with an Horizontal Insulation thickness of 0.5m
+
+    std::string const idf_objects = delimited_string({
+        "Site:GroundDomain:Slab,",
+        "CoupledSlab,	!- Name",
+        "5,				!- Ground Domain Depth {m}",
+        "1,				!- Aspect Ratio",
+        "5,				!- Domain Perimeter Offset {m}",
+        "1.8,			!- Soil Thermal Conductivity {W/m-K}",
+        "3200,			!- Soil Density {kg/m3}",
+        "836,			!- Soil Specific Heat {J/kg-K}",
+        "30,			!- Soil Moisture Content Volume Fraction {percent}",
+        "50,			!- Soil Moisture Content Volume Fraction at Saturation {percent}",
+        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,	!- Type of Undisturbed Ground Temperature Model",
+        "KATemps,		!- Name of Undisturbed Ground Temperature Model",
+        "1,				!- Evapotranspiration Ground Cover Parameter",
+        "GroundCoupledOSCM,	!- Name of Floor Boundary Condition Model",
+        "InGrade,		!- Slab Location (InGrade/OnGrade)",
+        "SlabMaterial,	!- Slab Material Name",
+        "Yes,			!- Horizontal Insulation (Yes/No)",
+        "HorizInsulation,	!- Horizontal Insulation Material Name",
+        "Full,			!- Full Horizontal or Perimeter Only (Full/Perimeter)",
+        ",				!- Perimeter insulation width (m)",
+        "Yes,			!- Vertical Insulation (Yes/No)",
+        "VertiInsulation,	!- Vertical Insulation Name",
+        "0.5,			!- Vertical perimeter insulation depth from surface (m)",
+        "Hourly;		!- Domain Simulation Interval. (Timestep/Hourly)",
+        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+        "KATemps,		!- Name of object",
+        "1.8,			!- Soil Thermal Conductivity {W/m-K}",
+        "3200,			!- Soil Density {kg/m3}",
+        "836,			!- Soil Specific Heat {J/kg-K}",
+        "15.5,			!- Annual average surface temperature {C}",
+        "12.8,			!- Annual amplitude of surface temperature {delta C}",
+        "17.3;			!- Phase shift of minimum surface temperature {days}",
+        "SurfaceProperty:OtherSideConditionsModel,",
+        "GroundCoupledOSCM,		!- Name",
+        "GroundCoupledSurface;	!- Type of Modeling",
+
+        "Material,",
+        "SlabMaterial,  !- Name",
+        "MediumRough,	!- Roughness",
+        "0.2,		    !- Thickness {m}",
+        "1.8,			!- Conductivity {W/m-K}",
+        "2400,			!- Density {kg/m3}",
+        "750,			!- Specific Heat {J/kg-K}",
+        "0.9,			!- Thermal Absorptance",
+        "0.65,			!- Solar Absorptance",
+        "0.65;			!- Visible Absorptance",
+
+        "Material,",
+        "HorizInsulation,         !- Name",
+        "Rough,                   !- Roughness",
+        "0.2,                     !- Thickness {m}",
+        "0.04,                    !- Conductivity {W/m-K}",
+        "15,                      !- Density {kg/m3}",
+        "1300,                    !- Specific Heat {J/kg-K}",
+        "0.9,                     !- Thermal Absorptance",
+        "0.6,                     !- Solar Absorptance",
+        "0.6;                     !- Visible Absorptance",
+
+        "Material,",
+        "VertiInsulation,         !- Name",
+        "Rough,                   !- Roughness",
+        "0.15,                    !- Thickness {m}",
+        "0.04,                    !- Conductivity {W/m-K}",
+        "15,                      !- Density {kg/m3}",
+        "1300,                    !- Specific Heat {J/kg-K}",
+        "0.9,                     !- Thermal Absorptance",
+        "0.6,                     !- Solar Absorptance",
+        "0.6;                     !- Visible Absorptance",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // Dummy surface
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).OSCMPtr = 1;
+    state->dataSurface->Surface(1).Area = 100;
+
+    bool errorsFound = false;
+
+    // Other necessary inputs
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
+
+    state->dataPlantPipingSysMgr->domains.resize(1);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
+
+    // 2021-08: revised the case so no more error complains
+    EXPECT_FALSE(errorsFound);
+
+    auto &theDomain = state->dataPlantPipingSysMgr->domains[0];
+
+    theDomain.createPartitionCenterList(*state);
+
+    // Take the logic in the code about how the partition positions were calculated
+    // and how they were affected by the horizontal thickness
+    Real64 insyLoc = theDomain.Extents.yMax - theDomain.VertInsDepth + theDomain.HorizInsThickness / 2.0;
+    Real64 slabBot = theDomain.Extents.yMax - theDomain.SlabThickness - theDomain.HorizInsThickness / 2.0;
+    Real64 totalWid = theDomain.HorizInsThickness;
+
+    int partySize = theDomain.Partitions.Y.size();
+
+    Real64 err_tol = 1.0e-4;
+
+    // check horizontal partitions for the new case
+    // and expect that the results should be different from the previous case
+
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].rDimension, insyLoc, err_tol);
+    // This is expected to be different from Test 1
+    Real64 insyLoc_case1 = 4.55;
+    EXPECT_FALSE((insyLoc - insyLoc_case1) <= err_tol && (insyLoc - insyLoc_case1) >= -err_tol);
+
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 2].TotalWidth, totalWid, err_tol);
+    Real64 totalWid_case1 = 0.10;
+    // This is expected to be different from Test 1
+    EXPECT_FALSE((totalWid - totalWid_case1) <= err_tol && (totalWid - totalWid_case1) >= -err_tol);
+
+    EXPECT_TRUE(theDomain.Partitions.Y[partySize - 2].partitionType == PartitionType::VertInsLowerEdge);
+
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].rDimension, slabBot, err_tol);
+    // This is expected to be different from Test 1
+    Real64 slabBot_case1 = 4.75;
+    EXPECT_FALSE((slabBot - slabBot_case1) <= err_tol && (slabBot - slabBot_case1) >= -err_tol);
+
+    EXPECT_NEAR(theDomain.Partitions.Y[partySize - 1].TotalWidth, totalWid, err_tol);
+
+    EXPECT_TRUE(theDomain.Partitions.Y[partySize - 1].partitionType == PartitionType::UnderFloor);
+}

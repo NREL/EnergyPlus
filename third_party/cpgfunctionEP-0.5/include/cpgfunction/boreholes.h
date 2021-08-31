@@ -2,15 +2,14 @@
 // Created by jackcook on 7/11/20.
 //
 
-#include <iostream>
-#include <cmath>
-#include <tuple>
-#include <vector>
-
-using namespace std;
-
 #ifndef CPPGFUNCTION_BOREHOLES_H
 #define CPPGFUNCTION_BOREHOLES_H
+
+#include <cmath>
+#include <iostream>
+#include <string>
+#include <tuple>
+#include <vector>
 
 namespace gt {
 
@@ -36,21 +35,21 @@ namespace gt {
             }
 
             double distance(Borehole target);
-            tuple<double, double> position();
+            std::tuple<double, double> position();
         };
 
-        vector<Borehole>boreField(
-                const vector<tuple<double, double> > &coordinates,
+        std::vector<Borehole>boreField(
+                const std::vector<std::tuple<double, double> > &coordinates,
                 const double &r_b, const double &H, const double &D);
 
         struct SimilaritiesType {
             ~SimilaritiesType() {} // destructor
 
             int nSim = 0;
-            vector< vector <tuple<int, int> > > Sim;
-            vector<tuple<double, double> > HSim;
-            vector<tuple<double, double> > DSim;
-            vector<double> disSim;
+            std::vector< std::vector <std::tuple<int, int> > > Sim;
+            std::vector<std::tuple<double, double> > HSim;
+            std::vector<std::tuple<double, double> > DSim;
+            std::vector<double> disSim;
 
             SimilaritiesType() {} // constructor
         };
@@ -60,32 +59,32 @@ namespace gt {
 
             // delcare variables
             // positive similarities
-            vector<int> nSimPos;  // number of positive similarities
-            vector<vector<tuple<int, int> > > simPos;  // number of sim positions
-            vector<double> disSimPos;  // the distances between each position
-            vector<tuple<int, int> > HSimPos;  // the heights of each borehole
-            vector<tuple<int, int> > DSimPos;  // the burial depth of each borehole
+            std::vector<int> nSimPos;  // number of positive similarities
+            std::vector<std::vector<std::tuple<int, int> > > simPos;  // number of sim positions
+            std::vector<double> disSimPos;  // the distances between each position
+            std::vector<std::tuple<int, int> > HSimPos;  // the heights of each borehole
+            std::vector<std::tuple<int, int> > DSimPos;  // the burial depth of each borehole
             // negative similarities
-            vector<int> nSimNeg;
-            vector<vector<tuple<int, int> > > simNeg;
-            vector<double> disSimNeg;
-            vector<tuple<int, int> > HSimNeg;
-            vector<tuple<int, int> > DSimNeg;
+            std::vector<int> nSimNeg;
+            std::vector<std::vector<std::tuple<int, int> > > simNeg;
+            std::vector<double> disSimNeg;
+            std::vector<std::tuple<int, int> > HSimNeg;
+            std::vector<std::tuple<int, int> > DSimNeg;
 
             Similarity() {} // constructor
 
 
             void similarities(SimilaritiesType &SimReal, SimilaritiesType &SimImage,
-                              vector<gt::boreholes::Borehole> &boreSegments,
+                              std::vector<gt::boreholes::Borehole> &boreSegments,
                               bool splitRealAndImage = true, double disTol = 0.1, double tol = 1.0e-6);
 
-            void _similarities_group_by_distance(vector<gt::boreholes::Borehole> &boreSegments,
-                                                 vector<vector<tuple<int, int> > > &Pairs,
-                                                 vector<int> &nPairs, vector<double> &disPairs, int &nDis,
+            void _similarities_group_by_distance(std::vector<gt::boreholes::Borehole> &boreSegments,
+                                                 std::vector<std::vector<std::tuple<int, int> > > &Pairs,
+                                                 std::vector<int> &nPairs, std::vector<double> &disPairs, int &nDis,
                                                  double disTol = 0.1);
 
-            void _similarities_one_distance(SimilaritiesType &SimT, vector<tuple<int, int> > &pairs,
-                                            vector<gt::boreholes::Borehole> &boreSegments, const string &kind,
+            void _similarities_one_distance(SimilaritiesType &SimT, std::vector<std::tuple<int, int> > &pairs,
+                                            std::vector<gt::boreholes::Borehole> &boreSegments, const std::string &kind,
                                             double tol = 1.0e-6);
         };
 
