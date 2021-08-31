@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -772,6 +773,18 @@ namespace DaylightingDevices {
             } // PipeNum
 
             if (state.dataDaylightingDevices->GetTDDInputErrorsFound) ShowFatalError(state, "Errors in DaylightingDevice:Tubular input.");
+            state.dataDaylightingManager->TDDTransVisBeam.allocate(24, state.dataDaylightingDevicesData->NumOfTDDPipes);
+            state.dataDaylightingManager->TDDFluxInc.allocate(24, 4, state.dataDaylightingDevicesData->NumOfTDDPipes);
+            state.dataDaylightingManager->TDDFluxTrans.allocate(24, 4, state.dataDaylightingDevicesData->NumOfTDDPipes);
+            for (int tddNum = 1; tddNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++tddNum) {
+                for (int hr = 1; hr <= 24; ++hr) {
+                    state.dataDaylightingManager->TDDTransVisBeam(hr, tddNum) = 0.0;
+                    for (int iSky = 1; iSky <= 4; ++iSky) {
+                        state.dataDaylightingManager->TDDFluxInc(hr, iSky, tddNum) = 0.0;
+                        state.dataDaylightingManager->TDDFluxTrans(hr, iSky, tddNum) = 0.0;
+                    }
+                }
+            }
         }
     }
 

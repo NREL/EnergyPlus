@@ -7209,9 +7209,7 @@ namespace InternalHeatGains {
             int NZ = state.dataHeatBal->Lights(Loop).ZonePtr;
             Q = state.dataHeatBal->Lights(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->Lights(Loop).SchedPtr);
 
-            if (state.dataDaylightingData->ZoneDaylight(NZ).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting ||
-                state.dataDaylightingData->ZoneDaylight(NZ).DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
-
+            if (state.dataDaylightingData->ZoneDaylight(NZ).totRefPts > 0) {
                 if (state.dataHeatBal->Lights(Loop).FractionReplaceable > 0.0) { // FractionReplaceable can only be 0 or 1 for these models
                     Q *= state.dataDaylightingData->ZoneDaylight(NZ).ZonePowerReductionFactor;
                 }
@@ -8593,10 +8591,7 @@ namespace InternalHeatGains {
             LightsRepMin = min(LightsRepMin, state.dataHeatBal->Lights(Loop).FractionReplaceable);
             LightsRepMax = max(LightsRepMax, state.dataHeatBal->Lights(Loop).FractionReplaceable);
             ++NumLights;
-            if ((state.dataDaylightingData->ZoneDaylight(state.dataHeatBal->Lights(Loop).ZonePtr).DaylightMethod ==
-                     DataDaylighting::iDaylightingMethod::SplitFluxDaylighting ||
-                 state.dataDaylightingData->ZoneDaylight(state.dataHeatBal->Lights(Loop).ZonePtr).DaylightMethod ==
-                     DataDaylighting::iDaylightingMethod::DElightDaylighting) &&
+            if ((state.dataDaylightingData->ZoneDaylight(WhichZone).totRefPts > 0) &&
                 (state.dataHeatBal->Lights(Loop).FractionReplaceable > 0.0 && state.dataHeatBal->Lights(Loop).FractionReplaceable < 1.0)) {
                 ShowWarningError(state, "CheckLightsReplaceableMinMaxForZone: Fraction Replaceable must be 0.0 or 1.0 if used with daylighting.");
                 ShowContinueError(state,
@@ -8607,18 +8602,7 @@ namespace InternalHeatGains {
             }
         }
 
-        if (state.dataDaylightingData->ZoneDaylight(WhichZone).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
-            if (LightsRepMax == 0.0) {
-                ShowWarningError(state, "CheckLightsReplaceable: Zone \"" + state.dataHeatBal->Zone(WhichZone).Name + "\" has Daylighting:Controls.");
-                ShowContinueError(state, "but all of the LIGHTS object in that zone have zero Fraction Replaceable.");
-                ShowContinueError(state, "The daylighting controls will have no effect.");
-            }
-            if (NumLights == 0) {
-                ShowWarningError(state, "CheckLightsReplaceable: Zone \"" + state.dataHeatBal->Zone(WhichZone).Name + "\" has Daylighting:Controls.");
-                ShowContinueError(state, "but there are no LIGHTS objects in that zone.");
-                ShowContinueError(state, "The daylighting controls will have no effect.");
-            }
-        } else if (state.dataDaylightingData->ZoneDaylight(WhichZone).DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
+        if (state.dataDaylightingData->ZoneDaylight(WhichZone).totRefPts > 0) {
             if (LightsRepMax == 0.0) {
                 ShowWarningError(state, "CheckLightsReplaceable: Zone \"" + state.dataHeatBal->Zone(WhichZone).Name + "\" has Daylighting:Controls.");
                 ShowContinueError(state, "but all of the LIGHTS object in that zone have zero Fraction Replaceable.");

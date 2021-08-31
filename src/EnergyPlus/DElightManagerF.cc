@@ -237,7 +237,7 @@ namespace DElightManagerF {
         SinBldgRelNorth = std::sin(-state.dataHeatBal->BuildingAzimuth * DataGlobalConstants::DegToRadians);
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
-        for (auto &znDayl : state.dataDaylightingData->ZoneDaylight) {
+        for (auto &znDayl : state.dataDaylightingData->daylightControl) {
             if (znDayl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
 
                 // Register Error if 0 DElight RefPts have been input for valid DElight object
@@ -273,7 +273,7 @@ namespace DElightManagerF {
 
         // Loop through the Daylighting:DElight objects searching for a match to the current Zone
 
-        for (auto &znDayl : state.dataDaylightingData->ZoneDaylight) {
+        for (auto &znDayl : state.dataDaylightingData->daylightControl) {
             if (znDayl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
                 int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
                 if (izone != 0) {

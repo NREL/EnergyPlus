@@ -87,7 +87,7 @@ void ConvertCaseToLower(std::string_view InputString, // Input string
                         std::string &OutputString     // Output string (in LowerCase)
 );
 
-int getEnumerationValue(gsl::span<std::string_view> sList, std::string_view s);
+int getEnumerationValue(gsl::span<const std::string_view> sList, const std::string_view s);
 
 // useful for forcing a conversion to a string reference for JSON objects
 inline const std::string &AsString(const std::string &value)

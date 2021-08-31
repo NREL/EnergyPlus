@@ -383,13 +383,12 @@ namespace DataHeatBalance {
         // 2=Plenum Zone, 11=Solar Wall, 12=Roof Pond
         Real64 UserEnteredFloorArea; // User input floor area for this zone
         // Calculated after input
-        Real64 FloorArea;        // Floor area used for this zone
-        Real64 CalcFloorArea;    // Calculated floor area used for this zone
-        Real64 CeilingArea;      // Ceiling area for the zone
-        bool HasFloor;           // Has "Floor" surface
-        bool HasRoof;            // Has "Roof" or "Ceiling" Surface
-        bool HasInterZoneWindow; // Interzone Window(s) present in this zone
-        bool HasWindow;          // Window(s) present in this zone
+        Real64 FloorArea;     // Floor area used for this zone
+        Real64 CalcFloorArea; // Calculated floor area used for this zone
+        Real64 CeilingArea;   // Ceiling area for the zone
+        bool HasFloor;        // Has "Floor" surface
+        bool HasRoof;         // Has "Roof" or "Ceiling" Surface
+        bool HasWindow;       // Window(s) present in this zone
         Real64 AirCapacity;
         Real64 ExtWindowArea;               // Exterior Window Area for Zone
         Real64 ExtGrossWallArea;            // Exterior Wall Area for Zone (Gross)
@@ -521,16 +520,15 @@ namespace DataHeatBalance {
             : Multiplier(1), ListMultiplier(1), ListGroup(0), RelNorth(0.0), OriginX(0.0), OriginY(0.0), OriginZ(0.0),
               CeilingHeight(DataGlobalConstants::AutoCalculate), Volume(DataGlobalConstants::AutoCalculate), OfType(1),
               UserEnteredFloorArea(DataGlobalConstants::AutoCalculate), FloorArea(0.0), CalcFloorArea(0.0), CeilingArea(0.0), HasFloor(false),
-              HasRoof(false), HasInterZoneWindow(false), HasWindow(false), AirCapacity(0.0), ExtWindowArea(0.0), ExtGrossWallArea(0.0),
-              ExtWindowArea_Multiplied(0.0), ExtGrossWallArea_Multiplied(0.0), ExtNetWallArea(0.0), TotalSurfArea(0.0), ExteriorTotalSurfArea(0.0),
-              ExteriorTotalGroundSurfArea(0.0), ExtGrossGroundWallArea(0.0), ExtGrossGroundWallArea_Multiplied(0.0), SystemZoneNodeNumber(0),
-              IsControlled(false), IsSupplyPlenum(false), IsReturnPlenum(false), ZoneEqNum(0), PlenumCondNum(0), TempControlledZoneIndex(0),
-              AllSurfaceFirst(0), AllSurfaceLast(-1), HTSurfaceFirst(0), HTSurfaceLast(-1), OpaqOrIntMassSurfaceFirst(0),
-              OpaqOrIntMassSurfaceLast(-1), WindowSurfaceFirst(0), WindowSurfaceLast(-1), OpaqOrWinSurfaceFirst(0), OpaqOrWinSurfaceLast(-1),
-              TDDDomeFirst(0), TDDDomeLast(-1), InsideConvectionAlgo(ConvectionConstants::HcInt_ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0),
-              NumShadingSurfaces(0), OutsideConvectionAlgo(ConvectionConstants::HcExt_ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0),
-              MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0), zoneRadEnclosureFirst(-1), zoneRadEnclosureLast(-1),
-              zoneFirstSpaceSolEnclosure(0),
+              HasRoof(false), HasWindow(false), AirCapacity(0.0), ExtWindowArea(0.0), ExtGrossWallArea(0.0), ExtWindowArea_Multiplied(0.0),
+              ExtGrossWallArea_Multiplied(0.0), ExtNetWallArea(0.0), TotalSurfArea(0.0), ExteriorTotalSurfArea(0.0), ExteriorTotalGroundSurfArea(0.0),
+              ExtGrossGroundWallArea(0.0), ExtGrossGroundWallArea_Multiplied(0.0), SystemZoneNodeNumber(0), IsControlled(false),
+              IsSupplyPlenum(false), IsReturnPlenum(false), ZoneEqNum(0), PlenumCondNum(0), TempControlledZoneIndex(0), AllSurfaceFirst(0),
+              AllSurfaceLast(-1), HTSurfaceFirst(0), HTSurfaceLast(-1), OpaqOrIntMassSurfaceFirst(0), OpaqOrIntMassSurfaceLast(-1),
+              WindowSurfaceFirst(0), WindowSurfaceLast(-1), OpaqOrWinSurfaceFirst(0), OpaqOrWinSurfaceLast(-1), TDDDomeFirst(0), TDDDomeLast(-1),
+              InsideConvectionAlgo(ConvectionConstants::HcInt_ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0), NumShadingSurfaces(0),
+              OutsideConvectionAlgo(ConvectionConstants::HcExt_ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0), MaximumX(0.0), MinimumY(0.0),
+              MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0), zoneRadEnclosureFirst(-1), zoneRadEnclosureLast(-1), zoneFirstSpaceSolEnclosure(0),
 
               OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0),
               OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),

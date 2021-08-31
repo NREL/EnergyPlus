@@ -870,6 +870,10 @@ namespace HeatBalanceIntRadExchange {
                     state.dataSurface->Surface(surfNum).SolarEnclSurfIndex = enclosureSurfNum;
                     state.dataSurface->Surface(surfNum).SolarEnclIndex = enclosureNum;
                     state.dataSurface->Surface(surfNum).RadEnclIndex = enclosureNum; // Radiant and Solar enclosures are parallel for now
+                    if ((state.dataSurface->Surface(surfNum).ExtBoundCond > 0) &&
+                        (state.dataSurface->Surface(surfNum).BaseSurf != surfNum)) { // Interzone window present
+                        thisEnclosure.HasInterZoneWindow = true;
+                    }
                 }
                 // Store SurfaceReportNums to maintain original reporting order
                 for (int surfNum : state.dataHeatBal->space(spaceNum).surfaces) {

@@ -2591,11 +2591,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     state->dataGlobal->NumOfZones = 2;
     state->dataHeatBal->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
+    state->dataViewFactor->NumOfSolarEnclosures = 2;
 
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
-    state->dataHeatBal->EnclSolVMULT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->EnclSolVMULT.allocate(state->dataViewFactor->NumOfSolarEnclosures);
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataConstruction->Construct(1).TransDiff = 0.1;
     state->dataHeatBal->EnclSolVMULT(1) = 1.0;
     state->dataHeatBal->EnclSolVMULT(2) = 1.0;
@@ -2622,8 +2624,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(1));
     EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(2));
 
-    state->dataHeatBal->Zone(1).HasInterZoneWindow = true;
-    state->dataHeatBal->Zone(2).HasInterZoneWindow = true;
+    state->dataViewFactor->EnclSolInfo(1).HasInterZoneWindow = true;
+    state->dataViewFactor->EnclSolInfo(2).HasInterZoneWindow = true;
 
     ComputeDifSolExcZonesWIZWindows(*state, state->dataGlobal->NumOfZones);
 
@@ -2790,13 +2792,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     state->dataHeatBalFanSys->ZoneLightingLevelHourBins.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBins.allocate(state->dataGlobal->NumOfZones);
-    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
-    state->dataDaylightingData->ZoneDaylight(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
-    state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt.allocate(1);
-    state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint.allocate(1);
-    state->dataDaylightingData->ZoneDaylight(1).ZonePowerReductionFactor = 0.5;
-    state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1) = 300;
-    state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(1) = 400;
+    state->dataDaylightingData->daylightControl.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt.allocate(1);
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint.allocate(1);
+    state->dataDaylightingData->daylightControl(1).PowerReductionFactor = 0.5;
+    state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt(1) = 300;
+    state->dataDaylightingData->daylightControl(1).IllumSetPoint(1) = 400;
     state->dataOutRptTab->displayVisualResilienceSummary = true;
 
     ReportVisualResilience(*state);

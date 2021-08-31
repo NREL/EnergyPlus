@@ -9636,7 +9636,7 @@ void WindowShadingManager(EnergyPlusData &state)
             }
 
             Real64 GlareControlIsActive =
-                (state.dataDaylightingData->ZoneDaylight(IZone).TotalDaylRefPoints > 0 && state.dataEnvrn->SunIsUp &&
+                (state.dataDaylightingData->ZoneDaylight(IZone).totRefPts > 0 && state.dataEnvrn->SunIsUp &&
                  state.dataSurface->WindowShadingControl(IShadingCtrl).GlareControlIsActive); // True if glare control is active
 
             Real64 SolarOnWindow = 0.0;     // Direct plus diffuse solar intensity on window (W/m2)

@@ -391,7 +391,6 @@ namespace SurfaceGeometry {
 
         for (auto &e : state.dataHeatBal->Zone) {
             e.ExtWindowArea = 0.0;
-            e.HasInterZoneWindow = false;
             e.HasWindow = false;
             e.ExtGrossWallArea = 0.0;
             e.ExtNetWallArea = 0.0;
@@ -464,27 +463,22 @@ namespace SurfaceGeometry {
 
             } else { // For Windows
 
-                if ((state.dataSurface->Surface(SurfNum).ExtBoundCond > 0) &&
-                    (state.dataSurface->Surface(SurfNum).BaseSurf != SurfNum)) { // Interzone window present
-                    state.dataHeatBal->Zone(ZoneNum).HasInterZoneWindow = true;
-                } else {
-                    if (((state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) ||
-                         (state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) &&
-                        (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::TDD_Dome)) {
-                        state.dataHeatBal->Zone(ZoneNum).ExtWindowArea += state.dataSurface->Surface(SurfNum).GrossArea;
-                        state.dataHeatBal->space(spaceNum).extWindowArea += state.dataSurface->Surface(SurfNum).GrossArea;
-                        state.dataHeatBal->Zone(ZoneNum).ExtWindowArea_Multiplied =
-                            state.dataHeatBal->Zone(ZoneNum).ExtWindowArea +
-                            state.dataSurface->Surface(SurfNum).GrossArea * state.dataSurface->Surface(SurfNum).Multiplier *
-                                state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
-                        if (DetailedWWR) {
-                            print(state.files.debug,
-                                  "{},Window,{:.2R},{:.1R}\n",
-                                  state.dataSurface->Surface(SurfNum).Name,
-                                  state.dataSurface->Surface(SurfNum).GrossArea * state.dataSurface->Surface(SurfNum).Multiplier *
-                                      state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier,
-                                  state.dataSurface->Surface(SurfNum).Tilt);
-                        }
+                if (((state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) ||
+                     (state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) &&
+                    (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::TDD_Dome)) {
+                    state.dataHeatBal->Zone(ZoneNum).ExtWindowArea += state.dataSurface->Surface(SurfNum).GrossArea;
+                    state.dataHeatBal->space(spaceNum).extWindowArea += state.dataSurface->Surface(SurfNum).GrossArea;
+                    state.dataHeatBal->Zone(ZoneNum).ExtWindowArea_Multiplied =
+                        state.dataHeatBal->Zone(ZoneNum).ExtWindowArea +
+                        state.dataSurface->Surface(SurfNum).GrossArea * state.dataSurface->Surface(SurfNum).Multiplier *
+                            state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
+                    if (DetailedWWR) {
+                        print(state.files.debug,
+                              "{},Window,{:.2R},{:.1R}\n",
+                              state.dataSurface->Surface(SurfNum).Name,
+                              state.dataSurface->Surface(SurfNum).GrossArea * state.dataSurface->Surface(SurfNum).Multiplier *
+                                  state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier,
+                              state.dataSurface->Surface(SurfNum).Tilt);
                     }
                 }
             }

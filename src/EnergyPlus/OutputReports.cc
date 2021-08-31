@@ -443,18 +443,20 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
 
     // Do any daylighting reference points on layer for zone
     if (state.dataDaylightingData->TotRefPoints > 0) {
-        for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
+        for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+            auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
+            if (DELight && thisDaylightControl.DaylightMethod != DataDaylighting::iDaylightingMethod::DElightDaylighting) continue;
             auto curcolorno = ColorNo::DaylSensor1;
 
-            for (int refpt = 1; refpt <= state.dataDaylightingData->ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
-                print(of, "999\n{}:{}:{}\n", state.dataHeatBal->Zone(zones).Name, DELight ? "DEDayRefPt" : "DayRefPt", refpt);
+            for (int refpt = 1; refpt <= thisDaylightControl.TotalDaylRefPoints; ++refpt) {
+                print(of, "999\n{}:{}:{}\n", thisDaylightControl.ZoneName, DELight ? "DEDayRefPt" : "DayRefPt", refpt);
                 print(of,
                       Format_709,
-                      normalizeName(state.dataHeatBal->Zone(zones).Name),
+                      normalizeName(thisDaylightControl.ZoneName),
                       state.dataSurfColor->DXFcolorno(static_cast<int>(curcolorno)),
-                      state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt),
-                      state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt),
-                      state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt),
+                      thisDaylightControl.DaylRefPtAbsCoord(1, refpt),
+                      thisDaylightControl.DaylRefPtAbsCoord(2, refpt),
+                      thisDaylightControl.DaylRefPtAbsCoord(3, refpt),
                       0.2);
                 curcolorno = ColorNo::DaylSensor2; // ref pts 2 and later are this color
             }
