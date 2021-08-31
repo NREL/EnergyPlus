@@ -208,8 +208,6 @@ namespace WaterUse {
         int PlantLoopBranchNum;
         int PlantLoopCompNum;
         bool MyEnvrnFlag;
-        bool setupMyOutputVars;
-        bool plantScanFlag;
 
         WaterConnectionsType()
             : Init(true), InitSizing(true), StandAlone(false), InletNode(0), OutletNode(0), SupplyTankNum(0), RecoveryTankNum(0), TankDemandID(0),
@@ -220,8 +218,7 @@ namespace WaterUse {
               DrainVolFlowRate(0.0), PeakMassFlowRate(0.0), ColdTempSchedule(0), HotTempSchedule(0), MainsTemp(0.0), TankTemp(0.0),
               ColdSupplyTemp(0.0), ColdTemp(0.0), HotTemp(0.0), DrainTemp(0.0), RecoveryTemp(0.0), ReturnTemp(0.0), WasteTemp(0.0), TempError(0.0),
               MainsVolume(0.0), TankVolume(0.0), ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0), Energy(0.0), NumWaterEquipment(0),
-              MaxIterationsErrorIndex(0), PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0), MyEnvrnFlag(true),
-              setupMyOutputVars(true), plantScanFlag(true)
+              MaxIterationsErrorIndex(0), PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0), MyEnvrnFlag(true)
         {
         }
 
@@ -248,6 +245,8 @@ namespace WaterUse {
         void setupOutputVars([[maybe_unused]] EnergyPlusData &state);
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     void SimulateWaterUse(EnergyPlusData &state, bool FirstHVACIteration);

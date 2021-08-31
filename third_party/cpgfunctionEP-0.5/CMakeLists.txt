@@ -36,8 +36,6 @@ if(USE_OpenMP)
     find_package(OpenMP)
     if(OpenMP_CXX_FOUND)
         target_link_libraries(cpgfunctionEP PRIVATE OpenMP::OpenMP_CXX)
-    else()
-        message(AUTHOR_WARNING "OpenMP_CXX not found")
     endif()
 endif()
 
