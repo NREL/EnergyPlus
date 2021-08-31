@@ -150,30 +150,6 @@ namespace UtilityRoutines {
         return rProcessNumber;
     }
 
-    int aFindItemInList(std::string &String, gsl::span<const std::string_view> ListOfItems)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   September 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function looks up a string in a similar list of
-        // items and returns the index of the item in the list, if
-        // found.  This routine is not case insensitive and doesn't need
-        // for most inputs -- they are automatically turned to UPPERCASE.
-        // If you need case insensitivity use FindItem.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        for (u_int Count = 0; Count < ListOfItems.size(); ++Count) {
-            if (String == ListOfItems[Count]) return Count;
-        }
-        return 0; // Not found
-    }
-
     int FindItemInList(std::string_view const String, Array1_string const &ListOfItems, int const NumItems)
     {
 
@@ -308,7 +284,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    int aFindItem(std::string &String, gsl::span<const std::string_view> ListOfItems)
+    int FindItemInStdArray(std::string &InputString, gsl::span<const std::string_view> ListOfItems)
     {
 
         // FUNCTION INFORMATION:
@@ -324,11 +300,12 @@ namespace UtilityRoutines {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int FindItem = UtilityRoutines::aFindItemInList(String, ListOfItems);
-        if (FindItem != 0) return FindItem;
+        for (u_int Count = 0; Count < ListOfItems.size(); ++Count) {
+            if (InputString == ListOfItems[Count]) return Count;
+        }
 
-        for (uint Count = 0; Count < ListOfItems.size(); ++Count) {
-            if (equali(String, ListOfItems[Count])) return Count;
+        for (u_int Count = 0; Count < ListOfItems.size(); ++Count) {
+            if (equali(InputString, ListOfItems[Count])) return Count;
         }
         return 0; // Not found
     }

@@ -233,9 +233,7 @@ namespace UtilityRoutines {
 
     Real64 ProcessNumber(std::string_view const String, bool &ErrorFlag);
 
-    int aFindItem(std::string &String, gsl::span<const std::string_view> ListOfItems);
-
-    int aFindItemInList(std::string &String, gsl::span<const std::string_view> ListOfItems);
+    int FindItemInStdArray(std::string &InputString, gsl::span<const std::string_view> ListOfItems);
 
     int FindItemInList(std::string_view const String, Array1_string const &ListOfItems, int NumItems);
 
