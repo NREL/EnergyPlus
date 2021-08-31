@@ -79,6 +79,12 @@ namespace FluidProperties {
     int constexpr iRefri = 1;
     int constexpr iGlyco = 1;
 
+    constexpr int DefaultNumGlyTemps(33);                  // Temperature dimension of default glycol data
+    constexpr int DefaultNumGlyConcs(10);                  // Concentration dimension of default glycol data
+    constexpr int DefaultNumSteamTemps(111);               // Temperature dimension of default steam data.
+    constexpr int DefaultNumSteamSuperheatedTemps(114);    // Temperature dimension of default steam data.
+    constexpr int DefaultNumSteamSuperheatedPressure(114); // Temperature dimension of default steam data.
+
     constexpr static std::string_view Refrig("REFRIGERANT");
     constexpr static std::string_view Glycol("GLYCOL");
     constexpr static std::string_view Pressure("PRESSURE");
@@ -356,9 +362,9 @@ namespace FluidProperties {
     };
 
 #ifdef EP_cache_GlycolSpecificHeat
-    extern Array1D<FluidProperties::cached_tsh> cached_t_sh; // DIMENSION(t_sh_cache_size)
+    extern std::array<FluidProperties::cached_tsh, t_sh_cache_size> cached_t_sh;
 #endif
-        // Object Data
+    // Object Data
 
     // Functions
 
@@ -368,13 +374,13 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void InterpDefValuesForGlycolConc(EnergyPlusData &state,
-                                      int NumOfConcs,                     // number of concentrations (dimension of raw data)
-                                      int NumOfTemps,                     // number of temperatures (dimension of raw data)
-                                      const Array1D<Real64> &RawConcData, // concentrations for raw data
-                                      Array2S<Real64> RawPropData,        // raw property data (concentration, temperature)
-                                      Real64 Concentration,               // concentration of actual fluid mix
-                                      Array1D<Real64> &InterpData         // interpolated output data at proper concentration
+    template <size_t NumOfTemps, size_t NumOfConcs>
+    void InterpDefValuesForGlycolConc(
+        EnergyPlusData &state,
+        const std::array<Real64, NumOfConcs> &RawConcData,                         // concentrations for raw data
+        const std::array<std::array<Real64, NumOfTemps>, NumOfConcs> &RawPropData, // raw property data (concentration, temperature)
+        Real64 Concentration,                                                      // concentration of actual fluid mix
+        Array1D<Real64> &InterpData                                                // interpolated output data at proper concentration
     );
 
     //*****************************************************************************
@@ -498,7 +504,7 @@ namespace FluidProperties {
                                    std::string_view const CalledFrom   // routine this function was called from (error messages)
     );
 
-    //*****************************************************************************
+//*****************************************************************************
 #ifdef EP_cache_GlycolSpecificHeat
     Real64 GetSpecificHeatGlycol_raw(EnergyPlusData &state,
                                      std::string_view const Glycol,    // carries in substance name
@@ -524,7 +530,7 @@ namespace FluidProperties {
         DISABLE_WARNING_POP
 
         std::uint64_t const hash(T_tag & t_sh_cache_mask);
-        auto &cTsh(cached_t_sh(hash));
+        auto &cTsh(cached_t_sh[hash]);
 
         if (cTsh.iT != T_tag) {
             cTsh.iT = T_tag;

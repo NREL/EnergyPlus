@@ -427,6 +427,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
                   CurArgs = CurArgs + 1
 
+              CASE('CONTROLLER:MECHANICALVENTILATION')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                IF (MakeUPPERCase(OutArgs(4)) == "VENTILATIONRATEPROCEDURE") THEN
+                  OutArgs(4) = "Standard62.1VentilationRateProcedure"
+                ENDIF
+              
               ! If your original object starts with D, insert the rules here
 
               ! If your original object starts with E, insert the rules here
@@ -509,6 +517,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   OutArgs(4) = ''
                   OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
                   CurArgs = CurArgs + 1
+
+              ! If your original object starts with S, insert the rules here
+              
+              CASE('SIZING:SYSTEM')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                IF (MakeUPPERCase(OutArgs(27)) == "VENTILATIONRATEPROCEDURE") THEN
+                  OutArgs(27) = "Standard62.1VentilationRateProcedure"
+                ENDIF
 
               CASE('ROOF')
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)

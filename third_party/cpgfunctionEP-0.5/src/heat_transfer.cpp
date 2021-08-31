@@ -2,12 +2,12 @@
 // Created by jackcook on 7/11/20.
 //
 
+#include <cmath>
+#include <cpgfunction/boreholes.h>
 #include <cpgfunction/heat_transfer.h>
+#include <qdt.h>
 #include <stdexcept>
 #include <thread>
-#include <cpgfunction/boreholes.h>
-#include <cmath>
-#include <qdt.h>
 
 using namespace gt;
 using namespace std;
@@ -55,7 +55,7 @@ namespace gt::heat_transfer {
 
     void thermal_response_factors(gt::segments::SegmentResponse &SegRes,
                                   vector<double> &time, const double alpha,
-                                  bool use_similaries, bool disp) {
+                                  bool use_similarities, bool disp, int numThreads) {
         // total number of line sources
         int nSources = SegRes.boreSegments.size();
         // number of time values
@@ -64,7 +64,7 @@ namespace gt::heat_transfer {
         // Open up processes here
         // Create a vector of threads
         //may return 0 when not able to detect
-        const auto processor_count = thread::hardware_concurrency();
+        const auto processor_count = numThreads;
         if (disp) {
             cout << "\tDetected " << processor_count
             << " as the number of available threads" << endl;
@@ -76,7 +76,7 @@ namespace gt::heat_transfer {
         auto sum_to_n = [](const int n) {
             return n * (n + 1) / 2;
         };
-        if (use_similaries) {
+        if (use_similarities) {
             auto start = std::chrono::steady_clock::now();
             // Calculations with similarities
             if (disp) {
