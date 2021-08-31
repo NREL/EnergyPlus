@@ -64,7 +64,8 @@ namespace gt::gfunction {
                                                     time,
                                                     alpha,
                                                     use_similarities,
-                                                    display);
+                                                    display,
+                                                    n_Threads);
         auto end = std::chrono::steady_clock::now();
 
         if (display) {
@@ -274,7 +275,8 @@ namespace gt::gfunction {
                                     H_ij,
                                     q_r,
                                     p,
-                                    nSources);
+                                    nSources,
+                                    n_Threads);
             // fill b with -Tb
             B[SIZE-1] = Hb_sum;
             for (int i=0; i<Tb_0.size(); i++) {
@@ -459,14 +461,14 @@ namespace gt::gfunction {
                                  gt::segments::SegmentResponse &SegRes,
                                  vector<double> &h_ij,
                                  vector<double> &q_reconstructed,
-                                 const int p, int &nSources)
+                                 const int p, int &nSources, int numThreads)
             {
         // This function performs equation (37) of Cimmino (2017)
         std::fill(Tb_0.begin(), Tb_0.end(), 0);
         // Number of time steps
         int nt = p + 1;
 
-        const auto processor_count = thread::hardware_concurrency();
+        const auto processor_count = numThreads;
         int n_threads = int(processor_count);
 
         int gauss_sum = nSources * (nSources + 1) / 2;  // Number of positions in packed symmetric matrix

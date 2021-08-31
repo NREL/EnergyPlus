@@ -2,15 +2,13 @@
 // Created by jackcook on 7/15/21.
 //
 
-#include <iostream>
-#include <vector>
-#include <map>
-#include <cpgfunction/boreholes.h>
-
-using namespace std;
-
 #ifndef CPGFUNCTIONEP_SEGMENTS_H
 #define CPGFUNCTIONEP_SEGMENTS_H
+
+#include <cpgfunction/boreholes.h>
+#include <iostream>
+#include <map>
+#include <vector>
 
 namespace gt::segments {
 
@@ -19,8 +17,8 @@ namespace gt::segments {
 
         int nSources;
         int nSum;
-        vector<gt::boreholes::Borehole> boreSegments;
-        vector < vector < double > > h_ij;
+        std::vector<gt::boreholes::Borehole> boreSegments;
+        std::vector < std::vector < double > > h_ij;
 
         SegmentResponse(int nSources,
                         int nSum,
@@ -28,10 +26,10 @@ namespace gt::segments {
                 nSources(nSources),
                 nSum(nSum),
                 boreSegments(nSources),
-                h_ij(nSum, vector<double>(nt, 0))
+                h_ij(nSum, std::vector<double>(nt, 0))
         {} // constructor
 
-        // storage_mode = 1 is the reduced segment response vector
+        // storage_mode = 1 is the reduced segment response std::vector
         int storage_mode = 1;
 
 //        void ReSizeContainers(int n, int nt);
@@ -42,8 +40,8 @@ namespace gt::segments {
     struct adaptive {
         ~adaptive() = default;  // destructor
 
-        vector<double> heights = { 24, 48, 96, 192, 384};
-        vector<vector<double > > drilling_depths {
+        std::vector<double> heights = { 24, 48, 96, 192, 384};
+        std::vector<std::vector<double > > drilling_depths {
                 {96,600,1536,2904,3456,4056,4704,5400,6144,6936,7776,8664,9600,
                  10584,11616,12696,13824,15000,16224,17496,18816,20184,21600,
                  23064,24576},
@@ -58,7 +56,7 @@ namespace gt::segments {
                 {1536,9600,24576,46464,55296,64896,75264,86400,98304,110976,
                  124416,138624}
         };
-        vector<vector<double > > ideal_segment_lengths {
+        std::vector<std::vector<double > > ideal_segment_lengths {
                 {6.897,8.297,8.318,8.158,8.108,8.062,8.02,7.982,7.947,7.915,
                  7.886,7.859,7.835,7.813,7.792,7.773,7.755,7.739,7.724,7.71,
                  7.696,7.684,7.672,7.661,7.651},
