@@ -405,15 +405,25 @@ namespace DaylightingDevices {
 
                 if (state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor + state.dataSurface->Surface(WinSurf).ViewFactorSky +
                         state.dataSurface->Surface(WinSurf).ViewFactorGround >
-                    1.0) {
+                    1.0) { // Presence of a light shelf may require view factor to sky and ground be adjusted
+                    adjustViewFactorsWithShelf(state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor,
+                                               state.dataSurface->Surface(WinSurf).ViewFactorSky,
+                                               state.dataSurface->Surface(WinSurf).ViewFactorGround);
                     ShowWarningError(state,
-                                     format("DaylightingDevice:Shelf = {}:  Window view factors to sky [{:.2R}],",
+                                     format("DaylightingDevice:Shelf = {}:  Window view factors to shelf [{:.2R}].",
                                             state.dataDaylightingDevicesData->Shelf(ShelfNum).Name,
-                                            state.dataSurface->Surface(WinSurf).ViewFactorSky));
+                                            state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor));
+                    ShowContinueError(
+                        state,
+                        format("Due to the presence of the light shelf and view factors adding up to greater than 1, the view factors to the"));
                     ShowContinueError(state,
-                                      format("ground [{:.2R}], and outside shelf [{:.2R}] add up to > 1.0.",
+                                      format("ground [{:.2R}] and sky [{:.2R}] have been adjusted from the input file or autosized values.",
                                              state.dataSurface->Surface(WinSurf).ViewFactorGround,
-                                             state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor));
+                                             state.dataSurface->Surface(WinSurf).ViewFactorSky));
+                    ShowContinueError(
+                        state,
+                        format(
+                            "This can occur if the view factor to the ground for the window this light shelf is associated with used autosizing."));
                 }
 
                 // Report calculated view factor so that user knows what to make the view factor to ground
@@ -1618,6 +1628,22 @@ namespace DaylightingDevices {
         E4 = std::pow(pow_2(N) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(N)) * (pow_2(M) + pow_2(N))), pow_2(N));
 
         state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = (1.0 / (DataGlobalConstants::Pi * M)) * (E1 + 0.25 * std::log(E2 * E3 * E4));
+    }
+
+    void adjustViewFactorsWithShelf(Real64 &viewFactorToShelf, Real64 &viewFactorToSky, Real64 &viewFactorToGround)
+    {
+        if (viewFactorToSky <= 0.0) viewFactorToSky = 0.0;       // Just to make sure
+        if (viewFactorToGround <= 0.0) viewFactorToGround = 0.0; // Just to make sure
+        if (viewFactorToShelf + viewFactorToSky + viewFactorToGround > 1.0) {
+            if (viewFactorToSky + viewFactorToGround > 0.0) {
+                Real64 leftoverViewFactor = 1.0 - viewFactorToShelf;
+                Real64 fractionSkyToNonShelf = viewFactorToSky / (viewFactorToSky + viewFactorToGround);
+                viewFactorToSky = fractionSkyToNonShelf * leftoverViewFactor;
+                viewFactorToGround = leftoverViewFactor - viewFactorToSky;
+            } else {
+                viewFactorToShelf = 1.0; // Somehow this got assigned to greater than 1 (not allowed)
+            }
+        }
     }
 
     void FigureTDDZoneGains(EnergyPlusData &state)

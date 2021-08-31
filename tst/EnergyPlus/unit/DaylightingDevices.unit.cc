@@ -45,86 +45,78 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef DaylightingDevices_hh_INCLUDED
-#define DaylightingDevices_hh_INCLUDED
+// Google Test Headers
+#include <gtest/gtest.h>
+
+// C++ Headers
+#include <array>
+
+// ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataDaylightingDevices.hh>
-#include <EnergyPlus/EnergyPlus.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DaylightingDevices.hh>
 
-namespace EnergyPlus {
+using namespace EnergyPlus;
 
-// Forward declarations
-struct EnergyPlusData;
-
-namespace DaylightingDevices {
-
-    void InitDaylightingDevices(EnergyPlusData &state);
-
-    void GetTDDInput(EnergyPlusData &state);
-
-    void GetShelfInput(EnergyPlusData &state);
-
-    Real64 CalcPipeTransBeam(Real64 const R,    // Reflectance of surface, constant (can be made R = f(theta) later)
-                             Real64 const A,    // Aspect ratio, L / d
-                             Real64 const Theta // Angle of entry in radians
-    );
-
-    Real64 CalcTDDTransSolIso(EnergyPlusData &state, int const PipeNum); // TDD pipe object number
-
-    Real64 CalcTDDTransSolHorizon(EnergyPlusData &state, int const PipeNum); // TDD pipe object number
-
-    Real64 CalcTDDTransSolAniso(EnergyPlusData &state,
-                                int const PipeNum, // TDD pipe object number
-                                Real64 const COSI  // Cosine of the incident angle
-    );
-
-    Real64 TransTDD(EnergyPlusData &state,
-                    int const PipeNum,                                   // TDD pipe object number
-                    Real64 const COSI,                                   // Cosine of the incident angle
-                    DataDaylightingDevices::iRadType const RadiationType // Radiation type flag
-    );
-
-    Real64 InterpolatePipeTransBeam(EnergyPlusData &state,
-                                    Real64 const COSI,               // Cosine of the incident angle
-                                    const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
-    );
-
-    int FindTDDPipe(EnergyPlusData &state, int const WinNum);
-
-    void DistributeTDDAbsorbedSolar(EnergyPlusData &state);
-
-    void CalcViewFactorToShelf(EnergyPlusData &state, int const ShelfNum); // Daylighting shelf object number
-
-    void adjustViewFactorsWithShelf(Real64 &viewFactorToShelf,
-                                    Real64 &viewFactorToSky,
-                                    Real64 &viewFactorToGround
-    );
-
-
-    void FigureTDDZoneGains(EnergyPlusData &state);
-
-} // namespace DaylightingDevices
-
-struct DaylightingDevicesData : BaseGlobalStruct
+TEST_F(EnergyPlusFixture, DaylightingDevices_adjustViewFactorsWithShelfTest)
 {
+    // Defect #8154: Light shelf on a window that uses autosize for view factor to ground results in
+    // the sum of all view factors being greater than 1.
+    Real64 vfShelfSet;
+    Real64 vfSkySet;
+    Real64 vfGroundSet;
+    Real64 vfShelfResult;
+    Real64 vfSkyResult;
+    Real64 vfGroundResult;
+    Real64 acceptableTolerance = 0.00001;
 
-    Array1D<Real64> COSAngle = Array1D<Real64>(DataDaylightingDevices::NumOfAngles); // List of cosines of incident angle
-    bool ShelfReported = false;
-    bool GetTDDInputErrorsFound = false;   // Set to true if errors in input, fatal at end of routine
-    bool GetShelfInputErrorsFound = false; // Set to true if errors in input, fatal at end of routine
-    bool MyEnvrnFlag = true;
+    // Test 1: Sky and Ground are both negative (shouldn't happen but gotta test it), Shelf <= 1.0
+    vfShelfSet = 0.67;
+    vfSkySet = -0.1;
+    vfGroundSet = -0.1;
+    vfShelfResult = 0.67;
+    vfSkyResult = 0.0;
+    vfGroundResult = 0.0;
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(vfShelfSet, vfSkySet, vfGroundSet);
+    EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
+    EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
+    EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
 
-    void clear_state() override
-    {
-        this->COSAngle = Array1D<Real64>(DataDaylightingDevices::NumOfAngles);
-        this->ShelfReported = false;
-        this->GetTDDInputErrorsFound = false;
-        this->GetShelfInputErrorsFound = false;
-        this->MyEnvrnFlag = true;
-    }
-};
+    // Test 2: Sky and Ground are both negative, Shelf > 1.0 (shouldn't happen but gotta test it)
+    vfShelfSet = 1.987;
+    vfSkySet = -0.12;
+    vfGroundSet = -0.23;
+    vfShelfResult = 1.0;
+    vfSkyResult = 0.0;
+    vfGroundResult = 0.0;
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(vfShelfSet, vfSkySet, vfGroundSet);
+    EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
+    EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
+    EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
 
-} // namespace EnergyPlus
+    // Test 3: Sky and Ground are both positive, Sky + Shelf + Ground <= 1.0 (okay, nothing reset)
+    vfShelfSet = 0.67;
+    vfSkySet = 0.16;
+    vfGroundSet = 0.16;
+    vfShelfResult = 0.67;
+    vfSkyResult = 0.16;
+    vfGroundResult = 0.16;
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(vfShelfSet, vfSkySet, vfGroundSet);
+    EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
+    EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
+    EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
 
-#endif
+    // Test 4: Sky and Ground are both positive, Sky + Shelf + Ground > 1.0 (leave Shelf alone, adjust others)
+    vfShelfSet = 0.34;
+    vfSkySet = 0.4;
+    vfGroundSet = 0.6;
+    vfShelfResult = 0.34;
+    vfSkyResult = 0.264;
+    vfGroundResult = 0.396;
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(vfShelfSet, vfSkySet, vfGroundSet);
+    EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
+    EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
+    EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
+}
