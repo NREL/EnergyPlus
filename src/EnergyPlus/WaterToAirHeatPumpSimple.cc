@@ -3080,7 +3080,7 @@ namespace WaterToAirHeatPumpSimple {
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Energy =
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Power * ReportingConstant;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergyLoadTotal =
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotalReport * ReportingConstant;
+            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QLoadTotal * ReportingConstant;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergySensible =
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).QSensible * ReportingConstant;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergyLatent =
