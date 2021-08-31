@@ -5349,21 +5349,21 @@ TEST_F(EnergyPlusFixture, setBackupElementCapacityTest)
     // Test 1: TankMaxCapacity is still set to DataSizing::AutoSize, BackupElementCapacity set to 0.0
     originalTankMaxCapacity = DataSizing::AutoSize;
     originalBackupElementCapacity = 0.0;
-    setBackupElementCapacity(HPWH.originalBackupElementCapacity, TankoriginalTankMaxCapacityMaxCapacity);
+    EnergyPlus::WaterThermalTanks::setBackupElementCapacity(originalBackupElementCapacity, originalTankMaxCapacity);
     expectedAnswer = 0.0;
     EXPECT_NEAR(originalBackupElementCapacity, expectedAnswer, allowedTolerance);
 
     // Test 2: TankMaxCapacity is still set to DataSizing::AutoSize, BackupElementCapacity is negative, reset to 0.0
     originalTankMaxCapacity = DataSizing::AutoSize;
     originalBackupElementCapacity = -100.0;
-    setBackupElementCapacity(HPWH.originalBackupElementCapacity, TankoriginalTankMaxCapacityMaxCapacity);
+    EnergyPlus::WaterThermalTanks::setBackupElementCapacity(originalBackupElementCapacity, originalTankMaxCapacity);
     expectedAnswer = 0.0;
     EXPECT_NEAR(originalBackupElementCapacity, expectedAnswer, allowedTolerance);
 
     // Test 3: TankMaxCapacity is not DataSizing::AutoSize, BackupElementCapacity gets set to TankMaxCapacity
     originalTankMaxCapacity = 100.0;
     originalBackupElementCapacity = 0.0;
-    setBackupElementCapacity(HPWH.originalBackupElementCapacity, TankoriginalTankMaxCapacityMaxCapacity);
+    EnergyPlus::WaterThermalTanks::setBackupElementCapacity(originalBackupElementCapacity, originalTankMaxCapacity);
     expectedAnswer = 100.0;
     EXPECT_NEAR(originalBackupElementCapacity, expectedAnswer, allowedTolerance);
 }
