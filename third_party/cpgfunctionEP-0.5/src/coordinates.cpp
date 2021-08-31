@@ -2,10 +2,11 @@
 // Created by jackcook on 5/6/21.
 //
 
-#include <cpgfunction/coordinates.h>
-#include <fstream>
-//#include <string>
 #include <algorithm>
+#include <cpgfunction/coordinates.h>
+#include <stdexcept>
+#include <string>
+#include <tuple>
 
 using namespace std;
 
