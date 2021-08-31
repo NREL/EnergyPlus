@@ -121,7 +121,6 @@ struct DataStringGlobalsData : BaseGlobalStruct
     fs::path outDirPath;
     fs::path idfFilePathNameOnly;
     fs::path inputDirPath;
-    fs::path outputDirPath;
     fs::path inputFilePathNameOnly;
     fs::path exeDirectoryPath;
     fs::path ProgramPath;          // Path for Program from INI file
@@ -141,7 +140,6 @@ struct DataStringGlobalsData : BaseGlobalStruct
         outDirPath.clear();
         inputFilePathNameOnly.clear();
         inputDirPath.clear();
-        outputDirPath.clear();
         exeDirectoryPath.clear();
         inputFilePath.clear();
         inputIddFilePath.clear();
