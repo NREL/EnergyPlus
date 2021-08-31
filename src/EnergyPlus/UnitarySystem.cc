@@ -527,8 +527,8 @@ namespace UnitarySystems {
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
                     DXCoils::SetCoilSystemCoolingData(state, this->m_CoolingCoilName, this->Name);
                 }
-                // set only for air loop equipment
-                if (state.dataSize->CurOASysNum == 0) {
+                // set only for air loop equipment using load control
+                if (state.dataSize->CurOASysNum == 0 && this->m_ControlType == ControlType::Load) {
                     this->m_OASysNum = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysNum;
                     int OAMixerNum = MixedAir::FindOAMixerMatchForOASystem(state, this->m_OASysNum);
                     if (OAMixerNum > 0) {
