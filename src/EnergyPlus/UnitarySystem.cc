@@ -527,10 +527,13 @@ namespace UnitarySystems {
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
                     DXCoils::SetCoilSystemCoolingData(state, this->m_CoolingCoilName, this->Name);
                 }
-                this->m_OASysNum = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysNum;
-                int OAMixerNum = MixedAir::FindOAMixerMatchForOASystem(state, this->m_OASysNum);
-                if (OAMixerNum > 0) {
-                    this->m_OAMixerReturnNodeNum = MixedAir::GetOAMixerReturnNodeNumber(state, OAMixerNum);
+                // set only for air loop equipment
+                if (state.dataSize->CurOASysNum == 0) {
+                    this->m_OASysNum = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysNum;
+                    int OAMixerNum = MixedAir::FindOAMixerMatchForOASystem(state, this->m_OASysNum);
+                    if (OAMixerNum > 0) {
+                        this->m_OAMixerReturnNodeNum = MixedAir::GetOAMixerReturnNodeNumber(state, OAMixerNum);
+                    }
                 }
 
                 // open this up to include UnitarySystem on a future commit
@@ -10727,9 +10730,22 @@ namespace UnitarySystems {
         } else {
             this->setAverageAirFlow(state, max(CoolPLR, HeatPLR), OnOffAirFlowRatio);
         }
-        if (FirstHVACIteration && this->m_OAMixerReturnNodeNum > -1) {
-            state.dataLoopNodes->Node(this->m_OAMixerReturnNodeNum).MassFlowRate = state.dataLoopNodes->Node(this->AirInNode).MassFlowRate;
-            MixedAir::ManageOutsideAirSystem(state, compName, FirstHVACIteration, AirLoopNum, this->m_OASysNum);
+        if (FirstHVACIteration) {
+            if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil && this->m_OAMixerReturnNodeNum > -1) {
+                // these are globals that will get reset in Init if another UnitarySystem is called
+                Real64 saveMassFlow1 = state.dataUnitarySystems->m_massFlow1;
+                Real64 saveMassFlow2 = state.dataUnitarySystems->m_massFlow2;
+                Real64 saveRTF1 = state.dataUnitarySystems->m_runTimeFraction1;
+                Real64 saveRTF2 = state.dataUnitarySystems->m_runTimeFraction2;
+
+                state.dataLoopNodes->Node(this->m_OAMixerReturnNodeNum).MassFlowRate = state.dataLoopNodes->Node(this->AirInNode).MassFlowRate;
+                MixedAir::ManageOutsideAirSystem(state, compName, FirstHVACIteration, AirLoopNum, this->m_OASysNum);
+
+                state.dataUnitarySystems->m_massFlow1 = saveMassFlow1;
+                state.dataUnitarySystems->m_massFlow2 = saveMassFlow2;
+                state.dataUnitarySystems->m_runTimeFraction1 = saveRTF1;
+                state.dataUnitarySystems->m_runTimeFraction2 = saveRTF2;
+            }
         }
 
         // Call the series of components that simulate a Unitary System
