@@ -143,36 +143,140 @@ int constexpr HcExt_ISO15099Windows{323};
 int constexpr HcExt_AlamdariHammondStableHorizontal{324};
 int constexpr HcExt_AlamdariHammondUnstableHorizontal{325};
 
+// Parameters for classification of outside face of surfaces
+enum class OutConvClass
+{
+    Invalid = -1,
+    WindwardVertWall = 101,
+    LeewardVertWall = 102,
+    RoofStable = 103,
+    RoofUnstable = 104,
+};
+
+enum class ConvSurfDeltaT : int
+{
+    Invalid = -1,
+    Positive,
+    Zero,
+    Negative,
+    Num, // count, always the last element
+};
+
+enum class SurfConvOrientation : int
+{
+    Invalid = -1,
+    HorizontalDown,
+    TiltedDownward,
+    Vertical,
+    TiltedUpward,
+    HorizontalUp,
+    Num, // count, always the last element
+};
+
+// Parameters for fenestration relative location in zone
+enum class InConvWinLoc
+{
+    Invalid = -1,
+    NotSet = 0,
+    LowerPartOfExteriorWall = 1, // this is a window in the lower part of wall
+    UpperPartOfExteriorWall = 2, // this is a window in the upper part of wall
+    WindowAboveThis = 3,         // this is a wall with window above it
+    WindowBelowThis = 4,         // this is a wall with window below it
+    LargePartOfExteriorWall = 5, // this is a big window taking up most of wall
+};
+
+// Parameters for adaptive convection algorithm's classification of inside face of surfaces
+enum class InConvClass
+{
+    Invalid = -1,
+    A1_VertWalls = 1,           // flow regime A1, vertical walls
+    A1_StableHoriz = 2,         // flow regime A1
+    A1_UnstableHoriz = 3,       // flow regime A1
+    A1_HeatedFloor = 4,         // flow regime A1
+    A1_ChilledCeil = 5,         // flow regime A1
+    A1_StableTilted = 6,        // flow regime A1
+    A1_UnstableTilted = 7,      // flow regime A1
+    A1_Windows = 8,             // flow regime A1
+    A2_VertWallsNonHeated = 9,  // flow regime A2
+    A2_HeatedVerticalWall = 10, // flow regime A2
+    A2_StableHoriz = 11,        // flow regime A2
+    A2_UnstableHoriz = 12,      // flow regime A2
+    A2_StableTilted = 13,       // flow regime A2
+    A2_UnstableTilted = 14,     // flow regime A2
+    A2_Windows = 15,            // flow regime A2
+    A3_VertWalls = 16,          // flow regime A3
+    A3_StableHoriz = 17,        // flow regime A3
+    A3_UnstableHoriz = 18,      // flow regime A3
+    A3_StableTilted = 19,       // flow regime A3
+    A3_UnstableTilted = 20,     // flow regime A3
+    A3_Windows = 21,            // flow regime A3
+    B_VertWalls = 22,           // flow regime B
+    B_VertWallsNearHeat = 23,   // flow regime B
+    B_StableHoriz = 24,         // flow regime B
+    B_UnstableHoriz = 25,       // flow regime B
+    B_StableTilted = 26,        // flow regime B
+    B_UnstableTilted = 27,      // flow regime B
+    B_Windows = 28,             // flow regime B
+    C_Walls = 29,               // flow regime C
+    C_Ceiling = 30,             // flow regime C
+    C_Floor = 31,               // flow regime C
+    C_Windows = 32,             // flow regime C
+    D_Walls = 33,               // flow regime D
+    D_StableHoriz = 34,         // flow regime D
+    D_UnstableHoriz = 35,       // flow regime D
+    D_StableTilted = 36,        // flow regime D
+    D_UnstableTilted = 37,      // flow regime D
+    D_Windows = 38,             // flow regime D
+    E_AssistFlowWalls = 39,     // flow regime E
+    E_OpposFlowWalls = 40,      // flow regime E
+    E_StableFloor = 41,         // flow regime E
+    E_UnstableFloor = 42,       // flow regime E
+    E_StableCeiling = 43,       // flow regime E
+    E_UnstableCeiling = 44,     // flow regime E
+    E_Windows = 45,             // flow regime E
+};
+
+// Parameters to indicate user specified convection coefficients (for surface)
+enum class ConvCoefOverrideType : int
+{
+    Invalid = -1,
+    Value,          // User specified "value" as the override type
+    Schedule,       // User specified "schedule" as the override type
+    UserCurve,      // User specified "UserCurve" as the override type
+    SpecifiedModel, // one of the direct named model equation keys
+    Num,            // count, always last element
+};
+
 // parameters, by zone, for flow regimes for adaptive convection on inside face
 enum class InConvFlowRegime
 {
     Invalid = -1,
-    A1 = 0, // In-floor heating or in-ceiling cooling
-    A2 = 1, // In-wall heating
-    A3 = 2, // no HVAC system, all buoyancy
-    B = 3,  // Convective heater in zone
-    C = 4,  // central mechanical air
-    D = 5,  // zone mechanical air
-    E = 6,  // mixed. mechanical air and buoyancy
+    A1, // In-floor heating or in-ceiling cooling
+    A2, // In-wall heating
+    A3, // no HVAC system, all buoyancy
+    B,  // Convective heater in zone
+    C,  // central mechanical air
+    D,  // zone mechanical air
+    E,  // mixed. mechanical air and buoyancy
 };
 
 // params for reference temperature type
 enum class RefTemp
 {
     Invalid = -1,
-    MeanAirTemp = 0,
-    AdjacentAirTemp = 1,
-    SupplyAirTemp = 2,
+    MeanAirTemp,
+    AdjacentAirTemp,
+    SupplyAirTemp,
 };
 
 // params for wind speed type
 enum class RefWind
 {
     Invalid = -1,
-    WeatherFile = 0,
-    AtZ = 1,
-    ParallelComp = 2,
-    ParallelCompAtZ = 3,
+    WeatherFile,
+    AtZ,
+    ParallelComp,
+    ParallelCompAtZ,
 };
 
 } // namespace EnergyPlus::ConvectionConstants
