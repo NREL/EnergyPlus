@@ -864,7 +864,7 @@ namespace ResultsFramework {
                 last = (result + 1).base();
             }
 
-            print<FormatSyntax::FMT>(outputFile, "{}", fmt::format("{}", fmt::join(item.second.begin(), last, ",")));
+            print<FormatSyntax::FMT>(outputFile, "{},", fmt::join(item.second.begin(), last, ","));
             print<FormatSyntax::FMT>(outputFile, "{}\n", *last);
         }
 

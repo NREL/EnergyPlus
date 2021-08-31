@@ -1145,7 +1145,7 @@ namespace UnitarySystems {
                     Real64 companionAirInTemp = state.dataLoopNodes->Node(this->m_HRcoolCoilAirInNode).Temp;
                     Real64 oneHalfAirDeltaT = (companionAirInTemp - airInTemp) / 2.0;
                     Real64 initialLoopTemp = airInTemp + oneHalfAirDeltaT;
-                    if (initialLoopTemp > this->m_minWaterLoopTempForHR && abs(oneHalfAirDeltaT) > this->m_minAirToWaterTempOffset) {
+                    if (initialLoopTemp > this->m_minWaterLoopTempForHR && std::abs(oneHalfAirDeltaT) > this->m_minAirToWaterTempOffset) {
                         state.dataLoopNodes->Node(this->CoolCoilFluidInletNode).Temp = initialLoopTemp;
                         this->temperatureOffsetControlStatus = 1;
                     } else {

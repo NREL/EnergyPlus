@@ -264,7 +264,7 @@ namespace ScheduleManager {
         int skiprowCount;
         int curcolCount;
         int numHourlyValues;
-        int numerrors;
+        int numerrors = 0;
         int ifld;
         int hrLimitCount;
 
@@ -461,8 +461,6 @@ namespace ScheduleManager {
             if (state.files.TempFullFilePath.filePath.empty()) {
                 ShowFatalError(state, "Program terminates due to previous condition.");
             }
-
-            numerrors = 0;
 
             if (state.dataEnvrn->CurrentYearIsLeapYear) {
                 rowLimitCount = 366 * 24 * state.dataGlobal->NumOfTimeStepInHour;
@@ -1864,8 +1862,8 @@ namespace ScheduleManager {
 
                     for (jHour = 1; jHour <= 24; ++jHour) {
                         for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                            ++ifld;
                             state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = column_values[ifld];
+                            ++ifld;
                         }
                     }
                     if (iDay == 59 && !state.dataEnvrn->CurrentYearIsLeapYear) { // 28 Feb
