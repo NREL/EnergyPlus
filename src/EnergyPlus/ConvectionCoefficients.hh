@@ -713,25 +713,25 @@ namespace ConvectionCoefficients {
     Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(Real64 AirSystemFlowRate,  // [m3/s] air system flow rate
                                                        Real64 ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
                                                        Real64 WindWallRatio,      // [ ] fraction of window area to wall area for zone
-                                                       int WindowLocationType     // index for location types
+                                                       ConvectionConstants::InConvWinLoc WindowLocationType // index for location types
     );
 
     Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(EnergyPlusData &state,
                                                        Real64 ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
                                                        Real64 WindWallRatio,      // [ ] fraction of window area to wall area for zone
-                                                       int WindowLocationType,    // index for location types
-                                                       int ZoneNum                // for messages
+                                                       ConvectionConstants::InConvWinLoc WindowLocationType, // index for location types
+                                                       int ZoneNum                                           // for messages
     );
 
     Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(Real64 AirSystemFlowRate,  // [m3/s] air system flow rate
                                                      Real64 ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
-                                                     int WindowLocationType     // index for location types
+                                                     ConvectionConstants::InConvWinLoc WindowLocationType // index for location types
     );
 
     Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(EnergyPlusData &state,
                                                      Real64 ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
-                                                     int WindowLocationType,    // index for location types
-                                                     int ZoneNum                // for messages
+                                                     ConvectionConstants::InConvWinLoc WindowLocationType, // index for location types
+                                                     int ZoneNum                                           // for messages
     );
 
     Real64 CalcGoldsteinNovoselacCeilingDiffuserFloor(Real64 AirSystemFlowRate, // [m3/s] air system flow rate
@@ -819,6 +819,8 @@ namespace ConvectionCoefficients {
 
     Real64
     CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 const Tsurf, Real64 const Tair, Real64 const Vair, Real64 const Tilt);
+
+    ConvectionConstants::SurfConvOrientation GetSurfConvOrientation(Real64 const Tilt);
 
 } // namespace ConvectionCoefficients
 

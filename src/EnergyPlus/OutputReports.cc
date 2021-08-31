@@ -1222,7 +1222,6 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
         // still have to do shading surfaces for zone
         surfcount = 0;
         for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
-            // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (state.dataSurface->Surface(surf).Class != SurfaceClass::Shading) continue;
             if (state.dataSurface->Surface(surf).ZoneName != state.dataHeatBal->Zone(zones).Name) continue;
             colorindex = ColorNo::ShdAtt;
@@ -1249,10 +1248,6 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
             print(dxffile, Format_717, TempZoneName);
         }
     }
-
-    //  711 format('  0',/,'LINE',/,'  8',/,A,/,' 62',/,I3)
-    //  712 format(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,  &
-    //             ' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)
 
     DXFDaylightingReferencePoints(state, dxffile, false);
     DXFDaylightingReferencePoints(state, dxffile, true);
@@ -1463,30 +1458,9 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 } else {
                     BaseSurfName = state.dataSurface->Surface(surf).BaseSurfName;
                 }
-                {
-                    auto const SELECT_CASE_var(state.dataSurface->Surface(surf).HeatTransferAlgorithm);
-                    if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::None) {
-                        AlgoName = "None";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CTF) {
-                        AlgoName = "CTF - ConductionTransferFunction";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CondFD) {
-                        AlgoName = "CondFD - ConductionFiniteDifference";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::EMPD) {
-                        AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::HAMT) {
-                        AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Kiva) {
-                        AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Window5) {
-                        AlgoName = "Window5 Detailed Fenestration";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::ComplexFenestration) {
-                        AlgoName = "Window7 Complex Fenestration";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::TDD) {
-                        AlgoName = "Tubular Daylighting Device";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::AirBoundaryNoHT) {
-                        AlgoName = "Air Boundary - No Heat Transfer";
-                    }
-                }
+
+                AlgoName = DataSurfaces::HeatTransAlgoStrs[(int)state.dataSurface->Surface(surf).HeatTransferAlgorithm];
+
                 // Default Convection Coefficient Calculation Algorithms
                 IntConvCoeffCalc = ConvCoeffCalcs(state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo);
                 ExtConvCoeffCalc = ConvCoeffCalcs(state.dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo);
@@ -1573,37 +1547,21 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                            << format("{:.2R}", state.dataSurface->Surface(surf).Width) << ","
                            << format("{:.2R}", state.dataSurface->Surface(surf).Height) << ","
                            << format("{:.2R}", state.dataSurface->Surface(surf).Reveal) << ",";
+
+                constexpr std::array<std::string_view, (int)ConvectionConstants::ConvCoefOverrideType::Num> overrideTypeStrs = {
+                    "User Supplied Value", "User Supplied Schedule", "User Supplied Curve", "User Specified Model"};
+
                 if (state.dataSurface->SurfIntConvCoeffIndex(surf) > 0) {
-                    {
-                        auto const SELECT_CASE_var(
-                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(surf)).OverrideType);
-                        if (SELECT_CASE_var == ConvCoefValue) {
-                            IntConvCoeffCalc = "User Supplied Value";
-                        } else if (SELECT_CASE_var == ConvCoefSchedule) {
-                            IntConvCoeffCalc = "User Supplied Schedule";
-                        } else if (SELECT_CASE_var == ConvCoefUserCurve) {
-                            ExtConvCoeffCalc = "User Supplied Curve";
-                        } else if (SELECT_CASE_var == ConvCoefSpecifiedModel) {
-                            ExtConvCoeffCalc = "User Specified Model";
-                        }
-                    }
+                    IntConvCoeffCalc =
+                        overrideTypeStrs[(int)state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(surf))
+                                             .OverrideType];
                 } else if (state.dataSurface->SurfIntConvCoeffIndex(surf) < 0) { // not in use yet.
                     IntConvCoeffCalc = ConvCoeffCalcs(std::abs(state.dataSurface->SurfIntConvCoeffIndex(surf)));
                 }
                 if (state.dataSurface->SurfExtConvCoeffIndex(surf) > 0) {
-                    {
-                        auto const SELECT_CASE_var(
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(surf)).OverrideType);
-                        if (SELECT_CASE_var == ConvCoefValue) {
-                            ExtConvCoeffCalc = "User Supplied Value";
-                        } else if (SELECT_CASE_var == ConvCoefSchedule) {
-                            ExtConvCoeffCalc = "User Supplied Schedule";
-                        } else if (SELECT_CASE_var == ConvCoefUserCurve) {
-                            ExtConvCoeffCalc = "User Supplied Curve";
-                        } else if (SELECT_CASE_var == ConvCoefSpecifiedModel) {
-                            ExtConvCoeffCalc = "User Specified Model";
-                        }
-                    }
+                    ExtConvCoeffCalc =
+                        overrideTypeStrs[(int)state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(surf))
+                                             .OverrideType];
                 } else if (state.dataSurface->SurfExtConvCoeffIndex(surf) < 0) {
                     ExtConvCoeffCalc = ConvCoeffCalcs(std::abs(state.dataSurface->SurfExtConvCoeffIndex(surf)));
                 }
@@ -1682,28 +1640,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 if (state.dataSurface->Surface(surf).FrameDivider > 0) {
                     fd = state.dataSurface->Surface(surf).FrameDivider;
                     if (state.dataSurface->FrameDivider(fd).FrameWidth > 0.0) {
-                        {
-                            auto const SELECT_CASE_var(state.dataSurface->Surface(surf).HeatTransferAlgorithm);
-                            if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::None) {
-                                AlgoName = "None";
-                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CTF) {
-                                AlgoName = "CTF - ConductionTransferFunction";
-                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CondFD) {
-                                AlgoName = "CondFD - ConductionFiniteDifference";
-                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::EMPD) {
-                                AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
-                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::HAMT) {
-                                AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
-                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Kiva) {
-                                AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
-                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Window5) {
-                                AlgoName = "Window5 Detailed Fenestration";
-                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::ComplexFenestration) {
-                                AlgoName = "Window7 Complex Fenestration";
-                            } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::TDD) {
-                                AlgoName = "Tubular Daylighting Device";
-                            }
-                        }
+                        AlgoName = DataSurfaces::HeatTransAlgoStrs[(int)state.dataSurface->Surface(surf).HeatTransferAlgorithm];
                         *eiostream << "Frame/Divider Surface," << state.dataSurface->FrameDivider(fd).Name << ","
                                    << "Frame," << state.dataSurface->Surface(surf).Name << "," << AlgoName << ",";
                         *eiostream << ",N/A,N/A,," << format("{:.2R}", state.dataSurface->SurfWinFrameArea(surf)) << ","
@@ -1733,30 +1670,9 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 } else {
                     BaseSurfName = state.dataSurface->Surface(surf).BaseSurfName;
                 }
-                {
-                    auto const SELECT_CASE_var(state.dataSurface->Surface(surf).HeatTransferAlgorithm);
-                    if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::None) {
-                        AlgoName = "None";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CTF) {
-                        AlgoName = "CTF - ConductionTransferFunction";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::CondFD) {
-                        AlgoName = "CondFD - ConductionFiniteDifference";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::EMPD) {
-                        AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::HAMT) {
-                        AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Kiva) {
-                        AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::Window5) {
-                        AlgoName = "Window5 Detailed Fenestration";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::ComplexFenestration) {
-                        AlgoName = "Window7 Complex Fenestration";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::TDD) {
-                        AlgoName = "Tubular Daylighting Device";
-                    } else if (SELECT_CASE_var == DataSurfaces::iHeatTransferModel::AirBoundaryNoHT) {
-                        AlgoName = "Air Boundary - No Heat Transfer";
-                    }
-                }
+
+                AlgoName = DataSurfaces::HeatTransAlgoStrs[(int)state.dataSurface->Surface(surf).HeatTransferAlgorithm];
+
                 *eiostream << "HeatTransfer Surface," << state.dataSurface->Surface(surf).Name << ","
                            << cSurfaceClass(state.dataSurface->Surface(surf).Class) << "," << BaseSurfName << "," << AlgoName << ",";
                 *eiostream << fmt::to_string(state.dataSurface->Surface(surf).Sides) << ",";
@@ -1824,7 +1740,7 @@ void CostInfoOut(EnergyPlusData &state)
         return;
     }
 
-    // need to determine unique surfacs... some surfaces are shared by zones and hence doubled
+    // need to determine unique surfaces... some surfaces are shared by zones and hence doubled
     uniqueSurf.dimension(state.dataSurface->TotSurfaces, true);
 
     for (int surf : state.dataSurface->AllSurfaceListReportOrder) {

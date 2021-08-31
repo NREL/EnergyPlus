@@ -2968,7 +2968,7 @@ namespace PlantPipingSystemsManager {
 
             // Create Y-direction partitions
 
-            CellWidth = this->VertInsThickness;
+            CellWidth = this->HorizInsThickness;
 
             // Partition at bottom edge of vertical insulation, if vertical insulation present
             if (this->VertInsPresentFlag) {

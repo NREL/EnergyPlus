@@ -272,7 +272,12 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 cleanEPJSON(epJSONClean);
                 fs::path convertedIDF = FileSystem::makeNativePath(
                     FileSystem::replaceFileExtension(state.dataStrGlobals->outDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".epJSON"));
+<<<<<<< HEAD
                 FileSystem::writeFile<FileSystem::FileTypes::EpJSON>(convertedIDF, epJSONClean);
+=======
+                std::ofstream convertedFS(convertedIDF, std::ofstream::out);
+                convertedFS << input_file << std::endl;
+>>>>>>> origin/develop
             }
         } else {
             epJSON = FileSystem::readJSON(state.dataStrGlobals->inputFilePath, std::ios_base::in | std::ios_base::binary);
@@ -296,7 +301,12 @@ void InputProcessor::processInput(EnergyPlusData &state)
             std::string const encoded = idf_parser->encode(epJSON, schema);
             fs::path convertedEpJSON = FileSystem::makeNativePath(
                 FileSystem::replaceFileExtension(state.dataStrGlobals->outDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".idf"));
+<<<<<<< HEAD
             FileSystem::writeFile<FileSystem::FileTypes::IDF>(convertedEpJSON, encoded);
+=======
+            std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
+            convertedFS << encoded << std::endl;
+>>>>>>> origin/develop
         } else {
             ShowWarningError(state, "Skipping conversion of epJSON to IDF due to mismatched Version.");
         }
