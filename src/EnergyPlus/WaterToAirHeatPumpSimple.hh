@@ -93,8 +93,6 @@ namespace WaterToAirHeatPumpSimple {
         Real64 Power;                 // Power Consumption [W]
         Real64 QLoadTotal;            // Load Side Total Heat Transfer Rate [W]
         Real64 QLoadTotalReport;      // Load side total heat transfer rate for reporting[W]
-        Real64 QLoadSensReport;      // Load side sensible heat transfer rate for reporting[W]
-        Real64 QLoadLatReport;      // Load side latent heat transfer rate for reporting[W]
         Real64 QSensible;             // Sensible Load Side Heat Transfer Rate [W]
         Real64 QLatent;               // Latent Load Side Heat Transfer Rate [W]
         Real64 QSource;               // Source Side Heat Transfer Rate [W]
@@ -152,7 +150,7 @@ namespace WaterToAirHeatPumpSimple {
             : WAHPPlantTypeOfNum(0), SimFlag(false), AirVolFlowRate(0.0), AirMassFlowRate(0.0), InletAirDBTemp(0.0), InletAirHumRat(0.0),
               InletAirEnthalpy(0.0), OutletAirDBTemp(0.0), OutletAirHumRat(0.0), OutletAirEnthalpy(0.0), WaterVolFlowRate(0.0),
               WaterMassFlowRate(0.0), DesignWaterMassFlowRate(0.0), InletWaterTemp(0.0), InletWaterEnthalpy(0.0), OutletWaterTemp(0.0),
-              OutletWaterEnthalpy(0.0), Power(0.0), QLoadTotal(0.0), QLoadTotalReport(0.0), QLoadSensReport(0.0), QLoadLatReport(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0), Energy(0.0),
+              OutletWaterEnthalpy(0.0), Power(0.0), QLoadTotal(0.0), QLoadTotalReport(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0), Energy(0.0),
               EnergyLoadTotal(0.0), EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), COP(0.0), RunFrac(0.0), PartLoadRatio(0.0),
               RatedWaterVolFlowRate(0.0), RatedAirVolFlowRate(0.0), RatedCapHeat(0.0), RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolTotal(0.0),
               RatedCapCoolSens(0.0), RatedPowerCool(0.0), RatedCOPCool(0.0), HeatCapCurveIndex(0), HeatPowCurveIndex(0), TotalCoolCapCurveIndex(0),
@@ -304,8 +302,6 @@ struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct
     Real64 QSensible;              // Load side sensible heat transfer rate [W]
     Real64 QLoadTotal;             // Load side total heat transfer rate [W]
     Real64 QLoadTotalReport;       // Load side total heat transfer rate for reporting[W]
-    Real64 QLoadSensReport;       // Load side sensible heat transfer rate for reporting[W]
-    Real64 QLoadLatReport;       // Load side latent heat transfer rate for reporting[W]
     Real64 QLatRated;              // Latent Capacity [W] rated at entering air conditions [Tdb=26.7C Twb=19.4C]
     Real64 QLatActual;             // Actual Latent Capacity [W]
     Real64 QSource;                // Source side heat transfer rate [W]
@@ -348,7 +344,7 @@ struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct
         : CelsiustoKelvin(DataGlobalConstants::KelvinConv), NumWatertoAirHPs(0), AirflowErrPointer(0), GetCoilsInputFlag(true),
           SourceSideMassFlowRate(0.0), SourceSideInletTemp(0.0), SourceSideInletEnth(0.0), LoadSideInletDBTemp(0.0), LoadSideInletWBTemp(0.0),
           LoadSideInletHumRat(0.0), LoadSideInletEnth(0.0), LoadSideOutletDBTemp(0.0), LoadSideOutletHumRat(0.0), QSensible(0.0), QLoadTotal(0.0),
-          QLoadTotalReport(0.0), QLoadSensReport(0.0), QLoadLatReport(0.0), QLatRated(0.0), QLatActual(0.0), QSource(0.0), Winput(0.0), MyOneTimeFlag(true), firstTime(true)
+          QLoadTotalReport(0.0), QLatRated(0.0), QLatActual(0.0), QSource(0.0), Winput(0.0), MyOneTimeFlag(true), firstTime(true)
     {
     }
 };
