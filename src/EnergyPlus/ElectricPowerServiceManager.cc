@@ -2881,7 +2881,7 @@ void DCtoACInverter::calcEfficiency(EnergyPlusData &state)
             if (ac < 0) ac = 0;
             efficiency_ = ac / dCPowerIn_;
         } else {
-            efficiency_ = 0.0;
+            efficiency_ = 1.0; // Set to a non-zero reasonable value (to avoid divide by zero error)
         }
         break;
     }
@@ -5083,7 +5083,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
     } // switch
 
     if (powerIn_ <= 0) {
-        efficiency_ = 0.0;
+        efficiency_ = 1.0; // Set to something reasonable to avoid a divide by zero error
     } else {
         efficiency_ = powerOut_ / powerIn_;
     }
