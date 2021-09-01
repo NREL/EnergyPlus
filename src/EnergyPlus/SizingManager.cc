@@ -1346,7 +1346,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
         if (FinalSysSizing(AirLoopNum).OAAutoSized &&
             (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP || state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) &&
-            state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones > 1 && FinalSysSizing(AirLoopNum).LoadSizeType != Ventilation) {
+            state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones > 1 && FinalSysSizing(AirLoopNum).LoadSizeType != VentilationModelType) {
 
             // Loop over all zones connected to air loop, redo both cooling and heating calcs for Zdz minimum discharge outdoor air fraction for
             // each zone
@@ -3716,7 +3716,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
             } else if (loadSizeType == "TOTAL") {
                 SysSizInput(SysSizIndex).LoadSizeType = Total;
             } else if (loadSizeType == "VENTILATIONREQUIREMENT") {
-                SysSizInput(SysSizIndex).LoadSizeType = Ventilation;
+                SysSizInput(SysSizIndex).LoadSizeType = VentilationModelType;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
                 ShowContinueError(state,
@@ -4004,7 +4004,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
                 SysSizInput(SysSizIndex).SystemOAMethod = SOAM_ZoneSum;
             } else if (systemOAMethod == "STANDARD62.1VENTILATIONRATEPROCEDURE") {
                 SysSizInput(SysSizIndex).SystemOAMethod = SOAM_VRP;
-                if (SysSizInput(SysSizIndex).LoadSizeType == Ventilation) {
+                if (SysSizInput(SysSizIndex).LoadSizeType == VentilationModelType) {
                     ShowWarningError(
                         state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid combination of inputs.");
                     ShowContinueError(state,

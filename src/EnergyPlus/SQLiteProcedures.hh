@@ -912,10 +912,10 @@ private:
         std::string const &endUseSubcategory;
     };
 
-    class Infiltration : SQLiteData
+    class InfiltrationModelType : SQLiteData
     {
     public:
-        Infiltration(std::shared_ptr<std::ostream> const &errorStream,
+        InfiltrationModelType(std::shared_ptr<std::ostream> const &errorStream,
                      std::shared_ptr<sqlite3> const &db,
                      int const infiltrationNumber,
                      DataHeatBalance::InfiltrationData const &infiltrationData)
@@ -934,10 +934,10 @@ private:
         double const &designLevel;
     };
 
-    class Ventilation : SQLiteData
+    class VentilationModelType : SQLiteData
     {
     public:
-        Ventilation(std::shared_ptr<std::ostream> const &errorStream,
+        VentilationModelType(std::shared_ptr<std::ostream> const &errorStream,
                     std::shared_ptr<sqlite3> const &db,
                     int const ventilationNumber,
                     DataHeatBalance::VentilationData const &ventilationData)
@@ -994,8 +994,8 @@ private:
     std::vector<std::unique_ptr<SQLite::NominalHotWaterEquipment>> nominalHotWaterEquipments;
     std::vector<std::unique_ptr<SQLite::NominalOtherEquipment>> nominalOtherEquipments;
     std::vector<std::unique_ptr<SQLite::NominalBaseboardHeat>> nominalBaseboardHeats;
-    std::vector<std::unique_ptr<SQLite::Infiltration>> infiltrations;
-    std::vector<std::unique_ptr<SQLite::Ventilation>> ventilations;
+    std::vector<std::unique_ptr<SQLite::InfiltrationModelType>> infiltrations;
+    std::vector<std::unique_ptr<SQLite::VentilationModelType>> ventilations;
     std::vector<std::unique_ptr<SQLite::RoomAirModel>> roomAirModels;
 };
 

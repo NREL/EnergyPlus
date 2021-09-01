@@ -200,7 +200,7 @@ namespace DataHeatBalance {
     };
 
     // Parameters for type of infiltration model
-    enum class Infiltration
+    enum class InfiltrationModelType
     {
         Unassigned = -1,
         DesignFlowRate,
@@ -210,7 +210,7 @@ namespace DataHeatBalance {
     };
 
     // Parameters for type of ventilation model
-    enum class Ventilation
+    enum class VentilationModelType
     {
         Unassigned = -1,
         DesignFlowRate,
@@ -237,7 +237,7 @@ namespace DataHeatBalance {
         NUM
     };
 
-    enum class InfiltrationZone
+    enum class InfiltrationZoneType
     {
         Unassigned = -1,
         MixingSourceZonesOnly,
@@ -1077,9 +1077,9 @@ namespace DataHeatBalance {
     {
         // Members
         std::string Name;
-        int ZonePtr;            // Which zone infiltration is in
-        int SchedPtr;           // Schedule for infiltration
-        Infiltration ModelType; // which model is used for infiltration
+        int ZonePtr;                     // Which zone infiltration is in
+        int SchedPtr;                    // Schedule for infiltration
+        InfiltrationModelType ModelType; // which model is used for infiltration
         // Design Flow Rate model terms
         Real64 DesignLevel;
         Real64 ConstantTermCoef;
@@ -1119,13 +1119,13 @@ namespace DataHeatBalance {
 
         // Default Constructor
         InfiltrationData()
-            : ZonePtr(0), SchedPtr(0), ModelType(Infiltration::Unassigned), DesignLevel(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0),
-              VelocityTermCoef(0.0), VelocitySQTermCoef(0.0), LeakageArea(0.0), BasicStackCoefficient(0.0), BasicWindCoefficient(0.0),
-              FlowCoefficient(0.0), AIM2StackCoefficient(0.0), AIM2WindCoefficient(0.0), PressureExponent(0.0), ShelterFactor(0.0),
-              EMSOverrideOn(false), EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0), MassFlowRate(0.0),
-              MCpI_temp(0.0), InfilHeatGain(0.0), InfilHeatLoss(0.0), InfilLatentGain(0.0), InfilLatentLoss(0.0), InfilTotalGain(0.0),
-              InfilTotalLoss(0.0), InfilVolumeCurDensity(0.0), InfilVolumeStdDensity(0.0), InfilVdotCurDensity(0.0), InfilVdotStdDensity(0.0),
-              InfilMdot(0.0), InfilMass(0.0), InfilAirChangeRate(0.0)
+            : ZonePtr(0), SchedPtr(0), ModelType(InfiltrationModelType::Unassigned), DesignLevel(0.0), ConstantTermCoef(0.0),
+              TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0), LeakageArea(0.0), BasicStackCoefficient(0.0),
+              BasicWindCoefficient(0.0), FlowCoefficient(0.0), AIM2StackCoefficient(0.0), AIM2WindCoefficient(0.0), PressureExponent(0.0),
+              ShelterFactor(0.0), EMSOverrideOn(false), EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0),
+              MassFlowRate(0.0), MCpI_temp(0.0), InfilHeatGain(0.0), InfilHeatLoss(0.0), InfilLatentGain(0.0), InfilLatentLoss(0.0),
+              InfilTotalGain(0.0), InfilTotalLoss(0.0), InfilVolumeCurDensity(0.0), InfilVolumeStdDensity(0.0), InfilVdotCurDensity(0.0),
+              InfilVdotStdDensity(0.0), InfilMdot(0.0), InfilMass(0.0), InfilAirChangeRate(0.0)
         {
         }
     };
@@ -1136,7 +1136,7 @@ namespace DataHeatBalance {
         std::string Name;
         int ZonePtr;
         int SchedPtr;
-        Ventilation ModelType; // which model is used for ventilation: DesignFlowRate and WindandStackOpenArea
+        VentilationModelType ModelType; // which model is used for ventilation: DesignFlowRate and WindandStackOpenArea
         Real64 DesignLevel;
         bool EMSSimpleVentOn;        // EMS actuating ventilation flow rate if .TRUE.
         Real64 EMSimpleVentFlowRate; // Value EMS is directing to use for override
@@ -1179,12 +1179,12 @@ namespace DataHeatBalance {
 
         // Default Constructor
         VentilationData()
-            : ZonePtr(0), SchedPtr(0), ModelType(Ventilation::Unassigned), DesignLevel(0.0), EMSSimpleVentOn(false), EMSimpleVentFlowRate(0.0),
-              MinIndoorTemperature(-100.0), DelTemperature(0.0), FanType(VentilationType::Natural), FanPressure(0.0), FanEfficiency(0.0),
-              FanPower(0.0), AirTemp(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0),
-              MaxIndoorTemperature(100.0), MinOutdoorTemperature(-100.0), MaxOutdoorTemperature(100.0), MaxWindSpeed(40.0), MinIndoorTempSchedPtr(0),
-              MaxIndoorTempSchedPtr(0), DeltaTempSchedPtr(0), MinOutdoorTempSchedPtr(0), MaxOutdoorTempSchedPtr(0), IndoorTempErrCount(0),
-              OutdoorTempErrCount(0), IndoorTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(HybridCtrlType::Indiv),
+            : ZonePtr(0), SchedPtr(0), ModelType(VentilationModelType::Unassigned), DesignLevel(0.0), EMSSimpleVentOn(false),
+              EMSimpleVentFlowRate(0.0), MinIndoorTemperature(-100.0), DelTemperature(0.0), FanType(VentilationType::Natural), FanPressure(0.0),
+              FanEfficiency(0.0), FanPower(0.0), AirTemp(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0),
+              VelocitySQTermCoef(0.0), MaxIndoorTemperature(100.0), MinOutdoorTemperature(-100.0), MaxOutdoorTemperature(100.0), MaxWindSpeed(40.0),
+              MinIndoorTempSchedPtr(0), MaxIndoorTempSchedPtr(0), DeltaTempSchedPtr(0), MinOutdoorTempSchedPtr(0), MaxOutdoorTempSchedPtr(0),
+              IndoorTempErrCount(0), OutdoorTempErrCount(0), IndoorTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(HybridCtrlType::Indiv),
               HybridControlMasterNum(0), HybridControlMasterStatus(false), QuadratureSum(false), OABalancePtr(0), OpenArea(0.0), OpenAreaSchedPtr(0),
               OpenEff(0.0), EffAngle(0.0), DH(0.0), DiscCoef(0.0)
         {
@@ -1281,16 +1281,16 @@ namespace DataHeatBalance {
         AdjustmentType ZoneFlowAdjustment; // determines how zone air flow is adjusted (AdjustMixingOnly, AdjustReturnOnly, AdjustMixingThenReturn,
                                            // AdjustReturnThenMixing, None)        int InfiltrationTreatment;   // determines how infiltration is
                                            // treated for zone mass balance
-        InfiltrationFlow InfiltrationTreatment; // determines how infiltration is treated for zone mass balance
-        InfiltrationZone InfiltrationZoneType;  // specifies which types of zones allow infiltration to be changed
-        bool AdjustZoneMixingFlow;              // used to adjust zone mixing air flows to enforce air flow balance
-        bool AdjustZoneInfiltrationFlow;        // used to adjust zone infiltration air flows to enforce air flow balance
-                                                // Note, unique global object
+        InfiltrationFlow InfiltrationTreatment;    // determines how infiltration is treated for zone mass balance
+        InfiltrationZoneType InfiltrationZoneType; // specifies which types of zones allow infiltration to be changed
+        bool AdjustZoneMixingFlow;                 // used to adjust zone mixing air flows to enforce air flow balance
+        bool AdjustZoneInfiltrationFlow;           // used to adjust zone infiltration air flows to enforce air flow balance
+                                                   // Note, unique global object
 
         // Default Constructor
         ZoneAirMassFlowConservation()
             : EnforceZoneMassBalance(false), ZoneFlowAdjustment(AdjustmentType::NoAdjustReturnAndMixing), InfiltrationTreatment(InfiltrationFlow::No),
-              InfiltrationZoneType(InfiltrationZone::Unassigned), AdjustZoneMixingFlow(false), AdjustZoneInfiltrationFlow(false)
+              InfiltrationZoneType(InfiltrationZoneType::Unassigned), AdjustZoneMixingFlow(false), AdjustZoneInfiltrationFlow(false)
         {
         }
     };
@@ -2437,8 +2437,8 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::ZoneEquipData> ZoneSteamEq;
     EPVector<DataHeatBalance::ITEquipData> ZoneITEq;
     EPVector<DataHeatBalance::BBHeatData> ZoneBBHeat;
-    EPVector<DataHeatBalance::InfiltrationData> Infiltration;
-    EPVector<DataHeatBalance::VentilationData> Ventilation;
+    EPVector<DataHeatBalance::InfiltrationData> InfiltrationModelType;
+    EPVector<DataHeatBalance::VentilationData> VentilationModelType;
     EPVector<DataHeatBalance::ZoneAirBalanceData> ZoneAirBalance;
     EPVector<DataHeatBalance::MixingData> Mixing;
     EPVector<DataHeatBalance::MixingData> CrossMixing;
@@ -2715,8 +2715,8 @@ struct HeatBalanceData : BaseGlobalStruct
         this->ZoneSteamEq.deallocate();
         this->ZoneITEq.deallocate();
         this->ZoneBBHeat.deallocate();
-        this->Infiltration.deallocate();
-        this->Ventilation.deallocate();
+        this->InfiltrationModelType.deallocate();
+        this->VentilationModelType.deallocate();
         this->ZoneAirBalance.deallocate();
         this->Mixing.deallocate();
         this->CrossMixing.deallocate();

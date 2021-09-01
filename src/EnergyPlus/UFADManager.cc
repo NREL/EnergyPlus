@@ -1057,8 +1057,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
     Real64 HeightOccupiedSubzoneAve; // Height of center of occupied air subzone
     Real64 ZoneMult;                 // total zone multiplier
     int ZoneNodeNum;                 // node number of the HVAC zone node
-    Array1D<DataHeatBalance::IntGainType> IntGainTypesOccupied(30,
-                                                               {DataHeatBalance::IntGainType::People,
+    constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {DataHeatBalance::IntGainType::People,
                                                                 DataHeatBalance::IntGainType::WaterHeaterMixed,
                                                                 DataHeatBalance::IntGainType::WaterHeaterStratified,
                                                                 DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
@@ -1087,10 +1086,9 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
                                                                 DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
                                                                 DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
                                                                 DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
-                                                                DataHeatBalance::IntGainType::RefrigerationWalkIn});
+                                                                DataHeatBalance::IntGainType::RefrigerationWalkIn};
 
-    Array1D<DataHeatBalance::IntGainType> IntGainTypesUpSubzone(
-        2, {DataHeatBalance::IntGainType::DaylightingDeviceTubular, DataHeatBalance::IntGainType::Lights});
+    constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesUpSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular, DataHeatBalance::IntGainType::Lights};
     Real64 RetAirGains;
 
     // Exact solution or Euler method
@@ -1568,8 +1566,7 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
     int ZoneNodeNum;                 // node number of the HVAC zone node
     Real64 TempDepCoef(0.0);         // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
     Real64 TempIndCoef(0.0);         // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-    static const Array1D<DataHeatBalance::IntGainType> IntGainTypesOccupied(30,
-                                                                            {DataHeatBalance::IntGainType::People,
+    constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {DataHeatBalance::IntGainType::People,
                                                                              DataHeatBalance::IntGainType::WaterHeaterMixed,
                                                                              DataHeatBalance::IntGainType::WaterHeaterStratified,
                                                                              DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
@@ -1598,10 +1595,9 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
                                                                              DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
                                                                              DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
                                                                              DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
-                                                                             DataHeatBalance::IntGainType::RefrigerationWalkIn});
+                                                                             DataHeatBalance::IntGainType::RefrigerationWalkIn};
 
-    static const Array1D<DataHeatBalance::IntGainType> IntGainTypesUpSubzone(
-        2, {DataHeatBalance::IntGainType::DaylightingDeviceTubular, DataHeatBalance::IntGainType::Lights});
+    constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesUpSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular, DataHeatBalance::IntGainType::Lights};
     Real64 RetAirGains;
 
     // Exact solution or Euler method

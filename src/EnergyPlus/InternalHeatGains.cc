@@ -8056,15 +8056,14 @@ namespace InternalHeatGains {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int ZoneLoop; // Counter for the # of zones (nz)
-        static const Array1D<DataHeatBalance::IntGainType> TradIntGainTypes(8,
-                                                                            {DataHeatBalance::IntGainType::People,
-                                                                             DataHeatBalance::IntGainType::Lights,
-                                                                             DataHeatBalance::IntGainType::ElectricEquipment,
-                                                                             DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
-                                                                             DataHeatBalance::IntGainType::GasEquipment,
-                                                                             DataHeatBalance::IntGainType::HotWaterEquipment,
-                                                                             DataHeatBalance::IntGainType::SteamEquipment,
-                                                                             DataHeatBalance::IntGainType::OtherEquipment});
+        constexpr std::array<DataHeatBalance::IntGainType, 8> TradIntGainTypes = {DataHeatBalance::IntGainType::People,
+                                                                                  DataHeatBalance::IntGainType::Lights,
+                                                                                  DataHeatBalance::IntGainType::ElectricEquipment,
+                                                                                  DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+                                                                                  DataHeatBalance::IntGainType::GasEquipment,
+                                                                                  DataHeatBalance::IntGainType::HotWaterEquipment,
+                                                                                  DataHeatBalance::IntGainType::SteamEquipment,
+                                                                                  DataHeatBalance::IntGainType::OtherEquipment};
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
             state.dataHeatBal->People(Loop).RadGainEnergy = state.dataHeatBal->People(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
@@ -9162,64 +9161,60 @@ namespace InternalHeatGains {
         using namespace DataHeatBalance;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static const Array1D<DataHeatBalance::IntGainType> IntGainTypesPeople(1, {DataHeatBalance::IntGainType::People});
-        static const Array1D<DataHeatBalance::IntGainType> IntGainTypesLight(1, {DataHeatBalance::IntGainType::Lights});
-        static const Array1D<DataHeatBalance::IntGainType> IntGainTypesEquip(6,
-                                                                             {DataHeatBalance::IntGainType::ElectricEquipment,
-                                                                              DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
-                                                                              DataHeatBalance::IntGainType::GasEquipment,
-                                                                              DataHeatBalance::IntGainType::HotWaterEquipment,
-                                                                              DataHeatBalance::IntGainType::SteamEquipment,
-                                                                              DataHeatBalance::IntGainType::OtherEquipment});
-        static const Array1D<DataHeatBalance::IntGainType> IntGainTypesRefrig(10,
-                                                                              {DataHeatBalance::IntGainType::RefrigerationCase,
-                                                                               DataHeatBalance::IntGainType::RefrigerationCompressorRack,
-                                                                               DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
-                                                                               DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
-                                                                               DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
-                                                                               DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
-                                                                               DataHeatBalance::IntGainType::RefrigerationWalkIn,
-                                                                               DataHeatBalance::IntGainType::RefrigerationTransSysAirCooledGasCooler,
-                                                                               DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeMT,
-                                                                               DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeLT});
-        static const Array1D<DataHeatBalance::IntGainType> IntGainTypesWaterUse(3,
-                                                                                {DataHeatBalance::IntGainType::WaterUseEquipment,
-                                                                                 DataHeatBalance::IntGainType::WaterHeaterMixed,
-                                                                                 DataHeatBalance::IntGainType::WaterHeaterStratified});
-        static const Array1D<DataHeatBalance::IntGainType> IntGainTypesHvacLoss(
-            20,
-            {DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
-             DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
-             DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
-             DataHeatBalance::IntGainType::PipeIndoor,
-             DataHeatBalance::IntGainType::Pump_VarSpeed,
-             DataHeatBalance::IntGainType::Pump_ConSpeed,
-             DataHeatBalance::IntGainType::Pump_Cond,
-             DataHeatBalance::IntGainType::PumpBank_VarSpeed,
-             DataHeatBalance::IntGainType::PumpBank_ConSpeed,
-             DataHeatBalance::IntGainType::PlantComponentUserDefined,
-             DataHeatBalance::IntGainType::CoilUserDefined,
-             DataHeatBalance::IntGainType::ZoneHVACForcedAirUserDefined,
-             DataHeatBalance::IntGainType::AirTerminalUserDefined,
-             DataHeatBalance::IntGainType::PackagedTESCoilTank,
-             DataHeatBalance::IntGainType::FanSystemModel,
-             DataHeatBalance::IntGainType::SecCoolingDXCoilSingleSpeed,
-             DataHeatBalance::IntGainType::SecHeatingDXCoilSingleSpeed,
-             DataHeatBalance::IntGainType::SecCoolingDXCoilTwoSpeed,
-             DataHeatBalance::IntGainType::SecCoolingDXCoilMultiSpeed,
-             DataHeatBalance::IntGainType::SecHeatingDXCoilMultiSpeed});
-        static const Array1D<DataHeatBalance::IntGainType> IntGainTypesPowerGen(
-            10,
-            {DataHeatBalance::IntGainType::GeneratorFuelCell,
-             DataHeatBalance::IntGainType::GeneratorMicroCHP,
-             DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
-             DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
-             DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
-             DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
-             DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
-             DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
-             DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
-             DataHeatBalance::IntGainType::ElectricLoadCenterConverter});
+        constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesPeople = {DataHeatBalance::IntGainType::People};
+        constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesLight = {DataHeatBalance::IntGainType::Lights};
+        constexpr std::array<DataHeatBalance::IntGainType, 6> IntGainTypesEquip = {DataHeatBalance::IntGainType::ElectricEquipment,
+                                                                                   DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+                                                                                   DataHeatBalance::IntGainType::GasEquipment,
+                                                                                   DataHeatBalance::IntGainType::HotWaterEquipment,
+                                                                                   DataHeatBalance::IntGainType::SteamEquipment,
+                                                                                   DataHeatBalance::IntGainType::OtherEquipment};
+        constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesRefrig = {
+            DataHeatBalance::IntGainType::RefrigerationCase,
+            DataHeatBalance::IntGainType::RefrigerationCompressorRack,
+            DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
+            DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
+            DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
+            DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
+            DataHeatBalance::IntGainType::RefrigerationWalkIn,
+            DataHeatBalance::IntGainType::RefrigerationTransSysAirCooledGasCooler,
+            DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeMT,
+            DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeLT};
+        constexpr std::array<DataHeatBalance::IntGainType, 3> IntGainTypesWaterUse = {DataHeatBalance::IntGainType::WaterUseEquipment,
+                                                                                      DataHeatBalance::IntGainType::WaterHeaterMixed,
+                                                                                      DataHeatBalance::IntGainType::WaterHeaterStratified};
+        constexpr std::array<DataHeatBalance::IntGainType, 20> IntGainTypesHvacLoss = {
+            DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
+            DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
+            DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
+            DataHeatBalance::IntGainType::PipeIndoor,
+            DataHeatBalance::IntGainType::Pump_VarSpeed,
+            DataHeatBalance::IntGainType::Pump_ConSpeed,
+            DataHeatBalance::IntGainType::Pump_Cond,
+            DataHeatBalance::IntGainType::PumpBank_VarSpeed,
+            DataHeatBalance::IntGainType::PumpBank_ConSpeed,
+            DataHeatBalance::IntGainType::PlantComponentUserDefined,
+            DataHeatBalance::IntGainType::CoilUserDefined,
+            DataHeatBalance::IntGainType::ZoneHVACForcedAirUserDefined,
+            DataHeatBalance::IntGainType::AirTerminalUserDefined,
+            DataHeatBalance::IntGainType::PackagedTESCoilTank,
+            DataHeatBalance::IntGainType::FanSystemModel,
+            DataHeatBalance::IntGainType::SecCoolingDXCoilSingleSpeed,
+            DataHeatBalance::IntGainType::SecHeatingDXCoilSingleSpeed,
+            DataHeatBalance::IntGainType::SecCoolingDXCoilTwoSpeed,
+            DataHeatBalance::IntGainType::SecCoolingDXCoilMultiSpeed,
+            DataHeatBalance::IntGainType::SecHeatingDXCoilMultiSpeed};
+        constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesPowerGen = {
+            DataHeatBalance::IntGainType::GeneratorFuelCell,
+            DataHeatBalance::IntGainType::GeneratorMicroCHP,
+            DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
+            DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
+            DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
+            DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
+            DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
+            DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
+            DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
+            DataHeatBalance::IntGainType::ElectricLoadCenterConverter};
 
         if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
             int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;

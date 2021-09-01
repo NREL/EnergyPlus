@@ -221,6 +221,8 @@ namespace OutputReportTabular {
         AshStdDes2Line,
         AshStdDes3Line,
     };
+    
+    constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesTubularGCLS = {DataHeatBalance::IntGainType::DaylightingDeviceTubular};
 
     // Types
 
@@ -1210,8 +1212,6 @@ struct OutputReportTabularData : BaseGlobalStruct
     int TimeStepInDayGCLS = 0;
     int iZoneGCLH = 0;
     int TimeStepInDayGCLH = 0;
-    Array1D<DataHeatBalance::IntGainType> IntGainTypesTubularGCLS =
-        Array1D<DataHeatBalance::IntGainType>(1, {DataHeatBalance::IntGainType::DaylightingDeviceTubular});
     Array3D_bool adjFenDone;
     Real64 BigNumRMG = 0.0;
     int foundGsui = 0;
@@ -1515,7 +1515,6 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->TimeStepInDayGCLS = 0;
         this->iZoneGCLH = 0;
         this->TimeStepInDayGCLH = 0;
-        this->IntGainTypesTubularGCLS = Array1D<DataHeatBalance::IntGainType>(1, {DataHeatBalance::IntGainType::DaylightingDeviceTubular});
         this->adjFenDone.clear();
         this->BigNumRMG = 0.0;
         this->foundGsui = 0;

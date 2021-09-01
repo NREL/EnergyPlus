@@ -13853,7 +13853,7 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
         }
         for (int izone = 1; izone <= state.dataGlobal->NumOfZones; ++izone) {
             Real64 tubularGain = 0.0;
-            tubularGain = InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, state.dataOutRptTab->IntGainTypesTubularGCLS);
+            tubularGain = InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, OutputReportTabular::IntGainTypesTubularGCLS);
             ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, izone) += tubularGain;
         }
     }
@@ -14283,7 +14283,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                     } else {
                         timeCoolMax = 0;
                     }
-                } else if (FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::Ventilation) {
+                } else if (FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::VentilationModelType) {
                     coolDesSelected = SysSizPeakDDNum(iAirLoop).CoolFlowPeakDD;
                     if (coolDesSelected != 0) {
                         timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtCoolFlowPk(coolDesSelected);

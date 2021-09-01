@@ -118,7 +118,7 @@ namespace DataSizing {
     constexpr int Sensible(0);
     constexpr int Latent(1);
     constexpr int Total(2);
-    constexpr int Ventilation(3);
+    constexpr int VentilationModelType(3);
 
     // parameter for autosize
     constexpr Real64 AutoSize(-99999.0);

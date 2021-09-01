@@ -1275,13 +1275,13 @@ namespace HeatBalanceManager {
                     {
                         auto const SELECT_CASE_var(AlphaName(3));
                         if (SELECT_CASE_var == "MIXINGSOURCEZONESONLY") {
-                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = DataHeatBalance::InfiltrationZone::MixingSourceZonesOnly;
+                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly;
                             AlphaName(3) = "MixingSourceZonesOnly";
                         } else if (SELECT_CASE_var == "ALLZONES") {
-                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = DataHeatBalance::InfiltrationZone::AllZones;
+                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = DataHeatBalance::InfiltrationZoneType::AllZones;
                             AlphaName(3) = "AllZones";
                         } else {
-                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = DataHeatBalance::InfiltrationZone::MixingSourceZonesOnly;
+                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly;
                             AlphaName(3) = "MixingSourceZonesOnly";
                             ShowWarningError(state,
                                              state.dataHeatBalMgr->CurrentModuleObject + ": Invalid input of " +
@@ -1290,7 +1290,7 @@ namespace HeatBalanceManager {
                         }
                     }
                 } else {
-                    state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = DataHeatBalance::InfiltrationZone::MixingSourceZonesOnly;
+                    state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly;
                     AlphaName(3) = "MixingSourceZonesOnly";
                 }
             }
