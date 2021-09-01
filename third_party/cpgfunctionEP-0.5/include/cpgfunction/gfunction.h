@@ -4,16 +4,14 @@
 // Created by jackcook on 7/11/20.
 //
 
-#include <iostream>
-#include <vector>
-#include <thread>
-#include <cpgfunction/boreholes.h>
-#include <cpgfunction/segments.h>
-
-using namespace std;
-
 #ifndef CPPGFUNCTION_GFUNCTION_H
 #define CPPGFUNCTION_GFUNCTION_H
+
+#include <cpgfunction/boreholes.h>
+#include <cpgfunction/segments.h>
+#include <iostream>
+#include <thread>
+#include <vector>
 
 /** The functions will be listed here in the order which they appear in the
  * associated cpp file **/
@@ -35,28 +33,28 @@ namespace gt::gfunction {
      * @param use_similarities
      * @param disp
      */
-    vector<double> uniform_borehole_wall_temperature(
-            vector<gt::boreholes::Borehole> &boreField,
-            vector<double> &time, double alpha, int nSegments=12,
+    std::vector<double> uniform_borehole_wall_temperature(
+            std::vector<gt::boreholes::Borehole> &boreField,
+            std::vector<double> &time, double alpha, int nSegments=12,
             bool use_similarities=true,
-            int n_Threads=int(thread::hardware_concurrency()),
+            int n_Threads=1,
             bool display=false);
 
-    void _borehole_segments(vector<gt::boreholes::Borehole>& boreSegments,
-                            vector<gt::boreholes::Borehole>& boreholes,
+    void _borehole_segments(std::vector<gt::boreholes::Borehole>& boreSegments,
+                            std::vector<gt::boreholes::Borehole>& boreholes,
                             int nSegments);
-    void load_history_reconstruction(vector<double>& q_reconstructed,
-                                     vector<double>& time,
-                                     vector<double>& _time,
-                                     vector<vector<double> >& Q,
-                                     vector<double>& dt, int p);
-    void _temporal_superposition(vector<double>& Tb_0,
+    void load_history_reconstruction(std::vector<double>& q_reconstructed,
+                                     std::vector<double>& time,
+                                     std::vector<double>& _time,
+                                     std::vector<std::vector<double> >& Q,
+                                     std::vector<double>& dt, int p);
+    void _temporal_superposition(std::vector<double>& Tb_0,
                                  gt::segments::SegmentResponse &SegRes,
-                                 vector<double> &h_ij,
-                                 vector<double> &q_reconstructed, int p,
-                                 int &nSources);
-    void _solve_eqn(vector<double>& x, vector<vector<double>>& A,
-                    vector<double>& b);
+                                 std::vector<double> &h_ij,
+                                 std::vector<double> &q_reconstructed, int p,
+                                 int &nSources, int numThreads);
+    void _solve_eqn(std::vector<double>& x, std::vector<std::vector<double>>& A,
+                    std::vector<double>& b);
 
 }  // namespace gt::gfunction
 
