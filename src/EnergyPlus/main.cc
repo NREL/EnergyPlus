@@ -60,8 +60,7 @@ int main(int argc, const char *argv[])
     std::string datestring; // supposedly returns blank when no date available.
     date_and_time(datestring, _, _, value);
     if (!datestring.empty()) {
-        state.dataStrGlobals->CurrentDateTime =
-            fmt::format(" YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));
+        state.dataStrGlobals->CurrentDateTime = fmt::format(" YMD={:4}.{:02}.{:02} {:02}:{:02}", value(1), value(2), value(3), value(5), value(6));
     } else {
         state.dataStrGlobals->CurrentDateTime = " unknown date/time";
     }

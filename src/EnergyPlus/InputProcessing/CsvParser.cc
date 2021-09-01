@@ -164,7 +164,7 @@ int CsvParser::find_number_columns(std::string_view csv, size_t &index)
 
 json CsvParser::parse_csv(std::string_view csv, size_t &index, bool &success)
 {
-    json root = {{"header", {}}, {"values", {}}};
+    json root = {{"header", json::array()}, {"values", json::array()}};
     bool check_first_row = true;
     bool has_header = (rows_to_skip == 1);
 
@@ -193,7 +193,7 @@ json CsvParser::parse_csv(std::string_view csv, size_t &index, bool &success)
                 for (int i = 0; i < num_columns; ++i) {
                     auto arr = std::vector<json>();
                     arr.reserve(8764 * 4);
-                    columns.push_back(arr);
+                    columns.push_back(std::move(arr));
                 }
 
                 if (has_header) {
