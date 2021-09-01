@@ -178,7 +178,6 @@ namespace HeatBalFiniteDiffManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(1)) {
-
                 {
                     int SchemeTypeNum = getEnumerationValue(CondFDSchemeTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1));
                     if (SchemeTypeNum >= 0) {

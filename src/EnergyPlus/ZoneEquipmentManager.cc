@@ -4797,8 +4797,8 @@ void CalcZoneInfiltrationFlows(EnergyPlusData &state,
                         state.dataHeatBal->MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
                         state.dataHeatBal->InfiltrationModelType(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate =
                             ZoneInfiltrationMassFlowRate;
-                        state.dataHeatBal->InfiltrationModelType(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate =
-                            max(0.0, state.dataHeatBal->InfiltrationModelType(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate);
+                        state.dataHeatBal->InfiltrationModelType(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = max(
+                            0.0, state.dataHeatBal->InfiltrationModelType(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate);
                     } else {
                         state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
                         state.dataHeatBal->InfiltrationModelType(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = 0.0;
@@ -5306,7 +5306,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 GetCurrentScheduleValue(state, state.dataHeatBal->VentilationModelType(I).MaxIndoorTempSchedPtr);
         }
         // Ensure the minimum indoor temperature <= the maximum indoor temperature
-        if (state.dataHeatBal->VentilationModelType(I).MinIndoorTempSchedPtr > 0 || state.dataHeatBal->VentilationModelType(I).MaxIndoorTempSchedPtr > 0) {
+        if (state.dataHeatBal->VentilationModelType(I).MinIndoorTempSchedPtr > 0 ||
+            state.dataHeatBal->VentilationModelType(I).MaxIndoorTempSchedPtr > 0) {
             if (state.dataHeatBal->VentilationModelType(I).MinIndoorTemperature > state.dataHeatBal->VentilationModelType(I).MaxIndoorTemperature) {
                 ++state.dataHeatBal->VentilationModelType(I).IndoorTempErrCount;
                 if (state.dataHeatBal->VentilationModelType(I).IndoorTempErrCount < 2) {
@@ -5335,7 +5336,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 GetCurrentScheduleValue(state, state.dataHeatBal->VentilationModelType(I).MaxOutdoorTempSchedPtr);
         }
         // Ensure the minimum outdoor temperature <= the maximum outdoor temperature
-        if (state.dataHeatBal->VentilationModelType(I).MinOutdoorTempSchedPtr > 0 || state.dataHeatBal->VentilationModelType(I).MaxOutdoorTempSchedPtr > 0) {
+        if (state.dataHeatBal->VentilationModelType(I).MinOutdoorTempSchedPtr > 0 ||
+            state.dataHeatBal->VentilationModelType(I).MaxOutdoorTempSchedPtr > 0) {
             if (state.dataHeatBal->VentilationModelType(I).MinOutdoorTemperature > state.dataHeatBal->VentilationModelType(I).MaxOutdoorTemperature) {
                 ++state.dataHeatBal->VentilationModelType(I).OutdoorTempErrCount;
                 if (state.dataHeatBal->VentilationModelType(I).OutdoorTempErrCount < 2) {
@@ -5356,7 +5358,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             }
         }
         if (state.dataHeatBal->VentilationModelType(I).DeltaTempSchedPtr > 0) {
-            state.dataHeatBal->VentilationModelType(I).DelTemperature = GetCurrentScheduleValue(state, state.dataHeatBal->VentilationModelType(I).DeltaTempSchedPtr);
+            state.dataHeatBal->VentilationModelType(I).DelTemperature =
+                GetCurrentScheduleValue(state, state.dataHeatBal->VentilationModelType(I).DeltaTempSchedPtr);
         }
         // Skip this if the zone is below the minimum indoor temperature limit
         if ((state.dataZoneEquip->ZMAT(NH) < state.dataHeatBal->VentilationModelType(I).MinIndoorTemperature) &&
@@ -5371,11 +5374,16 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             (!state.dataHeatBal->VentilationModelType(j).EMSSimpleVentOn))
             continue;
         // Skip this if the outdoor temperature is below the minimum outdoor temperature limit
-        if ((TempExt < state.dataHeatBal->VentilationModelType(I).MinOutdoorTemperature) && (!state.dataHeatBal->VentilationModelType(j).EMSSimpleVentOn)) continue;
+        if ((TempExt < state.dataHeatBal->VentilationModelType(I).MinOutdoorTemperature) &&
+            (!state.dataHeatBal->VentilationModelType(j).EMSSimpleVentOn))
+            continue;
         // Skip this if the outdoor temperature is above the maximum outdoor temperature limit
-        if ((TempExt > state.dataHeatBal->VentilationModelType(I).MaxOutdoorTemperature) && (!state.dataHeatBal->VentilationModelType(j).EMSSimpleVentOn)) continue;
+        if ((TempExt > state.dataHeatBal->VentilationModelType(I).MaxOutdoorTemperature) &&
+            (!state.dataHeatBal->VentilationModelType(j).EMSSimpleVentOn))
+            continue;
         // Skip this if the outdoor wind speed is above the maximum windspeed limit
-        if ((WindSpeedExt > state.dataHeatBal->VentilationModelType(I).MaxWindSpeed) && (!state.dataHeatBal->VentilationModelType(j).EMSSimpleVentOn)) continue;
+        if ((WindSpeedExt > state.dataHeatBal->VentilationModelType(I).MaxWindSpeed) && (!state.dataHeatBal->VentilationModelType(j).EMSSimpleVentOn))
+            continue;
 
         // Hybrid ventilation controls
         if ((state.dataHeatBal->VentilationModelType(j).HybridControlType == DataHeatBalance::HybridCtrlType::Close) &&
@@ -5388,7 +5396,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
 
         if (state.dataHeatBal->VentilationModelType(j).ModelType == DataHeatBalance::VentilationModelType::DesignFlowRate) {
             // CR6845 if calculated < 0, don't propagate.
-            VVF = state.dataHeatBal->VentilationModelType(j).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->VentilationModelType(j).SchedPtr);
+            VVF = state.dataHeatBal->VentilationModelType(j).DesignLevel *
+                  GetCurrentScheduleValue(state, state.dataHeatBal->VentilationModelType(j).SchedPtr);
 
             if (state.dataHeatBal->VentilationModelType(j).EMSSimpleVentOn) VVF = state.dataHeatBal->VentilationModelType(j).EMSimpleVentFlowRate;
 
@@ -5397,8 +5406,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 VVF * AirDensity * CpAir *
                 (state.dataHeatBal->VentilationModelType(j).ConstantTermCoef +
                  std::abs(TempExt - state.dataZoneEquip->ZMAT(NZ)) * state.dataHeatBal->VentilationModelType(j).TemperatureTermCoef +
-                 WindSpeedExt *
-                     (state.dataHeatBal->VentilationModelType(j).VelocityTermCoef + WindSpeedExt * state.dataHeatBal->VentilationModelType(j).VelocitySQTermCoef));
+                 WindSpeedExt * (state.dataHeatBal->VentilationModelType(j).VelocityTermCoef +
+                                 WindSpeedExt * state.dataHeatBal->VentilationModelType(j).VelocitySQTermCoef));
             if (state.dataZoneEquip->VentMCP(j) < 0.0) state.dataZoneEquip->VentMCP(j) = 0.0;
             VAMFL_temp = state.dataZoneEquip->VentMCP(j) / CpAir;
             if (state.dataHeatBal->VentilationModelType(j).QuadratureSum) {
@@ -5423,8 +5432,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 state.dataHeatBalFanSys->VAMFL(NZ) += VAMFL_temp;
             }
             if (state.dataHeatBal->VentilationModelType(j).FanEfficiency > 0.0) {
-                state.dataHeatBal->VentilationModelType(j).FanPower =
-                    VAMFL_temp * state.dataHeatBal->VentilationModelType(j).FanPressure / (state.dataHeatBal->VentilationModelType(j).FanEfficiency * AirDensity);
+                state.dataHeatBal->VentilationModelType(j).FanPower = VAMFL_temp * state.dataHeatBal->VentilationModelType(j).FanPressure /
+                                                                      (state.dataHeatBal->VentilationModelType(j).FanEfficiency * AirDensity);
                 if (state.dataHeatBal->VentilationModelType(j).FanType == DataHeatBalance::VentilationType::Balanced)
                     state.dataHeatBal->VentilationModelType(j).FanPower *= 2.0;
                 // calc electric
@@ -5452,8 +5461,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 } else {
                     if (state.dataHeatBal->VentilationModelType(j).FanPower > 0.0) {
                         if (state.dataHeatBal->VentilationModelType(j).FanType == DataHeatBalance::VentilationType::Balanced) {
-                            OutletAirEnthalpy =
-                                EnthalpyExt + state.dataHeatBal->VentilationModelType(j).FanPower / VAMFL_temp / 2.0; // Half fan power to calculate inlet T
+                            OutletAirEnthalpy = EnthalpyExt + state.dataHeatBal->VentilationModelType(j).FanPower / VAMFL_temp /
+                                                                  2.0; // Half fan power to calculate inlet T
                         } else {
                             OutletAirEnthalpy = EnthalpyExt + state.dataHeatBal->VentilationModelType(j).FanPower / VAMFL_temp;
                         }
@@ -6007,7 +6016,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
 
             if (SELECT_CASE_var == DataHeatBalance::InfiltrationModelType::DesignFlowRate) {
 
-                IVF = state.dataHeatBal->InfiltrationModelType(j).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->InfiltrationModelType(j).SchedPtr);
+                IVF = state.dataHeatBal->InfiltrationModelType(j).DesignLevel *
+                      GetCurrentScheduleValue(state, state.dataHeatBal->InfiltrationModelType(j).SchedPtr);
                 // CR6845 if calculated < 0.0, don't propagate
                 if (IVF < 0.0) IVF = 0.0;
                 MCpI_temp = IVF * AirDensity * CpAir *
@@ -6021,7 +6031,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (AdjustZoneInfiltrationFlowFlag && state.dataHeatBalFanSys->ZoneInfiltrationFlag(NZ)) {
                     if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                         // if ( Infiltration(j).MassFlowRate > 0.0 ) {
-                        state.dataHeatBal->InfiltrationModelType(j).VolumeFlowRate = state.dataHeatBal->InfiltrationModelType(j).MassFlowRate / AirDensity;
+                        state.dataHeatBal->InfiltrationModelType(j).VolumeFlowRate =
+                            state.dataHeatBal->InfiltrationModelType(j).MassFlowRate / AirDensity;
                         MCpI_temp = state.dataHeatBal->InfiltrationModelType(j).VolumeFlowRate * AirDensity * CpAir;
                         //}
                     }
@@ -6036,10 +6047,11 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             } else if (SELECT_CASE_var == DataHeatBalance::InfiltrationModelType::ShermanGrimsrud) {
                 // Sherman Grimsrud model as formulated in ASHRAE HoF
                 WindSpeedExt = state.dataEnvrn->WindSpeed; // formulated to use wind at Meterological Station rather than local
-                IVF = GetCurrentScheduleValue(state, state.dataHeatBal->InfiltrationModelType(j).SchedPtr) * state.dataHeatBal->InfiltrationModelType(j).LeakageArea /
-                      1000.0 *
-                      std::sqrt(state.dataHeatBal->InfiltrationModelType(j).BasicStackCoefficient * std::abs(TempExt - state.dataZoneEquip->ZMAT(NZ)) +
-                                state.dataHeatBal->InfiltrationModelType(j).BasicWindCoefficient * pow_2(WindSpeedExt));
+                IVF =
+                    GetCurrentScheduleValue(state, state.dataHeatBal->InfiltrationModelType(j).SchedPtr) *
+                    state.dataHeatBal->InfiltrationModelType(j).LeakageArea / 1000.0 *
+                    std::sqrt(state.dataHeatBal->InfiltrationModelType(j).BasicStackCoefficient * std::abs(TempExt - state.dataZoneEquip->ZMAT(NZ)) +
+                              state.dataHeatBal->InfiltrationModelType(j).BasicWindCoefficient * pow_2(WindSpeedExt));
                 if (IVF < 0.0) IVF = 0.0;
                 MCpI_temp = IVF * AirDensity * CpAir;
                 if (MCpI_temp < 0.0) MCpI_temp = 0.0;
@@ -6047,7 +6059,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (AdjustZoneInfiltrationFlowFlag && state.dataHeatBalFanSys->ZoneInfiltrationFlag(NZ)) {
                     if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                         if (state.dataHeatBal->InfiltrationModelType(j).MassFlowRate > 0.0) {
-                            state.dataHeatBal->InfiltrationModelType(j).VolumeFlowRate = state.dataHeatBal->InfiltrationModelType(j).MassFlowRate / AirDensity;
+                            state.dataHeatBal->InfiltrationModelType(j).VolumeFlowRate =
+                                state.dataHeatBal->InfiltrationModelType(j).MassFlowRate / AirDensity;
                             MCpI_temp = state.dataHeatBal->InfiltrationModelType(j).VolumeFlowRate * AirDensity * CpAir;
                         }
                     }
@@ -6062,12 +6075,14 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             } else if (SELECT_CASE_var == DataHeatBalance::InfiltrationModelType::AIM2) {
                 // Walker Wilson model as formulated in ASHRAE HoF
                 IVF = GetCurrentScheduleValue(state, state.dataHeatBal->InfiltrationModelType(j).SchedPtr) *
-                      std::sqrt(
-                          pow_2(state.dataHeatBal->InfiltrationModelType(j).FlowCoefficient * state.dataHeatBal->InfiltrationModelType(j).AIM2StackCoefficient *
-                                std::pow(std::abs(TempExt - state.dataZoneEquip->ZMAT(NZ)), state.dataHeatBal->InfiltrationModelType(j).PressureExponent)) +
-                          pow_2(state.dataHeatBal->InfiltrationModelType(j).FlowCoefficient * state.dataHeatBal->InfiltrationModelType(j).AIM2WindCoefficient *
-                                std::pow(state.dataHeatBal->InfiltrationModelType(j).ShelterFactor * WindSpeedExt,
-                                         2.0 * state.dataHeatBal->InfiltrationModelType(j).PressureExponent)));
+                      std::sqrt(pow_2(state.dataHeatBal->InfiltrationModelType(j).FlowCoefficient *
+                                      state.dataHeatBal->InfiltrationModelType(j).AIM2StackCoefficient *
+                                      std::pow(std::abs(TempExt - state.dataZoneEquip->ZMAT(NZ)),
+                                               state.dataHeatBal->InfiltrationModelType(j).PressureExponent)) +
+                                pow_2(state.dataHeatBal->InfiltrationModelType(j).FlowCoefficient *
+                                      state.dataHeatBal->InfiltrationModelType(j).AIM2WindCoefficient *
+                                      std::pow(state.dataHeatBal->InfiltrationModelType(j).ShelterFactor * WindSpeedExt,
+                                               2.0 * state.dataHeatBal->InfiltrationModelType(j).PressureExponent)));
                 if (IVF < 0.0) IVF = 0.0;
                 MCpI_temp = IVF * AirDensity * CpAir;
                 if (MCpI_temp < 0.0) MCpI_temp = 0.0;
@@ -6075,7 +6090,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (AdjustZoneInfiltrationFlowFlag && state.dataHeatBalFanSys->ZoneInfiltrationFlag(NZ)) {
                     if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                         if (state.dataHeatBal->InfiltrationModelType(j).MassFlowRate > 0.0) {
-                            state.dataHeatBal->InfiltrationModelType(j).VolumeFlowRate = state.dataHeatBal->InfiltrationModelType(j).MassFlowRate / AirDensity;
+                            state.dataHeatBal->InfiltrationModelType(j).VolumeFlowRate =
+                                state.dataHeatBal->InfiltrationModelType(j).MassFlowRate / AirDensity;
                             MCpI_temp = state.dataHeatBal->InfiltrationModelType(j).VolumeFlowRate * AirDensity * CpAir;
                         }
                     }

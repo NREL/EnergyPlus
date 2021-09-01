@@ -916,9 +916,9 @@ private:
     {
     public:
         InfiltrationModelType(std::shared_ptr<std::ostream> const &errorStream,
-                     std::shared_ptr<sqlite3> const &db,
-                     int const infiltrationNumber,
-                     DataHeatBalance::InfiltrationData const &infiltrationData)
+                              std::shared_ptr<sqlite3> const &db,
+                              int const infiltrationNumber,
+                              DataHeatBalance::InfiltrationData const &infiltrationData)
             : SQLiteData(errorStream, db), number(infiltrationNumber), name(infiltrationData.Name), zonePtr(infiltrationData.ZonePtr),
               schedPtr(infiltrationData.SchedPtr), designLevel(infiltrationData.DesignLevel)
         {
@@ -938,9 +938,9 @@ private:
     {
     public:
         VentilationModelType(std::shared_ptr<std::ostream> const &errorStream,
-                    std::shared_ptr<sqlite3> const &db,
-                    int const ventilationNumber,
-                    DataHeatBalance::VentilationData const &ventilationData)
+                             std::shared_ptr<sqlite3> const &db,
+                             int const ventilationNumber,
+                             DataHeatBalance::VentilationData const &ventilationData)
             : SQLiteData(errorStream, db), number(ventilationNumber), name(ventilationData.Name), zonePtr(ventilationData.ZonePtr),
               schedPtr(ventilationData.SchedPtr), designLevel(ventilationData.DesignLevel)
         {
