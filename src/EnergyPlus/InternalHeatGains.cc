@@ -8712,11 +8712,11 @@ namespace InternalHeatGains {
         return SumConvGainRateExceptPeople;
     }
 
-    Real64
-    SumInternalConvectionGainsByTypes(EnergyPlusData &state,
-                                      int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
-                                      const Array1D<DataHeatBalance::IntGainType> &GainTypeARR, // variable length 1-d array of enum valued gain types
-                                      int const spaceIndex)                                     // space index pointer, sum gains only for this space
+    Real64 SumInternalConvectionGainsByTypes(
+        EnergyPlusData &state,
+        int const ZoneNum,                                         // zone index pointer for which zone to sum gains for
+        gsl::span<const DataHeatBalance::IntGainType> GainTypeARR, // variable length 1-d array of enum valued gain types
+        int const spaceIndex)                                      // space index pointer, sum gains only for this space
     {
 
         // SUBROUTINE INFORMATION:
@@ -8729,13 +8729,13 @@ namespace InternalHeatGains {
         // Return value
         Real64 SumConvGainRate = 0.0;
 
-        int NumberOfTypes = size(GainTypeARR);
+        int NumberOfTypes = GainTypeARR.size();
 
         // TODO MJW: This could be refactored to avoid duplicate code, but for now . . . .
         if (spaceIndex > 0) {
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
-                for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompType == GainTypeARR(TypeNum)) {
+                for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                         SumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).ConvectGainRate;
                     }
                 }
@@ -8746,8 +8746,8 @@ namespace InternalHeatGains {
                     continue;
                 }
                 for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                    for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
-                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR(TypeNum)) {
+                    for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                             SumConvGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ConvectGainRate;
                         }
                     }
@@ -8792,8 +8792,8 @@ namespace InternalHeatGains {
 
     Real64 SumReturnAirConvectionGainsByTypes(
         EnergyPlusData &state,
-        int const ZoneNum,                                       // zone index pointer for which zone to sum gains for
-        const Array1D<DataHeatBalance::IntGainType> &GainTypeARR // variable length 1-d array of integer valued gain types
+        int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
+        gsl::span<const DataHeatBalance::IntGainType> GainTypeARR // variable length 1-d array of integer valued gain types
     )
     {
 
@@ -8807,7 +8807,7 @@ namespace InternalHeatGains {
         // Return value
         Real64 SumReturnAirGainRate(0.0);
 
-        int NumberOfTypes = size(GainTypeARR);
+        int NumberOfTypes = GainTypeARR.size();
 
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
@@ -8815,9 +8815,9 @@ namespace InternalHeatGains {
             }
 
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
+                for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
 
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR(TypeNum)) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                         SumReturnAirGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ReturnAirConvGainRate;
                     }
                 }
@@ -8856,9 +8856,9 @@ namespace InternalHeatGains {
 
     Real64
     SumInternalRadiationGainsByTypes(EnergyPlusData &state,
-                                     int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
-                                     const Array1D<DataHeatBalance::IntGainType> &GainTypeARR, // variable length 1-d array of enum valued gain types
-                                     int const spaceIndex)                                     // space index pointer, sum gains only for this space
+                                     int const ZoneNum,                                         // zone index pointer for which zone to sum gains for
+                                     gsl::span<const DataHeatBalance::IntGainType> GainTypeARR, // variable length 1-d array of enum valued gain types
+                                     int const spaceIndex)                                      // space index pointer, sum gains only for this space
     {
 
         // SUBROUTINE INFORMATION:
@@ -8871,13 +8871,13 @@ namespace InternalHeatGains {
         // Return value
         Real64 SumRadiationGainRate(0.0);
 
-        int NumberOfTypes = size(GainTypeARR);
+        int NumberOfTypes = GainTypeARR.size();
 
         // TODO MJW: This could be refactored to avoid duplicate code, but for now . . . .
         if (spaceIndex > 0) {
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
-                for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompType == GainTypeARR(TypeNum)) {
+                for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                         SumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).RadiantGainRate;
                     }
                 }
@@ -8888,8 +8888,8 @@ namespace InternalHeatGains {
                     continue;
                 }
                 for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                    for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
-                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR(TypeNum)) {
+                    for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                             SumRadiationGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).RadiantGainRate;
                         }
                     }
@@ -8953,9 +8953,9 @@ namespace InternalHeatGains {
 
     Real64
     SumInternalLatentGainsByTypes(EnergyPlusData &state,
-                                  int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
-                                  const Array1D<DataHeatBalance::IntGainType> &GainTypeARR, // variable length 1-d array of enum valued gain types
-                                  int const spaceIndex)                                     // space index pointer, sum gains only for this space
+                                  int const ZoneNum,                                         // zone index pointer for which zone to sum gains for
+                                  gsl::span<const DataHeatBalance::IntGainType> GainTypeARR, // variable length 1-d array of enum valued gain types
+                                  int const spaceIndex)                                      // space index pointer, sum gains only for this space
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
@@ -8967,13 +8967,13 @@ namespace InternalHeatGains {
         // Return value
         Real64 SumLatentGainRate(0.0);
 
-        int NumberOfTypes = size(GainTypeARR);
+        int NumberOfTypes = GainTypeARR.size();
 
         // TODO MJW: This could be refactored to avoid duplicate code, but for now . . . .
         if (spaceIndex > 0) {
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceIndex).numberOfDevices; ++DeviceNum) {
-                for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompType == GainTypeARR(TypeNum)) {
+                for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                         SumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceIndex).device(DeviceNum).LatentGainRate;
                     }
                 }
@@ -8984,8 +8984,8 @@ namespace InternalHeatGains {
                     continue;
                 }
                 for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                    for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
-                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR(TypeNum)) {
+                    for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
+                        if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                             SumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
                         }
                     }
@@ -9080,8 +9080,8 @@ namespace InternalHeatGains {
 
     Real64
     SumInternalCO2GainsByTypes(EnergyPlusData &state,
-                               int const ZoneNum,                                       // zone index pointer for which zone to sum gains for
-                               const Array1D<DataHeatBalance::IntGainType> &GainTypeARR // variable length 1-d array of integer valued gain types
+                               int const ZoneNum,                                        // zone index pointer for which zone to sum gains for
+                               gsl::span<const DataHeatBalance::IntGainType> GainTypeARR // variable length 1-d array of integer valued gain types
     )
     {
 
@@ -9095,7 +9095,7 @@ namespace InternalHeatGains {
         // Return value
         Real64 SumCO2GainRate(0.0);
 
-        int NumberOfTypes = size(GainTypeARR);
+        int NumberOfTypes = GainTypeARR.size();
 
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
@@ -9103,9 +9103,9 @@ namespace InternalHeatGains {
             }
 
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                for (int TypeNum = 1; TypeNum <= NumberOfTypes; ++TypeNum) {
+                for (int TypeNum = 0; TypeNum < NumberOfTypes; ++TypeNum) {
 
-                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR(TypeNum)) {
+                    if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == GainTypeARR[TypeNum]) {
                         SumCO2GainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CarbonDioxideGainRate;
                     }
                 }
