@@ -5274,15 +5274,15 @@ void CalcThermalResilience(EnergyPlusData &state)
     // then heat index is calculated and converted back to C.
     if (state.dataHeatBalSurfMgr->reportVarHeatIndex || state.dataOutRptTab->displayThermalResilienceSummary) {
         // Constance for heat index regression equation of Rothfusz.
-        Real64 const c1 = -42.379;
-        Real64 const c2 = 2.04901523;
-        Real64 const c3 = 10.14333127;
-        Real64 const c4 = -.22475541;
-        Real64 const c5 = -.00683783;
-        Real64 const c6 = -.05481717;
-        Real64 const c7 = .00122874;
-        Real64 const c8 = .00085282;
-        Real64 const c9 = -.00000199;
+        Real64 constexpr c1 = -42.379;
+        Real64 constexpr c2 = 2.04901523;
+        Real64 constexpr c3 = 10.14333127;
+        Real64 constexpr c4 = -.22475541;
+        Real64 constexpr c5 = -.00683783;
+        Real64 constexpr c6 = -.05481717;
+        Real64 constexpr c7 = .00122874;
+        Real64 constexpr c8 = .00085282;
+        Real64 constexpr c9 = -.00000199;
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             Real64 const ZoneT = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             Real64 const ZoneW = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
