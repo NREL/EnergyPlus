@@ -574,10 +574,12 @@ namespace HeatBalFiniteDiffManager {
         QHeatOutFlux.allocate(state.dataSurface->TotSurfaces);
 
         // And then initialize
-        QHeatInFlux = 0.0;
-        QHeatOutFlux = 0.0;
-        state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux = 0.0;
-        state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux = 0.0;
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            QHeatInFlux(SurfNum) = 0.0;
+            QHeatOutFlux(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum) = 0.0;
+            state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum) = 0.0;
+        }
 
         // Setup Output Variables
 
@@ -883,8 +885,8 @@ namespace HeatBalFiniteDiffManager {
                                 "CondFD Inner Solver Loop Iteration Count",
                                 OutputProcessor::Unit::None,
                                 SurfaceFD(SurfNum).GSloopCounter,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataSurface->Surface(SurfNum).Name);
 
             // Setup EMS Material Actuators
@@ -912,65 +914,65 @@ namespace HeatBalFiniteDiffManager {
                                     format("CondFD Surface Temperature Node {}", Lay),
                                     OutputProcessor::Unit::C,
                                     SurfaceFD(SurfNum).TDreport(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Surface Heat Flux Node {}", Lay),
                                     OutputProcessor::Unit::W_m2,
                                     SurfaceFD(SurfNum).QDreport(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change State {}", Lay),
                                     OutputProcessor::Unit::None,
                                     SurfaceFD(SurfNum).PhaseChangeState(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Previous State {}", Lay),
                                     OutputProcessor::Unit::None,
                                     SurfaceFD(SurfNum).PhaseChangeStateOld(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Temperature {}", Lay),
                                     OutputProcessor::Unit::C,
                                     SurfaceFD(SurfNum).TDT(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Conductivity {}", Lay),
                                     OutputProcessor::Unit::W_mK,
                                     SurfaceFD(SurfNum).condNodeReport(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Specific Heat {}", Lay),
                                     OutputProcessor::Unit::J_kgK,
                                     SurfaceFD(SurfNum).specHeatNodeReport(Lay),
-                                    "Zone",
-                                    "State",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     SetupOutputVariable(state,
                                         format("CondFD Surface Heat Capacitance Outer Half Node {}", Lay),
                                         OutputProcessor::Unit::W_m2K,
                                         SurfaceFD(SurfNum).CpDelXRhoS1(Lay),
-                                        "Zone",
-                                        "State",
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::State,
                                         state.dataSurface->Surface(SurfNum).Name);
                     SetupOutputVariable(state,
                                         format("CondFD Surface Heat Capacitance Inner Half Node {}", Lay),
                                         OutputProcessor::Unit::W_m2K,
                                         SurfaceFD(SurfNum).CpDelXRhoS2(Lay),
-                                        "Zone",
-                                        "State",
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::State,
                                         state.dataSurface->Surface(SurfNum).Name);
                 }
             }
@@ -1500,7 +1502,7 @@ namespace HeatBalFiniteDiffManager {
                 SurfaceFD(Surf).CpDelXRhoS2(i) = surfaceFDEBC.CpDelXRhoS1(TotNodesPlusOne); // Save this for computing node flux values
             }
 
-            Real64 const QNetSurfFromOutside(state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(surface_ExtBoundCond)); // filled in InteriorBCEqns
+            Real64 const QNetSurfFromOutside(state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surface_ExtBoundCond)); // filled in InteriorBCEqns
             //    QFluxOutsideToOutSurf(Surf)       = QnetSurfFromOutside
             state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf) = -QNetSurfFromOutside;
             state.dataHeatBalSurf->SurfOpaqOutFaceCond(Surf) = surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf);
@@ -2313,9 +2315,9 @@ namespace HeatBalFiniteDiffManager {
 
         Real64 const QNetSurfInside(-(QFac + hconvi * (-TDT_i + Tia)));
         //  Pass inside conduction Flux [W/m2] to DataHeatBalanceSurface array
-        state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(Surf) = QNetSurfInside;
+        state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(Surf) = QNetSurfInside;
         //  QFluxZoneToInSurf(Surf) = QNetSurfInside
-        state.dataHeatBalSurf->SurfOpaqInsFaceConduction(Surf) = QNetSurfInside * surface.Area; // for reporting as in CTF, PT
+        state.dataHeatBalSurf->SurfOpaqInsFaceCond(Surf) = QNetSurfInside * surface.Area; // for reporting as in CTF, PT
     }
 
     // todo - function not used
@@ -2482,7 +2484,7 @@ namespace HeatBalFiniteDiffManager {
         // so the arrays are all allocated to Totodes+1
 
         // Heat flux at the inside face node (TotNodes+1)
-        surfaceFD.QDreport(TotNodes + 1) = state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(Surf);
+        surfaceFD.QDreport(TotNodes + 1) = state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(Surf);
 
         // Heat flux for remaining nodes.
         for (node = TotNodes; node >= 1; --node) {

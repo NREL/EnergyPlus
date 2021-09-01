@@ -465,8 +465,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "Heating Coil Heating Energy",
                             OutputProcessor::Unit::J,
                             state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
                             _,
                             "ENERGYTRANSFER",
@@ -477,8 +477,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "Heating Coil Source Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
                             _,
                             "PLANTLOOPHEATINGDEMAND",
@@ -489,15 +489,15 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "Heating Coil Heating Rate",
                             OutputProcessor::Unit::W,
                             state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name);
         SetupOutputVariable(state,
                             "Heating Coil U Factor Times Area Value",
                             OutputProcessor::Unit::W_K,
                             state.dataWaterCoils->WaterCoil(CoilNum).UACoilVariable,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name);
     }
 
@@ -660,8 +660,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "Cooling Coil Total Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
                             _,
                             "ENERGYTRANSFER",
@@ -672,8 +672,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "Cooling Coil Source Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
                             _,
                             "PLANTLOOPCOOLINGDEMAND",
@@ -684,22 +684,22 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "Cooling Coil Sensible Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name);
         SetupOutputVariable(state,
                             "Cooling Coil Total Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name);
         SetupOutputVariable(state,
                             "Cooling Coil Sensible Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
         if (state.dataWaterCoils->WaterCoil(CoilNum).CondensateCollectMode == state.dataWaterCoils->CondensateToTank) {
@@ -708,15 +708,15 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                 "Cooling Coil Condensate Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Condensate Volume",
                                 OutputProcessor::Unit::m3,
                                 state.dataWaterCoils->WaterCoil(CoilNum).CondensateVol,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                 _,
                                 "OnSiteWater",
@@ -888,8 +888,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "Cooling Coil Total Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
                             _,
                             "ENERGYTRANSFER",
@@ -900,8 +900,8 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "Cooling Coil Source Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name,
                             _,
                             "PLANTLOOPCOOLINGDEMAND",
@@ -912,29 +912,29 @@ void GetWaterCoilInput(EnergyPlusData &state)
                             "Cooling Coil Sensible Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name);
         SetupOutputVariable(state,
                             "Cooling Coil Total Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name);
         SetupOutputVariable(state,
                             "Cooling Coil Sensible Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name);
         SetupOutputVariable(state,
                             "Cooling Coil Wetted Area Fraction",
                             OutputProcessor::Unit::None,
                             state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFraction,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
         if (state.dataWaterCoils->WaterCoil(CoilNum).CondensateCollectMode == state.dataWaterCoils->CondensateToTank) {
@@ -943,15 +943,15 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                 "Cooling Coil Condensate Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Condensate Volume",
                                 OutputProcessor::Unit::m3,
                                 state.dataWaterCoils->WaterCoil(CoilNum).CondensateVol,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                 _,
                                 "OnSiteWater",
@@ -2461,6 +2461,17 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             sizerCWDesWaterInTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
             state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp = sizerCWDesWaterInTemp.size(state, TempSize, ErrorsFound);
 
+            if ((state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp > state.dataSize->DataDesOutletAirTemp) &&
+                state.dataSize->DataDesOutletAirTemp > 0.0) {
+                ShowWarningError(state, "Invalid design inlet water temperature for " + std::string{CompType} + " = " + std::string{CompName});
+                ShowContinueError(state,
+                                  format("...design inlet water temperature = {:.3R} C", state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp));
+                ShowContinueError(state, format("...design outlet air temperature = {:.3R} C", state.dataSize->DataDesOutletAirTemp));
+                ShowContinueError(state, "...design inlet water temperature should be less than the design outlet air temperature");
+                ShowContinueError(state, "...design inlet water temperature is set to the design outlet air temperature minus 5.0C");
+                state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp = state.dataSize->DataDesOutletAirTemp - 5.0;
+            }
+
             if (state.dataSize->CurZoneEqNum > 0) { // zone equipment use air inlet humrat to calculate design outlet air temperature
                 if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;      // no field for detailed water coil, should print to eio anyway
@@ -2558,7 +2569,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
             if (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate <= 0.0) {
                 state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = 0.0;
-                ShowWarningError(state, "The design air flow rate is zero for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                ShowWarningError(state, "The design air flow rate is zero for " + std::string{CompType} + " = " + std::string{CompName});
                 ShowContinueError(state, "The autosize value for max air volume flow rate is zero");
             }
 
@@ -6976,8 +6987,8 @@ void SetWaterCoilData(EnergyPlusData &state,
                       int const CoilNum,                       // Number of hot water heating Coil
                       bool &ErrorsFound,                       // Set to true if certain errors found
                       Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-                      Optional_int DesiccantDehumIndex         // Index for the desiccant dehum system where this caoil is used
-)
+                      Optional_int DesiccantDehumIndex,        // Index for the desiccant dehum system where this caoil is used
+                      Optional_bool heatRecoveryCoil)          // true if water coil is connected to heat recovery loop
 {
 
     // FUNCTION INFORMATION:
@@ -7011,6 +7022,10 @@ void SetWaterCoilData(EnergyPlusData &state,
 
     if (present(DesiccantDehumIndex)) {
         state.dataWaterCoils->WaterCoil(CoilNum).DesiccantDehumNum = DesiccantDehumIndex;
+    }
+
+    if (present(heatRecoveryCoil)) {
+        state.dataWaterCoils->WaterCoil(CoilNum).heatRecoveryCoil = heatRecoveryCoil;
     }
 }
 

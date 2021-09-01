@@ -236,7 +236,7 @@ namespace EcoRoofManager {
                                         HMovInsul,
                                         RoughSurf,
                                         AbsThermSurf,
-                                        state.dataHeatBalSurf->TH(1, 1, SurfNum),
+                                        state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
                                         state.dataHeatBalSurf->SurfHcExt(SurfNum),
                                         state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
                                         state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
@@ -294,117 +294,132 @@ namespace EcoRoofManager {
 
             // DJS NOVEMBER 2010 - Make calls to SetupOutput Variable to allow for reporting of ecoroof variables
 
-            SetupOutputVariable(
-                state, "Green Roof Soil Temperature", OutputProcessor::Unit::C, state.dataEcoRoofMgr->Tg, "Zone", "State", "Environment");
-            SetupOutputVariable(
-                state, "Green Roof Vegetation Temperature", OutputProcessor::Unit::C, state.dataEcoRoofMgr->Tf, "Zone", "State", "Environment");
+            SetupOutputVariable(state,
+                                "Green Roof Soil Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEcoRoofMgr->Tg,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Green Roof Vegetation Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEcoRoofMgr->Tf,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Soil Root Moisture Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataEcoRoofMgr->MeanRootMoisture,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Soil Near Surface Moisture Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataEcoRoofMgr->Moisture,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Soil Sensible Heat Transfer Rate per Area",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataEcoRoofMgr->sensibleg,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Vegetation Sensible Heat Transfer Rate per Area",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataEcoRoofMgr->sensiblef,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Vegetation Moisture Transfer Rate",
                                 OutputProcessor::Unit::m_s,
                                 state.dataEcoRoofMgr->Vfluxf,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Soil Moisture Transfer Rate",
                                 OutputProcessor::Unit::m_s,
                                 state.dataEcoRoofMgr->Vfluxg,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Vegetation Latent Heat Transfer Rate per Area",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataEcoRoofMgr->Lf,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Soil Latent Heat Transfer Rate per Area",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataEcoRoofMgr->Lg,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
 
             SetupOutputVariable(state,
                                 "Green Roof Cumulative Precipitation Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CumPrecip,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Cumulative Irrigation Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CumIrrigation,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Green Roof Cumulative Runoff Depth", OutputProcessor::Unit::m, state.dataEcoRoofMgr->CumRunoff, "Zone", "Sum", "Environment");
+            SetupOutputVariable(state,
+                                "Green Roof Cumulative Runoff Depth",
+                                OutputProcessor::Unit::m,
+                                state.dataEcoRoofMgr->CumRunoff,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Cumulative Evapotranspiration Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CumET,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Current Precipitation Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CurrentPrecipitation,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Current Irrigation Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CurrentIrrigation,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Current Runoff Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CurrentRunoff,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Current Evapotranspiration Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CurrentET,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
 
             // DJS NOVEMBER 2010 - end of calls to setup output of ecoroof variables
@@ -736,7 +751,7 @@ namespace EcoRoofManager {
         } // if firstecosurface (if not we do NOT need to recalculate ecoroof energybalance as all ecoroof surfaces MUST be the same
         // this endif was moved here from the if statement regarding whether we are looking at the first ecoroof surface or not.
 
-        state.dataHeatBalSurf->TH(1, 1, SurfNum) = state.dataEcoRoofMgr->Tgold; // SoilTemperature
+        state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataEcoRoofMgr->Tgold; // SoilTemperature
         TempExt = state.dataEcoRoofMgr->Tgold;
     }
 

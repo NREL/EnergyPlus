@@ -394,16 +394,16 @@ TEST_F(EnergyPlusFixture, General_EpexpTest)
     y = epexp(x, d);
     EXPECT_EQ(0.0, y);
 
-    /*// Overflow and near-overflow tests (Not currently used in code)
-    x = 10.0;
-    d = 1.0;
-    y = epexpOverflow(x, d);
-    EXPECT_NEAR(22026.46579480, y, 0.00001);
-
-    x = 800.0;
-    d = 1.0;
-    y = epexpOverflow(x, d);
-    EXPECT_NEAR(1.0142320547350045e+304, y, 1.0E2);
-    */
+    //    /*// Overflow and near-overflow tests (Not currently used in code)
+    //    x = 10.0;
+    //    d = 1.0;
+    //    y = epexpOverflow(x, d);
+    //    EXPECT_NEAR(22026.46579480, y, 0.00001);
+    //
+    //    x = 800.0;
+    //    d = 1.0;
+    //    y = epexpOverflow(x, d);
+    //    EXPECT_NEAR(1.0142320547350045e+304, y, 1.0E2);
+    //    */
 }
 } // namespace EnergyPlus

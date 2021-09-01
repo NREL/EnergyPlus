@@ -206,7 +206,7 @@ namespace PluginManagement {
 
         static void updatePluginValues(EnergyPlusData &state);
 
-        static int getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &programName);
+        static int getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &_programName);
         static void runSingleUserDefinedPlugin(EnergyPlusData &state, int index);
         static bool anyUnexpectedPluginObjects(EnergyPlusData &state);
     };
