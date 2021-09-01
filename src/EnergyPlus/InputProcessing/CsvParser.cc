@@ -193,7 +193,7 @@ json CsvParser::parse_csv(std::string_view csv, size_t &index, bool &success)
                 for (int i = 0; i < num_columns; ++i) {
                     auto arr = std::vector<json>();
                     arr.reserve(8764 * 4);
-                    columns.push_back(std::move(arr));
+                    columns.push_back(arr);
                 }
 
                 if (has_header) {
