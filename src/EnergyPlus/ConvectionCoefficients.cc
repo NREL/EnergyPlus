@@ -3365,16 +3365,11 @@ void CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
 
     for (auto SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+            Real64 height = state.dataSurface->Surface(SurfNum).Height;
+            bool isWindow = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow;
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in =
                 [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
-                return CalcCeilingDiffuserIntConvCoeff(state,
-                                                       ACH,
-                                                       Tsurf,
-                                                       Tamb,
-                                                       cosTilt,
-                                                       AirHumRat,
-                                                       Surface(SurfNum).Height,
-                                                       state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow);
+                return CalcCeilingDiffuserIntConvCoeff(state, ACH, Tsurf, Tamb, cosTilt, AirHumRat, height, isWindow);
             };
         } else {
             state.dataHeatBalSurf->SurfHConvInt(SurfNum) =
