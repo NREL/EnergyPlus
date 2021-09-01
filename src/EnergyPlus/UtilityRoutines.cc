@@ -300,11 +300,11 @@ namespace UtilityRoutines {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        for (u_int Count = 0; Count < ListOfItems.size(); ++Count) {
+        for (size_t Count = 0; Count < ListOfItems.size(); ++Count) {
             if (InputString == ListOfItems[Count]) return Count;
         }
 
-        for (u_int Count = 0; Count < ListOfItems.size(); ++Count) {
+        for (size_t Count = 0; Count < ListOfItems.size(); ++Count) {
             if (equali(InputString, ListOfItems[Count])) return Count;
         }
         return 0; // Not found
