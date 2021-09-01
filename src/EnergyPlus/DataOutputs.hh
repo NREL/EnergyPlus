@@ -78,8 +78,8 @@ namespace DataOutputs {
         std::string const key;
         std::string const variableName;
         bool is_simple_string = true;
-        std::unique_ptr<RE2> pattern = nullptr;
-        std::unique_ptr<RE2> case_insensitive_pattern = nullptr;
+        std::shared_ptr<RE2> pattern = nullptr;
+        std::shared_ptr<RE2> case_insensitive_pattern = nullptr;
     };
 
     // Check if a KeyValue/VariableName is inside the map OutputVariablesForSimulation
