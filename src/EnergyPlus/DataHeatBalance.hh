@@ -1282,7 +1282,7 @@ namespace DataHeatBalance {
                                            // AdjustReturnThenMixing, None)        int InfiltrationTreatment;   // determines how infiltration is
                                            // treated for zone mass balance
         InfiltrationFlow InfiltrationTreatment;    // determines how infiltration is treated for zone mass balance
-        InfiltrationZoneType InfiltrationZoneType; // specifies which types of zones allow infiltration to be changed
+        InfiltrationZoneType InfiltrationForZones; // specifies which types of zones allow infiltration to be changed
         bool AdjustZoneMixingFlow;                 // used to adjust zone mixing air flows to enforce air flow balance
         bool AdjustZoneInfiltrationFlow;           // used to adjust zone infiltration air flows to enforce air flow balance
                                                    // Note, unique global object
@@ -1290,7 +1290,7 @@ namespace DataHeatBalance {
         // Default Constructor
         ZoneAirMassFlowConservation()
             : EnforceZoneMassBalance(false), ZoneFlowAdjustment(AdjustmentType::NoAdjustReturnAndMixing), InfiltrationTreatment(InfiltrationFlow::No),
-              InfiltrationZoneType(InfiltrationZoneType::Unassigned), AdjustZoneMixingFlow(false), AdjustZoneInfiltrationFlow(false)
+              InfiltrationForZones(InfiltrationZoneType::Unassigned), AdjustZoneMixingFlow(false), AdjustZoneInfiltrationFlow(false)
         {
         }
     };

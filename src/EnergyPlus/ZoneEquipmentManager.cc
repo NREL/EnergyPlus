@@ -4785,7 +4785,7 @@ void CalcZoneInfiltrationFlows(EnergyPlusData &state,
     if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::InfiltrationFlow::No) {
         if (state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr > 0) {
             if (state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone ||
-                (state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType == DataHeatBalance::InfiltrationZoneType::AllZones)) {
+                (state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones == DataHeatBalance::InfiltrationZoneType::AllZones)) {
                 ZoneInfiltrationMassFlowRate = state.dataHeatBal->MassConservation(ZoneNum).MixingSourceMassFlowRate -
                                                state.dataHeatBal->MassConservation(ZoneNum).MixingMassFlowRate +
                                                state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate + ZoneReturnAirMassFlowRate -
