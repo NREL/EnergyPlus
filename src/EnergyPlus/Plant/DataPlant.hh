@@ -110,7 +110,6 @@ namespace DataPlant {
     }
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
-    extern Array1D<LoopType> const ValidLoopEquipTypes;
 
     constexpr std::array<std::string_view, static_cast<int>(PlantEquipmentType::Num)> PlantEquipTypeNamesCC{
         "Invalid",
@@ -309,6 +308,21 @@ namespace DataPlant {
         "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",
         "HEATPUMP:PLANTLOOP:EIR:COOLING",
         "HEATPUMP:PLANTLOOP:EIR:HEATING"};
+
+    constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
+        LoopType::Unassigned, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant,
+        LoopType::Plant,      LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant,
+        LoopType::Plant,      LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,
+        LoopType::Both,       LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,
+        LoopType::Both,       LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant,
+        LoopType::Plant,      LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
+        LoopType::Plant,      LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,
+        LoopType::Both,       LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant,
+        LoopType::Plant,      LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
+        LoopType::Plant,      LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
+        LoopType::Both,       LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant,
+        LoopType::Both,       LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,
+        LoopType::Both};
 
     extern Array1D<Real64> const ConvergenceHistoryARR;
 

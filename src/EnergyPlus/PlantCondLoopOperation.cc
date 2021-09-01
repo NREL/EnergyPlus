@@ -1990,7 +1990,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         this_equip.BranchNumPtr = BranchNum;
                         this_equip.CompNumPtr = CompNum;
 
-                        if (ValidLoopEquipTypes(static_cast<int>(ThisType)) == LoopType::Plant && this_plant_loop.TypeOfLoop == LoopType::Condenser) {
+                        if (ValidLoopEquipTypes[static_cast<int>(ThisType)] == LoopType::Plant && this_plant_loop.TypeOfLoop == LoopType::Condenser) {
                             ShowSevereError(state,
                                             "InitLoadDistribution: CondenserLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
                                                 this_plant_loop.OperationScheme + "\",");
@@ -2003,7 +2003,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                             ShowContinueError(state, "Component name = " + this_equip.Name);
                             errFlag2 = true;
                         }
-                        if (ValidLoopEquipTypes(static_cast<int>(ThisType)) == LoopType::Condenser && this_plant_loop.TypeOfLoop == LoopType::Plant) {
+                        if (ValidLoopEquipTypes[static_cast<int>(ThisType)] == LoopType::Condenser && this_plant_loop.TypeOfLoop == LoopType::Plant) {
                             ShowSevereError(state,
                                             "InitLoadDistribution: PlantLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
                                                 this_plant_loop.OperationScheme + "\",");
