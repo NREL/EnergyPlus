@@ -3365,16 +3365,11 @@ void CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
 
     for (auto SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+            Real64 height = state.dataSurface->Surface(SurfNum).Height;
+            bool isWindow = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow;
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in =
                 [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
-                return CalcCeilingDiffuserIntConvCoeff(state,
-                                                       ACH,
-                                                       Tsurf,
-                                                       Tamb,
-                                                       cosTilt,
-                                                       AirHumRat,
-                                                       Surface(SurfNum).Height,
-                                                       state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow);
+                return CalcCeilingDiffuserIntConvCoeff(state, ACH, Tsurf, Tamb, cosTilt, AirHumRat, height, isWindow);
             };
         } else {
             state.dataHeatBalSurf->SurfHConvInt(SurfNum) =
@@ -4858,6 +4853,9 @@ void ManageInsideAdaptiveConvectionAlgo(EnergyPlusData &state, int const SurfNum
     //  TODO: candidate for rework to do zone level calcs once rather than for each surface
     DynamicIntConvSurfaceClassification(state, SurfNum);
 
+    // Set report var after surface has been classified successfully
+    state.dataSurface->SurfIntConvClassificationRpt(SurfNum) = static_cast<int>(state.dataSurface->SurfIntConvClassification(SurfNum));
+
     // simple worker routine takes surface classification and fills in model to use (IntConvHcModelEq) for that surface
     MapIntConvClassificationToHcModels(state, SurfNum);
 
@@ -4884,6 +4882,9 @@ void ManageOutsideAdaptiveConvectionAlgo(EnergyPlusData &state,
     //   It calls a series of separable worker routines
 
     DynamicExtConvSurfaceClassification(state, SurfNum);
+
+    // Set report var after surface has been classified successfully
+    state.dataSurface->SurfOutConvClassificationRpt(SurfNum) = static_cast<int>(state.dataSurface->SurfOutConvClassification(SurfNum));
 
     MapExtConvClassificationToHcModels(state, SurfNum);
 
