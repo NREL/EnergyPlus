@@ -126,6 +126,8 @@ namespace DataPlant {
         void simulate(EnergyPlusData &state, bool FirstHVACIteration);
 
         bool isPump();
+
+        void oneTimeInit(EnergyPlusData &state) const;
     };
 } // namespace DataPlant
 } // namespace EnergyPlus

@@ -909,7 +909,7 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
     }
 }
 
-void PipeHTData::oneTimeInit(EnergyPlusData &state)
+void PipeHTData::oneTimeInit_new(EnergyPlusData &state)
 {
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(
@@ -966,12 +966,6 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
     state.dataPipeHT->nsvOutletNodeNum = this->OutletNodeNum;
     state.dataPipeHT->nsvMassFlowRate = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRate;
     state.dataPipeHT->nsvInletTemp = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Temp;
-
-    // get some data only once
-    if (this->OneTimeInit) {
-        this->oneTimeInit(state);
-        this->OneTimeInit = false;
-    }
 
     // initialize temperatures by inlet node temp
     if ((state.dataGlobal->BeginSimFlag && this->BeginSimInit) || (state.dataGlobal->BeginEnvrnFlag && this->BeginSimEnvrn)) {
@@ -1993,6 +1987,10 @@ Real64 PipeHTData::TBND(EnergyPlusData &state,
     TBND = this->groundTempModel->getGroundTempAtTimeInSeconds(state, z, curSimTime);
 
     return TBND;
+}
+
+void PipeHTData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 //===============================================================================
