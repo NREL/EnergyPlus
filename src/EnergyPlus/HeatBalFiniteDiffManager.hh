@@ -75,8 +75,14 @@ namespace HeatBalFiniteDiffManager {
     {
         Unassigned = -1,
         CrankNicholsonSecondOrder, // original CondFD scheme.  semi implicit, second order in time
-        FullyImplicitFirstOrder    // fully implicit scheme, first order in time.
+        FullyImplicitFirstOrder,   // fully implicit scheme, first order in time.
+        NUM
     };
+
+    constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::NUM)> CondFDSchemeTypeNamesCC = {
+        "CrankNicholsonSecondOrder", "FullyImplicitFirstOrder"};
+    constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::NUM)> CondFDSchemeTypeNamesUC = {
+        "CRANKNICHOLSONSECONDORDER", "FULLYIMPLICITFIRSTORDER"};
 
     struct ConstructionDataFD
     {
@@ -299,8 +305,6 @@ namespace HeatBalFiniteDiffManager {
 
 struct HeatBalFiniteDiffMgr : BaseGlobalStruct
 {
-    std::array<std::string_view, 2> const cCondFDSchemeType = {"CrankNicholsonSecondOrder", "FullyImplicitFirstOrder"};
-
     Array1D<Real64> SigmaR; // Total Resistance of construction layers
     Array1D<Real64> SigmaC; // Total Capacitance of construction layers
 

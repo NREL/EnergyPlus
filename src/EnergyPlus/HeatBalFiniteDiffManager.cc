@@ -180,12 +180,9 @@ namespace HeatBalFiniteDiffManager {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(1)) {
 
                 {
-                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(1));
-
-                    if (SELECT_CASE_var == "CRANKNICHOLSONSECONDORDER") {
-                        state.dataHeatBalFiniteDiffMgr->CondFDSchemeType = CondFDScheme::CrankNicholsonSecondOrder;
-                    } else if (SELECT_CASE_var == "FULLYIMPLICITFIRSTORDER") {
-                        state.dataHeatBalFiniteDiffMgr->CondFDSchemeType = CondFDScheme::FullyImplicitFirstOrder;
+                    int SchemeTypeNum = getEnumerationValue(CondFDSchemeTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1));
+                    if (SchemeTypeNum >= 0) {
+                        state.dataHeatBalFiniteDiffMgr->CondFDSchemeType = static_cast<CondFDScheme>(SchemeTypeNum);
                     } else {
                         ShowSevereError(state,
                                         cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) +
@@ -1222,7 +1219,7 @@ namespace HeatBalFiniteDiffManager {
               "Temperature Convergence Criteria\n");
         print(state.files.eio,
               " ConductionFiniteDifference HeatBalanceSettings,{},{:.2R},{:.2R},{:.4R}\n",
-              state.dataHeatBalFiniteDiffMgr->cCondFDSchemeType[static_cast<int>(state.dataHeatBalFiniteDiffMgr->CondFDSchemeType)],
+              CondFDSchemeTypeNamesCC[static_cast<int>(state.dataHeatBalFiniteDiffMgr->CondFDSchemeType)],
               state.dataHeatBalFiniteDiffMgr->SpaceDescritConstant,
               state.dataHeatBal->CondFDRelaxFactorInput,
               state.dataHeatBal->MaxAllowedDelTempCondFD);
