@@ -2792,8 +2792,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
 
     state->dataHeatBalFanSys->ZoneLightingLevelHourBins.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneLightingLevelOccuHourBins.allocate(state->dataGlobal->NumOfZones);
-    state->dataDaylightingData->daylightControl.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->totDaylightingControls = state->dataGlobal->NumOfZones;
+    state->dataDaylightingData->daylightControl.allocate(state->dataDaylightingData->totDaylightingControls);
     state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
+    state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 1;
+    state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
     state->dataDaylightingData->daylightControl(1).DaylIllumAtRefPt.allocate(1);
     state->dataDaylightingData->daylightControl(1).IllumSetPoint.allocate(1);
     state->dataDaylightingData->daylightControl(1).PowerReductionFactor = 0.5;

@@ -1165,7 +1165,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
             if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
                 ISunPos = 0;
                 for (IHR = 1; IHR <= 24; ++IHR) {
-                    FigureRefPointDayltgFactorsToAddIllums(state, daylightCtrlNum, ILB, IHR, ISunPos, IWin, loopwin, NWX, NWY, ICtrl);
+                    FigureRefPointDayltgFactorsToAddIllums(state, thisDaylightControl.enclIndex, ILB, IHR, ISunPos, IWin, loopwin, NWX, NWY, ICtrl);
 
                 } // End of sun position loop, IHR
             } else {
@@ -1181,7 +1181,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
                     ISunPos = -1;
                 }
                 FigureRefPointDayltgFactorsToAddIllums(
-                    state, daylightCtrlNum, ILB, state.dataGlobal->HourOfDay, ISunPos, IWin, loopwin, NWX, NWY, ICtrl);
+                    state, thisDaylightControl.enclIndex, ILB, state.dataGlobal->HourOfDay, ISunPos, IWin, loopwin, NWX, NWY, ICtrl);
             }
         } // End of window loop, loopwin - IWin
 
@@ -7227,6 +7227,7 @@ void DayltgElecLightingControl(EnergyPlusData &state)
         if (thisDaylightControl.DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) continue;
 
         TotReduction = 0.0;
+        ZFTOT = 0.0;
         //  ScheduledAvailable = .TRUE.
 
         // check if scheduled to be available
@@ -10199,6 +10200,7 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
     enclExtWin.dimension(state.dataViewFactor->NumOfSolarEnclosures, 0);
 
     for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+        enclExtWin(enclNum) = 0;
         if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
         if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;

@@ -1025,6 +1025,10 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
 
     state->dataGlobal->NumOfZones = zn;
     state->dataDaylightingData->daylightControl.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->enclDaylight.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->enclDaylight(zn).daylightControlIndexes.emplace_back(1);
+    state->dataHeatBal->Zone.allocate(zn);
+    state->dataHeatBal->Zone(zn).zoneFirstSpaceSolEnclosure = 1;
 
     CreateShadeDeploymentOrder(*state, zn);
 

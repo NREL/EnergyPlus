@@ -5557,12 +5557,12 @@ void ReportVisualResilience(EnergyPlusData &state)
             if (thisDaylightControl.PowerReductionFactor > 0) {
                 for (int refPt = 1; refPt <= thisDaylightControl.TotalDaylRefPoints; ++refPt) {
                     state.dataDaylightingData->ZoneDaylight(thisDaylightControl.zoneIndex).zoneAvgIllumSum +=
-                        thisDaylightControl.DaylIllumAtRefPt(refPt);
+                        thisDaylightControl.IllumSetPoint(refPt);
                 }
             } else {
                 for (int refPt = 1; refPt <= thisDaylightControl.TotalDaylRefPoints; ++refPt) {
                     state.dataDaylightingData->ZoneDaylight(thisDaylightControl.zoneIndex).zoneAvgIllumSum +=
-                        thisDaylightControl.IllumSetPoint(refPt);
+                        thisDaylightControl.DaylIllumAtRefPt(refPt);
                 }
             }
         }
