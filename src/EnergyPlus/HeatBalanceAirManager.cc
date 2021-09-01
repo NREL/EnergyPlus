@@ -574,12 +574,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
 
         {
-            auto const SELECT_CASE_var(cAlphaArgs(3)); // Aie balance method type character input-->convert to integer
-            if (SELECT_CASE_var == "QUADRATURE") {
-                state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::Quadrature;
-            } else if (SELECT_CASE_var == "NONE") {
-                state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
-            } else {
+            state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod =
+                static_cast<AirBalance>(getEnumerationValue(DataHeatBalance::AirBalanceTypeNamesUC, cAlphaArgs(3))); // Air balance method type character input-->convert to integer
+            if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Unassigned) {
                 state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
                 ShowWarningError(state,
                                  std::string{RoutineName} + cAlphaFieldNames(3) + " = " + cAlphaArgs(3) + " not valid choice for " +

@@ -317,6 +317,9 @@ namespace DataHeatBalance {
         NUM
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AirBalance::NUM)> AirBalanceTypeNamesUC = {
+        "NONE","QUADRATURE"};
+
     constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> IntGainTypeNamesUC = {
         "PEOPLE",
         "LIGHTS",
