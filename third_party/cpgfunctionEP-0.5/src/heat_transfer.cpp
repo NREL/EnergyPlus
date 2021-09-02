@@ -131,10 +131,10 @@ namespace gt::heat_transfer {
         // lower bound of integration
         double a = double(1.) / sqrt(double(4.) * alpha * time_);
         // Evaluate the integral using Gauss-Kronrod
-        double result;
+        double result=0.;
         // result = Kronrod_integrate(_Ils, a, INF)
 
-        return 0.;
+        return result;
     } // void finite_line_source
 
 } // namespace gt::heat_transfer
