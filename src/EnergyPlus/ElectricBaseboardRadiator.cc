@@ -1071,7 +1071,7 @@ namespace ElectricBaseboardRadiator {
 
         // Initialize arrays
         state.dataHeatBalFanSys->SurfQElecBaseboard = 0.0;
-        state.dataHeatBalFanSys->SurfQElecBaseboardToPerson = 0.0;
+        state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson = 0.0;
 
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
         for (BaseboardNum = 1; BaseboardNum <= state.dataElectBaseboardRad->NumElecBaseboards; ++BaseboardNum) {
@@ -1079,7 +1079,7 @@ namespace ElectricBaseboardRadiator {
             if (ElecBaseboard(BaseboardNum).ZonePtr >
                 0) { // issue 5806 can be zero during first calls to baseboards, will be set after all are modeled
                 ZoneNum = ElecBaseboard(BaseboardNum).ZonePtr;
-                state.dataHeatBalFanSys->SurfQElecBaseboardToPerson(ZoneNum) +=
+                state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson(ZoneNum) +=
                     state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum) * ElecBaseboard(BaseboardNum).FracDistribPerson;
 
                 for (RadSurfNum = 1; RadSurfNum <= ElecBaseboard(BaseboardNum).TotSurfToDistrib; ++RadSurfNum) {

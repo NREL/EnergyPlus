@@ -104,12 +104,12 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<Real64> SumLatentHTRadSys;           // Sum of latent gains from hi temp radiant heaters
     Array1D<Real64> SumConvPool;                 // Sum of convection to zone air from pools
     Array1D<Real64> SumLatentPool;               // Sum of latent gains from pools
-    Array1D<Real64> SurfQdotRadHVACToPerson;     // Sum of radiant gains to people from all radiant HVAC sources
-    Array1D<Real64> SurfQHTRadSysToPerson;       // Sum of radiant gains to people from hi temp radiant heaters
-    Array1D<Real64> SurfQHWBaseboardToPerson;    // Sum of radiant gains to people from hot water baseboard heaters
-    Array1D<Real64> SurfQSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
-    Array1D<Real64> SurfQElecBaseboardToPerson;  // Sum of radiant gains to people from electric baseboard heaters
-    Array1D<Real64> SurfQCoolingPanelToPerson;   // Sum of radiant losses to people from cooling panels
+    Array1D<Real64> ZoneQdotRadHVACToPerson;     // Sum of radiant gains to people from all radiant HVAC sources
+    Array1D<Real64> ZoneQHTRadSysToPerson;       // Sum of radiant gains to people from hi temp radiant heaters
+    Array1D<Real64> ZoneQHWBaseboardToPerson;    // Sum of radiant gains to people from hot water baseboard heaters
+    Array1D<Real64> ZoneQSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
+    Array1D<Real64> ZoneQElecBaseboardToPerson;  // Sum of radiant gains to people from electric baseboard heaters
+    Array1D<Real64> ZoneQCoolingPanelToPerson;   // Sum of radiant losses to people from cooling panels
     // Zone air drybulb conditions variables
     Array1D<Real64> ZTAV;         // Zone Air Temperature Averaged over the Zone Time step
     Array1D<Real64> MAT;          // MEAN AIR TEMPERATURE (C)
@@ -281,12 +281,12 @@ struct HeatBalFanSysData : BaseGlobalStruct
         this->SumLatentHTRadSys.deallocate();
         this->SumConvPool.deallocate();
         this->SumLatentPool.deallocate();
-        this->SurfQdotRadHVACToPerson.deallocate();
-        this->SurfQHTRadSysToPerson.deallocate();
-        this->SurfQHWBaseboardToPerson.deallocate();
-        this->SurfQSteamBaseboardToPerson.deallocate();
-        this->SurfQElecBaseboardToPerson.deallocate();
-        this->SurfQCoolingPanelToPerson.deallocate();
+        this->ZoneQdotRadHVACToPerson.deallocate();
+        this->ZoneQHTRadSysToPerson.deallocate();
+        this->ZoneQHWBaseboardToPerson.deallocate();
+        this->ZoneQSteamBaseboardToPerson.deallocate();
+        this->ZoneQElecBaseboardToPerson.deallocate();
+        this->ZoneQCoolingPanelToPerson.deallocate();
         this->ZTAV.deallocate();
         this->MAT.deallocate();
         this->TempTstatAir.deallocate();

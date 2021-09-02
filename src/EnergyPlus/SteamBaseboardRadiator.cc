@@ -1519,7 +1519,7 @@ namespace SteamBaseboardRadiator {
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
         state.dataHeatBalFanSys->SurfQSteamBaseboard = 0.0;
-        state.dataHeatBalFanSys->SurfQSteamBaseboardToPerson = 0.0;
+        state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson = 0.0;
 
         for (BaseboardNum = 1; BaseboardNum <= state.dataSteamBaseboardRadiator->NumSteamBaseboards; ++BaseboardNum) {
 
@@ -1527,7 +1527,7 @@ namespace SteamBaseboardRadiator {
             SteamBaseboardDesignData SteamBaseboardDesignDataObject{
                 state.dataSteamBaseboardRadiator->SteamBaseboardDesign(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum)
                                                                            .DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
-            state.dataHeatBalFanSys->SurfQSteamBaseboardToPerson(ZoneNum) +=
+            state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson(ZoneNum) +=
                 state.dataSteamBaseboardRadiator->QBBSteamRadSource(BaseboardNum) * SteamBaseboardDesignDataObject.FracDistribPerson;
 
             for (RadSurfNum = 1; RadSurfNum <= state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib; ++RadSurfNum) {

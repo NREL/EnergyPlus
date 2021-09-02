@@ -1697,7 +1697,7 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
 
     // Initialize arrays
     state.dataHeatBalFanSys->SurfQCoolingPanel = 0.0;
-    state.dataHeatBalFanSys->SurfQCoolingPanelToPerson = 0.0;
+    state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson = 0.0;
 
     for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
 
@@ -1705,7 +1705,7 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
 
         ZoneNum = ThisCP.ZonePtr;
         if (ZoneNum <= 0) continue;
-        state.dataHeatBalFanSys->SurfQCoolingPanelToPerson(ZoneNum) +=
+        state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson(ZoneNum) +=
             state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribPerson;
 
         for (RadSurfNum = 1; RadSurfNum <= ThisCP.TotSurfToDistrib; ++RadSurfNum) {

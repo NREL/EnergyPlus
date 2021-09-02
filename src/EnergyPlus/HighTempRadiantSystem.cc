@@ -1325,13 +1325,13 @@ namespace HighTempRadiantSystem {
         state.dataHeatBalFanSys->SumConvHTRadSys = 0.0;
         state.dataHeatBalFanSys->SumLatentHTRadSys = 0.0;
         state.dataHeatBalFanSys->SurfQHTRadSys = 0.0;
-        state.dataHeatBalFanSys->SurfQHTRadSysToPerson = 0.0;
+        state.dataHeatBalFanSys->ZoneQHTRadSysToPerson = 0.0;
 
         for (RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
 
             ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
 
-            state.dataHeatBalFanSys->SurfQHTRadSysToPerson(ZoneNum) = state.dataHighTempRadSys->QHTRadSource(RadSysNum) *
+            state.dataHeatBalFanSys->ZoneQHTRadSysToPerson(ZoneNum) = state.dataHighTempRadSys->QHTRadSource(RadSysNum) *
                                                                       state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
                                                                       state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribPerson;
 
@@ -1374,14 +1374,14 @@ namespace HighTempRadiantSystem {
         }
 
         // Here an assumption is made regarding radiant heat transfer to people.
-        // While the QHTRadSysToPerson array will be used by the thermal comfort
+        // While the ZoneQHTRadSysToPerson array will be used by the thermal comfort
         // routines, the energy transfer to people would get lost from the perspective
         // of the heat balance.  So, to avoid this net loss of energy which clearly
         // gets added to the zones, we must account for it somehow.  This assumption
         // that all energy radiated to people is converted to convective energy is
         // not very precise, but at least it conserves energy.
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) += state.dataHeatBalFanSys->SurfQHTRadSysToPerson(ZoneNum);
+            state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) += state.dataHeatBalFanSys->ZoneQHTRadSysToPerson(ZoneNum);
         }
     }
 
