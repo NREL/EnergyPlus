@@ -3,7 +3,10 @@
 //
 
 #include <LU-Decomposition/lu.h>
+#include <cmath>
+#include <stdexcept>
 
+using namespace std;
 
 void jcc::decomposition(vector<vector<double> > &A, int &n, vector<int> &indx,
                    double &d) {
@@ -16,7 +19,7 @@ void jcc::decomposition(vector<vector<double> > &A, int &n, vector<int> &indx,
     for (i=0; i<n;i++){  // loop over rows to get implicit scaling formation
         big = 0.0;
         for (j=0; j<n;j++) {
-            if (fabs(A[i][j]) > big) big = fabs(A[i][j]);
+            if (abs(A[i][j]) > big) big = abs(A[i][j]);
         } // next j
         if (big == 0.0) throw invalid_argument("Singular matrix in routine "
                                                "decomposition");
@@ -35,8 +38,8 @@ void jcc::decomposition(vector<vector<double> > &A, int &n, vector<int> &indx,
             sum = A[i][j];
             for (k=0; k<j;k++) sum -= A[i][k] * A[k][j];
             A[i][j] = sum;
-            if (fabs(sum) >= big) {
-                big = fabs(sum);
+            if (abs(sum) >= big) {
+                big = abs(sum);
                 imax = i;
             } // end if()
         } // next i

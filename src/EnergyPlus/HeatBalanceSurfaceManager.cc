@@ -2026,7 +2026,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Surface Inside Face Convection Classification Index",
                             OutputProcessor::Unit::None,
-                            state.dataSurface->SurfIntConvClassification(loop),
+                            state.dataSurface->SurfIntConvClassificationRpt(loop),
                             OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Average,
                             Surface(loop).Name);
@@ -2048,7 +2048,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Outside Face Convection Classification Index",
                                 OutputProcessor::Unit::None,
-                                state.dataSurface->SurfOutConvClassification(loop),
+                                state.dataSurface->SurfOutConvClassificationRpt(loop),
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
                                 Surface(loop).Name);
@@ -5637,6 +5637,7 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                 state.dataOutRptTab->feneSolarRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, SurfNum) =
                     state.dataHeatBalSurf->QdotRadSolarInRep(SurfNum);
             }
+
             // inside face conduction updates
             state.dataHeatBalSurf->SurfOpaqInsFaceCondEnergy(SurfNum) =
                 state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum) * state.dataGlobal->TimeStepZoneSec;

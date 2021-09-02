@@ -977,18 +977,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                 }
 
                 Real64 initDeepGroundDepth = fnd.deepGroundDepth;
-                for (auto &block : fnd.inputBlocks) {
-                    // Change temporary zero depth indicators to default foundation depth
-                    if (block.depth == 0.0) {
-                        block.depth = fnd.foundationDepth;
-                    }
-                    if (settings.deepGroundBoundary == Settings::AUTO) {
-                        // Ensure automatically set deep ground depth is at least 1 meater below lowest block
-                        if (block.z + block.depth + 1.0 > fnd.deepGroundDepth) {
-                            fnd.deepGroundDepth = block.z + block.depth + 1.0;
-                        }
-                    }
-                }
+                fnd.deepGroundDepth = getDeepGroundDepth(fnd);
 
                 if (fnd.deepGroundDepth > initDeepGroundDepth) {
                     ShowWarningError(state,
@@ -1113,6 +1102,27 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
     }
 
     return ErrorsFound;
+}
+
+Real64 KivaManager::getDeepGroundDepth(Kiva::Foundation fnd)
+{
+    Real64 totalDepthOfWallBelowGrade = fnd.wall.depthBelowSlab + (fnd.foundationDepth - fnd.wall.heightAboveGrade) + fnd.slab.totalWidth();
+    if (fnd.deepGroundDepth < totalDepthOfWallBelowGrade + 1.0) {
+        fnd.deepGroundDepth = totalDepthOfWallBelowGrade + 1.0;
+    }
+    for (auto &block : fnd.inputBlocks) {
+        // Change temporary zero depth indicators to default foundation depth
+        if (block.depth == 0.0) {
+            block.depth = fnd.foundationDepth;
+        }
+        if (settings.deepGroundBoundary == Settings::AUTO) {
+            // Ensure automatically set deep ground depth is at least 1 meter below lowest block
+            if (block.z + block.depth + 1.0 > fnd.deepGroundDepth) {
+                fnd.deepGroundDepth = block.z + block.depth + 1.0;
+            }
+        }
+    }
+    return fnd.deepGroundDepth;
 }
 
 void KivaManager::initKivaInstances(EnergyPlusData &state)
