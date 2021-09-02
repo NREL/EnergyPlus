@@ -281,4 +281,28 @@ TEST_F(EnergyPlusFixture, OpaqueSkyCover_InterpretWeatherMissingOpaqueSkyCover)
     EXPECT_NEAR(expected_ESky, km.kivaWeather.skyEmissivity[0], 0.01);
 }
 
+TEST_F(EnergyPlusFixture, HeatBalanceKiva_DeepGroundDepthCheck)
+{
+
+    // Create Kiva foundation and set parameters
+    Kiva::Foundation fnd;
+
+    fnd.wall.heightAboveGrade = 0.1;
+    fnd.wall.depthBelowSlab = 0.2;
+    fnd.foundationDepth = 10.0;
+
+    // Initial deep ground depth is less than the depth of the wall below grade
+    fnd.deepGroundDepth = 5.0;
+    Real64 initDeepGroundDepth = fnd.deepGroundDepth;
+
+    HeatBalanceKivaManager::KivaManager km;
+    fnd.deepGroundDepth = km.getDeepGroundDepth(fnd);
+
+    // Deep ground depth is modified to 1.0m below the depth of the wall below grade
+    Real64 totalDepthOfWallBelowGrade = fnd.wall.depthBelowSlab + (fnd.foundationDepth - fnd.wall.heightAboveGrade) + fnd.slab.totalWidth();
+    Real64 expectedValue = totalDepthOfWallBelowGrade + 1.0;
+    EXPECT_NE(initDeepGroundDepth, fnd.deepGroundDepth);
+    EXPECT_EQ(expectedValue, fnd.deepGroundDepth);
+}
+
 } // namespace EnergyPlus

@@ -2350,6 +2350,9 @@ namespace PlantPipingSystemsManager {
     void Circuit::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
     {
     }
+    void Circuit::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
     bool Domain::IsConverged_CurrentToPrevIteration()
     {
@@ -2965,7 +2968,7 @@ namespace PlantPipingSystemsManager {
 
             // Create Y-direction partitions
 
-            CellWidth = this->VertInsThickness;
+            CellWidth = this->HorizInsThickness;
 
             // Partition at bottom edge of vertical insulation, if vertical insulation present
             if (this->VertInsPresentFlag) {
