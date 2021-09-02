@@ -7115,7 +7115,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                                            // conduction from the outside surface | Coefficient for conduction (current
                                                            // time) | Convection and damping term
 
-                Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum)));
+                Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann *
+                                          pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum) + DataGlobalConstants::KelvinConv));
 
                 // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                 state.dataSurface->SurfWinHeatGain(SurfNum) =
@@ -7826,7 +7827,8 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                                                // conduction from the outside surface | Coefficient for conduction (current
                                                                // time) | Convection and damping term
 
-                    Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum)));
+                    Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann *
+                                              pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum) + DataGlobalConstants::KelvinConv));
 
                     // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                     state.dataSurface->SurfWinHeatGain(surfNum) =
