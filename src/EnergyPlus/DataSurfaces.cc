@@ -634,16 +634,10 @@ void SetSurfaceWindSpeedAt(EnergyPlusData &state)
             state.dataSurface->SurfOutWindSpeed(SurfNum) = state.dataEnvrn->WindSpeed;
         }
     } else {
-        //        Real64 SurfCentroidZPrev = 0.0;   // Surface centroid z coordinated used by the previous surface in loop
-        //        Real64 WindSpeedPrev = 0.0;       // Wind Speed calculated by the previous surface in loop
 
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
             if (!state.dataSurface->Surface(SurfNum).ExtWind) continue;
             Real64 const Z(state.dataSurface->Surface(SurfNum).Centroid.z); // Centroid value
-                                                                            //            if (Z == SurfCentroidZPrev) {
-            //                state.dataSurface->SurfOutWindSpeed(SurfNum) = WindSpeedPrev;
-            //                continue;
-            //            }
             if (Z <= 0.0) {
                 state.dataSurface->SurfOutWindSpeed(SurfNum) = 0.0;
             } else {
@@ -652,8 +646,6 @@ void SetSurfaceWindSpeedAt(EnergyPlusData &state)
                 //                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
                 state.dataSurface->SurfOutWindSpeed(SurfNum) = fac * std::pow(Z, state.dataEnvrn->SiteWindExp);
             }
-            //            SurfCentroidZPrev = Z;
-            //            WindSpeedPrev = state.dataSurface->SurfOutWindSpeed(SurfNum);
         }
     }
 }
