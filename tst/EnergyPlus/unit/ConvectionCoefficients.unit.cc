@@ -134,6 +134,7 @@ protected:
             "    WALL,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -150,6 +151,7 @@ protected:
             "    WALL,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -166,6 +168,7 @@ protected:
             "    WALL,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -182,6 +185,7 @@ protected:
             "    WALL,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -198,6 +202,7 @@ protected:
             "    WALL,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -214,6 +219,7 @@ protected:
             "    ROOF,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -230,6 +236,7 @@ protected:
             "    ROOF,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -246,6 +253,7 @@ protected:
             "    ROOF,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -262,6 +270,7 @@ protected:
             "    ROOF,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -278,6 +287,7 @@ protected:
             "    ROOF,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -294,6 +304,7 @@ protected:
             "    FLOOR,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -310,6 +321,7 @@ protected:
             "    FLOOR,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -326,6 +338,7 @@ protected:
             "    FLOOR,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -342,6 +355,7 @@ protected:
             "    FLOOR,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -358,6 +372,7 @@ protected:
             "    FLOOR,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -479,106 +494,106 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
 
     // Surface temps are 20C
     for (int surf = 1; surf <= state->dataSurface->TotSurfaces; ++surf) {
-        state->dataHeatBalSurf->TH(2, 1, surf) = 20.0;
+        state->dataHeatBalSurf->SurfInsideTempHist(1)(surf) = 20.0;
     }
 
     // Case 1 - Zone air warmer than surfaces
     state->dataHeatBalFanSys->MAT(1) = 30.0;
 
     DynamicIntConvSurfaceClassification(*state, 1);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(1), DataSurfaces::InConvClass_A3_VertWalls);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(1), ConvectionConstants::InConvClass::A3_VertWalls);
 
     DynamicIntConvSurfaceClassification(*state, 2);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(2), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(2), ConvectionConstants::InConvClass::A3_StableTilted);
 
     DynamicIntConvSurfaceClassification(*state, 3);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(3), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(3), ConvectionConstants::InConvClass::A3_UnstableTilted);
 
     DynamicIntConvSurfaceClassification(*state, 4);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(4), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(4), ConvectionConstants::InConvClass::A3_UnstableHoriz);
 
     DynamicIntConvSurfaceClassification(*state, 5);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(5), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(5), ConvectionConstants::InConvClass::A3_StableHoriz);
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
-    DynamicIntConvSurfaceClassification(*state, 6);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0);
+    //    DynamicIntConvSurfaceClassification(*state, 6);
+    //    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0);
 
     DynamicIntConvSurfaceClassification(*state, 7);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(7), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(7), ConvectionConstants::InConvClass::A3_StableTilted);
 
     DynamicIntConvSurfaceClassification(*state, 8);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(8), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(8), ConvectionConstants::InConvClass::A3_StableTilted);
 
     DynamicIntConvSurfaceClassification(*state, 9);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(9), DataSurfaces::InConvClass_A3_StableHoriz);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(9), ConvectionConstants::InConvClass::A3_StableHoriz);
 
     DynamicIntConvSurfaceClassification(*state, 10);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(10), DataSurfaces::InConvClass_A3_StableHoriz);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(10), ConvectionConstants::InConvClass::A3_StableHoriz);
 
     DynamicIntConvSurfaceClassification(*state, 11);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(11), DataSurfaces::InConvClass_A3_VertWalls);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(11), ConvectionConstants::InConvClass::A3_VertWalls);
 
     DynamicIntConvSurfaceClassification(*state, 12);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(12), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(12), ConvectionConstants::InConvClass::A3_UnstableTilted);
 
     DynamicIntConvSurfaceClassification(*state, 13);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(13), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(13), ConvectionConstants::InConvClass::A3_UnstableTilted);
 
     DynamicIntConvSurfaceClassification(*state, 14);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(14), DataSurfaces::InConvClass_A3_UnstableHoriz);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(14), ConvectionConstants::InConvClass::A3_UnstableHoriz);
 
     DynamicIntConvSurfaceClassification(*state, 15);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(15), DataSurfaces::InConvClass_A3_UnstableHoriz);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(15), ConvectionConstants::InConvClass::A3_UnstableHoriz);
 
     // Case 2 - Zone air colder than surfaces
     state->dataHeatBalFanSys->MAT(1) = 10.0;
 
     DynamicIntConvSurfaceClassification(*state, 1);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(1), DataSurfaces::InConvClass_A3_VertWalls);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(1), ConvectionConstants::InConvClass::A3_VertWalls);
 
     DynamicIntConvSurfaceClassification(*state, 2);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(2), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(2), ConvectionConstants::InConvClass::A3_UnstableTilted);
 
     DynamicIntConvSurfaceClassification(*state, 3);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(3), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(3), ConvectionConstants::InConvClass::A3_StableTilted);
 
     DynamicIntConvSurfaceClassification(*state, 4);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(4), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(4), ConvectionConstants::InConvClass::A3_StableHoriz);
 
     DynamicIntConvSurfaceClassification(*state, 5);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(5), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(5), ConvectionConstants::InConvClass::A3_UnstableHoriz);
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
-    DynamicIntConvSurfaceClassification(*state, 6);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0);
+    //    DynamicIntConvSurfaceClassification(*state, 6);
+    //    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0);
 
     DynamicIntConvSurfaceClassification(*state, 7);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(7), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(7), ConvectionConstants::InConvClass::A3_UnstableTilted);
 
     DynamicIntConvSurfaceClassification(*state, 8);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(8), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(8), ConvectionConstants::InConvClass::A3_UnstableTilted);
 
     DynamicIntConvSurfaceClassification(*state, 9);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(9), DataSurfaces::InConvClass_A3_UnstableHoriz);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(9), ConvectionConstants::InConvClass::A3_UnstableHoriz);
 
     DynamicIntConvSurfaceClassification(*state, 10);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(10), DataSurfaces::InConvClass_A3_UnstableHoriz);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(10), ConvectionConstants::InConvClass::A3_UnstableHoriz);
 
     DynamicIntConvSurfaceClassification(*state, 11);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(11), DataSurfaces::InConvClass_A3_VertWalls);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(11), ConvectionConstants::InConvClass::A3_VertWalls);
 
     DynamicIntConvSurfaceClassification(*state, 12);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(12), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(12), ConvectionConstants::InConvClass::A3_StableTilted);
 
     DynamicIntConvSurfaceClassification(*state, 13);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(13), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(13), ConvectionConstants::InConvClass::A3_StableTilted);
 
     DynamicIntConvSurfaceClassification(*state, 14);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(14), DataSurfaces::InConvClass_A3_StableHoriz);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(14), ConvectionConstants::InConvClass::A3_StableHoriz);
 
     DynamicIntConvSurfaceClassification(*state, 15);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(15), DataSurfaces::InConvClass_A3_StableHoriz);
+    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(15), ConvectionConstants::InConvClass::A3_StableHoriz);
 }
 
 TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
@@ -612,7 +627,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
     for (int surf = 1; surf <= state->dataSurface->TotSurfaces; ++surf) {
-        state->dataHeatBalSurf->TH(2, 1, surf) = 20.0;
+        state->dataHeatBalSurf->SurfInsideTempHist(1)(surf) = 20.0;
     }
 
     state->dataHeatBalFanSys->MAT.allocate(1);
@@ -628,8 +643,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     Hc = 0.0;
     state->dataSurface->Surface(SurfNum).CosTilt = -1;
 
-    HcExpectedValue =
-        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
+    HcExpectedValue = CalcASHRAETARPNatural(
+        state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
     EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
@@ -640,8 +655,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     Hc = 0.0;
     state->dataSurface->Surface(SurfNum).CosTilt = 1;
 
-    HcExpectedValue =
-        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
+    HcExpectedValue = CalcASHRAETARPNatural(
+        state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
     EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
@@ -652,8 +667,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     Hc = 0.0;
     state->dataSurface->Surface(SurfNum).CosTilt = 0;
 
-    HcExpectedValue =
-        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
+    HcExpectedValue = CalcASHRAETARPNatural(
+        state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
     EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);

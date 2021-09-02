@@ -197,6 +197,7 @@ TEST_F(InputProcessorFixture, decode_encode_1)
                                        "  Floor,",
                                        "  FLOOR38,",
                                        "  SCWINDOW,",
+                                       "  ,",
                                        "  Surface,",
                                        "  Zn009:Flr001,",
                                        "  NoSun,",
@@ -986,6 +987,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_required_extensible_fie
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -1075,6 +1077,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_extensible)
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -1140,6 +1143,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_extensible_objects)
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -1156,6 +1160,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_extensible_objects)
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -1252,6 +1257,7 @@ TEST_F(InputProcessorFixture, validate_two_extensible_objects_and_one_non_extens
         "    Floor,                   !- Surface Type",
         "    FLOOR38,                 !- Construction Name",
         "    SCWINDOW,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn009:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1268,6 +1274,7 @@ TEST_F(InputProcessorFixture, validate_two_extensible_objects_and_one_non_extens
         "    Floor,                   !- Surface Type",
         "    FLOOR38,                 !- Construction Name",
         "    SCWINDOW,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn009:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1403,6 +1410,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles)
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -1462,6 +1470,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles_two_objects)
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -1478,6 +1487,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles_two_objects)
                                             "    Floor,                   !- Surface Type",
                                             "    FLOOR38,                 !- Construction Name",
                                             "    SCWINDOW,                !- Zone Name",
+                                            "    ,                        !- Space Name",
                                             "    Surface,                 !- Outside Boundary Condition",
                                             "    Zn009:Flr001,            !- Outside Boundary Condition Object",
                                             "    NoSun,                   !- Sun Exposure",
@@ -1545,7 +1555,7 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles_two_objects)
     }
 }
 
-TEST_F(InputProcessorFixture, validate_epJSON_parametric_template)
+TEST_F(InputProcessorFixture, validate_idf_parametric_ght_HVACtemplate)
 {
     std::string const idf(delimited_string({"Parametric:Logic,",
                                             "Main,                    !- Name",
@@ -1558,17 +1568,53 @@ TEST_F(InputProcessorFixture, validate_epJSON_parametric_template)
                                             "$width = $depth * $aspectRatio,  !- Parametric Logic Line 7",
                                             "$height = 4.0;           !- Parametric Logic Line 8"
                                             "",
+                                            "GroundHeatTransfer:Control,",
+                                            "GHT Control, !- Name",
+                                            "Yes,         !- Run Basement Preprocessor",
+                                            "No;          !- Run Slab Preprocessor",
                                             "HVACTemplate:Thermostat,",
                                             "All Zones,               !- Name",
                                             "Htg-SetP-Sch,            !- Heating Setpoint Schedule Name",
                                             ",                        !- Constant Heating Setpoint {C}",
                                             "Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name",
                                             ";                        !- Constant Cooling Setpoint {C}"}));
-    EXPECT_FALSE(process_idf(idf, false));
-    std::string const error_string = delimited_string({
-        "   ** Severe  ** Line: 1 You must run Parametric Preprocessor for \"Parametric:Logic\"",
-        "   ** Severe  ** Line: 11 You must run the ExpandObjects program for \"HVACTemplate:Thermostat\"",
-    });
+    EXPECT_TRUE(process_idf(idf, false));
+    bool unsupportedFound = state->dataInputProcessing->inputProcessor->checkForUnsupportedObjects(*state);
+    EXPECT_TRUE(unsupportedFound);
+
+    std::string const error_string =
+        delimited_string({"   ** Severe  ** HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ExpandObjects program on this input.",
+                          "   ** Severe  ** GroundHeatTransfer:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ExpandObjects program on this input.",
+                          "   ** Severe  ** Parametric:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ParametricPreprocesor program on this input."});
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(InputProcessorFixture, validate_epJSON_parametric_ght_HVACtemplate)
+{
+    json root = {
+        {"Parametric:Logic", {{"Main", {"lines", {{{"parametric_logic_line", "PARAMETER $bldgArea"}, {"parametric_logic_line", "$depth"}}}}}}},
+        {"GroundHeatTransfer:Control", {{"GHT Control", {{"run_basement_preprocessor", "Yes"}, {"run_slab_preprocessor", "No"}}}}},
+        {"HVACTemplate:Plant:Boiler",
+         {{"Main Boiler",
+           {{"boiler_type", "HotWaterBoiler"}, {"capacity", "Autosize"}, {"efficiency", 0.8}, {"fuel_type", "NaturalGas"}, {"priority", "1"}}}}}};
+
+    state->dataInputProcessing->inputProcessor->epJSON = root;
+    state->dataGlobal->isEpJSON = true;
+    state->dataInputProcessing->inputProcessor->initializeMaps();
+    bool unsupportedFound = state->dataInputProcessing->inputProcessor->checkForUnsupportedObjects(*state);
+    EXPECT_TRUE(unsupportedFound);
+
+    std::string const error_string =
+        delimited_string({"   ** Severe  ** HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ExpandObjects program on this input.",
+                          "   ** Severe  ** GroundHeatTransfer:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ExpandObjects program on this input.",
+                          "   ** Severe  ** Parametric:* objects found. These objects are not supported directly by EnergyPlus.",
+                          "   **   ~~~   ** You must run the ParametricPreprocesor program on this input."});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
@@ -2148,6 +2194,7 @@ TEST_F(InputProcessorFixture, getObjectItem_json3)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    Main Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2192,12 +2239,12 @@ TEST_F(InputProcessorFixture, getObjectItem_json3)
                                                               cNumericFields);
 
     EXPECT_TRUE(compare_containers(
-        std::vector<std::string>({"ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED"}), Alphas));
+        std::vector<std::string>({"ZN001:WALL001", "WALL", "R13WALL", "MAIN ZONE", "", "OUTDOORS", "", "SUNEXPOSED", "WINDEXPOSED"}), Alphas));
     EXPECT_TRUE(compare_containers(
         std::vector<bool>({false, false, false, false, false, false, false, false, false, false, false, false, false, false}), lNumericBlanks));
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, true, false, false}), lAlphaBlanks));
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, false, true, false, false}), lAlphaBlanks));
     EXPECT_TRUE(compare_containers(std::vector<Real64>({0.5, 4, 0, 0, 4.572, 0, 0, 0, 15.24, 0, 0, 15.24, 0, 4.572}), Numbers));
-    EXPECT_EQ(8, NumAlphas);
+    EXPECT_EQ(9, NumAlphas);
     EXPECT_EQ(14, NumNumbers);
     EXPECT_EQ(1, IOStatus);
 }
@@ -2622,10 +2669,10 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, true, true, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(26, NumNumbers);
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8, 16.7,   0.0085, 0.0085, 0,      0, 0,
-                                                        0,      0,   0, 0,      0,    0,      1,    -99999, 0,      0,      -99999, 0, 0}),
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8,   16.7, 0.0085, 0.0085, 0, 0, 0, 0,
+                                                        0,      0,   0, 0,      0,    1,      -99999, 0,    0,      -99999, 0, 0, 0}),
                                    Numbers));
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true, true,
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true, true, true,
                                                       true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true, true, true}),
                                    lNumericBlanks));
     EXPECT_EQ(1, IOStatus);
@@ -4696,67 +4743,66 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
         }
     }
 }
+//
+//   TEST_F( InputProcessorFixture, processIDF_json )
+//   {
+//          const json schema = initialize();
+//          InputProcessor IP;
+//          IdfParser idf_parser(schema);
+//          State state(schema);
+//
+//          std::string const idf = delimited_string({
+//                                                                                                                         "Version,",
+//                                                                                                                         "8.3;",
+//                                                                                                                         "SimulationControl, NO, NO,
+//   NO, YES, YES;",
+//                                                                                                           });
+//
+//          json::parser_callback_t cb = [&state](int depth, json::parse_event_t event, json &parsed,
+//                                                                                        unsigned line_num, unsigned line_index) -> bool {
+//                state->traverse(event, parsed, line_num, line_index);
+//                return true;
+//          };
+//
+//          IP->epJSON = idf_parser.decode(idf, schema);
+//          json::parse(IP->epJSON.dump(2), cb);
+//
+//          EXPECT_EQ(2, state->errors + state->warnings);
+//
+//          // auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
+//          // if ( index != 0 ) index = iListOfObjects( index );
+//          // index = ObjectStartRecord( index );
+//          // EXPECT_EQ( 1, index );
+//
+//          json &loc = IP->epJSON["properties"]["Version"];
+//
+//          // EXPECT_EQ( "Version", IDFRecords( index ).Name );
+//          EXPECT_EQ(1, loc['alphas'].size());  // EXPECT_EQ( 1, IDFRecords( index ).NumAlphas )
+//          EXPECT_EQ(0, loc['numerics'].size());  // EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+//          EXPECT_EQ(1, )  // EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
+//          EXPECT_TRUE( compare_containers( std::vector< std::string >( { "8.5" } ), IDFRecords( index ).Alphas ) );
+//          EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
+//          EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+//          EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
+//
+//          std::string const simulation_control_name( "SIMULATIONCONTROL" );
+//
+//          index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
+//          if ( index != 0 ) index = iListOfObjects( index );
+//
+//          index = ObjectStartRecord( index );
+//
+//          ASSERT_EQ( 2, index );
+//
+//          EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
+//          EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
+//          EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
+//          EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
+//          EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
+//          EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
+//          EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
+//          EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
+//
+//   }
 
-/*
-   TEST_F( InputProcessorFixture, processIDF_json )
-   {
-          const json schema = initialize();
-          InputProcessor IP;
-          IdfParser idf_parser(schema);
-          State state(schema);
-
-          std::string const idf = delimited_string({
-                                                                                                                         "Version,",
-                                                                                                                         "8.3;",
-                                                                                                                         "SimulationControl, NO, NO,
-   NO, YES, YES;",
-                                                                                                           });
-
-          json::parser_callback_t cb = [&state](int depth, json::parse_event_t event, json &parsed,
-                                                                                        unsigned line_num, unsigned line_index) -> bool {
-                state->traverse(event, parsed, line_num, line_index);
-                return true;
-          };
-
-          IP->epJSON = idf_parser.decode(idf, schema);
-          json::parse(IP->epJSON.dump(2), cb);
-
-          EXPECT_EQ(2, state->errors + state->warnings);
-
-          // auto index = FindItemInSortedList( version_name, ListOfObjects, NumObjectDefs );
-          // if ( index != 0 ) index = iListOfObjects( index );
-          // index = ObjectStartRecord( index );
-          // EXPECT_EQ( 1, index );
-
-          json &loc = IP->epJSON["properties"]["Version"];
-
-          // EXPECT_EQ( "Version", IDFRecords( index ).Name );
-          EXPECT_EQ(1, loc['alphas'].size());  // EXPECT_EQ( 1, IDFRecords( index ).NumAlphas )
-          EXPECT_EQ(0, loc['numerics'].size());  // EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-          EXPECT_EQ(1, )  // EXPECT_EQ( 1, IDFRecords( index ).ObjectDefPtr );
-          EXPECT_TRUE( compare_containers( std::vector< std::string >( { "8.5" } ), IDFRecords( index ).Alphas ) );
-          EXPECT_TRUE( compare_containers( std::vector< bool >( { false } ), IDFRecords( index ).AlphBlank ) );
-          EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-          EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
-
-          std::string const simulation_control_name( "SIMULATIONCONTROL" );
-
-          index = FindItemInSortedList( simulation_control_name, ListOfObjects, NumObjectDefs );
-          if ( index != 0 ) index = iListOfObjects( index );
-
-          index = ObjectStartRecord( index );
-
-          ASSERT_EQ( 2, index );
-
-          EXPECT_EQ( simulation_control_name, IDFRecords( index ).Name );
-          EXPECT_EQ( 5, IDFRecords( index ).NumAlphas );
-          EXPECT_EQ( 0, IDFRecords( index ).NumNumbers );
-          EXPECT_EQ( 2, IDFRecords( index ).ObjectDefPtr );
-          EXPECT_TRUE( compare_containers( std::vector< std::string >( { "NO", "NO", "NO", "YES", "YES" } ), IDFRecords( index ).Alphas ) );
-          EXPECT_TRUE( compare_containers( std::vector< bool >( { false, false, false, false, false } ), IDFRecords( index ).AlphBlank ) );
-          EXPECT_TRUE( compare_containers( std::vector< Real64 >( {} ), IDFRecords( index ).Numbers ) );
-          EXPECT_TRUE( compare_containers( std::vector< bool >( {} ), IDFRecords( index ).NumBlank ) );
-
-   }
-   */
 } // namespace EnergyPlus

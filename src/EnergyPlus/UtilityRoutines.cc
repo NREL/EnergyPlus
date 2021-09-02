@@ -589,6 +589,13 @@ namespace UtilityRoutines {
 
 } // namespace UtilityRoutines
 
+int getEnumerationValue(gsl::span<std::string_view> sList, std::string_view s)
+{
+    for (unsigned int i = 0; i < sList.size(); ++i)
+        if (UtilityRoutines::SameString(sList[i], s)) return i;
+    return -1;
+}
+
 int AbortEnergyPlus(EnergyPlusData &state)
 {
 

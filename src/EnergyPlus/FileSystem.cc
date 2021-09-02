@@ -116,13 +116,13 @@ namespace FileSystem {
 
     fs::path getAbsolutePath(fs::path const &path)
     {
-        /*
-         * Returns the absolute path for a given relative path.
-         *
-         * If the relative path points to a symlink, the symlink will
-         * be resolved, and this function will return the absolute path
-         * of the link.
-         */
+        //        /*
+        //         * Returns the absolute path for a given relative path.
+        //         *
+        //         * If the relative path points to a symlink, the symlink will
+        //         * be resolved, and this function will return the absolute path
+        //         * of the link.
+        //         */
 
         // Not available in experimental/filesystem
         // return fs::weakly_canonical(fs::absolute(p));
@@ -173,11 +173,11 @@ namespace FileSystem {
 
     fs::path getProgramPath()
     {
-        /*
-         * Returns the relative path to the executable file (including symlinks).
-         *
-         * To resolve symlinks, wrap this call in getAbsolutePath().
-         */
+        // /*
+        // * Returns the relative path to the executable file (including symlinks).
+        // *
+        // * To resolve symlinks, wrap this call in getAbsolutePath().
+        // */
         char executableRelativePath[1024];
 
 #ifdef __APPLE__

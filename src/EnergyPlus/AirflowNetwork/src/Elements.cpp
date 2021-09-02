@@ -3370,6 +3370,86 @@ namespace AirflowNetwork {
         return 1;
     }
 
+    int SpecifiedMassFlow::calculate([[maybe_unused]] EnergyPlusData &state,
+                                     [[maybe_unused]] bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                                     [[maybe_unused]] Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                                     [[maybe_unused]] int const i,                // Linkage number
+                                     const Real64 multiplier,                     // Element multiplier
+                                     const Real64 control,                        // Element control signal
+                                     [[maybe_unused]] const AirProperties &propN, // Node 1 properties
+                                     [[maybe_unused]] const AirProperties &propM, // Node 2 properties
+                                     std::array<Real64, 2> &F,                    // Airflow through the component [kg/s]
+                                     std::array<Real64, 2> &DF                    // Partial derivative:  DF/DP
+    )
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Jason DeGraw and Prateek Shrestha
+        //       DATE WRITTEN   June 2021
+        //       MODIFIED       na
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine solves airflow for a specified mass flow element.
+
+        // METHODOLOGY EMPLOYED:
+        // Assignment
+
+        // REFERENCES:
+        // NA
+
+        F[0] = mass_flow * control * multiplier;
+        DF[0] = 0.0;
+        F[1] = 0.0;
+        DF[1] = 0.0;
+
+        return 1;
+    }
+
+    int SpecifiedVolumeFlow::calculate([[maybe_unused]] EnergyPlusData &state,
+                                       [[maybe_unused]] bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+                                       [[maybe_unused]] Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+                                       [[maybe_unused]] int const i,        // Linkage number
+                                       const Real64 multiplier,             // Element multiplier
+                                       const Real64 control,                // Element control signal
+                                       const AirProperties &propN,          // Node 1 properties
+                                       const AirProperties &propM,          // Node 2 properties
+                                       std::array<Real64, 2> &F,            // Airflow through the component [kg/s]
+                                       std::array<Real64, 2> &DF            // Partial derivative:  DF/DP
+    )
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Jason DeGraw and Prateek Shrestha
+        //       DATE WRITTEN   June 2021
+        //       MODIFIED       na
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine solves airflow for a specified mass flow element.
+
+        // METHODOLOGY EMPLOYED:
+        // Assignment
+
+        // REFERENCES:
+        // NA
+
+        Real64 flow = volume_flow * control * multiplier;
+
+        Real64 upwind_density{propN.density};
+
+        if (flow < 0.0) {
+            upwind_density = propM.density;
+        }
+
+        F[0] = flow * upwind_density;
+        DF[0] = 0.0;
+        F[1] = 0.0;
+        DF[1] = 0.0;
+
+        return 1;
+    }
+
     int OutdoorAirFan::calculate(EnergyPlusData &state,
                                  bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
                                  Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]

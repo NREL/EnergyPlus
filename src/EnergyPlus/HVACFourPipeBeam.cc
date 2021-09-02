@@ -376,8 +376,8 @@ namespace FourPipeBeam {
                                 "Zone Air Terminal Beam Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 thisBeam->beamCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisBeam->name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -388,8 +388,8 @@ namespace FourPipeBeam {
                                 "Zone Air Terminal Beam Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 thisBeam->beamCoolingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisBeam->name);
         }
         if (thisBeam->beamHeatingPresent) {
@@ -397,8 +397,8 @@ namespace FourPipeBeam {
                                 "Zone Air Terminal Beam Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
                                 thisBeam->beamHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisBeam->name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -409,52 +409,52 @@ namespace FourPipeBeam {
                                 "Zone Air Terminal Beam Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
                                 thisBeam->beamHeatingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisBeam->name);
         }
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Sensible Cooling Energy",
                             OutputProcessor::Unit::J,
                             thisBeam->supAirCoolingEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             thisBeam->name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Sensible Cooling Rate",
                             OutputProcessor::Unit::W,
                             thisBeam->supAirCoolingRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             thisBeam->name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Sensible Heating Energy",
                             OutputProcessor::Unit::J,
                             thisBeam->supAirHeatingEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             thisBeam->name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Sensible Heating Rate",
                             OutputProcessor::Unit::W,
                             thisBeam->supAirHeatingRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             thisBeam->name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             thisBeam->primAirFlow,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             thisBeam->name);
 
         SetupOutputVariable(state,
                             "Zone Air Terminal Outdoor Air Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             thisBeam->OutdoorAirFlowRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             thisBeam->name);
 
         airNodeFound = false;
@@ -855,7 +855,7 @@ namespace FourPipeBeam {
             Real64 minFlow(0.0);
             Real64 maxFlowCool(0.0);
             minFlow = std::min(state.dataEnvrn->StdRhoAir * originalTermUnitSizeMaxVDot,
-                               state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesOAFlow * state.dataEnvrn->StdRhoAir);
+                               state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).MinOA * state.dataEnvrn->StdRhoAir);
             minFlow = std::max(0.0, minFlow);
             // max flow is as if the air supply was sufficient to provide all the conditioning
 
@@ -960,7 +960,7 @@ namespace FourPipeBeam {
             // make sure this is higher than the zone OA requirement
             this->mDotDesignPrimAir =
                 std::max(this->mDotDesignPrimAir,
-                         state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesOAFlow * state.dataEnvrn->StdRhoAir);
+                         state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).MinOA * state.dataEnvrn->StdRhoAir);
             this->vDotDesignPrimAir = this->mDotDesignPrimAir / state.dataEnvrn->StdRhoAir;
             this->totBeamLength = this->vDotDesignPrimAir / this->vDotNormRatedPrimAir;
             if (this->vDotDesignCWWasAutosized) {

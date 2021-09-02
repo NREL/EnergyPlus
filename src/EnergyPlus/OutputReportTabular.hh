@@ -118,6 +118,12 @@ namespace OutputReportTabular {
         NotFound,
     };
 
+    enum class endUseSubTableType
+    {
+        bySubCategory,
+        bySpaceType
+    };
+
     // These correspond to the columns in the load component table
     constexpr int cSensInst(1);
     constexpr int cSensDelay(2);
@@ -591,6 +597,16 @@ namespace OutputReportTabular {
 
     void WriteBEPSTable(EnergyPlusData &state);
 
+    void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
+                                            endUseSubTableType tableType,
+                                            Array2D<Real64> &endUseSubOther,
+                                            Array2D<Real64> &collapsedEndUse,
+                                            Array3D<Real64> &collapsedEndUseSub,
+                                            Array1D_bool &needOtherRow,
+                                            const iUnitsStyle unitsStyle_cur,
+                                            const bool produceTabular,
+                                            const bool produceSQLite);
+
     std::string ResourceWarningMessage(std::string resource);
 
     Real64 WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor);
@@ -602,6 +618,8 @@ namespace OutputReportTabular {
     void WriteCompCostTable(EnergyPlusData &state);
 
     void WriteVeriSumTable(EnergyPlusData &state);
+
+    void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool produceSQLite);
 
     void WriteAdaptiveComfortTable(EnergyPlusData &state);
 
@@ -755,8 +773,8 @@ namespace OutputReportTabular {
 
     void DetermineBuildingFloorArea(EnergyPlusData &state);
 
-    /* Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
-     * This routine will fill up the blanks for output to Sql in particular */
+    // Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
+    // This routine will fill up the blanks for output to Sql in particular
     void FillRowHead(Array1D_string &rowHead);
 
     //======================================================================================================================
@@ -921,6 +939,7 @@ struct OutputReportTabularData : BaseGlobalStruct
     Array1D_int ffSchedIndex = Array1D_int(OutputReportTabular::numResourceTypes, 0);
     Array2D_int meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0);
     Array3D_int meterNumEndUseSubBEPS;
+    Array3D_int meterNumEndUseSpTypeBEPS;
     // arrays that hold the names of the resource and end uses
     Array1D_string resourceTypeNames = Array1D_string(OutputReportTabular::numResourceTypes);
     Array1D_string sourceTypeNames = Array1D_string(OutputReportTabular::numSourceTypes);
@@ -933,7 +952,9 @@ struct OutputReportTabularData : BaseGlobalStruct
     Array2D<Real64> gatherEndUseBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
     Array2D<Real64> gatherEndUseBySourceBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
     Array3D<Real64> gatherEndUseSubBEPS;
+    Array3D<Real64> gatherEndUseSpTypeBEPS;
     Array1D_bool needOtherRowLEED45 = Array1D_bool(DataGlobalConstantsData::iEndUseSize);
+    Array1D_bool needOtherRowEndUse = Array1D_bool(DataGlobalConstantsData::iEndUseSize);
 
     // arrays the hold the demand values
     Array1D<Real64> gatherDemandTotal = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
@@ -1261,6 +1282,7 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->ffSchedIndex = Array1D_int(OutputReportTabular::numResourceTypes, 0);
         this->meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0);
         this->meterNumEndUseSubBEPS.deallocate();
+        this->meterNumEndUseSpTypeBEPS.deallocate();
         this->resourceTypeNames = Array1D_string(OutputReportTabular::numResourceTypes);
         this->sourceTypeNames = Array1D_string(OutputReportTabular::numSourceTypes);
         this->endUseNames = Array1D_string(DataGlobalConstantsData::iEndUseSize);
@@ -1271,7 +1293,9 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->gatherEndUseBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
         this->gatherEndUseBySourceBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
         this->gatherEndUseSubBEPS.deallocate();
+        this->gatherEndUseSpTypeBEPS.deallocate();
         this->needOtherRowLEED45 = Array1D_bool(DataGlobalConstantsData::iEndUseSize);
+        this->needOtherRowEndUse = Array1D_bool(DataGlobalConstantsData::iEndUseSize);
         this->gatherDemandTotal = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
         this->gatherDemandEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
         this->gatherDemandIndEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);

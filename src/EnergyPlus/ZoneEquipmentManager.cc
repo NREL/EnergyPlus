@@ -798,7 +798,13 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     Real64 OAVolumeFlowRate;  // outside air flow rate (m3/s)
     bool UseOccSchFlag;       // flag to use occupancy schedule when calculating OA
     bool UseMinOASchFlag;     // flag to use min OA schedule when calculating OA
-    int DSOAPtr;              // index to DesignSpecification:OutdoorAir object
+
+    // TODO MJW: Punt for now, sometimes unit test will get here and need these to be allocated, but simulations need them sooner
+    if (!state.dataHeatBal->ZoneIntGain.allocated()) {
+        state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
+        state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
+    }
 
     for (ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
         ZoneIndex = UtilityRoutines::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataHeatBal->Zone);
@@ -837,9 +843,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             ShowSevereError(state, "SetUpZoneSizingArrays: Zone Sizing is requested but there are no ZoneHVAC:EquipmentConnections statements.");
             ErrorsFound = true;
         }
-    }
-    if (ErrorsFound) {
-        ShowFatalError(state, "SetUpZoneSizingArrays: Errors found in Sizing:Zone input");
     }
 
     // Put Auto Sizing of Sizing:Zone inputs here!
@@ -892,10 +895,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).HeatDesTempDiff = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatDesTempDiff;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).CoolDesHumRat = state.dataSize->ZoneSizingInput(ZoneSizNum).CoolDesHumRat;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).HeatDesHumRat = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatDesHumRat;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).OADesMethod;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPPer;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPerArea;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlow;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).CoolAirDesMethod;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatAirDesMethod;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesCoolAirFlow;
@@ -927,11 +926,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatDesTempDiff = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatDesTempDiff;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolDesHumRat = state.dataSize->ZoneSizingInput(ZoneSizNum).CoolDesHumRat;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatDesHumRat = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatDesHumRat;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).OADesMethod;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPPer;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPerArea =
-                    state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPerArea;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlow;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolAirDesMethod =
                     state.dataSize->ZoneSizingInput(ZoneSizNum).CoolAirDesMethod;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatAirDesMethod =
@@ -980,10 +974,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).HeatDesTempDiff = state.dataSize->ZoneSizingInput(1).HeatDesTempDiff;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).CoolDesHumRat = state.dataSize->ZoneSizingInput(1).CoolDesHumRat;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).HeatDesHumRat = state.dataSize->ZoneSizingInput(1).HeatDesHumRat;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(1).OADesMethod;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(1).DesOAFlowPPer;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(1).DesOAFlowPerArea;
-                state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(1).DesOAFlow;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(1).CoolAirDesMethod;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(1).HeatAirDesMethod;
                 state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(1).DesCoolAirFlow;
@@ -1010,10 +1000,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatDesTempDiff = state.dataSize->ZoneSizingInput(1).HeatDesTempDiff;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolDesHumRat = state.dataSize->ZoneSizingInput(1).CoolDesHumRat;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatDesHumRat = state.dataSize->ZoneSizingInput(1).HeatDesHumRat;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(1).OADesMethod;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(1).DesOAFlowPPer;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(1).DesOAFlowPerArea;
-                state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(1).DesOAFlow;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(1).CoolAirDesMethod;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(1).HeatAirDesMethod;
                 state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(1).DesCoolAirFlow;
@@ -1060,10 +1046,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex =
                 state.dataSize->ZoneSizingInput(ZoneSizNum).ZoneAirDistributionIndex;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = state.dataSize->ZoneSizingInput(ZoneSizNum).ZoneDesignSpecOAIndex;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).OADesMethod;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPPer;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPerArea;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlow;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).CoolAirDesMethod;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatAirDesMethod;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesCoolAirFlow;
@@ -1099,10 +1081,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                 state.dataSize->ZoneSizingInput(ZoneSizNum).ZoneAirDistributionIndex;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex =
                 state.dataSize->ZoneSizingInput(ZoneSizNum).ZoneDesignSpecOAIndex;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).OADesMethod;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPPer;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlowPerArea;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesOAFlow;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).CoolAirDesMethod;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(ZoneSizNum).HeatAirDesMethod;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(ZoneSizNum).DesCoolAirFlow;
@@ -1136,10 +1114,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDesHumRat = state.dataSize->ZoneSizingInput(1).HeatDesHumRat;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex = state.dataSize->ZoneSizingInput(1).ZoneAirDistributionIndex;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = state.dataSize->ZoneSizingInput(1).ZoneDesignSpecOAIndex;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(1).OADesMethod;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(1).DesOAFlowPPer;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(1).DesOAFlowPerArea;
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(1).DesOAFlow;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(1).CoolAirDesMethod;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(1).HeatAirDesMethod;
             state.dataSize->FinalZoneSizing(CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(1).DesCoolAirFlow;
@@ -1170,10 +1144,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatDesHumRat = state.dataSize->ZoneSizingInput(1).HeatDesHumRat;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex = state.dataSize->ZoneSizingInput(1).ZoneAirDistributionIndex;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = state.dataSize->ZoneSizingInput(1).ZoneDesignSpecOAIndex;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OADesMethod = state.dataSize->ZoneSizingInput(1).OADesMethod;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = state.dataSize->ZoneSizingInput(1).DesOAFlowPPer;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea = state.dataSize->ZoneSizingInput(1).DesOAFlowPerArea;
-            state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesOAFlow = state.dataSize->ZoneSizingInput(1).DesOAFlow;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolAirDesMethod = state.dataSize->ZoneSizingInput(1).CoolAirDesMethod;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatAirDesMethod = state.dataSize->ZoneSizingInput(1).HeatAirDesMethod;
             state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).InpDesCoolAirFlow = state.dataSize->ZoneSizingInput(1).DesCoolAirFlow;
@@ -1356,6 +1326,44 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         TotPeopleInZone = 0.0;
         Real64 ZoneMinOccupancy = 0.;
         ZoneIndex = state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum;
+        int DSOAPtr = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex; // index to DesignSpecification:OutdoorAir object
+        if (DSOAPtr > 0) {
+            auto &thisOAReq = state.dataSize->OARequirements(DSOAPtr);
+            // If this is a DesignSpecification:OutdoorAir:SpaceList check to make sure spaces are valid and belong to this zone
+            if (thisOAReq.numDSOA > 1) {
+                for (int spaceCounter = 1; spaceCounter <= thisOAReq.numDSOA; ++spaceCounter) {
+                    std::string thisSpaceName = thisOAReq.dsoaSpaceNames(spaceCounter);
+                    int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
+                    if (thisSpaceNum > 0) {
+                        thisOAReq.dsoaSpaceIndexes.emplace_back(thisSpaceNum);
+                        if (state.dataHeatBal->space(thisSpaceNum).zoneNum != state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
+                            ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
+                            ShowContinueError(state, "is invalid for Sizing:Zone=" + state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName);
+                            ShowContinueError(state, "All spaces in the list must be part of this zone.");
+                            ErrorsFound = true;
+                        }
+                    } else {
+                        ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
+                        ShowContinueError(state, "Space Name=" + thisSpaceName + " not found.");
+                        ErrorsFound = true;
+                    }
+                    // Check for duplicate spaces
+                    for (int loop = 1; loop <= int(thisOAReq.dsoaSpaceIndexes.size()) - 1; ++loop) {
+                        if (thisSpaceNum == thisOAReq.dsoaSpaceIndexes(loop)) {
+                            ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
+                            ShowContinueError(state, "Space Name=" + thisSpaceName + " appears more than once in list.");
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+            }
+
+            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer =
+                state.dataSize->OARequirements(DSOAPtr).desFlowPerZonePerson(state, ZoneIndex);
+            state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea =
+                state.dataSize->OARequirements(DSOAPtr).desFlowPerZoneArea(state, ZoneIndex);
+        }
+
         for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
             if (state.dataHeatBal->People(PeopleNum).ZonePtr == state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
                 TotPeopleInZone += (state.dataHeatBal->People(PeopleNum).NumberOfPeople *
@@ -1375,13 +1383,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             (state.dataHeatBal->Zone(ZoneIndex).FloorArea *
              state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum).Multiplier *
              state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum).ListMultiplier);
-        if (state.dataSize->FinalZoneSizing(CtrlZoneNum).OADesMethod == OAFlowPPer ||
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).OADesMethod == OAFlowSum ||
-            state.dataSize->FinalZoneSizing(CtrlZoneNum).OADesMethod == OAFlowMax) {
-            OAFromPeople = state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer * TotPeopleInZone;
-        } else {
-            OAFromPeople = 0.0;
-        }
+        OAFromPeople = state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer * TotPeopleInZone;
         OAFromArea = state.dataSize->FinalZoneSizing(CtrlZoneNum).DesOAFlowPerArea * state.dataSize->FinalZoneSizing(CtrlZoneNum).TotalZoneFloorArea;
         state.dataSize->FinalZoneSizing(CtrlZoneNum).TotPeopleInZone = TotPeopleInZone;
         state.dataSize->FinalZoneSizing(CtrlZoneNum).TotalOAFromPeople = OAFromPeople;
@@ -1399,7 +1401,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         // Calculate the design min OA flow rate for this zone
         UseOccSchFlag = false;
         UseMinOASchFlag = false;
-        DSOAPtr = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex;
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex = DSOAPtr; // store for later use
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex =
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex; // store for later use
@@ -1492,6 +1493,9 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                   state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
                   state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolSizingFactor);
         }
+    }
+    if (ErrorsFound) {
+        ShowFatalError(state, "SetUpZoneSizingArrays: Errors found in Sizing:Zone input");
     }
 }
 
@@ -4984,22 +4988,23 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
     using InternalHeatGains::SumAllReturnAirLatentGains;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 QRetAir;         // Heat to return air from lights
-    Real64 CpAir;           // Air heat capacity [J/kg-K]
-    Real64 TempRetAir;      // Return air temperature [C]
-    Real64 TempZoneAir;     // Zone air temperature [C]
-    int ZoneNum;            // Controlled zone number
-    int ActualZoneNum;      // Zone number
-    int ZoneNode;           // Node number of controlled zone
-    int ReturnNode;         // Node number of controlled zone's return air
-    int SurfNum;            // Surface number
-    Real64 MassFlowRA;      // Return air mass flow [kg/s]
-    Real64 FlowThisTS;      // Window gap air mass flow [kg/s]
-    Real64 WinGapFlowToRA;  // Mass flow to return air from all airflow windows in zone [kg/s]
-    Real64 WinGapFlowTtoRA; // Sum of mass flow times outlet temp for all airflow windows in zone [(kg/s)-C]
-    Real64 WinGapTtoRA;     // Temp of outlet flow mixture to return air from all airflow windows in zone [C]
-    Real64 H2OHtOfVap;      // Heat of vaporization of water (W/kg)
-    Real64 ZoneMult;        // zone multiplier
+    Real64 QRetAir;           // Heat to return air from lights
+    Real64 CpAir;             // Air heat capacity [J/kg-K]
+    Real64 TempRetAir;        // Return air temperature [C]
+    Real64 TempZoneAir;       // Zone air temperature [C]
+    int ZoneNum;              // Controlled zone number
+    int ActualZoneNum;        // Zone number
+    int ZoneNode;             // Node number of controlled zone
+    int ReturnNode;           // Node number of controlled zone's return air
+    int ReturnNodeExhaustNum; // Asscoaited exhaust node number, corresponding to the return node
+    int SurfNum;              // Surface number
+    Real64 MassFlowRA;        // Return air mass flow [kg/s]
+    Real64 FlowThisTS;        // Window gap air mass flow [kg/s]
+    Real64 WinGapFlowToRA;    // Mass flow to return air from all airflow windows in zone [kg/s]
+    Real64 WinGapFlowTtoRA;   // Sum of mass flow times outlet temp for all airflow windows in zone [(kg/s)-C]
+    Real64 WinGapTtoRA;       // Temp of outlet flow mixture to return air from all airflow windows in zone [C]
+    Real64 H2OHtOfVap;        // Heat of vaporization of water (W/kg)
+    Real64 ZoneMult;          // zone multiplier
     Real64 SumRetAirLatentGainRate;
 
     for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -5013,6 +5018,7 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
         ZoneMult = state.dataHeatBal->Zone(ActualZoneNum).Multiplier * state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier;
         for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++nodeCount) {
             ReturnNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(nodeCount);
+            ReturnNodeExhaustNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeExhaustNodeNum(nodeCount);
 
             // RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
             // Add sensible heat gain from refrigerated cases with under case returns
@@ -5024,6 +5030,9 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
             // Correct step through the SysDepZoneLoads variable.
 
             MassFlowRA = state.dataLoopNodes->Node(ReturnNode).MassFlowRate / ZoneMult;
+            if (ReturnNodeExhaustNum > 0 && state.dataLoopNodes->Node(ReturnNodeExhaustNum).MassFlowRate > 0.0) {
+                MassFlowRA += state.dataLoopNodes->Node(ReturnNodeExhaustNum).MassFlowRate;
+            }
 
             // user defined room air model may feed temp that differs from zone node
             if (allocated(state.dataRoomAirMod->AirPatternZoneInfo)) {
@@ -5091,6 +5100,13 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
                         }
                     } else {
                         state.dataLoopNodes->Node(ReturnNode).Temp = TempRetAir;
+                    }
+                    if (ReturnNodeExhaustNum > 0 && state.dataLoopNodes->Node(ReturnNodeExhaustNum).MassFlowRate > 0.0 && QRetAir > 0.0) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) != iLightReturnExhaustConfig::Shared) {
+                            state.dataLoopNodes->Node(ReturnNodeExhaustNum).Temp = TempRetAir;
+                        } else {
+                            state.dataLoopNodes->Node(ReturnNodeExhaustNum).Temp += QRetAir / (MassFlowRA * CpAir);
+                        }
                     }
                 } else { // No return air flow
                     // Assign all heat-to-return from window gap airflow to zone air
@@ -6216,6 +6232,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         if (state.dataHeatBal->Infiltration(j).QuadratureSum) {
             state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Infiltration(j).OABalancePtr).InfMassFlowRate += MCpI_temp / CpAir;
         } else {
+            state.dataHeatBal->Infiltration(j).MCpI_temp = MCpI_temp;
             state.dataHeatBalFanSys->MCPI(NZ) += MCpI_temp;
             state.dataHeatBalFanSys->OAMFL(NZ) += MCpI_temp / CpAir;
             state.dataHeatBalFanSys->MCPTI(NZ) += MCpI_temp * TempExt;
