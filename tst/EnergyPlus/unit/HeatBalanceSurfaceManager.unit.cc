@@ -3278,6 +3278,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
         Wall,                    !- Surface Type
         UVal_0.2_Mass,           !- Construction Name
         Zone_0,                  !- Zone Name
+        ,                        !- Space Name
         Outdoors,                !- Outside Boundary Condition
         ,                        !- Outside Boundary Condition Object
         SunExposed,              !- Sun Exposure
@@ -3303,6 +3304,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
         Wall,                    !- Surface Type
         UVal_0.2_Mass,           !- Construction Name
         Zone_0,                  !- Zone Name
+        ,                        !- Space Name
         Outdoors,                !- Outside Boundary Condition
         ,                        !- Outside Boundary Condition Object
         SunExposed,              !- Sun Exposure
@@ -3328,8 +3330,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
         Wall,                    !- Surface Type
         defaultConstruction,     !- Construction Name
         Zone_0,                  !- Zone Name
-        Surface,                  !- Outside Boundary Condition
-        Zone_0:f2,                        !- Outside Boundary Condition Object
+        ,                        !- Space Name
+        Surface,                 !- Outside Boundary Condition
+        Zone_0:f2,               !- Outside Boundary Condition Object
         NoSun,                   !- Sun Exposure
         NoWind,                  !- Wind Exposure
         Autocalculate,           !- View Factor to Ground
@@ -3353,6 +3356,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
         Wall,                    !- Surface Type
         UVal_0.2_Mass,           !- Construction Name
         Zone_0,                  !- Zone Name
+        ,                        !- Space Name
         Outdoors,                !- Outside Boundary Condition
         ,                        !- Outside Boundary Condition Object
         SunExposed,              !- Sun Exposure
@@ -3378,8 +3382,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
         Floor,                   !- Surface Type
         defaultConstruction,     !- Construction Name
         Zone_0,                  !- Zone Name
-        Surface,                  !- Outside Boundary Condition
-        Zone_0:f4,                        !- Outside Boundary Condition Object
+        ,                        !- Space Name
+        Surface,                 !- Outside Boundary Condition
+        Zone_0:f4,               !- Outside Boundary Condition Object
         NoSun,                   !- Sun Exposure
         NoWind,                  !- Wind Exposure
         Autocalculate,           !- View Factor to Ground
@@ -3403,6 +3408,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
         Roof,                    !- Surface Type
         UVal_0.2_Mass,           !- Construction Name
         Zone_0,                  !- Zone Name
+        ,                        !- Space Name
         Outdoors,                !- Outside Boundary Condition
         ,                        !- Outside Boundary Condition Object
         SunExposed,              !- Sun Exposure
@@ -3428,8 +3434,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
         Floor,                   !- Surface Type
         defaultConstruction,     !- Construction Name
         Zone_0,                  !- Zone Name
-        Surface,                  !- Outside Boundary Condition
-        Zone_0:f6,                        !- Outside Boundary Condition Object
+        ,                        !- Space Name
+        Surface,                 !- Outside Boundary Condition
+        Zone_0:f6,               !- Outside Boundary Condition Object
         NoSun,                   !- Sun Exposure
         NoWind,                  !- Wind Exposure
         Autocalculate,           !- View Factor to Ground
@@ -3498,7 +3505,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
 
     state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
 
-    state->dataHeatBalSurf->TH.allocate(2, 2, 6);
     state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
