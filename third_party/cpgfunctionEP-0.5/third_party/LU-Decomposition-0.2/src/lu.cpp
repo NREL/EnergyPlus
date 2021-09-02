@@ -12,8 +12,6 @@ double jcc::dot(int &n, std::vector<double> &A, int &begin_x, int &incx,
 
     int k;
     double summation = 0.;
-    double _x;
-    double _y;
     // reduction notes: https://stackoverflow.com/a/26999512
 //#pragma omp parallel for default(none) num_threads(n_threads) shared(n, A, begin_x, begin_y, incx, incy) private(k, _x, _y) reduction(+:summation)
     for (k=0; k<n; k++) {
