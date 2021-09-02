@@ -809,7 +809,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
 
         CASE('BUILDINGSURFACE:DETAILED')
           NVertFieldNum = 10 + SurfaceSpaceFieldShift
-          IF (MakeUPPERCase(OutArgs(11)) == 'AUTOCALCULATE') THEN
+          IF (MakeUPPERCase(OutArgs(NVertFieldNum)) == 'AUTOCALCULATE') THEN
             NVert=(CurArgs-NVertFieldNum)/3
           ELSEIF (OutArgs(NVertFieldNum) == '') THEN
             NVert=(CurArgs-NVertFieldNum)/3
