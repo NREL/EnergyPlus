@@ -5904,9 +5904,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
     }
 
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) { // Loop through all surfaces...
-        for (int SurfNum = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
-             SurfNum <= state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
-             ++SurfNum) {
+        for (int SurfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(zoneNum).HTSurfaceLast; ++SurfNum) {
+            if (Surface(SurfNum).Class == SurfaceClass::Window) continue;
             if (present(ZoneToResimulate)) {
                 if ((zoneNum != ZoneToResimulate) && (state.dataSurface->SurfAdjacentZone(SurfNum) != ZoneToResimulate)) {
                     continue; // skip surfaces that are not associated with this zone
