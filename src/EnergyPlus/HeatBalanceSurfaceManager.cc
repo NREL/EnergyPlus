@@ -480,7 +480,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
         if (state.dataEnvrn->SunIsUp && state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0) {
             if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Daylighting Illumination");
-            DayltgInteriorIllum(state, NZ);
+            if (state.dataDaylightingManager->maxNumRefPtInAnyZone > 0) DayltgInteriorIllum(state, NZ);
             if (!state.dataGlobal->DoingSizing) DayltgInteriorMapIllum(state, NZ);
         }
 
@@ -644,7 +644,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                     DayltgInterReflIllFrIntWins(state, NZ);
                     DayltgGlareWithIntWins(state, state.dataDaylightingData->ZoneDaylight(NZ).GlareIndexAtRefPt, NZ);
                 }
-                DayltgElecLightingControl(state, NZ);
+                if (state.dataDaylightingManager->maxNumRefPtInAnyZone > 0) DayltgElecLightingControl(state, NZ);
             }
         }
     } else if (state.dataDaylightingData->mapResultsToReport && state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
