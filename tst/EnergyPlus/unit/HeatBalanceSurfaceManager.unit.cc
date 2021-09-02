@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -4081,13 +4082,29 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
-    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Daylit Attic Zone";
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    int const HoursInDay(24);
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+    }
+    //    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
+    //    EXPECT_FALSE(ErrorsFound);
+
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound); // this calls GetSurfaceData()
+    EXPECT_FALSE(ErrorsFound);                               // expect no errors
+    HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
+
+    state->dataZoneEquip->ZoneEquipConfig.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Daylit Zone";
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataHeatBal->Zone(1).ZoneEqNum = 1;
@@ -4102,14 +4119,35 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Daylit Attic Zone";
+    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
+    state->dataHeatBal->Zone(2).IsControlled = true;
+    state->dataHeatBal->Zone(2).ZoneEqNum = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(2) = 7;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1) = 8;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode(1) = 9;
+    state->dataZoneEquip->ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
 
-    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(2);
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 10;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataHeatBalFanSys->MAT.allocate(1); // Zone temperature C
+    state->dataHeatBalFanSys->MAT.allocate(2); // Zone temperature C
     state->dataHeatBalFanSys->MAT(1) = 24.0;
-    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT(2) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(2);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(2);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg(2) = 0.001;
 
     state->dataLoopNodes->Node.allocate(4);
 
@@ -4149,14 +4187,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     for (int loop = 1; loop <= state->dataSurface->TotSurfaces; ++loop) {
         state->dataHeatBalSurf->SurfOutsideTempHist(1)(loop) = 20.0;
     }
-    state->dataSurface->SurfTAirRef(1) = DataSurfaces::ZoneMeanAirTemp;
-    state->dataSurface->SurfTAirRef(2) = DataSurfaces::AdjacentAirTemp;
-    state->dataSurface->SurfTAirRef(3) = DataSurfaces::ZoneSupplyAirTemp;
 
-    // with supply air
+    state->dataConstruction->Construct(state->dataSurface->Surface(8).Construction).TransDiff = 0.001; // required for GetTDDInput function to work.
+    DaylightingDevices::GetTDDInput(*state);
+
     CalcHeatBalanceInsideSurf(*state);
-    EXPECT_EQ(24.0, state->dataHeatBal->SurfTempEffBulkAir(1));
-    EXPECT_EQ(23.0, state->dataHeatBal->SurfTempEffBulkAir(2));
-    EXPECT_EQ(20.0, state->dataHeatBal->SurfTempEffBulkAir(3));
+    EXPECT_NEAR(37.63, state->dataSurface->SurfWinHeatGain(7), 0.1);
+    EXPECT_NEAR(37.63, state->dataSurface->SurfWinHeatGain(8), 0.1);
 }
 } // namespace EnergyPlus
