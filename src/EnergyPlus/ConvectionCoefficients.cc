@@ -4853,9 +4853,6 @@ void ManageInsideAdaptiveConvectionAlgo(EnergyPlusData &state, int const SurfNum
     //  TODO: candidate for rework to do zone level calcs once rather than for each surface
     DynamicIntConvSurfaceClassification(state, SurfNum);
 
-    // Set report var after surface has been classified successfully
-    state.dataSurface->SurfIntConvClassificationRpt(SurfNum) = static_cast<int>(state.dataSurface->SurfIntConvClassification(SurfNum));
-
     // simple worker routine takes surface classification and fills in model to use (IntConvHcModelEq) for that surface
     MapIntConvClassificationToHcModels(state, SurfNum);
 
@@ -4882,9 +4879,6 @@ void ManageOutsideAdaptiveConvectionAlgo(EnergyPlusData &state,
     //   It calls a series of separable worker routines
 
     DynamicExtConvSurfaceClassification(state, SurfNum);
-
-    // Set report var after surface has been classified successfully
-    state.dataSurface->SurfOutConvClassificationRpt(SurfNum) = static_cast<int>(state.dataSurface->SurfOutConvClassification(SurfNum));
 
     MapExtConvClassificationToHcModels(state, SurfNum);
 
@@ -5729,6 +5723,9 @@ void MapExtConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum
                         format("MapExtConvClassificationToHcModels: caught unknown outdoor surface classification: {}",
                                state.dataSurface->SurfOutConvClassification(SurfNum)));
     }
+
+    // Set report var after surface has been classified
+    state.dataSurface->SurfOutConvClassificationRpt(SurfNum) = static_cast<int>(state.dataSurface->SurfOutConvClassification(SurfNum));
 }
 
 void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNum) // surface number
@@ -6429,6 +6426,10 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         ShowSevereError(state,
                         "DynamicIntConvSurfaceClassification: failed to determine zone flow regime for surface named " + Surface(SurfNum).Name);
     }
+
+    // Set report var after surface has been classified
+    state.dataSurface->SurfIntConvClassificationRpt(SurfNum) = static_cast<int>(state.dataSurface->SurfIntConvClassification(SurfNum));
+
 }
 
 void MapIntConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum) // surface pointer index
