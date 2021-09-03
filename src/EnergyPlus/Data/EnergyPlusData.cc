@@ -312,6 +312,8 @@ EnergyPlusData::EnergyPlusData()
 void EnergyPlusData::clear_state()
 {
     this->ready = true;
+    this->dataAFNProps->clear_state();
+    this->dataAFNSolver->clear_state();
     this->dataAirLoop->clear_state();
     this->dataAirLoopHVACDOAS->clear_state();
     this->dataAirSystemsData->clear_state();
