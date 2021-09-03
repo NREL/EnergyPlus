@@ -80,7 +80,7 @@ namespace Cache {
             arr.dimension({0, size - 1});
             int idx = 0;
             for (auto &v : j.at(key)) {
-                arr(idx) = v.get<Real64>();
+                arr(idx) = v.get<T>();
                 ++idx;
             }
         } catch (const nlohmann::json::out_of_range &e) {
@@ -97,7 +97,7 @@ namespace Cache {
             arr.dimension(size);
             int idx = 1;
             for (auto &v : j.at(key)) {
-                arr(idx) = v.get<Real64>();
+                arr(idx) = v.get<T>();
                 ++idx;
             }
         } catch (const nlohmann::json::out_of_range &e) {
@@ -117,7 +117,7 @@ namespace Cache {
     template <typename T> void arrayToJSON(Array1D<T> const &arr, nlohmann::json &j, std::string const &key)
     {
         std::vector<T> vect;
-        for (auto v : arr)
+        for (auto &v : arr)
             vect.push_back(v);
         j[key] = vect;
     }
