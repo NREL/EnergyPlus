@@ -12,6 +12,7 @@
 #include <map>
 #include <string>
 #include <utility>
+#include <vector>
 #if !defined(_MSC_VER) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #include <sys/mman.h>
 #include <unistd.h>  /* for sysconf */
@@ -221,6 +222,15 @@ TEST(RE2, Extract) {
   // check that false match doesn't overwrite
   ASSERT_FALSE(RE2::Extract("baz", "bar", "'\\0'", &s));
   ASSERT_EQ(s, "'foo'");
+}
+
+TEST(RE2, MaxSubmatchTooLarge) {
+  std::string s;
+  ASSERT_FALSE(RE2::Extract("foo", "f(o+)", "\\1\\2", &s));
+  s = "foo";
+  ASSERT_FALSE(RE2::Replace(&s, "f(o+)", "\\1\\2"));
+  s = "foo";
+  ASSERT_FALSE(RE2::GlobalReplace(&s, "f(o+)", "\\1\\2"));
 }
 
 TEST(RE2, Consume) {
@@ -473,40 +483,39 @@ TEST(ProgramFanout, BigProgram) {
   RE2 re100("(?:(?:(?:(?:(?:.)?){100})*)+)");
   RE2 re1000("(?:(?:(?:(?:(?:.)?){1000})*)+)");
 
-  std::map<int, int> histogram;
+  std::vector<int> histogram;
 
-  // 3 is the largest non-empty bucket and has 1 element.
+  // 3 is the largest non-empty bucket and has 2 element.
   ASSERT_EQ(3, re1.ProgramFanout(&histogram));
-  ASSERT_EQ(1, histogram[3]);
+  ASSERT_EQ(2, histogram[3]);
 
-  // 7 is the largest non-empty bucket and has 10 elements.
-  ASSERT_EQ(7, re10.ProgramFanout(&histogram));
-  ASSERT_EQ(10, histogram[7]);
+  // 6 is the largest non-empty bucket and has 11 elements.
+  ASSERT_EQ(6, re10.ProgramFanout(&histogram));
+  ASSERT_EQ(11, histogram[6]);
 
-  // 10 is the largest non-empty bucket and has 100 elements.
-  ASSERT_EQ(10, re100.ProgramFanout(&histogram));
-  ASSERT_EQ(100, histogram[10]);
+  // 9 is the largest non-empty bucket and has 101 elements.
+  ASSERT_EQ(9, re100.ProgramFanout(&histogram));
+  ASSERT_EQ(101, histogram[9]);
 
-  // 13 is the largest non-empty bucket and has 1000 elements.
+  // 13 is the largest non-empty bucket and has 1001 elements.
   ASSERT_EQ(13, re1000.ProgramFanout(&histogram));
-  ASSERT_EQ(1000, histogram[13]);
+  ASSERT_EQ(1001, histogram[13]);
 
-  // 2 is the largest non-empty bucket and has 3 elements.
-  // This differs from the others due to how reverse `.' works.
+  // 2 is the largest non-empty bucket and has 2 element.
   ASSERT_EQ(2, re1.ReverseProgramFanout(&histogram));
-  ASSERT_EQ(3, histogram[2]);
+  ASSERT_EQ(2, histogram[2]);
 
-  // 5 is the largest non-empty bucket and has 10 elements.
+  // 5 is the largest non-empty bucket and has 11 elements.
   ASSERT_EQ(5, re10.ReverseProgramFanout(&histogram));
-  ASSERT_EQ(10, histogram[5]);
+  ASSERT_EQ(11, histogram[5]);
 
-  // 9 is the largest non-empty bucket and has 100 elements.
+  // 9 is the largest non-empty bucket and has 101 elements.
   ASSERT_EQ(9, re100.ReverseProgramFanout(&histogram));
-  ASSERT_EQ(100, histogram[9]);
+  ASSERT_EQ(101, histogram[9]);
 
-  // 12 is the largest non-empty bucket and has 1000 elements.
+  // 12 is the largest non-empty bucket and has 1001 elements.
   ASSERT_EQ(12, re1000.ReverseProgramFanout(&histogram));
-  ASSERT_EQ(1000, histogram[12]);
+  ASSERT_EQ(1001, histogram[12]);
 }
 
 // Issue 956519: handling empty character sets was
@@ -1232,11 +1241,10 @@ TEST(RE2, DeepRecursion) {
 // Suggested by Josh Hyman.  Failed when SearchOnePass was
 // not implementing case-folding.
 TEST(CaseInsensitive, MatchAndConsume) {
-  std::string result;
   std::string text = "A fish named *Wanda*";
   StringPiece sp(text);
-
-  EXPECT_TRUE(RE2::PartialMatch(sp, "(?i)([wand]{5})", &result));
+  StringPiece result;
+  EXPECT_TRUE(RE2::PartialMatch(text, "(?i)([wand]{5})", &result));
   EXPECT_TRUE(RE2::FindAndConsume(&sp, "(?i)([wand]{5})", &result));
 }
 
@@ -1269,38 +1277,43 @@ TEST(RE2, CL8622304) {
   EXPECT_EQ(val, "1,0x2F,030,4,5");
 }
 
-
 // Check that RE2 returns correct regexp pieces on error.
 // In particular, make sure it returns whole runes
 // and that it always reports invalid UTF-8.
 // Also check that Perl error flag piece is big enough.
 static struct ErrorTest {
   const char *regexp;
-  const char *error;
+  RE2::ErrorCode error_code;
+  const char *error_arg;
 } error_tests[] = {
-  { "ab\\αcd", "\\α" },
-  { "ef\\x☺01", "\\x☺0" },
-  { "gh\\x1☺01", "\\x1☺" },
-  { "ij\\x1", "\\x1" },
-  { "kl\\x", "\\x" },
-  { "uv\\x{0000☺}", "\\x{0000☺" },
-  { "wx\\p{ABC", "\\p{ABC" },
-  { "yz(?smiUX:abc)", "(?smiUX" },   // used to return (?s but the error is X
-  { "aa(?sm☺i", "(?sm☺" },
-  { "bb[abc", "[abc" },
+  { "ab\\αcd", RE2::ErrorBadEscape, "\\α" },
+  { "ef\\x☺01", RE2::ErrorBadEscape, "\\x☺0" },
+  { "gh\\x1☺01", RE2::ErrorBadEscape, "\\x1☺" },
+  { "ij\\x1", RE2::ErrorBadEscape, "\\x1" },
+  { "kl\\x", RE2::ErrorBadEscape, "\\x" },
+  { "uv\\x{0000☺}", RE2::ErrorBadEscape, "\\x{0000☺" },
+  { "wx\\p{ABC", RE2::ErrorBadCharRange, "\\p{ABC" },
+  // used to return (?s but the error is X
+  { "yz(?smiUX:abc)", RE2::ErrorBadPerlOp, "(?smiUX" },
+  { "aa(?sm☺i", RE2::ErrorBadPerlOp, "(?sm☺" },
+  { "bb[abc", RE2::ErrorMissingBracket, "[abc" },
+  { "abc(def", RE2::ErrorMissingParen, "abc(def" },
+  { "abc)def", RE2::ErrorUnexpectedParen, "abc)def" },
 
-  { "mn\\x1\377", "" },  // no argument string returned for invalid UTF-8
-  { "op\377qr", "" },
-  { "st\\x{00000\377", "" },
-  { "zz\\p{\377}", "" },
-  { "zz\\x{00\377}", "" },
-  { "zz(?P<name\377>abc)", "" },
+  // no argument string returned for invalid UTF-8
+  { "mn\\x1\377", RE2::ErrorBadUTF8, "" },
+  { "op\377qr", RE2::ErrorBadUTF8, "" },
+  { "st\\x{00000\377", RE2::ErrorBadUTF8, "" },
+  { "zz\\p{\377}", RE2::ErrorBadUTF8, "" },
+  { "zz\\x{00\377}", RE2::ErrorBadUTF8, "" },
+  { "zz(?P<name\377>abc)", RE2::ErrorBadUTF8, "" },
 };
-TEST(RE2, ErrorArgs) {
+TEST(RE2, ErrorCodeAndArg) {
   for (size_t i = 0; i < arraysize(error_tests); i++) {
     RE2 re(error_tests[i].regexp, RE2::Quiet);
     EXPECT_FALSE(re.ok());
-    EXPECT_EQ(re.error_arg(), error_tests[i].error) << re.error();
+    EXPECT_EQ(re.error_code(), error_tests[i].error_code) << re.error();
+    EXPECT_EQ(re.error_arg(), error_tests[i].error_arg) << re.error();
   }
 }
 
@@ -1626,6 +1639,21 @@ TEST(RE2, Issue104) {
   s = "人类";
   ASSERT_EQ(3, RE2::GlobalReplace(&s, "大*", "小"));
   ASSERT_EQ("小人小类小", s);
+}
+
+TEST(RE2, Issue310) {
+  // (?:|a)* matched more text than (?:|a)+ did.
+
+  std::string s = "aaa";
+  StringPiece m;
+
+  RE2 star("(?:|a)*");
+  ASSERT_TRUE(star.Match(s, 0, s.size(), RE2::UNANCHORED, &m, 1));
+  ASSERT_EQ(m, "") << " got m='" << m << "', want ''";
+
+  RE2 plus("(?:|a)+");
+  ASSERT_TRUE(plus.Match(s, 0, s.size(), RE2::UNANCHORED, &m, 1));
+  ASSERT_EQ(m, "") << " got m='" << m << "', want ''";
 }
 
 }  // namespace re2
