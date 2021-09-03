@@ -189,7 +189,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
         }
     }
     EXPECT_EQ(1, state->dataHeatBal->TotBlindsEQL);
-    EXPECT_EQ(state->dataMaterial->Material(VBMatNum).Group, DataHeatBalance::MaterialGroup::BlindEquivalentLayer);
+    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(VBMatNum).Group, DataHeatBalance::MaterialGroup::BlindEquivalentLayer));
     EXPECT_EQ(state->dataMaterial->Material(VBMatNum).SlatAngleType, state->dataWindowEquivalentLayer->lscVBNOBM);
 
     int ConstrNum = 1;
@@ -947,7 +947,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, state->dataHeatBal->TotMaterials);
-    EXPECT_EQ(state->dataMaterial->Material(1).Group, DataHeatBalance::MaterialGroup::WindowSimpleGlazing);
+    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(1).Group, DataHeatBalance::MaterialGroup::WindowSimpleGlazing));
     // get construction returns error forund true due to invalid layer
     GetConstructData(*state, ErrorsFound);
     EXPECT_EQ(1, state->dataHeatBal->TotConstructs);

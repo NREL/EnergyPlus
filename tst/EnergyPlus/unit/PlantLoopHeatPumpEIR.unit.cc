@@ -2807,10 +2807,10 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
         *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_EQ(ResourceTypes.at(1), DataGlobalConstants::ResourceType::EnergyTransfer); // ENERGYTRANSFER
+    EXPECT_TRUE(compare_enums(ResourceTypes.at(1), DataGlobalConstants::ResourceType::EnergyTransfer)); // ENERGYTRANSFER
     EXPECT_EQ(EndUses(1), "");
     EXPECT_EQ(Groups(1), "PLANT");
-    EXPECT_EQ(ResourceTypes.at(2), DataGlobalConstants::ResourceType::Electricity); // Electric
+    EXPECT_TRUE(compare_enums(ResourceTypes.at(2), DataGlobalConstants::ResourceType::Electricity)); // Electric
     EXPECT_EQ(EndUses(2), "COOLING");
     EXPECT_EQ(Groups(2), "PLANT");
 }
@@ -2908,10 +2908,10 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
         *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_EQ(ResourceTypes.at(1), DataGlobalConstants::ResourceType::EnergyTransfer); // ENERGYTRANSFER
+    EXPECT_TRUE(compare_enums(ResourceTypes.at(1), DataGlobalConstants::ResourceType::EnergyTransfer)); // ENERGYTRANSFER
     EXPECT_EQ(EndUses(1), "");
     EXPECT_EQ(Groups(1), "PLANT");
-    EXPECT_EQ(ResourceTypes.at(2), DataGlobalConstants::ResourceType::Electricity); // Electric
+    EXPECT_TRUE(compare_enums(ResourceTypes.at(2), DataGlobalConstants::ResourceType::Electricity)); // Electric
     EXPECT_EQ(EndUses(2), "HEATING");
     EXPECT_EQ(Groups(2), "PLANT");
 }

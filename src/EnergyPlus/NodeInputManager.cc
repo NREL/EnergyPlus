@@ -481,11 +481,11 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
         print(state.files.bnd, "{}\n", "! schematic diagram of the HVAC system.");
         print(state.files.bnd, "{}\n", "! ===============================================================");
         // Show the node names on the Branch-Node Details file
-        static constexpr fmt::string_view Format_700("! #Nodes,<Number of Unique Nodes>");
+        static constexpr std::string_view Format_700("! #Nodes,<Number of Unique Nodes>");
         print(state.files.bnd, "{}\n", Format_700);
         print(state.files.bnd, " #Nodes,{}\n", state.dataNodeInputMgr->NumOfUniqueNodeNames);
         if (state.dataNodeInputMgr->NumOfUniqueNodeNames > 0) {
-            static constexpr fmt::string_view Format_702(
+            static constexpr std::string_view Format_702(
                 "! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
             print(state.files.bnd, "{}\n", Format_702);
         }
@@ -504,7 +504,7 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
             print(state.files.bnd, "{}\n", "! ===============================================================");
             print(state.files.bnd, "{}\n", "! Suspicious nodes have 0 references.  It is normal for some nodes, however.");
             print(state.files.bnd, "{}\n", "! Listing nodes with 0 references (culled from previous list):");
-            static constexpr fmt::string_view Format_703(
+            static constexpr std::string_view Format_703(
                 "! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
             print(state.files.bnd, "{}\n", Format_703);
             for (int NumNode = 1; NumNode <= state.dataNodeInputMgr->NumOfUniqueNodeNames; ++NumNode) {
