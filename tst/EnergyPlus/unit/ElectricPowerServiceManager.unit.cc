@@ -67,7 +67,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest)
 {
@@ -344,7 +343,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2)
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::aCBussStorage;
     //	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storagePresent
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj =
-        std::unique_ptr<ElectricStorage>(new ElectricStorage(*state, "TEST STORAGE BANK"));
+        std::make_unique<ElectricStorage>(*state, "TEST STORAGE BANK");
 
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 1000.0;
 
@@ -445,7 +444,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
     // Case 3 DCBussInverter   Inverter = 3000,
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::dCBussInverter;
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj =
-        std::unique_ptr<DCtoACInverter>(new DCtoACInverter(*state, "TEST INVERTER"));
+        std::make_unique<DCtoACInverter>(*state, "TEST INVERTER");
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterPresent = true;
 
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 1000.0;
@@ -557,7 +556,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
         ElectPowerLoadCenter::ElectricBussType::dCBussInverterDCStorage;
 
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj =
-        std::unique_ptr<DCtoACInverter>(new DCtoACInverter(*state, "TEST INVERTER"));
+        std::make_unique<DCtoACInverter>(*state, "TEST INVERTER");
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterPresent = true;
 
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 2000.0;
@@ -654,10 +653,10 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType =
         (ElectPowerLoadCenter::ElectricBussType::dCBussInverterACStorage);
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj =
-        std::unique_ptr<DCtoACInverter>(new DCtoACInverter(*state, "TEST INVERTER"));
+        std::make_unique<DCtoACInverter>(*state, "TEST INVERTER");
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterPresent = true;
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj =
-        std::unique_ptr<ElectricStorage>(new ElectricStorage(*state, "TEST STORAGE BANK"));
+        std::make_unique<ElectricStorage>(*state, "TEST STORAGE BANK");
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->storOpCVDischargeRate = 200.0;
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->storOpCVChargeRate = 150.0;
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 2000.0;
@@ -800,7 +799,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
     createFacilityElectricPowerServiceObject(*state);
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj =
-        std::unique_ptr<ElectricTransformer>(new ElectricTransformer(*state, "TRANSFORMER"));
+        std::make_unique<ElectricTransformer>(*state, "TRANSFORMER");
     Real64 expectedtransformerObjLossRate =
         state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj->getLossRateForOutputPower(*state, 2000.0);
     // check the transformer loss rate for load and no load condition
