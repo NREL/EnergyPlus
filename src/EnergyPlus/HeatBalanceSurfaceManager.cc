@@ -4763,8 +4763,15 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
 
 void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate)
 {
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        if (present(ZoneToResimulate) && (zoneNum != ZoneToResimulate)) continue;
+    int firstZone = 1;
+    int lastZone = state.dataGlobal->NumOfZones;
+
+    if (present(ZoneToResimulate)) {
+        firstZone = ZoneToResimulate;
+        lastZone = ZoneToResimulate;
+    }
+
+    for (int zoneNum = firstZone; zoneNum <= lastZone; ++zoneNum) {
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
@@ -4785,21 +4792,17 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional
     // Set normalized properties used for reporting
 
     // Heat transfer surfaces
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        if (present(ZoneToResimulate) && (zoneNum != ZoneToResimulate)) continue;
-        int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
-        int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+    for (int zoneNum = firstZone; zoneNum <= lastZone; ++zoneNum) {
+        int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
+        int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast; // Skip TDD:DOME objects. Inside temp is handled by TDD:DIFFUSER.
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-            if (state.dataSurface->Surface(surfNum).Class == SurfaceClass::TDD_Dome)
-                continue; // Skip TDD:DOME objects. Inside temp is handled by TDD:DIFFUSER.
             state.dataHeatBalSurf->SurfQdotConvInPerArea(surfNum) =
                 -state.dataHeatBalSurf->SurfHConvInt(surfNum) *
                 (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum));
         }
     }
     // Opaque surfaces
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        if (present(ZoneToResimulate) && (zoneNum != ZoneToResimulate)) continue;
+    for (int zoneNum = firstZone; zoneNum <= lastZone; ++zoneNum) {
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
