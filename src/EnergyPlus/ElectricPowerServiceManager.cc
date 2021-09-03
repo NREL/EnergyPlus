@@ -2881,7 +2881,7 @@ void DCtoACInverter::calcEfficiency(EnergyPlusData &state)
             if (ac < 0) ac = 0;
             efficiency_ = ac / dCPowerIn_;
         } else {
-            efficiency_ = 0.0;
+            efficiency_ = 1.0; // Set to a non-zero reasonable value (to avoid divide by zero error)
         }
         break;
     }
@@ -3343,8 +3343,8 @@ ElectricStorage::ElectricStorage( // main constructor
         switch (storageModelMode_) {
 
         case StorageModelType::simpleBucketStorage: {
-            energeticEfficCharge_ = state.dataIPShortCut->rNumericArgs(2);
-            energeticEfficDischarge_ = state.dataIPShortCut->rNumericArgs(3);
+            energeticEfficCharge_ = checkUserEfficiencyInput(state, state.dataIPShortCut->rNumericArgs(2), "CHARGING", name_, errorsFound);
+            energeticEfficDischarge_ = checkUserEfficiencyInput(state, state.dataIPShortCut->rNumericArgs(3), "DISCHARGING", name_, errorsFound);
             maxEnergyCapacity_ = state.dataIPShortCut->rNumericArgs(4);
             maxPowerDraw_ = state.dataIPShortCut->rNumericArgs(5);
             maxPowerStore_ = state.dataIPShortCut->rNumericArgs(6);
@@ -3760,6 +3760,37 @@ ElectricStorage::ElectricStorage( // main constructor
     }
 }
 
+Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, std::string whichType, std::string deviceName, bool &errorsFound)
+{
+    Real64 const minChargeEfficiency = 0.001;
+    Real64 const minDischargeEfficiency = 0.001;
+
+    // Fix for Defect #8867.  Do not allow either efficiency to be zero as it will lead to a divide by zero (NaN).
+    if (UtilityRoutines::SameString(whichType, "CHARGING")) {
+        if (userInputValue < minChargeEfficiency) {
+            ShowSevereError(state,
+                            format("ElectricStorage charge efficiency was too low.  This occurred for electric storage unit named " + deviceName));
+            ShowContinueError(state, format("Please check your input value  for this electric storage unit and fix the charge efficiency."));
+            errorsFound = true;
+            return minChargeEfficiency;
+        } else {
+            return userInputValue;
+        }
+    } else if (UtilityRoutines::SameString(whichType, "DISCHARGING")) {
+        if (userInputValue < minDischargeEfficiency) {
+            ShowSevereError(state,
+                            format("ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named " + deviceName));
+            ShowContinueError(state, format("Please check your input value  for this electric storage unit and fix the discharge efficiency."));
+            errorsFound = true;
+            return minDischargeEfficiency;
+        } else {
+            return userInputValue;
+        }
+    } else { // This shouldn't happen but this will still allow a value to be returned.
+        return userInputValue;
+    }
+}
+
 void ElectricStorage::reinitAtBeginEnvironment()
 {
     pelNeedFromStorage_ = 0.0;
@@ -3952,6 +3983,7 @@ void ElectricStorage::simulateSimpleBucketModel(EnergyPlusData &state,
                                                 Real64 const controlSOCMaxFracLimit,
                                                 Real64 const controlSOCMinFracLimit)
 {
+
     // given arguments for how the storage operation would like to run storage charge or discharge
     // apply model constraints and adjust arguments accordingly
 
@@ -5053,7 +5085,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
     } // switch
 
     if (powerIn_ <= 0) {
-        efficiency_ = 0.0;
+        efficiency_ = 1.0; // Set to something reasonable to avoid a divide by zero error
     } else {
         efficiency_ = powerOut_ / powerIn_;
     }
