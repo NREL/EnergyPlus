@@ -111,6 +111,8 @@ namespace gt::heat_transfer {
                                   bool use_similarities, bool disp=false,
                                   int numThreads=1);
 
+    double E1(double &z, int max_iter=10);
+
 } // namespace gt::heat_transfer
 
 #endif //CPPGFUNCTION_HEAT_TRANSFER_H
