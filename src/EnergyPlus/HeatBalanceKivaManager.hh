@@ -139,6 +139,7 @@ namespace HeatBalanceKivaManager {
         virtual ~KivaManager();
         void readWeatherData(EnergyPlusData &state);
         bool setupKivaInstances(EnergyPlusData &state);
+        Real64 getDeepGroundDepth(Kiva::Foundation fnd);
         void initKivaInstances(EnergyPlusData &state);
         void calcKivaInstances(EnergyPlusData &state);
         void defineDefaultFoundation(EnergyPlusData &state);
