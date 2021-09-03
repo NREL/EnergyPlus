@@ -299,12 +299,8 @@ struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct
     Real64 LoadSideInletEnth;      // Load Side Inlet Enthalpy [J/kg]
     Real64 LoadSideOutletDBTemp;   // Load Side Outlet Dry Bulb Temp [C]
     Real64 LoadSideOutletHumRat;   // Load Side Outlet Humidity ratio
-    Real64 QSensible;              // Load side sensible heat transfer rate [W]
-    Real64 QLoadTotal;             // Load side total heat transfer rate [W]
-    Real64 QLoadTotalReport;       // Load side total heat transfer rate for reporting[W]
     Real64 QLatRated;              // Latent Capacity [W] rated at entering air conditions [Tdb=26.7C Twb=19.4C]
     Real64 QLatActual;             // Actual Latent Capacity [W]
-    Real64 QSource;                // Source side heat transfer rate [W]
     Real64 Winput;                 // Power Consumption [W]
     bool MyOneTimeFlag = true;     // one time allocation flag
     bool firstTime = true;
@@ -343,8 +339,8 @@ struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct
     WaterToAirHeatPumpSimpleData()
         : CelsiustoKelvin(DataGlobalConstants::KelvinConv), NumWatertoAirHPs(0), AirflowErrPointer(0), GetCoilsInputFlag(true),
           SourceSideMassFlowRate(0.0), SourceSideInletTemp(0.0), SourceSideInletEnth(0.0), LoadSideInletDBTemp(0.0), LoadSideInletWBTemp(0.0),
-          LoadSideInletHumRat(0.0), LoadSideInletEnth(0.0), LoadSideOutletDBTemp(0.0), LoadSideOutletHumRat(0.0), QSensible(0.0), QLoadTotal(0.0),
-          QLoadTotalReport(0.0), QLatRated(0.0), QLatActual(0.0), QSource(0.0), Winput(0.0), MyOneTimeFlag(true), firstTime(true)
+          LoadSideInletHumRat(0.0), LoadSideInletEnth(0.0), LoadSideOutletDBTemp(0.0), LoadSideOutletHumRat(0.0), QLatRated(0.0), QLatActual(0.0),
+          Winput(0.0), MyOneTimeFlag(true), firstTime(true)
     {
     }
 };
