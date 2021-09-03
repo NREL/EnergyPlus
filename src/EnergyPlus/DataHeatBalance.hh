@@ -828,6 +828,8 @@ namespace DataHeatBalance {
         int SupplyApproachTempSch;         // The difference schedule of the IT inlet temperature from the AHU supply air temperature
         Real64 ReturnApproachTemp;         // The difference of the unit outlet temperature from the well mixed zone temperature
         int ReturnApproachTempSch;         // The difference schedule of the unit outlet temperature from the well mixed zone temperature
+        int zoneEqIndex;                   // index in zone equipment data structure for the zone this IT equipment is in
+        bool gotControlledZoneIndex;       // set to true when zoneEqIndex has been set
 
         // Report variables
         Real64 CPUPower;            // ITE CPU Electric Power [W]
@@ -876,13 +878,14 @@ namespace DataHeatBalance {
               AirConnectionType(0), InletRoomAirNodeNum(0), OutletRoomAirNodeNum(0), SupplyAirNodeNum(0), DesignRecircFrac(0.0), RecircFLTCurve(0),
               DesignUPSEfficiency(0.0), UPSEfficFPLRCurve(0), UPSLossToZoneFrac(0.0), EMSCPUPowerOverrideOn(false), EMSCPUPower(0.0),
               EMSFanPowerOverrideOn(false), EMSFanPower(0.0), EMSUPSPowerOverrideOn(false), EMSUPSPower(0.0), SupplyApproachTemp(0.0),
-              SupplyApproachTempSch(0), ReturnApproachTemp(0.0), ReturnApproachTempSch(0), CPUPower(0.0), FanPower(0.0), UPSPower(0.0),
-              CPUPowerAtDesign(0.0), FanPowerAtDesign(0.0), UPSGainRateToZone(0.0), ConGainRateToZone(0.0), CPUConsumption(0.0), FanConsumption(0.0),
-              UPSConsumption(0.0), CPUEnergyAtDesign(0.0), FanEnergyAtDesign(0.0), UPSGainEnergyToZone(0.0), ConGainEnergyToZone(0.0),
-              AirVolFlowStdDensity(0.0), AirVolFlowCurDensity(0.0), AirMassFlow(0.0), AirInletDryBulbT(0.0), AirInletDewpointT(0.0),
-              AirInletRelHum(0.0), AirOutletDryBulbT(0.0), SHI(0.0), TimeOutOfOperRange(0.0), TimeAboveDryBulbT(0.0), TimeBelowDryBulbT(0.0),
-              TimeAboveDewpointT(0.0), TimeBelowDewpointT(0.0), TimeAboveRH(0.0), TimeBelowRH(0.0), DryBulbTAboveDeltaT(0.0),
-              DryBulbTBelowDeltaT(0.0), DewpointTAboveDeltaT(0.0), DewpointTBelowDeltaT(0.0), RHAboveDeltaRH(0.0), RHBelowDeltaRH(0.0)
+              SupplyApproachTempSch(0), ReturnApproachTemp(0.0), ReturnApproachTempSch(0), zoneEqIndex(0), gotControlledZoneIndex(false),
+              CPUPower(0.0), FanPower(0.0), UPSPower(0.0), CPUPowerAtDesign(0.0), FanPowerAtDesign(0.0), UPSGainRateToZone(0.0),
+              ConGainRateToZone(0.0), CPUConsumption(0.0), FanConsumption(0.0), UPSConsumption(0.0), CPUEnergyAtDesign(0.0), FanEnergyAtDesign(0.0),
+              UPSGainEnergyToZone(0.0), ConGainEnergyToZone(0.0), AirVolFlowStdDensity(0.0), AirVolFlowCurDensity(0.0), AirMassFlow(0.0),
+              AirInletDryBulbT(0.0), AirInletDewpointT(0.0), AirInletRelHum(0.0), AirOutletDryBulbT(0.0), SHI(0.0), TimeOutOfOperRange(0.0),
+              TimeAboveDryBulbT(0.0), TimeBelowDryBulbT(0.0), TimeAboveDewpointT(0.0), TimeBelowDewpointT(0.0), TimeAboveRH(0.0), TimeBelowRH(0.0),
+              DryBulbTAboveDeltaT(0.0), DryBulbTBelowDeltaT(0.0), DewpointTAboveDeltaT(0.0), DewpointTBelowDeltaT(0.0), RHAboveDeltaRH(0.0),
+              RHBelowDeltaRH(0.0)
         {
         }
     };

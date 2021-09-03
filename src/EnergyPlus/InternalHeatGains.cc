@@ -7763,9 +7763,12 @@ namespace InternalHeatGains {
                     WAirIn = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                 } else {
                     // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
-                    int zoneEqIndex =
-                        DataZoneEquipment::GetControlledZoneIndex(state, state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
-                    if (zoneEqIndex > 0) {
+                    if (!state.dataHeatBal->ZoneITEq(Loop).gotControlledZoneIndex) { // Do the following only once to save time
+                        state.dataHeatBal->ZoneITEq(Loop).zoneEqIndex =
+                            DataZoneEquipment::GetControlledZoneIndex(state, state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(Loop).ZonePtr).Name);
+                        state.dataHeatBal->ZoneITEq(Loop).gotControlledZoneIndex = true;
+                    }
+                    if (state.dataHeatBal->ZoneITEq(Loop).zoneEqIndex > 0) {
                         int ZoneAirInletNode = state.dataZoneEquip->ZoneEquipConfig(NZ).InletNode(1);
                         TSupply = state.dataLoopNodes->Node(ZoneAirInletNode).Temp;
                     } else {

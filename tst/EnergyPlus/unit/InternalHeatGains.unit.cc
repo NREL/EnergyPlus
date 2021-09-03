@@ -2584,7 +2584,6 @@ TEST_F(EnergyPlusFixture, ITEwithUncontrolledZoneTest)
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
 
-    state->dataGlobal->numSpaces = 0;
     state->dataEnvrn->StdBaroPress = 101400.0;
 
     InternalHeatGains::CalcZoneITEq(*state);
