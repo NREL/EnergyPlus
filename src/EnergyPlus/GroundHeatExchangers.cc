@@ -141,8 +141,8 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
 
     this->name = objName;
 
-    std::string inletNodeName = UtilityRoutines::MakeUPPERCase(AsString(j["inlet_node_name"]));
-    std::string outletNodeName = UtilityRoutines::MakeUPPERCase(AsString(j["outlet_node_name"]));
+    std::string inletNodeName = UtilityRoutines::MakeUPPERCase(j["inlet_node_name"].get<std::string>());
+    std::string outletNodeName = UtilityRoutines::MakeUPPERCase(j["outlet_node_name"].get<std::string>());
 
     // get inlet node num
     this->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -172,34 +172,34 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     BranchNodeConnections::TestCompSet(state, this->moduleName, this->name, inletNodeName, outletNodeName, "Condenser Water Nodes");
 
     // load data
-    this->designFlow = j["design_flow_rate"];
+    this->designFlow = j["design_flow_rate"].get<Real64>();
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->inletNodeNum, this->designFlow);
 
-    this->soil.k = j["soil_thermal_conductivity"];
-    this->soil.rho = j["soil_density"];
-    this->soil.cp = j["soil_specific_heat"];
+    this->soil.k = j["soil_thermal_conductivity"].get<Real64>();
+    this->soil.rho = j["soil_density"].get<Real64>();
+    this->soil.cp = j["soil_specific_heat"].get<Real64>();
     this->soil.rhoCp = this->soil.rho * this->soil.cp;
-    this->pipe.k = j["pipe_thermal_conductivity"];
-    this->pipe.rho = j["pipe_density"];
-    this->pipe.cp = j["pipe_specific_heat"];
-    this->pipe.outDia = j["pipe_outer_diameter"];
+    this->pipe.k = j["pipe_thermal_conductivity"].get<Real64>();
+    this->pipe.rho = j["pipe_density"].get<Real64>();
+    this->pipe.cp = j["pipe_specific_heat"].get<Real64>();
+    this->pipe.outDia = j["pipe_outer_diameter"].get<Real64>();
     this->pipe.outRadius = this->pipe.outDia / 2.0;
-    this->pipe.thickness = j["pipe_thickness"];
+    this->pipe.thickness = j["pipe_thickness"].get<Real64>();
 
-    std::string const hxConfig = UtilityRoutines::MakeUPPERCase(AsString(j["heat_exchanger_configuration"]));
+    std::string const hxConfig = UtilityRoutines::MakeUPPERCase(j["heat_exchanger_configuration"].get<std::string>());
     if (UtilityRoutines::SameString(hxConfig, "VERTICAL")) {
         this->verticalConfig = true;
     } else if (UtilityRoutines::SameString(hxConfig, "HORIZONTAL")) {
         this->verticalConfig = false;
     }
 
-    this->coilDiameter = j["coil_diameter"];
-    this->coilPitch = j["coil_pitch"];
-    this->trenchDepth = j["trench_depth"];
-    this->trenchLength = j["trench_length"];
-    this->numTrenches = j["number_of_trenches"];
-    this->trenchSpacing = j["horizontal_spacing_between_pipes"];
-    this->maxSimYears = j["maximum_length_of_simulation"];
+    this->coilDiameter = j["coil_diameter"].get<Real64>();
+    this->coilPitch = j["coil_pitch"].get<Real64>();
+    this->trenchDepth = j["trench_depth"].get<Real64>();
+    this->trenchLength = j["trench_length"].get<Real64>();
+    this->numTrenches = j["number_of_trenches"].get<int>();
+    this->trenchSpacing = j["horizontal_spacing_between_pipes"].get<Real64>();
+    this->maxSimYears = j["maximum_length_of_simulation"].get<Real64>();
 
     // Need to add a response factor object for the slinky model
     std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
@@ -253,8 +253,8 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     }
 
     // Initialize ground temperature model and get pointer reference
-    std::string const gtmType = UtilityRoutines::MakeUPPERCase(AsString(j["undisturbed_ground_temperature_model_type"]));
-    std::string const gtmName = UtilityRoutines::MakeUPPERCase(AsString(j["undisturbed_ground_temperature_model_name"]));
+    std::string const gtmType = UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_type"].get<std::string>());
+    std::string const gtmName = UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_name"].get<std::string>());
     this->groundTempModel = GetGroundTempModelAndInit(state, gtmType, gtmName);
     if (this->groundTempModel) {
         errorsFound = this->groundTempModel->errorsFound;
@@ -282,7 +282,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     this->name = objName;
 
     // get inlet node num
-    std::string const inletNodeName = UtilityRoutines::MakeUPPERCase(AsString(j["inlet_node_name"]));
+    std::string const inletNodeName = UtilityRoutines::MakeUPPERCase(j["inlet_node_name"].get<std::string>());
     this->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                              inletNodeName,
                                                              errorsFound,
@@ -294,7 +294,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                                                              ObjectIsNotParent);
 
     // get outlet node num
-    std::string const outletNodeName = UtilityRoutines::MakeUPPERCase(AsString(j["outlet_node_name"]));
+    std::string const outletNodeName = UtilityRoutines::MakeUPPERCase(j["outlet_node_name"].get<std::string>());
     this->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                               outletNodeName,
                                                               errorsFound,
@@ -309,15 +309,16 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
 
     BranchNodeConnections::TestCompSet(state, this->moduleName, objName, inletNodeName, outletNodeName, "Condenser Water Nodes");
 
-    this->designFlow = j["design_flow_rate"];
+    this->designFlow = j["design_flow_rate"].get<Real64>();
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->inletNodeNum, this->designFlow);
 
-    this->soil.k = j["ground_thermal_conductivity"];
-    this->soil.rhoCp = j["ground_thermal_heat_capacity"];
+    this->soil.k = j["ground_thermal_conductivity"].get<Real64>();
+    this->soil.rhoCp = j["ground_thermal_heat_capacity"].get<Real64>();
 
     if (j.find("ghe_vertical_responsefactors_object_name") != j.end()) {
         // Response factors come from IDF object
-        this->myRespFactors = GetResponseFactor(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_responsefactors_object_name"])));
+        this->myRespFactors =
+            GetResponseFactor(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_responsefactors_object_name"].get<std::string>()));
         this->gFunctionsExist = true;
 
         if (!this->myRespFactors) {
@@ -331,7 +332,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
 
         // g-function calculation method
         if (j.find("g_function_calculation_method") != j.end()) {
-            std::string gFunctionMethodStr = UtilityRoutines::MakeUPPERCase(AsString(j["g_function_calculation_method"]));
+            std::string gFunctionMethodStr = UtilityRoutines::MakeUPPERCase(j["g_function_calculation_method"].get<std::string>());
             if (gFunctionMethodStr == "UHFCALC") {
                 this->gFuncCalcMethod = GFuncCalcMethod::UniformHeatFlux;
             } else if (gFunctionMethodStr == "UBHWTCALC") {
@@ -346,7 +347,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
         if (j.find("ghe_vertical_array_object_name") != j.end()) {
             // Response factors come from array object
             this->myRespFactors = BuildAndGetResponseFactorObjectFromArray(
-                state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_array_object_name"]))));
+                state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_array_object_name"].get<std::string>())));
 
             if (!this->myRespFactors) {
                 errorsFound = true;
@@ -367,12 +368,12 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
             for (auto const &var : vars) {
                 if (!var.at("ghe_vertical_single_object_name").empty()) {
                     std::shared_ptr<GLHEVertSingle> tempBHptr =
-                        GetSingleBH(state, UtilityRoutines::MakeUPPERCase(AsString(var.at("ghe_vertical_single_object_name"))));
+                        GetSingleBH(state, UtilityRoutines::MakeUPPERCase(var.at("ghe_vertical_single_object_name").get<std::string>()));
                     if (tempBHptr) {
                         tempVectOfBHObjects.push_back(tempBHptr);
                     } else {
                         errorsFound = true;
-                        std::string const tmpName = var.at("ghe_vertical_single_object_name");
+                        std::string const tmpName = var.at("ghe_vertical_single_object_name").get<std::string>();
                         ShowSevereError(state, "Borehole= " + tmpName + " not found.");
                         break;
                     }
@@ -437,9 +438,10 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     state.dataGroundHeatExchanger->prevTimeSteps = 0.0;
 
     // Initialize ground temperature model and get pointer reference
-    this->groundTempModel = GetGroundTempModelAndInit(state,
-                                                      UtilityRoutines::MakeUPPERCase(AsString(j["undisturbed_ground_temperature_model_type"])),
-                                                      UtilityRoutines::MakeUPPERCase(AsString(j["undisturbed_ground_temperature_model_name"])));
+    this->groundTempModel =
+        GetGroundTempModelAndInit(state,
+                                  UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_type"].get<std::string>()),
+                                  UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_name"].get<std::string>()));
     if (this->groundTempModel) {
         errorsFound = this->groundTempModel->errorsFound;
     }
@@ -462,9 +464,9 @@ GLHEVertSingle::GLHEVertSingle(EnergyPlusData &state, std::string const &objName
     }
 
     this->name = objName;
-    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_properties_object_name"])));
-    this->xLoc = j["x_location"];
-    this->yLoc = j["y_location"];
+    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"].get<std::string>()));
+    this->xLoc = j["x_location"].get<Real64>();
+    this->yLoc = j["y_location"].get<Real64>();
     this->dl_i = 0.0;
     this->dl_ii = 0.0;
     this->dl_j = 0.0;
@@ -482,10 +484,10 @@ GLHEVertArray::GLHEVertArray(EnergyPlusData &state, std::string const &objName, 
     }
 
     this->name = objName;
-    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_properties_object_name"])));
-    this->numBHinXDirection = j["number_of_boreholes_in_x_direction"];
-    this->numBHinYDirection = j["number_of_boreholes_in_y_direction"];
-    this->bhSpacing = j["borehole_spacing"];
+    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"].get<std::string>()));
+    this->numBHinXDirection = j["number_of_boreholes_in_x_direction"].get<int>();
+    this->numBHinYDirection = j["number_of_boreholes_in_y_direction"].get<int>();
+    this->bhSpacing = j["borehole_spacing"].get<Real64>();
 }
 
 //******************************************************************************
@@ -501,17 +503,17 @@ GLHEResponseFactors::GLHEResponseFactors(EnergyPlusData &state, std::string cons
     }
 
     this->name = objName;
-    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_properties_object_name"])));
-    this->numBoreholes = j["number_of_boreholes"];
-    this->gRefRatio = j["g_function_reference_ratio"];
+    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"].get<std::string>()));
+    this->numBoreholes = j["number_of_boreholes"].get<int>();
+    this->gRefRatio = j["g_function_reference_ratio"].get<Real64>();
     this->maxSimYears = state.dataEnvrn->MaxNumberSimYears;
 
     auto const vars = j.at("g_functions");
     std::vector<Real64> tmpLntts;
     std::vector<Real64> tmpGvals;
     for (auto const &var : vars) {
-        tmpLntts.push_back(var.at("g_function_ln_t_ts_value"));
-        tmpGvals.push_back(var.at("g_function_g_value"));
+        tmpLntts.push_back(var.at("g_function_ln_t_ts_value").get<Real64>());
+        tmpGvals.push_back(var.at("g_function_g_value").get<Real64>());
     }
 
     bool errorsFound = false;
@@ -551,16 +553,16 @@ GLHEVertProps::GLHEVertProps(EnergyPlusData &state, std::string const &objName, 
 
     // Load data from JSON
     this->name = objName;
-    this->bhTopDepth = j["depth_of_top_of_borehole"];
-    this->bhLength = j["borehole_length"];
-    this->bhDiameter = j["borehole_diameter"];
-    this->grout.k = j["grout_thermal_conductivity"];
-    this->grout.rhoCp = j["grout_thermal_heat_capacity"];
-    this->pipe.k = j["pipe_thermal_conductivity"];
-    this->pipe.rhoCp = j["pipe_thermal_heat_capacity"];
-    this->pipe.outDia = j["pipe_outer_diameter"];
-    this->pipe.thickness = j["pipe_thickness"];
-    this->bhUTubeDist = j["u_tube_distance"];
+    this->bhTopDepth = j["depth_of_top_of_borehole"].get<Real64>();
+    this->bhLength = j["borehole_length"].get<Real64>();
+    this->bhDiameter = j["borehole_diameter"].get<Real64>();
+    this->grout.k = j["grout_thermal_conductivity"].get<Real64>();
+    this->grout.rhoCp = j["grout_thermal_heat_capacity"].get<Real64>();
+    this->pipe.k = j["pipe_thermal_conductivity"].get<Real64>();
+    this->pipe.rhoCp = j["pipe_thermal_heat_capacity"].get<Real64>();
+    this->pipe.outDia = j["pipe_outer_diameter"].get<Real64>();
+    this->pipe.thickness = j["pipe_thickness"].get<Real64>();
+    this->bhUTubeDist = j["u_tube_distance"].get<Real64>();
 
     // Verify u-tube spacing is valid
     if (this->bhUTubeDist < this->pipe.outDia) {
@@ -1515,37 +1517,14 @@ void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
         }
 
         if (gFunctionsExist) {
-
-            // Setup the arrays
-            int numEntries = myCacheData["Response Factors"]["LNTTS"].size();
-
-            this->myRespFactors->time.dimension(numEntries, 0.0);
-            this->myRespFactors->LNTTS.dimension(numEntries, 0.0);
-            this->myRespFactors->GFNC.dimension(numEntries, 0.0);
-
             // Populate the time array
-            int index = 1;
-            auto &j_time = myCacheData["Response Factors"]["time"];
-            for (auto &it : j_time) {
-                this->myRespFactors->time(index) = it;
-                ++index;
-            }
+            this->myRespFactors->time = Array1D<Real64>(myCacheData["Response Factors"]["time"].get<std::vector<Real64>>());
 
             // Populate the lntts array
-            index = 1;
-            auto &j_lntts = myCacheData["Response Factors"]["LNTTS"];
-            for (auto &j_lntt : j_lntts) {
-                this->myRespFactors->LNTTS(index) = j_lntt;
-                ++index;
-            }
+            this->myRespFactors->LNTTS = Array1D<Real64>(myCacheData["Response Factors"]["LNTTS"].get<std::vector<Real64>>());
 
             // Populate the g-function array
-            index = 1;
-            auto &j_gfnc = myCacheData["Response Factors"]["GFNC"];
-            for (auto &it : j_gfnc) {
-                this->myRespFactors->GFNC(index) = it;
-                ++index;
-            }
+            this->myRespFactors->GFNC = Array1D<Real64>(myCacheData["Response Factors"]["GFNC"].get<std::vector<Real64>>());
         }
     }
 }
@@ -1558,73 +1537,20 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
     // For convenience
     using json = nlohmann::json;
 
+    json cached_json;
     if (FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath)) {
         // file exists -- add data
-
         // open file
-        std::ifstream ifs(state.dataStrGlobals->outputGLHEFilePath);
-
-        // create empty json object
-        json json_in;
-
-        // read json_in data
-        try {
-            ifs >> json_in;
-            ifs.close();
-        } catch (...) {
-            if (!json_in.empty()) {
-                // file exists, is not empty, but failed for some other reason
-                ShowWarningError(state, "Error reading from " + state.dataStrGlobals->outputGLHEFilePath.string());
-                ShowWarningError(state, "Data from previous " + state.dataStrGlobals->outputGLHEFilePath.string() + " not saved");
-            }
-            ifs.close();
-        }
-
-        // empty json object for output writing
-        json json_out;
-
-        // add existing data to json_out
-        int i = 0;
-        for (auto &existing_data : json_in) {
-            ++i;
-            std::string case_name = format("GHLE {}", i);
-            json_out[case_name] = existing_data;
-        }
+        cached_json = FileSystem::readJSON(state.dataStrGlobals->outputGLHEFilePath, std::ios_base::in | std::ios_base::binary);
 
         // add current data
-        std::string case_name = format("GHLE {}", i + 1);
-        json_out[case_name] = myCacheData;
-
-        if (state.files.outputControl.glhe) {
-            // open output file
-            std::ofstream ofs;
-            ofs.open(state.dataStrGlobals->outputGLHEFilePath);
-            // write data to file, set spacing at 2
-            ofs << std::setw(2) << json_out;
-            // don't forget to close
-            ofs.close();
-        }
-
+        cached_json.emplace(fmt::format("GHLE {}", cached_json.size() + 1), myCacheData);
     } else {
         // file doesn't exist -- add data
-
-        // empty json object for output writing
-        json json_out;
-
         // add current data
-        std::string case_name = "GHLE 1";
-        json_out[case_name] = myCacheData;
-
-        if (state.files.outputControl.glhe) {
-            // open output file
-            std::ofstream ofs;
-            ofs.open(state.dataStrGlobals->outputGLHEFilePath);
-            // write data to file, set spacing at 2
-            ofs << std::setw(2) << json_out;
-            // don't forget to close
-            ofs.close();
-        }
+        cached_json.emplace("GHLE 1", myCacheData);
     }
+    FileSystem::writeFile<FileSystem::FileTypes::GLHE>(state.dataStrGlobals->outputGLHEFilePath, cached_json, 2);
 }
 
 //******************************************************************************

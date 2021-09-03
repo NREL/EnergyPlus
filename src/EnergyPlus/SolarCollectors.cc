@@ -1233,9 +1233,9 @@ namespace SolarCollectors {
                 }
 
                 if (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) > 0.0) { // Calculate thermal efficiency
-                    // NOTE: Efficiency can be > 1 if Q > QRadSWOutIncident because of favorable delta T, i.e. warm outdoor temperature
+                    // NOTE: Efficiency can be > 1 if Q > SurfQRadSWOutIncident because of favorable delta T, i.e. warm outdoor temperature
                     efficiency =
-                        Q / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * area); // Q has units of W; QRadSWOutIncident has units of W/m2
+                        Q / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * area); // Q has units of W; SurfQRadSWOutIncident has units of W/m2
                 } else {
                     efficiency = 0.0;
                 }

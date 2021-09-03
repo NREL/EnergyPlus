@@ -237,6 +237,7 @@ target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/re2)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/doj)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/nlohmann)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/fast_float)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/valijson)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/)
 target_include_directories(project_options SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/third_party/SQLite/)

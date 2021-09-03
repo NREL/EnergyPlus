@@ -81,7 +81,6 @@ using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SimulationManager;
 using namespace EnergyPlus::SurfaceGeometry;
 
-using namespace ObjexxFCL;
 // using DataVectorTypes::Vector;
 
 TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)

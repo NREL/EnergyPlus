@@ -60,7 +60,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ExteriorEnergyUse;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::ScheduleManager;
 
 TEST_F(EnergyPlusFixture, ExteriorEquipmentTest_Test1)
