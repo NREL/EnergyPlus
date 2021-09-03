@@ -967,7 +967,7 @@ namespace TranspiredCollector {
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        using namespace DataHeatBalance; // , ONLY: QRadSWOutIncident, Construct, Material
+        using namespace DataHeatBalance; // , ONLY: SurfQRadSWOutIncident, Construct, Material
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const nu(15.66e-6); // kinematic viscosity (m**2/s) for air at 300 K
@@ -1168,7 +1168,7 @@ namespace TranspiredCollector {
         HrPlen = sum(HPlenARR * Area) / AreaSum;
         HPlenARR.deallocate();
 
-        //        Isc = sum( QRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum;
+        //        Isc = sum( SurfQRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum;
         ////Autodesk:F2C++ Array subscript usage: Replaced by below
         Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident,
                               state.dataSurface->Surface,

@@ -4,20 +4,18 @@
 
 // BLAS functions that have been written in C++
 
-#include <vector>
-
-using namespace std;
-
 #ifndef CPGFUNCTION_BLAS_H
 #define CPGFUNCTION_BLAS_H
 
+#include <vector>
+
 namespace jcc  { namespace blas {
 
-        void axpy(int &n, double &a, vector<double> &x, vector<double> &y,
+        void axpy(int &n, double &a, std::vector<double> &x, std::vector<double> &y,
                   int &start, int &n_threads);
 
-        void spmv(int &n, double &alpha, vector<double> &A, vector<double> &x,
-                  double &beta, vector<double> &y, int &start, int &n_threads);
+        void spmv(int &n, double &alpha, std::vector<double> &A, std::vector<double> &x,
+                  double &beta, std::vector<double> &y, int &start, int &n_threads);
 
     }  // namespace blas
 }  // namespace jcc

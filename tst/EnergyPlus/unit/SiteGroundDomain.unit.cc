@@ -89,5 +89,5 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking)
     state->dataPlantPipingSysMgr->domains[1].groundTempModel =
         GetGroundTempModelAndInit(*state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
 
-    EXPECT_NE(state->dataPlantPipingSysMgr->domains[0].groundTempModel, state->dataPlantPipingSysMgr->domains[1].groundTempModel);
+    EXPECT_NE(state->dataPlantPipingSysMgr->domains[0].groundTempModel.get(), state->dataPlantPipingSysMgr->domains[1].groundTempModel.get());
 }

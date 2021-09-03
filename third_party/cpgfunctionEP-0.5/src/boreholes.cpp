@@ -2,8 +2,11 @@
 // Created by jackcook on 7/11/20.
 //
 
-#include <cpgfunction/boreholes.h>
 #include <algorithm>
+#include <cpgfunction/boreholes.h>
+#include <stdexcept>
+#include <string>
+#include <tuple>
 
 using namespace std;
 
@@ -12,7 +15,7 @@ namespace gt {
     double Distance_Formula(double x1, double y1, double x2, double y2) {
         return sqrt(pow((x1 - x2), 2) + pow((y1 - y2), 2));
     }
-    
+
 }  // namespace gt
 
 namespace gt::boreholes {

@@ -63,7 +63,6 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
 {

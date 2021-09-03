@@ -3,6 +3,7 @@
 //
 
 #include <cpgfunction/interpolation.h>
+#include <stdexcept>
 
 using namespace std;
 
