@@ -318,7 +318,6 @@ namespace HVACMultiSpeedHeatPump {
                                      CompOp,
                                      OpMode,
                                      QZnReq,
-                                     ZoneNum,
                                      SpeedNum,
                                      SpeedRatio,
                                      PartLoadFrac,
@@ -333,7 +332,6 @@ namespace HVACMultiSpeedHeatPump {
                                          CompOp,
                                          OpMode,
                                          QZnReq,
-                                         ZoneNum,
                                          SpeedNum,
                                          SpeedRatio,
                                          PartLoadFrac,
@@ -347,7 +345,6 @@ namespace HVACMultiSpeedHeatPump {
                                      CompOp,
                                      OpMode,
                                      QZnReq,
-                                     ZoneNum,
                                      SpeedNum,
                                      SpeedRatio,
                                      PartLoadFrac,
@@ -3021,7 +3018,6 @@ namespace HVACMultiSpeedHeatPump {
                               int const CompOp,              // compressor operation; 1=on, 0=off
                               int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                               Real64 const QZnReq,           // cooling or heating output needed by zone [W]
-                              int const ZoneNum,             // Index to zone number
                               int const SpeedNum,            // Speed number
                               Real64 &SpeedRatio,            // unit speed ratio for DX coils
                               Real64 &PartLoadFrac,          // unit part load fraction
@@ -3030,37 +3026,14 @@ namespace HVACMultiSpeedHeatPump {
 
     )
     {
-        int const MaxIte(500);           // maximum number of iterations
-        Real64 const ErrorToler = 0.001; // error tolerance
-
-        auto &MSHeatPump(state.dataHVACMultiSpdHP->MSHeatPump);
         OnOffAirFlowRatio = 0.0;
         SupHeaterLoad = 0.0;
-        PartLoadFrac = 0.0;
-        SpeedRatio = 0.0;
 
         // Calculate TempOutput
         Real64 TempOutput = 0.0; // unit output when iteration limit exceeded [W]
-
-        // Calculate the part load fraction
-        int SolFla = 0;         // Flag of RegulaFalsi solver
-        Array1D<Real64> Par(9); // Parameters passed to RegulaFalsi
-        Par(1) = MSHeatPumpNum;
-        Par(2) = ZoneNum;
-        if (FirstHVACIteration) {
-            Par(3) = 1.0;
-        } else {
-            Par(3) = 0.0;
-        }
-        Par(4) = OpMode;
-        Par(5) = QZnReq;
-        Par(6) = OnOffAirFlowRatio;
-        Par(7) = SupHeaterLoad;
-        Par(8) = SpeedNum;
-        Par(9) = CompOp;
-
         PartLoadFrac = 1.0;
         if (SpeedNum == 1) {
+            SpeedRatio = 0.0;
             CalcMSHeatPump(state,
                            MSHeatPumpNum,
                            FirstHVACIteration,
@@ -3072,9 +3045,6 @@ namespace HVACMultiSpeedHeatPump {
                            QZnReq,
                            OnOffAirFlowRatio,
                            SupHeaterLoad);
-            if ((QZnReq > 0.0 && QZnReq <= TempOutput) || (QZnReq < 0.0 && QZnReq >= TempOutput)) {
-                General::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
-            }
         } else {
             SpeedRatio = 1.0;
             CalcMSHeatPump(state,
@@ -3088,50 +3058,6 @@ namespace HVACMultiSpeedHeatPump {
                            QZnReq,
                            OnOffAirFlowRatio,
                            SupHeaterLoad);
-            if ((QZnReq > 0.0 && QZnReq <= TempOutput) || (QZnReq < 0.0 && QZnReq >= TempOutput)) {
-                General::SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par);
-            }
-        }
-        if (SolFla == -1) {
-            if (!state.dataGlobal->WarmupFlag) {
-                if (SpeedNum == 1) {
-                    if (state.dataHVACMultiSpdHP->ErrCountCyc == 0) {
-                        ++state.dataHVACMultiSpdHP->ErrCountCyc;
-                        ShowWarningError(state,
-                                         "Iteration limit exceeded calculating DX unit cycling ratio, for unit=" + MSHeatPump(MSHeatPumpNum).Name +
-                                             ". The warning is caused by the EMS program overriding the coil speed.");
-                        ShowContinueErrorTimeStamp(state, format("Cycling ratio returned={:.2R}", PartLoadFrac));
-                    } else {
-                        ++state.dataHVACMultiSpdHP->ErrCountCyc;
-                        ShowRecurringWarningErrorAtEnd(state,
-                                                       MSHeatPump(MSHeatPumpNum).Name +
-                                                           "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...",
-                                                       MSHeatPump(MSHeatPumpNum).ErrIndexCyc,
-                                                       PartLoadFrac,
-                                                       PartLoadFrac);
-                    }
-                } else {
-                    if (state.dataHVACMultiSpdHP->ErrCountVar == 0) {
-                        ++state.dataHVACMultiSpdHP->ErrCountVar;
-                        ShowWarningError(state,
-                                         "Iteration limit exceeded calculating DX unit speed ratio, for unit=" + MSHeatPump(MSHeatPumpNum).Name +
-                                             ". The warning is caused by the EMS program overriding the coil speed.");
-                        ShowContinueErrorTimeStamp(state, format("Speed ratio returned=[{:.2R}], Speed number ={}", SpeedRatio, SpeedNum));
-                    } else {
-                        ++state.dataHVACMultiSpdHP->ErrCountVar;
-                        ShowRecurringWarningErrorAtEnd(state,
-                                                       MSHeatPump(MSHeatPumpNum).Name +
-                                                           "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
-                                                       MSHeatPump(MSHeatPumpNum).ErrIndexVar,
-                                                       SpeedRatio,
-                                                       SpeedRatio);
-                    }
-                }
-            }
-        } else if (SolFla == -2) {
-            ShowFatalError(state,
-                           "DX unit compressor speed calculation failed: speed limits exceeded, for unit=" +
-                               MSHeatPump(MSHeatPumpNum).DXCoolCoilName + ". The error is caused by the EMS program overriding the coil speed.");
         }
 
         ControlMSHPSupHeater(state,

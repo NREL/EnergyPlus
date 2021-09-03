@@ -352,7 +352,6 @@ namespace HVACMultiSpeedHeatPump {
                               int const CompOp,              // compressor operation; 1=on, 0=off
                               int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                               Real64 const QZnReq,           // cooling or heating output needed by zone [W]
-                              int const ZoneNum,             // Index to zone number
                               int const SpeedNum,            // Speed number
                               Real64 &SpeedRatio,            // unit speed ratio for DX coils
                               Real64 &PartLoadFrac,          // unit part load fraction
