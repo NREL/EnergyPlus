@@ -60,7 +60,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::EcoRoofManager;
 using namespace EnergyPlus::SolarShading;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataEnvironment;
 
 namespace EnergyPlus {
