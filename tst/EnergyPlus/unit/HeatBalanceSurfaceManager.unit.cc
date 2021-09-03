@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -3539,5 +3540,659 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
     state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints = 1;
     InitSurfaceHeatBalance(*state);
     EXPECT_FALSE(has_err_output(true));
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
+{
+
+    std::string const idf_objects = delimited_string({
+        "  Zone,",
+        "    Daylit Zone,             !- Name",
+        "    0.0,                     !- Direction of Relative North {deg}",
+        "    0.0,                     !- X Origin {m}",
+        "    0.0,                     !- Y Origin {m}",
+        "    0.0,                     !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "  BuildingSurface:Detailed,",
+        "    Daylit South Wall,       !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5,                     !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.0,0.0,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5.0,0.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    5.0,0.0,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Daylit West Wall,        !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5,                     !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.0,10.0,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.0,10.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0.0,0.0,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Daylit North Wall,       !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5,                     !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    5.0,10.0,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    5.0,10.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0.0,10.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0.0,10.0,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Daylit East Wall,        !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5,                     !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    5.0,0.0,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    5.0,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5.0,10.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    5.0,10.0,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Daylit Floor,            !- Name",
+        "    Floor,                   !- Surface Type",
+        "    FLOOR SLAB 8 IN,         !- Construction Name",
+        "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Daylit Floor,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.0,                     !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.0,10.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5.0,10.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    5.0,0.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Daylit Ceiling,          !- Name",
+        "    Roof,                    !- Surface Type",
+        "    CEILING IN ZONE,         !- Construction Name",
+        "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Daylit Attic Floor,      !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.0,                     !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.0,10.0,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.0,0.0,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5.0,0.0,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    5.0,10.0,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  Zone,",
+        "    Daylit Attic Zone,       !- Name",
+        "    0.0,                     !- Direction of Relative North {deg}",
+        "    0.0,                     !- X Origin {m}",
+        "    0.0,                     !- Y Origin {m}",
+        "    0.0,                     !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "  BuildingSurface:Detailed,",
+        "    Daylit Attic South Wall, !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5,                     !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.0,0.0,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5.0,0.0,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    5.0,0.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Daylit Attic West Wall,  !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5,                     !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.0,10.0,5.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.0,10.0,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0.0,0.0,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0.0,0.0,3.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Daylit Attic North Wall, !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5,                     !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    5.0,10.0,5.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    5.0,10.0,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0.0,10.0,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0.0,10.0,5.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Daylit Attic East Wall,  !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5,                     !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    5.0,0.0,3.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    5.0,0.0,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5.0,10.0,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    5.0,10.0,5.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Daylit Attic Floor,      !- Name",
+        "    Floor,                   !- Surface Type",
+        "    CEILING IN ATTIC,        !- Construction Name",
+        "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Daylit Ceiling,          !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0.0,                     !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.0,0.0,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.0,10.0,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5.0,10.0,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    5.0,0.0,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Daylit Attic Roof,       !- Name",
+        "    Roof,                    !- Surface Type",
+        "    ROOF,                    !- Construction Name",
+        "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.0,                     !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.0,10.0,5.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.0,0.0,3.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5.0,0.0,3.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    5.0,10.0,5.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  DaylightingDevice:Tubular,",
+        "    Pipe1,                   !- Name",
+        "    Dome1,                   !- Dome Name",
+        "    Diffuser1,               !- Diffuser Name",
+        "    TDD Pipe,                !- Construction Name",
+        "    0.3556,                  !- Diameter {m}",
+        "    1.4,                     !- Total Length {m}",
+        "    0.28,                    !- Effective Thermal Resistance {m2-K/W}",
+        "    Daylit Attic Zone,       !- Transition Zone 1 Name",
+        "    1.1;                     !- Transition Zone 1 Length {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    Dome1,                   !- Name",
+        "    TubularDaylightDome,     !- Surface Type",
+        "    TDD Dome,                !- Construction Name",
+        "    Daylit Attic Roof,       !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.0,                     !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    2.3425,3.209,3.64,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    2.3425,2.906,3.58,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    2.6575,2.906,3.58,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    2.6575,3.209,3.64;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    Diffuser1,               !- Name",
+        "    TubularDaylightDiffuser, !- Surface Type",
+        "    TDD Diffuser,            !- Construction Name",
+        "    Daylit Ceiling,          !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.0,                     !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    2.3425,3.1575,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    2.3425,2.8425,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    2.6575,2.8425,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    2.6575,3.1575,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  DaylightingDevice:Tubular,",
+        "    Pipe2,                   !- Name",
+        "    Dome2,                   !- Dome Name",
+        "    Diffuser2,               !- Diffuser Name",
+        "    TDD Pipe,                !- Construction Name",
+        "    0.3556,                  !- Diameter {m}",
+        "    2.2,                     !- Total Length {m}",
+        "    0.28,                    !- Effective Thermal Resistance {m2-K/W}",
+        "    Daylit Attic Zone,       !- Transition Zone 1 Name",
+        "    1.9;                     !- Transition Zone 1 Length {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    Dome2,                   !- Name",
+        "    TubularDaylightDome,     !- Surface Type",
+        "    TDD Dome,                !- Construction Name",
+        "    Daylit Attic Roof,       !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.0,                     !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    2.3425,7.209134615385,4.441826923077,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    2.3425,6.90625,4.38125,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    2.6575,6.90625,4.38125,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    2.6575,7.209134615385,4.441826923077;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    Diffuser2,               !- Name",
+        "    TubularDaylightDiffuser, !- Surface Type",
+        "    TDD Diffuser,            !- Construction Name",
+        "    Daylit Ceiling,          !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.0,                     !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    2.3425,7.1575,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    2.3425,6.8425,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    2.6575,6.8425,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    2.6575,7.1575,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  Material,",
+        "    A1 - 1 IN STUCCO,        !- Name",
+        "    Smooth,                  !- Roughness",
+        "    2.5389841E-02,           !- Thickness {m}",
+        "    0.6918309,               !- Conductivity {W/m-K}",
+        "    1858.142,                !- Density {kg/m3}",
+        "    836.8,                   !- Specific Heat {J/kg-K}",
+        "    0.90,                    !- Thermal Absorptance",
+        "    0.92,                    !- Solar Absorptance",
+        "    0.92;                    !- Visible Absorptance",
+
+        "  Material,",
+        "    C4 - 4 IN COMMON BRICK,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.1014984,               !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1922.216,                !- Density {kg/m3}",
+        "    836.8,                   !- Specific Heat {J/kg-K}",
+        "    0.90,                    !- Thermal Absorptance",
+        "    0.76,                    !- Solar Absorptance",
+        "    0.76;                    !- Visible Absorptance",
+
+        "  Material,",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name",
+        "    Smooth,                  !- Roughness",
+        "    1.9050000E-02,           !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1601.846,                !- Density {kg/m3}",
+        "    836.8,                   !- Specific Heat {J/kg-K}",
+        "    0.90,                    !- Thermal Absorptance",
+        "    0.92,                    !- Solar Absorptance",
+        "    0.92;                    !- Visible Absorptance",
+
+        "  Material,",
+        "    C6 - 8 IN CLAY TILE,     !- Name",
+        "    Smooth,                  !- Roughness",
+        "    0.2033016,               !- Thickness {m}",
+        "    0.5707605,               !- Conductivity {W/m-K}",
+        "    1121.292,                !- Density {kg/m3}",
+        "    836.8,                   !- Specific Heat {J/kg-K}",
+        "    0.90,                    !- Thermal Absorptance",
+        "    0.82,                    !- Solar Absorptance",
+        "    0.82;                    !- Visible Absorptance",
+
+        "  Material,",
+        "    C10 - 8 IN HW CONCRETE,  !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.2033016,               !- Thickness {m}",
+        "    1.729577,                !- Conductivity {W/m-K}",
+        "    2242.585,                !- Density {kg/m3}",
+        "    836.8,                   !- Specific Heat {J/kg-K}",
+        "    0.90,                    !- Thermal Absorptance",
+        "    0.65,                    !- Solar Absorptance",
+        "    0.65;                    !- Visible Absorptance",
+
+        "  Material,",
+        "    E2 - 1 / 2 IN SLAG OR STONE,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    1.2710161E-02,           !- Thickness {m}",
+        "    1.435549,                !- Conductivity {W/m-K}",
+        "    881.0155,                !- Density {kg/m3}",
+        "    1673.6,                  !- Specific Heat {J/kg-K}",
+        "    0.90,                    !- Thermal Absorptance",
+        "    0.55,                    !- Solar Absorptance",
+        "    0.55;                    !- Visible Absorptance",
+
+        "  Material,",
+        "    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    9.5402403E-03,           !- Thickness {m}",
+        "    0.1902535,               !- Conductivity {W/m-K}",
+        "    1121.292,                !- Density {kg/m3}",
+        "    1673.6,                  !- Specific Heat {J/kg-K}",
+        "    0.90,                    !- Thermal Absorptance",
+        "    0.75,                    !- Solar Absorptance",
+        "    0.75;                    !- Visible Absorptance",
+
+        "  Material,",
+        "    B5 - 1 IN DENSE INSULATION,  !- Name",
+        "    VeryRough,               !- Roughness",
+        "    2.5389841E-02,           !- Thickness {m}",
+        "    4.3239430E-02,           !- Conductivity {W/m-K}",
+        "    91.30524,                !- Density {kg/m3}",
+        "    836.8,                   !- Specific Heat {J/kg-K}",
+        "    0.90,                    !- Thermal Absorptance",
+        "    0.50,                    !- Solar Absorptance",
+        "    0.50;                    !- Visible Absorptance",
+
+        "  Material,",
+        "    C12 - 2 IN HW CONCRETE,  !- Name",
+        "    MediumRough,             !- Roughness",
+        "    5.0901599E-02,           !- Thickness {m}",
+        "    1.729577,                !- Conductivity {W/m-K}",
+        "    2242.585,                !- Density {kg/m3}",
+        "    836.8,                   !- Specific Heat {J/kg-K}",
+        "    0.90,                    !- Thermal Absorptance",
+        "    0.65,                    !- Solar Absorptance",
+        "    0.65;                    !- Visible Absorptance",
+
+        "  Material,",
+        "    ROOFING - ASPHALT SHINGLES,  !- Name",
+        "    VeryRough,               !- Roughness",
+        "    3.1999999E-03,           !- Thickness {m}",
+        "    2.9999999E-02,           !- Conductivity {W/m-K}",
+        "    1121.29,                 !- Density {kg/m3}",
+        "    830.0,                   !- Specific Heat {J/kg-K}",
+        "    0.90,                    !- Thermal Absorptance",
+        "    0.70,                    !- Solar Absorptance",
+        "    0.70;                    !- Visible Absorptance",
+
+        "  Material,",
+        "    BB46 - 5 / 8 IN PLYWOOD, !- Name",
+        "    Smooth,                  !- Roughness",
+        "    9.9999998E-03,           !- Thickness {m}",
+        "    0.110,                   !- Conductivity {W/m-K}",
+        "    544.62,                  !- Density {kg/m3}",
+        "    1210.0,                  !- Specific Heat {J/kg-K}",
+        "    0.90,                    !- Thermal Absorptance",
+        "    0.70,                    !- Solar Absorptance",
+        "    0.70;                    !- Visible Absorptance",
+
+        "  Material,",
+        "    INS - GLASS FIBER BONDED 3 IN,  !- Name",
+        "    VeryRough,               !- Roughness",
+        "    7.000E-02,               !- Thickness {m}",
+        "    2.9999999E-02,           !- Conductivity {W/m-K}",
+        "    96.11,                   !- Density {kg/m3}",
+        "    790.0,                   !- Specific Heat {J/kg-K}",
+        "    0.90,                    !- Thermal Absorptance",
+        "    0.50,                    !- Solar Absorptance",
+        "    0.50;                    !- Visible Absorptance",
+
+        "  WindowMaterial:Glazing,",
+        "    Clear Acrylic Plastic,   !- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.003,                   !- Thickness {m}",
+        "    0.92,                    !- Solar Transmittance at Normal Incidence",
+        "    0.05,                    !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.05,                    !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.92,                    !- Visible Transmittance at Normal Incidence",
+        "    0.05,                    !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.05,                    !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.00,                    !- Infrared Transmittance at Normal Incidence",
+        "    0.90,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.90,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.90;                    !- Conductivity {W/m-K}",
+
+        "  WindowMaterial:Glazing,",
+        "    Diffusing Acrylic Plastic,  !- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.0022,                  !- Thickness {m}",
+        "    0.90,                    !- Solar Transmittance at Normal Incidence",
+        "    0.08,                    !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.08,                    !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.90,                    !- Visible Transmittance at Normal Incidence",
+        "    0.08,                    !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.08,                    !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.00,                    !- Infrared Transmittance at Normal Incidence",
+        "    0.90,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.90,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.90;                    !- Conductivity {W/m-K}",
+
+        "  Material,",
+        "    Very High Reflectivity Surface,  !- Name",
+        "    Smooth,                  !- Roughness",
+        "    0.0005,                  !- Thickness {m}",
+        "    237,                     !- Conductivity {W/m-K}",
+        "    2702,                    !- Density {kg/m3}",
+        "    903,                     !- Specific Heat {J/kg-K}",
+        "    0.90,                    !- Thermal Absorptance",
+        "    0.05,                    !- Solar Absorptance",
+        "    0.05;                    !- Visible Absorptance",
+
+        "  Construction,",
+        "    EXTWALL80,               !- Name",
+        "    A1 - 1 IN STUCCO,        !- Outside Layer",
+        "    C4 - 4 IN COMMON BRICK,  !- Layer 2",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3",
+
+        "  Construction,",
+        "    FLOOR SLAB 8 IN,         !- Name",
+        "    C10 - 8 IN HW CONCRETE;  !- Outside Layer",
+
+        "  Construction,",
+        "    ROOF,                    !- Name",
+        "    ROOFING - ASPHALT SHINGLES,  !- Outside Layer",
+        "    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2",
+        "    BB46 - 5 / 8 IN PLYWOOD; !- Layer 3",
+
+        "  Construction,",
+        "    CEILING IN ZONE,         !- Name",
+        "    INS - GLASS FIBER BONDED 3 IN,  !- Outside Layer",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 2",
+
+        "  Construction,",
+        "    CEILING IN ATTIC,        !- Name",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer",
+        "    INS - GLASS FIBER BONDED 3 IN;  !- Layer 2",
+
+        "  Construction,",
+        "    TDD Pipe,                !- Name",
+        "    Very High Reflectivity Surface;  !- Outside Layer",
+
+        "  Construction,",
+        "    TDD Dome,                !- Name",
+        "    Clear Acrylic Plastic;   !- Outside Layer",
+
+        "  Construction,",
+        "    TDD Diffuser,            !- Name",
+        "    Diffusing Acrylic Plastic;  !- Outside Layer",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
+
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    int const HoursInDay(24);
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+    }
+    //    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
+    //    EXPECT_FALSE(ErrorsFound);
+
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound); // this calls GetSurfaceData()
+    EXPECT_FALSE(ErrorsFound);                               // expect no errors
+    HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
+
+    state->dataZoneEquip->ZoneEquipConfig.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Daylit Zone";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataHeatBal->Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Daylit Attic Zone";
+    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
+    state->dataHeatBal->Zone(2).IsControlled = true;
+    state->dataHeatBal->Zone(2).ZoneEqNum = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(2) = 7;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1) = 8;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode(1) = 9;
+    state->dataZoneEquip->ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
+
+    state->dataSize->ZoneEqSizing.allocate(2);
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 10;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataHeatBalFanSys->MAT.allocate(2); // Zone temperature C
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->MAT(2) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(2);
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(2);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg(2) = 0.001;
+
+    state->dataLoopNodes->Node.allocate(4);
+
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(3) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(4) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
+
+    state->dataLoopNodes->Node(1).Temp = 20.0;
+    state->dataLoopNodes->Node(2).Temp = 20.0;
+    state->dataLoopNodes->Node(3).Temp = 20.0;
+    state->dataLoopNodes->Node(4).Temp = 20.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
+
+    state->dataHeatBalSurf->SurfHConvInt.allocate(6);
+    state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(3) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(4) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(5) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(6) = 0.5;
+    state->dataMstBal->HConvInFD.allocate(6);
+    state->dataMstBal->RhoVaporAirIn.allocate(6);
+    state->dataMstBal->HMassConvInFD.allocate(6);
+
+    SolarShading::AllocateModuleArrays(*state);
+    HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
+    AllocateSurfaceHeatBalArrays(*state);
+    createFacilityElectricPowerServiceObject(*state);
+
+    for (int loop = 1; loop <= state->dataSurface->TotSurfaces; ++loop) {
+        state->dataHeatBalSurf->SurfOutsideTempHist(1)(loop) = 20.0;
+    }
+
+    state->dataConstruction->Construct(state->dataSurface->Surface(8).Construction).TransDiff = 0.001; // required for GetTDDInput function to work.
+    DaylightingDevices::GetTDDInput(*state);
+
+    CalcHeatBalanceInsideSurf(*state);
+    EXPECT_NEAR(37.63, state->dataSurface->SurfWinHeatGain(7), 0.1);
+    EXPECT_NEAR(37.63, state->dataSurface->SurfWinHeatGain(8), 0.1);
 }
 } // namespace EnergyPlus
