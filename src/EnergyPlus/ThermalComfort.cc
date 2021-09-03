@@ -2263,19 +2263,17 @@ namespace ThermalComfort {
         }
 
         // If high temperature radiant heater present and on, then must account for this in MRT calculation
-        if (state.dataHeatBalFanSys->QHTRadSysToPerson(state.dataThermalComforts->ZoneNum) > 0.0 ||
-            state.dataHeatBalFanSys->QCoolingPanelToPerson(state.dataThermalComforts->ZoneNum) > 0.0 ||
-            state.dataHeatBalFanSys->QHWBaseboardToPerson(state.dataThermalComforts->ZoneNum) > 0.0 ||
-            state.dataHeatBalFanSys->QSteamBaseboardToPerson(state.dataThermalComforts->ZoneNum) > 0.0 ||
-            state.dataHeatBalFanSys->QElecBaseboardToPerson(state.dataThermalComforts->ZoneNum) > 0.0) {
+        state.dataHeatBalFanSys->ZoneQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) =
+            state.dataHeatBalFanSys->ZoneQHTRadSysToPerson(state.dataThermalComforts->ZoneNum) +
+            state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson(state.dataThermalComforts->ZoneNum) +
+            state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
+            state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
+            state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson(state.dataThermalComforts->ZoneNum);
+        if (state.dataHeatBalFanSys->ZoneQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) > 0.0) {
             state.dataThermalComforts->RadTemp += DataGlobalConstants::KelvinConv; // Convert to Kelvin
-            state.dataThermalComforts->RadTemp = root_4(pow_4(state.dataThermalComforts->RadTemp) +
-                                                        ((state.dataHeatBalFanSys->QHTRadSysToPerson(state.dataThermalComforts->ZoneNum) +
-                                                          state.dataHeatBalFanSys->QCoolingPanelToPerson(state.dataThermalComforts->ZoneNum) +
-                                                          state.dataHeatBalFanSys->QHWBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
-                                                          state.dataHeatBalFanSys->QSteamBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
-                                                          state.dataHeatBalFanSys->QElecBaseboardToPerson(state.dataThermalComforts->ZoneNum)) /
-                                                         AreaEff / StefanBoltzmannConst));
+            state.dataThermalComforts->RadTemp =
+                root_4(pow_4(state.dataThermalComforts->RadTemp) +
+                       (state.dataHeatBalFanSys->ZoneQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) / AreaEff / StefanBoltzmannConst));
             state.dataThermalComforts->RadTemp -= DataGlobalConstants::KelvinConv; // Convert back to Celsius
         }
 

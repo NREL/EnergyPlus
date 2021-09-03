@@ -370,9 +370,7 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
 
     bcs->slabAbsRadiation = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(floorSurface) +      // solar
                             state.dataHeatBal->SurfQdotRadIntGainsInPerArea(floorSurface) + // internal gains
-                            state.dataHeatBalFanSys->QHTRadSysSurf(floorSurface) + state.dataHeatBalFanSys->QHWBaseboardSurf(floorSurface) +
-                            state.dataHeatBalFanSys->QCoolingPanelSurf(floorSurface) + state.dataHeatBalFanSys->QSteamBaseboardSurf(floorSurface) +
-                            state.dataHeatBalFanSys->QElecBaseboardSurf(floorSurface); // HVAC
+                            state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(floorSurface);  // HVAC
 
     bcs->slabConvectiveTemp = state.dataHeatBal->SurfTempEffBulkAir(floorSurface) + DataGlobalConstants::KelvinConv;
     bcs->slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, floorSurface) + DataGlobalConstants::KelvinConv;
@@ -388,9 +386,7 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
     for (auto &wl : wallSurfaces) {
         Real64 Q = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(wl) +      // solar
                    state.dataHeatBal->SurfQdotRadIntGainsInPerArea(wl) + // internal gains
-                   state.dataHeatBalFanSys->QHTRadSysSurf(wl) + state.dataHeatBalFanSys->QHWBaseboardSurf(floorSurface) +
-                   state.dataHeatBalFanSys->QCoolingPanelSurf(wl) + state.dataHeatBalFanSys->QSteamBaseboardSurf(floorSurface) +
-                   state.dataHeatBalFanSys->QElecBaseboardSurf(wl); // HVAC
+                   state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(wl);  // HVAC
 
         Real64 &A = state.dataSurface->Surface(wl).Area;
 
@@ -1090,7 +1086,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
             wallSurfaceString += "," + state.dataSurface->Surface(wl).Name;
         }
 
-        static constexpr fmt::string_view fmt = "{},{},{},{},{:.2R},{:.2R},{:.2R},{},{}{}\n";
+        static constexpr std::string_view fmt = "{},{},{},{},{:.2R},{:.2R},{:.2R},{},{}{}\n";
         print(state.files.eio,
               fmt,
               foundationInputs[state.dataSurface->Surface(kv.floorSurface).OSCPtr].name,
