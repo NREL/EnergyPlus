@@ -7085,7 +7085,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                 // Absorbed shortwave radiation is treated similar to a regular window, but only 1 glass layer is allowed.
                 //   = SurfWinQRadSWwinAbs(SurfNum,1)/2.0
                 Real64 const HConvIn_surf(state.dataMstBal->HConvInFD(SurfNum) = state.dataHeatBalSurf->SurfHConvInt(SurfNum));
-                state.dataHeatBalSurf->SurfTempIn(SurfNum) = state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
+                state.dataHeatBalSurf->SurfTempInTmp(SurfNum) =
                     (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, 1) / 2.0 +
                      state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(SurfNum) + HConvIn_surf * state.dataHeatBalSurfMgr->RefAirTemp(SurfNum) +
                      state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum) + IterDampConst * state.dataHeatBalSurf->SurfTempInsOld(SurfNum) +
@@ -7095,8 +7095,10 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                                                            // other zone surfaces | Iterative damping term (for stability) | Current
                                                            // conduction from the outside surface | Coefficient for conduction (current
                                                            // time) | Convection and damping term
+                state.dataHeatBalSurf->SurfTempIn(SurfNum) = state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
 
-                Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum)));
+                Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann *
+                                          pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum) + DataGlobalConstants::KelvinConv));
 
                 // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                 if (state.dataHeatBalSurf->AnyRadiantSystems(SurfNum))
@@ -7787,7 +7789,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                     // Absorbed shortwave radiation is treated similar to a regular window, but only 1 glass layer is allowed.
                     //   = SurfWinQRadSWwinAbs(surfNum,1)/2.0
                     Real64 const HConvIn_surf(state.dataMstBal->HConvInFD(surfNum) = state.dataHeatBalSurf->SurfHConvInt(surfNum));
-                    state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataHeatBalSurf->SurfTempInTmp(surfNum) =
+                    state.dataHeatBalSurf->SurfTempInTmp(surfNum) =
                         (state.dataHeatBal->SurfQRadThermInAbs(surfNum) + state.dataHeatBal->SurfWinQRadSWwinAbs(surfNum, 1) / 2.0 +
                          state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(surfNum) +
                          HConvIn_surf * state.dataHeatBalSurfMgr->RefAirTemp(surfNum) + state.dataHeatBalSurf->SurfNetLWRadToSurf(surfNum) +
@@ -7798,8 +7800,10 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                                                // other zone surfaces | Iterative damping term (for stability) | Current
                                                                // conduction from the outside surface | Coefficient for conduction (current
                                                                // time) | Convection and damping term
+                    state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataHeatBalSurf->SurfTempInTmp(surfNum);
 
-                    Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum)));
+                    Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann *
+                                              pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum) + DataGlobalConstants::KelvinConv));
 
                     // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                     if (state.dataHeatBalSurf->AnyRadiantSystems(surfNum))
