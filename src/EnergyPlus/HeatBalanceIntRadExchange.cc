@@ -146,8 +146,6 @@ namespace HeatBalanceIntRadExchange {
 
         bool IntShadeOrBlindStatusChanged; // True if status of interior shade or blind on at least
         // one window in a zone has changed from previous time step
-        WinShadingType ShadeFlag;     // Window shading status current time step
-        WinShadingType ShadeFlagPrev; // Window shading status previous time step
 
         auto &SurfaceTempRad(state.dataHeatBalIntRadExchg->SurfaceTempRad);
         auto &SurfaceTempInKto4th(state.dataHeatBalIntRadExchg->SurfaceTempInKto4th);
@@ -241,8 +239,8 @@ namespace HeatBalanceIntRadExchange {
                         if (IntShadeOrBlindStatusChanged || IntMovInsulChanged)
                             break; // Need only check if one window's status or one movable insulation status has changed
                         if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) {
-                            ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
-                            ShadeFlagPrev = state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum);
+                            WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
+                            WinShadingType ShadeFlagPrev = state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum);
                             if (ShadeFlagPrev != ShadeFlag && (ANY_INTERIOR_SHADE_BLIND(ShadeFlagPrev) || ANY_INTERIOR_SHADE_BLIND(ShadeFlag)))
                                 IntShadeOrBlindStatusChanged = true;
                             if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
@@ -340,7 +338,6 @@ namespace HeatBalanceIntRadExchange {
             }
 
             // These are the money loops
-            size_type lSR(0u);
             if (state.dataHeatBalIntRadExchg->CarrollMethod) {
                 for (size_type RecZoneSurfNum = 0; RecZoneSurfNum < s_zone_Surfaces; ++RecZoneSurfNum) {
                     int const RecSurfNum = zone_SurfacePtr[RecZoneSurfNum];
@@ -381,7 +378,8 @@ namespace HeatBalanceIntRadExchange {
                         Real64 scriptF_acc(0.0);           // Local accumulator
                         Real64 netLWRadToRecSurf_cor(0.0); // Correction
                         Real64 IRfromParentZone_acc(0.0);  // Local accumulator
-                        for (size_type SendZoneSurfNum = 0; SendZoneSurfNum < s_zone_Surfaces; ++SendZoneSurfNum, ++lSR) {
+                        for (size_type SendZoneSurfNum = 0; SendZoneSurfNum < s_zone_Surfaces; ++SendZoneSurfNum) {
+                            size_type lSR = RecZoneSurfNum * s_zone_Surfaces + SendZoneSurfNum;
                             Real64 const scriptF(zone_ScriptF[lSR]); // [ lSR ] == ( SendZoneSurfNum+1, RecZoneSurfNum+1 )
                             Real64 const scriptF_temp_ink_4th(scriptF * SurfaceTempInKto4th[SendZoneSurfNum]);
                             // Calculate interior LW incident on window rather than net LW for use in window layer heat balance calculation.
@@ -408,12 +406,12 @@ namespace HeatBalanceIntRadExchange {
                         state.dataSurface->SurfWinIRfromParentZone(RecSurfNum) += IRfromParentZone_acc / SurfaceEmiss[RecZoneSurfNum];
                     } else {
                         Real64 netLWRadToRecSurf_acc(0.0); // Local accumulator
-                        for (size_type SendZoneSurfNum = 0; SendZoneSurfNum < s_zone_Surfaces; ++SendZoneSurfNum, ++lSR) {
-                            if (RecZoneSurfNum != SendZoneSurfNum) {
-                                netLWRadToRecSurf_acc +=
-                                    zone_ScriptF[lSR] * (SurfaceTempInKto4th[SendZoneSurfNum] -
-                                                         SurfaceTempInKto4th[RecZoneSurfNum]); // [ lSR ] == ( SendZoneSurfNum+1, RecZoneSurfNum+1 )
-                            }
+                        zone_ScriptF[RecZoneSurfNum * s_zone_Surfaces + RecZoneSurfNum] = 0;
+                        for (size_type SendZoneSurfNum = 0; SendZoneSurfNum < s_zone_Surfaces; ++SendZoneSurfNum) {
+                            size_type lSR = RecZoneSurfNum * s_zone_Surfaces + SendZoneSurfNum;
+                            netLWRadToRecSurf_acc +=
+                                zone_ScriptF[lSR] * (SurfaceTempInKto4th[SendZoneSurfNum] -
+                                                     SurfaceTempInKto4th[RecZoneSurfNum]); // [ lSR ] == ( SendZoneSurfNum+1, RecZoneSurfNum+1 )
                         }
                         netLWRadToRecSurf += netLWRadToRecSurf_acc;
                     }
@@ -1163,7 +1161,7 @@ namespace HeatBalanceIntRadExchange {
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
-            std::string const thisSpaceOrSpaceListName = fields.at("space_or_spacelist_name");
+            std::string const thisSpaceOrSpaceListName = fields.at("space_or_spacelist_name").get<std::string>();
             // do not mark object as used here - let GetInputViewFactorsbyName do that
 
             // Look for matching radiant enclosure name

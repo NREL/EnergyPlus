@@ -7,7 +7,7 @@
 // Prog::SearchBitState is a regular expression search with submatch
 // tracking for small regular expressions and texts.  Similarly to
 // testing/backtrack.cc, it allocates a bitmap with (count of
-// lists) * (length of prog) bits to make sure it never explores the
+// lists) * (length of text) bits to make sure it never explores the
 // same (instruction list, character position) multiple times.  This
 // limits the search to run in time linear in the length of the text.
 //
@@ -24,7 +24,7 @@
 #include <utility>
 
 #include "util/logging.h"
-#include "util/pod_array.h"
+#include "re2/pod_array.h"
 #include "re2/prog.h"
 #include "re2/regexp.h"
 
@@ -63,11 +63,14 @@ class BitState {
   int nsubmatch_;           //   # of submatches to fill in
 
   // Search state
-  static const int VisitedBits = 32;
-  PODArray<uint32_t> visited_;  // bitmap: (list ID, char*) pairs visited
+  static constexpr int kVisitedBits = 64;
+  PODArray<uint64_t> visited_;  // bitmap: (list ID, char*) pairs visited
   PODArray<const char*> cap_;   // capture registers
   PODArray<Job> job_;           // stack of text positions to explore
   int njob_;                    // stack size
+
+  BitState(const BitState&) = delete;
+  BitState& operator=(const BitState&) = delete;
 };
 
 BitState::BitState(Prog* prog)
@@ -87,9 +90,9 @@ BitState::BitState(Prog* prog)
 bool BitState::ShouldVisit(int id, const char* p) {
   int n = prog_->list_heads()[id] * static_cast<int>(text_.size()+1) +
           static_cast<int>(p-text_.data());
-  if (visited_[n/VisitedBits] & (1 << (n & (VisitedBits-1))))
+  if (visited_[n/kVisitedBits] & (uint64_t{1} << (n & (kVisitedBits-1))))
     return false;
-  visited_[n/VisitedBits] |= 1 << (n & (VisitedBits-1));
+  visited_[n/kVisitedBits] |= uint64_t{1} << (n & (kVisitedBits-1));
   return true;
 }
 
@@ -304,8 +307,8 @@ bool BitState::Search(const StringPiece& text, const StringPiece& context,
 
   // Allocate scratch space.
   int nvisited = prog_->list_count() * static_cast<int>(text.size()+1);
-  nvisited = (nvisited + VisitedBits-1) / VisitedBits;
-  visited_ = PODArray<uint32_t>(nvisited);
+  nvisited = (nvisited + kVisitedBits-1) / kVisitedBits;
+  visited_ = PODArray<uint64_t>(nvisited);
   memset(visited_.data(), 0, nvisited*sizeof visited_[0]);
 
   int ncap = 2*nsubmatch;
@@ -329,19 +332,22 @@ bool BitState::Search(const StringPiece& text, const StringPiece& context,
   // This looks like it's quadratic in the size of the text,
   // but we are not clearing visited_ between calls to TrySearch,
   // so no work is duplicated and it ends up still being linear.
-  for (const char* p = text.data(); p <= text.data() + text.size(); p++) {
-    // Try to use memchr to find the first byte quickly.
-    int fb = prog_->first_byte();
-    if (fb >= 0 && p < text.data() + text.size() && (p[0] & 0xFF) != fb) {
-      p = reinterpret_cast<const char*>(
-          memchr(p, fb, text.data() + text.size() - p));
+  const char* etext = text.data() + text.size();
+  for (const char* p = text.data(); p <= etext; p++) {
+    // Try to use prefix accel (e.g. memchr) to skip ahead.
+    if (p < etext && prog_->can_prefix_accel()) {
+      p = reinterpret_cast<const char*>(prog_->PrefixAccel(p, etext - p));
       if (p == NULL)
-        p = text.data() + text.size();
+        p = etext;
     }
 
     cap_[0] = p;
     if (TrySearch(prog_->start(), p))  // Match must be leftmost; done.
       return true;
+    // Avoid invoking undefined behavior (arithmetic on a null pointer)
+    // by simply not continuing the loop.
+    if (p == NULL)
+      break;
   }
   return false;
 }

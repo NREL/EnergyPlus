@@ -4,6 +4,8 @@
 
 #include <blas/blas.h>
 
+using namespace std;
+
 namespace jcc::blas {
 
     void axpy(int &n, double &a, vector<double> &x, vector<double> &y,
