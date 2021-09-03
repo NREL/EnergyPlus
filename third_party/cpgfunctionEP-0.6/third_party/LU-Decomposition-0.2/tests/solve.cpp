@@ -10,8 +10,6 @@
 
 using namespace std;
 
-using namespace std;
-
 int main() {
 
     //may return 0 when not able to detect
