@@ -1182,6 +1182,7 @@ TEST_F(EnergyPlusFixture, Battery_checkUserEfficiencyInputTest)
     Real64 userInputEfficiencyDischarge;
     Real64 functionResult;
     Real64 expectedResult;
+    bool errorsFound;
 
     // Fix for Defect #8867: EnergyPlus was allowing zero efficiency which led to a divide by zero in ElectricPowerServiceManager.cc.
     // Input is now tested to make sure that a zero value is not allowed.
@@ -1189,32 +1190,40 @@ TEST_F(EnergyPlusFixture, Battery_checkUserEfficiencyInputTest)
     // Test 1: charging, charging efficiency zero-->gets reset to minimum (0.001)
     userInputEfficiencyCharge = 0.0;
     expectedResult = 0.001;
-    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyCharge, "CHARGING", "Tatooine");
+    errorsFound = false;
+    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyCharge, "CHARGING", "Tatooine", errorsFound);
     EXPECT_NEAR(functionResult, expectedResult, 0.00001);
     std::string const error_string1 =
-        delimited_string({"   ** Warning ** ElectricStorage charge efficiency was too low.  This occurred for electric storage unit named Tatooine",
-                          "   **   ~~~   ** The value has been reset to 1.000E-003.  Please check your input values."});
+        delimited_string({"   ** Severe  ** ElectricStorage charge efficiency was too low.  This occurred for electric storage unit named Tatooine",
+                          "   **   ~~~   ** Please check your input value  for this electric storage unit and fix the charge efficiency."});
     EXPECT_TRUE(compare_err_stream(error_string1, true));
+    EXPECT_TRUE(errorsFound);
 
     // Test 2: charging, value greater than minimum (0.001)-->just keep the user input value
     userInputEfficiencyCharge = 0.7;
     expectedResult = 0.7;
-    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyCharge, "CHARGING", "Tatooine");
+    errorsFound = false;
+    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyCharge, "CHARGING", "Tatooine", errorsFound);
     EXPECT_NEAR(functionResult, expectedResult, 0.00001);
+    EXPECT_FALSE(errorsFound);
 
     // Test 3: discharging, discharging efficiency less than minimum allowed-->gets reset to minimum (0.001)
     userInputEfficiencyDischarge = -1.0;
     expectedResult = 0.001;
-    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyDischarge, "DISCHARGING", "Tatooine");
+    errorsFound = false;
+    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyDischarge, "DISCHARGING", "Tatooine", errorsFound);
     EXPECT_NEAR(functionResult, expectedResult, 0.00001);
     std::string const error_string2 = delimited_string(
-        {"   ** Warning ** ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named Tatooine",
-         "   **   ~~~   ** The value has been reset to 1.000E-003.  Please check your input values."});
+        {"   ** Severe  ** ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named Tatooine",
+         "   **   ~~~   ** Please check your input value  for this electric storage unit and fix the discharge efficiency."});
     EXPECT_TRUE(compare_err_stream(error_string2, true));
+    EXPECT_TRUE(errorsFound);
 
     // Test 4: discharging, value greater than minimum (0.001)-->just keep the user input value
     userInputEfficiencyDischarge = 0.9;
     expectedResult = 0.9;
-    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyDischarge, "DISCHARGING", "Tatooine");
+    errorsFound = false;
+    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyDischarge, "DISCHARGING", "Tatooine", errorsFound);
     EXPECT_NEAR(functionResult, expectedResult, 0.00001);
+    EXPECT_FALSE(errorsFound);
 }

@@ -3343,8 +3343,8 @@ ElectricStorage::ElectricStorage( // main constructor
         switch (storageModelMode_) {
 
         case StorageModelType::simpleBucketStorage: {
-            energeticEfficCharge_ = checkUserEfficiencyInput(state, state.dataIPShortCut->rNumericArgs(2), "CHARGING", name_);
-            energeticEfficDischarge_ = checkUserEfficiencyInput(state, state.dataIPShortCut->rNumericArgs(3), "DISCHARGING", name_);
+            energeticEfficCharge_ = checkUserEfficiencyInput(state, state.dataIPShortCut->rNumericArgs(2), "CHARGING", name_, errorsFound);
+            energeticEfficDischarge_ = checkUserEfficiencyInput(state, state.dataIPShortCut->rNumericArgs(3), "DISCHARGING", name_, errorsFound);
             maxEnergyCapacity_ = state.dataIPShortCut->rNumericArgs(4);
             maxPowerDraw_ = state.dataIPShortCut->rNumericArgs(5);
             maxPowerStore_ = state.dataIPShortCut->rNumericArgs(6);
@@ -3760,7 +3760,7 @@ ElectricStorage::ElectricStorage( // main constructor
     }
 }
 
-Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, std::string whichType, std::string deviceName)
+Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, std::string whichType, std::string deviceName, bool &errorsFound)
 {
     Real64 const minChargeEfficiency = 0.001;
     Real64 const minDischargeEfficiency = 0.001;
@@ -3768,18 +3768,20 @@ Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, st
     // Fix for Defect #8867.  Do not allow either efficiency to be zero as it will lead to a divide by zero (NaN).
     if (UtilityRoutines::SameString(whichType, "CHARGING")) {
         if (userInputValue < minChargeEfficiency) {
-            ShowWarningError(state,
-                             format("ElectricStorage charge efficiency was too low.  This occurred for electric storage unit named " + deviceName));
-            ShowContinueError(state, format("The value has been reset to {:.3R}.  Please check your input values.", minChargeEfficiency));
+            ShowSevereError(state,
+                            format("ElectricStorage charge efficiency was too low.  This occurred for electric storage unit named " + deviceName));
+            ShowContinueError(state, format("Please check your input value  for this electric storage unit and fix the charge efficiency."));
+            errorsFound = true;
             return minChargeEfficiency;
         } else {
             return userInputValue;
         }
     } else if (UtilityRoutines::SameString(whichType, "DISCHARGING")) {
         if (userInputValue < minDischargeEfficiency) {
-            ShowWarningError(
-                state, format("ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named " + deviceName));
-            ShowContinueError(state, format("The value has been reset to {:.3R}.  Please check your input values.", minDischargeEfficiency));
+            ShowSevereError(state,
+                            format("ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named " + deviceName));
+            ShowContinueError(state, format("Please check your input value  for this electric storage unit and fix the discharge efficiency."));
+            errorsFound = true;
             return minDischargeEfficiency;
         } else {
             return userInputValue;
