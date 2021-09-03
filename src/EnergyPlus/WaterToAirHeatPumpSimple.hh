@@ -65,9 +65,6 @@ struct EnergyPlusData;
 
 namespace WaterToAirHeatPumpSimple {
 
-    // Using/Aliasing
-    using DataHVACGlobals::WaterCycling;
-
     struct SimpleWatertoAirHPConditions
     {
         // Members

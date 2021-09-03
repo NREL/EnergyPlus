@@ -1096,10 +1096,10 @@ namespace WaterToAirHeatPumpSimple {
             // If air flow is less than 25% rated flow. Then throw warning
             RatedAirMassFlowRate =
                 simpleWatertoAirHP.RatedAirVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state,
-                                                                                              state.dataEnvrn->StdBaroPress,
-                                                                                              state.dataLoopNodes->Node(AirInletNode).Temp,
-                                                                                              state.dataLoopNodes->Node(AirInletNode).HumRat,
-                                                                                              RoutineName);
+                                                                                           state.dataEnvrn->StdBaroPress,
+                                                                                           state.dataLoopNodes->Node(AirInletNode).Temp,
+                                                                                           state.dataLoopNodes->Node(AirInletNode).HumRat,
+                                                                                           RoutineName);
             if (simpleWatertoAirHP.AirMassFlowRate < 0.25 * RatedAirMassFlowRate) {
                 ShowRecurringWarningErrorAtEnd(state,
                                                "Actual air mass flow rate is smaller than 25% of water-to-air heat pump coil rated air flow rate.",
