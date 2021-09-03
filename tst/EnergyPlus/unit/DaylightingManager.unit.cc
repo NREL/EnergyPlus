@@ -1101,12 +1101,18 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
     state->dataGlobal->NumOfZones = zn;
     state->dataDaylightingData->daylightControl.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->enclDaylight.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->enclDaylight(zn).daylightControlIndexes.emplace_back(1);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(zn).zoneFirstSpaceSolEnclosure = 1;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataGlobal->NumOfZones);
 
     CreateShadeDeploymentOrder(*state, zn);
 
     EXPECT_EQ(state->dataDaylightingData->daylightControl(zn).ShadeDeployOrderExtWins.size(), 6ul);
 
     state->dataDaylightingData->daylightControl(zn).TotalDaylRefPoints = 1;
+    state->dataViewFactor->EnclSolInfo(zn).TotalEnclosureDaylRefPoints = 1;
+
     state->dataDaylightingData->enclDaylight(zn).NumOfDayltgExtWins = 9;
     state->dataDaylightingData->daylightControl(zn).MapShdOrdToLoopNum.allocate(state->dataDaylightingData->enclDaylight(zn).NumOfDayltgExtWins);
     state->dataDaylightingData->enclDaylight(zn).DayltgExtWinSurfNums.allocate(state->dataDaylightingData->enclDaylight(zn).NumOfDayltgExtWins);

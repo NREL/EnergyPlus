@@ -445,7 +445,8 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
     if (state.dataDaylightingData->TotRefPoints > 0) {
         for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
             auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-            if (DELight && thisDaylightControl.DaylightMethod != DataDaylighting::iDaylightingMethod::DElightDaylighting) continue;
+            // TODO MJW: Post an issue to fix duplicate ref points in dxf files, but leave this off for now
+            // if (DELight && thisDaylightControl.DaylightMethod != DataDaylighting::iDaylightingMethod::DElightDaylighting) continue;
             auto curcolorno = ColorNo::DaylSensor1;
 
             for (int refpt = 1; refpt <= thisDaylightControl.TotalDaylRefPoints; ++refpt) {

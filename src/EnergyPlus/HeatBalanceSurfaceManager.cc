@@ -472,9 +472,6 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
         auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(thisDaylightControl.enclIndex);
-
-        if (thisDaylightControl.DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) continue;
-        int zoneNum = thisDaylightControl.zoneIndex;
         thisDaylightControl.DaylIllumAtRefPt = 0.0;
         thisDaylightControl.GlareIndexAtRefPt = 0.0;
         thisDaylightControl.PowerReductionFactor = 1.0;

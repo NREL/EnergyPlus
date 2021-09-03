@@ -3542,8 +3542,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWi
     state->dataSurface->Surface(5).SolarEnclIndex = 1;
     state->dataSurface->Surface(6).SolarEnclIndex = 1;
     state->dataSurface->Surface(7).SolarEnclIndex = 1;
-    state->dataDaylightingData->ZoneDaylight(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
-    state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints = 1;
+    state->dataViewFactor->EnclSolInfo(1).TotalEnclosureDaylRefPoints = 1;
+    state->dataDaylightingData->enclDaylight.allocate(1);
+    state->dataDaylightingData->enclDaylight(1).hasSplitFluxDaylighting = true;
     InitSurfaceHeatBalance(*state);
     EXPECT_FALSE(has_err_output(true));
 }

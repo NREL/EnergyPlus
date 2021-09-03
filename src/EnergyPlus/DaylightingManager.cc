@@ -156,7 +156,6 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
     //       MODIFIED       Mar 2004, FCW: add calculation of following SurfaceWindow variables:
     //                        EnclAreaMinusThisSurf, EnclAreaReflProdMinusThisSurf, RhoCeilingWall,
     //                        RhoFloorWall, FractionUpgoing. Add calculation of ZoneDaylight%floorVisRefl.
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Called by CalcDayltgCoefficients for each daylit zone. Determines total
@@ -173,8 +172,6 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
 
     // REFERENCES:
     // Based on DOE-2.1E subroutine DAVREF
-
-    auto &Zone(state.dataHeatBal->Zone);
 
     SurfaceClass IType; // Surface type/class
     Real64 AREA;        // Inside surface area (m2)
@@ -4146,7 +4143,6 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
     int NumNumbers;
     int IOStat;
 
-    auto &Zone(state.dataHeatBal->Zone);
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     ErrorsFound = false;
     cCurrentModuleObject = "Daylighting:Controls";
@@ -4166,7 +4162,6 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
     state.dataDaylightingManager->maxNumRefPtInAnyEncl = 0;
     // Loop through all daylighting controls to find total reference points in each enclosure
     for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
-        int ctrlEnclNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex;
         int numRefPoints = state.dataDaylightingData->daylightControl(daylightCtrlNum).TotalDaylRefPoints;
         state.dataDaylightingManager->maxNumRefPtInAnyDaylCtrl = max(numRefPoints, state.dataDaylightingManager->maxNumRefPtInAnyDaylCtrl);
     }
@@ -4996,15 +4991,6 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
 
         int typeNum = getEnumerationValue(DataDaylighting::LtgCtrlTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5));
         daylightControl.LightControlType = static_cast<DataDaylighting::LtgCtrlType>(typeNum);
-        // if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "CONTINUOUS")) { // Field: Lighting Control Type
-        //    daylightControl.LightControlType = DataDaylighting::LtgCtrlType::Continuous;
-        //} else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "STEPPED")) {
-        //    daylightControl.LightControlType = DataDaylighting::LtgCtrlType::Stepped;
-        //} else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "CONTINUOUSOFF")) {
-        //    daylightControl.LightControlType = DataDaylighting::LtgCtrlType::ContinuousOff;
-        //} else if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-        //    daylightControl.LightControlType = DataDaylighting::LtgCtrlType::Continuous;
-        //} else {
         if (daylightControl.LightControlType == DataDaylighting::LtgCtrlType::Invalid) {
             ShowWarningError(state,
                              "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5) + ", occurs in " +
@@ -5229,18 +5215,16 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
     NewAspectRatio = 1.0;
 
     CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
-    int zoneIndex = 0;
     for (auto &daylCntrl : state.dataDaylightingData->daylightControl) {
-        zoneIndex++;
         if (daylCntrl.TotalDaylRefPoints > 0) {
-            auto &zone(state.dataHeatBal->Zone(zoneIndex));
+            auto &zone(state.dataHeatBal->Zone(daylCntrl.zoneIndex));
 
             // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
             CosZoneRelNorth = std::cos(-zone.RelNorth * DataGlobalConstants::DegToRadians);
             SinZoneRelNorth = std::sin(-zone.RelNorth * DataGlobalConstants::DegToRadians);
 
-            rLightLevel = GetDesignLightingLevelForZone(state, zoneIndex);
-            CheckLightsReplaceableMinMaxForZone(state, zoneIndex);
+            rLightLevel = GetDesignLightingLevelForZone(state, daylCntrl.zoneIndex);
+            CheckLightsReplaceableMinMaxForZone(state, daylCntrl.zoneIndex);
 
             for (refPtNum = 1; refPtNum <= daylCntrl.TotalDaylRefPoints; ++refPtNum) {
                 auto &curRefPt(state.dataDaylightingData->DaylRefPt(daylCntrl.DaylRefPtNum(refPtNum))); // get the active daylighting:referencepoint
@@ -7217,8 +7201,6 @@ void DayltgElecLightingControl(EnergyPlusData &state)
     Real64 FL;    // Fraction electric lighting output required to meet setpoint
     Real64 FP;    // Fraction electric lighting power input required to meet setpoint
     Real64 XRAN;  // Random number between 0 and 1
-    int MapNum;   // Illuminance map number
-    int ILM;
     bool ScheduledAvailable;
 
     for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
@@ -7564,7 +7546,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     Real64 ZSU1refl; // Beam normal illuminance times ZSU1refl = illuminance on window
     //  due to specular reflection from exterior surfaces
 
-    int ZoneNumThisWin;                      // temporary to check if this window is actually in adjacent zone
     DataDaylighting::iExtWinType ExtWinType; // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
     Real64 EnclInsideSurfArea;               // temporary for calculations, total surface area of enclosure surfaces m2
     int IntWinAdjZoneExtWinNum;              // the index of the exterior window in IntWinAdjZoneExtWin nested struct
@@ -9321,8 +9302,6 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
     Real64 VTNow;
     Real64 VTMaster;
 
-    int ILM;
-
     if (state.dataDaylightingManager->DayltgInteriorMapIllum_FirstTimeFlag) {
         daylight_illum.allocate(DataDaylighting::MaxMapRefPoints);
         BACLUM.allocate(DataDaylighting::MaxMapRefPoints);
@@ -10221,9 +10200,9 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
                 // Get exterior windows in EnclNumAdj -- there must be at least one, otherwise
                 // it would not be an "AdjIntWinEncl"
                 for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
-                    if ((state.dataSurface->Surface(SurfNumAdj).Class == SurfaceClass::Window) &&
-                            (state.dataSurface->Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
-                        (state.dataSurface->SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser)) {
+                    if ((state.dataSurface->Surface(SurfNumAdj).Class == SurfaceClass::Window &&
+                         state.dataSurface->Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
+                        state.dataSurface->SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
                         ++enclExtWin(enclNum);
                     }
                 }
@@ -10277,9 +10256,9 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
                     // Get exterior windows in EnclNumAdj -- there must be at least one, otherwise
                     // it would not be an "AdjIntWinEncl"
                     for (int SurfNumAdj : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
-                        if ((state.dataSurface->Surface(SurfNumAdj).Class == SurfaceClass::Window) &&
-                                (state.dataSurface->Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
-                            (state.dataSurface->SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser)) {
+                        if ((state.dataSurface->Surface(SurfNumAdj).Class == SurfaceClass::Window &&
+                             state.dataSurface->Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
+                            state.dataSurface->SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
                             ++enclExtWinCtr;
                             thisEnclDaylight.DayltgExtWinSurfNums(enclExtWinCtr) = SurfNumAdj;
 

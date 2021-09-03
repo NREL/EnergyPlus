@@ -870,7 +870,8 @@ namespace HeatBalanceIntRadExchange {
                     state.dataSurface->Surface(surfNum).SolarEnclSurfIndex = enclosureSurfNum;
                     state.dataSurface->Surface(surfNum).SolarEnclIndex = enclosureNum;
                     state.dataSurface->Surface(surfNum).RadEnclIndex = enclosureNum; // Radiant and Solar enclosures are parallel for now
-                    if ((state.dataSurface->Surface(surfNum).ExtBoundCond > 0) &&
+                    if ((state.dataConstruction->Construct(state.dataSurface->Surface(surfNum).Construction).TypeIsWindow) &&
+                        (state.dataSurface->Surface(surfNum).ExtBoundCond > 0) &&
                         (state.dataSurface->Surface(surfNum).BaseSurf != surfNum)) { // Interzone window present
                         thisEnclosure.HasInterZoneWindow = true;
                     }
@@ -1201,7 +1202,7 @@ namespace HeatBalanceIntRadExchange {
                 zoneListNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(thisSpaceOrSpaceListName), state.dataHeatBal->ZoneList);
                 if (zoneListNum > 0) {
                     for (int const zoneNum : state.dataHeatBal->ZoneList(zoneListNum).Zone) {
-                        listSize += state.dataHeatBal->Zone(zoneListNum).spaceIndexes.size();
+                        listSize += state.dataHeatBal->Zone(zoneNum).spaceIndexes.size();
                     }
                 }
             }
