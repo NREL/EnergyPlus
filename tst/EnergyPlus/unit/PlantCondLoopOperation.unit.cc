@@ -862,7 +862,7 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp)
         std::string compName = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
         EXPECT_EQ(compName, "CHILLER");
         auto CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
-        EXPECT_EQ(CtrlTypeNum, DataPlant::iCtrlType::CoolingOp);
+        EXPECT_TRUE(compare_enums(CtrlTypeNum, DataPlant::iCtrlType::CoolingOp));
     }
 
     {
@@ -874,7 +874,7 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp)
         auto CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
 
         // Could just test this, but want to improve reporting
-        // EXPECT_EQ(CtrlTypeNum, PlantCondLoopOperation::DualOp);
+        // EXPECT_TRUE(compare_enums(CtrlTypeNum, PlantCondLoopOperation::DualOp));
 
         std::string ctrlType = "Unknown";
         if (CtrlTypeNum == DataPlant::iCtrlType::CoolingOp) {

@@ -72,7 +72,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::Furnaces;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace DataZoneEnergyDemands;

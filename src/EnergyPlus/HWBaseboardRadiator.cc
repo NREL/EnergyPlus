@@ -1737,8 +1737,8 @@ namespace HWBaseboardRadiator {
         auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
 
         // Initialize arrays
-        state.dataHeatBalFanSys->QHWBaseboardSurf = 0.0;
-        state.dataHeatBalFanSys->QHWBaseboardToPerson = 0.0;
+        state.dataHeatBalFanSys->SurfQHWBaseboard = 0.0;
+        state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson = 0.0;
 
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
 
@@ -1746,14 +1746,15 @@ namespace HWBaseboardRadiator {
                 HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for the design object
             ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
             if (ZoneNum <= 0) continue;
-            state.dataHeatBalFanSys->QHWBaseboardToPerson(ZoneNum) += QBBRadSource(BaseboardNum) * HWBaseboardDesignDataObject.FracDistribPerson;
+            state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson(ZoneNum) += QBBRadSource(BaseboardNum) * HWBaseboardDesignDataObject.FracDistribPerson;
 
             for (RadSurfNum = 1; RadSurfNum <= HWBaseboard(BaseboardNum).TotSurfToDistrib; ++RadSurfNum) {
                 SurfNum = HWBaseboard(BaseboardNum).SurfacePtr(RadSurfNum);
                 if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                     ThisSurfIntensity = (QBBRadSource(BaseboardNum) * HWBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) /
                                          state.dataSurface->Surface(SurfNum).Area);
-                    state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalFanSys->SurfQHWBaseboard(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalSurf->AnyRadiantSystems = true;
                     // CR 8074, trap for excessive intensity (throws off surface balance )
                     if (ThisSurfIntensity > MaxRadHeatFlux) {
                         ShowSevereError(state, "DistributeBBRadGains:  excessive thermal radiation heat flux intensity detected");

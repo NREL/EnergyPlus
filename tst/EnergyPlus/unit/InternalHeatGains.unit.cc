@@ -74,7 +74,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 {
@@ -129,9 +128,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
     for (unsigned long i = 1; i <= state->dataHeatBal->ZoneOtherEq.size(); ++i) {
         const DataHeatBalance::ZoneEquipData &equip = state->dataHeatBal->ZoneOtherEq(i);
         if (equip.Name == "OTHEREQ1") {
-            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::Unknown);
+            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::Unknown));
         } else if (equip.Name == "OTHEREQ2") {
-            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::PropaneUse);
+            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::PropaneUse));
         }
     }
 }

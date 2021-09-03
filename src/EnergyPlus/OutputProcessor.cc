@@ -79,6 +79,8 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+
+#include <fmt/ostream.h>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
 
@@ -655,8 +657,8 @@ namespace OutputProcessor {
         // First check environment variable to see of possible override for minimum reporting frequency
         if (!state.dataSysVars->MinReportFrequency.empty()) {
             // Formats
-            static constexpr fmt::string_view Format_800("! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value\n");
-            static constexpr fmt::string_view Format_801(" Minimum Reporting Frequency, {},{}\n");
+            static constexpr std::string_view Format_800("! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value\n");
+            static constexpr std::string_view Format_801(" Minimum Reporting Frequency, {},{}\n");
             op->minimumReportFrequency = determineFrequency(state, state.dataSysVars->MinReportFrequency);
             print(state.files.eio, Format_800);
             print(
@@ -749,9 +751,9 @@ namespace OutputProcessor {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr fmt::string_view DayFormat("{},{:2},{:2}");
-        static constexpr fmt::string_view MonthFormat("{},{:2},{:2},{:2}");
-        static constexpr fmt::string_view EnvrnFormat("{},{:2},{:2},{:2},{:2}");
+        static constexpr std::string_view DayFormat("{},{:2},{:2}");
+        static constexpr std::string_view MonthFormat("{},{:2},{:2},{:2}");
+        static constexpr std::string_view EnvrnFormat("{},{:2},{:2},{:2},{:2}");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -2908,7 +2910,7 @@ namespace OutputProcessor {
                                          DayTypes(CurDayType));
                 if (state.dataResultsFramework->resultsFramework->TSMeters.rDataFrameEnabled()) {
                     state.dataResultsFramework->resultsFramework->TSMeters.newRow(
-                        state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, EndMinute);
+                        state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, EndMinute);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3035,7 +3037,7 @@ namespace OutputProcessor {
                                          DayTypes(CurDayType));
                 if (state.dataResultsFramework->resultsFramework->HRMeters.rDataFrameEnabled()) {
                     state.dataResultsFramework->resultsFramework->HRMeters.newRow(
-                        state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                        state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3139,7 +3141,7 @@ namespace OutputProcessor {
                                          DayTypes(CurDayType));
                 if (state.dataResultsFramework->resultsFramework->DYMeters.rDataFrameEnabled()) {
                     state.dataResultsFramework->resultsFramework->DYMeters.newRow(
-                        state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                        state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3231,7 +3233,7 @@ namespace OutputProcessor {
                                          state.dataEnvrn->Month);
                 if (state.dataResultsFramework->resultsFramework->MNMeters.rDataFrameEnabled()) {
                     state.dataResultsFramework->resultsFramework->MNMeters.newRow(
-                        state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                        state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3316,7 +3318,7 @@ namespace OutputProcessor {
                     state, state.files.mtr, op->YearlyStampReportChr, state.dataGlobal->CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL);
                 if (state.dataResultsFramework->resultsFramework->YRMeters.rDataFrameEnabled()) {
                     state.dataResultsFramework->resultsFramework->YRMeters.newRow(
-                        state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                        state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3414,7 +3416,7 @@ namespace OutputProcessor {
                                          PrintTimeStamp && PrintTimeStampToSQL);
                 if (state.dataResultsFramework->resultsFramework->SMMeters.rDataFrameEnabled()) {
                     state.dataResultsFramework->resultsFramework->SMMeters.newRow(
-                        state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                        state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3663,7 +3665,7 @@ namespace OutputProcessor {
 
         if (codedDate == 0) return "-";
 
-        static constexpr fmt::string_view DateFmt("{:02}-{:3}-{:02}:{:02}");
+        static constexpr std::string_view DateFmt("{:02}-{:3}-{:02}:{:02}");
 
         // ((month*100 + day)*100 + hour)*100 + minute
         int Month;  // month in integer format (1-12)
@@ -4013,18 +4015,17 @@ namespace OutputProcessor {
         switch (reportingInterval) {
         case ReportingFrequency::EachCall:
         case ReportingFrequency::TimeStep:
-            std::sprintf(state.dataOutputProcessor->stamp,
-                         "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s",
-                         reportIDString.c_str(),
-                         DayOfSimChr.c_str(),
-                         Month(),
-                         DayOfMonth(),
-                         DST(),
-                         Hour(),
-                         StartMinute(),
-                         EndMinute(),
-                         DayType().c_str());
-            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
+            print<FormatSyntax::FMT>(outputFile,
+                                     "{},{},{:2d},{:2d},{:2d},{:2d},{:5.2f},{:5.2f},{}\n",
+                                     reportIDString.c_str(),
+                                     DayOfSimChr.c_str(),
+                                     Month(),
+                                     DayOfMonth(),
+                                     DST(),
+                                     Hour(),
+                                     StartMinute(),
+                                     EndMinute(),
+                                     DayType().c_str());
             if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                                                 reportID,
@@ -4042,18 +4043,17 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Hourly:
-            std::sprintf(state.dataOutputProcessor->stamp,
-                         "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s",
-                         reportIDString.c_str(),
-                         DayOfSimChr.c_str(),
-                         Month(),
-                         DayOfMonth(),
-                         DST(),
-                         Hour(),
-                         0.0,
-                         60.0,
-                         DayType().c_str());
-            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
+            print<FormatSyntax::FMT>(outputFile,
+                                     "{},{},{:2d},{:2d},{:2d},{:2d},{:5.2f},{:5.2f},{}\n",
+                                     reportIDString.c_str(),
+                                     DayOfSimChr.c_str(),
+                                     Month(),
+                                     DayOfMonth(),
+                                     DST(),
+                                     Hour(),
+                                     0.0,
+                                     60.0,
+                                     DayType().c_str());
             if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                                                 reportID,
@@ -4071,15 +4071,14 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Daily:
-            std::sprintf(state.dataOutputProcessor->stamp,
-                         "%s,%s,%2d,%2d,%2d,%s",
-                         reportIDString.c_str(),
-                         DayOfSimChr.c_str(),
-                         Month(),
-                         DayOfMonth(),
-                         DST(),
-                         DayType().c_str());
-            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
+            print<FormatSyntax::FMT>(outputFile,
+                                     "{},{},{:2d},{:2d},{:2d},{}\n",
+                                     reportIDString.c_str(),
+                                     DayOfSimChr.c_str(),
+                                     Month(),
+                                     DayOfMonth(),
+                                     DST(),
+                                     DayType().c_str());
             if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                                                 reportID,
@@ -4097,8 +4096,7 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Monthly:
-            std::sprintf(state.dataOutputProcessor->stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month());
-            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
+            print<FormatSyntax::FMT>(outputFile, "{},{},{:2d}\n", reportIDString.c_str(), DayOfSimChr.c_str(), Month());
             if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                                                 reportID,
@@ -4109,8 +4107,7 @@ namespace OutputProcessor {
             }
             break;
         case ReportingFrequency::Simulation:
-            std::sprintf(state.dataOutputProcessor->stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str());
-            print(outputFile, "{}\n", state.dataOutputProcessor->stamp);
+            print<FormatSyntax::FMT>(outputFile, "{},{}\n", reportIDString.c_str(), DayOfSimChr.c_str());
             if (writeToSQL && state.dataSQLiteProcedures->sqlite) {
                 state.dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(static_cast<int>(reportingInterval),
                                                                                 reportID,
@@ -4121,8 +4118,8 @@ namespace OutputProcessor {
             break;
         default:
             if (state.dataSQLiteProcedures->sqlite) {
-                std::string str(format("Illegal reportingInterval passed to WriteTimeStampFormatData: {}", static_cast<int>(reportingInterval)));
-                state.dataSQLiteProcedures->sqlite->sqliteWriteMessage(str);
+                state.dataSQLiteProcedures->sqlite->sqliteWriteMessage(format<FormatSyntax::FMT>(
+                    "Illegal reportingInterval passed to WriteTimeStampFormatData: {}", static_cast<int>(reportingInterval)));
             }
             break;
         }
@@ -4307,11 +4304,11 @@ namespace OutputProcessor {
             const auto out = [&](InputOutputFile &of) {
                 if (of.good()) {
                     if (cumulativeMeterFlag) {
-                        static constexpr fmt::string_view fmt{"{},{},Cumulative {} [{}]{}\n"};
+                        static constexpr std::string_view fmt{"{},{},Cumulative {} [{}]{}\n"};
                         const auto lenString = index(FreqString, '[');
                         print(of, fmt, reportIDChr, 1, meterName, UnitsString, FreqString.substr(0, lenString));
                     } else {
-                        static constexpr fmt::string_view fmt{"{},{},{} [{}]{}\n"};
+                        static constexpr std::string_view fmt{"{},{},{} [{}]{}\n"};
                         print(of, fmt, reportIDChr, frequency, meterName, UnitsString, FreqString);
                     }
                 }
@@ -4683,7 +4680,7 @@ namespace OutputProcessor {
         }
 
         if (state.files.eso.good()) {
-            print(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
+            print<FormatSyntax::FMT>(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
         }
     }
 
@@ -4708,14 +4705,14 @@ namespace OutputProcessor {
         // of the UpdateDataandReport subroutine. The code was moved to facilitate
         // easier maintenance and writing of data to the SQL database.
 
-        i32toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
+        //        i32toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
         }
 
         if (state.files.eso.good()) {
-            print(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
+            print<FormatSyntax::FMT>(state.files.eso, "{},{}\n", creportID, fmt::format_int(repValue).c_str());
         }
     }
 
@@ -5467,7 +5464,7 @@ void SetupOutputVariable(EnergyPlusData &state,
             } else {
                 EndUseSub = "";
                 if (present(EndUseKey)) {
-                    if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::MakeUPPERCase(AsString(EndUseKey))) !=
+                    if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::MakeUPPERCase(std::string{EndUseKey})) !=
                         endUseCategoryNames.end()) {
                         EndUseSub = "General";
                     }
@@ -5887,16 +5884,14 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
     if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
         if (t_TimeStepTypeKey == TimeStepType::TimeStepZone) {
-            state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.newRow(state,
-                                                                                      state.dataEnvrn->Month,
+            state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.newRow(state.dataEnvrn->Month,
                                                                                       state.dataEnvrn->DayOfMonth,
                                                                                       state.dataGlobal->HourOfDay,
                                                                                       op->TimeValue.at(TimeStepType::TimeStepZone).CurMinute);
         }
         if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem) {
             // TODO this was an error probably, was using TimeValue(1)
-            state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.newRow(state,
-                                                                                      state.dataEnvrn->Month,
+            state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.newRow(state.dataEnvrn->Month,
                                                                                       state.dataEnvrn->DayOfMonth,
                                                                                       state.dataGlobal->HourOfDay,
                                                                                       op->TimeValue.at(TimeStepType::TimeStepSystem).CurMinute);
@@ -6089,8 +6084,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                 state.dataResultsFramework->resultsFramework->initializeITSDataFrame(
                     ReportingFrequency::TimeStep, op->IVariableTypes, op->NumOfIVariable);
             }
-            state.dataResultsFramework->resultsFramework->RITimestepTSData.newRow(state,
-                                                                                  state.dataEnvrn->Month,
+            state.dataResultsFramework->resultsFramework->RITimestepTSData.newRow(state.dataEnvrn->Month,
                                                                                   state.dataEnvrn->DayOfMonth,
                                                                                   state.dataGlobal->HourOfDay,
                                                                                   op->TimeValue.at(TimeStepType::TimeStepZone).CurMinute);
@@ -6266,7 +6260,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     ReportingFrequency::Hourly, op->IVariableTypes, op->NumOfIVariable);
             }
             state.dataResultsFramework->resultsFramework->RIHourlyTSData.newRow(
-                state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
 
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
@@ -6369,7 +6363,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     ReportingFrequency::Daily, op->IVariableTypes, op->NumOfIVariable);
             }
             state.dataResultsFramework->resultsFramework->RIDailyTSData.newRow(
-                state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
 
         op->NumHoursInMonth += 24;
@@ -6418,7 +6412,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     ReportingFrequency::Monthly, op->IVariableTypes, op->NumOfIVariable);
             }
             state.dataResultsFramework->resultsFramework->RIMonthlyTSData.newRow(
-                state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
 
         op->NumHoursInSim += op->NumHoursInMonth;
@@ -6465,7 +6459,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     ReportingFrequency::Simulation, op->IVariableTypes, op->NumOfIVariable);
             }
             state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.newRow(
-                state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
             for (Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
@@ -6502,7 +6496,7 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     ReportingFrequency::Yearly, op->IVariableTypes, op->NumOfIVariable);
             }
             state.dataResultsFramework->resultsFramework->RIYearlyTSData.newRow(
-                state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
             for (Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
@@ -8834,7 +8828,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
 
 int initErrorFile(EnergyPlusData &state)
 {
-    state.files.err_stream = std::unique_ptr<std::ostream>(new std::ofstream(state.files.outputErrFilePath));
+    state.files.err_stream = std::make_unique<std::ofstream>(state.files.outputErrFilePath);
     if (state.files.err_stream->bad()) {
         DisplayString(state, "ERROR: Could not open file " + state.files.outputErrFilePath.string() + " for output (write).");
         return EXIT_FAILURE;

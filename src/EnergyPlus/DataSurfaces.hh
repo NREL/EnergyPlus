@@ -757,8 +757,6 @@ namespace DataSurfaces {
 
         Real64 getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
 
-        static Real64 getInsideIR(EnergyPlusData &state, const int t_SurfNum);
-
         Real64 getOutsideAirTemperature(EnergyPlusData &state, int t_SurfNum) const;
 
         Real64 getOutsideIR(EnergyPlusData &state, int t_SurfNum) const;
