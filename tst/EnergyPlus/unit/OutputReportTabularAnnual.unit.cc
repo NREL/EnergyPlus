@@ -62,7 +62,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::OutputReportTabularAnnual;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GetInput)
 {
