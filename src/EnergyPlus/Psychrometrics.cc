@@ -123,7 +123,6 @@ namespace Psychrometrics {
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
         state.dataPsychCache->cached_Psat.fill(cached_psat_t());
-        state.dataPsychCache->cached_Psat.fill(cached_psat_t());
 #endif
 #ifdef EP_cache_PsyTsatFnPb
         state.dataPsychCache->cached_Tsat.fill(cached_tsat_h_pb());
@@ -1444,9 +1443,9 @@ namespace Psychrometrics {
 
         return Temp;
     }
-    Real64 CSplineint(int const n,     // sample data size
-                      const Real64 &x) // given value of x
-    {                                  // Cubic Spline interpolation
+    Real64 CSplineint(int const n, // sample data size
+                      Real64 x)    // given value of x
+    {                              // Cubic Spline interpolation
         // Reference: Numerical Recipies in C (pp.97)
         Real64 A, B, y;
         // find location of x in arrays without searching since array bins are equally sized

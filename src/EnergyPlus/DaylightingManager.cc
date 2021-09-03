@@ -579,7 +579,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                 // for first time that daylight factors are calculated and so is insensitive to possible variation
                 // due to change in ground reflectance from month to month, or change in storm window status.
                 // TODO MJW: Post-release change to enclosure name
-                static constexpr fmt::string_view Format_700(
+                static constexpr std::string_view Format_700(
                     "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor\n");
                 print(state.files.eio, Format_700);
                 for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
@@ -10336,21 +10336,21 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
     } // End of zone loop
 
     // TODO MJW: These eio headings need to change from zone to enclosure
-    static constexpr fmt::string_view Format_700(
+    static constexpr std::string_view Format_700(
         "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones\n");
     print(state.files.eio, Format_700);
     for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
         if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
         if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
-        static constexpr fmt::string_view Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
+        static constexpr std::string_view Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
         print(state.files.eio,
               Format_701,
               state.dataViewFactor->EnclSolInfo(enclNum).Name,
               thisEnclDaylight.TotalExtWindows,
               (thisEnclDaylight.NumOfDayltgExtWins - thisEnclDaylight.TotalExtWindows));
     }
-    static constexpr fmt::string_view Format_702(
+    static constexpr std::string_view Format_702(
         "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent "
         "Zone Names - 1st 100 (max)\n");
     print(state.files.eio, Format_702);
@@ -10358,7 +10358,7 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
         if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
         if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
-        static constexpr fmt::string_view Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
+        static constexpr std::string_view Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
         print(state.files.eio, Format_703, state.dataViewFactor->EnclSolInfo(enclNum).Name, thisEnclDaylight.NumOfIntWinAdjEncls);
         for (int loop = 1, loop_end = min(thisEnclDaylight.NumOfIntWinAdjEncls, 100); loop <= loop_end; ++loop) {
             print(state.files.eio, ",{}", state.dataViewFactor->EnclSolInfo(thisEnclDaylight.AdjIntWinEnclNums(loop)).Name);
@@ -10731,10 +10731,13 @@ void WriteDaylightMapTitle(EnergyPlusData &state,
     // must add correct number of commas at end
     const auto fullmapName = fmt::format("{}:{}:{} Illuminance [lux] (Hourly)", state.dataHeatBal->Zone(ZoneNum).Name, environmentName, mapName);
     print(mapFile,
-          "Date/Time{Sep}{FullMapName}{Sep}{RefPts}{Sep}{Sep}\n",
-          fmt::arg("Sep", state.dataDaylightingData->MapColSep),
-          fmt::arg("FullMapName", fullmapName),
-          fmt::arg("RefPts", refPts));
+          "Date/Time{}{}{}{}{}{}\n",
+          state.dataDaylightingData->MapColSep,
+          fullmapName,
+          state.dataDaylightingData->MapColSep,
+          refPts,
+          state.dataDaylightingData->MapColSep,
+          state.dataDaylightingData->MapColSep);
 
     if (state.dataSQLiteProcedures->sqlite) {
         state.dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(mapNum, fullmapName, environmentName, ZoneNum, refPts, zcoord);

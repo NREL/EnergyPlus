@@ -87,47 +87,39 @@ void ConvertCaseToLower(std::string_view InputString, // Input string
                         std::string &OutputString     // Output string (in LowerCase)
 );
 
-int getEnumerationValue(gsl::span<const std::string_view> sList, const std::string_view s);
-
-// useful for forcing a conversion to a string reference for JSON objects
-inline const std::string &AsString(const std::string &value)
-{
-    return value;
-}
-
 std::string::size_type FindNonSpace(std::string const &String); // String to be scanned
 
-template <typename T> inline T pow2(T const &x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inline constexpr T pow2(T x)
 {
     return x * x;
 }
 
-template <typename T> inline T pow3(T const &x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inline constexpr T pow3(T x)
 {
     return x * x * x;
 }
 
-template <typename T> inline T pow4(T const &x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inline constexpr T pow4(T x)
 {
     T y(x * x);
     return y * y;
 }
 
-template <typename T> inline T pow5(T const &x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inline constexpr T pow5(T x)
 {
     T y(x * x);
     y *= y;
     return y * x;
 }
 
-template <typename T> inline T pow6(T const &x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inline constexpr T pow6(T x)
 {
     T y(x * x);
     y *= y;
     return y * y;
 }
 
-template <typename T> inline T pow7(T const &x)
+template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inline constexpr T pow7(T x)
 {
     T y(x * x);
     y *= y;
@@ -136,14 +128,6 @@ template <typename T> inline T pow7(T const &x)
 }
 
 bool env_var_on(std::string const &env_var_str);
-
-class FatalError : public std::runtime_error
-{
-public:
-    FatalError(std::string const &msg) : runtime_error(msg)
-    {
-    }
-};
 
 using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
@@ -231,7 +215,7 @@ namespace UtilityRoutines {
     {
     };
 
-    Real64 ProcessNumber(std::string_view const String, bool &ErrorFlag);
+    Real64 ProcessNumber(std::string_view String, bool &ErrorFlag);
 
     int FindItemInList(std::string_view const String, Array1_string const &ListOfItems, int NumItems);
 
@@ -241,6 +225,16 @@ namespace UtilityRoutines {
     }
 
     int FindItemInList(std::string_view const String, Array1S_string const ListOfItems, int NumItems);
+
+    template <typename InputIterator> int FindItemInList(std::string_view const str, InputIterator first, InputIterator last)
+    {
+        auto it = std::find(first, last, str);
+        if (it != last) {
+            return std::distance(first, it) + 1;
+        } else {
+            return 0;
+        }
+    }
 
     inline int FindItemInList(std::string_view const String, Array1S_string const ListOfItems)
     {
@@ -434,7 +428,7 @@ namespace UtilityRoutines {
 
     std::string MakeUPPERCase(std::string_view const InputString); // Input String
 
-    inline bool SameString(std::string_view const s, std::string_view const t)
+    constexpr bool SameString(std::string_view const s, std::string_view const t)
     {
         // case insensitive comparison
         return equali(s, t);
@@ -596,6 +590,14 @@ namespace UtilityRoutines {
                                                    bool &FuelTypeErrorsFound);
 
 } // namespace UtilityRoutines
+
+constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList, const std::string_view s)
+{
+    for (unsigned int i = 0; i < sList.size(); ++i) {
+        if (UtilityRoutines::SameString(sList[i], s)) return i;
+    }
+    return -1;
+}
 
 struct UtilityRoutinesData : BaseGlobalStruct
 {

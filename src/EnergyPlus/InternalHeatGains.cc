@@ -231,11 +231,11 @@ namespace InternalHeatGains {
         std::string liteName;
 
         // Formats
-        static constexpr fmt::string_view Format_720(" Zone Internal Gains Nominal, {},{:.2R},{:.1R},");
-        static constexpr fmt::string_view Format_722(" {} Internal Gains Nominal, {},{},{},{:.2R},{:.1R},");
-        static constexpr fmt::string_view Format_723(
+        static constexpr std::string_view Format_720(" Zone Internal Gains Nominal, {},{:.2R},{:.1R},");
+        static constexpr std::string_view Format_722(" {} Internal Gains Nominal, {},{},{},{:.2R},{:.1R},");
+        static constexpr std::string_view Format_723(
             "! <{} Internal Gains Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {{m2}},# Zone Occupants,{}");
-        static constexpr fmt::string_view Format_724(" {}, {}\n");
+        static constexpr std::string_view Format_724(" {}, {}\n");
 
         auto print_and_divide_if_greater_than_zero = [&](const Real64 numerator, const Real64 denominator) {
             if (denominator > 0.0) {
@@ -3276,7 +3276,7 @@ namespace InternalHeatGains {
 
         setupIHGOutputs(state);
 
-        static constexpr fmt::string_view Format_721(
+        static constexpr std::string_view Format_721(
             "! <Zone Internal Gains Nominal>,Zone Name, Floor Area {{m2}},# Occupants,Area per Occupant "
             "{{m2/person}},Occupant per Area {{person/m2}},Interior Lighting {{W/m2}},Electric Load {{W/m2}},Gas Load {{W/m2}},Other "
             "Load {{W/m2}},Hot Water Eq {{W/m2}},Steam Equipment {{W/m2}},Sum Loads per Area {{W/m2}},Outdoor Controlled Baseboard "
@@ -7517,7 +7517,8 @@ namespace InternalHeatGains {
                         state.dataInternalHeatGains->curQL + state.dataViewFactor->EnclRadInfo(radEnclosureNum).FloorArea * pulseMultipler;
                     // ITABSF is the Inside Thermal Absorptance
                     // EnclRadThermAbsMult is a multiplier for each zone
-                    // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
+                    //                     state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataInternalHeatGains->adjQL * is the thermal
+                    //                     radiation absorbed on inside surfaces
                     state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataInternalHeatGains->adjQL *
                                                                      state.dataHeatBal->EnclRadThermAbsMult(radEnclosureNum) *
                                                                      state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
