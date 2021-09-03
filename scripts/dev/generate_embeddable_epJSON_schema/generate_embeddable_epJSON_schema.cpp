@@ -19,7 +19,7 @@ int main( int argc, char const *argv[] )
 	auto const input_json = json::parse( schema_stream );
 	auto const v_cbor = json::to_cbor( input_json );
 
-	printf("	const static std::array< std::uint8_t, %zu > embeddedSchema = {{\n", v_cbor.size() );
+	printf("	static constexpr std::array< std::uint8_t, %zu > embeddedSchema = {{\n", v_cbor.size() );
 
 	for ( size_t i = 0; i < v_cbor.size(); ++i )
 	{

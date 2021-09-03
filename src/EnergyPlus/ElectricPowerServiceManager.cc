@@ -297,7 +297,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                 if (powerOutTransformerObj_ == nullptr) {
                     ++numPowerOutTransformers_;
                     powerOutTransformerName_ = state.dataIPShortCut->cAlphaArgs(1);
-                    powerOutTransformerObj_ = std::unique_ptr<ElectricTransformer>(new ElectricTransformer(state, powerOutTransformerName_));
+                    powerOutTransformerObj_ = std::make_unique<ElectricTransformer>(state, powerOutTransformerName_);
 
                 } else {
                     ShowWarningError(state,
@@ -307,7 +307,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
         }
         if (foundInFromGridTransformer) {
             // call transformer constructor
-            facilityPowerInTransformerObj_ = std::unique_ptr<ElectricTransformer>(new ElectricTransformer(state, facilityPowerInTransformerName_));
+            facilityPowerInTransformerObj_ = std::make_unique<ElectricTransformer>(state, facilityPowerInTransformerName_);
         }
     } // if transformers
 
@@ -1032,7 +1032,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
     if (!errorsFound && inverterPresent) {
         // call inverter constructor
-        inverterObj = std::unique_ptr<DCtoACInverter>(new DCtoACInverter(state, inverterName));
+        inverterObj = std::make_unique<DCtoACInverter>(state, inverterName);
 
         // Make sure only Generator::PVWatts are used with Inverter:PVWatts
         // Add up the total DC capacity and pass it to the inverter.
@@ -1060,7 +1060,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
     if (!errorsFound && storagePresent_) {
         // call storage constructor
-        storageObj = std::unique_ptr<ElectricStorage>(new ElectricStorage(state, storageName_));
+        storageObj = std::make_unique<ElectricStorage>(state, storageName_);
     }
 
     if (!errorsFound && transformerPresent_) {
@@ -1084,7 +1084,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3),
                                             "LoadCenterPowerConditioning")) { // this is the right kind of transformer
-                transformerObj = std::unique_ptr<ElectricTransformer>(new ElectricTransformer(state, transformerName_));
+                transformerObj = std::make_unique<ElectricTransformer>(state, transformerName_);
             } else {
                 ShowWarningError(state,
                                  "Transformer named " + transformerName_ + " associated with the load center named " + name_ + " should have " +
@@ -1098,7 +1098,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
     if (!errorsFound && converterPresent_) {
         // call AC to DC converter constructor
-        converterObj = std::unique_ptr<ACtoDCConverter>(new ACtoDCConverter(state, converterName_));
+        converterObj = std::make_unique<ACtoDCConverter>(state, converterName_);
     }
 
     // Setup general output variables for reporting in the electric load center
@@ -3472,7 +3472,7 @@ ElectricStorage::ElectricStorage( // main constructor
             break;
         }
         case StorageModelType::liIonNmcBattery: {
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "KandlerSmith") or state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "KandlerSmith") || state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                 lifeCalculation_ = BatteryDegradationModelType::lifeCalculationYes;
             } else {
                 lifeCalculation_ = BatteryDegradationModelType::lifeCalculationNo;
@@ -3488,7 +3488,7 @@ ElectricStorage::ElectricStorage( // main constructor
             liIon_Vfull_ = state.dataIPShortCut->lNumericFieldBlanks(10) ? 4.2 : state.dataIPShortCut->rNumericArgs(10);
             liIon_Vexp_ = state.dataIPShortCut->lNumericFieldBlanks(11) ? 3.53 : state.dataIPShortCut->rNumericArgs(11);
             liIon_Vnom_ = state.dataIPShortCut->lNumericFieldBlanks(12) ? 3.342 : state.dataIPShortCut->rNumericArgs(12);
-            if (liIon_Vfull_ < liIon_Vexp_ or liIon_Vexp_ < liIon_Vnom_) {
+            if (liIon_Vfull_ < liIon_Vexp_ || liIon_Vexp_ < liIon_Vnom_) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\", invalid entry.");
@@ -3572,8 +3572,8 @@ ElectricStorage::ElectricStorage( // main constructor
                                                 20.0 // Picking a temperature for now, will reset before each run.
                                                 ),
                                   nullptr));
-                ssc_lastBatteryState_ = std::unique_ptr<battery_state>(new battery_state(ssc_battery_->get_state()));
-                ssc_initBatteryState_ = std::unique_ptr<battery_state>(new battery_state(ssc_battery_->get_state()));
+                ssc_lastBatteryState_ = std::make_unique<battery_state>(ssc_battery_->get_state());
+                ssc_initBatteryState_ = std::make_unique<battery_state>(ssc_battery_->get_state());
             }
 
             break;
@@ -3585,7 +3585,7 @@ ElectricStorage::ElectricStorage( // main constructor
 
         } // switch storage model type
 
-        if (storageModelMode_ == StorageModelType::kiBaMBattery or storageModelMode_ == StorageModelType::liIonNmcBattery) {
+        if (storageModelMode_ == StorageModelType::kiBaMBattery || storageModelMode_ == StorageModelType::liIonNmcBattery) {
             SetupOutputVariable(state,
                                 "Electric Storage Operating Mode Index",
                                 OutputProcessor::Unit::None,
