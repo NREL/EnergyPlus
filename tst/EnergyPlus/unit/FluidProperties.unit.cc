@@ -59,7 +59,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::FluidProperties;
 
 TEST_F(EnergyPlusFixture, FluidProperties_GetDensityGlycol)

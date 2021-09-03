@@ -14,6 +14,7 @@
 #include <stdio.h>
 
 #include "util/test.h"
+#include "util/flags.h"
 #include "util/logging.h"
 #include "util/strutil.h"
 #include "re2/testing/exhaustive_tester.h"
@@ -24,11 +25,11 @@
 #define LOGGING 0
 #endif
 
-DEFINE_bool(show_regexps, false, "show regexps during testing");
+DEFINE_FLAG(bool, show_regexps, false, "show regexps during testing");
 
-DEFINE_int32(max_bad_regexp_inputs, 1,
-             "Stop testing a regular expression after finding this many "
-             "strings that break it.");
+DEFINE_FLAG(int, max_bad_regexp_inputs, 1,
+            "Stop testing a regular expression after finding this many "
+            "strings that break it.");
 
 namespace re2 {
 
@@ -66,7 +67,8 @@ static void PrintResult(const RE2& re, const StringPiece& input, RE2::Anchor anc
       printf("-");
     else
       printf("%td-%td",
-             m[i].begin() - input.begin(), m[i].end() - input.begin());
+             m[i].begin() - input.begin(),
+             m[i].end() - input.begin());
   }
 }
 
@@ -76,10 +78,11 @@ static void PrintResult(const RE2& re, const StringPiece& input, RE2::Anchor anc
 void ExhaustiveTester::HandleRegexp(const std::string& const_regexp) {
   regexps_++;
   std::string regexp = const_regexp;
-  if (!topwrapper_.empty())
+  if (!topwrapper_.empty()) {
     regexp = StringPrintf(topwrapper_.c_str(), regexp.c_str());
+  }
 
-  if (FLAGS_show_regexps) {
+  if (GetFlag(FLAGS_show_regexps)) {
     printf("\r%s", regexp.c_str());
     fflush(stdout);
   }
@@ -134,7 +137,7 @@ void ExhaustiveTester::HandleRegexp(const std::string& const_regexp) {
     tests_++;
     if (!tester.TestInput(strgen_.Next())) {
       failures_++;
-      if (++bad_inputs >= FLAGS_max_bad_regexp_inputs)
+      if (++bad_inputs >= GetFlag(FLAGS_max_bad_regexp_inputs))
         break;
     }
   }

@@ -583,10 +583,10 @@ namespace WeatherManager {
     );
 
     void ErrorInterpretWeatherDataLine(
-        EnergyPlusData &state, int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string &SaveLine, std::string &Line);
+        EnergyPlusData &state, int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string_view SaveLine, std::string_view Line);
 
     void InterpretWeatherDataLine(EnergyPlusData &state,
-                                  std::string &Line,
+                                  std::string_view Line,
                                   bool &ErrorFound, // True if an error is found, false otherwise
                                   int &WYear,
                                   int &WMonth,
