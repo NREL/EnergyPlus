@@ -74,7 +74,7 @@ TEST_F(EnergyPlusFixture, Construction_getCacheKeys)
         "    836.8000,                !- Specific Heat {J/kg-K}",
         "    0.9000000,               !- Thermal Absorptance",
         "    0.9200000,               !- Solar Absorptance",
-        "    0.9200000;               !- Visible Absorptance", /**/
+        "    0.9200000;               !- Visible Absorptance",
 
         "  Material,",
         "    C4 - 4 IN COMMON BRICK,  !- Name",
