@@ -69,6 +69,15 @@ namespace NodeInputManager {
     using DataLoopNode::MarkedNodeData;
     using DataLoopNode::NodeData;
 
+    // For GetOnlySingleNode(), GetNodeNums(), etc
+    enum class compFluidStream
+    {
+        Unassigned = -1,
+        Primary = 1,
+        Secondary = 2,
+        Tertiary = 3
+    };
+
     struct NodeListDef // Derived Type for Node Lists
     {
         // Members
@@ -92,7 +101,7 @@ namespace NodeInputManager {
                      std::string const &NodeObjectType,                         // Node Object Type (i.e. "Chiller:Electric")
                      std::string const &NodeObjectName,                         // Node Object Name (i.e. "MyChiller")
                      DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
-                     int const NodeFluidStream,                                 // Which Fluid Stream (1,2,3,...)
+                     compFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
                      bool const ObjectIsParent,                                 // True/False
                      Optional_bool_const IncrementFluidStream = _,              // True/False
                      Optional_string_const InputFieldName = _                   // Input Field Name
@@ -114,7 +123,7 @@ namespace NodeInputManager {
                           std::string const &NodeObjectName,                         // Node Object Name (i.e. "MyChiller")
                           DataLoopNode::NodeFluidType const NodeFluidType,           // Fluidtype for checking/setting node FluidType
                           DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
-                          int const NodeFluidStream,                                 // Which Fluid Stream (1,2,3,...)
+                          compFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
                           bool const ObjectIsParent,                                 // True/False
                           Optional_string_const InputFieldName = _                   // Input Field Name
     );

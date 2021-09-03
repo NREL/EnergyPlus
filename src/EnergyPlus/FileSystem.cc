@@ -46,12 +46,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // Standard C++ library
-#include <errno.h>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -69,6 +68,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -80,86 +80,105 @@ namespace FileSystem {
     std::string const exeExtension;
 #endif
 
-    void makeNativePath(std::string &path)
+    fs::path makeNativePath(fs::path const &path)
     {
-        std::replace(path.begin(), path.end(), DataStringGlobals::altpathChar, DataStringGlobals::pathChar);
+        // path.make_preferred() on windows will change "/" to "\\", because '/' is a fallback separator
+        // but on Unix it will *not* change "\\" to "/", because POSIX doesn't define it as a fallback separator. In fact, it's even allowed in a
+        // filename. Do we really need that though?
+        // path.make_preferred();
+        fs::path result = path;
+        std::string tempPathAsStr = result.make_preferred().string();
+        std::replace(tempPathAsStr.begin(), tempPathAsStr.end(), DataStringGlobals::altpathChar, DataStringGlobals::pathChar);
+        result = fs::path(tempPathAsStr);
+        return result;
     }
 
-    std::string getFileName(std::string const &filePath)
+    // TODO: remove as providing little benefit over calling fs::path::filename directly?
+    fs::path getFileName(fs::path const &filePath)
     {
-        int pathCharPosition = filePath.find_last_of(DataStringGlobals::pathChar);
-        return filePath.substr(pathCharPosition + 1, filePath.size() - 1);
+        return filePath.filename();
     }
 
-    std::string getParentDirectoryPath(std::string const &path)
+    fs::path getParentDirectoryPath(fs::path const &path)
     {
-        std::string tempPath = path;
-        if (path.at(path.size() - 1) == DataStringGlobals::pathChar) tempPath = path.substr(0, path.size() - 1);
-
-        int pathCharPosition = tempPath.find_last_of(DataStringGlobals::pathChar);
-        tempPath = tempPath.substr(0, pathCharPosition + 1);
-
-        // If empty, then current dir, but with trailing separator too: eg `./`
-        if (tempPath == "") tempPath = {'.', DataStringGlobals::pathChar};
-
-        return tempPath;
-    }
-
-    std::string getAbsolutePath(std::string const &path)
-    {
-        /*
-         * Returns the absolute path for a given relative path.
-         *
-         * If the relative path points to a symlink, the symlink will
-         * be resolved, and this function will return the absolute path
-         * of the link.
-         */
-
-#ifdef _WIN32
-        char absolutePath[1024];
-        GetFullPathName(path.c_str(), sizeof(absolutePath), absolutePath, NULL);
-        return std::string(absolutePath);
-#else
-        // If the path doesn't exist, find which of it's parents' paths does exist
-        std::string parentPath = path;
-        while (!pathExists(parentPath)) {
-            parentPath = getParentDirectoryPath(parentPath);
+        // Note: this is needed because "/a/b/c".parent_path() = "/a/b/c/"
+        std::string pathStr = path.string();
+        while ((pathStr.back() == DataStringGlobals::pathChar) || (pathStr.back() == DataStringGlobals::altpathChar)) {
+            pathStr.erase(pathStr.size() - 1);
         }
 
-        std::string pathTail;
-        std::string currentDir = ".";
-        std::string currentDirWithSep = currentDir + DataStringGlobals::pathChar;
-        if ((parentPath == currentDir || parentPath == currentDirWithSep) && path.find(currentDirWithSep) == std::string::npos)
-            // If parent path is the current directory and the original path does not already contain
-            // the current directory in the string, then leave the path tail as-is.
-            pathTail = path;
-        else
-            // otherwise strip off any preceding content from the path tail
-            pathTail = path.substr(parentPath.size(), path.size() - parentPath.size());
-
-        char *absolutePathTemp = realpath(parentPath.c_str(), NULL);
-        if (absolutePathTemp != NULL) {
-            std::string absoluteParentPath(absolutePathTemp);
-            free(absolutePathTemp);
-            if (pathTail.size() == 0)
-                return absoluteParentPath;
-            else
-                return absoluteParentPath + DataStringGlobals::pathChar + pathTail;
-
-        } else {
-            std::cout << "ERROR: Could not resolve path for " + path + "." << std::endl;
-            std::exit(EXIT_FAILURE);
+        // If empty, return "./" instead
+        fs::path parent_path = fs::path(pathStr).parent_path();
+        if (parent_path.empty()) {
+            parent_path = "./";
         }
-#endif
+        return parent_path;
     }
 
-    std::string getProgramPath()
+    fs::path getAbsolutePath(fs::path const &path)
     {
-        /*
-         * Returns the relative path to the executable file (including symlinks).
-         *
-         * To resolve symlinks, wrap this call in getAbsolutePath().
-         */
+        //        /*
+        //         * Returns the absolute path for a given relative path.
+        //         *
+        //         * If the relative path points to a symlink, the symlink will
+        //         * be resolved, and this function will return the absolute path
+        //         * of the link.
+        //         */
+
+        // Not available in experimental/filesystem
+        // return fs::weakly_canonical(fs::absolute(p));
+
+        fs::path p = fs::absolute(path);
+
+        while (fs::is_symlink(p)) {
+            auto linkpath = fs::read_symlink(p);
+            if (linkpath.is_absolute()) {
+                p = linkpath;
+            } else {
+                // Note: temp will end up absolute but not canonical yet
+                // eg:
+                // temp="/home/a_folder/a_symlink"
+                // linkpath="../another_folder/a_file"
+                p = p.parent_path() / linkpath;
+                // eg: temp ="/home/a_folder/../another_folder/a_file"
+            }
+        }
+
+        fs::path result;
+        // `p` now is absolute, but it isn't necessarilly canonical.
+        // If you have <filesystem>, you can use `fs::weakly_canonical`. <experimental/filesystem> does **not** have `weakly_canonical` though
+        // This block resolves a canonical path, even if it doesn't exist (yet?) on disk.
+        for (fs::path::iterator it = p.begin(); it != p.end(); ++it) {
+            if (*it == fs::path("..")) {
+                if (fs::is_symlink(result) || (result.filename() == fs::path(".."))) {
+                    result /= *it;
+                } else {
+                    result = result.parent_path();
+                }
+            } else if (*it != fs::path(".")) {
+                result /= *it;
+            }
+        }
+
+        // Workaround to maintain std::string & backward compat
+        // TODO: is this wanted?
+        // The problem is really only for unit tests, if you try to compare getAbsolutePath("sandbox/") == getAbsolutePath("sandbox") you get false
+        // because one has the trailing sep, the other doesn't. Both paths have the same components though (if iterated on), and as long as you use
+        // path operations (such as operator/) and not string concatenation, this works just fine.
+        // std::string s = result.string();
+        // if (fs::is_directory(s)) {
+        // s += '/';
+        //}
+        return result;
+    }
+
+    fs::path getProgramPath()
+    {
+        // /*
+        // * Returns the relative path to the executable file (including symlinks).
+        // *
+        // * To resolve symlinks, wrap this call in getAbsolutePath().
+        // */
         char executableRelativePath[1024];
 
 #ifdef __APPLE__
@@ -177,113 +196,93 @@ namespace FileSystem {
         GetModuleFileName(NULL, executableRelativePath, sizeof(executableRelativePath));
 #endif
 
-        return std::string(executableRelativePath);
+        return executableRelativePath;
     }
 
-    std::string getFileExtension(std::string const &fileName)
+    // TODO: remove? seems like fs::path::extension would do fine. It's only used in CommandLineInterface to check the input file type, so we could
+    // just compare to ".EPJSON" instead of "EPJSON"...
+    fs::path getFileExtension(fs::path const &filePath)
     {
-        int extensionPosition = fileName.find_last_of(".");
-        return fileName.substr(extensionPosition + 1, fileName.size() - 1);
+        std::string pext = fs::path(filePath).extension().string();
+        if (!pext.empty()) {
+            // remove '.'
+            pext = std::string(++pext.begin(), pext.end());
+        }
+        return fs::path{pext};
     }
 
-    std::string removeFileExtension(std::string const &fileName)
+    FileTypes getFileType(fs::path const &filePath)
     {
-        int extensionPosition = fileName.find_last_of(".");
-        return fileName.substr(0, extensionPosition);
+#ifdef _WIN32
+        auto const filePathStr = fs::path(filePath).extension().string();
+        auto extension = std::string_view(filePathStr.c_str());
+#else
+        auto extension = std::string_view(fs::path(filePath).extension().c_str());
+#endif
+
+        extension.remove_prefix(extension.find_last_of('.') + 1);
+        return static_cast<FileTypes>(getEnumerationValue(FileTypesExt, extension));
     }
 
-    void makeDirectory(std::string const &directoryPath)
+    // TODO: remove for fs::path::replace_extension directly? Note that replace_extension mutates the object
+    fs::path removeFileExtension(fs::path const &filePath)
+    {
+        // return fs::path(filePath).stem().string();
+        return fs::path(filePath).replace_extension();
+    }
+
+    fs::path replaceFileExtension(fs::path const &filePath, fs::path const &ext)
+    {
+        // return fs::path(filePath).stem().string();
+        return fs::path(filePath).replace_extension(ext);
+    }
+
+    // TODO: remove? `fs::create_directory` for a single or `fs::create_directories` for nested directory creation
+    void makeDirectory(fs::path const &directoryPath)
     {
         // Create a directory if doesn't already exist
         if (pathExists(directoryPath)) { // path already exists
             if (!directoryExists(directoryPath)) {
-                std::cout << "ERROR: " + getAbsolutePath(directoryPath) + " is not a directory." << std::endl;
+                std::cout << "ERROR: " << getAbsolutePath(directoryPath).string() << " already exists and is not a directory." << std::endl;
                 std::exit(EXIT_FAILURE);
             }
         } else { // directory does not already exist
-            std::string parentDirectoryPath = getParentDirectoryPath(directoryPath);
-            if (!pathExists(parentDirectoryPath)) {
-                std::cout << "ERROR: " + getAbsolutePath(parentDirectoryPath) + " is not a directory." << std::endl;
-                std::exit(EXIT_FAILURE);
-            }
-#ifdef _WIN32
-            CreateDirectory(directoryPath.c_str(), NULL);
-#else
-            mkdir(directoryPath.c_str(), 0755);
-#endif
+            // Create_directories is recursive, create_directory isn't. I don't see why we wouldn't want recursive
+            fs::create_directories(directoryPath);
         }
     }
 
-    bool pathExists(std::string const &path)
+    // TODO: remove?
+    bool pathExists(fs::path const &path)
     {
-#ifdef _WIN32
-        return PathFileExists(path.c_str());
-#else
-        struct stat info;
-        return (stat(path.c_str(), &info) == 0);
-#endif
+        return fs::exists(path);
     }
 
-    bool directoryExists(std::string const &directoryPath)
+    // TODO: I think we want to keep this one
+    bool directoryExists(fs::path const &directoryPath)
     {
-#ifdef _WIN32
-        if (PathFileExists(directoryPath.c_str()))
-            return PathIsDirectory(directoryPath.c_str());
-        else
-            return false;
-#else
-        struct stat info;
-        if (stat(directoryPath.c_str(), &info) == 0) {
-            return (info.st_mode & S_IFDIR);
-        } else
-            return false;
-#endif
+        return fs::exists(directoryPath) && fs::is_directory(directoryPath);
     }
 
-    bool fileExists(std::string const &filePath)
+    bool fileExists(fs::path const &filePath)
     {
-#ifdef _WIN32
-        if (PathFileExists(filePath.c_str()))
-            return !PathIsDirectory(filePath.c_str());
-        else
-            return false;
-#else
-        struct stat info;
-        if (stat(filePath.c_str(), &info) == 0) {
-            return !(info.st_mode & S_IFDIR);
-        } else
-            return false;
-#endif
+        return fs::exists(filePath) && !fs::is_directory(filePath);
     }
 
-    void moveFile(std::string const &filePath, std::string const &destination)
+    void moveFile(fs::path const &filePath, fs::path const &destination)
     {
+        // TODO: should we throw? Or return false?
         if (!fileExists(filePath)) {
             return;
         }
-#ifdef _WIN32
-        // Note: on Windows, rename function doesn't always replace the existing file so MoveFileExA is used
-        MoveFileExA(filePath.c_str(), destination.c_str(), MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING);
-#else
-        // Start by removing the destination file. rename fails silently, so you don't want to silently use a potentially outdated file...
-        removeFile(destination);
-        int result = rename(filePath.c_str(), destination.c_str());
-        if ((result != 0) || !fileExists(destination)) {
-            // rename won't work for cross-device (eg: copying from one disk to another)
 
-            // Do a copy of the content
-            {
-                std::ifstream src(filePath, std::ios::binary);
-                std::ofstream dst(destination, std::ios::binary);
-                dst << src.rdbuf();
-            }
-
-            //  Then remove original
-            if (fileExists(destination)) {
-                removeFile(filePath);
-            }
+        // rename would fail if copying across devices
+        try {
+            fs::rename(fs::path(filePath), destination);
+        } catch (fs::filesystem_error &) {
+            fs::copy(filePath, destination, fs::copy_options::update_existing);
+            fs::remove(filePath);
         }
-#endif
     }
 
     int systemCall(std::string const &command)
@@ -300,20 +299,124 @@ namespace FileSystem {
 #endif
     }
 
-    void removeFile(std::string const &fileName)
+    bool removeFile(fs::path const &filePath)
     {
-        remove(fileName.c_str());
+        if (!fileExists(filePath)) {
+            return false;
+        }
+
+        return fs::remove(filePath);
     }
 
-    void linkFile(std::string const &fileName, std::string const &link)
+    void linkFile(fs::path const &filePath, fs::path const &linkPath)
+    {
+        if (!fileExists(filePath)) {
+            return;
+        }
+
+#ifdef _WIN32
+        fs::copy(filePath, linkPath, fs::copy_options::update_existing);
+#else
+        // we could return bool?
+        fs::create_symlink(filePath, linkPath);
+#endif
+    }
+
+    std::string readFile(fs::path const &filePath, std::ios_base::openmode mode)
     {
 #ifdef _WIN32
-        CopyFile(fileName.c_str(), link.c_str(), false);
+        auto filePathStr = filePath.string();
+        auto path = filePathStr.c_str();
 #else
-        int returnValue = symlink(fileName.c_str(), link.c_str()); // ignore the return value
-        // we want to ignore the return value without muting all warnings, so...
-        (void)(returnValue + 1); // outsmart the compiler :-/
+        auto path = filePath.c_str();
 #endif
+
+        if (!fileExists(filePath)) {
+            throw FatalError(fmt::format("File does not exists: {}", path));
+        }
+
+        std::string_view fopen_mode;
+        if (mode == std::ios_base::in) {
+            fopen_mode = "r";
+        } else if (mode == std::ios_base::binary) {
+            fopen_mode = "b";
+        } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
+            fopen_mode = "rb";
+        } else {
+            throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+        }
+
+        auto close_file = [](FILE *f) { fclose(f); };
+        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, fopen_mode.data()), close_file);
+        if (!holder) {
+            throw FatalError(fmt::format("Could not open file: {}", path));
+        }
+
+        auto f = holder.get();
+        const auto size = fs::file_size(filePath);
+        std::string result;
+        result.resize(size);
+
+        auto bytes_read = fread(result.data(), 1, size, f);
+        auto is_eof = feof(f);
+        auto has_error = ferror(f);
+        if (is_eof != 0) {
+            return result;
+        }
+        if (has_error != 0 || bytes_read != size) {
+            throw FatalError(fmt::format("Error reading file: {}", path));
+        }
+        return result;
+    }
+
+    nlohmann::json readJSON(fs::path const &filePath, std::ios_base::openmode mode)
+    {
+#ifdef _WIN32
+        auto filePathStr = filePath.string();
+        auto path = filePathStr.c_str();
+#else
+        auto path = filePath.c_str();
+#endif
+
+        if (!fileExists(filePath)) {
+            throw FatalError(fmt::format("File does not exists: {}", path));
+        }
+
+        std::string_view fopen_mode;
+        if (mode == std::ios_base::in) {
+            fopen_mode = "r";
+        } else if (mode == std::ios_base::binary) {
+            fopen_mode = "b";
+        } else if (mode == (std::ios_base::in | std::ios_base::binary)) {
+            fopen_mode = "rb";
+        } else {
+            throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::in or std::ios_base::binary"));
+        }
+
+        auto close_file = [](FILE *f) { fclose(f); };
+        auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, fopen_mode.data()), close_file);
+        if (!holder) {
+            throw FatalError(fmt::format("Could not open file: {}", path));
+        }
+        auto f = holder.get();
+
+        auto const ext = getFileType(filePath);
+        switch (ext) {
+        case FileTypes::EpJSON:
+        case FileTypes::JSON:
+        case FileTypes::GLHE:
+            return nlohmann::json::parse(f, nullptr, true, true);
+        case FileTypes::CBOR:
+            return nlohmann::json::from_cbor(f);
+        case FileTypes::MsgPack:
+            return nlohmann::json::from_msgpack(f);
+        case FileTypes::UBJSON:
+            return nlohmann::json::from_ubjson(f);
+        case FileTypes::BSON:
+            return nlohmann::json::from_bson(f);
+        default:
+            throw FatalError("Invalid file extension. Must be epJSON, JSON, or other experimental extensions");
+        }
     }
 
 } // namespace FileSystem

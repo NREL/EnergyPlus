@@ -142,10 +142,10 @@ namespace HVACMultiSpeedHeatPump {
         Cubic,       // Cubic curve type
     };
 
-    static std::string const fluidNameSteam("STEAM");
+    static constexpr std::string_view fluidNameSteam("STEAM");
 
     void SimMSHeatPump(EnergyPlusData &state,
-                       std::string const &CompName,   // Name of the unitary engine driven heat pump system
+                       std::string_view CompName,     // Name of the unitary engine driven heat pump system
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
                        int const AirLoopNum,          // air loop index
                        int &CompIndex                 // Index to changeover-bypass VAV system
@@ -178,7 +178,7 @@ namespace HVACMultiSpeedHeatPump {
         if (CompIndex == 0) {
             MSHeatPumpNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACMultiSpdHP->MSHeatPump);
             if (MSHeatPumpNum == 0) {
-                ShowFatalError(state, "MultiSpeed Heat Pump is not found=" + CompName);
+                ShowFatalError(state, "MultiSpeed Heat Pump is not found=" + std::string{CompName});
             }
             CompIndex = MSHeatPumpNum;
         } else {
@@ -480,8 +480,8 @@ namespace HVACMultiSpeedHeatPump {
 
         // Locals
         // PARAMETERS
-        static std::string const RoutineName("GetMSHeatPumpInput: "); // include trailing blank space
-        static std::string const RoutineNameNoColon("GetMSHeatPumpInput");
+        static constexpr std::string_view RoutineName("GetMSHeatPumpInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineNameNoColon("GetMSHeatPumpInput");
 
         // LOCAL VARIABLES
         int MSHPNum;                   // Engine driven heat pump count
@@ -599,7 +599,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                     Alphas(1),
                                                                     DataLoopNode::NodeFluidType::Air,
                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                    1,
+                                                                    NodeInputManager::compFluidStream::Primary,
                                                                     ObjectIsParent);
 
             MSHeatPump(MSHPNum).AirOutletNodeNum = GetOnlySingleNode(state,
@@ -609,7 +609,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                      Alphas(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::NodeConnectionType::Outlet,
-                                                                     1,
+                                                                     NodeInputManager::compFluidStream::Primary,
                                                                      ObjectIsParent);
 
             TestCompSet(state, state.dataHVACMultiSpdHP->CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
@@ -779,7 +779,7 @@ namespace HVACMultiSpeedHeatPump {
                     ShowContinueError(state, cAlphaFields(11) + " \"" + Alphas(11) + "\" not found.");
                     ShowContinueError(state, cAlphaFields(10) + " must be Coil:Heating:DX:MultiSpeed ");
                     ShowFatalError(state,
-                                   RoutineName + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
+                                   std::string{RoutineName} + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
                                        " input. Preceding condition(s) causes termination.");
                     ErrorsFound = true;
                 }
@@ -836,7 +836,7 @@ namespace HVACMultiSpeedHeatPump {
                         ShowContinueError(state, cAlphaFields(11) + " \"" + Alphas(11) + "\" not found.");
                         ShowContinueError(state, cAlphaFields(10) + " must be Coil:Heating:Electric:MultiStage ");
                         ShowFatalError(state,
-                                       RoutineName + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
+                                       std::string{RoutineName} + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
                                            " input. Preceding condition(s) causes termination.");
                         ErrorsFound = true;
                     }
@@ -849,7 +849,7 @@ namespace HVACMultiSpeedHeatPump {
                         ShowContinueError(state, cAlphaFields(11) + " \"" + Alphas(11) + "\" not found.");
                         ShowContinueError(state, cAlphaFields(10) + " must be Coil:Heating:Gas:MultiStage ");
                         ShowFatalError(state,
-                                       RoutineName + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
+                                       std::string{RoutineName} + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
                                            " input. Preceding condition(s) causes termination.");
                         ErrorsFound = true;
                     }
@@ -1031,7 +1031,7 @@ namespace HVACMultiSpeedHeatPump {
                     ShowContinueError(state, cAlphaFields(13) + " \"" + Alphas(13) + "\" not found.");
                     ShowContinueError(state, cAlphaFields(12) + " must be Coil:Cooling:DX:MultiSpeed ");
                     ShowFatalError(state,
-                                   RoutineName + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
+                                   std::string{RoutineName} + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
                                        " input. Preceding condition(s) causes termination.");
                     ErrorsFound = true;
                 }
@@ -1338,7 +1338,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                             Alphas(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                            3,
+                                                                            NodeInputManager::compFluidStream::Tertiary,
                                                                             ObjectIsNotParent);
                 if (MSHeatPump(MSHPNum).HeatRecInletNodeNum == 0) {
                     ShowSevereError(state,
@@ -1353,7 +1353,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                              Alphas(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                             3,
+                                                                             NodeInputManager::compFluidStream::Tertiary,
                                                                              ObjectIsNotParent);
                 if (MSHeatPump(MSHPNum).HeatRecOutletNodeNum == 0) {
                     ShowSevereError(state,
@@ -1625,7 +1625,7 @@ namespace HVACMultiSpeedHeatPump {
 
         if (ErrorsFound) {
             ShowFatalError(state,
-                           RoutineName + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
+                           std::string{RoutineName} + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
                                " input.  Preceding condition(s) causes termination.");
         }
         // End of multispeed heat pump
@@ -1636,15 +1636,15 @@ namespace HVACMultiSpeedHeatPump {
                                 "Unitary System Ancillary Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 MSHeatPump(MSHPNum).AuxElecPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 MSHeatPump(MSHPNum).Name);
             SetupOutputVariable(state,
                                 "Unitary System Cooling Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).AuxElecCoolConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 MSHeatPump(MSHPNum).Name,
                                 _,
                                 "Electricity",
@@ -1655,8 +1655,8 @@ namespace HVACMultiSpeedHeatPump {
                                 "Unitary System Heating Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).AuxElecHeatConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 MSHeatPump(MSHPNum).Name,
                                 _,
                                 "Electricity",
@@ -1667,128 +1667,128 @@ namespace HVACMultiSpeedHeatPump {
                                 "Unitary System Fan Part Load Ratio",
                                 OutputProcessor::Unit::None,
                                 MSHeatPump(MSHPNum).FanPartLoadRatio,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 MSHeatPump(MSHPNum).Name);
             SetupOutputVariable(state,
                                 "Unitary System Compressor Part Load Ratio",
                                 OutputProcessor::Unit::None,
                                 MSHeatPump(MSHPNum).CompPartLoadRatio,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 MSHeatPump(MSHPNum).Name);
             SetupOutputVariable(state,
                                 "Unitary System Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 MSHeatPump(MSHPNum).ElecPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 MSHeatPump(MSHPNum).Name);
             SetupOutputVariable(state,
                                 "Unitary System Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).ElecPowerConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 MSHeatPump(MSHPNum).Name);
             SetupOutputVariable(state,
                                 "Unitary System DX Coil Cycling Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).CycRatio,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 MSHeatPump(MSHPNum).Name);
             SetupOutputVariable(state,
                                 "Unitary System DX Coil Speed Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).SpeedRatio,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 MSHeatPump(MSHPNum).Name);
             SetupOutputVariable(state,
                                 "Unitary System DX Coil Speed Level",
                                 OutputProcessor::Unit::None,
                                 state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).SpeedNum,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 MSHeatPump(MSHPNum).Name);
             SetupOutputVariable(state,
                                 "Unitary System Total Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 MSHeatPump(MSHPNum).TotCoolEnergyRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 MSHeatPump(MSHPNum).Name);
             SetupOutputVariable(state,
                                 "Unitary System Total Heating Rate",
                                 OutputProcessor::Unit::W,
                                 MSHeatPump(MSHPNum).TotHeatEnergyRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 MSHeatPump(MSHPNum).Name);
             SetupOutputVariable(state,
                                 "Unitary System Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 MSHeatPump(MSHPNum).SensCoolEnergyRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 MSHeatPump(MSHPNum).Name);
             SetupOutputVariable(state,
                                 "Unitary System Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
                                 MSHeatPump(MSHPNum).SensHeatEnergyRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 MSHeatPump(MSHPNum).Name);
             SetupOutputVariable(state,
                                 "Unitary System Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 MSHeatPump(MSHPNum).LatCoolEnergyRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 MSHeatPump(MSHPNum).Name);
             SetupOutputVariable(state,
                                 "Unitary System Latent Heating Rate",
                                 OutputProcessor::Unit::W,
                                 MSHeatPump(MSHPNum).LatHeatEnergyRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 MSHeatPump(MSHPNum).Name);
             if (MSHeatPump(MSHPNum).HeatRecActive) {
                 SetupOutputVariable(state,
                                     "Unitary System Heat Recovery Rate",
                                     OutputProcessor::Unit::W,
                                     MSHeatPump(MSHPNum).HeatRecoveryRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     MSHeatPump(MSHPNum).Name);
                 SetupOutputVariable(state,
                                     "Unitary System Heat Recovery Inlet Temperature",
                                     OutputProcessor::Unit::C,
                                     MSHeatPump(MSHPNum).HeatRecoveryInletTemp,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     MSHeatPump(MSHPNum).Name);
                 SetupOutputVariable(state,
                                     "Unitary System Heat Recovery Outlet Temperature",
                                     OutputProcessor::Unit::C,
                                     MSHeatPump(MSHPNum).HeatRecoveryOutletTemp,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     MSHeatPump(MSHPNum).Name);
                 SetupOutputVariable(state,
                                     "Unitary System Heat Recovery Fluid Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     MSHeatPump(MSHPNum).HeatRecoveryMassFlowRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     MSHeatPump(MSHPNum).Name);
                 SetupOutputVariable(state,
                                     "Unitary System Heat Recovery Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataHVACMultiSpdHP->MSHeatPumpReport(MSHPNum).HeatRecoveryEnergy,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     MSHeatPump(MSHPNum).Name);
             }
         }
@@ -1845,7 +1845,7 @@ namespace HVACMultiSpeedHeatPump {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineName("InitMSHeatPump");
+        static constexpr std::string_view RoutineName("InitMSHeatPump");
         int InNode;     // Inlet node number in MSHP loop
         int OutNode;    // Outlet node number in MSHP loop
         int ZoneInNode; // Zone inlet node number in the controlled zone for MSHP
@@ -4237,7 +4237,7 @@ namespace HVACMultiSpeedHeatPump {
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("MSHPHeatRecovery");
+        static constexpr std::string_view RoutineName("MSHPHeatRecovery");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatRecInNode;          // Node number of heat recovery water inlet node
@@ -4448,7 +4448,7 @@ namespace HVACMultiSpeedHeatPump {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // Locals
-        static std::string const CurrentModuleObject("AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed");
+        static constexpr std::string_view CurrentModuleObject("AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed");
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4553,8 +4553,8 @@ namespace HVACMultiSpeedHeatPump {
                             if (SolFlag == -1) {
                                 if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex == 0) {
                                     ShowWarningMessage(state,
-                                                       "CalcNonDXHeatingCoils: Hot water coil control failed for " + CurrentModuleObject + "=\"" +
-                                                           MSHeatPump(MSHeatPumpNum).Name + "\"");
+                                                       "CalcNonDXHeatingCoils: Hot water coil control failed for " +
+                                                           std::string{CurrentModuleObject} + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"");
                                     ShowContinueErrorTimeStamp(state, "");
                                     ShowContinueError(
                                         state, format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
@@ -4570,7 +4570,7 @@ namespace HVACMultiSpeedHeatPump {
                                 if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex2 == 0) {
                                     ShowWarningMessage(state,
                                                        "CalcNonDXHeatingCoils: Hot water coil control failed (maximum flow limits) for " +
-                                                           CurrentModuleObject + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"");
+                                                           std::string{CurrentModuleObject} + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"");
                                     ShowContinueErrorTimeStamp(state, "");
                                     ShowContinueError(state, "...Bad hot water maximum flow rate limits");
                                     ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
@@ -4578,7 +4578,7 @@ namespace HVACMultiSpeedHeatPump {
                                 }
                                 ShowRecurringWarningErrorAtEnd(state,
                                                                "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
-                                                                   CurrentModuleObject + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"",
+                                                                   std::string{CurrentModuleObject} + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"",
                                                                MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex2,
                                                                MaxHotWaterFlow,
                                                                MinWaterFlow,

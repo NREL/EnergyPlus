@@ -133,16 +133,16 @@ TEST_F(EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType)
 
     GetSetPointManagerInputs(*state);
     // check specified control variable type is "HumidityRatio"
-    ASSERT_EQ(iCtrlVarType::HumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
+    ASSERT_TRUE(compare_enums(iCtrlVarType::HumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode));
 
     GetControllerInput(*state);
     // check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
-    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
+    ASSERT_TRUE(compare_enums(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode));
 
     // ControllerProps always expects the control variable type to be "HumidityRatio"
     state->dataHVACControllers->ControllerProps(1).HumRatCntrlType =
         GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
-    ASSERT_EQ(iCtrlVarType::HumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType);
+    ASSERT_TRUE(compare_enums(iCtrlVarType::HumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType));
 
     ASSERT_EQ(state->dataHVACControllers->ControllerProps.size(), 1u);
     EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
@@ -206,16 +206,16 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
 
     GetSetPointManagerInputs(*state);
     // check specified control variable type is "HumidityRatio"
-    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
+    ASSERT_TRUE(compare_enums(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode));
 
     GetControllerInput(*state);
     // check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
-    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
+    ASSERT_TRUE(compare_enums(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode));
 
     // ControllerProps expects the control variable type to be "MaximumHumididtyRatio"
     state->dataHVACControllers->ControllerProps(1).HumRatCntrlType =
         GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
-    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType);
+    ASSERT_TRUE(compare_enums(iCtrlVarType::MaxHumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType));
 
     // test index for air loop controllers
     // before controllers are simulated, AirLoopControllerIndex = 0
@@ -256,7 +256,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNum(1) = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = 5; // DataPlant::TypeOf_CoilWaterCooling
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::WaterCoil_Cooling;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
@@ -357,14 +357,14 @@ TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
     // this was a bug waiting to happen, iTemperature is declared as its own int const in HVACControllers.hh
     // and it just happened to have the same value as the iCtrlVarType_Temperature int const in SetPointManager.hh
     // changing it to iCtrlVarType::Temp
-    ASSERT_EQ(iCtrlVarType::Temp, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);      // is "Temperature"
-    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(2).CtrlTypeMode); // is "MaximumHumidityRatio"
+    ASSERT_TRUE(compare_enums(iCtrlVarType::Temp, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode));      // is "Temperature"
+    ASSERT_TRUE(compare_enums(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(2).CtrlTypeMode)); // is "MaximumHumidityRatio"
 
     GetControllerInput(*state);
     // check ControllerProps control variable is set to "MaximumHumidityRatio"
     state->dataHVACControllers->ControllerProps(1).HumRatCntrlType =
         GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
-    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType); // MaximumHumidityRatio
+    ASSERT_TRUE(compare_enums(iCtrlVarType::MaxHumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType)); // MaximumHumidityRatio
 }
 
 TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
@@ -433,12 +433,12 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNum(1) = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::WaterCoil_Cooling;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::WaterCoil_Cooling;
 
     bool WaterCoilOnAirLoop = true;
     std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater); //"Coil:Cooling:Water";
     std::string CompName = "CHILLED WATER COIL";
-    int CoilTypeNum = SimAirServingZones::WaterCoil_Cooling;
+    SimAirServingZones::CompType CoilTypeNum = SimAirServingZones::CompType::WaterCoil_Cooling;
 
     WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(*state, CoilTypeNum, CompName);
     EXPECT_TRUE(WaterCoilOnAirLoop);
@@ -456,7 +456,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
     EXPECT_TRUE(WaterCoilOnAirLoop);
 
     // now test a different water coil type
-    CoilTypeNum = DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
+    CoilTypeNum = SimAirServingZones::CompType::WaterCoil_DetailedCool;
     WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
 }
@@ -523,8 +523,8 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     state->dataAirLoop->OutsideAirSys(1).ComponentName(1) = state->dataWaterCoils->WaterCoil(1).Name;
     state->dataAirLoop->OutsideAirSys(1).ComponentName(2) = "OAMixer";
     state->dataAirLoop->OutsideAirSys(1).ComponentType_Num.allocate(2);
-    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::WaterCoil_SimpleHeat;
-    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::OAMixer_Num;
+    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::CompType::WaterCoil_SimpleHeat;
+    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::CompType::OAMixer_Num;
 
     state->dataMixedAir->OAMixer.allocate(1);
     state->dataMixedAir->OAMixer(1).Name = "OAMixer";
@@ -543,7 +543,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     bool WaterCoilOnAirLoop = true;
     std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
     std::string CompName = state->dataWaterCoils->WaterCoil(1).Name;
-    int CoilTypeNum = SimAirServingZones::WaterCoil_SimpleHeat;
+    SimAirServingZones::CompType CoilTypeNum = SimAirServingZones::CompType::WaterCoil_SimpleHeat;
 
     WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
@@ -557,7 +557,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     EXPECT_TRUE(WaterCoilOnAirLoop);
 
     // test a different water coil type
-    CoilTypeNum = SimAirServingZones::WaterCoil_DetailedCool;
+    CoilTypeNum = SimAirServingZones::CompType::WaterCoil_DetailedCool;
     WaterCoilOnAirLoop = true;
     WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
@@ -655,8 +655,8 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     state->dataAirLoop->OutsideAirSys(1).ComponentName(1) = "HXAssisting Cooling Coil";
     state->dataAirLoop->OutsideAirSys(1).ComponentName(2) = "OAMixer";
     state->dataAirLoop->OutsideAirSys(1).ComponentType_Num.allocate(2);
-    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::WaterCoil_CoolingHXAsst;
-    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::OAMixer_Num;
+    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::CompType::WaterCoil_CoolingHXAsst;
+    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::CompType::OAMixer_Num;
 
     state->dataMixedAir->OAMixer.allocate(1);
     state->dataMixedAir->OAMixer(1).Name = "OAMixer";
@@ -675,7 +675,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     bool WaterCoilOnAirLoop = true;
     std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWaterDetailed);
     std::string CompName = state->dataWaterCoils->WaterCoil(1).Name;
-    int CoilTypeNum = SimAirServingZones::WaterCoil_DetailedCool;
+    SimAirServingZones::CompType CoilTypeNum = SimAirServingZones::CompType::WaterCoil_DetailedCool;
 
     WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
@@ -965,7 +965,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNum(1) = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
-    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = 5; // WaterCoil_Cooling
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::WaterCoil_Cooling;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop(1).Name = "CHW LOOP";

@@ -652,15 +652,15 @@ namespace WindTurbine {
                                 "Generator Produced AC Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Power,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
             SetupOutputVariable(state,
                                 "Generator Produced AC Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name,
                                 _,
                                 "ElectricityProduced",
@@ -671,22 +671,22 @@ namespace WindTurbine {
                                 "Generator Turbine Local Wind Speed",
                                 OutputProcessor::Unit::m_s,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalWindSpeed,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
             SetupOutputVariable(state,
                                 "Generator Turbine Local Air Density",
                                 OutputProcessor::Unit::kg_m3,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).LocalAirDensity,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
             SetupOutputVariable(state,
                                 "Generator Turbine Tip Speed Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).TipSpeedRatio,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
             {
                 auto const SELECT_CASE_var(state.dataWindTurbine->WindTurbineSys(WindTurbineNum).rotorType);
@@ -695,37 +695,37 @@ namespace WindTurbine {
                                         "Generator Turbine Power Coefficient",
                                         OutputProcessor::Unit::None,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).PowerCoeff,
-                                        "System",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
                 } else if (SELECT_CASE_var == RotorType::VAWT) {
                     SetupOutputVariable(state,
                                         "Generator Turbine Chordal Component Velocity",
                                         OutputProcessor::Unit::m_s,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).ChordalVel,
-                                        "System",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
                     SetupOutputVariable(state,
                                         "Generator Turbine Normal Component Velocity",
                                         OutputProcessor::Unit::m_s,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).NormalVel,
-                                        "System",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
                     SetupOutputVariable(state,
                                         "Generator Turbine Relative Flow Velocity",
                                         OutputProcessor::Unit::m_s,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).RelFlowVel,
-                                        "System",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
                     SetupOutputVariable(state,
                                         "Generator Turbine Attack Angle",
                                         OutputProcessor::Unit::deg,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).AngOfAttack,
-                                        "System",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataWindTurbine->WindTurbineSys(WindTurbineNum).Name);
                 }
             }
@@ -762,8 +762,8 @@ namespace WindTurbine {
         if (state.dataWindTurbine->MyOneTimeFlag) {
             wsStatFound = false;
 
-            if (FileSystem::fileExists(state.files.inStatFileName.fileName)) {
-                auto statFile = state.files.inStatFileName.open(state, "InitWindTurbine");
+            if (FileSystem::fileExists(state.files.inStatFilePath.filePath)) {
+                auto statFile = state.files.inStatFilePath.open(state, "InitWindTurbine");
                 while (statFile.good()) { // end of file
                     auto lineIn = statFile.readLine();
                     // reconcile line with different versions of stat file
@@ -784,14 +784,20 @@ namespace WindTurbine {
                             if (lnPtr != 1) {
                                 if ((lnPtr == std::string::npos) || (!stripped(lineIn.data.substr(0, lnPtr)).empty())) {
                                     if (lnPtr != std::string::npos) {
-                                        readItem(lineIn.data.substr(0, lnPtr), MonthWS(mon));
+                                        bool error = false;
+                                        MonthWS(mon) = UtilityRoutines::ProcessNumber(lineIn.data.substr(0, lnPtr), error);
+
+                                        if (error) {
+                                            // probably should throw some error here
+                                        }
+
                                         lineIn.data.erase(0, lnPtr + 1);
                                     }
                                 } else { // blank field
                                     if (!warningShown) {
                                         ShowWarningError(
                                             state,
-                                            "InitWindTurbine: read from " + state.files.inStatFileName.fileName +
+                                            "InitWindTurbine: read from " + state.files.inStatFilePath.filePath.string() +
                                                 " file shows <365 days in weather file. Annual average wind speed used will be inaccurate.");
                                         lineIn.data.erase(0, lnPtr + 1);
                                         warningShown = true;
@@ -800,7 +806,7 @@ namespace WindTurbine {
                             } else { // two tabs in succession
                                 if (!warningShown) {
                                     ShowWarningError(state,
-                                                     "InitWindTurbine: read from " + state.files.inStatFileName.fileName +
+                                                     "InitWindTurbine: read from " + state.files.inStatFilePath.filePath.string() +
                                                          " file shows <365 days in weather file. Annual average wind speed used will be inaccurate.");
                                     lineIn.data.erase(0, lnPtr + 1);
                                     warningShown = true;

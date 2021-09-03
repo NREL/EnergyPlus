@@ -1745,8 +1745,6 @@ If the Convection type was ``Value'', then this field is filled and contains the
 
 If the Convection type was ``Schedule'', then this field contains the name of a schedule describing the value to be used during the time intervals for the schedule.
 
-The complete IDD definition for the ConvectionCoefficients object follows:
-
 \paragraph{Field: Convection Coefficient 1 User Curve Name}\label{field-convection-coefficient-1-user-curve-name}
 
 \paragraph{Field: Convection Coefficient 2 User Curve Name}\label{field-convection-coefficient-2-user-curve-name}
@@ -2004,6 +2002,7 @@ Code & Zone Airflow Regime & Type of surface & Heat Flow \tabularnewline
 \midrule
 \endhead
 
+-1 & Invalid & N/A & N/A \tabularnewline
 1 & A1 Radiant Heated Floor or Chilled Ceiling & Vertical Wall & Any \tabularnewline
 2 & A1 Radiant Heated Floor or Chilled Ceiling & Horizontal & Stable \tabularnewline
 3 & A1 Radiant Heated Floor or Chilled Ceiling & Horizontal & Unstable \tabularnewline
@@ -2136,7 +2135,7 @@ Report Code & Surface Classification \tabularnewline
 Report Code & Surface Classification \tabularnewline
 \midrule
 \endhead
-
+-1 & Invalid \tabularnewline
 101 & Vertical Wall, Windward \tabularnewline
 102 & Vertical Wall, Leeward \tabularnewline
 103 & Roof, stable heat flow direction \tabularnewline
@@ -2232,7 +2231,7 @@ SurfaceProperties:VaporCoefficients,
 
 This object is used to model a multi-skin exterior heat transfer surface. This is a special case where the outside face is a slightly detached layer forming a naturally ventilated cavity. The actual outer surface is referred to as the baffle. The modeling here assumes that the heat capacity in the outer baffle can be neglected since it is much lower than the underlying mass surface. This object is used with the \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} object where the Heat Transfer surfaces are referred to as the underlying surfaces. The constructions and materials for the \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} object should reflect the construction of just the underlying surface. The SurfaceProperty:ExteriorNaturalVentedCavity object is used to describe the decoupled layer, or baffle, and the characteristics of the cavity and openings for natural ventilation. This object is also used in conjunction with the OtherSideConditionsModel.
 
-The area and orientation are obtained from \textbf{\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}} objects, which are referenced by name. This object can be used to model certain types of photovoltaic mounting configurations such as interlocking roof pavers. If the baffle covers only part of a surface, then that surface should be split into separate \textbf{\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}} objects where one matches the size of the baffle. A single baffle can be associated with as many \textbf{\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}} objects as desired (although if you need to use more than 10 surfaces, then the IDD will need to be extended). The base heat transfer surfaces need not be contiguous nor have the same orientation, but the program will issue warnings if surfaces have widely ranging tilts and azimuths.
+The area and orientation are obtained from \textbf{\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}} objects, which are referenced by name. This object can be used to model certain types of photovoltaic mounting configurations such as interlocking roof pavers. If the baffle covers only part of a surface, then that surface should be split into separate \textbf{\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}} objects where one matches the size of the baffle. A single baffle can be associated with as many \textbf{\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}} objects as desired. The base heat transfer surfaces need not be contiguous nor have the same orientation, but the program will issue warnings if surfaces have widely ranging tilts and azimuths.
 
 Note that the model involves predicting the rates that ambient air moves in and out of the cavity. Accurate modeling of these air flows would be extremely challenging and so the models provided through this object are simplistic engineering models based on discharge coefficients that are sensitive to wind and buoyancy effects. The accuracy depends on the values for, and applicability of, the discharge coefficients and unfortunately little research is available to help characterize these. The models should be considered rudimentary and the user is encouraged to explore different values for the coefficients in attempts to bound the importance of natural ventilation for the cavities. See the Engineering Reference for more details.
 
@@ -2294,7 +2293,7 @@ where \(\Delta {H_{NPL}}\) is the value input into the field above for the heigh
 
 \paragraph{Field(s): Surface \textless{}1 thru x\textgreater{} Name}\label{fields-surface-1-thru-x-name}
 
-The remaining fields are used to name the \textbf{\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}} objects that are associated with the exterior naturally vented cavity. These are the underlying heat transfer surfaces and are defined elsewhere in the input file. These surfaces should all specify OtherSideConditionsModel as their exterior environment. The input object can currently accommodate up to ten surfaces, but it is extensible by modifying the Energy+.idd entry.
+The remaining fields are used to name the \textbf{\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}} objects that are associated with the exterior naturally vented cavity. These are the underlying heat transfer surfaces and are defined elsewhere in the input file. These surfaces should all specify OtherSideConditionsModel as their exterior environment. This object is extensible, so additional fields of this type can be added to the end of this object.
 
 An example IDF entry is
 
@@ -2553,7 +2552,7 @@ This field defines the constant view factor of a surrounding surface to an exter
 
 This field is used to supply a schedule name of the of a surrounding surface temperature.
 
-The last three fields are extensible to define multiple surrounding surface name, temperature and view factor sets.
+The object is extensible so the last three fields can be repeated to define multiple surrounding surface name, temperature and view factor sets.
 
 An example IDF object follows.
 

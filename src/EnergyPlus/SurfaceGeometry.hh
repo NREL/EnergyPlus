@@ -82,11 +82,13 @@ namespace SurfaceGeometry {
 
     void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound);
 
-    void AllocateModuleArrays(EnergyPlusData &state);
+    void AllocateSurfaceArrays(EnergyPlusData &state);
 
     void AllocateSurfaceWindows(EnergyPlusData &state, int NumSurfaces);
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
+
+    void CreateMissingSpaces(EnergyPlusData &state, bool &ErrorsFound);
 
     void checkSubSurfAzTiltNorm(EnergyPlusData &state,
                                 SurfaceData &baseSurface, // Base surface data (in)
@@ -173,14 +175,14 @@ namespace SurfaceGeometry {
     );
 
     void CheckWindowShadingControlFrameDivider(EnergyPlusData &state,
-                                               std::string const &cRoutineName, // routine name calling this one (for error messages)
-                                               bool &ErrorsFound,               // true if errors have been found or are found here
-                                               int const SurfNum,               // current surface number
-                                               int const FrameField             // field number for frame/divider
+                                               std::string_view const cRoutineName, // routine name calling this one (for error messages)
+                                               bool &ErrorsFound,                   // true if errors have been found or are found here
+                                               int const SurfNum,                   // current surface number
+                                               int const FrameField                 // field number for frame/divider
     );
 
     void CheckSubSurfaceMiscellaneous(EnergyPlusData &state,
-                                      std::string const &cRoutineName,           // routine name calling this one (for error messages)
+                                      std::string_view const cRoutineName,       // routine name calling this one (for error messages)
                                       bool &ErrorsFound,                         // true if errors have been found or are found here
                                       int const SurfNum,                         // current surface number
                                       std::string const &SubSurfaceName,         // name of the surface
@@ -379,10 +381,11 @@ namespace SurfaceGeometry {
 
     void SetupShadeSurfacesForSolarCalcs(EnergyPlusData &state);
 
-    void SetupEnclosuresAndAirBoundaries(EnergyPlusData &state,
-                                         Array1D<DataViewFactorInformation::ZoneViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
-                                         SurfaceGeometry::enclosureType const &EnclosureType,                       // Radiant or Solar
-                                         bool &ErrorsFound);                                                        // Set to true if errors found
+    void
+    SetupEnclosuresAndAirBoundaries(EnergyPlusData &state,
+                                    Array1D<DataViewFactorInformation::EnclosureViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
+                                    SurfaceGeometry::enclosureType const &EnclosureType,                            // Radiant or Solar
+                                    bool &ErrorsFound);                                                             // Set to true if errors found
 
     void CheckConvexity(EnergyPlusData &state,
                         int const SurfNum, // Current surface number

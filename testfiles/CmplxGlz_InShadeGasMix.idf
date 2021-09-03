@@ -370,6 +370,7 @@
     WALL,                    !- Surface Type
     Room Wall - South,       !- Construction Name
     Room 102,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -391,6 +392,7 @@
     FLOOR,                   !- Surface Type
     Room Floor,              !- Construction Name
     Room 102,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -412,6 +414,7 @@
     WALL,                    !- Surface Type
     Room Wall - East West,   !- Construction Name
     Room 102,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Room102 West Wall,       !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -433,6 +436,7 @@
     WALL,                    !- Surface Type
     Room Wall - North,       !- Construction Name
     Room 102,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Room102 North Wall,      !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -454,6 +458,7 @@
     WALL,                    !- Surface Type
     Room Wall - East West,   !- Construction Name
     Room 102,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Room102 East Wall,       !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -475,6 +480,7 @@
     CEILING,                 !- Surface Type
     Room Ceiling,            !- Construction Name
     Room 102,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Room102 Ceiling,         !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -710,7 +716,7 @@
     Gap_9_Glz_62_Layer_2,    !- Gap 2 Name
     ,                        !- Gap 2 Directional Front Absoptance Matrix Name
     ,                        !- Gap 2 Directional Back Absoptance Matrix Name
-    Glass_21436_Layer,       !- Layer 3 Material
+    Glass_21436_Layer,       !- Layer 3 Name
     CFS_Glz_62_Layer_3_fAbs, !- Layer 3 Directional Front Absoptance Matrix Name
     CFS_Glz_62_Layer_3_bAbs, !- Layer 3 Directional Back Absoptance Matrix Name
     Gap_9_Glz_62_Layer_3,    !- Gap 3 Name

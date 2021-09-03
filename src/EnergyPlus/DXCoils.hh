@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/StandardRatings.hh>
 
@@ -68,16 +69,7 @@ struct EnergyPlusData;
 namespace DXCoils {
 
     // Using/Aliasing
-    using DataHVACGlobals::AirCooled;
     using DataHVACGlobals::DryBulbIndicator;
-
-    // Defrost strategy (heat pump only)
-    constexpr int ReverseCycle(1); // uses reverse cycle defrost strategy
-    constexpr int Resistive(2);    // uses electric resistance heater for defrost
-
-    // Defrost control  (heat pump only)
-    constexpr int Timed(1);    // defrost cycle is timed
-    constexpr int OnDemand(2); // defrost cycle occurs only when required
 
     // Compressor operation
     constexpr int On(1);  // normal compressor operation
@@ -225,7 +217,7 @@ namespace DXCoils {
         Real64 ElecHeatingConsumption;
         Real64 ElecHeatingPower;
         Real64 HeatingCoilRuntimeFraction;                // Run time fraction of the DX heating unit
-        int DefrostStrategy;                              // defrost strategy; 1=reverse-cycle, 2=resistive
+        StandardRatings::DefrostStrat DefrostStrategy;    // defrost strategy; 1=reverse-cycle, 2=resistive
         StandardRatings::HPdefrostControl DefrostControl; // defrost control; 1=timed, 2=on-demand
         int EIRFPLR;                                      // index of energy input ratio vs part-load ratio curve
         int DefrostEIRFT;                                 // index of defrost mode total cooling capacity for reverse cycle heat pump
@@ -256,7 +248,7 @@ namespace DXCoils {
         Array1D<Real64> LatentCapacityTimeConstant; // Time constant for latent capacity to reach steady state
         // after startup (sec)
         // end of variables for DX cooling coil latent degradation model
-        Array1D_int CondenserType; // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
+        Array1D<DataHeatBalance::RefrigCondenserType> CondenserType; // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
         // start of variables for DX cooling coil evaporative condenser option
         bool ReportEvapCondVars;        // true if any performance mode includes an evap condenser
         Array1D<Real64> EvapCondEffect; // effectiveness of the evaporatively cooled condenser
@@ -474,33 +466,33 @@ namespace DXCoils {
               PartLoadRatio(0.0), TotalCoolingEnergy(0.0), SensCoolingEnergy(0.0), LatCoolingEnergy(0.0), TotalCoolingEnergyRate(0.0),
               SensCoolingEnergyRate(0.0), LatCoolingEnergyRate(0.0), ElecCoolingConsumption(0.0), ElecCoolingPower(0.0),
               CoolingCoilRuntimeFraction(0.0), TotalHeatingEnergy(0.0), TotalHeatingEnergyRate(0.0), ElecHeatingConsumption(0.0),
-              ElecHeatingPower(0.0), HeatingCoilRuntimeFraction(0.0), DefrostStrategy(0),
+              ElecHeatingPower(0.0), HeatingCoilRuntimeFraction(0.0), DefrostStrategy(StandardRatings::DefrostStrat::Unassigned),
               DefrostControl(StandardRatings::HPdefrostControl::Unassigned), EIRFPLR(0), DefrostEIRFT(0), RegionNum(0), MinOATCompressor(0.0),
               OATempCompressorOn(0.0), MaxOATCompressor(0.0), MaxOATDefrost(0.0), DefrostTime(0.0), DefrostCapacity(0.0), HPCompressorRuntime(0.0),
               HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0), DefrostPower(0.0), DefrostConsumption(0.0),
               HeatingPerformanceOATType(DryBulbIndicator), HPCoilIsInCoilSystemHeatingDX(false), OATempCompressorOnOffBlank(false),
               Twet_Rated(MaxModes, 0.0), Gamma_Rated(MaxModes, 0.0), MaxONOFFCyclesperHour(MaxModes, 0.0), LatentCapacityTimeConstant(MaxModes, 0.0),
-              CondenserType(MaxModes, AirCooled), ReportEvapCondVars(false), EvapCondEffect(MaxModes, 0.0), CondInletTemp(0.0),
-              EvapCondAirFlow(MaxModes, 0.0), EvapCondPumpElecNomPower(MaxModes, 0.0), EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0),
-              EvapWaterConsumpRate(0.0), EvapWaterConsump(0.0), EvapCondAirFlow2(0.0), EvapCondEffect2(0.0), EvapCondPumpElecNomPower2(0.0),
-              BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), NumCapacityStages(1), NumDehumidModes(0), CoilPerformanceType(MaxModes),
-              CoilPerformanceType_Num(MaxModes, 0), CoilPerformanceName(MaxModes), CoolingCoilStg2RuntimeFrac(0.0), DehumidificationMode(0),
-              WaterInNode(0), WaterOutNode(0), HCOPFTemp(0), HCOPFTempErrorIndex(0), HCOPFAirFlow(0), HCOPFAirFlowErrorIndex(0), HCOPFWaterFlow(0),
-              HCOPFWaterFlowErrorIndex(0), HCapFTemp(0), HCapFTempErrorIndex(0), HCapFAirFlow(0), HCapFAirFlowErrorIndex(0), HCapFWaterFlow(0),
-              HCapFWaterFlowErrorIndex(0), InletAirTemperatureType(0), RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0),
-              HPWHCondPumpElecNomPower(0.0), HPWHCondPumpFracToWater(0.0), RatedHPWHCondWaterFlow(0.0), ElecWaterHeatingPower(0.0),
-              ElecWaterHeatingConsumption(0.0), FanPowerIncludedInCOP(true), CondPumpHeatInCapacity(false), CondPumpPowerInCOP(false),
-              LowTempLast(0.0), HighTempLast(0.0), ErrIndex1(0), ErrIndex2(0), ErrIndex3(0), ErrIndex4(0), LowAmbErrIndex(0), HighAmbErrIndex(0),
-              PLFErrIndex(0), PLRErrIndex(0), PrintLowAmbMessage(false), PrintHighAmbMessage(false), EvapWaterSupplyMode(iWaterSupply::FromMains),
-              EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), CondensateCollectMode(iCondensate::Discarded), CondensateTankID(0),
-              CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CurrentEndTimeLast(0.0), TimeStepSysLast(0.0),
-              FuelTypeNum(DataGlobalConstants::ResourceType::None), NumOfSpeeds(0), PLRImpact(false), LatentImpact(false), MSFuelWasteHeat(0.0),
-              MSHPHeatRecActive(false), MSHPDesignSpecIndex(0), CoolingCoilPresent(true), HeatingCoilPresent(true), ISHundredPercentDOASDXCoil(false),
-              SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0), SHRFFlow(MaxModes, 0), SHRFFlowErrorIndex(0), SHRFTemp2(0), SHRFFlow2(0),
-              UserSHRCurveExists(false), ASHRAE127StdRprt(false), SecZonePtr(0), SecCoilSHRFT(0), SecCoilSHRFF(0), SecCoilAirFlow(0.0),
-              SecCoilAirFlowScalingFactor(1.0), SecCoilRatedSHR(1.0), SecCoilSHR(1.0), EvapInletWetBulb(0.0), SecCoilSensibleHeatGainRate(0.0),
-              SecCoilTotalHeatRemovalRate(0.0), SecCoilSensibleHeatRemovalRate(0.0), SecCoilLatentHeatRemovalRate(0.0),
-              IsSecondaryDXCoilInZone(false), IsDXCoilInZone(false), CompressorPartLoadRatio(0.0),
+              CondenserType(MaxModes, DataHeatBalance::RefrigCondenserType::Air), ReportEvapCondVars(false), EvapCondEffect(MaxModes, 0.0),
+              CondInletTemp(0.0), EvapCondAirFlow(MaxModes, 0.0), EvapCondPumpElecNomPower(MaxModes, 0.0), EvapCondPumpElecPower(0.0),
+              EvapCondPumpElecConsumption(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsump(0.0), EvapCondAirFlow2(0.0), EvapCondEffect2(0.0),
+              EvapCondPumpElecNomPower2(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), NumCapacityStages(1), NumDehumidModes(0),
+              CoilPerformanceType(MaxModes), CoilPerformanceType_Num(MaxModes, 0), CoilPerformanceName(MaxModes), CoolingCoilStg2RuntimeFrac(0.0),
+              DehumidificationMode(0), WaterInNode(0), WaterOutNode(0), HCOPFTemp(0), HCOPFTempErrorIndex(0), HCOPFAirFlow(0),
+              HCOPFAirFlowErrorIndex(0), HCOPFWaterFlow(0), HCOPFWaterFlowErrorIndex(0), HCapFTemp(0), HCapFTempErrorIndex(0), HCapFAirFlow(0),
+              HCapFAirFlowErrorIndex(0), HCapFWaterFlow(0), HCapFWaterFlowErrorIndex(0), InletAirTemperatureType(0), RatedInletDBTemp(0.0),
+              RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), HPWHCondPumpElecNomPower(0.0), HPWHCondPumpFracToWater(0.0),
+              RatedHPWHCondWaterFlow(0.0), ElecWaterHeatingPower(0.0), ElecWaterHeatingConsumption(0.0), FanPowerIncludedInCOP(true),
+              CondPumpHeatInCapacity(false), CondPumpPowerInCOP(false), LowTempLast(0.0), HighTempLast(0.0), ErrIndex1(0), ErrIndex2(0), ErrIndex3(0),
+              ErrIndex4(0), LowAmbErrIndex(0), HighAmbErrIndex(0), PLFErrIndex(0), PLRErrIndex(0), PrintLowAmbMessage(false),
+              PrintHighAmbMessage(false), EvapWaterSupplyMode(iWaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
+              CondensateCollectMode(iCondensate::Discarded), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
+              CondensateVol(0.0), CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelTypeNum(DataGlobalConstants::ResourceType::None), NumOfSpeeds(0),
+              PLRImpact(false), LatentImpact(false), MSFuelWasteHeat(0.0), MSHPHeatRecActive(false), MSHPDesignSpecIndex(0), CoolingCoilPresent(true),
+              HeatingCoilPresent(true), ISHundredPercentDOASDXCoil(false), SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0), SHRFFlow(MaxModes, 0),
+              SHRFFlowErrorIndex(0), SHRFTemp2(0), SHRFFlow2(0), UserSHRCurveExists(false), ASHRAE127StdRprt(false), SecZonePtr(0), SecCoilSHRFT(0),
+              SecCoilSHRFF(0), SecCoilAirFlow(0.0), SecCoilAirFlowScalingFactor(1.0), SecCoilRatedSHR(1.0), SecCoilSHR(1.0), EvapInletWetBulb(0.0),
+              SecCoilSensibleHeatGainRate(0.0), SecCoilTotalHeatRemovalRate(0.0), SecCoilSensibleHeatRemovalRate(0.0),
+              SecCoilLatentHeatRemovalRate(0.0), IsSecondaryDXCoilInZone(false), IsDXCoilInZone(false), CompressorPartLoadRatio(0.0),
               // MSSecCoilSHRFT( 0 ),
               // MSSecCoilSHRFF( 0 ),
               // MSSecCoilAirFlow( 0.0 ),
@@ -539,7 +531,7 @@ namespace DXCoils {
     // Functions
 
     void SimDXCoil(EnergyPlusData &state,
-                   std::string const &CompName,   // name of the fan coil unit
+                   std::string_view CompName,     // name of the fan coil unit
                    int const CompOp,              // compressor operation; 1=on, 0=off
                    bool const FirstHVACIteration, // True when first HVAC iteration
                    int &CompIndex,
@@ -552,9 +544,9 @@ namespace DXCoils {
     );
 
     void SimDXCoilMultiSpeed(EnergyPlusData &state,
-                             std::string const &CompName, // name of the fan coil unit
-                             Real64 const SpeedRatio,     // = (CompressorSpeed - CompressorSpeedMin) /
-                             Real64 const CycRatio,       // cycling part load ratio for variable speed
+                             std::string_view CompName, // name of the fan coil unit
+                             Real64 const SpeedRatio,   // = (CompressorSpeed - CompressorSpeedMin) /
+                             Real64 const CycRatio,     // cycling part load ratio for variable speed
                              int &CompIndex,
                              Optional_int_const SpeedNum = _,  // Speed number for multispeed cooling coil onlyn
                              Optional_int_const FanOpMode = _, // Fan operation mode
@@ -563,7 +555,7 @@ namespace DXCoils {
     );
 
     void SimDXCoilMultiMode(EnergyPlusData &state,
-                            std::string const &CompName,   // name of the fan coil unit
+                            std::string_view CompName,     // name of the fan coil unit
                             int const CompOp,              // compressor operation; 1=on, 0=off !unused1208
                             bool const FirstHVACIteration, // true if first hvac iteration
                             Real64 const PartLoadRatio,    // part load ratio
@@ -822,18 +814,18 @@ namespace DXCoils {
     );
 
     void SetDXCoolingCoilData(EnergyPlusData &state,
-                              int const DXCoilNum,                        // Number of DX Cooling Coil
-                              bool &ErrorsFound,                          // Set to true if certain errors found
-                              Optional_int HeatingCoilPLFCurvePTR = _,    // Parameter equivalent of heating coil PLR curve index
-                              Optional_int CondenserType = _,             // Parameter equivalent of condenser type parameter
-                              Optional_int CondenserInletNodeNum = _,     // Parameter equivalent of condenser inlet node number
+                              int const DXCoilNum,                     // Number of DX Cooling Coil
+                              bool &ErrorsFound,                       // Set to true if certain errors found
+                              Optional_int HeatingCoilPLFCurvePTR = _, // Parameter equivalent of heating coil PLR curve index
+                              Optional<DataHeatBalance::RefrigCondenserType> CondenserType = _, // Parameter equivalent of condenser type parameter
+                              Optional_int CondenserInletNodeNum = _,                           // Parameter equivalent of condenser inlet node number
                               Optional<Real64> MaxOATCrankcaseHeater = _, // Parameter equivalent of condenser Max OAT for Crank Case Heater temp
                               Optional<Real64> MinOATCooling = _, // Parameter equivalent of condenser Min OAT for compressor cooling operation
                               Optional<Real64> MaxOATCooling = _, // Parameter equivalent of condenser Max OAT for compressor cooling operation
                               Optional<Real64> MinOATHeating = _, // Parameter equivalent of condenser Min OAT for compressor heating operation
                               Optional<Real64> MaxOATHeating = _, // Parameter equivalent of condenser Max OAT for compressor heating operation
                               Optional_int HeatingPerformanceOATType = _, // Parameter equivalent to condenser entering air temp type (1-db, 2=wb)
-                              Optional_int DefrostStrategy = _,
+                              Optional<StandardRatings::DefrostStrat> DefrostStrategy = _,
                               Optional<StandardRatings::HPdefrostControl> DefrostControl = _,
                               Optional_int DefrostEIRPtr = _,
                               Optional<Real64> DefrostFraction = _,

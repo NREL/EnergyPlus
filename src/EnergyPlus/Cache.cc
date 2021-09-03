@@ -55,7 +55,7 @@
 
 namespace EnergyPlus::Cache {
 
-void readJSONfile(EnergyPlusData &state, std::string &filePath, nlohmann::json &j)
+void readJSONfile(EnergyPlusData &state, fs::path const &filePath, nlohmann::json &j)
 {
     if (!FileSystem::fileExists(filePath)) {
         // if the file doesn't exist, there are no data to read
@@ -70,7 +70,7 @@ void readJSONfile(EnergyPlusData &state, std::string &filePath, nlohmann::json &
         } catch (...) {
             if (!j.empty()) {
                 // file exists, is not empty, but failed for some other reason
-                ShowWarningError(state, filePath + " contains invalid file format");
+                ShowWarningError(state, filePath / " contains invalid file format");
             }
             ifs.close();
             return;
@@ -78,9 +78,9 @@ void readJSONfile(EnergyPlusData &state, std::string &filePath, nlohmann::json &
     }
 }
 
-void writeJSONfile(nlohmann::json &j, std::string &fPath)
+void writeJSONfile(nlohmann::json &j, fs::path const &filePath)
 {
-    std::ofstream ofs(fPath, std::ofstream::out | std::ofstream::binary);
+    std::ofstream ofs(filePath, std::ofstream::out | std::ofstream::binary);
     nlohmann::json::to_cbor(j, ofs);
     ofs.close();
 }
@@ -89,7 +89,7 @@ void loadCache(EnergyPlusData &state)
 {
     // load cache file if it exists
     if (FileSystem::fileExists(state.dataStrGlobals->outputCacheFileName) && state.dataGlobal->useCache) {
-        readJSONfile(state, state.dataStrGlobals->outputCacheFileName, state.dataCache->cache);
+        Cache::readJSONfile(state, state.dataStrGlobals->outputCacheFileName, state.dataCache->cache);
 
         // file exists but is empty, so don't try to read data
         if (state.dataCache->cache.empty()) return;

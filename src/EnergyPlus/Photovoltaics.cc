@@ -323,7 +323,7 @@ namespace Photovoltaics {
             } else {
                 // Found one -- make sure has right parameters for PV
                 SurfNum = state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr;
-                state.dataSurface->Surface(SurfNum).IsPV = true;
+                state.dataSurface->SurfIsPV(SurfNum) = true;
 
                 if (!state.dataSurface->Surface(SurfNum).ExtSolar) {
                     ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
@@ -673,15 +673,15 @@ namespace Photovoltaics {
                                 "Generator Produced DC Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPhotovoltaic->PVarray(PVnum).Report.DCPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPhotovoltaic->PVarray(PVnum).Name);
             SetupOutputVariable(state,
                                 "Generator Produced DC Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPhotovoltaic->PVarray(PVnum).Report.DCEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPhotovoltaic->PVarray(PVnum).Name,
                                 _,
                                 "ElectricityProduced",
@@ -692,8 +692,8 @@ namespace Photovoltaics {
                                 "Generator PV Array Efficiency",
                                 OutputProcessor::Unit::None,
                                 state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayEfficiency,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPhotovoltaic->PVarray(PVnum).Name);
 
             // CurrentModuleObject='Equiv1Diode or Sandia Photovoltaics'
@@ -703,22 +703,22 @@ namespace Photovoltaics {
                                     "Generator PV Cell Temperature",
                                     OutputProcessor::Unit::C,
                                     state.dataPhotovoltaic->PVarray(PVnum).Report.CellTemp,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataPhotovoltaic->PVarray(PVnum).Name);
                 SetupOutputVariable(state,
                                     "Generator PV Short Circuit Current",
                                     OutputProcessor::Unit::A,
                                     state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayIsc,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataPhotovoltaic->PVarray(PVnum).Name);
                 SetupOutputVariable(state,
                                     "Generator PV Open Circuit Voltage",
                                     OutputProcessor::Unit::V,
                                     state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayVoc,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataPhotovoltaic->PVarray(PVnum).Name);
             }
 
@@ -942,10 +942,10 @@ namespace Photovoltaics {
         state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IncidenceAngle =
             std::acos(state.dataHeatBal->SurfCosIncidenceAngle(ThisSurf)) / DataGlobalConstants::DegToRadians; // (deg) from dataHeatBalance
         state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.ZenithAngle =
-            std::acos(state.dataEnvrn->SOLCOS(3)) / DataGlobalConstants::DegToRadians;                               //(degrees),
-        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Tamb = state.dataSurface->Surface(ThisSurf).OutDryBulbTemp; //(deg. C)
-        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.WindSpeed = state.dataSurface->Surface(ThisSurf).WindSpeed; // (m/s)
-        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Altitude = state.dataEnvrn->Elevation;                      // from DataEnvironment via USE
+            std::acos(state.dataEnvrn->SOLCOS(3)) / DataGlobalConstants::DegToRadians;                              //(degrees),
+        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Tamb = state.dataSurface->SurfOutDryBulbTemp(ThisSurf);    //(deg. C)
+        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.WindSpeed = state.dataSurface->SurfOutWindSpeed(ThisSurf); // (m/s)
+        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Altitude = state.dataEnvrn->Elevation;                     // from DataEnvironment via USE
 
         if (((state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam + state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse) >
              state.dataPhotovoltaic->MinIrradiance) &&
@@ -1187,9 +1187,9 @@ namespace Photovoltaics {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && state.dataPhotovoltaicState->MyEnvrnFlag(PVnum)) {
             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTempK =
-                state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+                state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK =
-                state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+                state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
             state.dataPhotovoltaicState->MyEnvrnFlag(PVnum) = false;
         }
 
@@ -1281,7 +1281,7 @@ namespace Photovoltaics {
         state.dataPhotovoltaic->ShuntResistance = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.ShuntResistance;
 
         // convert ambient temperature from C to K
-        Tambient = state.dataSurface->Surface(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+        Tambient = state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
 
         if ((state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.Insolation > MinInsolation) && (RunFlag)) {
 

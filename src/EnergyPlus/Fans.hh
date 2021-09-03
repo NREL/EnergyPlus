@@ -68,6 +68,9 @@ namespace Fans {
     // Using/Aliasing
     using DataHVACGlobals::MinFrac;
 
+    constexpr int ExhaustFanCoupledToAvailManagers = 150;
+    constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
+
     struct FanEquipConditions
     {
         // Members
@@ -226,7 +229,7 @@ namespace Fans {
     };
 
     void SimulateFanComponents(EnergyPlusData &state,
-                               std::string const &CompName,
+                               std::string_view const CompName,
                                bool FirstHVACIteration,
                                int &CompIndex,
                                Optional<Real64 const> SpeedRatio = _,
@@ -273,16 +276,16 @@ namespace Fans {
     );
 
     Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
-                                      std::string const &FanType,     // must match fan types in this module
-                                      std::string const &FanName,     // must match fan names for the fan type
+                                      std::string_view FanType,       // must match fan types in this module
+                                      std::string_view FanName,       // must match fan names for the fan type
                                       bool &ErrorsFound,              // set to true if problem
                                       Optional_int_const FanIndex = _ // index to fan
     );
 
     int GetFanInletNode(EnergyPlusData &state,
-                        std::string const &FanType, // must match fan types in this module
-                        std::string const &FanName, // must match fan names for the fan type
-                        bool &ErrorsFound           // set to true if problem
+                        std::string_view FanType, // must match fan types in this module
+                        std::string_view FanName, // must match fan names for the fan type
+                        bool &ErrorsFound         // set to true if problem
     );
 
     int getFanInNodeIndex(EnergyPlusData &state,
@@ -350,11 +353,6 @@ namespace Fans {
 
 struct FansData : BaseGlobalStruct
 {
-    // constants
-    static constexpr int ExhaustFanCoupledToAvailManagers = 150;
-    static constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
-
-    // members
     int NumFans = 0;
     int NumNightVentPerf = 0;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
     bool GetFanInputFlag = true;   // Flag set to make sure you get input once

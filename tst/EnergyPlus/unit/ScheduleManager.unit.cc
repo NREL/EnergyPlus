@@ -64,7 +64,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ScheduleManager;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ScheduleManager_isMinuteMultipleOfTimestep)
 {

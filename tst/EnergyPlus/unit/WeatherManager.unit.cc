@@ -387,7 +387,8 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
+    EXPECT_TRUE(
+        compare_enums(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -430,7 +431,8 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
+    EXPECT_TRUE(
+        compare_enums(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -483,7 +485,8 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
+    EXPECT_TRUE(
+        compare_enums(state->dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
     // for calculation method CorrelationFromWeatherFile these two parameters are ignored
     EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeatherManager->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -590,7 +593,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     Real64 TauB = state->dataWeatherManager->DesDayInput(EnvrnNum).TauB;
     Real64 TauD = state->dataWeatherManager->DesDayInput(EnvrnNum).TauD;
     // check tau values
-    EXPECT_EQ(DesignDaySolarModel::ASHRAE_Tau2017, state->dataWeatherManager->DesDayInput(EnvrnNum).SolarModel);
+    EXPECT_TRUE(compare_enums(DesignDaySolarModel::ASHRAE_Tau2017, state->dataWeatherManager->DesDayInput(EnvrnNum).SolarModel));
     EXPECT_EQ(0.325, TauB);
     EXPECT_EQ(2.461, TauD);
     // calc expected values for environment 1
@@ -693,7 +696,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(1, state->dataWeatherManager->NumOfEnvrn);
-    EXPECT_EQ(state->dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::DesignDay);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobalConstants::KindOfSim::DesignDay));
 }
 
 // Test for https://github.com/NREL/EnergyPlus/issues/7550
@@ -768,7 +771,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     ASSERT_FALSE(ErrorsFound);
 
     WeatherManager::SetUpDesignDay(*state, 1);
-    EXPECT_EQ(state->dataWeatherManager->DesDayInput(1).HumIndType, DDHumIndType::Enthalpy);
+    EXPECT_TRUE(compare_enums(state->dataWeatherManager->DesDayInput(1).HumIndType, DDHumIndType::Enthalpy));
     EXPECT_EQ(state->dataWeatherManager->DesDayInput(1).HumIndValue, 90500.0);
 
     unsigned n_RH_not100 = 0;
@@ -966,7 +969,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherZeroIRHoriz)
 TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz)
 {
 
-    state->files.inputWeatherFileName.fileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/WeatherManagerIROutputTest.epw";
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/WeatherManagerIROutputTest.epw";
     std::string const idf_objects = delimited_string({
         "  Version,9.3;",
 
@@ -1104,7 +1107,7 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
     ErrorsFound = false;
 
     state->dataWeatherManager->WeatherFileExists = true;
-    state->files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
     state->dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(*state);
@@ -1145,8 +1148,144 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
     ReadWeatherForDay(*state, 1, 1, true);
 
     // Test the feature of interpolating some weather inputs to calc sky temp
-    Real64 expected_SkyTemp = -20.8188538296;
-    EXPECT_NEAR(state->dataWeatherManager->TomorrowSkyTemp(2, 1), expected_SkyTemp, 1e-6);
+    Real64 expected_SkyTemp = -22.8763495;
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowSkyTemp(2, 2), expected_SkyTemp, 1e-6);
+}
+
+// Test for fixing the first sub-hour weather data interpolation
+TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
+{
+    std::string const idf_objects = delimited_string({
+        "Timestep,4;"
+
+        "SimulationControl,",
+        "  Yes,                     !- Do Zone Sizing Calculation",
+        "  Yes,                     !- Do System Sizing Calculation",
+        "  No,                      !- Do Plant Sizing Calculation",
+        "  Yes,                     !- Run Simulation for Sizing Periods",
+        "  No;                      !- Run Simulation for Weather File Run Periods",
+
+        "RunPeriod,",
+        "  January,                 !- Name",
+        "  1,                       !- Begin Month",
+        "  1,                       !- Begin Day of Month",
+        "  ,                        !- Begin Year",
+        "  1,                       !- End Month",
+        "  31,                      !- End Day of Month",
+        "  ,                        !- End Year",
+        "  Tuesday,                 !- Day of Week for Start Day",
+        "  Yes,                     !- Use Weather File Holidays and Special Days",
+        "  Yes,                     !- Use Weather File Daylight Saving Period",
+        "  No,                      !- Apply Weekend Holiday Rule",
+        "  Yes,                     !- Use Weather File Rain Indicators",
+        "  Yes,                     !- Use Weather File Snow Indicators",
+        "  No,                      !-Treat Weather as Actual",
+        "  Hour1;                   !-First Hour Interpolation Starting Values",
+
+        "Site:Location,",
+        "  CHICAGO_IL_USA TMY3-725300,  !- Name",
+        "  41.98,                   !- Latitude {deg}",
+        "  -87.92,                  !- Longitude {deg}",
+        "  -6.00,                   !- Time Zone {hr}",
+        "  201.00;                  !- Elevation {m}",
+
+        "Output:Variable,*,Site Outdoor Air Drybulb Temperature,Timestep;",
+        "Output:Variable,*,Site Outdoor Air Dewpoint Temperature,Timestep;",
+        "Output:Variable,*,Site Outdoor Air Barometric Pressure,Timestep;",
+        "Output:Variable,*,Site Outdoor Air Relative Humidity,Timestep;",
+        "Output:Variable,*,Site Wind Speed,Timestep;",
+        "Output:Variable,*,Site Wind Direction,Timestep;"
+        "Output:Variable,*,Site Total Sky Cover,Timestep;",
+        "Output:Variable,*,Site Opaque Sky Cover,Timestep;",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::PostIPProcessing(*state);
+    bool ErrorsFound(false);
+    ErrorsFound = false;
+
+    state->dataWeatherManager->WeatherFileExists = true;
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+
+    state->dataGlobal->BeginSimFlag = true;
+    SimulationManager::GetProjectData(*state);
+
+    bool Available(true);
+    Available = true;
+
+    state->dataGlobal->BeginSimFlag = true;
+
+    // The added first hour processing will be called here:
+    WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
+
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state->dataWeatherManager->Environment(1).StartMonth = 1;
+    state->dataWeatherManager->Environment(1).StartDay = 1;
+
+    state->dataWeatherManager->Environment(1).UseWeatherFileHorizontalIR = false;
+
+    AllocateWeatherData(*state);
+    OpenWeatherFile(*state, ErrorsFound);
+    ReadWeatherForDay(*state, 1, 1, true);
+
+    // Test interpolating values of some weather data during the first hour
+    Real64 expected_DryBulbTemp = -12.2;
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDryBulbTemp(4, 1), expected_DryBulbTemp, 1e-6);
+
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDryBulbTemp(1, 1), expected_DryBulbTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDryBulbTemp(2, 1), expected_DryBulbTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDryBulbTemp(3, 1), expected_DryBulbTemp, 1e-6);
+
+    Real64 expected_DewPointTemp = -16.1;
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDewPointTemp(4, 1), expected_DewPointTemp, 1e-6);
+
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDewPointTemp(1, 1), expected_DewPointTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDewPointTemp(2, 1), expected_DewPointTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDewPointTemp(3, 1), expected_DewPointTemp, 1e-6);
+
+    Real64 expected_BaroPress = 99500;
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutBaroPress(4, 1), expected_BaroPress, 1e-6);
+
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutBaroPress(1, 1), expected_BaroPress, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutBaroPress(2, 1), expected_BaroPress, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutBaroPress(3, 1), expected_BaroPress, 1e-6);
+
+    Real64 expected_RelHum = 73;
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutRelHum(4, 1), expected_RelHum, 1e-6);
+
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutRelHum(1, 1), expected_RelHum, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutRelHum(2, 1), expected_RelHum, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutRelHum(3, 1), expected_RelHum, 1e-6);
+
+    Real64 expected_WindSpeed = 2.6;
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowWindSpeed(4, 1), expected_WindSpeed, 1e-6);
+
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowWindSpeed(1, 1), expected_WindSpeed, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowWindSpeed(2, 1), expected_WindSpeed, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowWindSpeed(3, 1), expected_WindSpeed, 1e-6);
+
+    Real64 expected_WindDir = 270;
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowWindDir(4, 1), expected_WindDir, 1e-6);
+
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowWindDir(1, 1), expected_WindDir, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowWindDir(2, 1), expected_WindDir, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowWindDir(3, 1), expected_WindDir, 1e-6);
+
+    Real64 expected_TotalSkyCover = 9;
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowTotalSkyCover(4, 1), expected_TotalSkyCover, 1e-6);
+
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowTotalSkyCover(1, 1), expected_TotalSkyCover, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowTotalSkyCover(2, 1), expected_TotalSkyCover, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowTotalSkyCover(3, 1), expected_TotalSkyCover, 1e-6);
+
+    Real64 expected_OpaqueSkyCover = 9;
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(4, 1), expected_OpaqueSkyCover, 1e-6);
+
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(1, 1), expected_OpaqueSkyCover, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(2, 1), expected_OpaqueSkyCover, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(3, 1), expected_OpaqueSkyCover, 1e-6);
 }
 
 // Test for Issue 8760: fix opaque sky cover weather values;
@@ -1195,8 +1334,7 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
     ErrorsFound = false;
 
     state->dataWeatherManager->WeatherFileExists = true;
-    state->files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_University.of.Illinois-Willard.AP.725315_TMY3.epw";
-
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "weather/USA_IL_University.of.Illinois-Willard.AP.725315_TMY3.epw";
     state->dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(*state);
 

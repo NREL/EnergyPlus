@@ -26,8 +26,6 @@ TEST( charFunctionsTest, Predicate )
 	EXPECT_TRUE( not_blank( 'x' ) );
 	EXPECT_TRUE( is_alpha( 'x' ) );
 	EXPECT_FALSE( is_alpha( '3' ) );
-	EXPECT_TRUE( is_consonant( 'x' ) );
-	EXPECT_FALSE( is_consonant( 'a' ) );
 	EXPECT_TRUE( is_digit( '4' ) );
 	EXPECT_FALSE( is_digit( 'P' ) );
 	EXPECT_TRUE( is_lower( 'e' ) );

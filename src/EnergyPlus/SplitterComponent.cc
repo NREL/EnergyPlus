@@ -77,7 +77,7 @@ namespace SplitterComponent {
     using namespace DataLoopNode;
 
     void SimAirLoopSplitter(EnergyPlusData &state,
-                            std::string const &CompName,
+                            std::string_view CompName,
                             bool const FirstHVACIteration,
                             bool const FirstCall,
                             bool &SplitterInletChanged,
@@ -107,7 +107,7 @@ namespace SplitterComponent {
         if (CompIndex == 0) {
             SplitterNum = UtilityRoutines::FindItemInList(CompName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
             if (SplitterNum == 0) {
-                ShowFatalError(state, "SimAirLoopSplitter: Splitter not found=" + CompName);
+                ShowFatalError(state, "SimAirLoopSplitter: Splitter not found=" + std::string{CompName});
             }
             CompIndex = SplitterNum;
         } else {
@@ -168,7 +168,7 @@ namespace SplitterComponent {
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSplitterInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetSplitterInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SplitterNum; // The Splitter that you are currently loading input into
@@ -229,7 +229,7 @@ namespace SplitterComponent {
                                                                                                  AlphArray(1),
                                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 1,
+                                                                                                 NodeInputManager::compFluidStream::Primary,
                                                                                                  ObjectIsNotParent);
             state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes = NumAlphas - 2;
 
@@ -264,7 +264,7 @@ namespace SplitterComponent {
                                       AlphArray(1),
                                       DataLoopNode::NodeFluidType::Air,
                                       DataLoopNode::NodeConnectionType::Outlet,
-                                      1,
+                                      NodeInputManager::compFluidStream::Primary,
                                       ObjectIsNotParent);
                 if (lAlphaBlanks(2 + NodeNum)) {
                     ShowSevereError(state, cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));
@@ -310,7 +310,7 @@ namespace SplitterComponent {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in getting input.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.");
         }
     }
 

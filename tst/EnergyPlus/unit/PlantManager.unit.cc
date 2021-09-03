@@ -65,7 +65,6 @@ namespace EnergyPlus {
 namespace PlantManager {
     using namespace DataPlant;
     using namespace DataLoopNode;
-    using namespace ObjexxFCL;
     using namespace DataSizing;
     using namespace ScheduleManager;
     using namespace SetPointManager;

@@ -45,6 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <memory>
 #include <string>
 #ifdef _OPENMP
 #include <omp.h>
@@ -56,6 +57,7 @@
 #include "EnergyPlus/InputProcessing/IdfParser.hh"
 #include "EnergyPlus/InputProcessing/InputValidation.hh"
 #include <ezOptionParser.hpp>
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
@@ -70,15 +72,10 @@ enum class OutputTypes
     BSON
 };
 
-template <typename T> void displayMessage(T t)
+template <typename... Args> void displayMessage(std::string_view str_format, Args &&... args)
 {
-    std::cout << t << '\n';
-}
-
-template <typename T, typename... Args> void displayMessage(T t, Args... args) // recursive variadic function
-{
-    std::cout << t;
-    displayMessage(args...);
+    fmt::print(std::cout, str_format, args...);
+    std::cout.write("\n", 1);
 }
 
 bool checkVersionMatch(json const &epJSON)
@@ -86,7 +83,7 @@ bool checkVersionMatch(json const &epJSON)
     auto it = epJSON.find("Version");
     if (it != epJSON.end()) {
         for (auto const &version : it.value()) {
-            std::string v = version["version_identifier"];
+            std::string v = version["version_identifier"].get<std::string>();
             if (v.empty()) {
                 displayMessage("Input errors occurred and version ID was left blank, verify file version");
             } else {
@@ -98,13 +95,131 @@ bool checkVersionMatch(json const &epJSON)
                     Which = static_cast<int>(index(v, EnergyPlus::DataStringGlobals::MatchVersion));
                 }
                 if (Which != 0) {
-                    displayMessage("Version: in IDF=\"" + v + "\" not the same as expected=\"" + EnergyPlus::DataStringGlobals::MatchVersion + "\"");
+                    displayMessage(R"(Version: in IDF="{}" not the same as expected="{}")", v, EnergyPlus::DataStringGlobals::MatchVersion);
                     return false;
                 }
             }
         }
     }
     return true;
+}
+
+bool checkForUnsupportedObjects(json const &epJSON, bool convertHVACTemplate)
+{
+    bool errorsFound = false;
+    constexpr std::array<std::string_view, 32> hvacTemplateObjects = {"HVACTemplate:Thermostat",
+                                                                      "HVACTemplate:Zone:IdealLoadsAirSystem",
+                                                                      "HVACTemplate:Zone:BaseboardHeat",
+                                                                      "HVACTemplate:Zone:FanCoil",
+                                                                      "HVACTemplate:Zone:PTAC",
+                                                                      "HVACTemplate:Zone:PTHP",
+                                                                      "HVACTemplate:Zone:WaterToAirHeatPump",
+                                                                      "HVACTemplate:Zone:VRF",
+                                                                      "HVACTemplate:Zone:Unitary",
+                                                                      "HVACTemplate:Zone:VAV",
+                                                                      "HVACTemplate:Zone:VAV:FanPowered",
+                                                                      "HVACTemplate:Zone:VAV:HeatAndCool",
+                                                                      "HVACTemplate:Zone:ConstantVolume",
+                                                                      "HVACTemplate:Zone:DualDuct",
+                                                                      "HVACTemplate:System:VRF",
+                                                                      "HVACTemplate:System:Unitary",
+                                                                      "HVACTemplate:System:UnitaryHeatPump:AirToAir",
+                                                                      "HVACTemplate:System:UnitarySystem",
+                                                                      "HVACTemplate:System:VAV",
+                                                                      "HVACTemplate:System:PackagedVAV",
+                                                                      "HVACTemplate:System:ConstantVolume",
+                                                                      "HVACTemplate:System:DualDuct",
+                                                                      "HVACTemplate:System:DedicatedOutdoorAir",
+                                                                      "HVACTemplate:Plant:ChilledWaterLoop",
+                                                                      "HVACTemplate:Plant:Chiller",
+                                                                      "HVACTemplate:Plant:Chiller:ObjectReference",
+                                                                      "HVACTemplate:Plant:Tower",
+                                                                      "HVACTemplate:Plant:Tower:ObjectReference",
+                                                                      "HVACTemplate:Plant:HotWaterLoop",
+                                                                      "HVACTemplate:Plant:Boiler",
+                                                                      "HVACTemplate:Plant:Boiler:ObjectReference",
+                                                                      "HVACTemplate:Plant:MixedWaterLoop"};
+
+    bool objectFound = false;
+    std::string objectType;
+
+    // For ConvertInputFormat, skip this unless -n option is present to not allow conversion of HVACTemplate objects
+    if (!convertHVACTemplate) {
+        for (size_t count = 0; count < hvacTemplateObjects.size(); ++count) {
+            objectType = hvacTemplateObjects[count];
+            auto it = epJSON.find(objectType);
+            if (it != epJSON.end()) {
+                objectFound = true;
+                break;
+            }
+        }
+        if (objectFound) {
+            displayMessage("HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.");
+            displayMessage("You must run the ExpandObjects program on this input.");
+            errorsFound = true;
+        }
+    }
+
+    constexpr std::array<std::string_view, 26> groundHTObjects = {"GroundHeatTransfer:Control",
+                                                                  "GroundHeatTransfer:Slab:Materials",
+                                                                  "GroundHeatTransfer:Slab:MatlProps",
+                                                                  "GroundHeatTransfer:Slab:BoundConds",
+                                                                  "GroundHeatTransfer:Slab:BldgProps",
+                                                                  "GroundHeatTransfer:Slab:Insulation",
+                                                                  "GroundHeatTransfer:Slab:EquivalentSlab",
+                                                                  "GroundHeatTransfer:Slab:AutoGrid",
+                                                                  "GroundHeatTransfer:Slab:ManualGrid",
+                                                                  "GroundHeatTransfer:Slab:XFACE",
+                                                                  "GroundHeatTransfer:Slab:YFACE",
+                                                                  "GroundHeatTransfer:Slab:ZFACE",
+                                                                  "GroundHeatTransfer:Basement:SimParameters",
+                                                                  "GroundHeatTransfer:Basement:MatlProps",
+                                                                  "GroundHeatTransfer:Basement:Insulation",
+                                                                  "GroundHeatTransfer:Basement:SurfaceProps",
+                                                                  "GroundHeatTransfer:Basement:BldgData",
+                                                                  "GroundHeatTransfer:Basement:Interior",
+                                                                  "GroundHeatTransfer:Basement:ComBldg",
+                                                                  "GroundHeatTransfer:Basement:EquivSlab",
+                                                                  "GroundHeatTransfer:Basement:EquivAutoGrid",
+                                                                  "GroundHeatTransfer:Basement:AutoGrid",
+                                                                  "GroundHeatTransfer:Basement:ManualGrid",
+                                                                  "GroundHeatTransfer:Basement:XFACE",
+                                                                  "GroundHeatTransfer:Basement:YFACE",
+                                                                  "GroundHeatTransfer:Basement:ZFACE"};
+
+    objectFound = false;
+    for (size_t count = 0; count < groundHTObjects.size(); ++count) {
+        objectType = groundHTObjects[count];
+        auto it = epJSON.find(objectType);
+        if (it != epJSON.end()) {
+            objectFound = true;
+            break;
+        }
+    }
+    if (objectFound) {
+        displayMessage("GroundHeatTransfer:* objects found. These objects are not supported directly by EnergyPlus.");
+        displayMessage("You must run the ExpandObjects program on this input.");
+        errorsFound = true;
+    }
+
+    constexpr std::array<std::string_view, 4> parametricObjects = {
+        "Parametric:SetValueForRun", "Parametric:Logic", "Parametric:RunControl", "Parametric:FileNameSuffix"};
+
+    objectFound = false;
+    for (size_t count = 0; count < parametricObjects.size(); ++count) {
+        objectType = parametricObjects[count];
+        auto it = epJSON.find(objectType);
+        if (it != epJSON.end()) {
+            objectFound = true;
+            break;
+        }
+    }
+    if (objectFound) {
+        displayMessage("Parametric:* objects found. These objects are not supported directly by EnergyPlus.");
+        displayMessage("You must run the ParametricPreprocesor program on this input.");
+        errorsFound = true;
+    }
+    return errorsFound;
 }
 
 bool processErrors(std::unique_ptr<IdfParser> const &idf_parser, std::unique_ptr<Validation> const &validation)
@@ -145,111 +260,80 @@ void cleanEPJSON(json &epjson)
     }
 }
 
-bool processInput(
-    std::string const &inputFilePath, json const &schema, OutputTypes outputType, std::string outputDirectory, std::string &outputTypeStr)
+bool processInput(std::string const &inputFilePath,
+                  json const &schema,
+                  OutputTypes outputType,
+                  fs::path outputDirPath,
+                  std::string &outputTypeStr,
+                  bool convertHVACTemplate)
 {
-    auto validation(std::unique_ptr<Validation>(new Validation(&schema)));
-    auto idf_parser(std::unique_ptr<IdfParser>(new IdfParser()));
+    auto validation(std::make_unique<Validation>(&schema));
+    auto idf_parser(std::make_unique<IdfParser>());
     json epJSON;
 
-    auto const inputFileNameOnly = EnergyPlus::FileSystem::removeFileExtension(EnergyPlus::FileSystem::getFileName(inputFilePath));
-    auto const inputDirPathName = EnergyPlus::FileSystem::getParentDirectoryPath(inputFilePath);
+    auto const inputPath = fs::path(inputFilePath);
 
-    if (outputDirectory.empty()) {
-        outputDirectory = inputDirPathName;
+    auto const inputFilePathNameOnly = EnergyPlus::FileSystem::removeFileExtension(EnergyPlus::FileSystem::getFileName(inputPath));
+    auto const inputDirPath = EnergyPlus::FileSystem::getParentDirectoryPath(inputPath);
+
+    if (outputDirPath.empty()) {
+        outputDirPath = inputDirPath;
     }
 
-    auto inputFileExt = EnergyPlus::FileSystem::getFileExtension(inputFilePath);
-    std::transform(inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper);
+    auto const inputFileType = EnergyPlus::FileSystem::getFileType(inputPath);
 
-    bool isEpJSON = true;
-    bool isCBOR = false;
-    bool isMsgPack = false;
-    bool isUBJSON = false;
-    bool isBSON = false;
+    bool isEpJSON = EnergyPlus::FileSystem::is_all_json_type(inputFileType);
+    bool isCBOR = (inputFileType == EnergyPlus::FileSystem::FileTypes::CBOR);
+    bool isMsgPack = (inputFileType == EnergyPlus::FileSystem::FileTypes::MsgPack);
+    bool isUBJSON = (inputFileType == EnergyPlus::FileSystem::FileTypes::UBJSON);
+    bool isBSON = (inputFileType == EnergyPlus::FileSystem::FileTypes::BSON);
 
-    if (inputFileExt == "EPJSON" || inputFileExt == "JSON") {
-        isEpJSON = true;
-        if (outputType == OutputTypes::epJSON) {
-            displayMessage("Same output format as input format requested (epJSON). Skipping conversion and moving to next file.");
-            return false;
-        }
-    } else if (inputFileExt == "IDF" || inputFileExt == "IMF") {
-        isEpJSON = false;
-        if (outputType == OutputTypes::IDF) {
-            displayMessage("Same output format as input format requested (IDF). Skipping conversion and moving to next file.");
-            return false;
-        }
-    } else if (inputFileExt == "CBOR") {
-        isEpJSON = true;
-        isCBOR = true;
-        if (outputType == OutputTypes::CBOR) {
-            displayMessage("Same output format as input format requested (CBOR). Skipping conversion and moving to next file.");
-            return false;
-        }
-    } else if (inputFileExt == "MSGPACK") {
-        isEpJSON = true;
-        isMsgPack = true;
-        if (outputType == OutputTypes::MsgPack) {
-            displayMessage("Same output format as input format requested (MsgPack). Skipping conversion and moving to next file.");
-            return false;
-        }
-    } else if (inputFileExt == "UBJSON") {
-        isEpJSON = true;
-        isUBJSON = true;
-        if (outputType == OutputTypes::UBJSON) {
-            displayMessage("Same output format as input format requested (UBJSON). Skipping conversion and moving to next file.");
-            return false;
-        }
-    } else if (inputFileExt == "BSON") {
-        isEpJSON = true;
-        isBSON = true;
-        if (outputType == OutputTypes::BSON) {
-            displayMessage("Same output format as input format requested (BSON). Skipping conversion and moving to next file.");
-            return false;
-        }
-    } else {
+    if (!(isEpJSON || EnergyPlus::FileSystem::is_idf_type(inputFileType))) {
         displayMessage("ERROR: Input file must have IDF, IMF, or epJSON extension.");
         return false;
     }
 
-    std::ifstream input_stream(inputFilePath, std::ifstream::in | std::ifstream::binary);
-    if (!input_stream.is_open()) {
-        displayMessage("Input file path " + inputFilePath + " not found");
+    if (outputType == OutputTypes::epJSON &&
+        (inputFileType == EnergyPlus::FileSystem::FileTypes::EpJSON || inputFileType == EnergyPlus::FileSystem::FileTypes::JSON)) {
+        displayMessage("Same output format as input format requested (epJSON). Skipping conversion and moving to next file.");
+        return false;
+    } else if (outputType == OutputTypes::IDF &&
+               (inputFileType == EnergyPlus::FileSystem::FileTypes::IDF || inputFileType == EnergyPlus::FileSystem::FileTypes::IMF)) {
+        displayMessage("Same output format as input format requested (IDF). Skipping conversion and moving to next file.");
+        return false;
+    } else if (outputType == OutputTypes::CBOR && isCBOR) {
+        displayMessage("Same output format as input format requested (CBOR). Skipping conversion and moving to next file.");
+        return false;
+    } else if (outputType == OutputTypes::MsgPack && isMsgPack) {
+        displayMessage("Same output format as input format requested (MsgPack). Skipping conversion and moving to next file.");
+        return false;
+    } else if (outputType == OutputTypes::UBJSON && isUBJSON) {
+        displayMessage("Same output format as input format requested (UBJSON). Skipping conversion and moving to next file.");
+        return false;
+    } else if (outputType == OutputTypes::BSON && isBSON) {
+        displayMessage("Same output format as input format requested (BSON). Skipping conversion and moving to next file.");
         return false;
     }
 
+    if (!EnergyPlus::FileSystem::fileExists(inputPath)) {
 #ifdef _WIN32
-    std::string const NL("\r\n"); // Platform newline
+        displayMessage("Input file path {} not found", inputPath.string());
 #else
-    std::string const NL("\n"); // Platform newline
+        displayMessage("Input file path {} not found", inputPath);
 #endif
+
+        return false;
+    }
 
     try {
         if (!isEpJSON) {
-            std::string input_file;
-            std::string line;
-            while (std::getline(input_stream, line)) {
-                input_file.append(line + NL);
-            }
-            if (input_file.empty()) {
-                displayMessage("Failed to read input file: " + inputFilePath);
-                return false;
-            }
+            auto input_file = EnergyPlus::FileSystem::readFile(inputPath);
 
             bool success = true;
             epJSON = idf_parser->decode(input_file, schema, success);
             cleanEPJSON(epJSON);
-        } else if (isCBOR) {
-            epJSON = json::from_cbor(input_stream);
-        } else if (isMsgPack) {
-            epJSON = json::from_msgpack(input_stream);
-        } else if (isUBJSON) {
-            epJSON = json::from_ubjson(input_stream);
-        } else if (isBSON) {
-            epJSON = json::from_bson(input_stream);
         } else {
-            epJSON = json::parse(input_stream);
+            epJSON = EnergyPlus::FileSystem::readJSON(inputPath, std::ios_base::in | std::ios_base::binary);
         }
     } catch (const std::exception &e) {
         displayMessage(e.what());
@@ -260,8 +344,9 @@ bool processInput(
     bool is_valid = validation->validate(epJSON);
     bool hasErrors = processErrors(idf_parser, validation);
     bool versionMatch = checkVersionMatch(epJSON);
+    bool unsupportedFound = checkForUnsupportedObjects(epJSON, convertHVACTemplate);
 
-    if (!is_valid || hasErrors) {
+    if (!is_valid || hasErrors || unsupportedFound) {
         displayMessage("Errors occurred when validating input file. Preceding condition(s) cause termination.");
         return false;
     }
@@ -271,40 +356,34 @@ bool processInput(
         return false;
     }
 
+    fs::path fileNameWithoutExtension = outputDirPath / inputFilePathNameOnly;
     if ((outputType == OutputTypes::Default || outputType == OutputTypes::IDF) && isEpJSON) {
         auto const input_file = idf_parser->encode(epJSON, schema);
-        std::string convertedEpJSON(outputDirectory + inputFileNameOnly + ".idf");
-        EnergyPlus::FileSystem::makeNativePath(convertedEpJSON);
-        std::ofstream convertedFS(convertedEpJSON, std::ofstream::out | std::ofstream::binary);
-        convertedFS << input_file << std::endl;
+        fs::path convertedEpJSON =
+            EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".idf"));
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::IDF>(convertedEpJSON, input_file);
         outputTypeStr = "IDF";
     } else if ((outputType == OutputTypes::Default || outputType == OutputTypes::epJSON) && !isEpJSON) {
-        auto const input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
-        std::string convertedIDF(outputDirectory + inputFileNameOnly + ".epJSON");
-        EnergyPlus::FileSystem::makeNativePath(convertedIDF);
-        std::ofstream convertedFS(convertedIDF, std::ofstream::out | std::ofstream::binary);
-        convertedFS << input_file << std::endl;
+        fs::path convertedIDF =
+            EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".epJSON"));
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::EpJSON>(convertedIDF, epJSON);
         outputTypeStr = "EPJSON";
     } else if (outputType == OutputTypes::CBOR) {
-        std::string convertedCBOR(outputDirectory + inputFileNameOnly + ".cbor");
-        EnergyPlus::FileSystem::makeNativePath(convertedCBOR);
-        std::ofstream convertedFS(convertedCBOR, std::ofstream::out | std::ofstream::binary);
-        json::to_cbor(epJSON, convertedFS);
+        fs::path convertedCBOR =
+            EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".cbor"));
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::CBOR>(convertedCBOR, epJSON);
     } else if (outputType == OutputTypes::MsgPack) {
-        std::string convertedMsgPack(outputDirectory + inputFileNameOnly + ".msgpack");
-        EnergyPlus::FileSystem::makeNativePath(convertedMsgPack);
-        std::ofstream convertedFS(convertedMsgPack, std::ofstream::out | std::ofstream::binary);
-        json::to_msgpack(epJSON, convertedFS);
+        fs::path convertedMsgPack =
+            EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".msgpack"));
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::MsgPack>(convertedMsgPack, epJSON);
     } else if (outputType == OutputTypes::UBJSON) {
-        std::string convertedUBJSON(outputDirectory + inputFileNameOnly + ".ubjson");
-        EnergyPlus::FileSystem::makeNativePath(convertedUBJSON);
-        std::ofstream convertedFS(convertedUBJSON, std::ofstream::out | std::ofstream::binary);
-        json::to_ubjson(epJSON, convertedFS);
+        fs::path convertedUBJSON =
+            EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".ubjson"));
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::UBJSON>(convertedUBJSON, epJSON);
     } else if (outputType == OutputTypes::BSON) {
-        std::string convertedBSON(outputDirectory + inputFileNameOnly + ".bson");
-        EnergyPlus::FileSystem::makeNativePath(convertedBSON);
-        std::ofstream convertedFS(convertedBSON, std::ofstream::out | std::ofstream::binary);
-        json::to_bson(epJSON, convertedFS);
+        fs::path convertedBSON =
+            EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".bson"));
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::BSON>(convertedBSON, epJSON);
     } else {
         return false;
     }
@@ -315,8 +394,8 @@ std::vector<std::string> parse_input_paths(std::string const &input_paths_file)
 {
     std::ifstream input_paths_stream(input_paths_file);
     if (!input_paths_stream.is_open()) {
-        displayMessage("Could not open file: " + input_paths_file);
-        return std::vector<std::string>();
+        displayMessage("Could not open file: {}", input_paths_file);
+        return {};
     }
     std::vector<std::string> input_paths;
     std::string line;
@@ -375,6 +454,15 @@ int main(int argc, const char *argv[])
             "--format",                                                        // Flag token.
             outputTypeValidation);
 
+    opt.add("",                                     // Default.
+            0,                                      // Required?
+            0,                                      // Number of args expected.
+            0,                                      // Delimiter if expecting multiple args.
+            "Do not convert HVACTemplate objects.", // Help description.
+            "-n",                                   // Flag token.
+            "--noHVACTemplate"                      // Flag token.
+    );
+
     opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
 
     opt.add("",                            // Default.
@@ -408,7 +496,7 @@ int main(int argc, const char *argv[])
     if (opt.isSet("-j")) {
         opt.get("-j")->getInt(number_of_threads);
 #ifndef _OPENMP
-        displayMessage("ConvertInputFormat is not compiled with OpenMP. Only running on 1 thread, not requested ", number_of_threads, " threads.");
+        displayMessage("ConvertInputFormat is not compiled with OpenMP. Only running on 1 thread, not requested {} threads.", number_of_threads);
 #endif
     }
 
@@ -428,26 +516,32 @@ int main(int argc, const char *argv[])
         files = parse_input_paths(input_paths_file);
     }
 
+    bool convertHVACTemplate = true;
+    if (opt.isSet("-n")) {
+        convertHVACTemplate = false;
+    }
+
     std::string outputTypeStr;
-    OutputTypes outputType = OutputTypes::Default;
+    auto outputType = OutputTypes::Default;
     if (opt.isSet("-f")) {
         opt.get("-f")->getString(outputTypeStr);
         std::transform(outputTypeStr.begin(), outputTypeStr.end(), outputTypeStr.begin(), ::toupper);
-        if (outputTypeStr == "EPJSON" || outputTypeStr == "JSON") {
+        auto const buffer_view = std::string_view(outputTypeStr.data());
+        if (buffer_view.compare(".EPJSON") == 0 || buffer_view.compare(".JSON") == 0) {
             outputType = OutputTypes::epJSON;
             outputTypeStr = "EPJSON";
-        } else if (outputTypeStr == "IDF") {
+        } else if (buffer_view.compare(".IDF") == 0 || buffer_view.compare(".IMF") == 0) {
             outputType = OutputTypes::IDF;
-        } else if (outputTypeStr == "CBOR") {
+        } else if (buffer_view.compare(".CBOR") == 0) {
             outputType = OutputTypes::CBOR;
             displayMessage("CBOR input format is experimental.");
-        } else if (outputTypeStr == "MSGPACK") {
+        } else if (buffer_view.compare(".MSGPACK") == 0) {
             outputType = OutputTypes::MsgPack;
             displayMessage("MsgPack input format is experimental.");
-        } else if (outputTypeStr == "UBJSON") {
+        } else if (buffer_view.compare(".UBJSON") == 0) {
             outputType = OutputTypes::UBJSON;
             displayMessage("UBJSON input format is experimental.");
-        } else if (outputTypeStr == "BSON") {
+        } else if (buffer_view.compare(".BSON") == 0) {
             outputType = OutputTypes::BSON;
             displayMessage("BSON input format is experimental.");
         } else {
@@ -469,7 +563,7 @@ int main(int argc, const char *argv[])
     std::vector<std::string> badOptions;
     if (!opt.gotRequired(badOptions)) {
         for (auto const &badOption : badOptions) {
-            std::cerr << "ERROR: Missing required option " << badOption << ".\n\n";
+            fmt::print(std::cerr, "ERROR: Missing required option {}.\n\n", badOption);
         }
         displayMessage(usage);
         return 1;
@@ -477,7 +571,7 @@ int main(int argc, const char *argv[])
 
     if (!opt.gotExpected(badOptions)) {
         for (auto const &badOption : badOptions) {
-            std::cerr << "ERROR: Got unexpected number of arguments for option " << badOption << ".\n\n";
+            fmt::print(std::cerr, "ERROR: Got unexpected number of arguments for option {}.\n\n", badOption);
         }
         displayMessage(usage);
         return 1;
@@ -486,13 +580,13 @@ int main(int argc, const char *argv[])
     std::vector<std::string> badArgs;
     if (!opt.gotValid(badOptions, badArgs)) {
         for (std::size_t i = 0; i < badOptions.size(); ++i) {
-            std::cerr << "ERROR: Got invalid argument \"" << badArgs[i] << "\" for option " << badOptions[i] << ".\n\n";
+            fmt::print(std::cerr, "ERROR: Got invalid argument \"{}\" for option {}.\n\n", badArgs[i], badOptions[i]);
         }
         return 1;
     }
 
     auto const embeddedEpJSONSchema = EnergyPlus::EmbeddedEpJSONSchema::embeddedEpJSONSchema();
-    auto schema = json::from_cbor(embeddedEpJSONSchema.first, embeddedEpJSONSchema.second);
+    auto schema = json::from_cbor(embeddedEpJSONSchema);
 
     int number_files = static_cast<int>(files.size());
     std::size_t fileCount = 0;
@@ -502,28 +596,28 @@ int main(int argc, const char *argv[])
 #endif
 
 #ifdef _OPENMP
-#pragma omp parallel default(none) shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory)
+#pragma omp parallel default(none) shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory, convertHVACTemplate)
     {
 #pragma omp for
         for (int i = 0; i < number_files; ++i) {
-            bool successful = processInput(files[i], schema, outputType, output_directory, outputTypeStr);
+            bool successful = processInput(files[i], schema, outputType, output_directory, outputTypeStr, convertHVACTemplate);
 #pragma omp atomic
             ++fileCount;
             if (successful) {
-                displayMessage("Input file converted to ", outputTypeStr, " successfully | ", fileCount, "/", number_files, " | ", files[i]);
+                displayMessage("Input file converted to {} successfully | {}/{} | {}", outputTypeStr, fileCount, number_files, files[i]);
             } else {
-                displayMessage("Input file conversion failed: | ", fileCount, "/", number_files, " | ", files[i]);
+                displayMessage("Input file conversion failed: | {}/{} | {}", fileCount, number_files, files[i]);
             }
         }
     }
 #else
     for (auto const &file : files) {
-        bool successful = processInput(file, schema, outputType, output_directory, outputTypeStr);
+        bool successful = processInput(file, schema, outputType, output_directory, outputTypeStr, convertHVACTemplate);
         ++fileCount;
         if (successful) {
-            displayMessage("Input file converted to ", outputTypeStr, " successfully | ", fileCount, "/", number_files, " | ", file);
+            displayMessage("Input file converted to {} successfully | {}/{} | {}", outputTypeStr, fileCount, number_files, file);
         } else {
-            displayMessage("Input file conversion failed: | ", fileCount, "/", number_files, " | ", file);
+            displayMessage("Input file conversion failed: | {}/{} | {}", fileCount, number_files, file);
         }
     }
 #endif

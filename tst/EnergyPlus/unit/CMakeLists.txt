@@ -94,6 +94,7 @@ set(test_src
     DualDuct.unit.cc
     EMSManager.unit.cc
     EarthTube.unit.cc
+    EcoRoofManager.unit.cc
     EconomicLifeCycleCost.unit.cc
     EconomicTariff.unit.cc
     ElectricBaseboardRadiator.unit.cc
@@ -155,6 +156,7 @@ set(test_src
     MoistureBalanceEMPD.unit.cc
     NodeInputManager.unit.cc
     OASystemHWPreheatCoil.unit.cc
+    OccupantDiversity.unit.cc
     OutAirNodeManager.unit.cc
     OutdoorAirUnit.unit.cc
     OutputFiles.unit.cc
@@ -208,6 +210,7 @@ set(test_src
     SizingManager.unit.cc
     SolarShading.unit.cc
     SortAndStringUtilities.unit.cc
+    Standard621SimplifiedProcedure.unit.cc
     StandardRatings.unit.cc
     StringUtilities.unit.cc
     SurfaceGeometry.unit.cc
@@ -233,6 +236,7 @@ set(test_src
     WaterThermalTanks.unit.cc
     WaterToAirHeatPump.unit.cc
     WaterToAirHeatPumpSimple.unit.cc
+    WaterUse.unit.cc
     WeatherManager.unit.cc
     WinCalcEngine.unit.cc
     WindowAC.unit.cc
@@ -252,11 +256,11 @@ set(test_dependencies energyplusapi)
 if(LINK_WITH_PYTHON)
   add_definitions("-DLINK_WITH_PYTHON")
   find_package(PythonLibs 3 REQUIRED)
-  include_directories(${PYTHON_INCLUDE_DIRS})
+  include_directories(${Python_INCLUDE_DIRS})
   if(CMAKE_HOST_UNIX)
     list(APPEND test_src api/datatransfer.unit.cc)
     list(APPEND test_src PluginManager.unit.cc)
-    list(APPEND test_dependencies ${PYTHON_LIBRARIES})
+    list(APPEND test_dependencies ${Python_LIBRARIES})
   endif()
 endif()
 

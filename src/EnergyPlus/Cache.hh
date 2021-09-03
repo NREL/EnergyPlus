@@ -67,9 +67,9 @@ namespace Cache {
     std::string const cacheName = "eplusout.cache";
     std::string const CTFKey = "CTFs";
 
-    void readJSONfile(EnergyPlusData &state, std::string &filePath, nlohmann::json &j);
+    void readJSONfile(EnergyPlusData &state, fs::path const &filePath, nlohmann::json &j);
 
-    void writeJSONfile(nlohmann::json &j, std::string &fPath);
+    void writeJSONfile(nlohmann::json &j, fs::path const &filePath);
 
     template <typename T> void jsonToArray(EnergyPlusData &state, Array1D<T> &arr, nlohmann::json &j, std::string const &key)
     {
@@ -80,7 +80,7 @@ namespace Cache {
             arr.dimension({0, size - 1});
             int idx = 0;
             for (auto &v : j.at(key)) {
-                arr(idx) = v;
+                arr(idx) = v.get<Real64>();
                 ++idx;
             }
         } catch (const nlohmann::json::out_of_range &e) {
@@ -97,7 +97,7 @@ namespace Cache {
             arr.dimension(size);
             int idx = 1;
             for (auto &v : j.at(key)) {
-                arr(idx) = v;
+                arr(idx) = v.get<Real64>();
                 ++idx;
             }
         } catch (const nlohmann::json::out_of_range &e) {
@@ -108,7 +108,7 @@ namespace Cache {
     template <typename T> void jsonToData(EnergyPlusData &state, T &data, nlohmann::json &j, std::string const &key)
     {
         try {
-            data = j.at(key);
+            data = j.at(key).get<T>();
         } catch (const nlohmann::json::out_of_range &e) {
             ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
         }

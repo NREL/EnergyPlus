@@ -54,6 +54,7 @@
 #include "Fixtures/SQLiteFixture.hh"
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
@@ -501,7 +502,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_privateMethods)
 
 TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
 {
-    auto const &zone = std::unique_ptr<DataHeatBalance::ZoneData>(new DataHeatBalance::ZoneData());
+    auto const &zone = std::make_unique<DataHeatBalance::ZoneData>();
     zone->Name = "DAYLIT ZONE";
     zone->CeilingHeight = 3;
     zone->Volume = 302;
@@ -514,7 +515,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
     state->dataSQLiteProcedures->sqlite->addZoneData(1, *zone);
     state->dataSQLiteProcedures->sqlite->createZoneExtendedOutput();
     state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(
-        1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", 0.8);
+        1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, " RefPt1=(2.50:2.00:0.80), RefPt2=(2.50:18.00:0.80)", 0.8);
     state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMap(1, 2005, 7, 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue);
 
     auto zones = queryResult("SELECT * FROM Zones;", "Zones");
@@ -530,7 +531,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
 
     ASSERT_EQ(1ul, daylightMaps.size());
     std::vector<std::string> daylightMap0{
-        "1", "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", "1", "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", "0.8"};
+        "1", "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", "1", " RefPt1=(2.50:2.00:0.80), RefPt2=(2.50:18.00:0.80)", "0.8", ""};
     EXPECT_EQ(daylightMap0, daylightMaps[0]);
 
     ASSERT_EQ(1ul, daylightMapHourlyReports.size());
@@ -549,9 +550,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
 
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
     // this should fail due to missing foreign key
-    state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(2, "test", "test", 2, "test", "test", 0.8);
+    state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(2, "test", "test", 2, "test,test", 0.8);
     // this should fail due to duplicate primary key
-    state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(1, "test", "test", 1, "test", "test", 0.8);
+    state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMapTitle(1, "test", "test", 1, "test,test", 0.8);
     // this should fail due to missing foreign key
     state->dataSQLiteProcedures->sqlite->createSQLiteDaylightMap(2, 2005, 7, 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue);
     daylightMaps = queryResult("SELECT * FROM DaylightMaps;", "DaylightMaps");
@@ -566,11 +567,11 @@ TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
 
 TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
 {
-    auto const &zoneData0 = std::unique_ptr<DataHeatBalance::ZoneData>(new DataHeatBalance::ZoneData());
+    auto const &zoneData0 = std::make_unique<DataHeatBalance::ZoneData>();
     zoneData0->Name = "test zone 1";
     zoneData0->CeilingHeight = 1;
     zoneData0->Volume = 1;
-    auto const &zoneData1 = std::unique_ptr<DataHeatBalance::ZoneData>(new DataHeatBalance::ZoneData());
+    auto const &zoneData1 = std::make_unique<DataHeatBalance::ZoneData>();
     zoneData1->Name = "test zone 2";
     zoneData1->RelNorth = 2;
     zoneData1->OriginX = 2;
@@ -598,30 +599,30 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     zoneData1->ExtWindowArea = 2;
     zoneData1->isPartOfTotalArea = false;
 
-    auto const &zoneListData0 = std::unique_ptr<DataHeatBalance::ZoneListData>(new DataHeatBalance::ZoneListData());
+    auto const &zoneListData0 = std::make_unique<DataHeatBalance::ZoneListData>();
     zoneListData0->Name = "test zoneList 1";
     zoneListData0->Zone.allocate(1);
     zoneListData0->Zone(1) = 1;
-    auto const &zoneListData1 = std::unique_ptr<DataHeatBalance::ZoneListData>(new DataHeatBalance::ZoneListData());
+    auto const &zoneListData1 = std::make_unique<DataHeatBalance::ZoneListData>();
     zoneListData1->Name = "test zoneList 2";
     zoneListData1->Zone.allocate(2);
     zoneListData1->Zone(1) = 1;
     zoneListData1->Zone(2) = 2;
 
-    auto const &zoneGroupData0 = std::unique_ptr<DataHeatBalance::ZoneGroupData>(new DataHeatBalance::ZoneGroupData());
+    auto const &zoneGroupData0 = std::make_unique<DataHeatBalance::ZoneGroupData>();
     zoneGroupData0->Name = "test zoneGroup 1";
-    auto const &zoneGroupData1 = std::unique_ptr<DataHeatBalance::ZoneGroupData>(new DataHeatBalance::ZoneGroupData());
+    auto const &zoneGroupData1 = std::make_unique<DataHeatBalance::ZoneGroupData>();
     zoneGroupData1->Name = "test zoneGroup 2";
     zoneGroupData1->ZoneList = 2;
     zoneGroupData1->Multiplier = 99;
 
-    auto const &materialData0 = std::unique_ptr<Material::MaterialProperties>(new Material::MaterialProperties());
+    auto const &materialData0 = std::make_unique<Material::MaterialProperties>();
     materialData0->Name = "test material 1";
-    materialData0->Group = 1;
-    auto const &materialData1 = std::unique_ptr<Material::MaterialProperties>(new Material::MaterialProperties());
+    materialData0->Group = DataHeatBalance::MaterialGroup::Air;
+    auto const &materialData1 = std::make_unique<Material::MaterialProperties>();
     materialData1->Name = "test material 2";
-    materialData1->Group = 2;
-    materialData1->Roughness = 2;
+    materialData1->Group = DataHeatBalance::MaterialGroup::Shade;
+    materialData1->Roughness = DataSurfaces::SurfaceRoughness::Rough; // 1
     materialData1->Conductivity = 2;
     materialData1->Density = 2;
     materialData1->IsoMoistCap = 2;
@@ -633,9 +634,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     materialData1->Thickness = 2;
     materialData1->VaporDiffus = 2;
 
-    auto const &constructData0 = std::unique_ptr<Construction::ConstructionProps>(new Construction::ConstructionProps());
+    auto const &constructData0 = std::make_unique<Construction::ConstructionProps>();
     constructData0->Name = "test construction 1";
-    auto const &constructData1 = std::unique_ptr<Construction::ConstructionProps>(new Construction::ConstructionProps());
+    auto const &constructData1 = std::make_unique<Construction::ConstructionProps>();
     constructData1->Name = "test construction 2";
     constructData1->TotLayers = 2;
     constructData1->TotSolidLayers = 2;
@@ -646,15 +647,15 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     constructData1->OutsideAbsorpSolar = 2;
     constructData1->InsideAbsorpThermal = 2;
     constructData1->OutsideAbsorpThermal = 2;
-    constructData1->OutsideRoughness = 2;
+    constructData1->OutsideRoughness = DataSurfaces::SurfaceRoughness::Rough; // 1
     constructData1->TypeIsWindow = true;
     constructData1->LayerPoint.allocate(2);
     constructData1->LayerPoint(1) = 2;
     constructData1->LayerPoint(2) = 1;
 
-    auto const &surfaceData0 = std::unique_ptr<DataSurfaces::SurfaceData>(new DataSurfaces::SurfaceData());
+    auto const &surfaceData0 = std::make_unique<DataSurfaces::SurfaceData>();
     surfaceData0->Name = "test surface 1";
-    auto const &surfaceData1 = std::unique_ptr<DataSurfaces::SurfaceData>(new DataSurfaces::SurfaceData());
+    auto const &surfaceData1 = std::make_unique<DataSurfaces::SurfaceData>();
     surfaceData1->Name = "test surface 2";
     surfaceData1->Construction = 2;
     surfaceData1->Area = 2;
@@ -674,9 +675,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     surfaceData1->ExtSolar = true;
     surfaceData1->ExtWind = true;
 
-    auto const &lightingData0 = std::unique_ptr<DataHeatBalance::LightsData>(new DataHeatBalance::LightsData());
+    auto const &lightingData0 = std::make_unique<DataHeatBalance::LightsData>();
     lightingData0->Name = "test lighting 1";
-    auto const &lightingData1 = std::unique_ptr<DataHeatBalance::LightsData>(new DataHeatBalance::LightsData());
+    auto const &lightingData1 = std::make_unique<DataHeatBalance::LightsData>();
     lightingData1->Name = "test lighting 2";
     lightingData1->ZonePtr = 1;
     lightingData1->SchedPtr = 1;
@@ -688,9 +689,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     lightingData1->FractionConvected = 2;
     lightingData1->EndUseSubcategory = "test";
 
-    auto const &peopleData0 = std::unique_ptr<DataHeatBalance::PeopleData>(new DataHeatBalance::PeopleData());
+    auto const &peopleData0 = std::make_unique<DataHeatBalance::PeopleData>();
     peopleData0->Name = "test people 1";
-    auto const &peopleData1 = std::unique_ptr<DataHeatBalance::PeopleData>(new DataHeatBalance::PeopleData());
+    auto const &peopleData1 = std::make_unique<DataHeatBalance::PeopleData>();
     peopleData1->Name = "test people 2";
     peopleData1->ZonePtr = 1;
     peopleData1->NumberOfPeople = 2;
@@ -704,16 +705,16 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     peopleData1->Fanger = true;
     peopleData1->Pierce = true;
     peopleData1->KSU = true;
-    peopleData1->MRTCalcType = 2;
+    peopleData1->MRTCalcType = DataHeatBalance::CalcMRT::SurfaceWeighted;
     peopleData1->SurfacePtr = 1;
     peopleData1->AngleFactorListName = "test";
     peopleData1->AngleFactorListPtr = 1;
     peopleData1->UserSpecSensFrac = 2;
     peopleData1->Show55Warning = true;
 
-    auto const &elecEquipData0 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+    auto const &elecEquipData0 = std::make_unique<DataHeatBalance::ZoneEquipData>();
     elecEquipData0->Name = "test elecEquip 1";
-    auto const &elecEquipData1 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+    auto const &elecEquipData1 = std::make_unique<DataHeatBalance::ZoneEquipData>();
     elecEquipData1->Name = "test elecEquip 2";
     elecEquipData1->ZonePtr = 1;
     elecEquipData1->SchedPtr = 1;
@@ -724,9 +725,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     elecEquipData1->FractionConvected = 2;
     elecEquipData1->EndUseSubcategory = "test";
 
-    auto const &gasEquipData0 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+    auto const &gasEquipData0 = std::make_unique<DataHeatBalance::ZoneEquipData>();
     gasEquipData0->Name = "test gasEquip 1";
-    auto const &gasEquipData1 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+    auto const &gasEquipData1 = std::make_unique<DataHeatBalance::ZoneEquipData>();
     gasEquipData1->Name = "test gasEquip 2";
     gasEquipData1->ZonePtr = 1;
     gasEquipData1->SchedPtr = 1;
@@ -737,9 +738,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     gasEquipData1->FractionConvected = 2;
     gasEquipData1->EndUseSubcategory = "test";
 
-    auto const &steamEquipData0 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+    auto const &steamEquipData0 = std::make_unique<DataHeatBalance::ZoneEquipData>();
     steamEquipData0->Name = "test steamEquip 1";
-    auto const &steamEquipData1 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+    auto const &steamEquipData1 = std::make_unique<DataHeatBalance::ZoneEquipData>();
     steamEquipData1->Name = "test steamEquip 2";
     steamEquipData1->ZonePtr = 1;
     steamEquipData1->SchedPtr = 1;
@@ -750,9 +751,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     steamEquipData1->FractionConvected = 2;
     steamEquipData1->EndUseSubcategory = "test";
 
-    auto const &hwEquipData0 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+    auto const &hwEquipData0 = std::make_unique<DataHeatBalance::ZoneEquipData>();
     hwEquipData0->Name = "test hwEquip 1";
-    auto const &hwEquipData1 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+    auto const &hwEquipData1 = std::make_unique<DataHeatBalance::ZoneEquipData>();
     hwEquipData1->Name = "test hwEquip 2";
     hwEquipData1->ZonePtr = 1;
     hwEquipData1->SchedPtr = 1;
@@ -763,9 +764,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     hwEquipData1->FractionConvected = 2;
     hwEquipData1->EndUseSubcategory = "test";
 
-    auto const &otherEquipData0 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+    auto const &otherEquipData0 = std::make_unique<DataHeatBalance::ZoneEquipData>();
     otherEquipData0->Name = "test otherEquip 1";
-    auto const &otherEquipData1 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+    auto const &otherEquipData1 = std::make_unique<DataHeatBalance::ZoneEquipData>();
     otherEquipData1->Name = "test otherEquip 2";
     otherEquipData1->ZonePtr = 1;
     otherEquipData1->SchedPtr = 1;
@@ -776,9 +777,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     otherEquipData1->FractionConvected = 2;
     otherEquipData1->EndUseSubcategory = "test";
 
-    auto const &baseboardData0 = std::unique_ptr<DataHeatBalance::BBHeatData>(new DataHeatBalance::BBHeatData());
+    auto const &baseboardData0 = std::make_unique<DataHeatBalance::BBHeatData>();
     baseboardData0->Name = "test baseboard 1";
-    auto const &baseboardData1 = std::unique_ptr<DataHeatBalance::BBHeatData>(new DataHeatBalance::BBHeatData());
+    auto const &baseboardData1 = std::make_unique<DataHeatBalance::BBHeatData>();
     baseboardData1->Name = "test baseboard 2";
     baseboardData1->ZonePtr = 1;
     baseboardData1->SchedPtr = 1;
@@ -790,25 +791,25 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     baseboardData1->FractionConvected = 2;
     baseboardData1->EndUseSubcategory = "test";
 
-    auto const &infiltrationData0 = std::unique_ptr<DataHeatBalance::InfiltrationData>(new DataHeatBalance::InfiltrationData());
+    auto const &infiltrationData0 = std::make_unique<DataHeatBalance::InfiltrationData>();
     infiltrationData0->Name = "test infiltration 1";
-    auto const &infiltrationData1 = std::unique_ptr<DataHeatBalance::InfiltrationData>(new DataHeatBalance::InfiltrationData());
+    auto const &infiltrationData1 = std::make_unique<DataHeatBalance::InfiltrationData>();
     infiltrationData1->Name = "test infiltration 2";
     infiltrationData1->ZonePtr = 1;
     infiltrationData1->SchedPtr = 1;
     infiltrationData1->DesignLevel = 2;
 
-    auto const &ventilationData0 = std::unique_ptr<DataHeatBalance::VentilationData>(new DataHeatBalance::VentilationData());
+    auto const &ventilationData0 = std::make_unique<DataHeatBalance::VentilationData>();
     ventilationData0->Name = "test ventilation 1";
-    auto const &ventilationData1 = std::unique_ptr<DataHeatBalance::VentilationData>(new DataHeatBalance::VentilationData());
+    auto const &ventilationData1 = std::make_unique<DataHeatBalance::VentilationData>();
     ventilationData1->Name = "test ventilation 2";
     ventilationData1->ZonePtr = 1;
     ventilationData1->SchedPtr = 1;
     ventilationData1->DesignLevel = 2;
 
-    auto const &roomAirModelData0 = std::unique_ptr<DataRoomAirModel::AirModelData>(new DataRoomAirModel::AirModelData());
+    auto const &roomAirModelData0 = std::make_unique<DataRoomAirModel::AirModelData>();
     roomAirModelData0->AirModelName = "test roomAirModel 1";
-    auto const &roomAirModelData1 = std::unique_ptr<DataRoomAirModel::AirModelData>(new DataRoomAirModel::AirModelData());
+    auto const &roomAirModelData1 = std::make_unique<DataRoomAirModel::AirModelData>();
     roomAirModelData1->AirModelName = "test roomAirModel 2";
     roomAirModelData1->AirModelType = DataRoomAirModel::RoomAirModel::Mundt;
     roomAirModelData1->TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct; // hmm this was set to 3 which wasn't a valid option
@@ -919,14 +920,14 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     EXPECT_EQ(schedule1, schedules[1]);
 
     ASSERT_EQ(2ul, materials.size());
-    std::vector<std::string> material0{"1", "test material 1", "1", "0", "0.0", "0.0", "0.0", "0.0", "0.0", "0", "0.0", "0.0", "0.0", "0.0"};
-    std::vector<std::string> material1{"2", "test material 2", "2", "2", "2.0", "2.0", "2.0", "2.0", "2.0", "1", "2.0", "2.0", "2.0", "2.0"};
+    std::vector<std::string> material0{"1", "test material 1", "1", "-1", "0.0", "0.0", "0.0", "0.0", "0.0", "0", "0.0", "0.0", "0.0", "0.0"};
+    std::vector<std::string> material1{"2", "test material 2", "2", "1", "2.0", "2.0", "2.0", "2.0", "2.0", "1", "2.0", "2.0", "2.0", "2.0"};
     EXPECT_EQ(material0, materials[0]);
     EXPECT_EQ(material1, materials[1]);
 
     ASSERT_EQ(2ul, constructions.size());
-    std::vector<std::string> construction0{"1", "test construction 1", "0", "0", "0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0", "0", "0.0"};
-    std::vector<std::string> construction1{"2", "test construction 2", "2", "2", "2", "2.0", "2.0", "2.0", "2.0", "2.0", "2.0", "2", "1", "2.0"};
+    std::vector<std::string> construction0{"1", "test construction 1", "0", "0", "0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "-1", "0", "0.0"};
+    std::vector<std::string> construction1{"2", "test construction 2", "2", "2", "2", "2.0", "2.0", "2.0", "2.0", "2.0", "2.0", "1", "1", "2.0"};
     EXPECT_EQ(construction0, constructions[0]);
     EXPECT_EQ(construction1, constructions[1]);
 
@@ -951,8 +952,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     EXPECT_EQ(lighting1, lightings[1]);
 
     ASSERT_EQ(2ul, peoples.size());
-    std::vector<std::string> people0{"1", "test people 1", "", "0", "", "", "0.0", "0.0", "", "", "", "0", "0", "0", "0", "", "", "-1", "0.0", "0"};
-    std::vector<std::string> people1{"2", "test people 2", "1", "2",   "1", "1", "2.0", "2.0", "1", "1", "1", "1", "1", "1", "2",
+    std::vector<std::string> people0{"1", "test people 1", "", "0", "", "", "0.0", "0.0", "", "", "", "0", "0", "0", "-1", "", "", "-1", "0.0", "0"};
+    std::vector<std::string> people1{"2", "test people 2", "1", "2",   "1", "1", "2.0", "2.0", "1", "1", "1", "1", "1", "1", "1",
                                      "1", "test",          "1", "2.0", "1"};
     EXPECT_EQ(people0, peoples[0]);
     EXPECT_EQ(people1, peoples[1]);

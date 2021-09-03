@@ -60,6 +60,8 @@ class PlantComponent
 {
 
 public:
+    bool oneTimeInitFlag = true;
+
     virtual void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) = 0;
 
     virtual void getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
@@ -82,8 +84,11 @@ public:
     {
     }
 
-    // virtual void oneTimeInit(EnergyPlusData &state) = 0;
-    virtual void oneTimeInit([[maybe_unused]] EnergyPlusData &state){};
+    virtual void oneTimeInit(EnergyPlusData &state) = 0;
+
+    virtual void oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
     ~PlantComponent() = default;
 };

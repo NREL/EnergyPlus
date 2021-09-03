@@ -454,6 +454,7 @@
     Wall,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZSF1,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -470,6 +471,7 @@
     Wall,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZSF1,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -486,6 +488,7 @@
     Wall,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZSF1,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -502,6 +505,7 @@
     Wall,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZNF1,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -518,6 +522,7 @@
     Wall,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZNF1,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -534,6 +539,7 @@
     Wall,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZNF1,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -550,6 +556,7 @@
     Wall,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZSF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -566,6 +573,7 @@
     Wall,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZSF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -582,6 +590,7 @@
     Wall,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZSF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -598,6 +607,7 @@
     Roof,                    !- Surface Type
     ROOFR,                   !- Construction Name
     ZSF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -614,6 +624,7 @@
     Wall,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZNF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -630,6 +641,7 @@
     Wall,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZNF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -646,6 +658,7 @@
     Wall,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZNF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -662,6 +675,7 @@
     Roof,                    !- Surface Type
     ROOFR,                   !- Construction Name
     ZNF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -678,6 +692,7 @@
     Ceiling,                 !- Surface Type
     reverseFLOORR,           !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     FSFLOOR-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -694,6 +709,7 @@
     Ceiling,                 !- Surface Type
     reverseFLOORR,           !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     FNFLOOR-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -710,6 +726,7 @@
     Floor,                   !- Surface Type
     FLOORR,                  !- Construction Name
     ZSF1,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     BSCEING-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -726,6 +743,7 @@
     Floor,                   !- Surface Type
     FLOORR,                  !- Construction Name
     ZNF1,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     BNCEING-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -742,6 +760,7 @@
     Ceiling,                 !- Surface Type
     reverseFLOORR,           !- Construction Name
     ZSF1,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SSFLOOR-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -758,6 +777,7 @@
     Ceiling,                 !- Surface Type
     reverseFLOORR,           !- Construction Name
     ZNF1,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SNFLOOR-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -774,6 +794,7 @@
     Floor,                   !- Surface Type
     FLOORR,                  !- Construction Name
     ZSF2,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     FSCEING-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -790,6 +811,7 @@
     Floor,                   !- Surface Type
     FLOORR,                  !- Construction Name
     ZNF2,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     FNCEING-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -806,6 +828,7 @@
     Floor,                   !- Surface Type
     SLABL,                   !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -822,6 +845,7 @@
     WALL,                    !- Surface Type
     SLABL,                   !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -838,6 +862,7 @@
     WALL,                    !- Surface Type
     SLABL,                   !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -854,6 +879,7 @@
     WALL,                    !- Surface Type
     SLABL,                   !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -870,6 +896,7 @@
     WALL,                    !- Surface Type
     SLABL,                   !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1065,25 +1092,29 @@
     ZSF1-MASS,               !- Name
     FURNITURE,               !- Construction Name
     ZSF1,                    !- Zone or ZoneList Name
-    77;                      !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    77;                      !- Extended Field
 
   InternalMass,
     ZNF1-MASS,               !- Name
     FURNITURE,               !- Construction Name
     ZNF1,                    !- Zone or ZoneList Name
-    77;                      !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    77;                      !- Extended Field
 
   InternalMass,
     ZSF2-MASS,               !- Name
     FURNITURE,               !- Construction Name
     ZSF2,                    !- Zone or ZoneList Name
-    77;                      !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    77;                      !- Extended Field
 
   InternalMass,
     ZNF2-MASS,               !- Name
     FURNITURE,               !- Construction Name
     ZNF2,                    !- Zone or ZoneList Name
-    77;                      !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    77;                      !- Extended Field
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -2603,26 +2634,22 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 2,                !- Name
     OA Sys 2 Controllers,    !- Controller List Name
-    OA Sys 2 Equipment,      !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OA Sys 2 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 3,                !- Name
     OA Sys 3 Controllers,    !- Controller List Name
-    OA Sys 3 Equipment,      !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OA Sys 3 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 4,                !- Name
     OA Sys 4 Controllers,    !- Controller List Name
-    OA Sys 4 Equipment,      !- Outdoor Air Equipment List Name
-    Air Loop Avail List;     !- Availability Manager List Name
+    OA Sys 4 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 1 Controllers,    !- Name

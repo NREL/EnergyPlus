@@ -51,6 +51,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 namespace EnergyPlus {
 
@@ -71,7 +72,9 @@ namespace SimulationManager {
 
     void CheckForRequestedReporting(EnergyPlusData &state);
 
-    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const std::string &fileName);
+    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const fs::path &fileName);
+
+    std::unique_ptr<fmt::ostream> OpenFmtStreamFile(EnergyPlusData &state, const fs::path &filePath);
 
     void OpenOutputFiles(EnergyPlusData &state);
 

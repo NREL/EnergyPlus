@@ -179,7 +179,7 @@ namespace PlantValves {
                                                                                          Alphas(1),
                                                                                          DataLoopNode::NodeFluidType::Water,
                                                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                                                         1,
+                                                                                         NodeInputManager::compFluidStream::Primary,
                                                                                          ObjectIsNotParent);
             // Get Plant Outlet Node
             state.dataPlantValves->TemperValve(Item).PltOutletNodeNum = GetOnlySingleNode(state,
@@ -189,7 +189,7 @@ namespace PlantValves {
                                                                                           Alphas(1),
                                                                                           DataLoopNode::NodeFluidType::Water,
                                                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                                                          1,
+                                                                                          NodeInputManager::compFluidStream::Primary,
                                                                                           ObjectIsNotParent);
 
             // Get Stream 2 Source Node
@@ -200,7 +200,7 @@ namespace PlantValves {
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Water,
                                                                                            DataLoopNode::NodeConnectionType::Sensor,
-                                                                                           1,
+                                                                                           NodeInputManager::compFluidStream::Primary,
                                                                                            ObjectIsNotParent);
             // Get Mixed water Setpoint
             state.dataPlantValves->TemperValve(Item).PltSetPointNodeNum = GetOnlySingleNode(state,
@@ -210,7 +210,7 @@ namespace PlantValves {
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
                                                                                             DataLoopNode::NodeConnectionType::SetPoint,
-                                                                                            1,
+                                                                                            NodeInputManager::compFluidStream::Primary,
                                                                                             ObjectIsNotParent);
 
             // Get Pump outlet
@@ -221,7 +221,7 @@ namespace PlantValves {
                                                                                               Alphas(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                               DataLoopNode::NodeConnectionType::Sensor,
-                                                                                              1,
+                                                                                              NodeInputManager::compFluidStream::Primary,
                                                                                               ObjectIsNotParent);
 
             // Note most checks on user input are made in second pass thru init routine
@@ -235,8 +235,8 @@ namespace PlantValves {
                                 "Tempering Valve Flow Fraction",
                                 OutputProcessor::Unit::None,
                                 state.dataPlantValves->TemperValve(Item).FlowDivFract,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlantValves->TemperValve(Item).Name);
         }
 
@@ -501,6 +501,12 @@ namespace PlantValves {
 
         if (this->FlowDivFract < 0.0) this->FlowDivFract = 0.0;
         if (this->FlowDivFract > 1.0) this->FlowDivFract = 1.0;
+    }
+    void TemperValveData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
+    void TemperValveData::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+    {
     }
 
 } // namespace PlantValves

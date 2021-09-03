@@ -165,13 +165,6 @@ CHECKED_AND_OKED = {
         ]
     },
 
-    # Could be changed to just return a string
-    "DataSystemVariables.cc": {
-        "CheckForActualFileName": [
-            "FileFound"
-        ]
-    },
-
     "DaylightingManager.cc": {
         "CheckForGeometricTransform": [
             "doTransform",
@@ -425,6 +418,9 @@ CHECKED_AND_OKED = {
         # Used with dedicated bool
         "heatPumpRunFrac": [
             "errFlag"
+        ],
+        "isWaterCoilHeatRecoveryType": [
+            "nodeNotFound"
         ],
         "simulate": [
             "CoolActive",

@@ -317,7 +317,7 @@ namespace BranchInputManager {
         return NumCompsInBranch;
     }
 
-    int GetAirBranchIndex(EnergyPlusData &state, std::string const &CompType, std::string const &CompName)
+    int GetAirBranchIndex(EnergyPlusData &state, std::string const &CompType, std::string_view CompName)
     {
 
         // FUNCTION INFORMATION:
@@ -346,7 +346,7 @@ namespace BranchInputManager {
         NumBranches = size(state.dataBranchInputManager->Branch);
 
         if (NumBranches == 0) {
-            ShowSevereError(state, "GetAirBranchIndex:  Branch not found with component = " + CompType + " \"" + CompName + "\"");
+            ShowSevereError(state, "GetAirBranchIndex:  Branch not found with component = " + CompType + " \"" + std::string{CompName} + "\"");
         } else {
             for (BranchNum = 1; BranchNum <= NumBranches; ++BranchNum) {
                 for (CompNum = 1; CompNum <= state.dataBranchInputManager->Branch(BranchNum).NumOfComponents; ++CompNum) {
@@ -690,7 +690,7 @@ namespace BranchInputManager {
                                        "Connector:Mixer",
                                        MixerName,
                                        DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet),
-                                       1,
+                                       NodeInputManager::compFluidStream::Primary,
                                        ObjectIsNotParent,
                                        errFlag);
 
@@ -722,7 +722,7 @@ namespace BranchInputManager {
                                                "Connector:Mixer",
                                                MixerName,
                                                DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet),
-                                               1,
+                                               NodeInputManager::compFluidStream::Primary,
                                                ObjectIsNotParent,
                                                errFlag);
                     }
@@ -848,7 +848,7 @@ namespace BranchInputManager {
                                        "Connector:Splitter",
                                        SplitterName,
                                        DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet),
-                                       1,
+                                       NodeInputManager::compFluidStream::Primary,
                                        ObjectIsNotParent,
                                        errFlag);
 
@@ -881,7 +881,7 @@ namespace BranchInputManager {
                                                "Connector:Splitter",
                                                SplitterName,
                                                DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet),
-                                               1,
+                                               NodeInputManager::compFluidStream::Primary,
                                                ObjectIsNotParent,
                                                errFlag);
                     }
@@ -1030,7 +1030,7 @@ namespace BranchInputManager {
         //         \required-field
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetBranchInput: ");
+        static constexpr std::string_view RoutineName("GetBranchInput: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1094,8 +1094,9 @@ namespace BranchInputManager {
                 lAlphaBlanks.deallocate();
                 lNumericBlanks.deallocate();
                 if (ErrFound) {
-                    ShowSevereError(
-                        state, RoutineName + " Invalid " + CurrentModuleObject + " Input, preceding condition(s) will likely cause termination.");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + " Invalid " + CurrentModuleObject +
+                                        " Input, preceding condition(s) will likely cause termination.");
                     state.dataBranchInputManager->InvalidBranchDefinitions = true;
                 }
                 TestInletOutletNodes(state, ErrFound);
@@ -1105,7 +1106,7 @@ namespace BranchInputManager {
     }
 
     void GetSingleBranchInput(EnergyPlusData &state,
-                              std::string const &RoutineName,
+                              std::string_view const RoutineName,
                               int const BCount,
                               Array1D_string &Alphas,
                               Array1D_string &cAlphaFields,
@@ -1131,7 +1132,7 @@ namespace BranchInputManager {
         state.dataBranchInputManager->Branch(BCount).Name = Alphas(1);
         GetPressureCurveTypeAndIndex(state, Alphas(2), pressureCurveType, PressureCurveIndex);
         if (pressureCurveType == DataBranchAirLoopPlant::PressureCurveType::Error) {
-            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
             ShowContinueError(state, "..Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
             ShowContinueError(state, "This curve could not be found in the input deck.  Ensure that this curve has been entered");
             ShowContinueError(state, " as either a Curve:Functional:PressureDrop or one of Curve:{Linear,Quadratic,Cubic,Exponent}");
@@ -1148,13 +1149,13 @@ namespace BranchInputManager {
         Comp = 1;
         for (int Loop = 3; Loop <= NumAlphas; Loop += 4) {
             if (UtilityRoutines::SameString(Alphas(Loop), cSPLITTER) || UtilityRoutines::SameString(Alphas(Loop), cMIXER)) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                 ShowContinueError(state, "Connector:Splitter/Connector:Mixer not allowed in object " + CurrentModuleObject);
                 ErrFound = true;
                 continue;
             }
             if (Comp > NumInComps) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                 ShowContinueError(state, fmt::format("...Number of Arguments indicate [{}], but count of fields indicates [{}]", NumInComps, Comp));
                 ShowContinueError(state, "...examine " + CurrentModuleObject + " carefully.");
                 continue;
@@ -1183,12 +1184,12 @@ namespace BranchInputManager {
                             CurrentModuleObject,
                             state.dataBranchInputManager->Branch(BCount).Name,
                             ConnectionType,
-                            1,
+                            NodeInputManager::compFluidStream::Primary,
                             ObjectIsParent,
                             _,
                             cAlphaFields(Loop + 2));
                 if (NumNodes > 1) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                     ShowContinueError(state,
                                       "..invalid " + cAlphaFields(Loop + 2) + "=\"" +
                                           state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNodeName +
@@ -1201,7 +1202,7 @@ namespace BranchInputManager {
                     state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNode = NodeNums(1);
                 }
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                 ShowContinueError(state, "blank required field: " + cAlphaFields(Loop + 2));
                 ShowContinueError(state,
                                   "Occurs on " + cAlphaFields(Loop) + "=\"" + Alphas(Loop) + "\", " + cAlphaFields(Loop + 1) + "=\"" +
@@ -1225,12 +1226,12 @@ namespace BranchInputManager {
                             CurrentModuleObject,
                             state.dataBranchInputManager->Branch(BCount).Name,
                             ConnectionType,
-                            1,
+                            NodeInputManager::compFluidStream::Primary,
                             ObjectIsParent,
                             _,
                             cAlphaFields(Loop + 3));
                 if (NumNodes > 1) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                     ShowContinueError(state,
                                       "..invalid " + cAlphaFields(Loop + 2) + "=\"" +
                                           state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNodeName +
@@ -1243,7 +1244,7 @@ namespace BranchInputManager {
                     state.dataBranchInputManager->Branch(BCount).Component(Comp).OutletNode = NodeNums(1);
                 }
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                 ShowContinueError(state, "blank required field: " + cAlphaFields(Loop + 3));
                 ShowContinueError(state,
                                   "Occurs on " + cAlphaFields(Loop) + "=\"" + Alphas(Loop) + "\", " + cAlphaFields(Loop + 1) + "=\"" +
@@ -1296,7 +1297,7 @@ namespace BranchInputManager {
         // Using/Aliasing
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetBranchListInput: ");
+        static constexpr std::string_view RoutineName("GetBranchListInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;     // Loop Counter
@@ -1335,8 +1336,9 @@ namespace BranchInputManager {
         lNumericBlanks.dimension(NumNumbers, true);
 
         if (NumNumbers > 0) {
-            ShowSevereError(
-                state, RoutineName + CurrentModuleObject + " Object definition contains numbers, cannot be decoded by GetBranchListInput routine.");
+            ShowSevereError(state,
+                            std::string{RoutineName} + CurrentModuleObject +
+                                " Object definition contains numbers, cannot be decoded by GetBranchListInput routine.");
             ErrFound = true;
         }
         BCount = 0;
@@ -1362,7 +1364,7 @@ namespace BranchInputManager {
             state.dataBranchInputManager->BranchList(BCount).BranchNames.allocate(NumAlphas - 1);
             if (state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames == 0) {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name +
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name +
                                     "\", No branch names entered.");
                 ErrFound = true;
             } else {
@@ -1377,8 +1379,8 @@ namespace BranchInputManager {
                                                                 state.dataBranchInputManager->Branch);
                         if (Found == 0) {
                             ShowSevereError(state,
-                                            RoutineName + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name +
-                                                "\", invalid data.");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                state.dataBranchInputManager->BranchList(BCount).Name + "\", invalid data.");
                             ShowContinueError(state,
                                               "..invalid Branch Name not found=\"" +
                                                   state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop) + "\".");
@@ -1395,8 +1397,9 @@ namespace BranchInputManager {
             TestName = state.dataBranchInputManager->BranchList(Count).BranchNames(1);
             for (Loop = 2; Loop <= state.dataBranchInputManager->BranchList(Count).NumOfBranchNames; ++Loop) {
                 if (TestName != state.dataBranchInputManager->BranchList(Count).BranchNames(Loop)) continue;
-                ShowSevereError(
-                    state, RoutineName + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name + "\", invalid data.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name +
+                                    "\", invalid data.");
                 ShowContinueError(state, "..invalid: duplicate branch name specified in the list.");
                 ShowContinueError(state, "..Branch Name=" + TestName);
                 ShowContinueError(state, fmt::format("..Branch Name #{} is duplicate.", Loop));
@@ -1405,7 +1408,7 @@ namespace BranchInputManager {
         }
 
         if (ErrFound) {
-            ShowSevereError(state, RoutineName + " Invalid Input -- preceding condition(s) will likely cause termination.");
+            ShowSevereError(state, std::string{RoutineName} + " Invalid Input -- preceding condition(s) will likely cause termination.");
         }
         state.dataBranchInputManager->NumOfBranchLists = BCount;
         Alphas.deallocate();
@@ -2460,8 +2463,8 @@ namespace BranchInputManager {
             FoundBranchName = "";
             if (present(CompType) && present(CompName)) {
                 for (CpN = 1; CpN <= state.dataBranchInputManager->Branch(BrN).NumOfComponents; ++CpN) {
-                    if (!UtilityRoutines::SameString(CompType, state.dataBranchInputManager->Branch(BrN).Component(CpN).CType) ||
-                        !UtilityRoutines::SameString(CompName, state.dataBranchInputManager->Branch(BrN).Component(CpN).Name))
+                    if (!UtilityRoutines::SameString(CompType(), state.dataBranchInputManager->Branch(BrN).Component(CpN).CType) ||
+                        !UtilityRoutines::SameString(CompName(), state.dataBranchInputManager->Branch(BrN).Component(CpN).Name))
                         continue;
                     FoundBranchName = state.dataBranchInputManager->Branch(BrN).Name;
                     NeverFound = false;
@@ -2480,7 +2483,7 @@ namespace BranchInputManager {
                     ShowContinueError(
                         state, "AuditBranches: Branch=\"" + state.dataBranchInputManager->Branch(BrN).Name + "\" not found on any BranchLists.");
                     if (!FoundBranchName.empty()) {
-                        ShowContinueError(state, "Branch contains component, type=\"" + CompType + "\", name=\"" + CompName + "\"");
+                        ShowContinueError(state, "Branch contains component, type=\"" + CompType + "\", name=\"" + std::string{CompName} + "\"");
                     }
                 } else {
                     ShowSevereMessage(
@@ -2490,7 +2493,7 @@ namespace BranchInputManager {
             }
         }
         if (mustprint && NeverFound) { // this may be caught during branch input, not sure
-            ShowContinueError(state, "Component, type=\"" + CompType + "\", name=\"" + CompName + "\" was not found on any Branch.");
+            ShowContinueError(state, "Component, type=\"" + CompType + "\", name=\"" + std::string{CompName} + "\" was not found on any Branch.");
             ShowContinueError(state, "Look for mistyped branch or component names/types.");
         }
         if (!mustprint && NumDanglingCount > 0) {
@@ -2565,12 +2568,13 @@ namespace BranchInputManager {
         BranchNodes.allocate(state.dataBranchInputManager->NumOfBranches);
 
         print(state.files.bnd, "{}\n", "! ===============================================================");
-        static constexpr auto Format_700("! <#Branch Lists>,<Number of Branch Lists>");
+        static constexpr std::string_view Format_700("! <#Branch Lists>,<Number of Branch Lists>");
         print(state.files.bnd, "{}\n", Format_700);
         print(state.files.bnd, " #Branch Lists,{}\n", state.dataBranchInputManager->NumOfBranchLists);
-        static constexpr auto Format_702("! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>");
+        static constexpr std::string_view Format_702(
+            "! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>");
         print(state.files.bnd, "{}\n", Format_702);
-        static constexpr auto Format_704(
+        static constexpr std::string_view Format_704(
             "! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>");
         print(state.files.bnd, "{}\n", Format_704);
 
@@ -2784,7 +2788,7 @@ namespace BranchInputManager {
             ++BCount;
         }
         if (BCount > 0) {
-            static constexpr auto Format_706("! <# Orphaned Branches>,<Number of Branches not on Branch Lists>");
+            static constexpr std::string_view Format_706("! <# Orphaned Branches>,<Number of Branches not on Branch Lists>");
             print(state.files.bnd, "{}\n", Format_706);
             print(state.files.bnd, " #Orphaned Branches,{}\n", BCount);
             ShowWarningError(state, "There are orphaned Branches in input. See .bnd file for details.");

@@ -142,8 +142,6 @@ namespace ChillerGasAbsorption {
         int HWBranchNum;   // hot water plant loop branch index
         int HWCompNum;     // hot water plant loop component index
         bool envrnFlag;
-        bool plantScanFlag;
-        bool oneTimeFlag;
         Real64 oldCondSupplyTemp; // save the last iteration value of leaving condenser water temperature
 
         // Originally on report variable structure
@@ -194,13 +192,13 @@ namespace ChillerGasAbsorption {
               CHWLowLimitTemp(0.0), FuelHeatingValue(0.0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0), DesEvapMassFlowRate(0.0),
               DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWLoopNum(0), CWLoopSideNum(0),
               CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HWLoopNum(0), HWLoopSideNum(0),
-              HWBranchNum(0), HWCompNum(0), envrnFlag(true), plantScanFlag(true), oneTimeFlag(true), oldCondSupplyTemp(0.0), CoolingLoad(0.0),
-              CoolingEnergy(0.0), HeatingLoad(0.0), HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), FuelUseRate(0.0), FuelEnergy(0.0),
-              CoolFuelUseRate(0.0), CoolFuelEnergy(0.0), HeatFuelUseRate(0.0), HeatFuelEnergy(0.0), ElectricPower(0.0), ElectricEnergy(0.0),
-              CoolElectricPower(0.0), CoolElectricEnergy(0.0), HeatElectricPower(0.0), HeatElectricEnergy(0.0), ChillReturnTemp(0.0),
-              ChillSupplyTemp(0.0), ChillWaterFlowRate(0.0), CondReturnTemp(0.0), CondSupplyTemp(0.0), CondWaterFlowRate(0.0),
-              HotWaterReturnTemp(0.0), HotWaterSupplyTemp(0.0), HotWaterFlowRate(0.0), CoolPartLoadRatio(0.0), HeatPartLoadRatio(0.0),
-              CoolingCapacity(0.0), HeatingCapacity(0.0), FractionOfPeriodRunning(0.0), FuelCOP(0.0)
+              HWBranchNum(0), HWCompNum(0), envrnFlag(true), oldCondSupplyTemp(0.0), CoolingLoad(0.0), CoolingEnergy(0.0), HeatingLoad(0.0),
+              HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), FuelUseRate(0.0), FuelEnergy(0.0), CoolFuelUseRate(0.0), CoolFuelEnergy(0.0),
+              HeatFuelUseRate(0.0), HeatFuelEnergy(0.0), ElectricPower(0.0), ElectricEnergy(0.0), CoolElectricPower(0.0), CoolElectricEnergy(0.0),
+              HeatElectricPower(0.0), HeatElectricEnergy(0.0), ChillReturnTemp(0.0), ChillSupplyTemp(0.0), ChillWaterFlowRate(0.0),
+              CondReturnTemp(0.0), CondSupplyTemp(0.0), CondWaterFlowRate(0.0), HotWaterReturnTemp(0.0), HotWaterSupplyTemp(0.0),
+              HotWaterFlowRate(0.0), CoolPartLoadRatio(0.0), HeatPartLoadRatio(0.0), CoolingCapacity(0.0), HeatingCapacity(0.0),
+              FractionOfPeriodRunning(0.0), FuelCOP(0.0)
         {
         }
 
@@ -219,6 +217,8 @@ namespace ChillerGasAbsorption {
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
 
         void initialize(EnergyPlusData &state);
 
