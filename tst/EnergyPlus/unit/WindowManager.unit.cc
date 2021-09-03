@@ -548,10 +548,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 25.0;
-    state->dataHeatBalFanSys->QHTRadSysSurf.allocate(3);
-    state->dataHeatBalFanSys->QHWBaseboardSurf.allocate(3);
-    state->dataHeatBalFanSys->QSteamBaseboardSurf.allocate(3);
-    state->dataHeatBalFanSys->QElecBaseboardSurf.allocate(3);
+    state->dataHeatBalSurf->SurfQdotRadHVACInPerArea.allocate(3);
     state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
     state->dataHeatBal->SurfQRadThermInAbs.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
@@ -593,10 +590,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
     state->dataHeatBal->SurfQRadThermInAbs = 0.0;
 
-    state->dataHeatBalFanSys->QHTRadSysSurf = 0.0;
-    state->dataHeatBalFanSys->QHWBaseboardSurf = 0.0;
-    state->dataHeatBalFanSys->QSteamBaseboardSurf = 0.0;
-    state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
+    state->dataHeatBalSurf->SurfQdotRadHVACInPerArea = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->EnclSolQSWRad = 0.0;
 
@@ -2813,10 +2807,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 25.0;
-    state->dataHeatBalFanSys->QHTRadSysSurf.allocate(3);
-    state->dataHeatBalFanSys->QHWBaseboardSurf.allocate(3);
-    state->dataHeatBalFanSys->QSteamBaseboardSurf.allocate(3);
-    state->dataHeatBalFanSys->QElecBaseboardSurf.allocate(3);
+    state->dataHeatBalSurf->SurfQdotRadHVACInPerArea.allocate(3);
     state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
     state->dataHeatBal->SurfQRadThermInAbs.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
@@ -2857,10 +2848,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
     state->dataHeatBal->SurfQRadThermInAbs = 0.0;
 
-    state->dataHeatBalFanSys->QHTRadSysSurf = 0.0;
-    state->dataHeatBalFanSys->QHWBaseboardSurf = 0.0;
-    state->dataHeatBalFanSys->QSteamBaseboardSurf = 0.0;
-    state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
+    state->dataHeatBalSurf->SurfQdotRadHVACInPerArea = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->EnclSolQSWRad = 0.0;
 
