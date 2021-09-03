@@ -5631,13 +5631,7 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
     // This subroutine puts the reporting part of the HBSurface Module in one area.
 
     using SolarShading::ReportSurfaceShading;
-    auto &Surface(state.dataSurface->Surface);
     state.dataHeatBalSurf->SumSurfaceHeatEmission = 0.0;
-    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
-            state.dataHeatBalSurf->SumSurfaceHeatEmission += state.dataHeatBalSurf->QHeatEmiReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-        }
-    }
     ReportSurfaceShading(state);
 
     // Set derived surface output variables and other record keeping - after iterations are complete - all HT surfaces
