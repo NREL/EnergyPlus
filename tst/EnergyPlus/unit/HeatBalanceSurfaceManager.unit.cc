@@ -3153,4 +3153,398 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     InitIntSolarDistribution(*state);
     EXPECT_NEAR(1.666667, state->dataHeatBal->SurfIntBmIncInsSurfIntensRep(1), 0.00001);
 }
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWindow)
+{
+
+    std::string const idf_objects1 = R"IDF(
+    Building,
+        Building,                !- Name
+        0,                       !- North Axis {deg}
+        Suburbs,                 !- Terrain
+        0.04,                    !- Loads Convergence Tolerance Value {W}
+        0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
+        FullExterior,            !- Solar Distribution
+        25,                      !- Maximum Number of Warmup Days
+        6;                       !- Minimum Number of Warmup Days
+
+    Timestep,6;
+
+    SimulationControl,
+        No,                      !- Do Zone Sizing Calculation
+        No,                      !- Do System Sizing Calculation
+        No,                      !- Do Plant Sizing Calculation
+        No,                     !- Run Simulation for Sizing Periods
+        YES;                     !- Run Simulation for Weather File Run Periods
+
+    RunPeriod,
+        TESTSim,                 !- Name
+        1,                       !- Begin Month
+        1,                       !- Begin Day of Month
+        ,                        !- Begin Year
+        12,                      !- End Month
+        31,                      !- End Day of Month
+        ,                        !- End Year
+        Sunday,                  !- Day of Week for Start Day
+        No,                      !- Use Weather File Holidays and Special Days
+        No,                      !- Use Weather File Daylight Saving Period
+        No,                      !- Apply Weekend Holiday Rule
+        Yes,                     !- Use Weather File Rain Indicators
+        Yes,                     !- Use Weather File Snow Indicators
+        No;                      !- Treat Weather as Actual
+
+    Site:GroundTemperature:BuildingSurface,
+        18,                      !- January Ground Temperature {C}
+        18,                      !- February Ground Temperature {C}
+        18,                      !- March Ground Temperature {C}
+        18,                      !- April Ground Temperature {C}
+        18,                      !- May Ground Temperature {C}
+        18,                      !- June Ground Temperature {C}
+        18,                      !- July Ground Temperature {C}
+        18,                      !- August Ground Temperature {C}
+        18,                      !- September Ground Temperature {C}
+        18,                      !- October Ground Temperature {C}
+        18,                      !- November Ground Temperature {C}
+        18;                      !- December Ground Temperature {C}
+
+    ! Materials
+    Material,
+        defaultMat_0.25_defaultConstruction ,  !- Name
+        Rough,                   !- Roughness
+        0.25,                    !- Thickness {m}
+        2.3,                     !- Conductivity {W/m-K}
+        2400,                    !- Density {kg/m3}
+        840,                     !- Specific Heat {J/kg-K}
+        0.9,                     !- Thermal Absorptance
+        0.7,                     !- Solar Absorptance
+        0.7;                     !- Visible Absorptance
+
+    ! Materials
+    Material,
+        Mineral Wool_0.194_UVal_0.2_Mass ,  !- Name
+        Rough,                   !- Roughness
+        0.194,                   !- Thickness {m}
+        0.041,                   !- Conductivity {W/m-K}
+        155,                     !- Density {kg/m3}
+        1130,                    !- Specific Heat {J/kg-K}
+        0.9,                     !- Thermal Absorptance
+        0.7,                     !- Solar Absorptance
+        0.7;                     !- Visible Absorptance
+
+    Material,
+        General Concrete_0.2_UVal_0.2_Mass ,  !- Name
+        Rough,                   !- Roughness
+        0.2,                     !- Thickness {m}
+        2,                       !- Conductivity {W/m-K}
+        2400,                    !- Density {kg/m3}
+        950,                     !- Specific Heat {J/kg-K}
+        0.9,                     !- Thermal Absorptance
+        0.7,                     !- Solar Absorptance
+        0.7;                     !- Visible Absorptance
+
+    Construction,
+        defaultConstruction,     !- Name
+        defaultMat_0.25_defaultConstruction;  !- Outside Layer
+
+    Construction,
+        defaultConstruction_FLIPPED,  !- Name
+        defaultMat_0.25_defaultConstruction;  !- Outside Layer
+
+    ! UVal_0.2_Mass Type: Facade
+    Construction,
+        UVal_0.2_Mass,           !- Name
+        Mineral Wool_0.194_UVal_0.2_Mass,  !- Outside Layer
+        General Concrete_0.2_UVal_0.2_Mass;  !- Layer 2
+
+    Construction,
+        UVal_0.2_Mass_FLIPPED,   !- Name
+        General Concrete_0.2_UVal_0.2_Mass,  !- Outside Layer
+        Mineral Wool_0.194_UVal_0.2_Mass;  !- Layer 2
+
+    Zone,
+        Zone_0,                  !- Name
+        0,                       !- Direction of Relative North {deg}
+        0,                       !- X Origin {m}
+        0,                       !- Y Origin {m}
+        0,                       !- Z Origin {m}
+        1,                       !- Type
+        1.0,                     !- Multiplier
+        ,                        !- Ceiling Height {m}
+        8197.0573178193,         !- Volume {m3}
+        631.643058536491,        !- Floor Area {m2}
+        TARP,                    !- Zone Inside Convection Algorithm
+        DOE-2;                   !- Zone Outside Convection Algorithm
+
+    GlobalGeometryRules,
+        LowerLeftCorner,         !- Starting Vertex Position
+        CounterClockWise,        !- Vertex Entry Direction
+        Relative;                !- Coordinate System
+
+    BuildingSurface:Detailed,
+        Zone_0:f0,               !- Name
+        Wall,                    !- Surface Type
+        UVal_0.2_Mass,           !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Outdoors,                !- Outside Boundary Condition
+        ,                        !- Outside Boundary Condition Object
+        SunExposed,              !- Sun Exposure
+        WindExposed,             !- Wind Exposure
+        Autocalculate,           !- View Factor to Ground
+        4,                       !- Number of Vertices
+        -2.6475,                 !- Vertex 1 X-coordinate {m}
+        16.8426,                 !- Vertex 1 Y-coordinate {m}
+        0.0000,                  !- Vertex 1 Z-coordinate {m}
+        24.7463,                 !- Vertex 2 X-coordinate {m}
+        16.8426,                 !- Vertex 2 Y-coordinate {m}
+        0.0000,                  !- Vertex 2 Z-coordinate {m}
+        24.7463,                 !- Vertex 3 X-coordinate {m}
+        16.8426,                 !- Vertex 3 Y-coordinate {m}
+        12.9774,                 !- Vertex 3 Z-coordinate {m}
+        -2.6475,                 !- Vertex 4 X-coordinate {m}
+        16.8426,                 !- Vertex 4 Y-coordinate {m}
+        12.9774;                 !- Vertex 4 Z-coordinate {m}
+
+    ! FACE NORMAL  1 3.46944695195361E-17 0
+    BuildingSurface:Detailed,
+        Zone_0:f1,               !- Name
+        Wall,                    !- Surface Type
+        UVal_0.2_Mass,           !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Outdoors,                !- Outside Boundary Condition
+        ,                        !- Outside Boundary Condition Object
+        SunExposed,              !- Sun Exposure
+        WindExposed,             !- Wind Exposure
+        Autocalculate,           !- View Factor to Ground
+        4,                       !- Number of Vertices
+        24.7463,                 !- Vertex 1 X-coordinate {m}
+        16.8426,                 !- Vertex 1 Y-coordinate {m}
+        0.0000,                  !- Vertex 1 Z-coordinate {m}
+        24.7463,                 !- Vertex 2 X-coordinate {m}
+        39.9005,                 !- Vertex 2 Y-coordinate {m}
+        0.0000,                  !- Vertex 2 Z-coordinate {m}
+        24.7463,                 !- Vertex 3 X-coordinate {m}
+        39.9005,                 !- Vertex 3 Y-coordinate {m}
+        12.9774,                 !- Vertex 3 Z-coordinate {m}
+        24.7463,                 !- Vertex 4 X-coordinate {m}
+        16.8426,                 !- Vertex 4 Y-coordinate {m}
+        12.9774;                 !- Vertex 4 Z-coordinate {m}
+
+    ! FACE NORMAL  -4.16333634234434E-17 1 0
+    BuildingSurface:Detailed,
+        Zone_0:f2,               !- Name
+        Wall,                    !- Surface Type
+        defaultConstruction,     !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Surface,                 !- Outside Boundary Condition
+        Zone_0:f2,               !- Outside Boundary Condition Object
+        NoSun,                   !- Sun Exposure
+        NoWind,                  !- Wind Exposure
+        Autocalculate,           !- View Factor to Ground
+        4,                       !- Number of Vertices
+        24.7463,                 !- Vertex 1 X-coordinate {m}
+        39.9005,                 !- Vertex 1 Y-coordinate {m}
+        0.0000,                  !- Vertex 1 Z-coordinate {m}
+        -2.6475,                 !- Vertex 2 X-coordinate {m}
+        39.9005,                 !- Vertex 2 Y-coordinate {m}
+        0.0000,                  !- Vertex 2 Z-coordinate {m}
+        -2.6475,                 !- Vertex 3 X-coordinate {m}
+        39.9005,                 !- Vertex 3 Y-coordinate {m}
+        12.9774,                 !- Vertex 3 Z-coordinate {m}
+        24.7463,                 !- Vertex 4 X-coordinate {m}
+        39.9005,                 !- Vertex 4 Y-coordinate {m}
+        12.9774;                 !- Vertex 4 Z-coordinate {m}
+
+    ! FACE NORMAL  -1 6.07153216591882E-18 0
+    BuildingSurface:Detailed,
+        Zone_0:f3,               !- Name
+        Wall,                    !- Surface Type
+        UVal_0.2_Mass,           !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Outdoors,                !- Outside Boundary Condition
+        ,                        !- Outside Boundary Condition Object
+        SunExposed,              !- Sun Exposure
+        WindExposed,             !- Wind Exposure
+        Autocalculate,           !- View Factor to Ground
+        4,                       !- Number of Vertices
+        -2.6475,                 !- Vertex 1 X-coordinate {m}
+        39.9005,                 !- Vertex 1 Y-coordinate {m}
+        0.0000,                  !- Vertex 1 Z-coordinate {m}
+        -2.6475,                 !- Vertex 2 X-coordinate {m}
+        16.8426,                 !- Vertex 2 Y-coordinate {m}
+        0.0000,                  !- Vertex 2 Z-coordinate {m}
+        -2.6475,                 !- Vertex 3 X-coordinate {m}
+        16.8426,                 !- Vertex 3 Y-coordinate {m}
+        12.9774,                 !- Vertex 3 Z-coordinate {m}
+        -2.6475,                 !- Vertex 4 X-coordinate {m}
+        39.9005,                 !- Vertex 4 Y-coordinate {m}
+        12.9774;                 !- Vertex 4 Z-coordinate {m}
+
+    ! FACE NORMAL  0 0 -1
+    BuildingSurface:Detailed,
+        Zone_0:f4,               !- Name
+        Floor,                   !- Surface Type
+        defaultConstruction,     !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Surface,                 !- Outside Boundary Condition
+        Zone_0:f4,               !- Outside Boundary Condition Object
+        NoSun,                   !- Sun Exposure
+        NoWind,                  !- Wind Exposure
+        Autocalculate,           !- View Factor to Ground
+        4,                       !- Number of Vertices
+        -2.6475,                 !- Vertex 1 X-coordinate {m}
+        39.9005,                 !- Vertex 1 Y-coordinate {m}
+        0.0000,                  !- Vertex 1 Z-coordinate {m}
+        24.7463,                 !- Vertex 2 X-coordinate {m}
+        39.9005,                 !- Vertex 2 Y-coordinate {m}
+        0.0000,                  !- Vertex 2 Z-coordinate {m}
+        24.7463,                 !- Vertex 3 X-coordinate {m}
+        30.1033,                 !- Vertex 3 Y-coordinate {m}
+        0.0000,                  !- Vertex 3 Z-coordinate {m}
+        -2.6475,                 !- Vertex 4 X-coordinate {m}
+        30.1033,                 !- Vertex 4 Y-coordinate {m}
+        0.0000;                  !- Vertex 4 Z-coordinate {m}
+
+    ! FACE NORMAL  0 0 1
+    BuildingSurface:Detailed,
+        Zone_0:f5,               !- Name
+        Roof,                    !- Surface Type
+        UVal_0.2_Mass,           !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Outdoors,                !- Outside Boundary Condition
+        ,                        !- Outside Boundary Condition Object
+        SunExposed,              !- Sun Exposure
+        WindExposed,             !- Wind Exposure
+        0,                       !- View Factor to Ground
+        4,                       !- Number of Vertices
+        24.7463,                 !- Vertex 1 X-coordinate {m}
+        16.8426,                 !- Vertex 1 Y-coordinate {m}
+        12.9774,                 !- Vertex 1 Z-coordinate {m}
+        24.7463,                 !- Vertex 2 X-coordinate {m}
+        39.9005,                 !- Vertex 2 Y-coordinate {m}
+        12.9774,                 !- Vertex 2 Z-coordinate {m}
+        -2.6475,                 !- Vertex 3 X-coordinate {m}
+        39.9005,                 !- Vertex 3 Y-coordinate {m}
+        12.9774,                 !- Vertex 3 Z-coordinate {m}
+        -2.6475,                 !- Vertex 4 X-coordinate {m}
+        16.8426,                 !- Vertex 4 Y-coordinate {m}
+        12.9774;                 !- Vertex 4 Z-coordinate {m}
+
+    ! FACE NORMAL  0 0 -1
+    BuildingSurface:Detailed,
+        Zone_0:f6,               !- Name
+        Floor,                   !- Surface Type
+        defaultConstruction,     !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Surface,                 !- Outside Boundary Condition
+        Zone_0:f6,               !- Outside Boundary Condition Object
+        NoSun,                   !- Sun Exposure
+        NoWind,                  !- Wind Exposure
+        Autocalculate,           !- View Factor to Ground
+        4,                       !- Number of Vertices
+        24.7463,                 !- Vertex 1 X-coordinate {m}
+        30.1033,                 !- Vertex 1 Y-coordinate {m}
+        0.0000,                  !- Vertex 1 Z-coordinate {m}
+        24.7463,                 !- Vertex 2 X-coordinate {m}
+        16.8426,                 !- Vertex 2 Y-coordinate {m}
+        0.0000,                  !- Vertex 2 Z-coordinate {m}
+        -2.6475,                 !- Vertex 3 X-coordinate {m}
+        16.8426,                 !- Vertex 3 Y-coordinate {m}
+        0.0000,                  !- Vertex 3 Z-coordinate {m}
+        -2.6475,                 !- Vertex 4 X-coordinate {m}
+        30.1033,                 !- Vertex 4 Y-coordinate {m}
+        0.0000;                  !- Vertex 4 Z-coordinate {m}
+    )IDF";
+
+    std::string const idf_objects2 = R"IDF(
+    Daylighting:Controls,
+        Zone_0_DaylCtrl,         !- Name
+        Zone_0,                  !- Zone Name
+        SplitFlux,               !- Daylighting Method
+        lightsOffice,            !- Availability Schedule Name
+        Continuous,              !- Lighting Control Type
+        0.1,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+        0.1,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+        3,                       !- Number of Stepped Control Steps
+        1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+        ,                        !- Glare Calculation Daylighting Reference Point Name
+        ,                        !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
+        22,                      !- Maximum Allowable Discomfort Glare Index
+        ,                        !- DElight Gridding Resolution {m2}
+        Zone_0_DaylCtrlRefPt1,   !- Daylighting Reference Point 1 Name
+        1,                       !- Fraction of Zone Controlled by Reference Point 1
+        500;                     !- Illuminance Setpoint at Reference Point 1 {lux}
+
+    Daylighting:ReferencePoint,
+        Zone_0_DaylCtrlRefPt1,   !- Name
+        Zone_0,                  !- Zone Name
+        11.0493979164892,        !- X-Coordinate of Reference Point {m}
+        28.3715348505495,        !- Y-Coordinate of Reference Point {m}
+        0.85;                    !- Z-Coordinate of Reference Point {m}
+    )IDF";
+
+    std::string const idf_objects = idf_objects1 + idf_objects2;
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
+
+    state->dataHeatBalSurf->SurfHConvInt.allocate(6);
+    state->dataMstBal->HConvInFD.allocate(6);
+    state->dataMstBal->RhoVaporAirIn.allocate(6);
+    state->dataMstBal->HMassConvInFD.allocate(6);
+
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->KickOffSimulation = true;
+    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
+    state->dataGlobal->TimeStepZoneSec = 900;
+    state->dataGlobal->NumOfTimeStepInHour = 6;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->TimeStep = 1;
+
+    AllocateSurfaceHeatBalArrays(*state);
+    createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
+    SolarShading::AllocateModuleArrays(*state);
+    SolarShading::DetermineShadowingCombinations(*state);
+
+    state->dataEnvrn->SunIsUp = true;
+    state->dataEnvrn->BeamSolarRad = 50;
+    state->dataEnvrn->GndSolarRad = 50;
+    state->dataEnvrn->DifSolarRad = 0;
+    state->dataSurface->Surface(1).SolarEnclIndex = 1;
+    state->dataSurface->Surface(2).SolarEnclIndex = 1;
+    state->dataSurface->Surface(3).SolarEnclIndex = 1;
+    state->dataSurface->Surface(4).SolarEnclIndex = 1;
+    state->dataSurface->Surface(5).SolarEnclIndex = 1;
+    state->dataSurface->Surface(6).SolarEnclIndex = 1;
+    state->dataSurface->Surface(7).SolarEnclIndex = 1;
+    state->dataDaylightingData->ZoneDaylight(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints = 1;
+    InitSurfaceHeatBalance(*state);
+    EXPECT_FALSE(has_err_output(true));
+}
 } // namespace EnergyPlus
