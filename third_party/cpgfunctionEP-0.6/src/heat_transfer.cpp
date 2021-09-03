@@ -91,50 +91,6 @@ double gt::heat_transfer::FLSApproximation::finite_line_source(
     return -h_ij;
 }
 
-
-
-namespace gt::heat_transfer {
-
-    double finite_line_source(const double time_, const double alpha,
-                              boreholes::Borehole &b1, boreholes::Borehole &b2,
-                              bool reaSource, bool imgSource) {
-
-        auto _Ils = [&b1, &b2, reaSource, imgSource](const double s) {
-            auto _erfint = [](const double x) {
-                return x * std::erf(x) - (1 / sqrt(M_PI)) * (1 - exp(-pow(x, 2)));
-            };
-            double r = b1.distance(b2);
-            double func = 0.;
-            // function to integrate
-            if (reaSource) {
-                // Real part of the FLS solution
-                func += _erfint(double(b2.D - b1.D + b2.H) * s);
-                func += -_erfint(double(b2.D - b1.D) * s);
-                func += _erfint(double(b2.D - b1.D - b1.H) * s);
-                func += -_erfint(double(b2.D - b1.D + b2.H - b1.H) * s);
-            } // fi reaSource
-            if (imgSource) {
-                // Image part of the FLS solution
-                func += _erfint(double(b2.D + b1.D + b2.H) * s);
-                func += -_erfint(double(b2.D + b1.D) * s);
-                func += _erfint(double(b2.D + b1.D + b1.H) * s);
-                func += -_erfint(double(b2.D + b1.D + b2.H + b1.H) * s);
-            } // fi imgSource
-            double a = 0.5 / (b2.H * pow(s, 2)) * func * exp(-pow(r, 2) * pow(s, 2));
-            return a;
-        }; // auto _Ils
-
-        // lower bound of integration
-        double a = double(1.) / sqrt(double(4.) * alpha * time_);
-        // Evaluate the integral using Gauss-Kronrod
-        double result;
-        // result = Kronrod_integrate(_Ils, a, INF)
-
-        return 0.;
-    } // void finite_line_source
-
-} // namespace gt::heat_transfer
-
 void gt::heat_transfer::thermal_response_factors(gt::segments::SegmentResponse &SegRes,
                                                  std::vector<double> &time, const double alpha,
                                                  bool use_similaries, bool disp, int n_Threads) {

@@ -102,10 +102,7 @@ namespace gt::heat_transfer {
 
 
     };
-
-    double finite_line_source(double time_, double alpha,
-                              boreholes::Borehole& b1, boreholes::Borehole& b2,
-                              bool reaSource=true, bool imgSource=true);
+    
     void thermal_response_factors(gt::segments::SegmentResponse &SegRes,
                                   std::vector<double>& time, double alpha,
                                   bool use_similarities, bool disp=false,
