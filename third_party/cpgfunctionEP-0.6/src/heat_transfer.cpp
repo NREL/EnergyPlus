@@ -194,7 +194,7 @@ void gt::heat_transfer::thermal_response_factors(gt::segments::SegmentResponse &
         // inputs
         bool reaSource;
         bool imgSource;
-# pragma omp parallel for num_threads(n_Threads)
+# pragma omp parallel for default(none) num_threads(n_Threads) shared(SimReal, _calculate_h, reaSource, imgSource)
         for (int s=0; s<SimReal.nSim; s++) {
             reaSource = true;
             imgSource = false;
@@ -203,7 +203,7 @@ void gt::heat_transfer::thermal_response_factors(gt::segments::SegmentResponse &
         if (splitRealAndImage) {
             reaSource = false;
             imgSource = true;
-# pragma omp parallel for num_threads(n_Threads)
+# pragma omp parallel for default(none) num_threads(n_Threads) shared(SimImage, _calculate_h, reaSource, imgSource)
             for (int s=0; s<SimImage.nSim; s++) {
                 _calculate_h(SimImage, s, reaSource, imgSource);
             }
@@ -225,23 +225,31 @@ void gt::heat_transfer::thermal_response_factors(gt::segments::SegmentResponse &
         bool sameSegment;
         bool otherSegment;
 
-        auto _fill_line = [&SegRes, &time](const int i, const int j,
+        gt::heat_transfer::FLSApproximation FLSApprox =
+                gt::heat_transfer::FLSApproximation(10);
+
+        auto _fill_line = [&SegRes, &time, &FLSApprox](const int i, const int j,
                                            const double alpha, bool sameSegment, bool otherSegment) {
             double h;
             int index;
             gt::boreholes::Borehole b1;
             gt::boreholes::Borehole b2;
+            std::vector<double> d_ = FLSApprox.construct_dm(b1, b2);
             b2 = SegRes.boreSegments[i];
             for (std::size_t k = 0; k < time.size(); k++) {
                 double t = time[k];
                 if (!otherSegment){
                     if (sameSegment) {
                         b1 = SegRes.boreSegments[i];
-                        h = finite_line_source(t, alpha, b2, b2);
+                        h = FLSApprox.finite_line_source(
+                                t,const_cast<double &>(alpha), b1,
+                                b2, d_, true, true);
                     }
                 } else if (otherSegment && !sameSegment) {
                     b1 = SegRes.boreSegments[j];
-                    h = finite_line_source(t, alpha, b1, b2);
+                    h = FLSApprox.finite_line_source(
+                            t,const_cast<double &>(alpha), b1,
+                            b2, d_, true, true);
                 } else {
                     throw std::invalid_argument( "sameSegment and otherSegment cannot both be true" );
                 } // end if
@@ -249,7 +257,7 @@ void gt::heat_transfer::thermal_response_factors(gt::segments::SegmentResponse &
                 SegRes.h_ij[index][k] = h;
             }; // end for
         }; // auto _fill_line
-#pragma omp parallel for num_threads(n_Threads)
+#pragma omp parallel for default(none) num_threads(n_Threads) shared(nSources, _fill_line, alpha) private(sameSegment, otherSegment)
         for (int i = 0; i < nSources; i++) {
             // Segment to same-segment thermal response factor
             // FLS solution for combined real and image sources
