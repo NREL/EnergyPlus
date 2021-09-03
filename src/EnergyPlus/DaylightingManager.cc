@@ -465,7 +465,8 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
         for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
             int enclNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex;
             if (state.dataDaylightingData->daylightControl(daylightCtrlNum).TotalDaylRefPoints > 0) {
-                if (state.dataDaylightingData->enclDaylight(enclNum).NumOfDayltgExtWins == 0) {
+                if (state.dataDaylightingData->enclDaylight(enclNum).NumOfDayltgExtWins == 0 &&
+                    state.dataDaylightingData->enclDaylight(enclNum).TotalExtWindows == 0) {
                     ShowWarningError(state,
                                      "Detailed daylighting will not be done for Daylighting:Controls=" +
                                          state.dataDaylightingData->daylightControl(daylightCtrlNum).Name);
