@@ -137,7 +137,7 @@ namespace gt::heat_transfer {
 
 void gt::heat_transfer::thermal_response_factors(gt::segments::SegmentResponse &SegRes,
                                                  std::vector<double> &time, const double alpha,
-                                                 bool use_similaries, bool disp, int n_Threads) {
+                                                 bool use_similarities, bool disp, int n_Threads) {
     // total number of line sources
     int nSources = SegRes.boreSegments.size();
     // number of time values
@@ -149,7 +149,7 @@ void gt::heat_transfer::thermal_response_factors(gt::segments::SegmentResponse &
     auto sum_to_n = [](const int n) {
         return n * (n + 1) / 2;
     };
-    if (use_similaries) {
+    if (use_similarities) {
         auto start = std::chrono::steady_clock::now();
         // Calculations with similarities
         if (disp) {

@@ -62,7 +62,8 @@ vector<double> gt::gfunction::uniform_borehole_wall_temperature(
                                                 time,
                                                 alpha,
                                                 use_similarities,
-                                                display);
+                                                display,
+                                                n_Threads);
     auto end = std::chrono::steady_clock::now();
 
     if (display) {
