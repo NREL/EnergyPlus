@@ -798,6 +798,8 @@ namespace WaterThermalTanks {
                                  Real64 &OptLoad) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        void setBackupElementCapacity(EnergyPlusData &state);
     };
 
     struct WaterHeaterDesuperheaterData
@@ -904,8 +906,6 @@ namespace WaterThermalTanks {
     bool getWaterTankStratifiedInput(EnergyPlusData &state);
 
     bool GetWaterThermalTankInput(EnergyPlusData &state);
-
-    void setBackupElementCapacity(Real64 &BackElCap, Real64 MaxTankCap);
 
     void CalcWaterThermalTankZoneGains(EnergyPlusData &state);
 

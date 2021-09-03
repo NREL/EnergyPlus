@@ -4228,7 +4228,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     if (!(UtilityRoutines::SameString(HPWH.TankName, Tank.Name) && UtilityRoutines::SameString(HPWH.TankType, Tank.Type))) continue;
 
                     // save backup element and on/off-cycle parasitic properties for use during standard rating procedure
-                    setBackupElementCapacity(HPWH.BackupElementCapacity, Tank.MaxCapacity);
+                    HPWH.BackupElementCapacity = Tank.MaxCapacity;
                     HPWH.BackupElementEfficiency = Tank.Efficiency;
                     HPWH.WHOnCycParaLoad = Tank.OnCycParaLoad;
                     HPWH.WHOffCycParaLoad = Tank.OffCycParaLoad;
@@ -4860,15 +4860,6 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
     } // get input flag
 
     return ErrorsFound;
-}
-
-void setBackupElementCapacity(Real64 &BackElCap, Real64 MaxTankCap)
-{
-    if (MaxTankCap != DataSizing::AutoSize) { // Defect 9001 fix to avoid BackupElementCapacity being set to DataSizing::AutoSize
-        BackElCap = MaxTankCap;
-    } else { // Only reset BackupElementCapacity if it's less than zero
-        if (BackElCap < 0.0) BackElCap = 0.0;
-    }
 }
 
 void WaterThermalTankData::setupOutputVars(EnergyPlusData &state)
@@ -11320,6 +11311,8 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
         }
     }
 
+    if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
+
     // if stratified, might set height.
     if ((this->VolumeWasAutoSized) && (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) &&
         state.dataPlnt->PlantFirstSizesOkayToFinalize) { // might set height
@@ -11451,6 +11444,8 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
             }
         }
     }
+
+    if (this - MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
 
     if ((this->VolumeWasAutoSized) && (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) &&
         state.dataPlnt->PlantFirstSizesOkayToFinalize) { // might set height
@@ -11977,6 +11972,8 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
             }
+
+            if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
         }
     }
 }
@@ -12609,6 +12606,22 @@ void WaterThermalTankData::oneTimeInit(EnergyPlusData &state)
     if (this->myOneTimeInitFlag) {
         this->setupOutputVars(state);
         this->myOneTimeInitFlag = false;
+    }
+}
+
+void WaterThermalTankData::setBackupElementCapacity(EnergyPlusData &state)
+{
+    // Fix for #9001: The BackupElementCapacity was not being reset from the autosize value (-99999) which resulted in
+    // negative electric consumption.  Using a test for any negative numbers here instead of just -99999 for safety.
+    // Only reset the backup element capacity if a problem has been occured.
+    if (this->HeatPumpNum > 0) {
+        if (state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).BackupElementCapacity < 0.0) {
+            state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).BackupElementCapacity = this->MaxCapacity;
+        }
+    } else if (this->DesuperheaterNum > 0) {
+        if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).BackupElementCapacity < 0.0) {
+            state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).BackupElementCapacity = this->MaxCapacity;
+        }
     }
 }
 
