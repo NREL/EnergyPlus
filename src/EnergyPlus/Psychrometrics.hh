@@ -1680,8 +1680,8 @@ namespace Psychrometrics {
         Real64 const Wmin = min(W1, W2);
         return PsyDeltaHSenFnTdb2Tdb1W(TDB2, TDB1, Wmin);
     }
-    Real64 CSplineint(int const n,      // sample data size
-                      const Real64 &x); // given value of x
+    Real64 CSplineint(int const n, // sample data size
+                      Real64 x);   // given value of x
 } // namespace Psychrometrics
 
 struct PsychrometricsData : BaseGlobalStruct
