@@ -11445,7 +11445,7 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
         }
     }
 
-    if (this - MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
+    if (this->MaxCapacityWasAutoSized) this->setBackupElementCapacity(state);
 
     if ((this->VolumeWasAutoSized) && (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) &&
         state.dataPlnt->PlantFirstSizesOkayToFinalize) { // might set height
