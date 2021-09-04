@@ -59,116 +59,28 @@
 
 using namespace EnergyPlus;
 
-TEST_F(EnergyPlusFixture, Cache_TestJSONToData)
-{
-    Cache cache;
-    cache.setValue(3.14159, "pi");
-    cache.setValue(42, "answer");
-    cache.setValue(true, "happy");
-    cache.setValue("energyplus", "name");
-
-    // test jsonToData
-//    nlohmann::json j;
-//    j["pi"] = 3.14159;
-//    j["answer"] = 42;
-//    j["happy"] = true;
-//    j["name"] = "energyplus";
-
-    // test double
-//    double d;
-//    Cache::jsonToData(*state, d, j, "pi");
-    EXPECT_EQ(cache.getValue<double>("pi"), 3.14159);
-
-    // test int
-//    int i;
-//    Cache::jsonToData(*state, i, j, "answer");
-    EXPECT_EQ(cache.getValue<int>("answer"), 42);
-
-    // test str
-//    std::string s;
-//    Cache::jsonToData(*state, s, j, "name");
-    EXPECT_EQ(cache.getValue<std::string>("name"), "energyplus");
-
-    // test bool
-//    bool b;
-//    Cache::jsonToData(*state, b, j, "happy");
-    EXPECT_EQ(cache.getValue<bool>("happy"), true);
-
-    // bad key
-//    EXPECT_ANY_THROW(Cache::jsonToData(*state, b, j, "bad_key"));
-    EXPECT_ANY_THROW(cache.getValue<bool>("bad_key"));
-}
-
 TEST_F(EnergyPlusFixture, Cache_TestJSONToArray)
 {
-    Cache cache;
-    cache.setValue({0, 1, 2, 3}, "array");
-//    nlohmann::json j;
-//    j["array"] = {0, 1, 2, 3};
+    nlohmann::json j;
+    j["array"] = {0, 1, 2, 3};
 
-//    Array1D<Real64> arr_double;
-//    Cache::jsonToArray(*state, arr_double, j, "array");
-    auto const arr_double = cache.getValue<Array1D<Real64>>("array");
+    auto const arr_double = j.at("array").get<ObjexxFCL::Array1D<Real64>>();
     EXPECT_EQ(arr_double(1), 0.0);
     EXPECT_EQ(arr_double(2), 1.0);
     EXPECT_EQ(arr_double(3), 2.0);
     EXPECT_EQ(arr_double(4), 3.0);
 
-//    Array1D<int> arr_int;
-//    Cache::jsonToArray(*state, arr_int, j, "array");
-    auto const arr_int = cache.getValue<Array1D<int>>("array");
+    auto const arr_int = j.at("array").get<ObjexxFCL::Array1D<int>>();
     EXPECT_EQ(arr_int(1), 0);
     EXPECT_EQ(arr_int(2), 1);
     EXPECT_EQ(arr_int(3), 2);
     EXPECT_EQ(arr_int(4), 3);
 
-    cache.setValue({false, true}, "bool");
-//    j["bool"] = {false, true};
-//    Array1D<bool> arr_bool;
-//    Cache::jsonToArray(*state, arr_bool, j, "bool");
-    auto const arr_bool = cache.getValue<Array1D<bool>>("bool");
+    j["bool"] = {false, true};
+    auto const arr_bool = j.at("bool").get<ObjexxFCL::Array1D<bool>>();
     EXPECT_EQ(arr_bool(1), false);
     EXPECT_EQ(arr_bool(2), true);
 
     // bad key
-//    EXPECT_ANY_THROW(Cache::jsonToArray(*state, arr_bool, j, "bad_key"));
-    EXPECT_ANY_THROW(cache.getValue<Array1D<bool>>("bad_key"));
+    EXPECT_ANY_THROW(j.at("bad_key").get<ObjexxFCL::Array1D<bool>>());
 }
-
-//TEST_F(EnergyPlusFixture, Cache_TestJSONToArray1)
-//{
-//    nlohmann::json j;
-//    j["array"] = {0, 1, 2, 3};
-//
-//    Array1D<Real64> arr_double;
-//    Cache::jsonToArray1(*state, arr_double, j, "array");
-//    EXPECT_EQ(arr_double(1), 0.0);
-//    EXPECT_EQ(arr_double(2), 1.0);
-//    EXPECT_EQ(arr_double(3), 2.0);
-//    EXPECT_EQ(arr_double(4), 3.0);
-//
-//    Array1D<int> arr_int;
-//    Cache::jsonToArray1(*state, arr_int, j, "array");
-//    EXPECT_EQ(arr_int(1), 0);
-//    EXPECT_EQ(arr_int(2), 1);
-//    EXPECT_EQ(arr_int(3), 2);
-//    EXPECT_EQ(arr_int(4), 3);
-//
-//    j["bool"] = {false, true};
-//    Array1D<bool> arr_bool;
-//    Cache::jsonToArray1(*state, arr_bool, j, "bool");
-//    EXPECT_EQ(arr_bool(1), false);
-//    EXPECT_EQ(arr_bool(2), true);
-//
-//    // bad key
-//    EXPECT_ANY_THROW(Cache::jsonToArray1(*state, arr_bool, j, "bad_key"));
-//}
-
-//TEST_F(EnergyPlusFixture, Cache_TestArrayToJSON)
-//{
-//    Array1D<double> arr = {0.0, 1.0, 2.0};
-//    nlohmann::json j;
-//    Cache::arrayToJSON(arr, j, "data");
-//    auto val = j.at("data");
-//    EXPECT_EQ(val[0], 0.0);
-//}

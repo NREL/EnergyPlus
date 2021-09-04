@@ -91,7 +91,7 @@ void Cache::loadCache(EnergyPlusData &state)
     if (!state.dataGlobal->useCache) {
         return;
     }
-    cache = FileSystem::readJSON(state.dataStrGlobals->outputCacheFileName);
+    state.dataCache->cache = FileSystem::readJSON(state.dataStrGlobals->outputCacheFileName);
     state.dataCache->ctfObjectsInCache = true;
 //
 //    if (state.dataGlobal->useCache && FileSystem::fileExists(state.dataStrGlobals->outputCacheFileName)) {
@@ -114,29 +114,8 @@ void Cache::loadCache(EnergyPlusData &state)
 
 void Cache::writeCache(EnergyPlusData &state)
 {
-    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(state.dataStrGlobals->outputCacheFileName, cache);
+    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(state.dataStrGlobals->outputCacheFileName, state.dataCache->cache);
 //    writeJSONfile(state.dataCache->cache, state.dataStrGlobals->outputCacheFileName);
-}
-
-//void Cache::findKey(nlohmann::json *input, std::string_view const key)
-//{
-//    auto const found = input->find(key.data());
-//    if (found == cache.end()) {
-//        throw FatalError(fmt::format("key: \"{}\" not found in cache", key));
-//    }
-//    input = &found.value();
-//}
-
-nlohmann::json *Cache::writeKey(nlohmann::json *input, std::string_view const key)
-{
-    auto const found = input->find(key.data());
-    if (found == cache.end()) {
-        return &input->emplace(key, nlohmann::json()).first.value();
-//        throw FatalError(fmt::format("key: \"{}\" not found in cache", key));
-    } else {
-        input = &found.value();
-        return input;
-    }
 }
 
 } // namespace EnergyPlus::Cache

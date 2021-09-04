@@ -60,26 +60,13 @@
 
 namespace ObjexxFCL {
     template <class T>
-    void to_json(nlohmann::json& j, const Array1<T>& p) {
-        j = nlohmann::json{p};
+    void to_json(nlohmann::json& j, const Array1D<T>& p) {
+        j = std::vector<T>(p.begin(), p.end());
     }
 
     template <class T>
-    void from_json(const nlohmann::json& j, Array1<T>& p) {
-        Array1D<T> ret;
-        std::transform(
-                j.begin(), j.end(), std::inserter(ret, std::end(ret)),
-                [](const nlohmann::json & i)
-                {
-                    // get<BasicJsonType>() returns *this, this won't call a from_json
-                    // method when value_type is BasicJsonType
-                    return i.get<T>();
-                });
-        p = std::move(ret);
-////
-////        j.at("name").get_to(p.name);
-////        j.at("address").get_to(p.address);
-////        j.at("age").get_to(p.age);
+    void from_json(const nlohmann::json& j, Array1D<T>& p) {
+        p = Array1D<T>(j.get<std::vector<T>>());
     }
 }
 
@@ -88,204 +75,33 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-class Cache {
-    using json = nlohmann::json;
-public:
-    static constexpr std::string_view cacheName = "eplusout.cache";
-    static constexpr std::string_view CTFKey = "CTFs";
+namespace Cache {
 
-    template <typename T>
-    void setValue(std::initializer_list<T> data, std::string_view const key)
-    {
-        cache.emplace(key, data);
-//        auto const found = cache.find(key);
-//        if (found == cache.end()) {
-//            throw FatalError(fmt::format("key: \"{}\" not found in cache", key));
-//        }
-//        out = found.value().get<T>();
-    }
-
-    template <typename T>
-    void setValue(T &&data, std::string_view const key)
-    {
-        cache.emplace(key, data);
-//        auto const found = cache.find(key);
-//        if (found == cache.end()) {
-//            throw FatalError(fmt::format("key: \"{}\" not found in cache", key));
-//        }
-//        out = found.value().get<T>();
-    }
-
-    template <typename T, typename... Args>
-    void setValue(T &&data, Args &&...keys)
-    {
-        static_assert(sizeof...(keys) > 0);
-//        std::array<std::string_view, sizeof...(keys)> all_keys = {keys...};
-//        auto found = cache.find(all_keys.front());
-//
-//        auto &write = [](json & input, std::string_view key, json const & value = nlohmann::json())
-//        {
-//            auto const found = input.find(key.data());
-//            if (found == input.end()) {
-//                return input.emplace(key, value).first.value();
-////        throw FatalError(fmt::format("key: \"{}\" not found in cache", key));
-//            } else {
-//                return found.value();
-//            }
-//        };
-//        for (auto key : all_keys) {
-//
-//        }
-
-        json &nestedKey = writeNestedKey(keys...);
-        nestedKey = data;
-    }
-
-    template <typename... Args>
-    auto &writeNestedKey(Args &&...keys)
-    {
-        auto &nestedKey = cache;
-
-        ([&nestedKey](std::string_view key)
-        {
-            auto const found = nestedKey.find(key.data());
-            if (found == nestedKey.end()) {
-                return nestedKey.emplace(key, nlohmann::json()).first.value();
-//        throw FatalError(fmt::format("key: \"{}\" not found in cache", key));
-            } else {
-                nestedKey = found.value();
-                return nestedKey;
-            }
-        } (keys), ...);
-        return nestedKey;
-    }
-
-    template <typename T>
-    T getValue(std::string_view const key)
-    {
-        auto const found = cache.find(key);
-        if (found == cache.end()) {
-            throw FatalError(fmt::format("key: \"{}\" not found in cache", key));
-        }
-        return found.value().get<T>();
-    }
-
-    template <typename T, typename... Args>
-    T getValue(Args &&...keys)
-    {
-        json const &nestedKey = findNestedKey(keys...);
-        return nestedKey.get<T>();
-    }
-
-    template <typename... Args>
-    auto &findNestedKey(Args &&...keys)
-    {
-        auto &nestedKey = cache;
-//        auto out = cache.begin();
-        ([&nestedKey](std::string_view key)
-        {
-            auto const found = nestedKey.find(key.data());
-            if (found == nestedKey.end()) {
-                throw FatalError(fmt::format("key: \"{}\" not found in cache", key));
-            }
-            nestedKey = found.value();
-        } (keys), ...);
-//        (findKey(out, keys), ...);
-        return nestedKey;
-    }
-
-//    template <typename T> void jsonToArray(EnergyPlusData &state, Array1D<T> &arr, json &j, std::string const &key)
-//    {
-//        // 0-based array to JSON list
-//
-//        try {
-//            int size = static_cast<int>(j.at(key).size());
-//            arr.dimension({0, size - 1});
-//            int idx = 0;
-//            for (auto &v : j.at(key)) {
-//                arr(idx) = v.get<T>();
-//                ++idx;
-//            }
-//        } catch (const json::out_of_range &e) {
-//            ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
-//        }
-//    }
-//
-//    template <typename T> void jsonToArray1(EnergyPlusData &state, Array1D<T> &arr, json &j, std::string const &key)
-//    {
-//        // 1-based array to JSON list
-//
-//        try {
-//            int size = static_cast<int>(j.at(key).size());
-//            arr.dimension(size);
-//            int idx = 1;
-//            for (auto &v : j.at(key)) {
-//                arr(idx) = v.get<T>();
-//                ++idx;
-//            }
-//        } catch (const json::out_of_range &e) {
-//            ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
-//        }
-//    }
-//
-//    template <typename T> void jsonToData(EnergyPlusData &state, T &data, json &j, std::string const &key)
-//    {
-//        try {
-//            data = j.at(key).get<T>();
-//        } catch (const json::out_of_range &e) {
-//            ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
-//        }
-//    }
-
-//    template <typename T> void arrayToJSON(Array1D<T> const &arr, json &j, std::string const &key)
-//    {
-//        std::vector<T> vect;
-//        for (auto &v : arr)
-//            vect.push_back(v);
-//        j[key] = vect;
-//    }
+    constexpr std::string_view cacheName = "eplusout.cache";
+    constexpr std::string_view CTFKey = "CTFs";
 
     void loadCache(EnergyPlusData &state);
 
     void writeCache(EnergyPlusData &state);
 
-    static inline unsigned long long prepFloatForCacheKey(double const x, unsigned int const precision_bits)
+    inline unsigned long long prepFloatForCacheKey(double const x, unsigned int const precision_bits)
     {
         static_assert(sizeof(double) == sizeof(unsigned long long));
         return *reinterpret_cast<unsigned long long const *>(&x) >> (64 - 12 - precision_bits);
     }
-
-    void clear_state()
-    {
-        cache.clear();
-    }
-
-private:
-    template<typename Iterator>
-    Iterator findKey(Iterator input, std::string_view key)
-    {
-        auto const found = input.find(key.data());
-        if (found == cache.end()) {
-            throw FatalError(fmt::format("key: \"{}\" not found in cache", key));
-        }
-        return found;
-    }
-    json * writeKey(json *input, std::string_view key);
-
-    json cache;
 
 };
 
 struct CacheData : BaseGlobalStruct
 {
 
-    Cache cache;
+    nlohmann::json cache;
     bool ctfObjectsInCache = false;
 //    std::unordered_map<std::string, nlohmann::json> unorderedCTFObjects;
 
     void clear_state() override
     {
-        this->cache.clear_state();
+        this->cache.clear();
         this->ctfObjectsInCache = false;
 //        this->unorderedCTFObjects.clear();
     }

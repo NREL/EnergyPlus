@@ -2093,60 +2093,41 @@ void ConstructionProps::setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state)
 void ConstructionProps::writeCacheData(EnergyPlusData &state)
 {
     // empty cache for this construction
-//    nlohmann::json cacheData;
-//    cacheData["ctf_cross"] = this->CTFCross;
+    nlohmann::json cacheData;
 
-    auto const key = this->getCacheKey(state);
     // construction name
-    state.dataCache->cache.setValue(this->Name, Cache::CTFKey, key, "name");
+    cacheData["name"] = this->Name;
 
     // CTF data
-    state.dataCache->cache.setValue(this->CTFCross, Cache::CTFKey, key, "ctf_cross");
-    state.dataCache->cache.setValue(this->CTFFlux, Cache::CTFKey, key, "ctf_flux");
-    state.dataCache->cache.setValue(this->CTFInside, Cache::CTFKey, key, "ctf_inside");
-    state.dataCache->cache.setValue(this->CTFOutside, Cache::CTFKey, key, "ctf_outside");
+    cacheData["ctf_cross"] = this->CTFCross;
+    cacheData["ctf_flux"] = this->CTFFlux;
+    cacheData["ctf_inside"] = this->CTFInside;
+    cacheData["ctf_outside"] = this->CTFOutside;
 
     // other necessary data
-    state.dataCache->cache.setValue(this->NumHistories, Cache::CTFKey, key, "num_histories");
-    state.dataCache->cache.setValue(this->NumCTFTerms, Cache::CTFKey, key, "num_ctf_terms");
-    state.dataCache->cache.setValue(this->CTFTimeStep, Cache::CTFKey, key, "ctf_timestep");
-    state.dataCache->cache.setValue(this->UValue, Cache::CTFKey, key, "u_value");
+    cacheData["num_histories"] = this->NumHistories;
+    cacheData["num_ctf_terms"] = this->NumCTFTerms;
+    cacheData["ctf_timestep"] = this->CTFTimeStep;
+    cacheData["u_value"] = this->UValue;
 
     // long verification key
-    state.dataCache->cache.setValue(this->getCacheKeyString(state), Cache::CTFKey, "full_data_key");
-
-//    // construction name
-//    cacheData["name"] = this->Name;
-//
-//    // CTF data
-//    Cache::arrayToJSON(this->CTFCross, cacheData, "ctf_cross");
-//    Cache::arrayToJSON(this->CTFFlux, cacheData, "ctf_flux");
-//    Cache::arrayToJSON(this->CTFInside, cacheData, "ctf_inside");
-//    Cache::arrayToJSON(this->CTFOutside, cacheData, "ctf_outside");
-//
-//    // other necessary data
-//    cacheData["num_histories"] = this->NumHistories;
-//    cacheData["num_ctf_terms"] = this->NumCTFTerms;
-//    cacheData["ctf_timestep"] = this->CTFTimeStep;
-//    cacheData["u_value"] = this->UValue;
-//
-//    // long verification key
-//    cacheData["full_data_key"] = this->getCacheKeyString(state);
+    cacheData["full_data_key"] = this->getCacheKeyString(state);
 
     // write to cache
-//    std::string key = this->getCacheKey(state);
-//    state.dataCache->cache[Cache::CTFKey][key] = cacheData;
+    auto const key = this->getCacheKey(state);
+    state.dataCache->cache[Cache::CTFKey.data()][key] = cacheData;
 }
 
 void ConstructionProps::loadFromCache(EnergyPlusData &state)
 {
-    if (state.dataCache->ctfObjectsInCache) {
+    if (!state.dataCache->ctfObjectsInCache) {
         this->CTFLoadedFromCache = false;
         return;
     }
     // load cached data
     auto const key = this->getCacheKey(state);
-    auto const a = state.dataCache->cache.getValue<std::string>(key, "full_data_key");
+    auto const & ctf_cache = state.dataCache->cache.at(key);
+    auto const & a = ctf_cache.at("full_data_key");
     auto const b = this->getCacheKeyString(state);
 
     // final confirmation that the object we found matches exactly with the current construction
@@ -2157,16 +2138,16 @@ void ConstructionProps::loadFromCache(EnergyPlusData &state)
     }
 
     // CTF arrays
-    CTFCross = state.dataCache->cache.getValue<ObjexxFCL::Array1D<Real64>>(key, "ctf_cross");
-    CTFFlux = state.dataCache->cache.getValue<ObjexxFCL::Array1D<Real64>>(key, "ctf_flux");
-    CTFInside = state.dataCache->cache.getValue<ObjexxFCL::Array1D<Real64>>(key, "ctf_inside");
-    CTFOutside = state.dataCache->cache.getValue<ObjexxFCL::Array1D<Real64>>(key, "ctf_outside");
+    CTFCross = ctf_cache.at("ctf_cross").get<ObjexxFCL::Array1D<Real64>>();
+    CTFFlux = ctf_cache.at("ctf_flux").get<ObjexxFCL::Array1D<Real64>>();
+    CTFInside = ctf_cache.at("ctf_inside").get<ObjexxFCL::Array1D<Real64>>();
+    CTFOutside = ctf_cache.at("ctf_outside").get<ObjexxFCL::Array1D<Real64>>();
 
     // other necessary data
-    NumHistories = state.dataCache->cache.getValue<int>(key, "num_histories");
-    NumCTFTerms = state.dataCache->cache.getValue<int>(key, "num_ctf_terms");
-    CTFTimeStep = state.dataCache->cache.getValue<Real64>(key, "ctf_timestep");
-    UValue = state.dataCache->cache.getValue<Real64>(key, "u_value");
+    NumHistories = ctf_cache.at("num_histories").get<int>();
+    NumCTFTerms = ctf_cache.at("num_ctf_terms").get<int>();
+    CTFTimeStep = ctf_cache.at("ctf_timestep").get<Real64>();
+    UValue = ctf_cache.at("u_value").get<Real64>();
 
     this->CTFLoadedFromCache = true;
 
