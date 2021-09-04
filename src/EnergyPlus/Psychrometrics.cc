@@ -123,7 +123,6 @@ namespace Psychrometrics {
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
         state.dataPsychCache->cached_Psat.fill(cached_psat_t());
-        state.dataPsychCache->cached_Psat.fill(cached_psat_t());
 #endif
 #ifdef EP_cache_PsyTsatFnPb
         state.dataPsychCache->cached_Tsat.fill(cached_tsat_h_pb());
