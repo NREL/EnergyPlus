@@ -2093,71 +2093,118 @@ void ConstructionProps::setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state)
 void ConstructionProps::writeCacheData(EnergyPlusData &state)
 {
     // empty cache for this construction
-    nlohmann::json cacheData;
+//    nlohmann::json cacheData;
+//    cacheData["ctf_cross"] = this->CTFCross;
 
+    auto const key = this->getCacheKey(state);
     // construction name
-    cacheData["name"] = this->Name;
+    state.dataCache->cache.setValue(this->Name, Cache::CTFKey, key, "name");
 
     // CTF data
-    Cache::arrayToJSON(this->CTFCross, cacheData, "ctf_cross");
-    Cache::arrayToJSON(this->CTFFlux, cacheData, "ctf_flux");
-    Cache::arrayToJSON(this->CTFInside, cacheData, "ctf_inside");
-    Cache::arrayToJSON(this->CTFOutside, cacheData, "ctf_outside");
+    state.dataCache->cache.setValue(this->CTFCross, Cache::CTFKey, key, "ctf_cross");
+    state.dataCache->cache.setValue(this->CTFFlux, Cache::CTFKey, key, "ctf_flux");
+    state.dataCache->cache.setValue(this->CTFInside, Cache::CTFKey, key, "ctf_inside");
+    state.dataCache->cache.setValue(this->CTFOutside, Cache::CTFKey, key, "ctf_outside");
 
     // other necessary data
-    cacheData["num_histories"] = this->NumHistories;
-    cacheData["num_ctf_terms"] = this->NumCTFTerms;
-    cacheData["ctf_timestep"] = this->CTFTimeStep;
-    cacheData["u_value"] = this->UValue;
+    state.dataCache->cache.setValue(this->NumHistories, Cache::CTFKey, key, "num_histories");
+    state.dataCache->cache.setValue(this->NumCTFTerms, Cache::CTFKey, key, "num_ctf_terms");
+    state.dataCache->cache.setValue(this->CTFTimeStep, Cache::CTFKey, key, "ctf_timestep");
+    state.dataCache->cache.setValue(this->UValue, Cache::CTFKey, key, "u_value");
 
     // long verification key
-    cacheData["full_data_key"] = this->getCacheKeyString(state);
+    state.dataCache->cache.setValue(this->getCacheKeyString(state), Cache::CTFKey, "full_data_key");
+
+//    // construction name
+//    cacheData["name"] = this->Name;
+//
+//    // CTF data
+//    Cache::arrayToJSON(this->CTFCross, cacheData, "ctf_cross");
+//    Cache::arrayToJSON(this->CTFFlux, cacheData, "ctf_flux");
+//    Cache::arrayToJSON(this->CTFInside, cacheData, "ctf_inside");
+//    Cache::arrayToJSON(this->CTFOutside, cacheData, "ctf_outside");
+//
+//    // other necessary data
+//    cacheData["num_histories"] = this->NumHistories;
+//    cacheData["num_ctf_terms"] = this->NumCTFTerms;
+//    cacheData["ctf_timestep"] = this->CTFTimeStep;
+//    cacheData["u_value"] = this->UValue;
+//
+//    // long verification key
+//    cacheData["full_data_key"] = this->getCacheKeyString(state);
 
     // write to cache
-    std::string key = this->getCacheKey(state);
-    state.dataCache->cache[Cache::CTFKey][key] = cacheData;
+//    std::string key = this->getCacheKey(state);
+//    state.dataCache->cache[Cache::CTFKey][key] = cacheData;
 }
 
 void ConstructionProps::loadFromCache(EnergyPlusData &state)
 {
-    try {
-        // load cached data
-        std::string key = this->getCacheKey(state);
-
-        // get the cached data if it exists. if it doesn't nlohmann::json throws out_of_range
-        nlohmann::json thisConstrData = state.dataCache->unorderedCTFObjects.at(key);
-
-        // nlohmann::json does some weird things when directly accessing strings
-        // explicitly setting these as string objects here so we can do a proper comparison
-        nlohmann::json a = thisConstrData.at("full_data_key");
-        std::string b = this->getCacheKeyString(state);
-
-        // final confirmation that the object we found matches exactly with the current construction
-        if (a != b) {
-            // show warning message here?
-            this->CTFLoadedFromCache = false;
-            return;
-        }
-
-        // we can load the data if if we've made it this far
-
-        // CTF arrays
-        Cache::jsonToArray(state, this->CTFCross, thisConstrData, "ctf_cross");
-        Cache::jsonToArray1(state, this->CTFFlux, thisConstrData, "ctf_flux");
-        Cache::jsonToArray(state, this->CTFInside, thisConstrData, "ctf_inside");
-        Cache::jsonToArray(state, this->CTFOutside, thisConstrData, "ctf_outside");
-
-        // other necessary data
-        Cache::jsonToData(state, this->NumHistories, thisConstrData, "num_histories");
-        Cache::jsonToData(state, this->NumCTFTerms, thisConstrData, "num_ctf_terms");
-        Cache::jsonToData(state, this->CTFTimeStep, thisConstrData, "ctf_timestep");
-        Cache::jsonToData(state, this->UValue, thisConstrData, "u_value");
-
-        this->CTFLoadedFromCache = true;
-    } catch (const nlohmann::json::out_of_range &e) {
-        // should already be defaulted to false, but this makes sure
+    if (state.dataCache->ctfObjectsInCache) {
         this->CTFLoadedFromCache = false;
+        return;
     }
+    // load cached data
+    auto const key = this->getCacheKey(state);
+    auto const a = state.dataCache->cache.getValue<std::string>(key, "full_data_key");
+    auto const b = this->getCacheKeyString(state);
+
+    // final confirmation that the object we found matches exactly with the current construction
+    if (a != b) {
+        // show warning message here?
+        this->CTFLoadedFromCache = false;
+        return;
+    }
+
+    // CTF arrays
+    CTFCross = state.dataCache->cache.getValue<ObjexxFCL::Array1D<Real64>>(key, "ctf_cross");
+    CTFFlux = state.dataCache->cache.getValue<ObjexxFCL::Array1D<Real64>>(key, "ctf_flux");
+    CTFInside = state.dataCache->cache.getValue<ObjexxFCL::Array1D<Real64>>(key, "ctf_inside");
+    CTFOutside = state.dataCache->cache.getValue<ObjexxFCL::Array1D<Real64>>(key, "ctf_outside");
+
+    // other necessary data
+    NumHistories = state.dataCache->cache.getValue<int>(key, "num_histories");
+    NumCTFTerms = state.dataCache->cache.getValue<int>(key, "num_ctf_terms");
+    CTFTimeStep = state.dataCache->cache.getValue<Real64>(key, "ctf_timestep");
+    UValue = state.dataCache->cache.getValue<Real64>(key, "u_value");
+
+    this->CTFLoadedFromCache = true;
+
+//    try {
+//        // get the cached data if it exists. if it doesn't nlohmann::json throws out_of_range
+//        nlohmann::json thisConstrData = state.dataCache->unorderedCTFObjects.at(key);
+//
+//        // nlohmann::json does some weird things when directly accessing strings
+//        // explicitly setting these as string objects here so we can do a proper comparison
+//        nlohmann::json a = thisConstrData.at("full_data_key");
+//        std::string b = this->getCacheKeyString(state);
+//
+//        // final confirmation that the object we found matches exactly with the current construction
+//        if (a != b) {
+//            // show warning message here?
+//            this->CTFLoadedFromCache = false;
+//            return;
+//        }
+//
+//        // we can load the data if if we've made it this far
+//
+//        // CTF arrays
+//        Cache::jsonToArray(state, this->CTFCross, thisConstrData, "ctf_cross");
+//        Cache::jsonToArray1(state, this->CTFFlux, thisConstrData, "ctf_flux");
+//        Cache::jsonToArray(state, this->CTFInside, thisConstrData, "ctf_inside");
+//        Cache::jsonToArray(state, this->CTFOutside, thisConstrData, "ctf_outside");
+//
+//        // other necessary data
+//        Cache::jsonToData(state, this->NumHistories, thisConstrData, "num_histories");
+//        Cache::jsonToData(state, this->NumCTFTerms, thisConstrData, "num_ctf_terms");
+//        Cache::jsonToData(state, this->CTFTimeStep, thisConstrData, "ctf_timestep");
+//        Cache::jsonToData(state, this->UValue, thisConstrData, "u_value");
+//
+//        this->CTFLoadedFromCache = true;
+//    } catch (const nlohmann::json::out_of_range &e) {
+//        // should already be defaulted to false, but this makes sure
+//        this->CTFLoadedFromCache = false;
+//    }
 }
 
 std::string ConstructionProps::getCacheKey(EnergyPlusData &state)
@@ -2178,25 +2225,25 @@ std::string ConstructionProps::getCacheKey(EnergyPlusData &state)
         key ^= Cache::prepFloatForCacheKey(mat.Resistance, precision_bits) << Layer;
     }
 
-    return format("{}", key);
+    return fmt::format("{}", key);
 }
 
 std::string ConstructionProps::getCacheKeyString(EnergyPlusData &state)
 {
-    std::string key;
+    auto buffer = fmt::memory_buffer();
 
     // Data from material layers
     for (int Layer = 1; Layer <= this->TotLayers; ++Layer) {
         int CurrentLayer = this->LayerPoint(Layer);
         auto &mat = state.dataMaterial->Material(CurrentLayer);
-        key.append(format("{:.{}f},", mat.Thickness, 8));
-        key.append(format("{:.{}f},", mat.Conductivity, 8));
-        key.append(format("{:.{}f},", mat.Density, 8));
-        key.append(format("{:.{}f},", mat.SpecHeat, 8));
-        key.append(format("{:.{}f},", mat.Resistance, 8));
+        fmt::format_to(std::back_inserter(buffer), "{:.8f},", mat.Thickness);
+        fmt::format_to(std::back_inserter(buffer), "{:.8f},", mat.Conductivity);
+        fmt::format_to(std::back_inserter(buffer), "{:.8f},", mat.Density);
+        fmt::format_to(std::back_inserter(buffer), "{:.8f},", mat.SpecHeat);
+        fmt::format_to(std::back_inserter(buffer), "{:.8f},", mat.Resistance);
     }
 
-    return key;
+    return fmt::to_string(buffer);
 }
 
 } // namespace EnergyPlus::Construction

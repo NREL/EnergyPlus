@@ -232,7 +232,8 @@ namespace SimulationManager {
         state.dataResultsFramework->resultsFramework->setupOutputOptions(state);
 
         // Load cache file
-        Cache::loadCache(state);
+        state.dataCache->cache.loadCache(state);
+//        Cache::loadCache(state);
 
         state.files.debug.ensure_open(state, "OpenOutputFiles", state.files.outputControl.dbg);
 
@@ -2031,7 +2032,8 @@ namespace SimulationManager {
         state.files.shade.close();
 
         // Write cache file
-        Cache::writeCache(state);
+        state.dataCache->cache.writeCache(state);
+//        Cache::writeCache(state);
     }
 
     void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound)
