@@ -2132,7 +2132,7 @@ void ConstructionProps::loadFromCache(EnergyPlusData &state)
         this->CTFLoadedFromCache = false;
         return;
     }
-    auto const & ctf_cache_data = it.value();
+    auto const &ctf_cache_data = it.value();
 
     // CTF arrays
     CTFCross = ctf_cache_data.at("ctf_cross").get<ObjexxFCL::Array1D<Real64>>();

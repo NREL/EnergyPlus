@@ -53,20 +53,20 @@
 #include <EnergyPlus/FileSystem.hh>
 
 // Third Party Headers
-#include <nlohmann/json.hpp>
 #include <ObjexxFCL/Array1D.fwd.hh>
+#include <nlohmann/json.hpp>
 
 namespace ObjexxFCL {
-    template <class T>
-    void to_json(nlohmann::json& j, const Array1D<T>& p) {
-        j = std::vector<T>(p.begin(), p.end());
-    }
-
-    template <class T>
-    void from_json(const nlohmann::json& j, Array1D<T>& p) {
-        p = Array1D<T>(j.get<std::vector<T>>());
-    }
+template <class T> void to_json(nlohmann::json &j, const Array1D<T> &p)
+{
+    j = std::vector<T>(p.begin(), p.end());
 }
+
+template <class T> void from_json(const nlohmann::json &j, Array1D<T> &p)
+{
+    p = Array1D<T>(j.get<std::vector<T>>());
+}
+} // namespace ObjexxFCL
 
 namespace EnergyPlus {
 
@@ -88,13 +88,7 @@ namespace Cache {
 
     void writeCache(EnergyPlusData &state);
 
-    inline unsigned long long prepFloatForCacheKey(double const x, unsigned int const precision_bits)
-    {
-        static_assert(sizeof(double) == sizeof(unsigned long long));
-        return *reinterpret_cast<unsigned long long const *>(&x) >> (64 - 12 - precision_bits);
-    }
-
-};
+} // namespace Cache
 
 struct CacheData : BaseGlobalStruct
 {

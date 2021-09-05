@@ -47,6 +47,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Cache.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 
@@ -67,4 +68,4 @@ void Cache::writeCache(EnergyPlusData &state)
     FileSystem::writeFile<CacheData::cacheFileType>(state.dataStrGlobals->outputCacheFileName, state.dataCache->cache);
 }
 
-} // namespace EnergyPlus::Cache
+} // namespace EnergyPlus

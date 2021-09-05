@@ -10172,30 +10172,6 @@ namespace HeatBalanceManager {
             }
         }
 
-//        if (state.dataCache->ctfObjectsInCache) {
-//
-//            // cache exists, check each construction for cached CTF values
-//            for (auto &construction : state.dataConstruction->Construct) {
-//
-//                if (!construction.IsUsedCTF) continue;
-//
-//                // try loading from cache
-//                construction.loadFromCache(state);
-//
-//                // if they were not found, compute the CTF values and write to a file
-//                if (!construction.CTFLoadedFromCache) {
-//                    construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);
-//                }
-//            }
-//        } else {
-//
-//            // cache doesn't exist, so we must compute the CTFs and write them to the cache file
-//            for (auto &construction : state.dataConstruction->Construct) {
-//                if (!construction.IsUsedCTF) continue;
-//                construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);
-//            }
-//        }
-
         for (auto &construction : state.dataConstruction->Construct) {
             if (construction.NumHistories > 1) {
                 state.dataHeatBal->SimpleCTFOnly = false;

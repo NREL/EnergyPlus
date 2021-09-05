@@ -471,7 +471,8 @@ namespace CommandLineInterface {
         state.dataStrGlobals->outputShdFilePath = composePath(normalSuffix + ".shd");
         state.files.dfs.filePath = composePath(normalSuffix + ".dfs");
         state.dataStrGlobals->outputGLHEFilePath = composePath(normalSuffix + ".glhe");
-        state.dataStrGlobals->outputCacheFileName = composePath(fmt::format("{}_cache.{}", normalSuffix, FileSystem::FileTypesExt.at(std::underlying_type_t<FileSystem::FileTypes>(CacheData::cacheFileType))));
+        state.dataStrGlobals->outputCacheFileName = composePath(fmt::format(
+            "{}_cache.{}", normalSuffix, FileSystem::FileTypesExt.at(std::underlying_type_t<FileSystem::FileTypes>(CacheData::cacheFileType))));
         state.files.edd.filePath = composePath(normalSuffix + ".edd");
         state.dataStrGlobals->outputIperrFilePath = composePath(normalSuffix + ".iperr");
         state.files.sln.filePath = composePath(normalSuffix + ".sln");
