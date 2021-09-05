@@ -127,9 +127,5 @@ TEST_F(EnergyPlusFixture, Construction_getCacheKeys)
 
     EnergyPlus::HeatBalanceManager::InitConductionTransferFunctions(*state);
 
-    EXPECT_EQ(state->dataConstruction->Construct(1).getCacheKey(*state), "200446872");
-
-    std::string expectedFullKey = "0.02538984,0.69183090,1858.14200000,836.80000000,0.03669949,0.10149840,0.72642240,1922.21600000,836.80000000,0."
-                                  "13972366,0.01905000,0.72642240,1601.84600000,836.80000000,0.02622441,";
-    EXPECT_EQ(state->dataConstruction->Construct(1).getCacheKeyString(*state), expectedFullKey);
+    EXPECT_EQ(state->dataConstruction->Construct(1).getCacheKey(*state), "1418839503204676466");
 }

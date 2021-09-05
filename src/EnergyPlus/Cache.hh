@@ -51,12 +51,10 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/FileSystem.hh>
-//#include <EnergyPlus/IOFiles.hh>
-//#include <EnergyPlus/UtilityRoutines.hh>
 
-// JSON Header
+// Third Party Headers
 #include <nlohmann/json.hpp>
-//#include <ObjexxFCL/Array1D.fwd.hh>
+#include <ObjexxFCL/Array1D.fwd.hh>
 
 namespace ObjexxFCL {
     template <class T>
@@ -74,6 +72,12 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+
+constexpr std::size_t hash_combine(std::size_t current_hash, std::size_t new_hash)
+{
+    current_hash ^= new_hash + 0x9e3779b9 + (current_hash << 6) + (current_hash >> 2);
+    return current_hash;
+}
 
 namespace Cache {
 
@@ -94,16 +98,14 @@ namespace Cache {
 
 struct CacheData : BaseGlobalStruct
 {
-
+    static constexpr FileSystem::FileTypes cacheFileType = FileSystem::FileTypes::CBOR;
     nlohmann::json cache;
     bool ctfObjectsInCache = false;
-//    std::unordered_map<std::string, nlohmann::json> unorderedCTFObjects;
 
     void clear_state() override
     {
         this->cache.clear();
         this->ctfObjectsInCache = false;
-//        this->unorderedCTFObjects.clear();
     }
 };
 

@@ -45,6 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// C++ Headers
+#include <functional>
+
 // EnergyPlus Headers
 #include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Cache.hh>
@@ -2110,9 +2113,6 @@ void ConstructionProps::writeCacheData(EnergyPlusData &state)
     cacheData["ctf_timestep"] = this->CTFTimeStep;
     cacheData["u_value"] = this->UValue;
 
-    // long verification key
-    cacheData["full_data_key"] = this->getCacheKeyString(state);
-
     // write to cache
     auto const key = this->getCacheKey(state);
     state.dataCache->cache[Cache::CTFKey.data()][key] = cacheData;
@@ -2126,105 +2126,46 @@ void ConstructionProps::loadFromCache(EnergyPlusData &state)
     }
     // load cached data
     auto const key = this->getCacheKey(state);
-    auto const & ctf_cache = state.dataCache->cache.at(key);
-    auto const & a = ctf_cache.at("full_data_key");
-    auto const b = this->getCacheKeyString(state);
-
-    // final confirmation that the object we found matches exactly with the current construction
-    if (a != b) {
-        // show warning message here?
+    auto const &ctf_cache = state.dataCache->cache.at(Cache::CTFKey.data());
+    auto const it = ctf_cache.find(key);
+    if (it == ctf_cache.end()) {
         this->CTFLoadedFromCache = false;
         return;
     }
+    auto const & ctf_cache_data = it.value();
 
     // CTF arrays
-    CTFCross = ctf_cache.at("ctf_cross").get<ObjexxFCL::Array1D<Real64>>();
-    CTFFlux = ctf_cache.at("ctf_flux").get<ObjexxFCL::Array1D<Real64>>();
-    CTFInside = ctf_cache.at("ctf_inside").get<ObjexxFCL::Array1D<Real64>>();
-    CTFOutside = ctf_cache.at("ctf_outside").get<ObjexxFCL::Array1D<Real64>>();
+    CTFCross = ctf_cache_data.at("ctf_cross").get<ObjexxFCL::Array1D<Real64>>();
+    CTFFlux = ctf_cache_data.at("ctf_flux").get<ObjexxFCL::Array1D<Real64>>();
+    CTFInside = ctf_cache_data.at("ctf_inside").get<ObjexxFCL::Array1D<Real64>>();
+    CTFOutside = ctf_cache_data.at("ctf_outside").get<ObjexxFCL::Array1D<Real64>>();
 
     // other necessary data
-    NumHistories = ctf_cache.at("num_histories").get<int>();
-    NumCTFTerms = ctf_cache.at("num_ctf_terms").get<int>();
-    CTFTimeStep = ctf_cache.at("ctf_timestep").get<Real64>();
-    UValue = ctf_cache.at("u_value").get<Real64>();
+    NumHistories = ctf_cache_data.at("num_histories").get<int>();
+    NumCTFTerms = ctf_cache_data.at("num_ctf_terms").get<int>();
+    CTFTimeStep = ctf_cache_data.at("ctf_timestep").get<Real64>();
+    UValue = ctf_cache_data.at("u_value").get<Real64>();
 
     this->CTFLoadedFromCache = true;
-
-//    try {
-//        // get the cached data if it exists. if it doesn't nlohmann::json throws out_of_range
-//        nlohmann::json thisConstrData = state.dataCache->unorderedCTFObjects.at(key);
-//
-//        // nlohmann::json does some weird things when directly accessing strings
-//        // explicitly setting these as string objects here so we can do a proper comparison
-//        nlohmann::json a = thisConstrData.at("full_data_key");
-//        std::string b = this->getCacheKeyString(state);
-//
-//        // final confirmation that the object we found matches exactly with the current construction
-//        if (a != b) {
-//            // show warning message here?
-//            this->CTFLoadedFromCache = false;
-//            return;
-//        }
-//
-//        // we can load the data if if we've made it this far
-//
-//        // CTF arrays
-//        Cache::jsonToArray(state, this->CTFCross, thisConstrData, "ctf_cross");
-//        Cache::jsonToArray1(state, this->CTFFlux, thisConstrData, "ctf_flux");
-//        Cache::jsonToArray(state, this->CTFInside, thisConstrData, "ctf_inside");
-//        Cache::jsonToArray(state, this->CTFOutside, thisConstrData, "ctf_outside");
-//
-//        // other necessary data
-//        Cache::jsonToData(state, this->NumHistories, thisConstrData, "num_histories");
-//        Cache::jsonToData(state, this->NumCTFTerms, thisConstrData, "num_ctf_terms");
-//        Cache::jsonToData(state, this->CTFTimeStep, thisConstrData, "ctf_timestep");
-//        Cache::jsonToData(state, this->UValue, thisConstrData, "u_value");
-//
-//        this->CTFLoadedFromCache = true;
-//    } catch (const nlohmann::json::out_of_range &e) {
-//        // should already be defaulted to false, but this makes sure
-//        this->CTFLoadedFromCache = false;
-//    }
 }
 
 std::string ConstructionProps::getCacheKey(EnergyPlusData &state)
 {
-    unsigned long long key = 0;
-
-    constexpr int precision_bits(15);
+    std::size_t combined_hash = 0u;
 
     // data from material layers
     // adding the layer num to get a unique key for objects with reversed layers
     for (int Layer = 1; Layer <= this->TotLayers; ++Layer) {
         int CurrentLayer = this->LayerPoint(Layer);
         auto &mat = state.dataMaterial->Material(CurrentLayer);
-        key ^= Cache::prepFloatForCacheKey(mat.Thickness, precision_bits) << Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.Conductivity, precision_bits) << Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.Density, precision_bits) << Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.SpecHeat, precision_bits) << Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.Resistance, precision_bits) << Layer;
+        combined_hash = EnergyPlus::hash_combine(combined_hash, std::hash<Real64>{}(mat.Thickness));
+        combined_hash = EnergyPlus::hash_combine(combined_hash, std::hash<Real64>{}(mat.Conductivity));
+        combined_hash = EnergyPlus::hash_combine(combined_hash, std::hash<Real64>{}(mat.Density));
+        combined_hash = EnergyPlus::hash_combine(combined_hash, std::hash<Real64>{}(mat.SpecHeat));
+        combined_hash = EnergyPlus::hash_combine(combined_hash, std::hash<Real64>{}(mat.Resistance));
     }
 
-    return fmt::format("{}", key);
-}
-
-std::string ConstructionProps::getCacheKeyString(EnergyPlusData &state)
-{
-    auto buffer = fmt::memory_buffer();
-
-    // Data from material layers
-    for (int Layer = 1; Layer <= this->TotLayers; ++Layer) {
-        int CurrentLayer = this->LayerPoint(Layer);
-        auto &mat = state.dataMaterial->Material(CurrentLayer);
-        fmt::format_to(std::back_inserter(buffer), "{:.8f},", mat.Thickness);
-        fmt::format_to(std::back_inserter(buffer), "{:.8f},", mat.Conductivity);
-        fmt::format_to(std::back_inserter(buffer), "{:.8f},", mat.Density);
-        fmt::format_to(std::back_inserter(buffer), "{:.8f},", mat.SpecHeat);
-        fmt::format_to(std::back_inserter(buffer), "{:.8f},", mat.Resistance);
-    }
-
-    return fmt::to_string(buffer);
+    return fmt::format("{}", combined_hash);
 }
 
 } // namespace EnergyPlus::Construction

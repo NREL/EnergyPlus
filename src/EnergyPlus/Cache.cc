@@ -47,75 +47,24 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Cache.hh>
-//#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
-//#include <EnergyPlus/FileSystem.hh>
-//#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
-
-//void readJSONfile(EnergyPlusData &state, fs::path const &filePath, nlohmann::json &j)
-//{
-//    if (!FileSystem::fileExists(filePath)) {
-//        // if the file doesn't exist, there are no data to read
-//        return;
-//    } else {
-//        std::ifstream ifs(filePath);
-//
-//        // read json_in data
-//        try {
-//            j = nlohmann::json::from_cbor(ifs);
-//            ifs.close();
-//        } catch (...) {
-//            if (!j.empty()) {
-//                // file exists, is not empty, but failed for some other reason
-//                ShowWarningError(state, filePath / " contains invalid file format");
-//            }
-//            ifs.close();
-//            return;
-//        }
-//    }
-//}
-//
-//void writeJSONfile(nlohmann::json &j, fs::path const &filePath)
-//{
-//    std::ofstream ofs(filePath, std::ofstream::out | std::ofstream::binary);
-//    nlohmann::json::to_cbor(j, ofs);
-//    ofs.close();
-//}
 
 void Cache::loadCache(EnergyPlusData &state)
 {
     // load cache file if it exists
-    if (!state.dataGlobal->useCache) {
+    if (!state.dataGlobal->useCache || !FileSystem::fileExists(state.dataStrGlobals->outputCacheFileName)) {
         return;
     }
     state.dataCache->cache = FileSystem::readJSON(state.dataStrGlobals->outputCacheFileName);
     state.dataCache->ctfObjectsInCache = true;
-//
-//    if (state.dataGlobal->useCache && FileSystem::fileExists(state.dataStrGlobals->outputCacheFileName)) {
-//        Cache::readJSONfile(state, state.dataStrGlobals->outputCacheFileName, state.dataCache->cache);
-//
-//        // file exists but is empty, so don't try to read data
-//        if (state.dataCache->cache.empty()) return;
-//
-//        try {
-//            // load these up one time up front
-//            // nlohmann::json is loading this by default as an ordered set of data, but it needs to be unordered for the search later
-//            nlohmann::json allCTFs = state.dataCache->cache.at(Cache::CTFKey.data());
-//            allCTFs.get_to(state.dataCache->unorderedCTFObjects);
-//            state.dataCache->ctfObjectsInCache = true;
-//        } catch (nlohmann::json::out_of_range &e) {
-//            state.dataCache->ctfObjectsInCache = false;
-//        }
-//    }
 }
 
 void Cache::writeCache(EnergyPlusData &state)
 {
-    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(state.dataStrGlobals->outputCacheFileName, state.dataCache->cache);
-//    writeJSONfile(state.dataCache->cache, state.dataStrGlobals->outputCacheFileName);
+    FileSystem::writeFile<CacheData::cacheFileType>(state.dataStrGlobals->outputCacheFileName, state.dataCache->cache);
 }
 
 } // namespace EnergyPlus::Cache

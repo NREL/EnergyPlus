@@ -50,9 +50,6 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// JSON Header
-#include <nlohmann/json.hpp>
-
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Cache.hh>
