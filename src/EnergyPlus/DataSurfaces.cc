@@ -607,9 +607,11 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     if (extBoundCond > 0) {
         calcHashKey.ExtZone = state.dataSurface->Surface(extBoundCond).Zone;
         calcHashKey.ExtEnclIndex = state.dataSurface->Surface(extBoundCond).SolarEnclIndex;
+        calcHashKey.ExtCond = 1;
     } else {
         calcHashKey.ExtZone = 0;
         calcHashKey.ExtEnclIndex = 0;
+        calcHashKey.ExtCond = extBoundCond;
     }
 
     calcHashKey.ExtSolar = ExtSolar;

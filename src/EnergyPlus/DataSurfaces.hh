@@ -489,6 +489,7 @@ namespace DataSurfaces {
         int EnclIndex;           // Pointer to enclosure this surface belongs to
         int TAirRef;             // Flag for reference air temperature
         int ExtZone;             // For an "interzone" surface, this is the adjacent ZONE number (not adjacent SURFACE number).
+        int ExtCond;             // Exterior condition type. Same as ExtBoundCond for non-interzone surfaces. Value = 1 for interzone surfaces.
         int ExtEnclIndex;        // For an "interzone" surface, this is the adjacent ENCLOSURE number
         bool ExtSolar;           // True if the "outside" of the surface is exposed to solar
         bool ExtWind;            // True if the "outside" of the surface is exposed to wind
@@ -539,6 +540,7 @@ namespace DataSurfaces {
                     hash<int>()(EnclIndex),
                     hash<int>()(TAirRef),
                     hash<int>()(ExtZone),
+                    hash<int>()(ExtCond),
                     hash<int>()(ExtEnclIndex),
                     hash<bool>()(ExtSolar),
                     hash<bool>()(ExtWind),
@@ -578,9 +580,9 @@ namespace DataSurfaces {
         bool operator==(const SurfaceCalcHashKey &other) const
         {
             return (Construction == other.Construction && Azimuth == other.Azimuth && Tilt == other.Tilt && Height == other.Height &&
-                    Zone == other.Zone && EnclIndex == other.EnclIndex && ExtZone == other.ExtZone && ExtEnclIndex == other.ExtEnclIndex &&
-                    ExtSolar == other.ExtSolar && ExtWind == other.ExtWind && ViewFactorGround == other.ViewFactorGround &&
-                    ViewFactorSky == other.ViewFactorSky &&
+                    Zone == other.Zone && EnclIndex == other.EnclIndex && ExtZone == other.ExtZone && ExtCond == other.ExtCond &&
+                    ExtEnclIndex == other.ExtEnclIndex && ExtSolar == other.ExtSolar && ExtWind == other.ExtWind &&
+                    ViewFactorGround == other.ViewFactorGround && ViewFactorSky == other.ViewFactorSky &&
 
                     HeatTransferAlgorithm == other.HeatTransferAlgorithm && IntConvCoeff == other.IntConvCoeff &&
                     ExtConvCoeff == other.ExtConvCoeff && OSCPtr == other.OSCPtr && OSCMPtr == other.OSCMPtr &&
@@ -614,8 +616,8 @@ namespace DataSurfaces {
         std::string Name; // User supplied name of the surface (must be unique)
         int Construction; // Pointer to the construction in the Construct derived type
 
-        int RepresentativeCalcSurfNum; // Index of the surface that is used to calculate the heat
-        // balance for this surface
+        int RepresentativeCalcSurfNum; // Index of the surface that is used to calculate the heat balance for this surface. Equal to this surfaces
+                                       // index when not using representative surface calculations.
 
         int ConstructionStoredInputValue; // holds the original value for Construction per surface input
         SurfaceClass Class;
