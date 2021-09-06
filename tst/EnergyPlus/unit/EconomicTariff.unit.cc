@@ -195,7 +195,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GetInput_Test)
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
     EXPECT_EQ("EXAMPLEFMC", state->dataEconTariff->tariff(1).tariffName);
-    EXPECT_EQ(iEconConv::KWH, state->dataEconTariff->tariff(1).convChoice);
+    EXPECT_TRUE(compare_enums(iEconConv::KWH, state->dataEconTariff->tariff(1).convChoice));
     EXPECT_EQ(37.75, state->dataEconTariff->tariff(1).monthChgVal);
 
     // qualify
@@ -229,7 +229,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GetInput_Test)
     EXPECT_EQ(1, state->dataEconTariff->numComputation);
 }
 
-/** Test that if a meter is a water meter, and no conversion choice is give, it defaults to m3 **/
+// /** Test that if a meter is a water meter, and no conversion choice is give, it defaults to m3 **/
 TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
 {
     std::string const idf_objects = delimited_string({
@@ -274,13 +274,13 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
     EXPECT_EQ(kindMeterNotGas, state->dataEconTariff->tariff(1).kindGasMtr);
 
     // Check that if defaults the conversion choice correctly
-    EXPECT_EQ(iEconConv::M3, state->dataEconTariff->tariff(1).convChoice);
+    EXPECT_TRUE(compare_enums(iEconConv::M3, state->dataEconTariff->tariff(1).convChoice));
     EXPECT_EQ(1, state->dataEconTariff->tariff(1).energyConv);
     EXPECT_EQ(3600, state->dataEconTariff->tariff(1).demandConv);
     EXPECT_EQ(10, state->dataEconTariff->tariff(1).monthChgVal);
 }
 
-/** Test that if a meter is a water meter, and CCF is used, it uses the right conversion (not the gas one) **/
+// /** Test that if a meter is a water meter, and CCF is used, it uses the right conversion (not the gas one) **/
 TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
 {
     std::string const idf_objects = delimited_string({
@@ -317,11 +317,11 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
     EXPECT_EQ(kindMeterNotGas, state->dataEconTariff->tariff(1).kindGasMtr);
 
     // Check conversion choice
-    EXPECT_EQ(iEconConv::CCF, state->dataEconTariff->tariff(1).convChoice);
+    EXPECT_TRUE(compare_enums(iEconConv::CCF, state->dataEconTariff->tariff(1).convChoice));
     ASSERT_DOUBLE_EQ(0.35314666721488586, state->dataEconTariff->tariff(1).energyConv);
 }
 
-/** Test that if a meter is a gas meter, and CCF is used, it uses the right conversion (not the water one) **/
+// /** Test that if a meter is a gas meter, and CCF is used, it uses the right conversion (not the water one) **/
 TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
 {
     std::string const idf_objects = delimited_string({
@@ -359,11 +359,11 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
 
     // Check conversion choice
 
-    EXPECT_EQ(iEconConv::CCF, state->dataEconTariff->tariff(1).convChoice);
+    EXPECT_TRUE(compare_enums(iEconConv::CCF, state->dataEconTariff->tariff(1).convChoice));
     ASSERT_DOUBLE_EQ(9.4781712e-9, state->dataEconTariff->tariff(1).energyConv);
 }
 
-/** Test that if a meter is an Electric meter, and CCF is used, it still defaults to kWh (not allowed) **/
+// /** Test that if a meter is an Electric meter, and CCF is used, it still defaults to kWh (not allowed) **/
 TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
 {
     std::string const idf_objects = delimited_string({
@@ -401,7 +401,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
     EXPECT_EQ(kindMeterNotGas, state->dataEconTariff->tariff(1).kindGasMtr);
 
     // Check conversion choice, should force back to kWh
-    EXPECT_EQ(iEconConv::KWH, state->dataEconTariff->tariff(1).convChoice);
+    EXPECT_TRUE(compare_enums(iEconConv::KWH, state->dataEconTariff->tariff(1).convChoice));
     ASSERT_DOUBLE_EQ(0.0000002778, state->dataEconTariff->tariff(1).energyConv);
     ASSERT_DOUBLE_EQ(0.001, state->dataEconTariff->tariff(1).demandConv);
 }
@@ -603,7 +603,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     // tariff
     EXPECT_EQ(1, state->dataEconTariff->numTariff);
     EXPECT_EQ("SEASONAL_TARIFF", state->dataEconTariff->tariff(1).tariffName);
-    EXPECT_EQ(iEconConv::KWH, state->dataEconTariff->tariff(1).convChoice);
+    EXPECT_TRUE(compare_enums(iEconConv::KWH, state->dataEconTariff->tariff(1).convChoice));
     EXPECT_EQ(0, state->dataEconTariff->tariff(1).monthChgVal);
     EXPECT_EQ("ELECTRICITY SEASON SCHEDULE", state->dataEconTariff->tariff(1).seasonSchedule);
 

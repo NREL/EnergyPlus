@@ -123,7 +123,6 @@ namespace Psychrometrics {
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
         state.dataPsychCache->cached_Psat.fill(cached_psat_t());
-        state.dataPsychCache->cached_Psat.fill(cached_psat_t());
 #endif
 #ifdef EP_cache_PsyTsatFnPb
         state.dataPsychCache->cached_Tsat.fill(cached_tsat_h_pb());
@@ -1345,58 +1344,63 @@ namespace Psychrometrics {
             return state.dataPsychrometrics->tSat_Save;
         }
         state.dataPsychrometrics->Press_Save = Press;
-
-        // Uses an iterative process to determine the saturation temperature at a given
-        // pressure by correlating saturated water vapor as a function of temperature.
-
-        // Initial guess of boiling temperature
-        tSat = 100.0;
-        iter = 0;
-
-        // If above 1555000,set value of Temp corresponding to Saturation Pressure of 1555000 Pascal.
-        if (Press >= 1555000.0) {
-            tSat = 200.0;
-            // If below 0.0017,set value of Temp corresponding to Saturation Pressure of 0.0017 Pascal.
-        } else if (Press <= 0.0017) {
-            tSat = -100.0;
-
-            // Setting Value of PsyTsatFnPb= 0C, due to non-continuous function for Saturation Pressure at 0C.
-        } else if ((Press > 611.000) && (Press < 611.25)) {
-            tSat = 0.0;
-
+        if (state.dataPsychrometrics->useInterpolationPsychTsatFnPb) {
+            int n_sample = 1651; // sample bin size = 64 Pa; continous sample size = 1651
+            // CSpline interpolation
+            tSat = CSplineint(n_sample, Press); // Cubic spline interpolation
+            iter = 0;
         } else {
-            // Iterate to find the saturation temperature
-            // of water given the total pressure
+            // Uses an iterative process to determine the saturation temperature at a given
+            // pressure by correlating saturated water vapor as a function of temperature.
 
-            // Set iteration loop parameters
-            // make sure these are initialized
-            Real64 pSat;    // Pressure corresponding to temp. guess
-            Real64 error;   // Deviation of dependent variable in iteration
-            Real64 X1;      // Previous value of independent variable in ITERATE
-            Real64 Y1;      // Previous value of dependent variable in ITERATE
-            Real64 ResultX; // ResultX is the final Iteration result passed back to the calling routine
-            bool const CalledFrom_empty(CalledFrom.empty());
-            int icvg; // Iteration convergence flag
-            for (iter = 1; iter <= itmax; ++iter) {
+            // Initial guess of boiling temperature
+            tSat = 100.0;
+            iter = 0;
 
-                // Calculate saturation pressure for estimated boiling temperature
-                pSat =
-                    PsyPsatFnTemp(state, tSat, (CalledFrom_empty ? PsyRoutineNames[static_cast<int>(PsychrometricFunction::TsatFnPb)] : CalledFrom));
+            // If above 1555000,set value of Temp corresponding to Saturation Pressure of 1555000 Pascal.
+            if (Press >= 1555000.0) {
+                tSat = 200.0;
+                // If below 0.0017,set value of Temp corresponding to Saturation Pressure of 0.0017 Pascal.
+            } else if (Press <= 0.0017) {
+                tSat = -100.0;
 
-                // Compare with specified pressure and update estimate of temperature
-                error = Press - pSat;
-                Iterate(ResultX, convTol, tSat, error, X1, Y1, iter, icvg);
-                tSat = ResultX;
-                // If converged leave loop iteration
-                if (icvg == 1) break;
+                // Setting Value of PsyTsatFnPb= 0C, due to non-continuous function for Saturation Pressure at 0C.
+            } else if ((Press > 611.000) && (Press < 611.25)) {
+                tSat = 0.0;
 
-                // Water temperature not converged, repeat calculations with new
-                // estimate of water temperature
+            } else {
+                // Iterate to find the saturation temperature
+                // of water given the total pressure
+
+                // Set iteration loop parameters
+                // make sure these are initialized
+                Real64 pSat;    // Pressure corresponding to temp. guess
+                Real64 error;   // Deviation of dependent variable in iteration
+                Real64 X1;      // Previous value of independent variable in ITERATE
+                Real64 Y1;      // Previous value of dependent variable in ITERATE
+                Real64 ResultX; // ResultX is the final Iteration result passed back to the calling routine
+                bool const CalledFrom_empty(CalledFrom.empty());
+                int icvg; // Iteration convergence flag
+                for (iter = 1; iter <= itmax; ++iter) {
+
+                    // Calculate saturation pressure for estimated boiling temperature
+                    pSat = PsyPsatFnTemp(
+                        state, tSat, (CalledFrom_empty ? PsyRoutineNames[static_cast<int>(PsychrometricFunction::TsatFnPb)] : CalledFrom));
+
+                    // Compare with specified pressure and update estimate of temperature
+                    error = Press - pSat;
+                    Iterate(ResultX, convTol, tSat, error, X1, Y1, iter, icvg);
+                    tSat = ResultX;
+                    // If converged leave loop iteration
+                    if (icvg == 1) break;
+
+                    // Water temperature not converged, repeat calculations with new
+                    // estimate of water temperature
+                }
+
+                // Saturation temperature has not converged after maximum specified
+                // iterations. Print error message, set return error flag, and RETURN
             }
-
-            // Saturation temperature has not converged after maximum specified
-            // iterations. Print error message, set return error flag, and RETURN
-
         } // End If for the Pressure Range Checking
 
 #ifdef EP_psych_stats
@@ -1438,6 +1442,26 @@ namespace Psychrometrics {
 #endif
 
         return Temp;
+    }
+    Real64 CSplineint(int const n, // sample data size
+                      Real64 x)    // given value of x
+    {                              // Cubic Spline interpolation
+        // Reference: Numerical Recipies in C (pp.97)
+        Real64 A, B, y;
+        // find location of x in arrays without searching since array bins are equally sized
+        int x_int = static_cast<int>(x);
+        //********continous sample start
+        int j = (x_int >> 6) - 1; // sample bin 64, sample size=1651
+        if (j < 0) j = 0;
+        if (j > (n - 2)) j = n - 2;
+        static constexpr Real64 h(64); // sample bin 64, sample size=1651
+        //********continous sample end
+        int tsat_fn_pb_x_j1 = 64 * (j + 1); // sample data for pressure
+        A = (tsat_fn_pb_x_j1 - x) / h;
+        B = 1 - A;
+        y = A * tsat_fn_pb_y[j] + B * tsat_fn_pb_y[j + 1] +
+            ((A * A * A - A) * (tsat_fn_pb_d2y[j]) + (B * B * B - B) * (tsat_fn_pb_d2y[j + 1])) * (h * h) * 0.1666666667;
+        return y;
     }
 
 } // namespace Psychrometrics

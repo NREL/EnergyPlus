@@ -730,30 +730,30 @@ namespace HWBaseboardRadiator {
                                 "Baseboard Total Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HWBaseboard(BaseboardNum).TotPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
 
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HWBaseboard(BaseboardNum).ConvPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
             SetupOutputVariable(state,
                                 "Baseboard Radiant Heating Rate",
                                 OutputProcessor::Unit::W,
                                 HWBaseboard(BaseboardNum).RadPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HWBaseboard(BaseboardNum).TotEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 HWBaseboard(BaseboardNum).EquipID,
                                 _,
                                 "ENERGYTRANSFER",
@@ -765,22 +765,22 @@ namespace HWBaseboardRadiator {
                                 "Baseboard Convective Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HWBaseboard(BaseboardNum).ConvEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 HWBaseboard(BaseboardNum).EquipID);
             SetupOutputVariable(state,
                                 "Baseboard Radiant Heating Energy",
                                 OutputProcessor::Unit::J,
                                 HWBaseboard(BaseboardNum).RadEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 HWBaseboard(BaseboardNum).EquipID);
             SetupOutputVariable(state,
                                 "Baseboard Hot Water Energy",
                                 OutputProcessor::Unit::J,
                                 HWBaseboard(BaseboardNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 HWBaseboard(BaseboardNum).EquipID,
                                 _,
                                 "PLANTLOOPHEATINGDEMAND",
@@ -791,43 +791,43 @@ namespace HWBaseboardRadiator {
                                 "Baseboard Hot Water Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 HWBaseboard(BaseboardNum).WaterMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
             SetupOutputVariable(state,
                                 "Baseboard Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 HWBaseboard(BaseboardNum).AirMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
             SetupOutputVariable(state,
                                 "Baseboard Air Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 HWBaseboard(BaseboardNum).AirInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
             SetupOutputVariable(state,
                                 "Baseboard Air Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 HWBaseboard(BaseboardNum).AirOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
             SetupOutputVariable(state,
                                 "Baseboard Water Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 HWBaseboard(BaseboardNum).WaterInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
             SetupOutputVariable(state,
                                 "Baseboard Water Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 HWBaseboard(BaseboardNum).WaterOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 HWBaseboard(BaseboardNum).EquipID);
         }
     }
@@ -1737,8 +1737,8 @@ namespace HWBaseboardRadiator {
         auto &QBBRadSource = state.dataHWBaseboardRad->QBBRadSource;
 
         // Initialize arrays
-        state.dataHeatBalFanSys->QHWBaseboardSurf = 0.0;
-        state.dataHeatBalFanSys->QHWBaseboardToPerson = 0.0;
+        state.dataHeatBalFanSys->SurfQHWBaseboard = 0.0;
+        state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson = 0.0;
 
         for (BaseboardNum = 1; BaseboardNum <= NumHWBaseboards; ++BaseboardNum) {
 
@@ -1746,14 +1746,15 @@ namespace HWBaseboardRadiator {
                 HWBaseboardDesignObject(HWBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for the design object
             ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
             if (ZoneNum <= 0) continue;
-            state.dataHeatBalFanSys->QHWBaseboardToPerson(ZoneNum) += QBBRadSource(BaseboardNum) * HWBaseboardDesignDataObject.FracDistribPerson;
+            state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson(ZoneNum) += QBBRadSource(BaseboardNum) * HWBaseboardDesignDataObject.FracDistribPerson;
 
             for (RadSurfNum = 1; RadSurfNum <= HWBaseboard(BaseboardNum).TotSurfToDistrib; ++RadSurfNum) {
                 SurfNum = HWBaseboard(BaseboardNum).SurfacePtr(RadSurfNum);
                 if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                     ThisSurfIntensity = (QBBRadSource(BaseboardNum) * HWBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) /
                                          state.dataSurface->Surface(SurfNum).Area);
-                    state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalFanSys->SurfQHWBaseboard(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalSurf->AnyRadiantSystems = true;
                     // CR 8074, trap for excessive intensity (throws off surface balance )
                     if (ThisSurfIntensity > MaxRadHeatFlux) {
                         ShowSevereError(state, "DistributeBBRadGains:  excessive thermal radiation heat flux intensity detected");

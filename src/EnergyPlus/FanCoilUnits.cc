@@ -92,6 +92,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 namespace EnergyPlus {
 
@@ -280,7 +281,6 @@ namespace FanCoilUnits {
         Array1D<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        int CtrlZone;                    // index to loop counter
         int NodeNum;                     // index to loop counter
         std::string ATMixerName;
 
@@ -711,6 +711,13 @@ namespace FanCoilUnits {
                        state.dataFanCoilUnits->ATMixerSecNode,
                        state.dataFanCoilUnits->ATMixerOutNode,
                        FanCoil(FanCoilNum).AirOutNode);
+            FanCoil(FanCoilNum).ControlZoneNum =
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::FanCoil4Pipe_Num, FanCoil(FanCoilNum).Name);
+            if (FanCoil(FanCoilNum).ControlZoneNum == 0) {
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
+                ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
+                ErrorsFound = true;
+            }
             if (state.dataFanCoilUnits->ATMixerType == ATMixer_InletSide) {
                 // save the air terminal mixer data in the fan coil data array
                 FanCoil(FanCoilNum).ATMixerExists = true;
@@ -762,38 +769,72 @@ namespace FanCoilUnits {
                     ShowContinueError(state, "..Fan coil unit air outlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirOutNode));
                     ErrorsFound = true;
                 }
+                bool ZoneNodeNotFound = true;
+                for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).NumExhaustNodes; ++NodeNum) {
+                    if (FanCoil(FanCoilNum).AirInNode ==
+                        state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).ExhaustNode(NodeNum)) {
+                        ZoneNodeNotFound = false;
+                        break;
+                    }
+                }
+                if (ZoneNodeNotFound) {
+                    bool InletNodeFound = false;
+                    if (FanCoil(FanCoilNum).ControlZoneNum > 0) {
+                        InletNodeFound =
+                            ZonePlenum::ValidateInducedNode(state,
+                                                            FanCoil(FanCoilNum).AirInNode,
+                                                            state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).NumReturnNodes,
+                                                            state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).ReturnNode);
+                    }
+                    if (!InletNodeFound) {
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\"");
+                        ShowContinueError(state,
+                                          "..FanCoil inlet node name must be the same as either a zone exhaust node name or an induced "
+                                          "air node in ZonePlenum.");
+                        ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                        ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
+                        ShowContinueError(state, "..FanCoil inlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirInNode));
+                        ErrorsFound = true;
+                    }
+                }
                 // no air terminal mixer; do the normal connectivity checks
             } else {
                 // check that the fan coil inlet node is the same as one of the zone exhaust nodes
                 state.dataFanCoilUnits->ZoneExNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                        if (FanCoil(FanCoilNum).AirInNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
-                            state.dataFanCoilUnits->ZoneExNodeNotFound = false;
-                        }
+                for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).NumExhaustNodes; ++NodeNum) {
+                    if (FanCoil(FanCoilNum).AirInNode ==
+                        state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).ExhaustNode(NodeNum)) {
+                        state.dataFanCoilUnits->ZoneExNodeNotFound = false;
+                        break;
                     }
                 }
                 if (state.dataFanCoilUnits->ZoneExNodeNotFound) {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
-                                        "\". Fan coil unit air inlet node name must be the same as a zone exhaust node name.");
-                    ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state, "..Fan coil unit air inlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirInNode));
-                    ErrorsFound = true;
+                    bool InletNodeFound = false;
+                    InletNodeFound =
+                        ZonePlenum::ValidateInducedNode(state,
+                                                        FanCoil(FanCoilNum).AirInNode,
+                                                        state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).NumReturnNodes,
+                                                        state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).ReturnNode);
+
+                    if (!InletNodeFound) {
+                        ShowSevereError(state,
+                                        CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
+                                            "\". Fan coil unit air inlet node name must be the same either as a zone exhaust node name or an induce "
+                                            "air node in ZoePlenum.");
+                        ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                        ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
+                        ShowContinueError(state,
+                                          "..Fan coil unit air inlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirInNode));
+                        ErrorsFound = true;
+                    }
                 }
                 // check that the fan coil outlet node is the same as one of the zone inlet nodes
                 state.dataFanCoilUnits->ZoneInNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (FanCoil(FanCoilNum).AirOutNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                            FanCoil(FanCoilNum).ControlZoneNum = CtrlZone;
-                            FanCoil(FanCoilNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ZoneNode;
-                            state.dataFanCoilUnits->ZoneInNodeNotFound = false;
-                        }
-                    }
+                if (FanCoil(FanCoilNum).ControlZoneNum > 0) {
+                    FanCoil(FanCoilNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).ZoneNode;
+                    state.dataFanCoilUnits->ZoneInNodeNotFound = false;
                 }
+
                 if (state.dataFanCoilUnits->ZoneInNodeNotFound) {
                     ShowSevereError(state,
                                     CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
@@ -928,87 +969,87 @@ namespace FanCoilUnits {
                                 "Fan Coil Heating Rate",
                                 OutputProcessor::Unit::W,
                                 FanCoil(FanCoilNum).HeatPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 FanCoil(FanCoilNum).Name);
             SetupOutputVariable(state,
                                 "Fan Coil Heating Energy",
                                 OutputProcessor::Unit::J,
                                 FanCoil(FanCoilNum).HeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 FanCoil(FanCoilNum).Name);
             SetupOutputVariable(state,
                                 "Fan Coil Total Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 FanCoil(FanCoilNum).TotCoolPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 FanCoil(FanCoilNum).Name);
             SetupOutputVariable(state,
                                 "Fan Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 FanCoil(FanCoilNum).TotCoolEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 FanCoil(FanCoilNum).Name);
             SetupOutputVariable(state,
                                 "Fan Coil Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 FanCoil(FanCoilNum).SensCoolPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 FanCoil(FanCoilNum).Name);
             SetupOutputVariable(state,
                                 "Fan Coil Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 FanCoil(FanCoilNum).SensCoolEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 FanCoil(FanCoilNum).Name);
             SetupOutputVariable(state,
                                 "Fan Coil Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 FanCoil(FanCoilNum).ElecPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 FanCoil(FanCoilNum).Name);
             SetupOutputVariable(state,
                                 "Fan Coil Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 FanCoil(FanCoilNum).ElecEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 FanCoil(FanCoilNum).Name);
             if (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM::CycFan || FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM::MultiSpeedFan) {
                 SetupOutputVariable(state,
                                     "Fan Coil Runtime Fraction",
                                     OutputProcessor::Unit::None,
                                     FanCoil(FanCoilNum).PLR,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     FanCoil(FanCoilNum).Name);
                 SetupOutputVariable(state,
                                     "Fan Coil Fan Speed Level",
                                     OutputProcessor::Unit::None,
                                     FanCoil(FanCoilNum).SpeedFanSel,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     FanCoil(FanCoilNum).Name);
                 if (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM::MultiSpeedFan) {
                     SetupOutputVariable(state,
                                         "Fan Coil Speed Ratio",
                                         OutputProcessor::Unit::None,
                                         FanCoil(FanCoilNum).SpeedRatio,
-                                        "System",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
                                         FanCoil(FanCoilNum).Name);
                     SetupOutputVariable(state,
                                         "Fan Coil Part Load Ratio",
                                         OutputProcessor::Unit::None,
                                         FanCoil(FanCoilNum).PLR,
-                                        "System",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
                                         FanCoil(FanCoilNum).Name);
                 }
             }
@@ -1017,16 +1058,16 @@ namespace FanCoilUnits {
                                     "Fan Coil Part Load Ratio",
                                     OutputProcessor::Unit::None,
                                     FanCoil(FanCoilNum).PLR,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     FanCoil(FanCoilNum).Name);
             }
             SetupOutputVariable(state,
                                 "Fan Coil Availability Status",
                                 OutputProcessor::Unit::None,
                                 FanCoil(FanCoilNum).AvailStatus,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 FanCoil(FanCoilNum).Name);
         }
 

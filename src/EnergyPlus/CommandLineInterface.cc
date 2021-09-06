@@ -45,6 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// C++ Headers
+#include <thread>
+
 // CLI Headers
 #include <ezOptionParser.hpp>
 
@@ -68,7 +71,7 @@ namespace CommandLineInterface {
     {
         typedef std::string::size_type size_type;
 
-        // Expand long-name options using "=" sign into two arguments
+        // Expand long-name options using "=" sign in to two arguments
         // and expand multiple short options into separate arguments
         std::vector<std::string> arguments;
 
@@ -147,11 +150,13 @@ namespace CommandLineInterface {
                 "-s",
                 "--output-suffix");
 
-        opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
+        opt.add("", false, 0, 0, "Display version information", "-v", "--version");
 
-        opt.add("in.epw", 0, 1, 0, "Weather file path (default: in.epw in current directory)", "-w", "--weather");
+        opt.add("1", false, 1, 0, "Multi-thread with N threads; 1 thread with no arg. (Currently only for G-Function generation)", "-j", "--jobs");
 
-        opt.add("", 0, 0, 0, "Run ExpandObjects prior to simulation", "-x", "--expandobjects");
+        opt.add("in.epw", false, 1, 0, "Weather file path (default: in.epw in current directory)", "-w", "--weather");
+
+        opt.add("", false, 0, 0, "Run ExpandObjects prior to simulation", "-x", "--expandobjects");
 
         opt.example = "energyplus -w weather.epw -r input.idf";
 
@@ -161,15 +166,17 @@ namespace CommandLineInterface {
         opt.parse(argCount, &cStrArgs[0]);
 
         // print arguments parsed (useful for debugging)
-        /*std::string pretty;
-        opt.prettyPrint(pretty);
-        std::cout << pretty << std::endl;*/
+        //        std::string pretty;
+        //        opt.prettyPrint(pretty);
+        //        std::cout << pretty << std::endl;
 
         std::string usage;
         opt.getUsage(usage);
 
-        // Set path of EnergyPlus program path
-        state.dataStrGlobals->exeDirectoryPath = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+        // Set path of EnergyPlus program path (if we aren't overriding it)
+        if (!state.dataGlobal->installRootOverride) {
+            state.dataStrGlobals->exeDirectoryPath = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+        }
 
         // ezOptionParser doesn't have a getPath, so we get a string, then convert it to path
         // I'm limiting the scope of the std::string temporaries I used to avoid mistakes
@@ -180,7 +187,7 @@ namespace CommandLineInterface {
         }
 
         {
-            // TODO: should this vbe in IOFiles as an InputFile?
+            // TODO: should this be in IOFiles as an InputFile?
             std::string inputIddFileName;
             opt.get("-i")->getString(inputIddFileName);
             state.dataStrGlobals->inputIddFilePath = fs::path{inputIddFileName};
@@ -208,6 +215,18 @@ namespace CommandLineInterface {
 
         bool eplusRunningViaAPI = state.dataGlobal->eplusRunningViaAPI;
 
+        opt.get("-j")->getInt(state.dataGlobal->numThread);
+
+        if (state.dataGlobal->numThread == 0) {
+            DisplayString(state, "Invalid value for -j arg. Defaulting to 1.");
+            state.dataGlobal->numThread = 1;
+        } else if (state.dataGlobal->numThread > (int)std::thread::hardware_concurrency()) {
+            DisplayString(state,
+                          fmt::format("Invalid value for -j arg. Value exceeds num available. Defaulting to num available. -j {}",
+                                      (int)std::thread::hardware_concurrency()));
+            state.dataGlobal->numThread = (int)std::thread::hardware_concurrency();
+        }
+
         // Process standard arguments
         if (opt.isSet("-h")) {
             DisplayString(state, usage);
@@ -230,12 +249,8 @@ namespace CommandLineInterface {
         }
 
         if (opt.lastArgs.size() == 1) {
-            for (size_type i = 0; i < opt.lastArgs.size(); ++i) {
-                std::string const &arg(*opt.lastArgs[i]);
-                std::string inputFileName = arg;
-                state.dataStrGlobals->inputFilePath = fs::path{inputFileName};
-            }
-        } else if (opt.lastArgs.size() == 0) {
+            state.dataStrGlobals->inputFilePath = fs::path{*opt.lastArgs[0]};
+        } else if (opt.lastArgs.empty()) {
             state.dataStrGlobals->inputFilePath = "in.idf";
         }
 
@@ -280,33 +295,32 @@ namespace CommandLineInterface {
         state.dataStrGlobals->inputFilePathNameOnly = FileSystem::removeFileExtension(FileSystem::getFileName(state.dataStrGlobals->inputFilePath));
         state.dataStrGlobals->inputDirPath = FileSystem::getParentDirectoryPath(state.dataStrGlobals->inputFilePath);
 
-        // TODO: would this be better?
-        // FileSystem::InputFileType fileType = FileSystem::getInputFileType(state.dataStrGlobals->inputFilePath);
         {
-            auto inputFileExt = state.dataStrGlobals->inputFilePath.extension().string();
-            std::transform(inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper);
-
-            if (inputFileExt == ".EPJSON" || inputFileExt == ".JSON") {
-                state.dataGlobal->isEpJSON = true;
-            } else if (inputFileExt == ".IDF" || inputFileExt == ".IMF") {
-                state.dataGlobal->isEpJSON = false;
-            } else if (inputFileExt == ".CBOR") {
-                state.dataGlobal->isEpJSON = true;
+            auto const fileType = FileSystem::getFileType(state.dataStrGlobals->inputFilePath);
+            state.dataGlobal->isEpJSON = FileSystem::is_all_json_type(fileType);
+            switch (fileType) {
+            case FileSystem::FileTypes::IDF:
+            case FileSystem::FileTypes::IMF:
+            case FileSystem::FileTypes::EpJSON:
+            case FileSystem::FileTypes::JSON:
+                break;
+            case FileSystem::FileTypes::CBOR:
                 state.dataGlobal->isCBOR = true;
                 DisplayString(state, "CBOR input format is experimental and unsupported.");
-            } else if (inputFileExt == ".MSGPACK") {
-                state.dataGlobal->isEpJSON = true;
+                break;
+            case FileSystem::FileTypes::MsgPack:
                 state.dataGlobal->isMsgPack = true;
                 DisplayString(state, "MsgPack input format is experimental and unsupported.");
-            } else if (inputFileExt == ".UBJSON") {
-                state.dataGlobal->isEpJSON = true;
+                break;
+            case FileSystem::FileTypes::UBJSON:
                 state.dataGlobal->isUBJSON = true;
                 DisplayString(state, "UBJSON input format is experimental and unsupported.");
-            } else if (inputFileExt == ".BSON") {
-                state.dataGlobal->isEpJSON = true;
+                break;
+            case FileSystem::FileTypes::BSON:
                 state.dataGlobal->isBSON = true;
                 DisplayString(state, "BSON input format is experimental and unsupported.");
-            } else {
+                break;
+            default:
                 DisplayString(state, "ERROR: Input file must have IDF, IMF, or epJSON extension.");
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
@@ -316,12 +330,8 @@ namespace CommandLineInterface {
             }
         }
 
-        bool runExpandObjects(false);
-        bool runEPMacro(false);
-
-        runExpandObjects = opt.isSet("-x");
-
-        runEPMacro = opt.isSet("-m");
+        bool runExpandObjects = opt.isSet("-x");
+        bool runEPMacro = opt.isSet("-m");
 
         if (opt.isSet("-d")) {
             // Create directory if it doesn't already exist
@@ -535,7 +545,7 @@ namespace CommandLineInterface {
             }
         }
 
-        // This is a place holder in case there are required options in the future
+        // This is a placeholder in case there are required options in the future
         if (!opt.gotRequired(badOptions)) {
             for (size_type i = 0; i < badOptions.size(); ++i) {
                 DisplayString(state, "ERROR: Missing required option " + badOptions[i]);
@@ -868,7 +878,14 @@ namespace CommandLineInterface {
         if (!FileSystem::fileExists(readVarsPath)) {
             readVarsPath = (state.dataStrGlobals->exeDirectoryPath / "PostProcess" / "ReadVarsESO").replace_extension(FileSystem::exeExtension);
             if (!FileSystem::fileExists(readVarsPath)) {
-                DisplayString(state, "ERROR: Could not find ReadVarsESO executable: " + FileSystem::getAbsolutePath(readVarsPath).string() + ".");
+                // should report the error differently if the user is calling into E+ through EXE or DLL
+                if (state.dataGlobal->eplusRunningViaAPI) {
+                    DisplayString(
+                        state,
+                        "ERROR: Could not find ReadVarsESO executable.  When calling through C API, make sure to call setEnergyPlusRootDirectory");
+                } else {
+                    DisplayString(state, "ERROR: Could not find ReadVarsESO executable: " + FileSystem::getAbsolutePath(readVarsPath).string() + ".");
+                }
                 return static_cast<int>(ReturnCodes::Failure);
             }
         }

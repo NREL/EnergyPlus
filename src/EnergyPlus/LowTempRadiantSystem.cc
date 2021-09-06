@@ -1429,14 +1429,19 @@ namespace LowTempRadiantSystem {
 
             auto &thisHydrSys(state.dataLowTempRadSys->HydrRadSys(Item));
 
-            SetupOutputVariable(
-                state, "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, thisHydrSys.HeatPower, "System", "Average", thisHydrSys.Name);
+            SetupOutputVariable(state,
+                                "Zone Radiant HVAC Heating Rate",
+                                OutputProcessor::Unit::W,
+                                thisHydrSys.HeatPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisHydrSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Energy",
                                 OutputProcessor::Unit::J,
                                 thisHydrSys.HeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisHydrSys.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -1447,23 +1452,28 @@ namespace LowTempRadiantSystem {
                                 "Zone Radiant HVAC Heating Fluid Energy",
                                 OutputProcessor::Unit::J,
                                 thisHydrSys.HeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisHydrSys.Name,
                                 _,
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Zone Radiant HVAC Cooling Rate", OutputProcessor::Unit::W, thisHydrSys.CoolPower, "System", "Average", thisHydrSys.Name);
+            SetupOutputVariable(state,
+                                "Zone Radiant HVAC Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                thisHydrSys.CoolPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisHydrSys.Name);
 
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 thisHydrSys.CoolEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisHydrSys.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -1474,8 +1484,8 @@ namespace LowTempRadiantSystem {
                                 "Zone Radiant HVAC Cooling Fluid Energy",
                                 OutputProcessor::Unit::J,
                                 thisHydrSys.CoolEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisHydrSys.Name,
                                 _,
                                 "PLANTLOOPCOOLINGDEMAND",
@@ -1486,36 +1496,36 @@ namespace LowTempRadiantSystem {
                                 "Zone Radiant HVAC Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 thisHydrSys.WaterMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisHydrSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 thisHydrSys.WaterInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisHydrSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 thisHydrSys.WaterOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisHydrSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Moisture Condensation Time",
                                 OutputProcessor::Unit::s,
                                 thisHydrSys.CondCausedTimeOff,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisHydrSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Operation Mode",
                                 OutputProcessor::Unit::None,
                                 thisHydrSys.OperatingMode,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisHydrSys.Name);
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSInternalVariable(state,
@@ -1544,14 +1554,19 @@ namespace LowTempRadiantSystem {
 
             auto &thisCFloSys(state.dataLowTempRadSys->CFloRadSys(Item));
 
-            SetupOutputVariable(
-                state, "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, thisCFloSys.HeatPower, "System", "Average", thisCFloSys.Name);
+            SetupOutputVariable(state,
+                                "Zone Radiant HVAC Heating Rate",
+                                OutputProcessor::Unit::W,
+                                thisCFloSys.HeatPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Energy",
                                 OutputProcessor::Unit::J,
                                 thisCFloSys.HeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -1562,22 +1577,27 @@ namespace LowTempRadiantSystem {
                                 "Zone Radiant HVAC Heating Fluid Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 thisCFloSys.HeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
                                 _,
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Zone Radiant HVAC Cooling Rate", OutputProcessor::Unit::W, thisCFloSys.CoolPower, "System", "Average", thisCFloSys.Name);
+            SetupOutputVariable(state,
+                                "Zone Radiant HVAC Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                thisCFloSys.CoolPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 thisCFloSys.CoolEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -1588,8 +1608,8 @@ namespace LowTempRadiantSystem {
                                 "Zone Radiant HVAC Cooling Fluid Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 thisCFloSys.CoolEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
                                 _,
                                 "PLANTLOOPCOOLINGDEMAND",
@@ -1600,57 +1620,57 @@ namespace LowTempRadiantSystem {
                                 "Zone Radiant HVAC Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 thisCFloSys.WaterMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Injection Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 thisCFloSys.WaterInjectionRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Recirculation Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 thisCFloSys.WaterRecircRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 thisCFloSys.WaterInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 thisCFloSys.WaterOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Pump Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 thisCFloSys.PumpInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 thisCFloSys.PumpPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 thisCFloSys.PumpEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name,
                                 _,
                                 "Electricity",
@@ -1661,58 +1681,58 @@ namespace LowTempRadiantSystem {
                                 "Zone Radiant HVAC Pump Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 thisCFloSys.PumpMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Pump Fluid Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 thisCFloSys.PumpHeattoFluid,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Pump Fluid Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 thisCFloSys.PumpHeattoFluidEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Moisture Condensation Time",
                                 OutputProcessor::Unit::s,
                                 thisCFloSys.CondCausedTimeOff,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisCFloSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Operation Mode",
                                 OutputProcessor::Unit::None,
                                 thisCFloSys.OperatingMode,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 thisCFloSys.Name);
             if (state.dataLowTempRadSys->anyRadiantSystemUsingRunningMeanAverage) {
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC Running Mean Outdoor Dry-Bulb Temperature",
                                     OutputProcessor::Unit::C,
                                     thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     thisCFloSys.Name);
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC Previous Day Running Mean Outdoor Dry-Bulb Temperature",
                                     OutputProcessor::Unit::C,
                                     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     thisCFloSys.Name);
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC Previous Day Average Outdoor Dry-Bulb Temperature",
                                     OutputProcessor::Unit::C,
                                     thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     thisCFloSys.Name);
             }
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -1734,28 +1754,38 @@ namespace LowTempRadiantSystem {
 
             auto &thisElecSys(state.dataLowTempRadSys->ElecRadSys(Item));
 
-            SetupOutputVariable(
-                state, "Zone Radiant HVAC Electricity Rate", OutputProcessor::Unit::W, thisElecSys.ElecPower, "System", "Average", thisElecSys.Name);
+            SetupOutputVariable(state,
+                                "Zone Radiant HVAC Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                thisElecSys.ElecPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisElecSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 thisElecSys.ElecEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisElecSys.Name,
                                 _,
                                 "ELECTRICITY",
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Zone Radiant HVAC Heating Rate", OutputProcessor::Unit::W, thisElecSys.HeatPower, "System", "Average", thisElecSys.Name);
+            SetupOutputVariable(state,
+                                "Zone Radiant HVAC Heating Rate",
+                                OutputProcessor::Unit::W,
+                                thisElecSys.HeatPower,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisElecSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Energy",
                                 OutputProcessor::Unit::J,
                                 thisElecSys.HeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 thisElecSys.Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -3999,7 +4029,7 @@ namespace LowTempRadiantSystem {
             if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                    if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) <
+                    if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) <
                         (DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT)) {
                         // Condensation warning--must shut off radiant system
                         this->CondCausedShutDown = true;
@@ -4031,7 +4061,7 @@ namespace LowTempRadiantSystem {
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
                                 ShowContinueError(state,
                                                   format("Predicted radiant system surface temperature = {:.2R}",
-                                                         state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2))));
+                                                         state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2))));
                                 ShowContinueError(state,
                                                   format("Zone dew-point temperature + safety delta T= {:.2R}",
                                                          DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT));
@@ -4057,7 +4087,7 @@ namespace LowTempRadiantSystem {
             } else if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlNone)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                    if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
+                    if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
                         // Condensation occurring but user does not want to shut radiant system off ever
                         this->CondCausedShutDown = true;
                     }
@@ -4068,10 +4098,10 @@ namespace LowTempRadiantSystem {
                 LowestRadSurfTemp = 999.9;
                 CondSurfNum = 0;
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                    if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) <
+                    if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) <
                         (DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT)) {
-                        if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) < LowestRadSurfTemp) {
-                            LowestRadSurfTemp = state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2));
+                        if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) < LowestRadSurfTemp) {
+                            LowestRadSurfTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2));
                             CondSurfNum = RadSurfNum2;
                         }
                     }
@@ -4106,7 +4136,7 @@ namespace LowTempRadiantSystem {
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Now check all of the surface temperatures.  If any potentially have condensation, leave the system off.
                     for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                        if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) <
+                        if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) <
                             (DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT)) {
                             this->CondCausedShutDown = true;
                         }
@@ -4116,7 +4146,7 @@ namespace LowTempRadiantSystem {
                     // flow rate.
                     if (!this->CondCausedShutDown) {
                         PredictedCondTemp = DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT;
-                        ZeroFlowSurfTemp = state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(CondSurfNum));
+                        ZeroFlowSurfTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(CondSurfNum));
                         ReductionFrac = (ZeroFlowSurfTemp - PredictedCondTemp) / std::abs(ZeroFlowSurfTemp - LowestRadSurfTemp);
                         if (ReductionFrac < 0.0) ReductionFrac = 0.0; // Shouldn't happen as the above check should have screened this out
                         if (ReductionFrac > 1.0) ReductionFrac = 1.0; // Shouldn't happen either because condensation doesn't exist then
@@ -4180,7 +4210,7 @@ namespace LowTempRadiantSystem {
                         // condensation, shut things down and be done.
                         for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                             if (this->CondCausedShutDown) break;
-                            if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) < (PredictedCondTemp)) {
+                            if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) < (PredictedCondTemp)) {
                                 // Condensation still present--must shut off radiant system
                                 this->CondCausedShutDown = true;
                                 WaterMassFlow = 0.0;
@@ -4217,7 +4247,7 @@ namespace LowTempRadiantSystem {
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
                                 ShowContinueError(state,
                                                   format("Predicted radiant system surface temperature = {:.2R}",
-                                                         state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(CondSurfNum))));
+                                                         state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(CondSurfNum))));
                                 ShowContinueError(state,
                                                   format("Zone dew-point temperature + safety delta T= {:.2R}",
                                                          DewPointTemp + variableFlowDesignDataObject.CondDewPtDeltaT));
@@ -5154,7 +5184,7 @@ namespace LowTempRadiantSystem {
             if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                    if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) <
+                    if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) <
                         (DewPointTemp + ConstantFlowDesignDataObject.CondDewPtDeltaT)) {
                         // Condensation warning--must shut off radiant system
                         this->CondCausedShutDown = true;
@@ -5186,7 +5216,7 @@ namespace LowTempRadiantSystem {
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
                                 ShowContinueError(state,
                                                   format("Predicted radiant system surface temperature = {:.2R}",
-                                                         state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2))));
+                                                         state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2))));
                                 ShowContinueError(state,
                                                   format("Zone dew-point temperature + safety delta T= {:.2R}",
                                                          DewPointTemp + ConstantFlowDesignDataObject.CondDewPtDeltaT));
@@ -5213,7 +5243,7 @@ namespace LowTempRadiantSystem {
             } else if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlNone)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                    if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
+                    if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
                         // Condensation occurring but user does not want to shut radiant system off ever
                         this->CondCausedShutDown = true;
                     }
@@ -5222,7 +5252,7 @@ namespace LowTempRadiantSystem {
             } else if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlVariedOff)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                    if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) <
+                    if (state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2)) <
                         (DewPointTemp + ConstantFlowDesignDataObject.CondDewPtDeltaT)) {
                         state.dataLowTempRadSys->VarOffCond = true;
                         if (state.dataLowTempRadSys->CFloCondIterNum >= 2) {
@@ -5256,7 +5286,7 @@ namespace LowTempRadiantSystem {
                                     ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
                                     ShowContinueError(state,
                                                       format("Predicted radiant system surface temperature = {:.2R}",
-                                                             state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2))));
+                                                             state.dataHeatBalSurf->SurfInsideTempHist(1)(this->SurfacePtr(RadSurfNum2))));
                                     ShowContinueError(state,
                                                       format("Zone dew-point temperature + safety delta T= {:.2R}",
                                                              DewPointTemp + ConstantFlowDesignDataObject.CondDewPtDeltaT));

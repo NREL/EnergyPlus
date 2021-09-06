@@ -63,7 +63,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataZoneEquipment;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, DataZoneEquipment_TestGetSystemNodeNumberForZone)
 {

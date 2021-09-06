@@ -656,37 +656,37 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                             "Cooling Panel Total Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).Power,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
         SetupOutputVariable(state,
                             "Cooling Panel Total System Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).TotPower,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
         SetupOutputVariable(state,
                             "Cooling Panel Convective Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ConvPower,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
         SetupOutputVariable(state,
                             "Cooling Panel Radiant Cooling Rate",
                             OutputProcessor::Unit::W,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).RadPower,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
 
         SetupOutputVariable(state,
                             "Cooling Panel Total Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).Energy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID,
                             _,
                             "ENERGYTRANSFER",
@@ -697,8 +697,8 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                             "Cooling Panel Total System Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).TotEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID,
                             _,
                             "ENERGYTRANSFER",
@@ -709,37 +709,37 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                             "Cooling Panel Convective Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ConvEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
         SetupOutputVariable(state,
                             "Cooling Panel Radiant Cooling Energy",
                             OutputProcessor::Unit::J,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).RadEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
 
         SetupOutputVariable(state,
                             "Cooling Panel Water Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).WaterMassFlowRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
         SetupOutputVariable(state,
                             "Cooling Panel Water Inlet Temperature",
                             OutputProcessor::Unit::C,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).WaterInletTemp,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
         SetupOutputVariable(state,
                             "Cooling Panel Water Outlet Temperature",
                             OutputProcessor::Unit::C,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).WaterOutletTemp,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
     }
 }
@@ -1696,8 +1696,8 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
     Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
     // Initialize arrays
-    state.dataHeatBalFanSys->QCoolingPanelSurf = 0.0;
-    state.dataHeatBalFanSys->QCoolingPanelToPerson = 0.0;
+    state.dataHeatBalFanSys->SurfQCoolingPanel = 0.0;
+    state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson = 0.0;
 
     for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
 
@@ -1705,7 +1705,7 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
 
         ZoneNum = ThisCP.ZonePtr;
         if (ZoneNum <= 0) continue;
-        state.dataHeatBalFanSys->QCoolingPanelToPerson(ZoneNum) +=
+        state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson(ZoneNum) +=
             state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribPerson;
 
         for (RadSurfNum = 1; RadSurfNum <= ThisCP.TotSurfToDistrib; ++RadSurfNum) {
@@ -1714,7 +1714,8 @@ void DistributeCoolingPanelRadGains(EnergyPlusData &state)
             if (ThisSurf.Area > SmallestArea) {
                 ThisSurfIntensity =
                     (state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribToSurf(RadSurfNum) / ThisSurf.Area);
-                state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) += ThisSurfIntensity;
+                state.dataHeatBalFanSys->SurfQCoolingPanel(SurfNum) += ThisSurfIntensity;
+                state.dataHeatBalSurf->AnyRadiantSystems = true;
                 // CR 8074, trap for excessive intensity (throws off surface balance )
                 if (ThisSurfIntensity > MaxRadHeatFlux) {
                     ShowSevereError(state, "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");

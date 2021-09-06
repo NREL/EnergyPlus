@@ -90,6 +90,7 @@
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 namespace EnergyPlus {
 
@@ -276,7 +277,6 @@ namespace UnitVentilator {
         Array1D_string cNumericFields; // Numeric field names
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
-        int CtrlZone;                  // index to loop counter
         int NodeNum;                   // index to loop counter
         bool ZoneNodeNotFound;         // used in error checking
 
@@ -459,6 +459,14 @@ namespace UnitVentilator {
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerType == ATMixer_InletSide ||
                 state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerType == ATMixer_SupplySide) {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists = true;
+            }
+            state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
+                state, DataZoneEquipment::UnitVentilator_Num, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
+            if (state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr == 0) {
+                ShowSevereError(
+                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\",");
+                ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
+                ErrorsFound = true;
             }
 
             if (!state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {
@@ -1028,37 +1036,47 @@ namespace UnitVentilator {
             if (!state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {
                 // check that unit ventilator air inlet node is the same as a zone exhaust node
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                        if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode ==
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
-                            ZoneNodeNotFound = false;
-                            break;
-                        }
+                for (NodeNum = 1;
+                     NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumExhaustNodes;
+                     ++NodeNum) {
+                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode ==
+                        state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ExhaustNode(NodeNum)) {
+                        ZoneNodeNotFound = false;
+                        break;
                     }
                 }
                 if (ZoneNodeNotFound) {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + " = \"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
-                                        "\". Unit ventilator air inlet node name must be the same as a zone exhaust node name.");
-                    ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state,
-                                      "..Unit ventilator air inlet node name = " +
-                                          state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode));
-                    ErrorsFound = true;
+                    bool InletNodeFound = false;
+                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr > 0) {
+                        InletNodeFound = ZonePlenum::ValidateInducedNode(
+                            state,
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode,
+                            state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumReturnNodes,
+                            state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ReturnNode);
+                    }
+                    if (!InletNodeFound) {
+                        ShowSevereError(
+                            state,
+                            CurrentModuleObject + " = \"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
+                                "\". Unit ventilator air inlet node name must be the same either as a zone exhaust node name or an induce "
+                                "air node in ZoePlenum.");
+                        ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                        ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
+                        ShowContinueError(state,
+                                          "..Unit ventilator unit air inlet node name = " +
+                                              state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode));
+                        ErrorsFound = true;
+                    }
                 }
                 // check that unit ventilator air outlet node is the same as a zone inlet node.
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode ==
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = CtrlZone;
-                            ZoneNodeNotFound = false;
-                            break;
-                        }
+                for (NodeNum = 1;
+                     NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumInletNodes;
+                     ++NodeNum) {
+                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode ==
+                        state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).InletNode(NodeNum)) {
+                        ZoneNodeNotFound = false;
+                        break;
                     }
                 }
                 if (ZoneNodeNotFound) {
@@ -1075,15 +1093,13 @@ namespace UnitVentilator {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerType == ATMixer_InletSide) {
                     // check that unit ventilator air outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
-                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode ==
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                                state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = CtrlZone;
-                                ZoneNodeNotFound = false;
-                                break;
-                            }
+                    for (NodeNum = 1;
+                         NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumInletNodes;
+                         ++NodeNum) {
+                        if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode ==
+                            state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).InletNode(NodeNum)) {
+                            ZoneNodeNotFound = false;
+                            break;
                         }
                     }
                     if (ZoneNodeNotFound) {
@@ -1126,15 +1142,13 @@ namespace UnitVentilator {
 
                     // check that air teminal mixer outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
-                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerOutNode ==
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                                state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = CtrlZone;
-                                ZoneNodeNotFound = false;
-                                break;
-                            }
+                    for (NodeNum = 1;
+                         NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumInletNodes;
+                         ++NodeNum) {
+                        if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerOutNode ==
+                            state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).InletNode(NodeNum)) {
+                            ZoneNodeNotFound = false;
+                            break;
                         }
                     }
                     if (ZoneNodeNotFound) {
@@ -1146,6 +1160,45 @@ namespace UnitVentilator {
                                           "..Air terminal mixer outlet node name = " +
                                               state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerOutNode));
                         ErrorsFound = true;
+                    } else {
+                        bool ExhastNodeNotFound = true;
+                        // check exhaust node
+                        for (NodeNum = 1;
+                             NodeNum <=
+                             state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumExhaustNodes;
+                             ++NodeNum) {
+                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode ==
+                                state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ExhaustNode(NodeNum)) {
+                                ExhastNodeNotFound = false;
+                                break;
+                            }
+                        }
+                        // check induce node
+                        if (ExhastNodeNotFound) {
+                            bool InletNodeFound = false;
+                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr > 0) {
+                                InletNodeFound = ZonePlenum::ValidateInducedNode(
+                                    state,
+                                    state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode,
+                                    state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumReturnNodes,
+                                    state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ReturnNode);
+                            }
+                            if (!InletNodeFound) {
+                                ShowSevereError(state,
+                                                std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                    state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
+                                ShowContinueError(
+                                    state,
+                                    "..UnitVentilator inlet node name must be the same as either a zone exhaust node name or an induced "
+                                    "air node in ZonePlenum.");
+                                ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                                ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
+                                ShowContinueError(state,
+                                                  "..UnitVentilator inlet node name = " +
+                                                      state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode));
+                                ErrorsFound = true;
+                            }
+                        }
                     }
                 }
             }
@@ -1213,73 +1266,73 @@ namespace UnitVentilator {
                                 "Zone Unit Ventilator Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).HeatPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).HeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Total Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).TotCoolPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).TotCoolEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).SensCoolPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).SensCoolEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).ElecPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             // Note that the unit vent fan electric is NOT metered because this value is already metered through the fan component
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).ElecEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Fan Availability Status",
                                 OutputProcessor::Unit::None,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).AvailStatus,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).FanType_Num == FanType_SimpleOnOff) {
                 SetupOutputVariable(state,
                                     "Zone Unit Ventilator Fan Part Load Ratio",
                                     OutputProcessor::Unit::None,
                                     state.dataUnitVentilators->UnitVent(UnitVentNum).FanPartLoadRatio,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             }
         }

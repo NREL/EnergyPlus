@@ -54,6 +54,11 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
+// cpgfunction Headers
+#include <cpgfunction/boreholes.h>
+#include <cpgfunction/gfunction.h>
+#include <cpgfunction/segments.h>
+
 // JSON Headers
 #include <nlohmann/json.hpp>
 
@@ -119,6 +124,7 @@ using namespace GroundTemperatureManager;
 // MODULE PARAMETER DEFINITIONS
 constexpr Real64 hrsPerMonth(730.0); // Number of hours in month
 constexpr Real64 maxTSinHr(60);      // Max number of time step in a hour
+constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
 
 //******************************************************************************
 
@@ -135,8 +141,8 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
 
     this->name = objName;
 
-    std::string inletNodeName = UtilityRoutines::MakeUPPERCase(AsString(j["inlet_node_name"]));
-    std::string outletNodeName = UtilityRoutines::MakeUPPERCase(AsString(j["outlet_node_name"]));
+    std::string inletNodeName = UtilityRoutines::MakeUPPERCase(j["inlet_node_name"].get<std::string>());
+    std::string outletNodeName = UtilityRoutines::MakeUPPERCase(j["outlet_node_name"].get<std::string>());
 
     // get inlet node num
     this->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -166,34 +172,34 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     BranchNodeConnections::TestCompSet(state, this->moduleName, this->name, inletNodeName, outletNodeName, "Condenser Water Nodes");
 
     // load data
-    this->designFlow = j["design_flow_rate"];
+    this->designFlow = j["design_flow_rate"].get<Real64>();
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->inletNodeNum, this->designFlow);
 
-    this->soil.k = j["soil_thermal_conductivity"];
-    this->soil.rho = j["soil_density"];
-    this->soil.cp = j["soil_specific_heat"];
+    this->soil.k = j["soil_thermal_conductivity"].get<Real64>();
+    this->soil.rho = j["soil_density"].get<Real64>();
+    this->soil.cp = j["soil_specific_heat"].get<Real64>();
     this->soil.rhoCp = this->soil.rho * this->soil.cp;
-    this->pipe.k = j["pipe_thermal_conductivity"];
-    this->pipe.rho = j["pipe_density"];
-    this->pipe.cp = j["pipe_specific_heat"];
-    this->pipe.outDia = j["pipe_outer_diameter"];
+    this->pipe.k = j["pipe_thermal_conductivity"].get<Real64>();
+    this->pipe.rho = j["pipe_density"].get<Real64>();
+    this->pipe.cp = j["pipe_specific_heat"].get<Real64>();
+    this->pipe.outDia = j["pipe_outer_diameter"].get<Real64>();
     this->pipe.outRadius = this->pipe.outDia / 2.0;
-    this->pipe.thickness = j["pipe_thickness"];
+    this->pipe.thickness = j["pipe_thickness"].get<Real64>();
 
-    std::string const hxConfig = UtilityRoutines::MakeUPPERCase(AsString(j["heat_exchanger_configuration"]));
+    std::string const hxConfig = UtilityRoutines::MakeUPPERCase(j["heat_exchanger_configuration"].get<std::string>());
     if (UtilityRoutines::SameString(hxConfig, "VERTICAL")) {
         this->verticalConfig = true;
     } else if (UtilityRoutines::SameString(hxConfig, "HORIZONTAL")) {
         this->verticalConfig = false;
     }
 
-    this->coilDiameter = j["coil_diameter"];
-    this->coilPitch = j["coil_pitch"];
-    this->trenchDepth = j["trench_depth"];
-    this->trenchLength = j["trench_length"];
-    this->numTrenches = j["number_of_trenches"];
-    this->trenchSpacing = j["horizontal_spacing_between_pipes"];
-    this->maxSimYears = j["maximum_length_of_simulation"];
+    this->coilDiameter = j["coil_diameter"].get<Real64>();
+    this->coilPitch = j["coil_pitch"].get<Real64>();
+    this->trenchDepth = j["trench_depth"].get<Real64>();
+    this->trenchLength = j["trench_length"].get<Real64>();
+    this->numTrenches = j["number_of_trenches"].get<int>();
+    this->trenchSpacing = j["horizontal_spacing_between_pipes"].get<Real64>();
+    this->maxSimYears = j["maximum_length_of_simulation"].get<Real64>();
 
     // Need to add a response factor object for the slinky model
     std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
@@ -247,8 +253,8 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     }
 
     // Initialize ground temperature model and get pointer reference
-    std::string const gtmType = UtilityRoutines::MakeUPPERCase(AsString(j["undisturbed_ground_temperature_model_type"]));
-    std::string const gtmName = UtilityRoutines::MakeUPPERCase(AsString(j["undisturbed_ground_temperature_model_name"]));
+    std::string const gtmType = UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_type"].get<std::string>());
+    std::string const gtmName = UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_name"].get<std::string>());
     this->groundTempModel = GetGroundTempModelAndInit(state, gtmType, gtmName);
     if (this->groundTempModel) {
         errorsFound = this->groundTempModel->errorsFound;
@@ -276,7 +282,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     this->name = objName;
 
     // get inlet node num
-    std::string const inletNodeName = UtilityRoutines::MakeUPPERCase(AsString(j["inlet_node_name"]));
+    std::string const inletNodeName = UtilityRoutines::MakeUPPERCase(j["inlet_node_name"].get<std::string>());
     this->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                              inletNodeName,
                                                              errorsFound,
@@ -288,7 +294,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                                                              ObjectIsNotParent);
 
     // get outlet node num
-    std::string const outletNodeName = UtilityRoutines::MakeUPPERCase(AsString(j["outlet_node_name"]));
+    std::string const outletNodeName = UtilityRoutines::MakeUPPERCase(j["outlet_node_name"].get<std::string>());
     this->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                               outletNodeName,
                                                               errorsFound,
@@ -303,64 +309,85 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
 
     BranchNodeConnections::TestCompSet(state, this->moduleName, objName, inletNodeName, outletNodeName, "Condenser Water Nodes");
 
-    this->designFlow = j["design_flow_rate"];
+    this->designFlow = j["design_flow_rate"].get<Real64>();
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->inletNodeNum, this->designFlow);
 
-    this->soil.k = j["ground_thermal_conductivity"];
-    this->soil.rhoCp = j["ground_thermal_heat_capacity"];
+    this->soil.k = j["ground_thermal_conductivity"].get<Real64>();
+    this->soil.rhoCp = j["ground_thermal_heat_capacity"].get<Real64>();
 
     if (j.find("ghe_vertical_responsefactors_object_name") != j.end()) {
         // Response factors come from IDF object
-        this->myRespFactors = GetResponseFactor(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_responsefactors_object_name"])));
+        this->myRespFactors =
+            GetResponseFactor(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_responsefactors_object_name"].get<std::string>()));
         this->gFunctionsExist = true;
 
         if (!this->myRespFactors) {
             errorsFound = true;
             ShowSevereError(state, "GroundHeatExchanger:ResponseFactors object not found.");
         }
-    } else if (j.find("ghe_vertical_array_object_name") != j.end()) {
-        // Response factors come from array object
-        this->myRespFactors = BuildAndGetResponseFactorObjectFromArray(
-            state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_array_object_name"]))));
+    }
 
-        if (!this->myRespFactors) {
-            errorsFound = true;
-            ShowSevereError(state, "GroundHeatExchanger:Vertical:Array object not found.");
-        }
-    } else {
-        if (j.find("vertical_well_locations") == j.end()) {
-            // No ResponseFactors, GHEArray, or SingleBH object are referenced
-            ShowSevereError(state, "No GHE:ResponseFactors, GHE:Vertical:Array, or GHE:Vertical:Single objects found");
-            ShowFatalError(state, "Check references to these objects for GHE:System object: " + this->name);
-        }
+    // no g-functions in the input file, so they need to be calculated
+    if (!this->gFunctionsExist) {
 
-        auto const vars = j.at("vertical_well_locations");
-
-        // Calculate response factors from individual boreholes
-        std::vector<std::shared_ptr<GLHEVertSingle>> tempVectOfBHObjects;
-
-        for (auto const &var : vars) {
-            if (!var.at("ghe_vertical_single_object_name").empty()) {
-                std::shared_ptr<GLHEVertSingle> tempBHptr =
-                    GetSingleBH(state, UtilityRoutines::MakeUPPERCase(AsString(var.at("ghe_vertical_single_object_name"))));
-                if (tempBHptr) {
-                    tempVectOfBHObjects.push_back(tempBHptr);
-                } else {
-                    errorsFound = true;
-                    std::string const tmpName = var.at("ghe_vertical_single_object_name");
-                    ShowSevereError(state, "Borehole= " + tmpName + " not found.");
-                    break;
-                }
+        // g-function calculation method
+        if (j.find("g_function_calculation_method") != j.end()) {
+            std::string gFunctionMethodStr = UtilityRoutines::MakeUPPERCase(j["g_function_calculation_method"].get<std::string>());
+            if (gFunctionMethodStr == "UHFCALC") {
+                this->gFuncCalcMethod = GFuncCalcMethod::UniformHeatFlux;
+            } else if (gFunctionMethodStr == "UBHWTCALC") {
+                this->gFuncCalcMethod = GFuncCalcMethod::UniformBoreholeWallTemp;
             } else {
-                break;
+                errorsFound = true;
+                ShowSevereError(state, fmt::format("g-Function Calculation Method: \"{}\" is invalid", gFunctionMethodStr));
             }
         }
 
-        this->myRespFactors = BuildAndGetResponseFactorsObjectFromSingleBHs(state, tempVectOfBHObjects);
+        // get borehole data from array or individual borehole instance objects
+        if (j.find("ghe_vertical_array_object_name") != j.end()) {
+            // Response factors come from array object
+            this->myRespFactors = BuildAndGetResponseFactorObjectFromArray(
+                state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_array_object_name"].get<std::string>())));
 
-        if (!this->myRespFactors) {
-            errorsFound = true;
-            ShowSevereError(state, "GroundHeatExchanger:Vertical:Single objects not found.");
+            if (!this->myRespFactors) {
+                errorsFound = true;
+                ShowSevereError(state, "GroundHeatExchanger:Vertical:Array object not found.");
+            }
+        } else {
+            if (j.find("vertical_well_locations") == j.end()) {
+                // No ResponseFactors, GHEArray, or SingleBH object are referenced
+                ShowSevereError(state, "No GHE:ResponseFactors, GHE:Vertical:Array, or GHE:Vertical:Single objects found");
+                ShowFatalError(state, "Check references to these objects for GHE:System object: " + this->name);
+            }
+
+            auto const vars = j.at("vertical_well_locations");
+
+            // Calculate response factors from individual boreholes
+            std::vector<std::shared_ptr<GLHEVertSingle>> tempVectOfBHObjects;
+
+            for (auto const &var : vars) {
+                if (!var.at("ghe_vertical_single_object_name").empty()) {
+                    std::shared_ptr<GLHEVertSingle> tempBHptr =
+                        GetSingleBH(state, UtilityRoutines::MakeUPPERCase(var.at("ghe_vertical_single_object_name").get<std::string>()));
+                    if (tempBHptr) {
+                        tempVectOfBHObjects.push_back(tempBHptr);
+                    } else {
+                        errorsFound = true;
+                        std::string const tmpName = var.at("ghe_vertical_single_object_name").get<std::string>();
+                        ShowSevereError(state, "Borehole= " + tmpName + " not found.");
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            this->myRespFactors = BuildAndGetResponseFactorsObjectFromSingleBHs(state, tempVectOfBHObjects);
+
+            if (!this->myRespFactors) {
+                errorsFound = true;
+                ShowSevereError(state, "GroundHeatExchanger:Vertical:Single objects not found.");
+            }
         }
     }
 
@@ -411,9 +438,10 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     state.dataGroundHeatExchanger->prevTimeSteps = 0.0;
 
     // Initialize ground temperature model and get pointer reference
-    this->groundTempModel = GetGroundTempModelAndInit(state,
-                                                      UtilityRoutines::MakeUPPERCase(AsString(j["undisturbed_ground_temperature_model_type"])),
-                                                      UtilityRoutines::MakeUPPERCase(AsString(j["undisturbed_ground_temperature_model_name"])));
+    this->groundTempModel =
+        GetGroundTempModelAndInit(state,
+                                  UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_type"].get<std::string>()),
+                                  UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_name"].get<std::string>()));
     if (this->groundTempModel) {
         errorsFound = this->groundTempModel->errorsFound;
     }
@@ -436,9 +464,9 @@ GLHEVertSingle::GLHEVertSingle(EnergyPlusData &state, std::string const &objName
     }
 
     this->name = objName;
-    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_properties_object_name"])));
-    this->xLoc = j["x_location"];
-    this->yLoc = j["y_location"];
+    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"].get<std::string>()));
+    this->xLoc = j["x_location"].get<Real64>();
+    this->yLoc = j["y_location"].get<Real64>();
     this->dl_i = 0.0;
     this->dl_ii = 0.0;
     this->dl_j = 0.0;
@@ -456,10 +484,10 @@ GLHEVertArray::GLHEVertArray(EnergyPlusData &state, std::string const &objName, 
     }
 
     this->name = objName;
-    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_properties_object_name"])));
-    this->numBHinXDirection = j["number_of_boreholes_in_x_direction"];
-    this->numBHinYDirection = j["number_of_boreholes_in_y_direction"];
-    this->bhSpacing = j["borehole_spacing"];
+    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"].get<std::string>()));
+    this->numBHinXDirection = j["number_of_boreholes_in_x_direction"].get<int>();
+    this->numBHinYDirection = j["number_of_boreholes_in_y_direction"].get<int>();
+    this->bhSpacing = j["borehole_spacing"].get<Real64>();
 }
 
 //******************************************************************************
@@ -475,17 +503,17 @@ GLHEResponseFactors::GLHEResponseFactors(EnergyPlusData &state, std::string cons
     }
 
     this->name = objName;
-    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_properties_object_name"])));
-    this->numBoreholes = j["number_of_boreholes"];
-    this->gRefRatio = j["g_function_reference_ratio"];
+    this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"].get<std::string>()));
+    this->numBoreholes = j["number_of_boreholes"].get<int>();
+    this->gRefRatio = j["g_function_reference_ratio"].get<Real64>();
     this->maxSimYears = state.dataEnvrn->MaxNumberSimYears;
 
     auto const vars = j.at("g_functions");
     std::vector<Real64> tmpLntts;
     std::vector<Real64> tmpGvals;
     for (auto const &var : vars) {
-        tmpLntts.push_back(var.at("g_function_ln_t_ts_value"));
-        tmpGvals.push_back(var.at("g_function_g_value"));
+        tmpLntts.push_back(var.at("g_function_ln_t_ts_value").get<Real64>());
+        tmpGvals.push_back(var.at("g_function_g_value").get<Real64>());
     }
 
     bool errorsFound = false;
@@ -525,16 +553,16 @@ GLHEVertProps::GLHEVertProps(EnergyPlusData &state, std::string const &objName, 
 
     // Load data from JSON
     this->name = objName;
-    this->bhTopDepth = j["depth_of_top_of_borehole"];
-    this->bhLength = j["borehole_length"];
-    this->bhDiameter = j["borehole_diameter"];
-    this->grout.k = j["grout_thermal_conductivity"];
-    this->grout.rhoCp = j["grout_thermal_heat_capacity"];
-    this->pipe.k = j["pipe_thermal_conductivity"];
-    this->pipe.rhoCp = j["pipe_thermal_heat_capacity"];
-    this->pipe.outDia = j["pipe_outer_diameter"];
-    this->pipe.thickness = j["pipe_thickness"];
-    this->bhUTubeDist = j["u_tube_distance"];
+    this->bhTopDepth = j["depth_of_top_of_borehole"].get<Real64>();
+    this->bhLength = j["borehole_length"].get<Real64>();
+    this->bhDiameter = j["borehole_diameter"].get<Real64>();
+    this->grout.k = j["grout_thermal_conductivity"].get<Real64>();
+    this->grout.rhoCp = j["grout_thermal_heat_capacity"].get<Real64>();
+    this->pipe.k = j["pipe_thermal_conductivity"].get<Real64>();
+    this->pipe.rhoCp = j["pipe_thermal_heat_capacity"].get<Real64>();
+    this->pipe.outDia = j["pipe_outer_diameter"].get<Real64>();
+    this->pipe.thickness = j["pipe_thickness"].get<Real64>();
+    this->bhUTubeDist = j["u_tube_distance"].get<Real64>();
 
     // Verify u-tube spacing is valid
     if (this->bhUTubeDist < this->pipe.outDia) {
@@ -946,13 +974,54 @@ Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std
 
 //******************************************************************************
 
+void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
+{
+    switch (this->gFuncCalcMethod) {
+    case GFuncCalcMethod::UniformHeatFlux:
+        this->calcUniformHeatFluxGFunctions(state);
+        break;
+    case GFuncCalcMethod::UniformBoreholeWallTemp:
+        this->calcUniformBHWallTempGFunctions(state);
+        break;
+    default:
+        assert(false);
+    }
+}
+
+//******************************************************************************
+
+void GLHEVert::calcUniformBHWallTempGFunctions(EnergyPlusData &state)
+{
+    // construct boreholes vector
+    std::vector<gt::boreholes::Borehole> boreholes;
+    for (auto &bh : this->myRespFactors->myBorholes) {
+        boreholes.emplace_back(bh->props->bhLength, bh->props->bhTopDepth, bh->props->bhDiameter / 2.0, bh->xLoc, bh->yLoc);
+    }
+
+    // convert time to a std::vector from an Array1D
+    std::vector<double> time;
+    for (auto &v : this->myRespFactors->time) {
+        time.push_back(v);
+    }
+
+    // Obtain number of segments by adaptive discretization
+    gt::segments::adaptive adptDisc;
+    int nSegments = adptDisc.discretize(this->bhLength, this->totalTubeLength);
+
+    this->myRespFactors->GFNC =
+        gt::gfunction::uniform_borehole_wall_temperature(boreholes, time, this->soil.diffusivity, nSegments, true, state.dataGlobal->numThread);
+}
+
+//******************************************************************************
+
 void GLHEVert::calcGFunctions(EnergyPlusData &state)
 {
 
     // No other choice than to calculate the g-functions here
-    calcShortTimestepGFunctions(state);
-    calcLongTimestepGFunctions(state);
-    combineShortAndLongTimestepGFunctions();
+    this->setupTimeVectors();
+    this->calcShortTimestepGFunctions(state);
+    this->calcLongTimestepGFunctions(state);
+    this->combineShortAndLongTimestepGFunctions();
 
     // save data for later
     if (!state.dataSysVars->DisableGLHECaching) {
@@ -965,7 +1034,7 @@ void GLHEVert::calcGFunctions(EnergyPlusData &state)
 
 //******************************************************************************
 
-void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
+void GLHEVert::setupTimeVectors()
 {
 
     constexpr int numDaysInYear(365);
@@ -1004,7 +1073,12 @@ void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
         this->myRespFactors->LNTTS(index) = thisLNTTS;
         ++index;
     }
+}
 
+//******************************************************************************
+
+void GLHEVert::calcUniformHeatFluxGFunctions(EnergyPlusData &state)
+{
     DisplayString(state, "Initializing GroundHeatExchanger:System: " + this->name);
 
     // Calculate the g-functions
@@ -1391,6 +1465,7 @@ void GLHEVert::makeThisGLHECacheStruct()
     d["Pipe Thickness"] = this->myRespFactors->props->pipe.thickness;
     d["U-tube Dist"] = this->myRespFactors->props->bhUTubeDist;
     d["Max Simulation Years"] = this->myRespFactors->maxSimYears;
+    d["g-Function Calc Method"] = GroundHeatExchangers::GFuncCalcMethodsStrs[int(this->gFuncCalcMethod)];
 
     int i = 0;
     for (auto &thisBH : this->myRespFactors->myBorholes) {
@@ -1442,37 +1517,14 @@ void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
         }
 
         if (gFunctionsExist) {
-
-            // Setup the arrays
-            int numEntries = myCacheData["Response Factors"]["LNTTS"].size();
-
-            this->myRespFactors->time.dimension(numEntries, 0.0);
-            this->myRespFactors->LNTTS.dimension(numEntries, 0.0);
-            this->myRespFactors->GFNC.dimension(numEntries, 0.0);
-
             // Populate the time array
-            int index = 1;
-            auto &j_time = myCacheData["Response Factors"]["time"];
-            for (auto &it : j_time) {
-                this->myRespFactors->time(index) = it;
-                ++index;
-            }
+            this->myRespFactors->time = Array1D<Real64>(myCacheData["Response Factors"]["time"].get<std::vector<Real64>>());
 
             // Populate the lntts array
-            index = 1;
-            auto &j_lntts = myCacheData["Response Factors"]["LNTTS"];
-            for (auto &j_lntt : j_lntts) {
-                this->myRespFactors->LNTTS(index) = j_lntt;
-                ++index;
-            }
+            this->myRespFactors->LNTTS = Array1D<Real64>(myCacheData["Response Factors"]["LNTTS"].get<std::vector<Real64>>());
 
             // Populate the g-function array
-            index = 1;
-            auto &j_gfnc = myCacheData["Response Factors"]["GFNC"];
-            for (auto &it : j_gfnc) {
-                this->myRespFactors->GFNC(index) = it;
-                ++index;
-            }
+            this->myRespFactors->GFNC = Array1D<Real64>(myCacheData["Response Factors"]["GFNC"].get<std::vector<Real64>>());
         }
     }
 }
@@ -1485,73 +1537,20 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
     // For convenience
     using json = nlohmann::json;
 
+    json cached_json;
     if (FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath)) {
         // file exists -- add data
-
         // open file
-        std::ifstream ifs(state.dataStrGlobals->outputGLHEFilePath);
-
-        // create empty json object
-        json json_in;
-
-        // read json_in data
-        try {
-            ifs >> json_in;
-            ifs.close();
-        } catch (...) {
-            if (!json_in.empty()) {
-                // file exists, is not empty, but failed for some other reason
-                ShowWarningError(state, "Error reading from " + state.dataStrGlobals->outputGLHEFilePath.string());
-                ShowWarningError(state, "Data from previous " + state.dataStrGlobals->outputGLHEFilePath.string() + " not saved");
-            }
-            ifs.close();
-        }
-
-        // empty json object for output writing
-        json json_out;
-
-        // add existing data to json_out
-        int i = 0;
-        for (auto &existing_data : json_in) {
-            ++i;
-            std::string case_name = format("GHLE {}", i);
-            json_out[case_name] = existing_data;
-        }
+        cached_json = FileSystem::readJSON(state.dataStrGlobals->outputGLHEFilePath, std::ios_base::in | std::ios_base::binary);
 
         // add current data
-        std::string case_name = format("GHLE {}", i + 1);
-        json_out[case_name] = myCacheData;
-
-        if (state.files.outputControl.glhe) {
-            // open output file
-            std::ofstream ofs;
-            ofs.open(state.dataStrGlobals->outputGLHEFilePath);
-            // write data to file, set spacing at 2
-            ofs << std::setw(2) << json_out;
-            // don't forget to close
-            ofs.close();
-        }
-
+        cached_json.emplace(fmt::format("GHLE {}", cached_json.size() + 1), myCacheData);
     } else {
         // file doesn't exist -- add data
-
-        // empty json object for output writing
-        json json_out;
-
         // add current data
-        std::string case_name = "GHLE 1";
-        json_out[case_name] = myCacheData;
-
-        if (state.files.outputControl.glhe) {
-            // open output file
-            std::ofstream ofs;
-            ofs.open(state.dataStrGlobals->outputGLHEFilePath);
-            // write data to file, set spacing at 2
-            ofs << std::setw(2) << json_out;
-            // don't forget to close
-            ofs.close();
-        }
+        cached_json.emplace("GHLE 1", myCacheData);
     }
+    FileSystem::writeFile<FileSystem::FileTypes::GLHE>(state.dataStrGlobals->outputGLHEFilePath, cached_json, 2);
 }
 
 //******************************************************************************
@@ -2631,18 +2630,55 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
 
 void GLHEBase::setupOutput(EnergyPlusData &state)
 {
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Average Borehole Temperature", OutputProcessor::Unit::C, this->bhTemp, "System", "Average", this->name);
-    SetupOutputVariable(state, "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, this->QGLHE, "System", "Average", this->name);
-    SetupOutputVariable(state, "Ground Heat Exchanger Inlet Temperature", OutputProcessor::Unit::C, this->inletTemp, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Outlet Temperature", OutputProcessor::Unit::C, this->outletTemp, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Mass Flow Rate", OutputProcessor::Unit::kg_s, this->massFlowRate, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Average Fluid Temperature", OutputProcessor::Unit::C, this->aveFluidTemp, "System", "Average", this->name);
-    SetupOutputVariable(
-        state, "Ground Heat Exchanger Farfield Ground Temperature", OutputProcessor::Unit::C, this->tempGround, "System", "Average", this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Average Borehole Temperature",
+                        OutputProcessor::Unit::C,
+                        this->bhTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->QGLHE,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->inletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->outletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->massFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Average Fluid Temperature",
+                        OutputProcessor::Unit::C,
+                        this->aveFluidTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
+    SetupOutputVariable(state,
+                        "Ground Heat Exchanger Farfield Ground Temperature",
+                        OutputProcessor::Unit::C,
+                        this->tempGround,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
 }
 
 //******************************************************************************
@@ -3074,7 +3110,6 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
                       DataGlobalConstants::SecInHour;
 
     // Init more variables
-    this->oneTimeInit(state);
 
     if (this->myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         this->initEnvironment(state, currTime);
@@ -3139,22 +3174,22 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
 
 //******************************************************************************
 
-void GLHEVert::oneTimeInit(EnergyPlusData &state)
+void GLHEVert::oneTimeInit_new(EnergyPlusData &state)
 {
 
     using DataPlant::TypeOf_GrndHtExchgSystem;
     using PlantUtilities::ScanPlantLoopsForObject;
 
-    if (this->myOneTImeInitFlag) {
-        // Locate the hx on the plant loops for later usage
-        bool errFlag = false;
-        ScanPlantLoopsForObject(
-            state, this->name, TypeOf_GrndHtExchgSystem, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
-        if (errFlag) {
-            ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
-        }
-        this->myOneTImeInitFlag = false;
+    // Locate the hx on the plant loops for later usage
+    bool errFlag = false;
+    ScanPlantLoopsForObject(
+        state, this->name, TypeOf_GrndHtExchgSystem, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+    if (errFlag) {
+        ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }
+}
+void GLHEVert::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 //******************************************************************************
@@ -3177,7 +3212,6 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
                      DataGlobalConstants::SecInHour;
 
     // Init more variables
-    this->oneTimeInit(state);
 
     if (this->myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         this->initEnvironment(state, CurTime);
@@ -3227,21 +3261,21 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
 
 //******************************************************************************
 
-void GLHESlinky::oneTimeInit(EnergyPlusData &state)
+void GLHESlinky::oneTimeInit_new(EnergyPlusData &state)
 {
     using DataPlant::TypeOf_GrndHtExchgSlinky;
     using PlantUtilities::ScanPlantLoopsForObject;
 
-    if (this->myOneTImeInitFlag) {
-        // Locate the hx on the plant loops for later usage
-        bool errFlag = false;
-        ScanPlantLoopsForObject(
-            state, this->name, TypeOf_GrndHtExchgSlinky, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
-        if (errFlag) {
-            ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
-        }
-        this->myOneTImeInitFlag = false;
+    // Locate the hx on the plant loops for later usage
+    bool errFlag = false;
+    ScanPlantLoopsForObject(
+        state, this->name, TypeOf_GrndHtExchgSlinky, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+    if (errFlag) {
+        ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }
+}
+void GLHESlinky::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 //******************************************************************************

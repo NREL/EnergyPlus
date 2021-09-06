@@ -64,6 +64,7 @@
 #include <ObjexxFCL/time.hh>
 
 // Third-party Headers
+#include <fast_float/fast_float.h>
 #include <fmt/format.h>
 
 // EnergyPlus Headers
@@ -90,6 +91,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
@@ -1694,10 +1696,17 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
                 }
             }
             if (!nameFound) {
-                ShowSevereError(
-                    state,
-                    format("{} Field[{}]=\"{}\", invalid report name -- will not be reported.", CurrentModuleObject, iReport, AlphArray(iReport)));
-                //      ErrorsFound=.TRUE.
+                if (UtilityRoutines::SameString(AlphArray(iReport), "Standard62.1Summary")) {
+                    ShowWarningError(state, format("{} Field[{}]=\"Standard62.1Summary\", Report is not enabled.", CurrentModuleObject, iReport));
+                    ShowContinueError(state, "Do Zone Sizing or Do System Sizing must be enabled in SimulationControl.");
+
+                } else {
+                    ShowSevereError(
+                        state,
+                        format(
+                            "{} Field[{}]=\"{}\", invalid report name -- will not be reported.", CurrentModuleObject, iReport, AlphArray(iReport)));
+                    //      ErrorsFound=.TRUE.
+                }
             }
         }
         CreatePredefinedMonthlyReports(state);
@@ -1756,8 +1765,19 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->endUseNames(state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) = "Cogeneration";
 
         // End use subs must be dynamically allocated to accomodate the end use with the most subcategories
-        ort->meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
-        ort->meterNumEndUseSubBEPS = 0;
+        ort->meterNumEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, numResourceTypes);
+        ort->meterNumEndUseSpTypeBEPS.allocate(
+            state.dataOutputProcessor->maxNumEndUseSpaceTypes, DataGlobalConstantsData::iEndUseSize, numResourceTypes);
+        for (int endUse = 1; endUse <= DataGlobalConstantsData::iEndUseSize; ++endUse) {
+            for (int resType = 1; resType <= numResourceTypes; ++resType) {
+                for (int subCat = 1; subCat <= state.dataOutputProcessor->MaxNumSubcategories; ++subCat) {
+                    ort->meterNumEndUseSubBEPS(subCat, endUse, resType) = 0;
+                }
+                for (int spType = 1; spType <= state.dataOutputProcessor->maxNumEndUseSpaceTypes; ++spType) {
+                    ort->meterNumEndUseSpTypeBEPS(spType, endUse, resType) = 0;
+                }
+            }
+        }
 
         // loop through all of the resources and end uses and sub end uses for the entire facility
         for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
@@ -1765,7 +1785,7 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
             meterNumber = GetMeterIndex(state, meterName);
             ort->meterNumTotalsBEPS(iResource) = meterNumber;
 
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 meterName = ort->endUseNames(jEndUse) + ':' + ort->resourceTypeNames(iResource); //// ':FACILITY'
                 meterNumber = GetMeterIndex(state, meterName);
                 ort->meterNumEndUseBEPS(iResource, jEndUse) = meterNumber;
@@ -1775,6 +1795,12 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
                                 ':' + ort->resourceTypeNames(iResource);
                     meterNumber = GetMeterIndex(state, meterName);
                     ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource) = meterNumber;
+                }
+                for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+                    meterName = ort->endUseNames(jEndUse) + ':' + ort->resourceTypeNames(iResource) +
+                                ":SpaceType:" + state.dataOutputProcessor->EndUseCategory(jEndUse).spaceTypeName(kEndUseSpType);
+                    meterNumber = GetMeterIndex(state, meterName);
+                    ort->meterNumEndUseSpTypeBEPS(kEndUseSpType, jEndUse, iResource) = meterNumber;
                 }
             }
         }
@@ -1792,12 +1818,15 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->gatherEndUseBEPS = 0.0;
         ort->gatherEndUseBySourceBEPS = 0.0;
         // End use subs must be dynamically allocated to accommodate the end use with the most subcategories
-        ort->gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
+        ort->gatherEndUseSubBEPS.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, numResourceTypes);
         ort->gatherEndUseSubBEPS = 0.0;
-        ort->gatherDemandEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
+        ort->gatherEndUseSpTypeBEPS.allocate(
+            state.dataOutputProcessor->maxNumEndUseSpaceTypes, DataGlobalConstantsData::iEndUseSize, numResourceTypes);
+        ort->gatherEndUseSpTypeBEPS = 0.0;
+        ort->gatherDemandEndUseSub.allocate(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, numResourceTypes);
         ort->gatherDemandEndUseSub = 0.0;
         ort->gatherDemandIndEndUseSub.allocate(
-            state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), numResourceTypes);
+            state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, numResourceTypes);
         ort->gatherDemandIndEndUseSub = 0.0;
 
         // get meter numbers for other meters relating to electric load components
@@ -3875,31 +3904,10 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
     //          DistrictCooling
     //          DistrictHeating
 
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
     using DataStringGlobals::CharComma;
     using DataStringGlobals::CharSpace;
     using DataStringGlobals::CharTab;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int iResource;
-    int kEndUseSub;
-    Real64 curMeterValue;
-    int curMeterNumber;
     auto &ort(state.dataOutRptTab);
 
     // if no beps report is called then skip
@@ -3918,35 +3926,42 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
         //  END DO
 
         // loop through all of the resources and end uses for the entire facility
-        for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
-            curMeterNumber = ort->meterNumTotalsBEPS(iResource);
-            if (curMeterNumber > 0) {
-                curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
-                ort->gatherTotalsBEPS(iResource) += curMeterValue;
+        for (int iResource = 1; iResource <= numResourceTypes; ++iResource) {
+            int curResMeterNumber = ort->meterNumTotalsBEPS(iResource);
+            if (curResMeterNumber > 0) {
+                Real64 curResMeterValue = GetCurrentMeterValue(state, curResMeterNumber);
+                ort->gatherTotalsBEPS(iResource) += curResMeterValue;
             }
 
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
-                curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
-                if (curMeterNumber > 0) {
-                    curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
-                    ort->gatherEndUseBEPS(iResource, jEndUse) += curMeterValue;
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+                int curEndUseMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
+                if (curEndUseMeterNumber > 0) {
+                    Real64 curEndUseMeterValue = GetCurrentMeterValue(state, curEndUseMeterNumber);
+                    ort->gatherEndUseBEPS(iResource, jEndUse) += curEndUseMeterValue;
 
-                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        curMeterNumber = ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
-                        if (curMeterNumber > 0) {
-                            curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
-                            ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, iResource) += curMeterValue;
+                    for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                        int curSubMeterNumber = ort->meterNumEndUseSubBEPS(kEndUseSub, jEndUse, iResource);
+                        if (curSubMeterNumber > 0) {
+                            Real64 curSubMeterValue = GetCurrentMeterValue(state, curSubMeterNumber);
+                            ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, iResource) += curSubMeterValue;
+                        }
+                    }
+                    for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+                        int curSpTypeMeterNumber = ort->meterNumEndUseSpTypeBEPS(kEndUseSpType, jEndUse, iResource);
+                        if (curSpTypeMeterNumber > 0) {
+                            Real64 curSpTypeMeterValue = GetCurrentMeterValue(state, curSpTypeMeterNumber);
+                            ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, iResource) += curSpTypeMeterValue;
                         }
                     }
                 }
             }
         }
 
-        for (iResource = 1; iResource <= numSourceTypes; ++iResource) {
-            curMeterNumber = ort->meterNumTotalsSource(iResource);
-            if (curMeterNumber > 0) {
-                curMeterValue = GetCurrentMeterValue(state, curMeterNumber);
-                ort->gatherTotalsSource(iResource) += curMeterValue;
+        for (int iResource = 1; iResource <= numSourceTypes; ++iResource) {
+            int curResMeterNumber = ort->meterNumTotalsSource(iResource);
+            if (curResMeterNumber > 0) {
+                Real64 curResMeterValue = GetCurrentMeterValue(state, curResMeterNumber);
+                ort->gatherTotalsSource(iResource) += curResMeterValue;
             }
         }
 
@@ -4084,7 +4099,7 @@ void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state,
                 }
             }
 
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 if (ort->ffSchedUsed(iResource)) {
                     curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                     if (curMeterNumber > 0) {
@@ -4204,7 +4219,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
                     ort->gatherDemandTimeStamp(iResource) = timestepTimeStamp;
                     // if new peak demand is set, then gather all of the end use values at this particular
                     // time to find the components of the peak demand
-                    for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+                    for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                         curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                         if (curMeterNumber > 0) {
                             curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
@@ -4227,7 +4242,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     if ((ort->displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
         // loop through all of the resources and end uses for the entire facility
         for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 curMeterNumber = ort->meterNumEndUseBEPS(iResource, jEndUse);
                 if (curMeterNumber > 0) {
                     curDemandValue = GetCurrentMeterValue(state, curMeterNumber) / state.dataGlobal->TimeStepZoneSec;
@@ -5261,23 +5276,24 @@ void WriteTabularReports(EnergyPlusData &state)
     }
 
     constexpr static auto variable_fmt{" {}={:12}\n"};
+    constexpr static auto variable_fmt_syntax = check_syntax(variable_fmt);
     state.files.audit.ensure_open(state, "WriteTabularReports", state.files.outputControl.audit);
-    print(state.files.audit, variable_fmt, "MonthlyInputCount", ort->MonthlyInputCount);
-    print(state.files.audit, variable_fmt, "sizeMonthlyInput", ort->sizeMonthlyInput);
-    print(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", ort->MonthlyFieldSetInputCount);
-    print(state.files.audit, variable_fmt, "sizeMonthlyFieldSetInput", ort->sizeMonthlyFieldSetInput);
-    print(state.files.audit, variable_fmt, "MonthlyTablesCount", ort->MonthlyTablesCount);
-    print(state.files.audit, variable_fmt, "MonthlyColumnsCount", ort->MonthlyColumnsCount);
-    print(state.files.audit, variable_fmt, "sizeReportName", state.dataOutRptPredefined->sizeReportName);
-    print(state.files.audit, variable_fmt, "numReportName", state.dataOutRptPredefined->numReportName);
-    print(state.files.audit, variable_fmt, "sizeSubTable", state.dataOutRptPredefined->sizeSubTable);
-    print(state.files.audit, variable_fmt, "numSubTable", state.dataOutRptPredefined->numSubTable);
-    print(state.files.audit, variable_fmt, "sizeColumnTag", state.dataOutRptPredefined->sizeColumnTag);
-    print(state.files.audit, variable_fmt, "numColumnTag", state.dataOutRptPredefined->numColumnTag);
-    print(state.files.audit, variable_fmt, "sizeTableEntry", state.dataOutRptPredefined->sizeTableEntry);
-    print(state.files.audit, variable_fmt, "numTableEntry", state.dataOutRptPredefined->numTableEntry);
-    print(state.files.audit, variable_fmt, "sizeCompSizeTableEntry", state.dataOutRptPredefined->sizeCompSizeTableEntry);
-    print(state.files.audit, variable_fmt, "numCompSizeTableEntry", state.dataOutRptPredefined->numCompSizeTableEntry);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "MonthlyInputCount", ort->MonthlyInputCount);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeMonthlyInput", ort->sizeMonthlyInput);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", ort->MonthlyFieldSetInputCount);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeMonthlyFieldSetInput", ort->sizeMonthlyFieldSetInput);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "MonthlyTablesCount", ort->MonthlyTablesCount);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "MonthlyColumnsCount", ort->MonthlyColumnsCount);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeReportName", state.dataOutRptPredefined->sizeReportName);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "numReportName", state.dataOutRptPredefined->numReportName);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeSubTable", state.dataOutRptPredefined->sizeSubTable);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "numSubTable", state.dataOutRptPredefined->numSubTable);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeColumnTag", state.dataOutRptPredefined->sizeColumnTag);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "numColumnTag", state.dataOutRptPredefined->numColumnTag);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeTableEntry", state.dataOutRptPredefined->sizeTableEntry);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "numTableEntry", state.dataOutRptPredefined->numTableEntry);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "sizeCompSizeTableEntry", state.dataOutRptPredefined->sizeCompSizeTableEntry);
+    print<variable_fmt_syntax>(state.files.audit, variable_fmt, "numCompSizeTableEntry", state.dataOutRptPredefined->numCompSizeTableEntry);
 }
 
 bool produceDualUnitsFlags(const int &iUnit_Sys,
@@ -7576,7 +7592,7 @@ void WriteTimeBinTables(EnergyPlusData &state)
             tableBody(1, 1) = "less than";
             tableBody(1, 2) = RealToStr(curIntervalStart, numIntervalDigits);
             for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                columnHead(nCol + 1) = format("{} [hr]", nCol);
+                columnHead(nCol + 1) = fmt::format("{} [hr]", nCol);
                 // beginning of interval
                 tableBody(nCol + 1, 1) = RealToStr(curIntervalStart + (nCol - 1) * curIntervalSize, numIntervalDigits) + "<=";
                 // end of interval
@@ -7731,7 +7747,6 @@ void WriteBEPSTable(EnergyPlusData &state)
     //       DATE WRITTEN   November 2003
     //       MODIFIED       January 2010, Kyle Benne; Added SQLite output
     //                      March 2020, Dareum Nam; Disaggregated "Additional Fuel"
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //   Take the gathered total and enduse meter data and structure
@@ -7745,18 +7760,6 @@ void WriteBEPSTable(EnergyPlusData &state)
     //   that will split up very long header lines for the fixed width
     //   table is the header rows.
 
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using DataWater::StorageTankDataStruct;
-    using ScheduleManager::GetScheduleName;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
     int const colElectricity(1);
     int const colGas(2);
     int const colPurchCool(11);
@@ -7764,14 +7767,6 @@ void WriteBEPSTable(EnergyPlusData &state)
 
     Real64 const SmallValue(1.e-14);
     auto &ort(state.dataOutRptTab);
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // all arrays are in the format: (row, column)
     Array1D_string columnHead;
@@ -7783,9 +7778,10 @@ void WriteBEPSTable(EnergyPlusData &state)
     Array2D<Real64> useVal(13, 15);
     Array2D<Real64> normalVal(13, 4);
     Array1D<Real64> collapsedTotal(13);
-    Array2D<Real64> collapsedEndUse(13, state.dataGlobalConst->iEndUse.size());
-    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
-    Array2D<Real64> endUseSubOther(13, state.dataGlobalConst->iEndUse.size());
+    Array2D<Real64> collapsedEndUse(13, DataGlobalConstantsData::iEndUseSize);
+    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 13);
+    Array2D<Real64> endUseSubOther(13, DataGlobalConstantsData::iEndUseSize);
+    Array3D<Real64> collapsedEndUseSpType(state.dataOutputProcessor->maxNumEndUseSpaceTypes, DataGlobalConstantsData::iEndUseSize, 13);
     Real64 totalOnsiteHeat;
     Real64 totalOnsiteWater;
     Real64 totalWater;
@@ -7796,11 +7792,9 @@ void WriteBEPSTable(EnergyPlusData &state)
     Real64 netSourceEnergyUse;
     Real64 netSourceElecPurchasedSold;
     int iResource;
-    int kEndUseSub;
     int i;
     Real64 largeConversionFactor;
     Real64 kConversionFactor;
-    int numRows;
     Real64 initialStorage;
     Real64 finalStorage;
     Real64 StorageChange;
@@ -7863,7 +7857,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             // determine building floor areas
             DetermineBuildingFloorArea(state);
             // collapse the gatherEndUseBEPS array to the resource groups displayed
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 collapsedEndUse(1, jEndUse) = ort->gatherEndUseBEPS(1, jEndUse);   // electricity
                 collapsedEndUse(2, jEndUse) = ort->gatherEndUseBEPS(2, jEndUse);   // natural gas
                 collapsedEndUse(3, jEndUse) = ort->gatherEndUseBEPS(6, jEndUse);   // gasoline
@@ -7921,8 +7915,8 @@ void WriteBEPSTable(EnergyPlusData &state)
                                                    format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband));
                 }
             }
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
-                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+                for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1);   // electricity
                     collapsedEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 2);   // natural gas
                     collapsedEndUseSub(kEndUseSub, jEndUse, 3) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 6);   // gasoline
@@ -7940,8 +7934,26 @@ void WriteBEPSTable(EnergyPlusData &state)
                         ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 5); // district heating <- purch heating | <- steam
                     collapsedEndUseSub(kEndUseSub, jEndUse, 13) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 7); // water
                 }
-            }
 
+                for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 1) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 1);   // electricity
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 2) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 2);   // natural gas
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 3) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 6);   // gasoline
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 4) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 8);   // diesel
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 5) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 9);   // coal
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 6) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 10);  // Fuel Oil No1
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 7) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 11);  // Fuel Oil No2
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 8) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 12);  // propane
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 9) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 13);  // otherfuel1
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 10) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 14); // otherfuel2
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 11) =
+                        ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 3); // district cooling <- purch cooling
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 12) =
+                        ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 4) +
+                        ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 5); // district heating <- purch heating | <- steam
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 13) = ort->gatherEndUseSpTypeBEPS(kEndUseSpType, jEndUse, 7); // water
+                }
+            }
             // unit conversion - all values are used as divisors
             {
                 auto const SELECT_CASE_var(unitsStyle_cur);
@@ -7969,19 +7981,25 @@ void WriteBEPSTable(EnergyPlusData &state)
 
             // convert units into GJ (divide by 1,000,000,000) if J otherwise kWh
             for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                     collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
-                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                    for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         collapsedEndUseSub(kEndUseSub, jEndUse, iResource) /= largeConversionFactor;
+                    }
+                    for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+                        collapsedEndUseSpType(kEndUseSpType, jEndUse, iResource) /= largeConversionFactor;
                     }
                 }
                 collapsedTotal(iResource) /= largeConversionFactor;
             }
             // do water
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 collapsedEndUse(13, jEndUse) /= waterConversionFactor;
-                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 13) /= waterConversionFactor;
+                }
+                for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, 13) /= waterConversionFactor;
                 }
             }
 
@@ -8320,7 +8338,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 1) = RealToStr(ort->sourceFactorElectric, 3);
             } else if (ort->gatherTotalsBEPS(1) > SmallValue) {
                 tableBody(1, 1) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(1) / ort->gatherTotalsBEPS(1), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(1)) + "\")";
+                                  " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(1)) + "\")";
             } else {
                 tableBody(1, 1) = "N/A";
             }
@@ -8329,7 +8347,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 2) = RealToStr(ort->sourceFactorNaturalGas, 3);
             } else if (ort->gatherTotalsBEPS(2) > SmallValue) {
                 tableBody(1, 2) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(2) / ort->gatherTotalsBEPS(2), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(2)) + "\")";
+                                  " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(2)) + "\")";
             } else {
                 tableBody(1, 2) = "N/A";
             }
@@ -8344,7 +8362,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 6) = RealToStr(ort->sourceFactorGasoline, 3);
             } else if (ort->gatherTotalsBEPS(6) > SmallValue) {
                 tableBody(1, 6) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(6) / ort->gatherTotalsBEPS(6), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(6)) + "\")";
+                                  " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(6)) + "\")";
             } else {
                 tableBody(1, 6) = "N/A";
             }
@@ -8353,7 +8371,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 7) = RealToStr(ort->sourceFactorDiesel, 3);
             } else if (ort->gatherTotalsBEPS(8) > SmallValue) {
                 tableBody(1, 7) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(8) / ort->gatherTotalsBEPS(8), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(8)) + "\")";
+                                  " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(8)) + "\")";
             } else {
                 tableBody(1, 7) = "N/A";
             }
@@ -8362,7 +8380,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 8) = RealToStr(ort->sourceFactorCoal, 3);
             } else if (ort->gatherTotalsBEPS(9) > SmallValue) {
                 tableBody(1, 8) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(9) / ort->gatherTotalsBEPS(9), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(9)) + "\")";
+                                  " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(9)) + "\")";
             } else {
                 tableBody(1, 8) = "N/A";
             }
@@ -8371,7 +8389,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 9) = RealToStr(ort->sourceFactorFuelOil1, 3);
             } else if (ort->gatherTotalsBEPS(10) > SmallValue) {
                 tableBody(1, 9) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(10) / ort->gatherTotalsBEPS(10), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(10)) + "\")";
+                                  " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(10)) + "\")";
             } else {
                 tableBody(1, 9) = "N/A";
             }
@@ -8380,7 +8398,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 10) = RealToStr(ort->sourceFactorFuelOil2, 3);
             } else if (ort->gatherTotalsBEPS(11) > SmallValue) {
                 tableBody(1, 10) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(11) / ort->gatherTotalsBEPS(11), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(11)) + "\")";
+                                   " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(11)) + "\")";
             } else {
                 tableBody(1, 10) = "N/A";
             }
@@ -8389,7 +8407,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 11) = RealToStr(ort->sourceFactorPropane, 3);
             } else if (ort->gatherTotalsBEPS(12) > SmallValue) {
                 tableBody(1, 11) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(12) / ort->gatherTotalsBEPS(12), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(12)) + "\")";
+                                   " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(12)) + "\")";
             } else {
                 tableBody(1, 11) = "N/A";
             }
@@ -8398,7 +8416,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 12) = RealToStr(ort->sourceFactorOtherFuel1, 3);
             } else if (ort->gatherTotalsBEPS(13) > SmallValue) {
                 tableBody(1, 12) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(13) / ort->gatherTotalsBEPS(13), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(13)) + "\")";
+                                   " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(13)) + "\")";
             } else {
                 tableBody(1, 12) = "N/A";
             }
@@ -8407,7 +8425,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 13) = RealToStr(ort->sourceFactorOtherFuel2, 3);
             } else if (ort->gatherTotalsBEPS(14) > SmallValue) {
                 tableBody(1, 13) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(14) / ort->gatherTotalsBEPS(14), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(14)) + "\")";
+                                   " (calculated using schedule \"" + ScheduleManager::GetScheduleName(state, ort->ffSchedIndex(14)) + "\")";
             } else {
                 tableBody(1, 13) = "N/A";
             }
@@ -8592,7 +8610,7 @@ void WriteBEPSTable(EnergyPlusData &state)
 
             tableBody = "";
             for (iResource = 1; iResource <= 13; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= 14; ++jEndUse) {
                     tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse), 2);
                 }
                 tableBody(iResource, 16) = RealToStr(useVal(iResource, 15), 2);
@@ -8889,187 +8907,25 @@ void WriteBEPSTable(EnergyPlusData &state)
             }
 
             //---- End Uses By Subcategory Sub-Table
+            writeBEPSEndUseBySubCatOrSpaceType(state,
+                                               endUseSubTableType::bySubCategory,
+                                               endUseSubOther,
+                                               collapsedEndUse,
+                                               collapsedEndUseSub,
+                                               ort->needOtherRowLEED45,
+                                               unitsStyle_cur,
+                                               produceTabular,
+                                               produceSQLite);
 
-            // determine if subcategories add up to the total and
-            // if not, determine the difference for the 'other' row
-            ort->needOtherRowLEED45 = false; // set array to all false assuming no other rows are needed
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
-                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                        // set the value to the total for the end use
-                        endUseSubOther(iResource, jEndUse) = collapsedEndUse(iResource, jEndUse);
-                        // subtract off each sub end use category value
-                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            endUseSubOther(iResource, jEndUse) -= collapsedEndUseSub(kEndUseSub, jEndUse, iResource);
-                        }
-                        // if just a small value remains set it to zero
-                        if (std::abs(endUseSubOther(iResource, jEndUse)) > 0.01) {
-                            ort->needOtherRowLEED45(jEndUse) = true;
-                        } else {
-                            endUseSubOther(iResource, jEndUse) = 0.0;
-                        }
-                    } else {
-                        endUseSubOther(iResource, jEndUse) = 0.0;
-                    }
-                }
-            }
-
-            // determine the number of rows needed for sub-table
-            numRows = 0;
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        ++numRows;
-                    }
-                    // check if an 'other' row is needed
-                    if (ort->needOtherRowLEED45(jEndUse)) {
-                        ++numRows;
-                    }
-                } else {
-                    ++numRows;
-                }
-            }
-
-            rowHead.allocate(numRows);
-            columnHead.allocate(14);
-            columnWidth.allocate(14);
-            columnWidth = 10;                // array assignment - same for all columns
-            tableBody.allocate(14, numRows); // TODO: this appears to be (column, row)...
-            rowHead = "";
-            tableBody = "";
-
-            // Build row head and subcategories columns
-            i = 1;
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
-                rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
-                        ++i;
-                    }
-                    // check if an 'other' row is needed
-                    if (ort->needOtherRowLEED45(jEndUse)) {
-                        tableBody(1, i) = "Other";
-                        ++i;
-                    }
-                } else {
-                    tableBody(1, i) = "General";
-                    ++i;
-                }
-            }
-
-            columnHead(1) = "Subcategory";
-
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(2) = "Electricity [kWh]";
-                    columnHead(3) = "Natural Gas [kWh]";
-                    columnHead(4) = "Gasoline [kWh]";
-                    columnHead(5) = "Diesel [kWh]";
-                    columnHead(6) = "Coal [kWh]";
-                    columnHead(7) = "Fuel Oil No 1 [kWh]";
-                    columnHead(8) = "Fuel Oil No 2 [kWh]";
-                    columnHead(9) = "Propane [kWh]";
-                    columnHead(10) = "Other Fuel 1 [kWh]";
-                    columnHead(11) = "Other Fuel 2 [kWh]";
-                    columnHead(12) = "District Cooling [kWh]";
-                    columnHead(13) = "District Heating [kWh]";
-                    columnHead(14) = "Water [m3]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(2) = "Electricity [kBtu]";
-                    columnHead(3) = "Natural Gas [kBtu]";
-                    columnHead(4) = "Gasoline [kBtu]";
-                    columnHead(5) = "Diesel [kBtu]";
-                    columnHead(6) = "Coal [kBtu]";
-                    columnHead(7) = "Fuel Oil No 1 [kBtu]";
-                    columnHead(8) = "Fuel Oil No 2 [kBtu]";
-                    columnHead(9) = "Propane [kBtu]";
-                    columnHead(10) = "Other Fuel 1 [kBtu]";
-                    columnHead(11) = "Other Fuel 2 [kBtu]";
-                    columnHead(12) = "District Cooling [kBtu]";
-                    columnHead(13) = "District Heating [kBtu]";
-                    columnHead(14) = "Water [gal]";
-                } else {
-                    columnHead(2) = "Electricity [GJ]";
-                    columnHead(3) = "Natural Gas [GJ]";
-                    columnHead(4) = "Gasoline [GJ]";
-                    columnHead(5) = "Diesel [GJ]";
-                    columnHead(6) = "Coal [GJ]";
-                    columnHead(7) = "Fuel Oil No 1 [GJ]";
-                    columnHead(8) = "Fuel Oil No 2 [GJ]";
-                    columnHead(9) = "Propane [GJ]";
-                    columnHead(10) = "Other Fuel 1 [GJ]";
-                    columnHead(11) = "Other Fuel 2 [GJ]";
-                    columnHead(12) = "District Cooling [GJ]";
-                    columnHead(13) = "District Heating [GJ]";
-                    columnHead(14) = "Water [m3]";
-                }
-            }
-
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                i = 1;
-                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
-                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
-                            ++i;
-                        }
-                        // put other
-                        if (ort->needOtherRowLEED45(jEndUse)) {
-                            tableBody(iResource + 1, i) = RealToStr(endUseSubOther(iResource, jEndUse), 2);
-                            ++i;
-                        }
-                    } else {
-                        tableBody(iResource + 1, i) = RealToStr(collapsedEndUse(iResource, jEndUse), 2);
-                        ++i;
-                    }
-                }
-            }
-
-            // heading for the entire sub-table
-            if (ort->displayTabularBEPS) {
-                if (produceTabular) {
-                    WriteSubtitle(state, "End Uses By Subcategory");
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                }
-                Array1D_string rowHeadTemp(rowHead);
-                // Before outputing to SQL, we forward fill the End use column (rowHead)
-                // for better sql queries
-                FillRowHead(rowHeadTemp);
-
-                for (int i = 1; i <= numRows; ++i) {
-                    rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
-                }
-
-                // Erase the SubCategory (first column), using slicing
-                Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
-                Array1D_string columnHeadTemp(columnHead({2, _, _}));
-                if (produceSQLite) {
-                    if (state.dataSQLiteProcedures->sqlite) {
-                        state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
-                                                                                           rowHeadTemp,
-                                                                                           columnHeadTemp,
-                                                                                           "AnnualBuildingUtilityPerformanceSummary",
-                                                                                           "Entire Facility",
-                                                                                           "End Uses By Subcategory");
-                    }
-                }
-                if (produceTabular) {
-                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBodyTemp,
-                            rowHeadTemp,
-                            columnHeadTemp,
-                            "Annual Building Utility Performance Summary",
-                            "Entire Facility",
-                            "End Uses By Subcategory");
-                    }
-                }
-                rowHeadTemp.deallocate();
-                tableBodyTemp.deallocate();
-                columnHeadTemp.deallocate();
-            }
+            writeBEPSEndUseBySubCatOrSpaceType(state,
+                                               endUseSubTableType::bySpaceType,
+                                               endUseSubOther,
+                                               collapsedEndUse,
+                                               collapsedEndUseSpType,
+                                               ort->needOtherRowEndUse,
+                                               unitsStyle_cur,
+                                               produceTabular,
+                                               produceSQLite);
 
             // EAp2-4/5. Performance Rating Method Compliance
             // repeat some of the code for the end use subcategory table but only looping over the energy resources and not including water
@@ -9091,9 +8947,9 @@ void WriteBEPSTable(EnergyPlusData &state)
 
             for (iResource = 1; iResource <= 12; ++iResource) {
                 i = 1;
-                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                        for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             if (produceTabular) {
                                 PreDefTableEntry(state,
                                                  resource_entry_map(iResource),
@@ -9167,7 +9023,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             }
             // convert the normalized end use values to MJ from GJ if using J
             for (iResource = 1; iResource <= 12; ++iResource) { // not including resource=13 water
-                for (size_t jEndUse = 1; jEndUse <= 4; ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= 4; ++jEndUse) {
                     normalVal(iResource, jEndUse) *= kConversionFactor;
                 }
             }
@@ -9232,7 +9088,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             tableBody = "";
             if (convBldgCondFloorArea > 0) {
                 for (iResource = 1; iResource <= 13; ++iResource) {
-                    for (size_t jEndUse = 1; jEndUse <= 4; ++jEndUse) {
+                    for (int jEndUse = 1; jEndUse <= 4; ++jEndUse) {
                         tableBody(iResource, jEndUse) = RealToStr(normalVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
                     }
                 }
@@ -9269,7 +9125,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             tableBody = "";
             if (convBldgGrossFloorArea > 0) {
                 for (iResource = 1; iResource <= 13; ++iResource) {
-                    for (size_t jEndUse = 1; jEndUse <= 4; ++jEndUse) {
+                    for (int jEndUse = 1; jEndUse <= 4; ++jEndUse) {
                         tableBody(iResource, jEndUse) = RealToStr(normalVal(iResource, jEndUse) / convBldgGrossFloorArea, 2);
                     }
                 }
@@ -9553,8 +9409,8 @@ void WriteBEPSTable(EnergyPlusData &state)
             tableBody(1, 4) = RealToStr(totalOnsiteWater / waterConversionFactor, 2);
 
             if (allocated(state.dataWaterData->WaterStorage)) {
-                initialStorage = sum(state.dataWaterData->WaterStorage, &StorageTankDataStruct::InitialVolume);
-                finalStorage = sum(state.dataWaterData->WaterStorage, &StorageTankDataStruct::ThisTimeStepVolume);
+                initialStorage = sum(state.dataWaterData->WaterStorage, &DataWater::StorageTankDataStruct::InitialVolume);
+                finalStorage = sum(state.dataWaterData->WaterStorage, &DataWater::StorageTankDataStruct::ThisTimeStepVolume);
                 StorageChange = initialStorage - finalStorage;
             } else {
                 initialStorage = 0.0;
@@ -9735,7 +9591,7 @@ void WriteBEPSTable(EnergyPlusData &state)
     }
 }
 
-std::string ResourceWarningMessage(std::string resource)
+std::string ResourceWarningMessage(std::string const &resource)
 {
     return "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: " + resource;
 }
@@ -9745,6 +9601,239 @@ Real64 WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor)
     return WaterTotal / ConversionFactor;
 }
 
+void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
+                                        endUseSubTableType tableType,
+                                        Array2D<Real64> &endUseSubOther,
+                                        Array2D<Real64> &collapsedEndUse,
+                                        Array3D<Real64> &collapsedEndUseSubTable,
+                                        Array1D_bool &needOtherRow,
+                                        const iUnitsStyle unitsStyle_cur,
+                                        const bool produceTabular,
+                                        const bool produceSQLite)
+{
+    auto &ort(state.dataOutRptTab);
+    int numCol = 14;
+    Array1D_string columnHead;
+    Array1D_int columnWidth;
+    columnHead.allocate(numCol);
+    columnWidth.allocate(numCol);
+    for (int col = 1; col <= numCol; ++col) {
+        columnWidth(col) = 10; // array assignment - same for all columns
+    }
+    {
+        auto const SELECT_CASE_var(unitsStyle_cur);
+        if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+            columnHead(2) = "Electricity [kWh]";
+            columnHead(3) = "Natural Gas [kWh]";
+            columnHead(4) = "Gasoline [kWh]";
+            columnHead(5) = "Diesel [kWh]";
+            columnHead(6) = "Coal [kWh]";
+            columnHead(7) = "Fuel Oil No 1 [kWh]";
+            columnHead(8) = "Fuel Oil No 2 [kWh]";
+            columnHead(9) = "Propane [kWh]";
+            columnHead(10) = "Other Fuel 1 [kWh]";
+            columnHead(11) = "Other Fuel 2 [kWh]";
+            columnHead(12) = "District Cooling [kWh]";
+            columnHead(13) = "District Heating [kWh]";
+            columnHead(14) = "Water [m3]";
+        } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+            columnHead(2) = "Electricity [kBtu]";
+            columnHead(3) = "Natural Gas [kBtu]";
+            columnHead(4) = "Gasoline [kBtu]";
+            columnHead(5) = "Diesel [kBtu]";
+            columnHead(6) = "Coal [kBtu]";
+            columnHead(7) = "Fuel Oil No 1 [kBtu]";
+            columnHead(8) = "Fuel Oil No 2 [kBtu]";
+            columnHead(9) = "Propane [kBtu]";
+            columnHead(10) = "Other Fuel 1 [kBtu]";
+            columnHead(11) = "Other Fuel 2 [kBtu]";
+            columnHead(12) = "District Cooling [kBtu]";
+            columnHead(13) = "District Heating [kBtu]";
+            columnHead(14) = "Water [gal]";
+        } else {
+            columnHead(2) = "Electricity [GJ]";
+            columnHead(3) = "Natural Gas [GJ]";
+            columnHead(4) = "Gasoline [GJ]";
+            columnHead(5) = "Diesel [GJ]";
+            columnHead(6) = "Coal [GJ]";
+            columnHead(7) = "Fuel Oil No 1 [GJ]";
+            columnHead(8) = "Fuel Oil No 2 [GJ]";
+            columnHead(9) = "Propane [GJ]";
+            columnHead(10) = "Other Fuel 1 [GJ]";
+            columnHead(11) = "Other Fuel 2 [GJ]";
+            columnHead(12) = "District Cooling [GJ]";
+            columnHead(13) = "District Heating [GJ]";
+            columnHead(14) = "Water [m3]";
+        }
+    }
+
+    int numSubCatOrTypes = 0;
+    int numRows = 0;
+    if (tableType == endUseSubTableType::bySubCategory) {
+        columnHead(1) = "Subcategory";
+    } else if (tableType == endUseSubTableType::bySpaceType) {
+        columnHead(1) = "Space Type";
+    }
+
+    // determine number of rows and if subcategories add up to the total
+    // if not, determine the difference for the 'other' row
+    for (int i = 1; i <= DataGlobalConstantsData::iEndUseSize; ++i) {
+        needOtherRow(i) = false; // set array to all false assuming no other rows are needed
+    }
+    for (int iResource = 1; iResource <= 13; ++iResource) {
+        for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            if (tableType == endUseSubTableType::bySubCategory) {
+                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
+            } else if (tableType == endUseSubTableType::bySpaceType) {
+                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
+            }
+            if (numSubCatOrTypes > 0) {
+                // set the value to the total for the end use
+                endUseSubOther(iResource, jEndUse) = collapsedEndUse(iResource, jEndUse);
+                // subtract off each sub end use category value
+                for (int kEndUseSub = 1; kEndUseSub <= numSubCatOrTypes; ++kEndUseSub) {
+                    endUseSubOther(iResource, jEndUse) -= collapsedEndUseSubTable(kEndUseSub, jEndUse, iResource);
+                }
+                // if just a small value remains set it to zero
+                if (std::abs(endUseSubOther(iResource, jEndUse)) > 0.01) {
+                    needOtherRow(jEndUse) = true;
+                } else {
+                    endUseSubOther(iResource, jEndUse) = 0.0;
+                }
+            } else {
+                endUseSubOther(iResource, jEndUse) = 0.0;
+            }
+        }
+    }
+
+    for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+        if (tableType == endUseSubTableType::bySubCategory) {
+            numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
+        } else if (tableType == endUseSubTableType::bySpaceType) {
+            numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
+        }
+        if (numSubCatOrTypes > 0) {
+            for (int kEndUseSub = 1; kEndUseSub <= numSubCatOrTypes; ++kEndUseSub) {
+                ++numRows;
+            }
+            if (needOtherRow(jEndUse)) {
+                ++numRows;
+            }
+        } else {
+            ++numRows;
+        }
+    }
+    // all arrays are in the format: (row, column)
+    Array1D_string rowHead;
+    Array2D_string tableBody;
+    rowHead.allocate(numRows);
+    tableBody.allocate(numCol, numRows); // TODO: this appears to be (column, row)...
+    for (int col = 1; col <= numCol; ++col) {
+        for (int row = 1; row <= numRows; ++row) {
+            rowHead(row) = "";
+            tableBody(col, row) = "";
+        }
+    }
+
+    // Build row head and subcategories columns
+    int i = 1;
+    for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+        if (tableType == endUseSubTableType::bySubCategory) {
+            numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
+        } else if (tableType == endUseSubTableType::bySpaceType) {
+            numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
+        }
+        rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
+        if (numSubCatOrTypes > 0) {
+            for (int kEndUseSub = 1; kEndUseSub <= numSubCatOrTypes; ++kEndUseSub) {
+                if (tableType == endUseSubTableType::bySubCategory) {
+                    tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
+                } else if (tableType == endUseSubTableType::bySpaceType) {
+                    tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).spaceTypeName(kEndUseSub);
+                }
+                ++i;
+            }
+            // check if an 'other' row is needed
+            if (needOtherRow(jEndUse)) {
+                tableBody(1, i) = "Other";
+                ++i;
+            }
+        } else {
+            if (tableType == endUseSubTableType::bySubCategory) {
+                tableBody(1, i) = "General";
+            } else if (tableType == endUseSubTableType::bySpaceType) {
+                tableBody(1, i) = "Unassigned";
+            }
+            ++i;
+        }
+    }
+
+    for (int iResource = 1; iResource <= 13; ++iResource) {
+        i = 1;
+        for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
+            if (tableType == endUseSubTableType::bySubCategory) {
+                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
+            } else if (tableType == endUseSubTableType::bySpaceType) {
+                numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
+            }
+            if (numSubCatOrTypes > 0) {
+                for (int kEndUseSub = 1; kEndUseSub <= numSubCatOrTypes; ++kEndUseSub) {
+                    tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSubTable(kEndUseSub, jEndUse, iResource), 2);
+                    ++i;
+                }
+                // put other
+                if (needOtherRow(jEndUse)) {
+                    tableBody(iResource + 1, i) = RealToStr(endUseSubOther(iResource, jEndUse), 2);
+                    ++i;
+                }
+            } else {
+                tableBody(iResource + 1, i) = RealToStr(collapsedEndUse(iResource, jEndUse), 2);
+                ++i;
+            }
+        }
+    }
+
+    // heading for the entire sub-table
+    std::string subTableTitle;
+    if (ort->displayTabularBEPS) {
+        if (tableType == endUseSubTableType::bySubCategory) {
+            subTableTitle = "End Uses By Subcategory";
+        } else if (tableType == endUseSubTableType::bySpaceType) {
+            subTableTitle = "End Uses By Space Type";
+        }
+        if (produceTabular) {
+            WriteSubtitle(state, subTableTitle);
+            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+        }
+        Array1D_string rowHeadTemp(rowHead);
+        // Before outputing to SQL, we forward fill the End use column (rowHead)
+        // for better sql queries
+        FillRowHead(rowHeadTemp);
+
+        for (int i = 1; i <= numRows; ++i) {
+            rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
+        }
+
+        // Erase the SubCategory (first column), using slicing
+        Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
+        Array1D_string columnHeadTemp(columnHead({2, _, _}));
+        if (produceSQLite) {
+            if (state.dataSQLiteProcedures->sqlite) {
+                state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", subTableTitle);
+            }
+        }
+        if (produceTabular) {
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "Annual Building Utility Performance Summary", "Entire Facility", subTableTitle);
+            }
+        }
+        rowHeadTemp.deallocate();
+        tableBodyTemp.deallocate();
+        columnHeadTemp.deallocate();
+    }
+}
 void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -9769,8 +9858,8 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
     // all arrays are in the format: (row, columnm)
     Array2D<Real64> useVal(13, 15);
     Array1D<Real64> collapsedTotal(13);
-    Array2D<Real64> collapsedEndUse(13, state.dataGlobalConst->iEndUse.size());
-    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
+    Array2D<Real64> collapsedEndUse(13, DataGlobalConstantsData::iEndUseSize);
+    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 13);
     int iResource;
     Real64 largeConversionFactor;
     Real64 areaConversionFactor;
@@ -9797,7 +9886,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
             if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
             // collapse the gatherEndUseBEPS array to the resource groups displayed
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 collapsedEndUse(1, jEndUse) = ort->gatherEndUseBySourceBEPS(1, jEndUse);   // electricity
                 collapsedEndUse(2, jEndUse) = ort->gatherEndUseBySourceBEPS(2, jEndUse);   // natural gas
                 collapsedEndUse(3, jEndUse) = ort->gatherEndUseBySourceBEPS(6, jEndUse);   // gasoline
@@ -9847,7 +9936,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
             // convert units into MJ (divide by 1,000,000) if J otherwise kWh
             for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                     collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
                 }
                 collapsedTotal(iResource) /= largeConversionFactor;
@@ -9945,7 +10034,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
             tableBody = "";
             for (iResource = 1; iResource <= 12; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= 14; ++jEndUse) {
                     tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / largeConversionFactor, 2);
                 }
                 tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / largeConversionFactor, 2);
@@ -10030,7 +10119,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
                 Real64 convBldgCondFloorArea = ort->buildingConditionedFloorArea / areaConversionFactor;
                 if (convBldgCondFloorArea > 0) {
                     for (iResource = 1; iResource <= 12; ++iResource) {
-                        for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                        for (int jEndUse = 1; jEndUse <= 14; ++jEndUse) {
                             tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
                         }
                         tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgCondFloorArea, 2);
@@ -10077,7 +10166,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
                 if (convBldgGrossFloorArea > 0) {
                     for (iResource = 1; iResource <= 12; ++iResource) {
-                        for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                        for (int jEndUse = 1; jEndUse <= 14; ++jEndUse) {
                             tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgGrossFloorArea, 2);
                         }
                         tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgGrossFloorArea, 2);
@@ -10142,12 +10231,12 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
     // all arrays are in the format: (row, column)
     Array2D<Real64> useVal(13, 15);
     Array1D<Real64> collapsedTotal(13);
-    Array2D<Real64> collapsedEndUse(13, state.dataGlobalConst->iEndUse.size());
-    Array2D<Real64> collapsedIndEndUse(13, state.dataGlobalConst->iEndUse.size());
+    Array2D<Real64> collapsedEndUse(13, DataGlobalConstantsData::iEndUseSize);
+    Array2D<Real64> collapsedIndEndUse(13, DataGlobalConstantsData::iEndUseSize);
     Array1D_int collapsedTimeStep(13);
-    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
-    Array3D<Real64> collapsedIndEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
-    Array2D<Real64> endUseSubOther(13, state.dataGlobalConst->iEndUse.size());
+    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 13);
+    Array3D<Real64> collapsedIndEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, DataGlobalConstantsData::iEndUseSize, 13);
+    Array2D<Real64> endUseSubOther(13, DataGlobalConstantsData::iEndUseSize);
     int iResource;
     int kEndUseSub;
     int i;
@@ -10227,7 +10316,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
             // collapse the gatherEndUseBEPS array to the resource groups displayed
             collapsedEndUse = 0.0;
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 collapsedEndUse(1, jEndUse) = ort->gatherDemandEndUse(1, jEndUse) * powerConversion;                  // electricity
                 collapsedEndUse(2, jEndUse) = ort->gatherDemandEndUse(2, jEndUse) * powerConversion;                  // natural gas
                 collapsedEndUse(3, jEndUse) = ort->gatherDemandEndUse(6, jEndUse) * powerConversion;                  // gasoline
@@ -10242,7 +10331,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 collapsedEndUse(12, jEndUse) = ort->gatherDemandEndUse(distrHeatSelected, jEndUse) * powerConversion; // district heating
                 collapsedEndUse(13, jEndUse) = ort->gatherDemandEndUse(7, jEndUse) * flowConversion;                  // water
             }
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion; // electricity
                     collapsedEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 2) * powerConversion; // natural gas
@@ -10267,7 +10356,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
             // collapse the gatherEndUseBEPS array to the resource groups displayed
             // no unit conversion, it is done at the reporting stage if necessary
             collapsedIndEndUse = 0.0;
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 collapsedIndEndUse(1, jEndUse) = ort->gatherDemandIndEndUse(1, jEndUse);                  // electricity
                 collapsedIndEndUse(2, jEndUse) = ort->gatherDemandIndEndUse(2, jEndUse);                  // natural gas
                 collapsedIndEndUse(3, jEndUse) = ort->gatherDemandIndEndUse(6, jEndUse);                  // gasoline
@@ -10282,7 +10371,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 collapsedIndEndUse(12, jEndUse) = ort->gatherDemandIndEndUse(distrHeatSelected, jEndUse); // district heating
                 collapsedIndEndUse(13, jEndUse) = ort->gatherDemandIndEndUse(7, jEndUse);                 // water
             }
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1);   // electricity
                     collapsedIndEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 2);   // natural gas
@@ -10403,7 +10492,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
             tableBody = "";
             for (iResource = 1; iResource <= 13; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= 14; ++jEndUse) {
                     tableBody(iResource, 1 + jEndUse) = RealToStr(useVal(iResource, jEndUse), 2);
                 }
                 tableBody(iResource, 1) = DateToString(collapsedTimeStep(iResource));
@@ -10432,7 +10521,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
             //---- End Uses By Subcategory Sub-Table
             numRows = 0;
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         ++numRows;
@@ -10453,7 +10542,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
             // Build row head and subcategories columns
             i = 1;
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
                 if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
@@ -10514,7 +10603,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
             for (iResource = 1; iResource <= 13; ++iResource) {
                 i = 1;
-                for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+                for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
@@ -10570,7 +10659,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
         // EAp2-4/5. Performance Rating Method Compliance
         for (iResource = 1; iResource <= 13; ++iResource) {
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 if (ort->needOtherRowLEED45(jEndUse)) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories == 0) {
                         endUseSubOther(iResource, jEndUse) =
@@ -10606,7 +10695,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
         for (iResource = 1; iResource <= 12; ++iResource) {
             i = 1;
-            for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
+            for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
                 if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                         PreDefTableEntry(state,
@@ -11598,6 +11687,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             }
 
             rowHead.allocate(state.dataGlobal->NumOfZones + 4);
+
             NumOfCol = 12;
             columnHead.allocate(NumOfCol);
             columnWidth.allocate(NumOfCol);
@@ -11815,6 +11905,382 @@ void WriteVeriSumTable(EnergyPlusData &state)
                         tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
                 }
             }
+
+            writeVeriSumSpaceTables(state, produceTabular, produceSQLite);
+        }
+    }
+}
+
+void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool produceSQLite)
+{
+
+    // Write Space and SpaceType sub-tables for Input Verification and Results Summary
+    Array1D_string spaceRowHead;
+    Array1D_string spaceColumnHead;
+    Array1D_int spaceColumnWidth;
+    Array2D_string spaceTableBody;
+    int spaceNumCol = 11;
+    spaceRowHead.allocate(state.dataGlobal->numSpaces + 4); // Extra rows for totals
+    spaceColumnHead.allocate(spaceNumCol);
+    spaceColumnWidth.allocate(spaceNumCol);
+    spaceTableBody.allocate(spaceNumCol, state.dataGlobal->numSpaces + 4); // Extra rows for totals
+    for (int iCol = 1; iCol <= spaceNumCol; ++iCol) {
+        spaceColumnWidth = 14;
+    }
+
+    spaceColumnHead(1) = "Area " + state.dataOutRptTab->m2_unitName;
+    spaceColumnHead(2) = "Conditioned (Y/N)";
+    spaceColumnHead(3) = "Part of Total Floor Area (Y/N)";
+    spaceColumnHead(4) = "Multipliers";
+    spaceColumnHead(5) = "Zone Name";
+    spaceColumnHead(6) = "Space Type";
+    spaceColumnHead(7) = "Radiant/Solar Enclosure Name";
+    spaceColumnHead(8) = "Lighting " + state.dataOutRptTab->Wm2_unitName;
+    spaceColumnHead(9) = "People " + state.dataOutRptTab->m2_unitName.substr(0, len(state.dataOutRptTab->m2_unitName) - 1) + " per person" +
+                         state.dataOutRptTab->m2_unitName[len(state.dataOutRptTab->m2_unitName) - 1];
+    spaceColumnHead(10) = "Plug and Process " + state.dataOutRptTab->Wm2_unitName;
+    spaceColumnHead(11) = "Tags";
+
+    int constexpr colSpaceArea(1);
+    int constexpr colConditioned(2);
+    int constexpr colPartOfTotal(3);
+    int constexpr colMultipliers(4);
+    int constexpr colZoneName(5);
+    int constexpr colSpaceType(6);
+    int constexpr colEnclName(7);
+    int constexpr colSpaceLighting(8);
+    int constexpr colSpacePeople(9);
+    int constexpr colSpacePlugProcess(10);
+    int constexpr colSpaceTags(11);
+
+    spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->grandTotal) = "Total";
+    spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->condTotal) = "Conditioned Total";
+    spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->uncondTotal) = "Unconditioned Total";
+    spaceRowHead(state.dataGlobal->numSpaces + state.dataOutRptTab->notpartTotal) = "Not Part of Total";
+
+    EPVector<Real64> spaceTotLighting;
+    EPVector<Real64> spaceTotPeople;
+    EPVector<Real64> spaceTotPlugProcess;
+    spaceTotLighting.allocate(state.dataGlobal->numSpaces);
+    spaceTotPeople.allocate(state.dataGlobal->numSpaces);
+    spaceTotPlugProcess.allocate(state.dataGlobal->numSpaces);
+    for (int iSpace = 1; iSpace <= state.dataGlobal->numSpaces; ++iSpace) {
+        spaceTotLighting(iSpace) = 0.0;
+        spaceTotPeople(iSpace) = 0.0;
+        spaceTotPlugProcess(iSpace) = 0.0;
+    }
+
+    Array1D_string spaceTypeRowHead;
+    Array1D_string spaceTypeColumnHead;
+    Array1D_int spaceTypeColumnWidth;
+    Array2D_string spaceTypeTableBody;
+    int spaceTypeNumCol = 7;
+    spaceTypeRowHead.allocate(state.dataGlobal->numSpaceTypes + 1); // Extra row for total
+    spaceTypeColumnHead.allocate(spaceTypeNumCol);
+    spaceTypeColumnWidth.allocate(spaceTypeNumCol);
+    spaceTypeTableBody.allocate(spaceTypeNumCol, state.dataGlobal->numSpaceTypes + 1); // Extra row for total
+    for (int iCol = 1; iCol <= spaceTypeNumCol; ++iCol) {
+        spaceTypeColumnWidth = 14;
+    }
+    spaceTypeColumnHead(1) = "Total Area " + state.dataOutRptTab->m2_unitName;
+    spaceTypeColumnHead(2) = "Conditioned Area " + state.dataOutRptTab->m2_unitName;
+    spaceTypeColumnHead(3) = "Unconditioned Area " + state.dataOutRptTab->m2_unitName;
+    spaceTypeColumnHead(4) = "Not Part of Total Area " + state.dataOutRptTab->m2_unitName;
+    spaceTypeColumnHead(5) = "Lighting " + state.dataOutRptTab->Wm2_unitName;
+    spaceTypeColumnHead(6) = "People " + state.dataOutRptTab->m2_unitName.substr(0, len(state.dataOutRptTab->m2_unitName) - 1) + " per person" +
+                             state.dataOutRptTab->m2_unitName[len(state.dataOutRptTab->m2_unitName) - 1];
+    spaceTypeColumnHead(7) = "Plug and Process " + state.dataOutRptTab->Wm2_unitName;
+
+    int constexpr colSpaceTypeTotArea(1);
+    int constexpr colSpaceTypeCondArea(2);
+    int constexpr colSpaceTypeUncondArea(3);
+    int constexpr colSpaceTypeNotTotArea(4);
+    int constexpr colSpaceTypeLighting(5);
+    int constexpr colSpaceTypePeople(6);
+    int constexpr colSpaceTypePlugProcess(7);
+
+    spaceTypeRowHead(state.dataGlobal->numSpaceTypes + state.dataOutRptTab->grandTotal) = "Total";
+
+    EPVector<Real64> spaceTypeTotArea;
+    EPVector<Real64> spaceTypeCondArea;
+    EPVector<Real64> spaceTypeUncondArea;
+    EPVector<Real64> spaceTypeNotTotArea;
+    EPVector<Real64> spaceTypeTotLighting;
+    EPVector<Real64> spaceTypeTotPeople;
+    EPVector<Real64> spaceTypeTotPlugProcess;
+    spaceTypeTotArea.allocate(state.dataGlobal->numSpaceTypes);
+    spaceTypeCondArea.allocate(state.dataGlobal->numSpaceTypes);
+    spaceTypeUncondArea.allocate(state.dataGlobal->numSpaceTypes);
+    spaceTypeNotTotArea.allocate(state.dataGlobal->numSpaceTypes);
+    spaceTypeTotLighting.allocate(state.dataGlobal->numSpaceTypes);
+    spaceTypeTotPeople.allocate(state.dataGlobal->numSpaceTypes);
+    spaceTypeTotPlugProcess.allocate(state.dataGlobal->numSpaceTypes);
+    for (int iSpaceType = 1; iSpaceType <= state.dataGlobal->numSpaceTypes; ++iSpaceType) {
+        spaceTypeTotArea(iSpaceType) = 0.0;
+        spaceTypeCondArea(iSpaceType) = 0.0;
+        spaceTypeUncondArea(iSpaceType) = 0.0;
+        spaceTypeNotTotArea(iSpaceType) = 0.0;
+        spaceTypeTotLighting(iSpaceType) = 0.0;
+        spaceTypeTotPeople(iSpaceType) = 0.0;
+        spaceTypeTotPlugProcess(iSpaceType) = 0.0;
+    }
+
+    // Accumulate internal gain totals by space and space type
+    for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
+        auto curPeople = state.dataHeatBal->People(iPeople);
+        int const spaceNum = curPeople.spaceIndex;
+        Real64 const people = curPeople.NumberOfPeople;
+        spaceTotPeople(spaceNum) += people;
+        spaceTypeTotPeople(state.dataHeatBal->space(spaceNum).spaceTypeNum) += people;
+    }
+    for (int iLights = 1; iLights <= state.dataHeatBal->TotLights; ++iLights) {
+        auto curLighting = state.dataHeatBal->Lights(iLights);
+        int const spaceNum = curLighting.spaceIndex;
+        Real64 const lighting = curLighting.DesignLevel;
+        spaceTotLighting(spaceNum) += lighting;
+        spaceTypeTotLighting(state.dataHeatBal->space(spaceNum).spaceTypeNum) += lighting;
+    }
+    for (int iElecEquip = 1; iElecEquip <= state.dataHeatBal->TotElecEquip; ++iElecEquip) {
+        auto curElecEquip = state.dataHeatBal->ZoneElectric(iElecEquip);
+        int const spaceNum = curElecEquip.spaceIndex;
+        Real64 const elecEquip = curElecEquip.DesignLevel;
+        spaceTotPlugProcess(spaceNum) += elecEquip;
+        spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += elecEquip;
+    }
+    for (int iGasEquip = 1; iGasEquip <= state.dataHeatBal->TotGasEquip; ++iGasEquip) {
+        auto curGasEquip = state.dataHeatBal->ZoneGas(iGasEquip);
+        int const spaceNum = curGasEquip.spaceIndex;
+        Real64 const gasEquip = curGasEquip.DesignLevel;
+        spaceTotPlugProcess(spaceNum) += gasEquip;
+        spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += gasEquip;
+    }
+    for (int iOthEquip = 1; iOthEquip <= state.dataHeatBal->TotOthEquip; ++iOthEquip) {
+        auto curOthEquip = state.dataHeatBal->ZoneOtherEq(iOthEquip);
+        int const spaceNum = curOthEquip.spaceIndex;
+        Real64 const othEquip = curOthEquip.DesignLevel;
+        spaceTotPlugProcess(spaceNum) += othEquip;
+        spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += othEquip;
+    }
+    for (int iHWEquip = 1; iHWEquip <= state.dataHeatBal->TotHWEquip; ++iHWEquip) {
+        auto curHWEquip = state.dataHeatBal->ZoneHWEq(iHWEquip);
+        int const spaceNum = curHWEquip.spaceIndex;
+        Real64 const hwEquip = curHWEquip.DesignLevel;
+        spaceTotPlugProcess(spaceNum) += hwEquip;
+        spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += hwEquip;
+    }
+    for (int iSteamEquip = 1; iSteamEquip <= state.dataHeatBal->TotStmEquip; ++iSteamEquip) {
+        auto curSteamEquip = state.dataHeatBal->ZoneSteamEq(iSteamEquip);
+        int const spaceNum = curSteamEquip.spaceIndex;
+        Real64 const steamEquip = curSteamEquip.DesignLevel;
+        spaceTotPlugProcess(spaceNum) += steamEquip;
+        spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += steamEquip;
+    }
+    for (int iITEquip = 1; iITEquip <= state.dataHeatBal->TotITEquip; ++iITEquip) {
+        auto curITEquip = state.dataHeatBal->ZoneITEq(iITEquip);
+        int const spaceNum = curITEquip.spaceIndex;
+        Real64 const itEquip = curITEquip.DesignTotalPower;
+        spaceTotPlugProcess(spaceNum) += itEquip;
+        spaceTypeTotPlugProcess(state.dataHeatBal->space(spaceNum).spaceTypeNum) += itEquip;
+    }
+
+    // re-use existing zone total variables
+    for (int iTotal = 1; iTotal <= 4; ++iTotal) {
+        state.dataOutRptTab->zstArea(iTotal) = 0.0;
+        state.dataOutRptTab->zstLight(iTotal) = 0.0;
+        state.dataOutRptTab->zstPlug(iTotal) = 0.0;
+        state.dataOutRptTab->zstArea(iTotal) = 0.0;
+    }
+
+    int spaceTableRowNum = 0;
+    for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+        auto curZone = state.dataHeatBal->Zone(iZone);
+        Real64 const mult = Real64(curZone.Multiplier) * Real64(curZone.ListMultiplier);
+        for (int const spaceNum : curZone.spaceIndexes) {
+            auto curSpace = state.dataHeatBal->space(spaceNum);
+            bool spaceIsCond = false;
+            bool useSpaceFloorArea = false;
+            ++spaceTableRowNum;
+            spaceRowHead(spaceTableRowNum) = curSpace.Name;
+            spaceTableBody(colZoneName, spaceTableRowNum) = curZone.Name;
+            spaceTableBody(colSpaceType, spaceTableRowNum) = curSpace.spaceType;
+            spaceTableBody(colEnclName, spaceTableRowNum) = state.dataViewFactor->EnclSolInfo(curSpace.solarEnclosureNum).Name;
+            spaceTableBody(colSpaceArea, spaceTableRowNum) = RealToStr(curSpace.floorArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            // Conditioned or not
+            if (curZone.SystemZoneNodeNumber > 0) {
+                spaceTableBody(colConditioned, spaceTableRowNum) = "Yes";
+                spaceIsCond = true;
+            } else {
+                spaceTableBody(colConditioned, spaceTableRowNum) = "No";
+                spaceIsCond = false;
+            }
+            // Part of Total Floor Area or not
+            if (curZone.isPartOfTotalArea) {
+                spaceTableBody(colPartOfTotal, spaceTableRowNum) = "Yes";
+                useSpaceFloorArea = true;
+            } else {
+                spaceTableBody(colPartOfTotal, spaceTableRowNum) = "No";
+                useSpaceFloorArea = false;
+            }
+            // lighting density
+            spaceTableBody(colMultipliers, spaceTableRowNum) = RealToStr(mult, 2);
+            if (curSpace.floorArea > 0) {
+                spaceTableBody(colSpaceLighting, spaceTableRowNum) =
+                    RealToStr(state.dataOutRptTab->Wm2_unitConv * spaceTotLighting(spaceNum) / curSpace.floorArea, 4);
+            } else {
+                spaceTableBody(colSpaceLighting, spaceTableRowNum) = RealToStr(0.0, 4);
+            }
+            // people density
+            if (spaceTotPeople(spaceNum) > 0) {
+                spaceTableBody(colSpacePeople, spaceTableRowNum) =
+                    RealToStr(curSpace.floorArea * state.dataOutRptTab->m2_unitConvWVST / spaceTotPeople(spaceNum), 2);
+            } else {
+                spaceTableBody(colSpacePeople, spaceTableRowNum) = RealToStr(0.0, 2);
+            }
+            // plug and process density
+            if (curSpace.floorArea > 0) {
+                spaceTableBody(colSpacePlugProcess, spaceTableRowNum) =
+                    RealToStr(spaceTotPlugProcess(spaceNum) * state.dataOutRptTab->Wm2_unitConv / curSpace.floorArea, 4);
+            } else {
+                spaceTableBody(colSpacePlugProcess, spaceTableRowNum) = RealToStr(0.0, 4);
+            }
+
+            spaceTableBody(colSpaceTags, spaceTableRowNum) = fmt::format("{}", fmt::join(curSpace.tags, ", "));
+
+            // If not part of total, goes directly to this row
+            if (!useSpaceFloorArea) {
+                spaceTypeNotTotArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
+                state.dataOutRptTab->zstArea(state.dataOutRptTab->notpartTotal) += mult * curSpace.floorArea;
+                state.dataOutRptTab->zstLight(state.dataOutRptTab->notpartTotal) += mult * spaceTotLighting(spaceNum);
+                state.dataOutRptTab->zstPeople(state.dataOutRptTab->notpartTotal) += mult * spaceTotPeople(spaceNum);
+                state.dataOutRptTab->zstPlug(state.dataOutRptTab->notpartTotal) += mult * spaceTotPlugProcess(spaceNum);
+            } else {
+                // Add it to the 'Total'
+                spaceTypeTotArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
+                state.dataOutRptTab->zstArea(state.dataOutRptTab->grandTotal) += mult * curSpace.floorArea;
+                state.dataOutRptTab->zstLight(state.dataOutRptTab->grandTotal) += mult * spaceTotLighting(spaceNum);
+                state.dataOutRptTab->zstPeople(state.dataOutRptTab->grandTotal) += mult * spaceTotPeople(spaceNum);
+                state.dataOutRptTab->zstPlug(state.dataOutRptTab->grandTotal) += mult * spaceTotPlugProcess(spaceNum);
+
+                // Subtotal between cond/unconditioned
+                if (spaceIsCond) {
+                    spaceTypeCondArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
+                    state.dataOutRptTab->zstArea(state.dataOutRptTab->condTotal) += mult * curSpace.floorArea;
+                    state.dataOutRptTab->zstLight(state.dataOutRptTab->condTotal) += mult * spaceTotLighting(spaceNum);
+                    state.dataOutRptTab->zstPeople(state.dataOutRptTab->condTotal) += mult * spaceTotPeople(spaceNum);
+                    state.dataOutRptTab->zstPlug(state.dataOutRptTab->condTotal) += mult * spaceTotPlugProcess(spaceNum);
+                } else if (!spaceIsCond) {
+                    spaceTypeUncondArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
+                    state.dataOutRptTab->zstArea(state.dataOutRptTab->uncondTotal) += mult * curSpace.floorArea;
+                    state.dataOutRptTab->zstLight(state.dataOutRptTab->uncondTotal) += mult * spaceTotLighting(spaceNum);
+                    state.dataOutRptTab->zstPeople(state.dataOutRptTab->uncondTotal) += mult * spaceTotPeople(spaceNum);
+                    state.dataOutRptTab->zstPlug(state.dataOutRptTab->uncondTotal) += mult * spaceTotPlugProcess(spaceNum);
+                }
+            }
+        }
+    }
+    // total rows for Total / Not Part of Total
+    // In "Total": break between conditioned/unconditioned
+    for (int iTotal = 1; iTotal <= 4; ++iTotal) {
+        spaceTableBody(colSpaceArea, state.dataGlobal->numSpaces + iTotal) =
+            RealToStr(state.dataOutRptTab->zstArea(iTotal) * state.dataOutRptTab->m2_unitConvWVST, 2);
+        if (state.dataOutRptTab->zstArea(iTotal) != 0) {
+            spaceTableBody(colSpaceLighting, state.dataGlobal->numSpaces + iTotal) =
+                RealToStr(state.dataOutRptTab->zstLight(iTotal) * state.dataOutRptTab->Wm2_unitConv / state.dataOutRptTab->zstArea(iTotal), 4);
+            spaceTableBody(colSpacePlugProcess, state.dataGlobal->numSpaces + iTotal) =
+                RealToStr(state.dataOutRptTab->zstPlug(iTotal) * state.dataOutRptTab->Wm2_unitConv / state.dataOutRptTab->zstArea(iTotal), 4);
+        } else {
+            spaceTableBody(colSpaceLighting, state.dataGlobal->numSpaces + iTotal) = RealToStr(0.0, 4);
+            spaceTableBody(colSpacePlugProcess, state.dataGlobal->numSpaces + iTotal) = RealToStr(0.0, 4);
+        }
+        if (state.dataOutRptTab->zstPeople(iTotal) != 0) {
+            spaceTableBody(colSpacePeople, state.dataGlobal->numSpaces + iTotal) =
+                RealToStr(state.dataOutRptTab->zstArea(iTotal) * state.dataOutRptTab->m2_unitConvWVST / state.dataOutRptTab->zstPeople(iTotal), 2);
+        } else {
+            spaceTableBody(colSpacePeople, state.dataGlobal->numSpaces + iTotal) = RealToStr(0.0, 2);
+        }
+    }
+
+    Real64 totalArea = 0.0;
+    Real64 condArea = 0.0;
+    Real64 uncondArea = 0.0;
+    Real64 notTotalArea = 0.0;
+    for (int iSpaceType = 1; iSpaceType <= state.dataGlobal->numSpaceTypes; ++iSpaceType) {
+        spaceTypeRowHead(iSpaceType) = state.dataHeatBal->spaceTypes(iSpaceType);
+        spaceTypeTableBody(colSpaceTypeTotArea, iSpaceType) = RealToStr(spaceTypeTotArea(iSpaceType) * state.dataOutRptTab->m2_unitConvWVST, 2);
+        spaceTypeTableBody(colSpaceTypeCondArea, iSpaceType) = RealToStr(spaceTypeCondArea(iSpaceType) * state.dataOutRptTab->m2_unitConvWVST, 2);
+        spaceTypeTableBody(colSpaceTypeUncondArea, iSpaceType) = RealToStr(spaceTypeUncondArea(iSpaceType) * state.dataOutRptTab->m2_unitConvWVST, 2);
+        spaceTypeTableBody(colSpaceTypeNotTotArea, iSpaceType) = RealToStr(spaceTypeNotTotArea(iSpaceType) * state.dataOutRptTab->m2_unitConvWVST, 2);
+        totalArea += spaceTypeTotArea(iSpaceType);
+        condArea += spaceTypeCondArea(iSpaceType);
+        uncondArea += spaceTypeUncondArea(iSpaceType);
+        notTotalArea += spaceTypeNotTotArea(iSpaceType);
+        // lighting density
+        if (spaceTypeTotArea(iSpaceType) > 0) {
+            spaceTypeTableBody(colSpaceTypeLighting, iSpaceType) =
+                RealToStr(state.dataOutRptTab->Wm2_unitConv * spaceTypeTotLighting(iSpaceType) / spaceTypeTotArea(iSpaceType), 4);
+        } else {
+            spaceTypeTableBody(colSpaceTypeLighting, iSpaceType) = RealToStr(0.0, 4);
+        }
+        // people density
+        if (spaceTypeTotPeople(iSpaceType) > 0) {
+            spaceTypeTableBody(colSpaceTypePeople, iSpaceType) =
+                RealToStr(spaceTypeTotArea(iSpaceType) * state.dataOutRptTab->m2_unitConvWVST / spaceTypeTotPeople(iSpaceType), 2);
+        } else {
+            spaceTypeTableBody(colSpaceTypePeople, iSpaceType) = RealToStr(0.0, 2);
+        }
+        // plug and process density
+        if (spaceTypeTotArea(iSpaceType) > 0) {
+            spaceTypeTableBody(colSpaceTypePlugProcess, iSpaceType) =
+                RealToStr(spaceTypeTotPlugProcess(iSpaceType) * state.dataOutRptTab->Wm2_unitConv / spaceTypeTotArea(iSpaceType), 4);
+        } else {
+            spaceTypeTableBody(colSpaceTypePlugProcess, iSpaceType) = RealToStr(0.0, 4);
+        }
+    }
+    // Total Area
+    spaceTypeTableBody(colSpaceTypeTotArea, state.dataGlobal->numSpaceTypes + 1) = RealToStr(totalArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+    spaceTypeTableBody(colSpaceTypeCondArea, state.dataGlobal->numSpaceTypes + 1) = RealToStr(condArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+    spaceTypeTableBody(colSpaceTypeUncondArea, state.dataGlobal->numSpaceTypes + 1) = RealToStr(uncondArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+    spaceTypeTableBody(colSpaceTypeNotTotArea, state.dataGlobal->numSpaceTypes + 1) =
+        RealToStr(notTotalArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+
+    if (produceTabular) {
+        WriteSubtitle(state, "Space Summary");
+        WriteTable(state, spaceTableBody, spaceRowHead, spaceColumnHead, spaceColumnWidth);
+    }
+    if (produceSQLite) {
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(
+                spaceTableBody, spaceRowHead, spaceColumnHead, "InputVerificationandResultsSummary", "Entire Facility", "Space Summary");
+        }
+    }
+    if (produceTabular) {
+        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                spaceTableBody, spaceRowHead, spaceColumnHead, "Input Verification and Results Summary", "Entire Facility", "Space Summary");
+        }
+    }
+    if (produceTabular) {
+        WriteSubtitle(state, "Space Type Summary");
+        WriteTable(state, spaceTypeTableBody, spaceTypeRowHead, spaceTypeColumnHead, spaceTypeColumnWidth);
+    }
+    if (produceSQLite) {
+        if (state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite->createSQLiteTabularDataRecords(spaceTypeTableBody,
+                                                                               spaceTypeRowHead,
+                                                                               spaceTypeColumnHead,
+                                                                               "InputVerificationandResultsSummary",
+                                                                               "Entire Facility",
+                                                                               "Space Type Summary");
+        }
+    }
+    if (produceTabular) {
+        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(spaceTypeTableBody,
+                                                                                                  spaceTypeRowHead,
+                                                                                                  spaceTypeColumnHead,
+                                                                                                  "Input Verification and Results Summary",
+                                                                                                  "Entire Facility",
+                                                                                                  "Space Type Summary");
         }
     }
 }
@@ -13077,7 +13543,7 @@ void AllocateLoadComponentArrays(EnergyPlusData &state)
         ort->ITABSFseq = 0.0;
         ort->TMULTseq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays,
                                state.dataGlobal->NumOfTimeStepInHour * 24,
-                               state.dataGlobal->NumOfZones);
+                               state.dataViewFactor->NumOfRadiantEnclosures);
         ort->TMULTseq = 0.0;
         ort->peopleInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays,
                                        state.dataGlobal->NumOfTimeStepInHour * 24,
@@ -13525,7 +13991,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
     //   to each surface, the EnclRadThermAbsMult and ITABSF sequences were also stored
     //   which allocates the total radiant to each surface in the zone. The
     //   formula used is:
-    //       QRadThermInAbs(SurfNum) = QL(NZ) * EnclRadThermAbsMult(NZ) * SurfAbsThermalInt(SurfNum)
+    //       SurfQRadThermInAbs(SurfNum) = QL(NZ) * EnclRadThermAbsMult(NZ) * SurfAbsThermalInt(SurfNum)
 
     auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
@@ -14163,8 +14629,6 @@ void GetDelaySequences(EnergyPlusData &state,
         ort->initAdjFenDone = true;
     }
 
-    int radEnclosureNum = Zone(zoneIndex).RadiantEnclosureNum;
-
     if (desDaySelected != 0) {
 
         Array2D<Real64> decayCurve;
@@ -14186,6 +14650,7 @@ void GetDelaySequences(EnergyPlusData &state,
 
             // code from ComputeDelayedComponents starts
             for (int jSurf = Zone(zoneIndex).HTSurfaceFirst; jSurf <= Zone(zoneIndex).HTSurfaceLast; ++jSurf) {
+                int radEnclosureNum = state.dataSurface->Surface(jSurf).RadEnclIndex;
 
                 // for each time step, step back through time and apply decay curve to radiant heat for each end use absorbed in each surface
                 Real64 peopleConvFromSurf = 0.0;
@@ -14409,7 +14874,7 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
             // if exterior is other side coefficients using ground preprocessor terms then
             // set it to ground instead of other side coefficients
             if (curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt) {
-                if (has_prefixi(AsString(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name), "surfPropOthSdCoef")) {
+                if (has_prefixi(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
                     curExtBoundCond = Ground;
                 }
             }
@@ -15901,6 +16366,7 @@ std::string MakeAnchorName(std::string const &reportString, std::string const &o
 
     // Return value
     std::string StringOut;
+    StringOut.reserve(reportString.size() + objectString.size() + 2);
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -15916,15 +16382,15 @@ std::string MakeAnchorName(std::string const &reportString, std::string const &o
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    for (std::string::size_type i = 0, e = reportString.length(); i < e; ++i) {
-        if (has(validChars, reportString[i])) {
-            StringOut += reportString[i];
+    for (auto const i : reportString) {
+        if (has(validChars, i)) {
+            StringOut += i;
         }
     }
     StringOut += "::";
-    for (std::string::size_type i = 0, e = objectString.length(); i < e; ++i) {
-        if (has(validChars, objectString[i])) {
-            StringOut += objectString[i];
+    for (auto const i : objectString) {
+        if (has(validChars, i)) {
+            StringOut += i;
         }
     }
     return StringOut;
@@ -16714,7 +17180,7 @@ std::string RealToStr(Real64 const RealIn, int const numDigits)
 
     // FUNCTION PARAMETER DEFINITIONS:
     static constexpr std::array<const char *, 10> formDigitsA{
-        "{:#12.0F}", "{:12.1F}", "{:12.2F}", "{:12.3F}", "{:12.4F}", "{:12.5F}", "{:12.6F}", "{:12.7F}", "{:12.8F}", "{:12.9F}"};
+        "{:#11.0F}", "{:12.1F}", "{:12.2F}", "{:12.3F}", "{:12.4F}", "{:12.5F}", "{:12.6F}", "{:12.7F}", "{:12.8F}", "{:12.9F}"};
 
     static constexpr std::array<Real64, 10> maxvalDigitsA(
         {9999999999.0, 999999999.0, 99999999.0, 9999999.0, 999999.0, 99999.0, 9999.0, 999.0, 99.0, 9.0});
@@ -16734,7 +17200,7 @@ std::string RealToStr(Real64 const RealIn, int const numDigits)
     if (std::abs(RealIn) > maxvalDigitsA.at(nDigits)) {
         return format("{:12.6Z}", RealIn);
     } else {
-        return format(formDigitsA.at(nDigits), RealIn);
+        return format<FormatSyntax::FMT>(formDigitsA.at(nDigits), RealIn);
     }
     //  WRITE(FMT=, UNIT=stringOut) RealIn
     // check if it did not fit
@@ -16745,7 +17211,7 @@ std::string RealToStr(Real64 const RealIn, int const numDigits)
     // WRITE(FMT="(F10.4)", UNIT=stringOut, IOSTAT=status ) RealIn
 }
 
-Real64 StrToReal(std::string const &stringIn)
+Real64 StrToReal(std::string_view stringIn)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
@@ -16756,14 +17222,14 @@ Real64 StrToReal(std::string const &stringIn)
     // PURPOSE OF THIS SUBROUTINE:
     //   Abstract away the internal read concept
 
-    // Return value
-    Real64 realValue;
+    auto first_char = stringIn.find_first_not_of(' ');
+    if (first_char != std::string_view::npos) {
+        stringIn.remove_prefix(first_char);
+    }
 
-    std::stringstream ss{stringIn};
-    ss.imbue(std::locale("C"));
-    ss >> realValue;
-
-    if (ss.bad()) {
+    Real64 realValue = -99999.0;
+    auto answer = fast_float::from_chars(stringIn.data(), stringIn.data() + stringIn.size(), realValue);
+    if (answer.ec != std::errc()) {
         return -99999.0;
     }
     return realValue;
@@ -16781,64 +17247,28 @@ std::string DateToString(int const codedDate) // word containing encoded month, 
     //   Convert the coded date format into a usable
     //   string
 
-    // Using/Aliasing
-    using General::DecodeMonDayHrMin;
-
-    // Return value
-    std::string StringOut;
-
-    // Locals
-    // ((month*100 + day)*100 + hour)*100 + minute
-
     int Month;  // month in integer format (1-12)
     int Day;    // day in integer format (1-31)
     int Hour;   // hour in integer format (1-24)
     int Minute; // minute in integer format (0:59)
-    std::string monthName;
+    static constexpr std::array<std::string_view, 12> Months{"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
 
-    if (codedDate != 0) {
-        DecodeMonDayHrMin(codedDate, Month, Day, Hour, Minute);
-        --Hour;
-        if (Minute == 60) {
-            ++Hour;
-            Minute = 0;
-        }
-        if (Month == 1) {
-            monthName = "JAN";
-        } else if (Month == 2) {
-            monthName = "FEB";
-        } else if (Month == 3) {
-            monthName = "MAR";
-        } else if (Month == 4) {
-            monthName = "APR";
-        } else if (Month == 5) {
-            monthName = "MAY";
-        } else if (Month == 6) {
-            monthName = "JUN";
-        } else if (Month == 7) {
-            monthName = "JUL";
-        } else if (Month == 8) {
-            monthName = "AUG";
-        } else if (Month == 9) {
-            monthName = "SEP";
-        } else if (Month == 10) {
-            monthName = "OCT";
-        } else if (Month == 11) {
-            monthName = "NOV";
-        } else if (Month == 12) {
-            monthName = "DEC";
-        } else {
-            monthName = "***";
-        }
-        StringOut = format("{:02}-{:3}-{:02}:{:02}", Day, monthName, Hour, Minute);
-        if (has(StringOut, "*")) {
-            StringOut = "-";
-        }
-    } else { // codeddate = 0
-        StringOut = "-";
+    if (codedDate == 0) {
+        return "-";
     }
 
-    return StringOut;
+    General::DecodeMonDayHrMin(codedDate, Month, Day, Hour, Minute);
+    if (Month < 1 || Month > 12) {
+        return "-";
+    }
+
+    --Hour;
+    if (Minute == 60) {
+        ++Hour;
+        Minute = 0;
+    }
+
+    return fmt::format("{:02}-{:3}-{:02}:{:02}", Day, Months[Month - 1], Hour, Minute);
 }
 
 bool isNumber(std::string const &s)
@@ -16852,7 +17282,7 @@ bool isNumber(std::string const &s)
 
 // return the number of digits after the decimal point
 // Glazer - November 2016
-int digitsAferDecimal(std::string s)
+int digitsAferDecimal(std::string const &s)
 {
     std::size_t decimalpos = s.find('.');
     std::size_t numDigits;
