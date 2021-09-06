@@ -59,7 +59,6 @@
 #include <EnergyPlus/SimulationManager.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, CheckThreading)
 {

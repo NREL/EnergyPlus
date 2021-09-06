@@ -76,7 +76,6 @@
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataContaminantBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
@@ -179,7 +178,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataHeatBal->ZoneIntGain.allocate(1);
-    state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 0;
     state->dataSize->ZoneEqSizing.allocate(1);
 
     // CorrectZoneHumRat variable initialization

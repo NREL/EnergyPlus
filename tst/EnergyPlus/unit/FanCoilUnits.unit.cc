@@ -78,7 +78,6 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-using namespace ObjexxFCL;
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
