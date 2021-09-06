@@ -62,7 +62,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace OutputProcessor;
 using namespace DataOutputs;
 TEST_F(EnergyPlusFixture, OutputReportData_AnnualFieldSetConstructor)

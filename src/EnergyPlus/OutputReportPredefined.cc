@@ -217,9 +217,11 @@ namespace OutputReportPredefined {
 
         s->pdstInLite = newPreDefSubTable(state, s->pdrLighting, "Interior Lighting");
 
-        s->pdchInLtZone = newPreDefColumn(state, s->pdstInLite, "Zone");
+        s->pdchInLtZone = newPreDefColumn(state, s->pdstInLite, "Zone Name");
+        s->pdchInLtSpace = newPreDefColumn(state, s->pdstInLite, "Space Name");
+        s->pdchInLtSpaceType = newPreDefColumn(state, s->pdstInLite, "Space Type");
         s->pdchInLtDens = newPreDefColumn(state, s->pdstInLite, "Lighting Power Density [W/m2]");
-        s->pdchInLtArea = newPreDefColumn(state, s->pdstInLite, "Zone Area [m2]");
+        s->pdchInLtArea = newPreDefColumn(state, s->pdstInLite, "Space Area [m2]");
         s->pdchInLtPower = newPreDefColumn(state, s->pdstInLite, "Total Power [W]");
         s->pdchInLtEndUse = newPreDefColumn(state, s->pdstInLite, "End Use Subcategory");
         s->pdchInLtSchd = newPreDefColumn(state, s->pdstInLite, "Schedule Name");
@@ -257,8 +259,10 @@ namespace OutputReportPredefined {
         s->pdstMech = newPreDefSubTable(state, s->pdrEquip, "Central Plant");
 
         s->pdchMechType = newPreDefColumn(state, s->pdstMech, "Type");
-        s->pdchMechNomCap = newPreDefColumn(state, s->pdstMech, "Nominal Capacity [W]");
-        s->pdchMechNomEff = newPreDefColumn(state, s->pdstMech, "Nominal Efficiency [W/W]");
+        s->pdchMechNomCap = newPreDefColumn(state, s->pdstMech, "Reference Capacity [W]");
+        s->pdchMechNomEff = newPreDefColumn(state, s->pdstMech, "Reference Efficiency [W/W]");
+        s->pdchMechRatCap = newPreDefColumn(state, s->pdstMech, "Rated Capacity [W]");
+        s->pdchMechRatEff = newPreDefColumn(state, s->pdstMech, "Rated Efficiency [W/W]");
         // Note: We don't want any of these to convert.
         // The Btu/W-h isn't going to convert anyways, and the W/W will convert to W/W since it has "SI" in the string as a hint
         s->pdchMechIPLVSI = newPreDefColumn(state, s->pdstMech, "IPLV in SI Units [W/W]");
@@ -942,10 +946,12 @@ namespace OutputReportPredefined {
             s->pdchS62svrClPs = newPreDefColumn(state, s->pdstS62sysVentReqCool, "System Population - Ps");
             s->pdchS62svrClSumPz = newPreDefColumn(state, s->pdstS62sysVentReqCool, "Sum of Zone Population - Pz-sum");
             s->pdchS62svrClD = newPreDefColumn(state, s->pdstS62sysVentReqCool, "Occupant Diversity - D");
+            s->pdchS62svrClDorg = newPreDefColumn(state, s->pdstS62sysVentReqCool, "Origin of D");
             s->pdchS62svrClVou = newPreDefColumn(state, s->pdstS62sysVentReqCool, "Uncorrected Outdoor Air Intake Airflow - Vou [m3/s]");
             s->pdchS62svrClVps = newPreDefColumn(state, s->pdstS62sysVentReqCool, "System Primary Airflow - Vps [m3/s]");
             s->pdchS62svrClXs = newPreDefColumn(state, s->pdstS62sysVentReqCool, "Average Outdoor Air Fraction - Xs");
             s->pdchS62svrClEv = newPreDefColumn(state, s->pdstS62sysVentReqCool, "System Ventilation Efficiency - Ev");
+            s->pdchS62svrClEvMthd = newPreDefColumn(state, s->pdstS62sysVentReqCool, "Calculation Method for Ev");
             s->pdchS62svrClVot = newPreDefColumn(state, s->pdstS62sysVentReqCool, "Outdoor Air Intake Flow - Vot [m3/s]");
             s->pdchS62svrClPercOA = newPreDefColumn(state, s->pdstS62sysVentReqCool, "Percent Outdoor Air - %OA");
             s->pdchS62svrClEnvironmentOfPs = newPreDefColumn(state, s->pdstS62sysVentReqCool, "Environment Name of Peak System Population - Ps");
@@ -957,10 +963,12 @@ namespace OutputReportPredefined {
             s->pdchS62svrHtPs = newPreDefColumn(state, s->pdstS62sysVentReqHeat, "System Population - Ps");
             s->pdchS62svrHtSumPz = newPreDefColumn(state, s->pdstS62sysVentReqHeat, "Sum of Zone Population - Pz-sum");
             s->pdchS62svrHtD = newPreDefColumn(state, s->pdstS62sysVentReqHeat, "Occupant Diversity - D");
+            s->pdchS62svrHtDorg = newPreDefColumn(state, s->pdstS62sysVentReqHeat, "Origin of D");
             s->pdchS62svrHtVou = newPreDefColumn(state, s->pdstS62sysVentReqHeat, "Uncorrected Outdoor Air Intake Airflow - Vou [m3/s]");
             s->pdchS62svrHtVps = newPreDefColumn(state, s->pdstS62sysVentReqHeat, "System Primary Airflow - Vps [m3/s]");
             s->pdchS62svrHtXs = newPreDefColumn(state, s->pdstS62sysVentReqHeat, "Average Outdoor Air Fraction - Xs");
             s->pdchS62svrHtEv = newPreDefColumn(state, s->pdstS62sysVentReqHeat, "System Ventilation Efficiency - Ev");
+            s->pdchS62svrHtEvMthd = newPreDefColumn(state, s->pdstS62sysVentReqHeat, "Calculation Method for Ev");
             s->pdchS62svrHtVot = newPreDefColumn(state, s->pdstS62sysVentReqHeat, "Outdoor Air Intake Flow Vot [m3/s]");
             s->pdchS62svrHtPercOA = newPreDefColumn(state, s->pdstS62sysVentReqHeat, "Percent Outdoor Air - %OA");
             s->pdchS62svrHtEnvironmentOfPs = newPreDefColumn(state, s->pdstS62sysVentReqHeat, "Environment Name of Peak System Population - Ps");
@@ -998,6 +1006,8 @@ namespace OutputReportPredefined {
             // s->pdchS62zcdVsec =        newPreDefColumn(state, s->pdstS62znCoolDes,'Secondary Fan Airflow - Vsec [m3/s]')
             s->pdchS62zcdVdz = newPreDefColumn(state, s->pdstS62znCoolDes, "Zone Discharge Airflow - Vdz [m3/s]");
             s->pdchS62zcdVpzmin = newPreDefColumn(state, s->pdstS62znCoolDes, "Minimum Zone Primary Airflow - Vpz-min [m3/s]");
+            s->pdchS62zcdVpzminSPSize =
+                newPreDefColumn(state, s->pdstS62znCoolDes, "Is Vpz-min calculated using the Standard 62.1 Simplified Procedure?");
             s->pdchS62zcdVozclg = newPreDefColumn(state, s->pdstS62znCoolDes, "Zone Outdoor Airflow Cooling - Voz-clg [m3/s]");
             s->pdchS62zcdZpz = newPreDefColumn(state, s->pdstS62znCoolDes, "Primary Outdoor Air Fraction - Zpz");
             s->pdchS62zcdEp = newPreDefColumn(state, s->pdstS62znCoolDes, "Primary Air Fraction - Ep");
@@ -1026,6 +1036,8 @@ namespace OutputReportPredefined {
             // s->pdchS62zhdVsec =        newPreDefColumn(state, s->pdstS62znHeatDes,'Secondary Fan Airflow - Vsec [m3/s]')
             s->pdchS62zhdVdz = newPreDefColumn(state, s->pdstS62znHeatDes, "Zone Discharge Airflow - Vdz [m3/s]");
             s->pdchS62zhdVpzmin = newPreDefColumn(state, s->pdstS62znHeatDes, "Minimum Zone Primary Airflow - Vpz-min [m3/s]");
+            s->pdchS62zhdVpzminSPSize =
+                newPreDefColumn(state, s->pdstS62znHeatDes, "Is Vpz-min calculated using the Standard 62.1 Simplified Procedure?");
             s->pdchS62zhdVozhtg = newPreDefColumn(state, s->pdstS62znHeatDes, "Zone Outdoor Airflow Heating - Voz-htg [m3/s]");
             s->pdchS62zhdZpz = newPreDefColumn(state, s->pdstS62znHeatDes, "Primary Outdoor Air Fraction - Zpz");
             s->pdchS62zhdEp = newPreDefColumn(state, s->pdstS62znHeatDes, "Primary Air Fraction - Ep");
@@ -1319,8 +1331,10 @@ namespace OutputReportPredefined {
         }
 
         if (tableEntryReal < 1e8) { // change from 1e10 for more robust entry writing
+            // something changed in FMT 7.x and "{:#12.{}F}" now outputs 13. So changing it to 11.{}F to maintain existing functionality. Likely
+            // related to https://github.com/fmtlib/fmt/issues/1893
             state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry =
-                format("{:#12.{}F}", tableEntryReal, sigDigitCount);
+                format("{:#11.{}F}", tableEntryReal, sigDigitCount);
         } else {
             // Formatting in scientific notation, zero sigDigits makes zero sense.
             // **for something greater than 1E+08**, one sigDigits is very unhelpful (you're having an accuracy of 0.5E+07 at best)

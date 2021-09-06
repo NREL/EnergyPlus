@@ -107,12 +107,12 @@ using namespace SimulationManager;
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmSetUnitsStyleFromString)
 {
 
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::None, SetUnitsStyleFromString("None"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::JtoKWH, SetUnitsStyleFromString("JTOKWH"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::JtoMJ, SetUnitsStyleFromString("JTOMJ"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::JtoGJ, SetUnitsStyleFromString("JTOGJ"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::InchPound, SetUnitsStyleFromString("INCHPOUND"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::NotFound, SetUnitsStyleFromString("qqq"));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::None, SetUnitsStyleFromString("None")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoKWH, SetUnitsStyleFromString("JTOKWH")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoMJ, SetUnitsStyleFromString("JTOMJ")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoGJ, SetUnitsStyleFromString("JTOGJ")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::InchPound, SetUnitsStyleFromString("INCHPOUND")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::NotFound, SetUnitsStyleFromString("qqq")));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_Basic)
@@ -494,6 +494,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
     state->dataEnvrn->TotDesDays = 2;
     state->dataEnvrn->TotRunDesPersDays = 3;
     state->dataGlobal->NumOfZones = 4;
+    state->dataViewFactor->NumOfRadiantEnclosures = 4;
     state->dataSurface->TotSurfaces = 7;
     state->dataGlobal->NumOfTimeStepInHour = 4;
 
@@ -1143,6 +1144,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -1159,6 +1161,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1175,6 +1178,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Ground,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1191,6 +1195,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1207,6 +1212,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1223,6 +1229,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1279,6 +1286,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -1295,6 +1303,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1311,6 +1320,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Ground,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1327,6 +1337,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1343,6 +1354,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1359,6 +1371,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1824,6 +1837,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -1840,6 +1854,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1856,6 +1871,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Ground,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1872,6 +1888,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1888,6 +1905,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1904,6 +1922,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1960,6 +1979,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -1976,6 +1996,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1992,6 +2013,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Ground,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2008,6 +2030,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2024,6 +2047,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2040,6 +2064,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2303,7 +2328,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "  DCVObject,               !- Name",
         "  AvailSched,              !- Availability Schedule Name",
         "  Yes,                     !- Demand Controlled Ventilation",
-        "  VentilationRateProcedure,!- System Outdoor Air Method",
+        "  Standard62.1VentilationRateProcedure,!- System Outdoor Air Method",
         "  ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}",
         "  Space,  !- Zone 1 Name",
         "  Space DSOA Design OA Spec,  !- Design Specification Outdoor Air Object Name 1",
@@ -3053,7 +3078,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 //" ,                         !- Heating Fraction of Autosized Heating Supply Air Flow Rate",
 //" ,                         !- Heating Fraction of Autosized Cooling Supply Air Flow Rate",
 //" ,                         !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}",
-//" VentilationRateProcedure, !- System Outdoor Air Method",
+//" Standard62.1VentilationRateProcedure, !- System Outdoor Air Method",
 //" 1.0,                      !- Zone Maximum Outdoor Air Fraction {dimensionless}",
 //" CoolingDesignCapacity,    !- Cooling Design Capacity Method",
 //" autosize,                 !- Cooling Design Capacity {W}",
@@ -3278,7 +3303,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 //"  DCVObject,               !- Name",
 //"  AvailSched,              !- Availability Schedule Name",
 //"  Yes,                     !- Demand Controlled Ventilation",
-//"  VentilationRateProcedure,!- System Outdoor Air Method",
+//"  Standard62.1VentilationRateProcedure,!- System Outdoor Air Method",
 //"  ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}",
 //"  Space,  !- Zone 1 Name",
 //"  Space DSOA Design OA Spec,  !- Design Specification Outdoor Air Object Name 1",
@@ -6154,7 +6179,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
-    EXPECT_EQ(123ul, tabularData.size());
+    EXPECT_EQ(174ul, tabularData.size());
     // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
     // columnId, value
     EXPECT_EQ("       12.30", tabularData[3][10]);
@@ -6245,34 +6270,55 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
     state->dataHeatBal->Lights(1).ZonePtr = 1;
+    state->dataHeatBal->Lights(1).spaceIndex = 1;
     state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
     state->dataHeatBal->Lights(2).ZonePtr = 2;
+    state->dataHeatBal->Lights(2).spaceIndex = 2;
     state->dataHeatBal->Lights(2).DesignLevel = 100.0;
     state->dataHeatBal->Lights(3).ZonePtr = 3;
+    state->dataHeatBal->Lights(3).spaceIndex = 3;
     state->dataHeatBal->Lights(3).DesignLevel = 10.0;
 
     state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).spaceIndex = 1;
     state->dataHeatBal->People(1).NumberOfPeople = 10.0;
     state->dataHeatBal->People(2).ZonePtr = 2;
+    state->dataHeatBal->People(2).spaceIndex = 2;
     state->dataHeatBal->People(2).NumberOfPeople = 5.0;
     state->dataHeatBal->People(3).ZonePtr = 3;
+    state->dataHeatBal->People(3).spaceIndex = 3;
     state->dataHeatBal->People(3).NumberOfPeople = 1.0;
 
     state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
+    state->dataHeatBal->ZoneElectric(1).spaceIndex = 1;
     state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
     state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
+    state->dataHeatBal->ZoneElectric(2).spaceIndex = 2;
     state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
     state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
+    state->dataHeatBal->ZoneElectric(3).spaceIndex = 3;
     state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
     state->dataGlobal->NumOfZones = 3;
+    state->dataGlobal->numSpaces = 3;
+    state->dataViewFactor->NumOfSolarEnclosures = 3;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
+    state->dataGlobal->numSpaceTypes = 1;
+    state->dataHeatBal->spaceTypes.allocate(state->dataGlobal->numSpaceTypes);
+    state->dataHeatBal->spaceTypes(1) = "General";
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->space.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
+    state->dataHeatBal->space(1).Name = "PartofTot Conditioned Zone";
+    state->dataHeatBal->space(1).spaceTypeNum = 1;
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(1).Multiplier = 1.;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(1).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes(1) = 1;
     // 10x10x2
     state->dataHeatBal->Zone(1).FloorArea = 1000.;
     state->dataHeatBal->Zone(1).Volume = 2000.;
@@ -6281,10 +6327,15 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
+    state->dataHeatBal->space(2).Name = "PartofTot Unconditioned Zone";
+    state->dataHeatBal->space(2).spaceTypeNum = 1;
+    state->dataHeatBal->space(2).solarEnclosureNum = 2;
     state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
     state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(2).Multiplier = 1.;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(2).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(2).spaceIndexes(1) = 2;
     // 10x10x2
     state->dataHeatBal->Zone(2).FloorArea = 100.;
     state->dataHeatBal->Zone(2).Volume = 200.;
@@ -6293,10 +6344,15 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->Zone(2).ExtWindowArea = 0.0;
 
     state->dataHeatBal->Zone(3).Name = "NOT PartofTot Conditioned Zone";
+    state->dataHeatBal->space(3).Name = "NOT PartofTot Conditioned Zone";
+    state->dataHeatBal->space(3).spaceTypeNum = 1;
+    state->dataHeatBal->space(3).solarEnclosureNum = 3;
     state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
     state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
     state->dataHeatBal->Zone(3).Multiplier = 1.;
     state->dataHeatBal->Zone(3).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(3).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(3).spaceIndexes(1) = 3;
     // 10x10x2
     state->dataHeatBal->Zone(3).FloorArea = 10.;
     state->dataHeatBal->Zone(3).Volume = 20.;
@@ -6837,15 +6893,19 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
 
     state->dataGlobal->NumOfZones = 4;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataGlobal->numSpaces = 4;
+    state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
+    state->dataViewFactor->NumOfRadiantEnclosures = 4;
 
     state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(iZone).HTSurfaceLast = 1;
-    state->dataHeatBal->Zone(iZone).RadiantEnclosureNum = 1;
+    state->dataHeatBal->space(iZone).radiantEnclosureNum = 1;
 
     state->dataSurface->TotSurfaces = 4;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(1).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(1).RadEnclIndex = 1;
 
     Array1D<Real64> peopleDelaySeq;
     peopleDelaySeq.allocate(state->dataGlobal->NumOfTimeStepInHour * 24);
@@ -6878,7 +6938,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     Array3D<Real64> feneCondInstantSeq;
     feneCondInstantSeq.allocate(state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays,
                                 state->dataGlobal->NumOfTimeStepInHour * 24,
-                                state->dataGlobal->NumOfZones);
+                                state->dataViewFactor->NumOfRadiantEnclosures);
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
@@ -8176,7 +8236,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     bool isKoppen = false;
     std::string coolingLineGoodDegrees = "    - 2874 annual (standard) cooling degree-days (10°C baseline)";
     parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_EQ((int)StatLineType::stdCDDLine, (int)lineTypeReturn);
+    EXPECT_TRUE(compare_enums(StatLineType::stdCDDLine, lineTypeReturn));
 
     lineTypeReturn = StatLineType::Initialized;
     desCondLinePassed = false;
@@ -8185,7 +8245,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     isKoppen = false;
     std::string coolingLineBadDegrees = "    - 2874 annual (standard) cooling degree-days (10_BADDEGREESYMBOL_C baseline)";
     parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_EQ((int)StatLineType::stdCDDLine, (int)lineTypeReturn);
+    EXPECT_TRUE(compare_enums(StatLineType::stdCDDLine, lineTypeReturn));
 
     lineTypeReturn = StatLineType::Initialized;
     desCondLinePassed = false;
@@ -8194,7 +8254,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     isKoppen = false;
     std::string koppenLineWithDots = " - Climate type \"Cfa\" (Köppen classification)**";
     parseStatLine(koppenLineWithDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_EQ((int)StatLineType::KoppenLine, (int)lineTypeReturn);
+    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, lineTypeReturn));
 
     lineTypeReturn = StatLineType::Initialized;
     desCondLinePassed = false;
@@ -8203,7 +8263,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     isKoppen = false;
     std::string koppenLineNoDots = " - Climate type \"Cfa\" (Koppen classification)**";
     parseStatLine(koppenLineNoDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_EQ((int)StatLineType::KoppenLine, (int)lineTypeReturn);
+    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, lineTypeReturn));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_test)
@@ -8217,10 +8277,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
 
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataGlobal->numSpaces = 1;
+    state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
+    state->dataViewFactor->NumOfRadiantEnclosures = 1;
 
     state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(iZone).HTSurfaceLast = 4;
-    state->dataHeatBal->Zone(iZone).RadiantEnclosureNum = 1;
+    state->dataHeatBal->space(iZone).radiantEnclosureNum = 1;
     int radEnclosureNum = 1;
 
     state->dataSurface->TotSurfaces = 4;
@@ -8257,7 +8320,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     Array3D<Real64> feneCondInstantSeq;
     feneCondInstantSeq.allocate(state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays,
                                 state->dataGlobal->NumOfTimeStepInHour * 24,
-                                state->dataGlobal->NumOfZones);
+                                state->dataViewFactor->NumOfRadiantEnclosures);
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
@@ -8280,6 +8343,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
     state->dataSurface->Surface(3).Class = SurfaceClass::Floor;
     state->dataSurface->Surface(4).Class = SurfaceClass::Shading;
+    state->dataSurface->Surface(1).RadEnclIndex = 1;
+    state->dataSurface->Surface(2).RadEnclIndex = 1;
+    state->dataSurface->Surface(3).RadEnclIndex = 1;
+    state->dataSurface->Surface(4).RadEnclIndex = 1;
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
@@ -8329,6 +8396,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     state->dataSurface->Surface(4).Class = SurfaceClass::Wall;
     state->dataSurface->Surface(1).Class = SurfaceClass::Floor;
     state->dataSurface->Surface(3).Class = SurfaceClass::Shading;
+    state->dataSurface->Surface(2).RadEnclIndex = 1;
+    state->dataSurface->Surface(4).RadEnclIndex = 1;
+    state->dataSurface->Surface(1).RadEnclIndex = 1;
+    state->dataSurface->Surface(3).RadEnclIndex = 1;
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
@@ -8500,8 +8571,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
     std::string endUseSub("");
     std::string group("");
     std::string const zoneName("");
+    std::string const spaceType("");
 
-    AttachMeters(*state, OutputProcessor::Unit::J, resourceType, endUse, endUseSub, group, zoneName, 1, meter_array_ptr, errors_found);
+    AttachMeters(*state, OutputProcessor::Unit::J, resourceType, endUse, endUseSub, group, zoneName, spaceType, 1, meter_array_ptr, errors_found);
 
     EXPECT_FALSE(errors_found);
     EXPECT_EQ(3, meter_array_ptr); // 2 meters were setup via SetupOutputVariable already
@@ -8534,8 +8606,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -8556,8 +8628,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
     state->dataStrGlobals->outputSqliteErrFilePath = "eplusout2.sql";
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -8578,8 +8650,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
     state->dataStrGlobals->outputSqliteErrFilePath = "eplusout3.sql";
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -8601,8 +8673,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -8625,8 +8697,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -9141,7 +9213,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
     auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
-    EXPECT_EQ(123ul, tabularData.size());
+    EXPECT_EQ(174ul, tabularData.size());
     // tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId,
     // columnId, value
     EXPECT_EQ("       12.30", tabularData[3][10]);
@@ -9232,34 +9304,56 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
     state->dataHeatBal->Lights(1).ZonePtr = 1;
+    state->dataHeatBal->Lights(1).spaceIndex = 1;
     state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
     state->dataHeatBal->Lights(2).ZonePtr = 2;
+    state->dataHeatBal->Lights(2).spaceIndex = 2;
     state->dataHeatBal->Lights(2).DesignLevel = 100.0;
     state->dataHeatBal->Lights(3).ZonePtr = 3;
+    state->dataHeatBal->Lights(3).spaceIndex = 3;
     state->dataHeatBal->Lights(3).DesignLevel = 10.0;
 
     state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).spaceIndex = 1;
     state->dataHeatBal->People(1).NumberOfPeople = 10.0;
     state->dataHeatBal->People(2).ZonePtr = 2;
+    state->dataHeatBal->People(2).spaceIndex = 2;
     state->dataHeatBal->People(2).NumberOfPeople = 5.0;
     state->dataHeatBal->People(3).ZonePtr = 3;
+    state->dataHeatBal->People(3).spaceIndex = 3;
     state->dataHeatBal->People(3).NumberOfPeople = 1.0;
 
     state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
+    state->dataHeatBal->ZoneElectric(1).spaceIndex = 1;
     state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
     state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
+    state->dataHeatBal->ZoneElectric(2).spaceIndex = 2;
     state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
     state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
+    state->dataHeatBal->ZoneElectric(3).spaceIndex = 3;
     state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
     state->dataGlobal->NumOfZones = 3;
+    state->dataGlobal->numSpaces = 3;
+    state->dataViewFactor->NumOfSolarEnclosures = 3;
+    state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
+    state->dataGlobal->numSpaceTypes = 1;
+    state->dataHeatBal->spaceTypes.allocate(state->dataGlobal->numSpaceTypes);
+    state->dataHeatBal->spaceTypes(1) = "General";
+
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->space.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(1).Multiplier = 1.;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.;
+    state->dataHeatBal->space(1).Name = "PartofTot Conditioned Zone";
+    state->dataHeatBal->space(1).spaceTypeNum = 1;
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
+    state->dataHeatBal->Zone(1).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes(1) = 1;
     // 10x10x2
     state->dataHeatBal->Zone(1).FloorArea = 1000.;
     state->dataHeatBal->Zone(1).Volume = 2000.;
@@ -9272,6 +9366,11 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(2).Multiplier = 1.;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.;
+    state->dataHeatBal->space(2).Name = "PartofTot Unconditioned Zone";
+    state->dataHeatBal->space(2).spaceTypeNum = 1;
+    state->dataHeatBal->space(2).solarEnclosureNum = 2;
+    state->dataHeatBal->Zone(2).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(2).spaceIndexes(1) = 2;
     // 10x10x2
     state->dataHeatBal->Zone(2).FloorArea = 100.;
     state->dataHeatBal->Zone(2).Volume = 200.;
@@ -9284,6 +9383,11 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
     state->dataHeatBal->Zone(3).Multiplier = 1.;
     state->dataHeatBal->Zone(3).ListMultiplier = 1.;
+    state->dataHeatBal->space(3).Name = "NOT PartofTot Conditioned Zone";
+    state->dataHeatBal->space(3).spaceTypeNum = 1;
+    state->dataHeatBal->space(3).solarEnclosureNum = 3;
+    state->dataHeatBal->Zone(3).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(3).spaceIndexes(1) = 3;
     // 10x10x2
     state->dataHeatBal->Zone(3).FloorArea = 10.;
     state->dataHeatBal->Zone(3).Volume = 20.;

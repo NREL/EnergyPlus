@@ -892,38 +892,38 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 EIRPlantLoopHeatPump thisPLHP;
                 thisPLHP.plantTypeOfNum = classToInput.thisTypeNum;
                 thisPLHP.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
-                std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("load_side_inlet_node_name")));
-                std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("load_side_outlet_node_name")));
-                std::string condenserType = UtilityRoutines::MakeUPPERCase(AsString(fields.at("condenser_type")));
-                std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("source_side_inlet_node_name")));
-                std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("source_side_outlet_node_name")));
+                std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("load_side_inlet_node_name").get<std::string>());
+                std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("load_side_outlet_node_name").get<std::string>());
+                std::string condenserType = UtilityRoutines::MakeUPPERCase(fields.at("condenser_type").get<std::string>());
+                std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_inlet_node_name").get<std::string>());
+                std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name").get<std::string>());
                 if (fields.find("companion_heat_pump_name") != fields.end()) { // optional field
-                    thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("companion_heat_pump_name")));
+                    thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_heat_pump_name").get<std::string>());
                 }
                 auto tmpFlowRate = fields.at("load_side_reference_flow_rate");
                 if (tmpFlowRate == "Autosize") {
                     thisPLHP.loadSideDesignVolFlowRate = DataSizing::AutoSize;
                     thisPLHP.loadSideDesignVolFlowRateWasAutoSized = true;
                 } else {
-                    thisPLHP.loadSideDesignVolFlowRate = tmpFlowRate;
+                    thisPLHP.loadSideDesignVolFlowRate = tmpFlowRate.get<Real64>();
                 }
                 auto tmpSourceFlowRate = fields.at("source_side_reference_flow_rate");
                 if (tmpSourceFlowRate == "Autosize") {
                     thisPLHP.sourceSideDesignVolFlowRate = DataSizing::AutoSize;
                     thisPLHP.sourceSideDesignVolFlowRateWasAutoSized = true;
                 } else {
-                    thisPLHP.sourceSideDesignVolFlowRate = tmpSourceFlowRate;
+                    thisPLHP.sourceSideDesignVolFlowRate = tmpSourceFlowRate.get<Real64>();
                 }
                 auto tmpRefCapacity = fields.at("reference_capacity");
                 if (tmpRefCapacity == "Autosize") {
                     thisPLHP.referenceCapacity = DataSizing::AutoSize;
                     thisPLHP.referenceCapacityWasAutoSized = true;
                 } else {
-                    thisPLHP.referenceCapacity = tmpRefCapacity;
+                    thisPLHP.referenceCapacity = tmpRefCapacity.get<Real64>();
                 }
 
                 if (fields.find("reference_coefficient_of_performance") != fields.end()) {
-                    thisPLHP.referenceCOP = fields.at("reference_coefficient_of_performance");
+                    thisPLHP.referenceCOP = fields.at("reference_coefficient_of_performance").get<Real64>();
                 } else {
                     Real64 defaultVal = 0.0;
                     if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
@@ -940,7 +940,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 if (fields.find("sizing_factor") != fields.end()) {
-                    thisPLHP.sizingFactor = fields.at("sizing_factor");
+                    thisPLHP.sizingFactor = fields.at("sizing_factor").get<Real64>();
                 } else {
                     Real64 defaultVal = 0.0;
                     if (!state.dataInputProcessing->inputProcessor->getDefaultValue(state, cCurrentModuleObject, "sizing_factor", defaultVal)) {
@@ -956,21 +956,23 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 auto &capFtName = fields.at("capacity_modifier_function_of_temperature_curve_name");
-                thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(AsString(capFtName)));
+                thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
                         state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name + "; entered curve name: " + capFtName.get<std::string>());
                     errorsFound = true;
                 }
                 auto &eirFtName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
-                thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(AsString(eirFtName)));
+                thisPLHP.powerRatioFuncTempCurveIndex =
+                    CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
                         state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name + "; entered curve name: " + eirFtName.get<std::string>());
                     errorsFound = true;
                 }
                 auto &eirFplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name");
-                thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(AsString(eirFplrName)));
+                thisPLHP.powerRatioFuncPLRCurveIndex =
+                    CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName.get<std::string>()));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
                         state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name + "; entered curve name: " + eirFplrName.get<std::string>());
