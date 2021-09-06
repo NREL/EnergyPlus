@@ -92,7 +92,7 @@ double gt::heat_transfer::FLSApproximation::finite_line_source(
 }
 
 void gt::heat_transfer::thermal_response_factors(gt::segments::SegmentResponse &SegRes,
-                                                 std::vector<double> &time, const double alpha,
+                                                 std::vector<double> &time, double &alpha,
                                                  bool use_similarities, bool disp, int n_Threads) {
     // total number of line sources
     int nSources = SegRes.boreSegments.size();

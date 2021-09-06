@@ -104,7 +104,7 @@ namespace gt::heat_transfer {
     };
     
     void thermal_response_factors(gt::segments::SegmentResponse &SegRes,
-                                  std::vector<double>& time, double alpha,
+                                  std::vector<double>& time, double &alpha,
                                   bool use_similarities, bool disp=false,
                                   int numThreads=1);
 
