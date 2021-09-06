@@ -130,7 +130,6 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
             }
         }
     } else if (this->curSysNum > 0) {
-        this->dataFracOfAutosizedHeatingCapacity = 1.0;
         if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
             this->autoSizedValue = _originalValue;
         } else {
@@ -171,9 +170,6 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
                                            (this->finalSysSizing(this->curSysNum).PreheatTemp - CoilInTemp);
                 }
             } else {
-                if (this->finalSysSizing(this->curSysNum).HeatingCapMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
-                    this->dataFracOfAutosizedHeatingCapacity = this->finalSysSizing(this->curSysNum).FractionOfAutosizedHeatingCapacity;
-                }
                 if (this->dataDesicRegCoil) {
                     this->autoSizedValue = CpAirStd * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing *
                                            (this->dataDesOutletAirTemp - this->dataDesInletAirTemp);
@@ -181,6 +177,9 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
                     this->autoSizedValue = CpAirStd * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing *
                                            (this->finalSysSizing(this->curSysNum).HeatSupTemp - CoilInTemp);
                 }
+            }
+            if (this->finalSysSizing(this->curSysNum).HeatingCapMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
+                this->dataFracOfAutosizedHeatingCapacity = this->finalSysSizing(this->curSysNum).FractionOfAutosizedHeatingCapacity;
             }
         }
     }
