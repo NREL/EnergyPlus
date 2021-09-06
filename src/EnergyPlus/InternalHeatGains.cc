@@ -2915,30 +2915,33 @@ namespace InternalHeatGains {
 
                         // check supply air node for matches with zone equipment supply air node
                         int zoneEqIndex = DataZoneEquipment::GetControlledZoneIndex(state, state.dataHeatBal->Zone(thisZoneITEq.ZonePtr).Name);
-                        auto itStart = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.begin();
-                        auto itEnd = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.end();
-                        auto key = thisZoneITEq.SupplyAirNodeNum;
-                        bool supplyNodeFound = false;
-                        if (std::find(itStart, itEnd, key) != itEnd) {
-                            supplyNodeFound = true;
-                        }
+                        thisZoneITEq.zoneEqIndex = zoneEqIndex;
+                        if (zoneEqIndex > 0) { // zoneEqIndex could be zero in the case of an uncontrolled zone
+                            auto itStart = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.begin();
+                            auto itEnd = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.end();
+                            auto key = thisZoneITEq.SupplyAirNodeNum;
+                            bool supplyNodeFound = false;
+                            if (std::find(itStart, itEnd, key) != itEnd) {
+                                supplyNodeFound = true;
+                            }
 
-                        if (thisZoneITEq.AirConnectionType == ITEInletAdjustedSupply && !supplyNodeFound) {
-                            // supply air node must match zone equipment supply air node for these conditions
-                            ShowSevereError(state, std::string{RoutineName} + ": ElectricEquipment:ITE:AirCooled " + thisZoneITEq.Name);
-                            ShowContinueError(state, "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
-                            ErrorsFound = true;
-                        } else if (thisZoneITEq.FlowControlWithApproachTemps && !supplyNodeFound) {
-                            // supply air node must match zone equipment supply air node for these conditions
-                            ShowSevereError(state, std::string{RoutineName} + ": ElectricEquipment:ITE:AirCooled " + thisZoneITEq.Name);
-                            ShowContinueError(state, "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
-                            ErrorsFound = true;
-                        } else if (thisZoneITEq.SupplyAirNodeNum != 0 && !supplyNodeFound) {
-                            // the given supply air node does not match any zone equipment supply air nodes
-                            ShowWarningError(state,
-                                             itEqModuleObject + "name: '" + AlphaName(1) + ". " + "Supply Air Node Name '" + AlphaName(14) +
-                                                 "' does not match any ZoneHVAC:EquipmentConnections objects.");
-                        }
+                            if (thisZoneITEq.AirConnectionType == ITEInletAdjustedSupply && !supplyNodeFound) {
+                                // supply air node must match zone equipment supply air node for these conditions
+                                ShowSevereError(state, std::string{RoutineName} + ": ElectricEquipment:ITE:AirCooled " + thisZoneITEq.Name);
+                                ShowContinueError(state, "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
+                                ErrorsFound = true;
+                            } else if (thisZoneITEq.FlowControlWithApproachTemps && !supplyNodeFound) {
+                                // supply air node must match zone equipment supply air node for these conditions
+                                ShowSevereError(state, std::string{RoutineName} + ": ElectricEquipment:ITE:AirCooled " + thisZoneITEq.Name);
+                                ShowContinueError(state, "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
+                                ErrorsFound = true;
+                            } else if (thisZoneITEq.SupplyAirNodeNum != 0 && !supplyNodeFound) {
+                                // the given supply air node does not match any zone equipment supply air nodes
+                                ShowWarningError(state,
+                                                 itEqModuleObject + "name: '" + AlphaName(1) + ". " + "Supply Air Node Name '" + AlphaName(14) +
+                                                     "' does not match any ZoneHVAC:EquipmentConnections objects.");
+                            }
+                        } // end of if block for zoneEqIndex > 0
 
                         // End-Use subcategories
                         if (NumAlpha > 16) {
@@ -7761,8 +7764,12 @@ namespace InternalHeatGains {
                     WAirIn = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                 } else {
                     // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
-                    int ZoneAirInletNode = state.dataZoneEquip->ZoneEquipConfig(NZ).InletNode(1);
-                    TSupply = state.dataLoopNodes->Node(ZoneAirInletNode).Temp;
+                    if (state.dataHeatBal->ZoneITEq(Loop).zoneEqIndex > 0) {
+                        int ZoneAirInletNode = state.dataZoneEquip->ZoneEquipConfig(NZ).InletNode(1);
+                        TSupply = state.dataLoopNodes->Node(ZoneAirInletNode).Temp;
+                    } else {
+                        TSupply = state.dataHeatBalFanSys->MAT(NZ);
+                    }
                     TAirIn = state.dataHeatBalFanSys->MAT(NZ);
                     WAirIn = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                 }
