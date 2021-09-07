@@ -317,8 +317,25 @@ namespace DataHeatBalance {
         NUM
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AirBalance::NUM)> AirBalanceTypeNamesUC = {
-        "NONE","QUADRATURE"};
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AirBalance::NUM)> AirBalanceTypeNamesUC = {"NONE", "QUADRATURE"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationFlow::NUM)> InfiltrationFlowTypeNamesUC = {
+        "NONE", "ADDINFILTRATIONFLOW", "ADJUSTINFILTRATIONFLOW"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationFlow::NUM)> InfiltrationFlowTypeNamesCC = {
+        "None", "AddInfiltrationFlow", "AdjustInfiltrationFlow"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationZoneType::NUM)> InfiltrationZoneTypeNamesUC = {
+        "MIXINGSOURCEZONESONLY", "ALLZONES"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationZoneType::NUM)> InfiltrationZoneTypeNamesCC = {
+        "MixingSourceZonesOnly", "AllZones"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AdjustmentType::NUM)> AdjustmentTypeNamesUC = {
+        "ADJUSTMIXINGONLY", "ADJUSTRETURNONLY", "ADJUSTMIXINGTHENRETURN", "ADJUSTRETURNTHENMIXING", "NONE"};
+
+    constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AdjustmentType::NUM)> AdjustmentTypeNamesCC = {
+        "AdjustMixingOnly", "AdjustReturnOnly", "AdjustMixingThenReturn", "AdjustReturnThenMixing", "None"};
 
     constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> IntGainTypeNamesUC = {
         "PEOPLE",

@@ -1205,27 +1205,15 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (NumAlpha > 0) {
                 {
-                    auto const SELECT_CASE_var(AlphaName(1));
-                    if (SELECT_CASE_var == "ADJUSTMIXINGONLY") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustMixingOnly;
+                    int FlowTypeNum = getEnumerationValue(AdjustmentTypeNamesUC, AlphaName(1));
+                    state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = static_cast<DataHeatBalance::AdjustmentType>(FlowTypeNum);
+                    AlphaName(1) = AdjustmentTypeNamesCC[FlowTypeNum];
+                    if (BITF_TEST_ANY(BITF(state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment),
+                                      BITF(AdjustmentType::AdjustMixingOnly) | BITF(AdjustmentType::AdjustReturnOnly) |
+                                          BITF(AdjustmentType::AdjustMixingThenReturn) | BITF(AdjustmentType::AdjustReturnThenMixing))) {
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(1) = "AdjustMixingOnly";
-                    } else if (SELECT_CASE_var == "ADJUSTRETURNONLY") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustReturnOnly;
-                        state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(1) = "AdjustReturnOnly";
-                    } else if (SELECT_CASE_var == "ADJUSTMIXINGTHENRETURN") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustMixingThenReturn;
-                        state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(1) = "AdjustMixingThenReturn";
-                    } else if (SELECT_CASE_var == "ADJUSTRETURNTHENMIXING") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustReturnThenMixing;
-                        state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(1) = "AdjustReturnThenMixing";
-                    } else if (SELECT_CASE_var == "NONE") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::NoAdjustReturnAndMixing;
-                        AlphaName(1) = "None";
-                    } else {
+                    }
+                    if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == AdjustmentType::Unassigned) {
                         state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::NoAdjustReturnAndMixing;
                         AlphaName(1) = "None";
                         ShowWarningError(state,
@@ -1238,23 +1226,15 @@ namespace HeatBalanceManager {
             }
             if (NumAlpha > 1) {
                 {
-                    auto const SELECT_CASE_var(AlphaName(2));
-                    if (SELECT_CASE_var == "ADDINFILTRATIONFLOW") {
-                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::Add;
+                    int FlowTypeNum = getEnumerationValue(InfiltrationFlowTypeNamesUC, AlphaName(2));
+                    state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = static_cast<DataHeatBalance::InfiltrationFlow>(FlowTypeNum);
+                    AlphaName(2) = InfiltrationFlowTypeNamesCC[FlowTypeNum];
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add ||
+                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(2) = "AddInfiltrationFlow";
                         if (!state.dataContaminantBalance->Contaminant.CO2Simulation)
                             state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
-                    } else if (SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW") {
-                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::Adjust;
-                        state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(2) = "AddInfiltrationFlow";
-                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation)
-                            state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
-                    } else if (SELECT_CASE_var == "NONE") {
-                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::No;
-                        AlphaName(2) = "None";
-                    } else {
+                    } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Unassigned) {
                         state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::Add;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
@@ -1273,14 +1253,10 @@ namespace HeatBalanceManager {
             } else {
                 if (NumAlpha > 2) {
                     {
-                        auto const SELECT_CASE_var(AlphaName(3));
-                        if (SELECT_CASE_var == "MIXINGSOURCEZONESONLY") {
-                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly;
-                            AlphaName(3) = "MixingSourceZonesOnly";
-                        } else if (SELECT_CASE_var == "ALLZONES") {
-                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = DataHeatBalance::InfiltrationZoneType::AllZones;
-                            AlphaName(3) = "AllZones";
-                        } else {
+                        int FlowTypeNum = getEnumerationValue(InfiltrationZoneTypeNamesUC, AlphaName(3));
+                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = static_cast<DataHeatBalance::InfiltrationZoneType>(FlowTypeNum);
+                        AlphaName(3) = InfiltrationZoneTypeNamesCC[FlowTypeNum];
+                        if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones == DataHeatBalance::InfiltrationZoneType::Unassigned) {
                             state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly;
                             AlphaName(3) = "MixingSourceZonesOnly";
                             ShowWarningError(state,
