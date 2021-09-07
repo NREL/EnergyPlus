@@ -156,15 +156,9 @@ void KivaInstanceMap::initGround(EnergyPlusData &state, const KivaWeatherData &k
     gp = Kiva::GroundPlot(ss, ground.domain, ground.foundation);
 #endif
 
-    // Determine accelerated intervals
     int numAccelaratedTimesteps = 3;
     int acceleratedTimestep = 30; // days
-    int accDate =
-        state.dataEnvrn->DayOfYear - 1 - acceleratedTimestep * (numAccelaratedTimesteps + 1); // date time = last timestep from the day before
-    while (accDate < 0) {
-        accDate = accDate + 365 + state.dataWeatherManager->LeapYearAdd;
-    }
-
+    int accDate = getAccDate(state, numAccelaratedTimesteps, acceleratedTimestep);
     // Initialize with steady state before accelerated timestepping
     instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_STEADY_STATE;
     setInitialBoundaryConditions(state, kivaWeather, accDate, 24, state.dataGlobal->NumOfTimeStepInHour);
@@ -187,6 +181,17 @@ void KivaInstanceMap::initGround(EnergyPlusData &state, const KivaWeatherData &k
 
     instance.calculate_surface_averages();
     instance.foundation->numericalScheme = Kiva::Foundation::NS_ADI;
+}
+
+int KivaInstanceMap::getAccDate(EnergyPlusData &state, const int numAccelaratedTimesteps, const int acceleratedTimestep)
+{
+    // Determine accelerated intervals
+    int accDate =
+        state.dataEnvrn->DayOfYear - 1 - acceleratedTimestep * (numAccelaratedTimesteps + 1); // date time = last timestep from the day before
+    while (accDate <= 0) {
+        accDate = accDate + 365 + state.dataWeatherManager->LeapYearAdd;
+    }
+    return accDate;
 }
 
 void KivaInstanceMap::setInitialBoundaryConditions(
