@@ -77,7 +77,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
@@ -2748,7 +2747,6 @@ namespace ThermalComfort {
         int j;
         bool weathersimulation;
         Real64 inavgdrybulb;
-        bool ErrorsFound(false);
 
         if (initiate) { // not optional on initiate=true.  would otherwise check for presence
             weathersimulation = wthrsim;
@@ -2793,19 +2791,21 @@ namespace ThermalComfort {
                 }
                 state.dataThermalComforts->DailyAveOutTemp = 0.0;
 
-                WeatherManager::OpenEPlusWeatherFile(state, ErrorsFound, false);
-
+                auto epwFile = state.files.inputWeatherFilePath.open(state, "CalcThermalComfortAdaptiveASH55");
+                for (i = 1; i <= 8; ++i) { // Headers
+                    epwLine = epwFile.readLine().data;
+                }
                 jStartDay = state.dataEnvrn->DayOfYear - 1;
                 calcStartDay = jStartDay - 30;
                 if (calcStartDay >= 0) {
                     calcStartHr = 24 * calcStartDay + 1;
                     for (i = 1; i <= calcStartHr - 1; ++i) {
-                        state.files.inputWeatherFile.readLine();
+                        epwFile.readLine();
                     }
                     for (i = 1; i <= 30; ++i) {
                         state.dataThermalComforts->avgDryBulbASH = 0.0;
                         for (j = 1; j <= 24; ++j) {
-                            epwLine = state.files.inputWeatherFile.readLine().data;
+                            epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
                                 pos = index(epwLine, ',');
                                 epwLine.erase(0, pos + 1);
@@ -2824,7 +2824,7 @@ namespace ThermalComfort {
                     for (i = 1; i <= calcEndDay; ++i) {
                         state.dataThermalComforts->avgDryBulbASH = 0.0;
                         for (j = 1; j <= 24; ++j) {
-                            epwLine = state.files.inputWeatherFile.readLine().data;
+                            epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
                                 pos = index(epwLine, ',');
                                 epwLine.erase(0, pos + 1);
@@ -2836,12 +2836,12 @@ namespace ThermalComfort {
                         state.dataThermalComforts->DailyAveOutTemp(i + 30 - calcEndDay) = state.dataThermalComforts->avgDryBulbASH;
                     }
                     for (i = calcEndHr + 1; i <= calcStartHr - 1; ++i) {
-                        epwLine = state.files.inputWeatherFile.readLine().data;
+                        epwLine = epwFile.readLine().data;
                     }
                     for (i = 1; i <= 30 - calcEndDay; ++i) {
                         state.dataThermalComforts->avgDryBulbASH = 0.0;
                         for (j = 1; j <= 24; ++j) {
-                            epwLine = state.files.inputWeatherFile.readLine().data;
+                            epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
                                 pos = index(epwLine, ',');
                                 epwLine.erase(0, pos + 1);
@@ -2988,7 +2988,7 @@ namespace ThermalComfort {
         int j;
         bool weathersimulation;
         Real64 inavgdrybulb;
-        bool ErrorsFound(false);
+        int const numHeaderRowsInEpw = 8;
 
         if (initiate) { // not optional on initiate=true.  would otherwise check for presence
             weathersimulation = wthrsim;
@@ -3012,20 +3012,22 @@ namespace ThermalComfort {
                     DaysInYear = 365;
                 }
 
-                WeatherManager::OpenEPlusWeatherFile(state, ErrorsFound, false);
-
+                auto epwFile = state.files.inputWeatherFilePath.open(state, "CalcThermalComfortAdaptiveCEN15251");
+                for (i = 1; i <= numHeaderRowsInEpw; ++i) {
+                    epwFile.readLine();
+                }
                 jStartDay = state.dataEnvrn->DayOfYear - 1;
                 calcStartDay = jStartDay - 7;
                 if (calcStartDay > 0) {
                     calcStartHr = 24 * calcStartDay + 1;
                     for (i = 1; i <= calcStartHr - 1; ++i) {
-                        state.files.inputWeatherFile.readLine();
+                        epwFile.readLine();
                     }
                     state.dataThermalComforts->runningAverageCEN = 0.0;
                     for (i = 1; i <= 7; ++i) {
                         state.dataThermalComforts->avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
-                            epwLine = state.files.inputWeatherFile.readLine().data;
+                            epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
                                 pos = index(epwLine, ',');
                                 epwLine.erase(0, pos + 1);
@@ -3044,7 +3046,7 @@ namespace ThermalComfort {
                     for (i = 1; i <= calcEndDay; ++i) {
                         state.dataThermalComforts->avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
-                            epwLine = state.files.inputWeatherFile.readLine().data;
+                            epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
                                 pos = index(epwLine, ',');
                                 epwLine.erase(0, pos + 1);
@@ -3056,12 +3058,12 @@ namespace ThermalComfort {
                         state.dataThermalComforts->runningAverageCEN += std::pow(alpha, calcEndDay - i) * state.dataThermalComforts->avgDryBulbCEN;
                     }
                     for (i = calcEndHr + 1; i <= calcStartHr - 1; ++i) {
-                        state.files.inputWeatherFile.readLine();
+                        epwFile.readLine();
                     }
                     for (i = 1; i <= 7 - calcEndDay; ++i) {
                         state.dataThermalComforts->avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
-                            epwLine = state.files.inputWeatherFile.readLine().data;
+                            epwLine = epwFile.readLine().data;
                             for (ind = 1; ind <= 6; ++ind) {
                                 pos = index(epwLine, ',');
                                 epwLine.erase(0, pos + 1);
