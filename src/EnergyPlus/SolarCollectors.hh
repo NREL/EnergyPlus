@@ -206,7 +206,6 @@ namespace SolarCollectors {
         bool InitICS;                  // used to initialize ICS variables only
         bool SetLoopIndexFlag;
         bool SetDiffRadFlag;
-        bool MyOneTimeFlag;
 
         // Default Constructor
         CollectorData()
@@ -220,7 +219,7 @@ namespace SolarCollectors {
               CoverAbs(2, 0.0), TimeElapsed(0.0), UbLoss(0.0), UsLoss(0.0), AreaRatio(0.0), RefSkyDiffInnerCover(0.0), RefGrnDiffInnerCover(0.0),
               RefDiffInnerCover(0.0), SavedTempOfWater(0.0), SavedTempOfAbsPlate(0.0), SavedTempOfInnerCover(0.0), SavedTempOfOuterCover(0.0),
               SavedTempCollectorOSCM(0.0), Length(1.0), TiltR2V(0.0), Tilt(0.0), CosTilt(0.0), SinTilt(0.0), SideArea(0.0), Area(0.0), Volume(0.0),
-              OSCM_ON(false), InitICS(false), SetLoopIndexFlag(true), SetDiffRadFlag(true), MyOneTimeFlag(true)
+              OSCM_ON(false), InitICS(false), SetLoopIndexFlag(true), SetDiffRadFlag(true)
         {
         }
 
@@ -288,6 +287,8 @@ namespace SolarCollectors {
         void update(EnergyPlusData &state);
 
         void report(EnergyPlusData &state);
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
     };

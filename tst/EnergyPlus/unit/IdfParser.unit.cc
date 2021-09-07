@@ -390,31 +390,31 @@ TEST_F(IdfParserFixture, look_ahead)
     size_t index = 0;
     IdfParser::Token token = look_ahead(test_input, index);
     EXPECT_EQ(0ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     index = 2;
     token = look_ahead(test_input, index);
     EXPECT_EQ(2ul, index);
-    EXPECT_EQ(IdfParser::Token::COMMA, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::COMMA, token));
     index = 3;
     token = look_ahead(test_input, index);
     EXPECT_EQ(3ul, index);
-    EXPECT_EQ(IdfParser::Token::EXCLAMATION, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::EXCLAMATION, token));
     index = 5;
     token = look_ahead(test_input, index);
     EXPECT_EQ(5ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     index = 7;
     token = look_ahead(test_input, index);
     EXPECT_EQ(7ul, index);
-    EXPECT_EQ(IdfParser::Token::SEMICOLON, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::SEMICOLON, token));
     index = 9;
     token = look_ahead(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_EQ(IdfParser::Token::NONE, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::NONE, token));
     index = test_input.size();
     token = look_ahead(test_input, index);
     EXPECT_EQ(test_input.size(), index);
-    EXPECT_EQ(IdfParser::Token::END, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::END, token));
 }
 
 TEST_F(IdfParserFixture, next_token)
@@ -424,26 +424,26 @@ TEST_F(IdfParserFixture, next_token)
     std::string const test_input("B , ! t ; `");
     IdfParser::Token token = next_token(test_input, index);
     EXPECT_EQ(1ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     token = next_token(test_input, index);
     EXPECT_EQ(3ul, index);
-    EXPECT_EQ(IdfParser::Token::COMMA, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::COMMA, token));
     token = next_token(test_input, index);
     EXPECT_EQ(5ul, index);
-    EXPECT_EQ(IdfParser::Token::EXCLAMATION, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::EXCLAMATION, token));
     token = next_token(test_input, index);
     EXPECT_EQ(7ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     token = next_token(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_EQ(IdfParser::Token::SEMICOLON, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::SEMICOLON, token));
     token = next_token(test_input, index);
     EXPECT_EQ(10ul, index);
-    EXPECT_EQ(IdfParser::Token::NONE, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::NONE, token));
     index = test_input.size();
     token = next_token(test_input, index);
     EXPECT_EQ(test_input.size(), index);
-    EXPECT_EQ(IdfParser::Token::END, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::END, token));
 }
 
 } // namespace EnergyPlus

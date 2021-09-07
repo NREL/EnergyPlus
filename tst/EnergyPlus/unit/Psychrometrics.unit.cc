@@ -433,3 +433,65 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
     EXPECT_DOUBLE_EQ(CpAirOut, 1.00484e3 + W2 * 1.85895e3);
     EXPECT_DOUBLE_EQ(CpAir_result, CpAir_average);
 }
+TEST_F(EnergyPlusFixture, Psychrometrics_Interpolation_Sample_Test)
+{
+    // Verify sample data for interpolation.
+    // The sample data were extracted from the original psychrometric function PsyTsatFnPb every 64 Pa in the range of 64 Pa to 105,664 Pa.
+    // The sample data for saturated temperature from tsat_fn_pb_tsat were compared to the results from the original psychrometric function.
+    InitializePsychRoutines(*state);
+    Real64 tsat_psy;
+    Real64 error = 0.0;
+    int i;
+    for (i = 1; i < 1651; ++i) {
+        int tsat_fn_pb_pressure = i * 64; // sample bin size =64 Pa; sample size =1651 (continous)
+        tsat_psy = PsyTsatFnPb(*state, tsat_fn_pb_pressure);
+        error = max(abs(tsat_psy - tsat_fn_pb_y[i]), error);
+    }
+
+    // check error
+    EXPECT_LE(error, 1E-7);
+}
+TEST_F(EnergyPlusFixture, Psychrometrics_CSpline_Test)
+{
+    // compare the results of Tsat between CSpline interpolation and original psychrometric function for PsychTsatFnPb
+    InitializePsychRoutines(*state);
+    Real64 tsat_psy;
+    Real64 tsat_cspline;
+    Real64 Press_test;
+    Real64 Press_test_smallchange;
+    Real64 error = 0.0;
+    int i;
+    for (i = 0; i <= 700; i++) { // Press =50,000 ~ 120,000 Pascal
+        state->dataPsychrometrics->useInterpolationPsychTsatFnPb = false;
+        Press_test = 50000 + i * 100;
+        tsat_psy = PsyTsatFnPb_raw(*state, Press_test); // Tsat from original psychrometric function for PsychTsatFnPb
+
+        state->dataPsychrometrics->useInterpolationPsychTsatFnPb = true; // change to cspline
+        Press_test_smallchange = Press_test + 1e-60;
+        tsat_cspline = PsyTsatFnPb_raw(*state, Press_test_smallchange); // Tsat from cspline interpolation
+        error = max(abs(tsat_psy - tsat_cspline), error);
+    }
+    // check error
+    EXPECT_LE(error, 1E-5);
+}
+
+TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test_Discontinuity)
+{
+    // Test for #8599
+    InitializePsychRoutines(*state);
+
+    state->dataGlobal->WarmupFlag = true;
+
+    // Test when wet bulb temperature is approaching zero. PsyPsatFnTemp used to have a discontinuity in Psat around 0.0°C that makes the calculation
+    // blow up. Before: PsyPsatFnTemp(-0.0001) = 611.1485382610978 PsyPsatFnTemp(+0.0001) = 611.2173076397495
+    //                  diff  = 0.06876937865172295
+    Real64 TDB = 1.4333333333333331;  // C
+    Real64 W = 0.0031902374172088472; // Kg.water/Kg.dryair
+    Real64 Pb = 101400.00000000001;
+
+    Real64 result = PsyTwbFnTdbWPb(*state, TDB, W, Pb);
+    Real64 expected_result = -0.1027; // expected result from psychrometrics chart
+    EXPECT_NEAR(result, expected_result, 0.001);
+
+    EXPECT_FALSE(has_err_output());
+}

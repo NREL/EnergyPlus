@@ -2555,10 +2555,10 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
 // Run and Check: VRFOU_CalcComp
 {
-    //   Test the method VRFOU_CalcCompH, which simulates the compressor performance at given oprtaional conditions. More specifically, it sepcifies
-    //   the compressor speed to provide sufficient evaporative capacity, and calculate the power of the compressor running at the specified
-    //   speed. Note that it may be needed to manipulate the operational conditions to further adjust system capacity at low load conditions.
-    //   The low load modification logics are different for cooling mode and heating mode.
+    //   Test the method VRFOU_CalcCompH, which simulates the compressor performance at given oprtaional conditions. More specifically, it
+    //   sepcifies the compressor speed to provide sufficient evaporative capacity, and calculate the power of the compressor running at the
+    //   specified speed. Note that it may be needed to manipulate the operational conditions to further adjust system capacity at low load
+    //   conditions. The low load modification logics are different for cooling mode and heating mode.
 
     // Inputs_condition
     Real64 TU_load = 6006;              // Indoor unit cooling load [W]
@@ -2669,7 +2669,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
     // Test
     EXPECT_NEAR(24456, Q_c_OU, 10);
 }
-}
+} // namespace EnergyPlus
 
 // Run and Check: VRFOU_FlowRate
 { //   Test the method VRFOU_Cap, which calculates the outdoor unit fan flow rate, given VRF OU load and refrigerant side temperature, i.e.,
@@ -4925,7 +4925,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 
     // Additional tests for fuel type input
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFTUNum).FuelType, "Electricity");
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFTUNum).FuelTypeNum, DataGlobalConstants::ResourceType::Electricity);
+    EXPECT_TRUE(compare_enums(state->dataHVACVarRefFlow->VRF(VRFTUNum).FuelTypeNum, DataGlobalConstants::ResourceType::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
@@ -8870,6 +8870,7 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
         "     Floor,                   !- Surface Type",
         "     ExtSlabCarpet 4in ClimateZone 1-8 1,  !- Construction Name",
         "     Zone 1,          !- Zone Name",
+        "    ,                        !- Space Name",
         "     Adiabatic,               !- Outside Boundary Condition",
         "     ,                        !- Outside Boundary Condition Object",
         "     NoSun,                   !- Sun Exposure",
@@ -8894,6 +8895,7 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
         "     Wall,                    !- Surface Type",
         "     ExtWall Mass ClimateZone 1,  !- Construction Name",
         "     Zone 1,          !- Zone Name",
+        "    ,                        !- Space Name",
         "     Outdoors,                !- Outside Boundary Condition",
         "     ,                        !- Outside Boundary Condition Object",
         "     SunExposed,              !- Sun Exposure",
@@ -8918,6 +8920,7 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
         "     Wall,                    !- Surface Type",
         "     ExtWall Mass ClimateZone 1,  !- Construction Name",
         "     Zone 1,          !- Zone Name",
+        "    ,                        !- Space Name",
         "     Outdoors,                !- Outside Boundary Condition",
         "     ,                        !- Outside Boundary Condition Object",
         "     SunExposed,              !- Sun Exposure",
@@ -8942,6 +8945,7 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
         "     Wall,                    !- Surface Type",
         "     ExtWall Mass ClimateZone 1,  !- Construction Name",
         "     Zone 1,          !- Zone Name",
+        "    ,                        !- Space Name",
         "     Outdoors,                !- Outside Boundary Condition",
         "     ,                        !- Outside Boundary Condition Object",
         "     SunExposed,              !- Sun Exposure",
@@ -8966,6 +8970,7 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
         "     Wall,                    !- Surface Type",
         "     ExtWall Mass ClimateZone 1,  !- Construction Name",
         "     Zone 1,          !- Zone Name",
+        "    ,                        !- Space Name",
         "     Outdoors,                !- Outside Boundary Condition",
         "     ,                        !- Outside Boundary Condition Object",
         "     SunExposed,              !- Sun Exposure",
@@ -8990,6 +8995,7 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
         "     Roof,                    !- Surface Type",
         "     ExtRoof IEAD ClimateZone 1,  !- Construction Name",
         "     Zone 1,          !- Zone Name",
+        "    ,                        !- Space Name",
         "     Outdoors,                !- Outside Boundary Condition",
         "     ,                        !- Outside Boundary Condition Object",
         "     SunExposed,              !- Sun Exposure",
@@ -14525,8 +14531,9 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_EQ(1.00, maxEIRfLowPLRXInput);               // getinput checks this
     EXPECT_GT(thisHeatEIRFPLR.Var1Min, thisVRF.MinPLR); // expect warning message
     EXPECT_EQ(thisVRF.FuelType, "Electricity"); // Check fuel type input that uses UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
-    EXPECT_EQ(thisVRF.FuelTypeNum, DataGlobalConstants::ResourceType::Electricity); // Check fuel type input that uses
-                                                                                    // UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
+    EXPECT_TRUE(compare_enums(thisVRF.FuelTypeNum,
+                              DataGlobalConstants::ResourceType::Electricity)); // Check fuel type input that uses
+                                                                                // UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum()
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
