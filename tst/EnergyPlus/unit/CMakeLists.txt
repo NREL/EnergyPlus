@@ -235,6 +235,7 @@ set(test_src
     WaterThermalTanks.unit.cc
     WaterToAirHeatPump.unit.cc
     WaterToAirHeatPumpSimple.unit.cc
+    WaterUse.unit.cc
     WeatherManager.unit.cc
     WinCalcEngine.unit.cc
     WindowAC.unit.cc
