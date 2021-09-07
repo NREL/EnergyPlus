@@ -1230,7 +1230,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
     auto &c(coilSelectionDataObjs[index]);
     // no this is adjusted back to ratings    c->coilTotCapAtPeak = TotalCoolingCap;
     c->coilCapFTIdealPeak = coilCapFunTempFac;
-    c->coilTotCapAtPeak = TotalCoolingCap / c->coilCapFTIdealPeak;
+    c->coilTotCapAtPeak = TotalCoolingCap * c->coilCapFTIdealPeak;
     c->capIsAutosized = isAutoSize;
     c->minRatio = DXFlowPerCapMinRatio;
     c->maxRatio = DXFlowPerCapMaxRatio;
@@ -1496,7 +1496,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     auto &c(coilSelectionDataObjs[index]);
     c->capIsAutosized = isAutoSize;
     c->coilCapFTIdealPeak = coilCapFunTempFac;
-    c->coilTotCapAtPeak = totalHeatingCap / c->coilCapFTIdealPeak;
+    c->coilTotCapAtPeak = totalHeatingCap * c->coilCapFTIdealPeak;
     c->minRatio = DXFlowPerCapMinRatio;
     c->maxRatio = DXFlowPerCapMaxRatio;
 
