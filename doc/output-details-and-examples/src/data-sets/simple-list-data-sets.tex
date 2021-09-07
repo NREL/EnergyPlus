@@ -66,6 +66,27 @@ Knowing the type of chiller that you want to simulate, you can find it and the a
   ! ElectricEIRChiller Carrier 23XL 724kW/6.04COP/Vanes  Centrifugal   724 (206)   6.04   Inlet Vanes
 \end{lstlisting}
 
+\subsection{CodeCompliantEquipment.idf}\label{codecompliantequipment.idf}
+
+This dataset includes performance curve objects that describe the part load performance of building energy code minimally compliant equipment. The dataset provides curves for the following EnergyPlus objects: Chiller:Electric:EIR. Sets of curves are provided for the following building energy codes minimum requirements: ASHRAE Standard 90.1-2019 Table 6.8.1-3, ASHRAE Standard 90.1-2019 Table G3.5.3.
+
+\begin{lstlisting}
+
+!----------------------------------------------------------
+!- Beginning of performance curves for Chiller:Electric:EIR:
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_cent_gte150lt300ton_0.634kWpton_0.596IPLV.IP_eir-f-plr,    !- Name
+    0.30662667381140624,      !- Coefficient1 Constant
+    0.06295923908320235,      !- Coefficient2 x
+    0.6358315679053916,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+  
+\end{lstlisting}
+
 \subsection{CompositeWallConstructions.idf}\label{compositewallconstructions.idf}
 
 The Reference Data Set CompositeWallConstructions.idf contains constructions and associated materials for a set of \textbf{composite} walls. These are walls---such as stud walls---that have complicated heat-flow paths so that the conduction is two- or three-dimensional.

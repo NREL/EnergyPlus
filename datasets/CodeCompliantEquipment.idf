@@ -1,0 +1,2427 @@
+!---------------------------------------------------------------------------------------------
+!- This dataset includes performance curve objects that describe the part load performance of
+!- building energy code minimally compliant equipment.
+!-
+!- The dataset provides curves for the following EnergyPlus object:
+!-   * Chiller:Electric:EIR
+!-
+!- Sets of curves are provided for the following building energy codes minimum requirements:
+!-   * ASHRAE Standard 90.1-2019 Table 6.8.1-3
+!-   * ASHRAE Standard 90.1-2019 Table G3.5.3
+!-
+!- Last update: Sept. 2021
+!---------------------------------------------------------------------------------------------
+
+!----------------------------------------------------------
+!- Beginning of performance curves for Chiller:Electric:EIR:
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_cent_gte150lt300ton_0.634kWpton_0.596IPLV.IP_eir-f-plr,    !- Name
+    0.3208405333114065,       !- Coefficient1 Constant
+    0.03157995838320167,      !- Coefficient2 x
+    0.6470161436053915,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_cent_gte300ton_0.576kWpton_0.549IPLV.IP_eir-f-plr,    !- Name
+    0.3518517931503423,       !- Coefficient1 Constant
+    -0.018692263443434075,    !- Coefficient2 x
+    0.6670832575930915,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_cent_lt150ton_0.703kWpton_0.67IPLV.IP_eir-f-plr,    !- Name
+    0.3230957411632388,       !- Coefficient1 Constant
+    0.05687948256216926,      !- Coefficient2 x
+    0.6178609802745922,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_cent_gte528lt1055kW_5.55COP_5.9IPLV.SI_eir-f-plr,    !- Name
+    0.2765299561491754,       !- Coefficient1 Constant
+    0.1571221623080913,       !- Coefficient2 x
+    0.5671116533427332,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_cent_gte1055kW_6.1COP_6.4IPLV.SI_eir-f-plr,    !- Name
+    0.35701678815169025,      !- Coefficient1 Constant
+    -0.034998159726537206,    !- Coefficient2 x
+    0.6767666960748471,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_cent_lt528kW_5COP_5.25IPLV.SI_eir-f-plr,    !- Name
+    0.32479010167099237,      !- Coefficient1 Constant
+    0.024938253242147764,     !- Coefficient2 x
+    0.6538390674868594,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_pdsp_gte150lt300ton_0.718kWpton_0.629IPLV.IP_eir-f-plr,    !- Name
+    0.289673730386271,        !- Coefficient1 Constant
+    0.09709947297397607,      !- Coefficient2 x
+    0.6149597226397528,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_pdsp_gte300ton_0.639kWpton_0.572IPLV.IP_eir-f-plr,    !- Name
+    0.3000625857720172,       !- Coefficient1 Constant
+    0.13806343774713772,      !- Coefficient2 x
+    0.5613940260808455,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_pdsp_lt150ton_0.79kWpton_0.676IPLV.IP_eir-f-plr,    !- Name
+    0.2626791349231719,       !- Coefficient1 Constant
+    0.18741860180286324,      !- Coefficient2 x
+    0.544801677373965,        !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_pdsp_gte528lt1055kW_4.9COP_5.6IPLV.SI_eir-f-plr,    !- Name
+    0.29031416215033945,      !- Coefficient1 Constant
+    0.08870041573486417,      !- Coefficient2 x
+    0.6207475461147967,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_pdsp_gte1055kW_5.5COP_6.15IPLV.SI_eir-f-plr,    !- Name
+    0.28234666932161534,      !- Coefficient1 Constant
+    0.20559418062370927,      !- Coefficient2 x
+    0.5120494130546761,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_pdsp_lt528kW_4.45COP_5.2IPLV.SI_eir-f-plr,    !- Name
+    0.2758837994535232,       !- Coefficient1 Constant
+    0.13763133955752768,      !- Coefficient2 x
+    0.5858637904889493,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_cent_lt150ton_0.61kWpton_0.55IPLV.IP_eir-f-plr,    !- Name
+    0.30006305147525447,      !- Coefficient1 Constant
+    0.04191631625870679,      !- Coefficient2 x
+    0.6582335338660386,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_cent_gte150lt300ton_0.61kWpton_0.55IPLV.IP_eir-f-plr,    !- Name
+    0.2990447742957775,       !- Coefficient1 Constant
+    0.03428051061627878,      !- Coefficient2 x
+    0.6662819906879439,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_cent_gte300lt400ton_0.56kWpton_0.52IPLV.IP_eir-f-plr,    !- Name
+    0.28199013039837284,      !- Coefficient1 Constant
+    0.1412214077397063,       !- Coefficient2 x
+    0.5736862837619211,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_cent_gte400lt600ton_0.56kWpton_0.5IPLV.IP_eir-f-plr,    !- Name
+    0.26374956209861594,      !- Coefficient1 Constant
+    0.14122943650861175,      !- Coefficient2 x
+    0.5951257025927722,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_cent_gte600ton_0.56kWpton_0.5IPLV.IP_eir-f-plr,    !- Name
+    0.29028385847438465,      !- Coefficient1 Constant
+    0.0815094851686235,       !- Coefficient2 x
+    0.6281354470569919,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_cent_lt528kW_5.771COP_6.401IPLV.SI_eir-f-plr,    !- Name
+    0.2920233813502632,       !- Coefficient1 Constant
+    0.04904517429561124,      !- Coefficient2 x
+    0.6589233372541258,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_cent_gte528lt1055kW_5.771COP_6.401IPLV.SI_eir-f-plr,    !- Name
+    0.29253545422753874,      !- Coefficient1 Constant
+    0.039765817229401146,     !- Coefficient2 x
+    0.6674765566430603,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_cent_gte1055lt1407kW_6.286COP_6.77IPLV.SI_eir-f-plr,    !- Name
+    0.31131752733825946,      !- Coefficient1 Constant
+    0.027290806790610526,     !- Coefficient2 x
+    0.6610411358711303,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_cent_gte1407lt2110kW_6.286COP_7.041IPLV.SI_eir-f-plr,    !- Name
+    0.25341611237862544,      !- Coefficient1 Constant
+    0.17082170987733944,      !- Coefficient2 x
+    0.5758326268440351,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_cent_gte2110kW_6.286COP_7.041IPLV.SI_eir-f-plr,    !- Name
+    0.2910231542945289,       !- Coefficient1 Constant
+    0.08815493186865271,      !- Coefficient2 x
+    0.6189315702368188,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte75lt150ton_0.72kWpton_0.56IPLV.IP_eir-f-plr,    !- Name
+    0.21388313636614195,      !- Coefficient1 Constant
+    0.26565097769042983,      !- Coefficient2 x
+    0.5226150559434282,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte150lt300ton_0.66kWpton_0.54IPLV.IP_eir-f-plr,    !- Name
+    0.24401842109474411,      !- Coefficient1 Constant
+    0.24428566313964084,      !- Coefficient2 x
+    0.5126298587656153,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte300lt600ton_0.61kWpton_0.52IPLV.IP_eir-f-plr,    !- Name
+    0.25184910799018156,      !- Coefficient1 Constant
+    0.2404098269649701,       !- Coefficient2 x
+    0.5070575817448483,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_pdsp_lt75ton_0.75kWpton_0.6IPLV.IP_eir-f-plr,    !- Name
+    0.23414516685971698,      !- Coefficient1 Constant
+    0.1898091875429007,       !- Coefficient2 x
+    0.575656312197382,        !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte600ton_0.56kWpton_0.5IPLV.IP_eir-f-plr,    !- Name
+    0.28497358048507476,      !- Coefficient1 Constant
+    0.2388155681578262,       !- Coefficient2 x
+    0.4762130176570992,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte264lt528kW_4.889COP_6.286IPLV.SI_eir-f-plr,    !- Name
+    0.2205210713344566,       !- Coefficient1 Constant
+    0.2413684337503751,       !- Coefficient2 x
+    0.5388558656151684,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte528lt1055kW_5.334COP_6.519IPLV.SI_eir-f-plr,    !- Name
+    0.2690446381742904,       !- Coefficient1 Constant
+    0.15146587024859778,      !- Coefficient2 x
+    0.5800418168771118,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte1055lt2110kW_5.771COP_6.77IPLV.SI_eir-f-plr,    !- Name
+    0.2797605732488911,       !- Coefficient1 Constant
+    0.15073641883188332,      !- Coefficient2 x
+    0.5679515668192257,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_pdsp_lt264kW_4.694COP_5.867IPLV.SI_eir-f-plr,    !- Name
+    0.23925783763774894,      !- Coefficient1 Constant
+    0.1796433004051594,       !- Coefficient2 x
+    0.5805576273570915,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte2110kW_6.286COP_7.041IPLV.SI_eir-f-plr,    !- Name
+    0.284916526088462,        !- Coefficient1 Constant
+    0.23863799174620323,      !- Coefficient2 x
+    0.4761473077653343,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_cent_lt150ton_0.695kWpton_0.44IPLV.IP_eir-f-plr,    !- Name
+    0.04155899272913314,      !- Coefficient1 Constant
+    0.23017566001961645,      !- Coefficient2 x
+    0.7291147519512506,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_cent_gte150lt300ton_0.635kWpton_0.4IPLV.IP_eir-f-plr,    !- Name
+    0.03593929283897784,      !- Coefficient1 Constant
+    0.2732154504016595,       !- Coefficient2 x
+    0.6900992163593629,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_cent_gte300lt400ton_0.595kWpton_0.39IPLV.IP_eir-f-plr,    !- Name
+    0.05843787534196874,      !- Coefficient1 Constant
+    0.2407848268330664,       !- Coefficient2 x
+    0.6996940217249646,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_cent_gte400lt600ton_0.585kWpton_0.38IPLV.IP_eir-f-plr,    !- Name
+    0.11038217419127445,      !- Coefficient1 Constant
+    0.05621452579083052,      !- Coefficient2 x
+    0.8338187823178952,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_cent_gte600ton_0.585kWpton_0.38IPLV.IP_eir-f-plr,    !- Name
+    0.07054776952124227,      !- Coefficient1 Constant
+    0.21080958600614935,      !- Coefficient2 x
+    0.7164216948726088,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_cent_lt528kW_5.065COP_8.001IPLV.SI_eir-f-plr,    !- Name
+    0.03428385847223983,      !- Coefficient1 Constant
+    0.25975027775176235,      !- Coefficient2 x
+    0.7059128146759976,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_cent_gte528lt1055kW_5.544COP_8.801IPLV.SI_eir-f-plr,    !- Name
+    0.05306514927417741,      !- Coefficient1 Constant
+    0.20237163407381623,      !- Coefficient2 x
+    0.7454963376520065,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_cent_gte1055lt1407kW_5.917COP_9.207IPLV.SI_eir-f-plr,    !- Name
+    0.03676899928097676,      !- Coefficient1 Constant
+    0.32172324209943104,      !- Coefficient2 x
+    0.6415099805195921,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_cent_gte1407lt2110kW_6.018COP_9.264IPLV.SI_eir-f-plr,    !- Name
+    0.06262132611677641,      !- Coefficient1 Constant
+    0.2273525766393428,       !- Coefficient2 x
+    0.7070415305438805,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_cent_gte2110kW_6.018COP_9.264IPLV.SI_eir-f-plr,    !- Name
+    0.09504965564741104,      !- Coefficient1 Constant
+    0.11861824567389433,      !- Coefficient2 x
+    0.7852207828786946,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte75lt150ton_0.75kWpton_0.49IPLV.IP_eir-f-plr,    !- Name
+    0.2022214892265913,       !- Coefficient1 Constant
+    -0.02665836995440789,     !- Coefficient2 x
+    0.8244707612278166,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte150lt300ton_0.68kWpton_0.44IPLV.IP_eir-f-plr,    !- Name
+    0.08528650178219002,      !- Coefficient1 Constant
+    0.3020189167414306,       !- Coefficient2 x
+    0.6119897188763789,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte300lt600ton_0.625kWpton_0.41IPLV.IP_eir-f-plr,    !- Name
+    0.08299854648796133,      !- Coefficient1 Constant
+    0.3120771671917522,       !- Coefficient2 x
+    0.6051929009202868,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_pdsp_lt75ton_0.78kWpton_0.5IPLV.IP_eir-f-plr,    !- Name
+    0.15719196318651557,      !- Coefficient1 Constant
+    0.08838157118156503,      !- Coefficient2 x
+    0.7551476603319189,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte600ton_0.585kWpton_0.38IPLV.IP_eir-f-plr,    !- Name
+    0.09654273624271807,      !- Coefficient1 Constant
+    0.289594633076948,        !- Coefficient2 x
+    0.6138484047803325,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte264lt528kW_4.694COP_7.184IPLV.SI_eir-f-plr,    !- Name
+    0.18673566736219627,      !- Coefficient1 Constant
+    0.03711867649141626,      !- Coefficient2 x
+    0.774865595746387,        !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte528lt1055kW_5.177COP_8.001IPLV.SI_eir-f-plr,    !- Name
+    0.07090443885174248,      !- Coefficient1 Constant
+    0.333347515908183,        !- Coefficient2 x
+    0.5958978588400747,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte1055lt2110kW_5.633COP_8.586IPLV.SI_eir-f-plr,    !- Name
+    0.08050918771878843,      !- Coefficient1 Constant
+    0.3235230109490967,       !- Coefficient2 x
+    0.595202042332115,        !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_pdsp_lt264kW_4.513COP_7.041IPLV.SI_eir-f-plr,    !- Name
+    0.17569007015298155,      !- Coefficient1 Constant
+    0.038092829099648395,     !- Coefficient2 x
+    0.7863847574473706,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Quadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte2110kW_6.018COP_9.264IPLV.SI_eir-f-plr,    !- Name
+    0.1027441688182878,       !- Coefficient1 Constant
+    0.1769042977539542,       !- Coefficient2 x
+    0.7207736753277576,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Cubic,
+    ASHRAE901_2019_air_A_lt150ton_10.1kWpton_13.7IPLV.IP_eir-f-plr,    !- Name
+    0.1271245020760697,       !- Coefficient1 Constant
+    0.07474000662382732,      !- Coefficient2 x
+    1.6429989224609347,       !- Coefficient3 x2
+    -0.8439853035608315,      !- Coefficient4 x3
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Cubic,
+    ASHRAE901_2019_air_A_gte150ton_10.1kWpton_14IPLV.IP_eir-f-plr,    !- Name
+    0.16266507402733643,      !- Coefficient1 Constant
+    0.09082153641729536,      !- Coefficient2 x
+    1.369885791798356,        !- Coefficient3 x2
+    -0.6246776637429885,      !- Coefficient4 x3
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Cubic,
+    ASHRAE901_2019_air_A_lt528kW_2.985COP_4.048IPLV.SI_eir-f-plr,    !- Name
+    0.18470909797497603,      !- Coefficient1 Constant
+    -0.07948281755466033,     !- Coefficient2 x
+    1.8082246647844338,       !- Coefficient3 x2
+    -0.9136557506047499,      !- Coefficient4 x3
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Cubic,
+    ASHRAE901_2019_air_A_gte528kW_2.985COP_4.137IPLV.SI_eir-f-plr,    !- Name
+    0.14968809892003052,      !- Coefficient1 Constant
+    0.05136978048468593,      !- Coefficient2 x
+    1.5724340307134264,       !- Coefficient3 x2
+    -0.7739499331181423,      !- Coefficient4 x3
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Cubic,
+    ASHRAE901_2019_air_B_lt150ton_9.7kWpton_15.8IPLV.IP_eir-f-plr,    !- Name
+    0.08666141661681519,      !- Coefficient1 Constant
+    0.019140365295631154,     !- Coefficient2 x
+    1.6920073253734107,       !- Coefficient3 x2
+    -0.7990510830858572,      !- Coefficient4 x3
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Cubic,
+    ASHRAE901_2019_air_B_gte150ton_9.7kWpton_16.1IPLV.IP_eir-f-plr,    !- Name
+    0.07524240756710364,      !- Coefficient1 Constant
+    0.031402409184518115,     !- Coefficient2 x
+    1.7196158727669184,       !- Coefficient3 x2
+    -0.830217972918539,       !- Coefficient4 x3
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Cubic,
+    ASHRAE901_2019_air_B_lt528kW_2.866COP_4.669IPLV.SI_eir-f-plr,    !- Name
+    0.08350351265417724,      !- Coefficient1 Constant
+    0.01604713767171153,      !- Coefficient2 x
+    1.6989072397583849,       !- Coefficient3 x2
+    -0.7992244286842732,      !- Coefficient4 x3
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Cubic,
+    ASHRAE901_2019_air_B_gte528kW_2.866COP_4.758IPLV.SI_eir-f-plr,    !- Name
+    0.09693673047080864,      !- Coefficient1 Constant
+    -0.0005842652078147641,    !- Coefficient2 x
+    1.5930047652746497,       !- Coefficient3 x2
+    -0.6903373176376427,      !- Coefficient4 x3
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_A_lt150ton_10.1kWpton_13.7IPLV.IP_eir-f-t,    !- Name
+    0.9908215848761304,       !- Coefficient1 Constant
+    -0.02794659902518455,     !- Coefficient2 x
+    0.0012289343079591177,    !- Coefficient3 x2
+    -0.01728290845730024,     !- Coefficient4 y
+    0.0006483611555952944,    !- Coefficient5 y2
+    -0.00020746337335725466,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_A_lt150ton_10.1kWpton_13.7IPLV.IP_cap-f-t,    !- Name
+    0.7536274941282223,       !- Coefficient1 Constant
+    0.059276028733216114,     !- Coefficient2 x
+    -0.002073292464305097,    !- Coefficient3 x2
+    0.00831633652983885,      !- Coefficient4 y
+    -0.00026246704098650017,    !- Coefficient5 y2
+    -0.00011269975583401686,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_A_gte150ton_10.1kWpton_14IPLV.IP_eir-f-t,    !- Name
+    0.872388053480053,        !- Coefficient1 Constant
+    -0.02372502054976646,     !- Coefficient2 x
+    0.0011453381173352607,    !- Coefficient3 x2
+    -0.013271002349552512,    !- Coefficient4 y
+    0.0006189144448899488,    !- Coefficient5 y2
+    -0.00025179743901172335,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_A_gte150ton_10.1kWpton_14IPLV.IP_cap-f-t,    !- Name
+    0.7869057566821718,       !- Coefficient1 Constant
+    0.06561212364217481,      !- Coefficient2 x
+    -0.002301768917046292,    !- Coefficient3 x2
+    0.00697010050343958,      !- Coefficient4 y
+    -0.00026792045664183377,    !- Coefficient5 y2
+    -0.00016228919441438013,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_A_lt528kW_2.985COP_4.048IPLV.SI_eir-f-t,    !- Name
+    0.8870774118142857,       !- Coefficient1 Constant
+    -0.024855155962524283,    !- Coefficient2 x
+    0.0011930867281970867,    !- Coefficient3 x2
+    -0.013818136673476294,    !- Coefficient4 y
+    0.0006361097011564334,    !- Coefficient5 y2
+    -0.0002740904902173277,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_A_lt528kW_2.985COP_4.048IPLV.SI_cap-f-t,    !- Name
+    0.7690349739482916,       !- Coefficient1 Constant
+    0.05996398871015482,      !- Coefficient2 x
+    -0.002064137421342899,    !- Coefficient3 x2
+    0.008553901409463558,     !- Coefficient4 y
+    -0.00028584225201728846,    !- Coefficient5 y2
+    -0.0001504895995249898,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_A_gte528kW_2.985COP_4.137IPLV.SI_eir-f-t,    !- Name
+    0.8873129513227191,       !- Coefficient1 Constant
+    -0.0231693983134991,      !- Coefficient2 x
+    0.0011189603656532278,    !- Coefficient3 x2
+    -0.01411658221035035,     !- Coefficient4 y
+    0.0006317233052125185,    !- Coefficient5 y2
+    -0.00024382405129925278,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_A_gte528kW_2.985COP_4.137IPLV.SI_cap-f-t,    !- Name
+    0.7703393922801269,       !- Coefficient1 Constant
+    0.06321886540061836,      !- Coefficient2 x
+    -0.002218518703432152,    !- Coefficient3 x2
+    0.007790195795420656,     !- Coefficient4 y
+    -0.00027940379191065175,    !- Coefficient5 y2
+    -0.00014102547496104868,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_B_lt150ton_9.7kWpton_15.8IPLV.IP_eir-f-t,    !- Name
+    0.8024149509361447,       !- Coefficient1 Constant
+    -0.020856081428500536,    !- Coefficient2 x
+    0.0011199744452278892,    !- Coefficient3 x2
+    -0.009763490760356099,    !- Coefficient4 y
+    0.0005787126413283654,    !- Coefficient5 y2
+    -0.0003441084939778933,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_B_lt150ton_9.7kWpton_15.8IPLV.IP_cap-f-t,    !- Name
+    0.7332916635331697,       !- Coefficient1 Constant
+    0.06832466267947408,      !- Coefficient2 x
+    -0.00227257048344532,     !- Coefficient3 x2
+    0.009340190841296002,     !- Coefficient4 y
+    -0.0002916800782372788,    !- Coefficient5 y2
+    -0.00024635504917115523,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_B_gte150ton_9.7kWpton_16.1IPLV.IP_eir-f-t,    !- Name
+    0.8376257618251238,       !- Coefficient1 Constant
+    -0.02517196794784297,     !- Coefficient2 x
+    0.0012343872931018665,    !- Coefficient3 x2
+    -0.01156407485622182,     !- Coefficient4 y
+    0.0006139504068498099,    !- Coefficient5 y2
+    -0.00030838250966097136,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_B_gte150ton_9.7kWpton_16.1IPLV.IP_cap-f-t,    !- Name
+    0.7640172447555345,       !- Coefficient1 Constant
+    0.06804849058816334,      !- Coefficient2 x
+    -0.0023096145622898837,    !- Coefficient3 x2
+    0.007913720581195351,     !- Coefficient4 y
+    -0.0002820709630886953,    !- Coefficient5 y2
+    -0.00019957916571648016,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_B_lt528kW_2.866COP_4.669IPLV.SI_eir-f-t,    !- Name
+    0.8230782204214352,       !- Coefficient1 Constant
+    -0.022012429915080095,    !- Coefficient2 x
+    0.0011358804721759072,    !- Coefficient3 x2
+    -0.010502845031063069,    !- Coefficient4 y
+    0.0005891047425181485,    !- Coefficient5 y2
+    -0.00032123709244909996,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_B_lt528kW_2.866COP_4.669IPLV.SI_cap-f-t,    !- Name
+    0.750610549792476,        !- Coefficient1 Constant
+    0.06658628651174267,      !- Coefficient2 x
+    -0.0022524210411017666,    !- Coefficient3 x2
+    0.00790603033381251,      !- Coefficient4 y
+    -0.0002705691963204832,    !- Coefficient5 y2
+    -0.0002106519206185119,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_B_gte528kW_2.866COP_4.758IPLV.SI_eir-f-t,    !- Name
+    0.8441279369820793,       !- Coefficient1 Constant
+    -0.025322803592858906,    !- Coefficient2 x
+    0.0012420500987246359,    !- Coefficient3 x2
+    -0.011717722588053125,    !- Coefficient4 y
+    0.0006190367571424688,    !- Coefficient5 y2
+    -0.0003099122595397933,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_air_B_gte528kW_2.866COP_4.758IPLV.SI_cap-f-t,    !- Name
+    0.7560274100326703,       !- Coefficient1 Constant
+    0.06735939470092053,      !- Coefficient2 x
+    -0.0022881225552003116,    !- Coefficient3 x2
+    0.00789419655704824,      !- Coefficient4 y
+    -0.0002802944079093568,    !- Coefficient5 y2
+    -0.00019739345935520963,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_cent_gte150lt300ton_0.634kWpton_0.596IPLV.IP_eir-f-t,    !- Name
+    0.5423081468436595,       !- Coefficient1 Constant
+    -0.025974035119724907,    !- Coefficient2 x
+    0.0002265179492333419,    !- Coefficient3 x2
+    0.034890054702786305,     !- Coefficient4 y
+    -0.0005368101227717118,    !- Coefficient5 y2
+    0.00030025012928554257,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_cent_gte150lt300ton_0.634kWpton_0.596IPLV.IP_cap-f-t,    !- Name
+    1.1149529817109296,       !- Coefficient1 Constant
+    0.030941646142571413,     !- Coefficient2 x
+    -0.0015239688720977847,    !- Coefficient3 x2
+    -0.014254282842365091,    !- Coefficient4 y
+    5.650452049428865e-05,    !- Coefficient5 y2
+    0.0005965365879085059,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_cent_gte300ton_0.576kWpton_0.549IPLV.IP_eir-f-t,    !- Name
+    0.5506051640539715,       !- Coefficient1 Constant
+    -0.028347284220525727,    !- Coefficient2 x
+    0.000564379796261937,     !- Coefficient3 x2
+    0.03503898365669335,      !- Coefficient4 y
+    -0.0005165318483084551,    !- Coefficient5 y2
+    0.00015023102046816657,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_cent_gte300ton_0.576kWpton_0.549IPLV.IP_cap-f-t,    !- Name
+    1.002123409081864,        !- Coefficient1 Constant
+    0.03244276766591707,      !- Coefficient2 x
+    -0.0016162140499369384,    !- Coefficient3 x2
+    -0.0082535614622847,      !- Coefficient4 y
+    -2.5868273897551978e-05,    !- Coefficient5 y2
+    0.0006049564386178142,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_cent_lt150ton_0.703kWpton_0.67IPLV.IP_eir-f-t,    !- Name
+    0.6249152694996862,       !- Coefficient1 Constant
+    -0.023930916216148693,    !- Coefficient2 x
+    0.0004568422122634307,    !- Coefficient3 x2
+    0.02837180718498266,      !- Coefficient4 y
+    -0.000386375026964708,    !- Coefficient5 y2
+    7.124505618948666e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_cent_lt150ton_0.703kWpton_0.67IPLV.IP_cap-f-t,    !- Name
+    1.040652085431715,        !- Coefficient1 Constant
+    0.03819040725920692,      !- Coefficient2 x
+    -0.001688531528326515,    !- Coefficient3 x2
+    -0.011423410913915348,    !- Coefficient4 y
+    2.6263058505905635e-05,    !- Coefficient5 y2
+    0.0004750417375259944,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_cent_gte528lt1055kW_5.55COP_5.9IPLV.SI_eir-f-t,    !- Name
+    0.5424202986049123,       !- Coefficient1 Constant
+    -0.025975717851900226,    !- Coefficient2 x
+    0.00022278308288962447,    !- Coefficient3 x2
+    0.03499865945727147,      !- Coefficient4 y
+    -0.0005388277066058216,    !- Coefficient5 y2
+    0.0003022786072565714,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_cent_gte528lt1055kW_5.55COP_5.9IPLV.SI_cap-f-t,    !- Name
+    1.1097497710742126,       !- Coefficient1 Constant
+    0.030724471095344225,     !- Coefficient2 x
+    -0.0015158135855616616,    !- Coefficient3 x2
+    -0.014206115747988024,    !- Coefficient4 y
+    5.6253794514856634e-05,    !- Coefficient5 y2
+    0.0005952802587007845,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_cent_gte1055kW_6.1COP_6.4IPLV.SI_eir-f-t,    !- Name
+    0.5516640109076426,       !- Coefficient1 Constant
+    -0.028409215953311463,    !- Coefficient2 x
+    0.0005655728897535839,    !- Coefficient3 x2
+    0.035138325213306426,     !- Coefficient4 y
+    -0.0005180272568791006,    !- Coefficient5 y2
+    0.00015029620933141257,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_cent_gte1055kW_6.1COP_6.4IPLV.SI_cap-f-t,    !- Name
+    0.9951177191716835,       !- Coefficient1 Constant
+    0.03230193210101465,      !- Coefficient2 x
+    -0.0016080988647085336,    !- Coefficient3 x2
+    -0.008171994964347194,    !- Coefficient4 y
+    -2.6199204499950815e-05,    !- Coefficient5 y2
+    0.0006014511117728646,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_cent_lt528kW_5COP_5.25IPLV.SI_eir-f-t,    !- Name
+    0.6268349982468346,       !- Coefficient1 Constant
+    -0.02403937164330887,     !- Coefficient2 x
+    0.0004619543343217903,    !- Coefficient3 x2
+    0.028385195047555455,     !- Coefficient4 y
+    -0.00038603767753198634,    !- Coefficient5 y2
+    6.991856774605842e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_cent_lt528kW_5COP_5.25IPLV.SI_cap-f-t,    !- Name
+    1.0336073126463643,       !- Coefficient1 Constant
+    0.03803005172588979,      !- Coefficient2 x
+    -0.0016805554188255773,    !- Coefficient3 x2
+    -0.011307556538332077,    !- Coefficient4 y
+    2.5274799703437547e-05,    !- Coefficient5 y2
+    0.0004714710343415626,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_pdsp_gte150lt300ton_0.718kWpton_0.629IPLV.IP_eir-f-t,    !- Name
+    0.6895488654750863,       !- Coefficient1 Constant
+    -0.022926364797701257,    !- Coefficient2 x
+    0.0011527726500542808,    !- Coefficient3 x2
+    0.01392552657611482,      !- Coefficient4 y
+    8.284730640367073e-05,    !- Coefficient5 y2
+    -0.0003548904335689384,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_pdsp_gte150lt300ton_0.718kWpton_0.629IPLV.IP_cap-f-t,    !- Name
+    0.8533489751354171,       !- Coefficient1 Constant
+    0.052988075034758914,     !- Coefficient2 x
+    -0.0019837959761807708,    !- Coefficient3 x2
+    -0.0026945857495234322,    !- Coefficient4 y
+    -5.6064179257318086e-05,    !- Coefficient5 y2
+    4.7858151199076684e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_pdsp_gte300ton_0.639kWpton_0.572IPLV.IP_eir-f-t,    !- Name
+    0.6711269452841652,       !- Coefficient1 Constant
+    -0.029197459610998976,    !- Coefficient2 x
+    0.0013705343613603519,    !- Coefficient3 x2
+    0.0173450777917461,       !- Coefficient4 y
+    1.8704254609334676e-05,    !- Coefficient5 y2
+    -0.0003269617460192303,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_pdsp_gte300ton_0.639kWpton_0.572IPLV.IP_cap-f-t,    !- Name
+    0.8695324876956667,       !- Coefficient1 Constant
+    0.035302713529232026,     !- Coefficient2 x
+    -0.0014807172061791635,    !- Coefficient3 x2
+    0.0006494620584330552,    !- Coefficient4 y
+    -0.0001095973002523798,    !- Coefficient5 y2
+    0.0001871170414967038,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_pdsp_lt150ton_0.79kWpton_0.676IPLV.IP_eir-f-t,    !- Name
+    0.8322405013188817,       !- Coefficient1 Constant
+    -0.026676686922709605,    !- Coefficient2 x
+    0.0013395159075468286,    !- Coefficient3 x2
+    0.00015164701078519693,    !- Coefficient4 y
+    0.00041321888442943965,    !- Coefficient5 y2
+    -0.00038961923783192485,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_pdsp_lt150ton_0.79kWpton_0.676IPLV.IP_cap-f-t,    !- Name
+    0.8341305094231326,       !- Coefficient1 Constant
+    0.056370683395619514,     !- Coefficient2 x
+    -0.002121590869709522,    !- Coefficient3 x2
+    0.00018175473436638293,    !- Coefficient4 y
+    -0.0001445905035483198,    !- Coefficient5 y2
+    2.1551585864370496e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_pdsp_gte528lt1055kW_4.9COP_5.6IPLV.SI_eir-f-t,    !- Name
+    0.6848073504704701,       !- Coefficient1 Constant
+    -0.022502572392329976,    !- Coefficient2 x
+    0.001138118663665801,     !- Coefficient3 x2
+    0.013880249514613242,     !- Coefficient4 y
+    8.417985139910723e-05,    !- Coefficient5 y2
+    -0.0003582214759113786,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_pdsp_gte528lt1055kW_4.9COP_5.6IPLV.SI_cap-f-t,    !- Name
+    0.8486588215502142,       !- Coefficient1 Constant
+    0.05261671099591911,      !- Coefficient2 x
+    -0.0019697918607570405,    !- Coefficient3 x2
+    -0.002651096701071132,    !- Coefficient4 y
+    -5.674720703749178e-05,    !- Coefficient5 y2
+    4.833042867297547e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_pdsp_gte1055kW_5.5COP_6.15IPLV.SI_eir-f-t,    !- Name
+    0.6687893462122525,       !- Coefficient1 Constant
+    -0.029188123430594806,    !- Coefficient2 x
+    0.0013727467364774164,    !- Coefficient3 x2
+    0.017305307311054566,     !- Coefficient4 y
+    2.0058564940206774e-05,    !- Coefficient5 y2
+    -0.00032832857173008246,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_pdsp_gte1055kW_5.5COP_6.15IPLV.SI_cap-f-t,    !- Name
+    0.8666692607793867,       !- Coefficient1 Constant
+    0.034932372902335466,     !- Coefficient2 x
+    -0.0014704357123838023,    !- Coefficient3 x2
+    0.0007028305958377218,    !- Coefficient4 y
+    -0.00011115966679180729,    !- Coefficient5 y2
+    0.00018959171927887533,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_pdsp_lt528kW_4.45COP_5.2IPLV.SI_eir-f-t,    !- Name
+    0.8240381258953534,       !- Coefficient1 Constant
+    -0.026268688643902582,    !- Coefficient2 x
+    0.0013231819634916802,    !- Coefficient3 x2
+    0.0003297044490907291,    !- Coefficient4 y
+    0.00040771207088864913,    !- Coefficient5 y2
+    -0.00038964389938877733,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_AppG_wtr_pdsp_lt528kW_4.45COP_5.2IPLV.SI_cap-f-t,    !- Name
+    0.8308359818563718,       !- Coefficient1 Constant
+    0.05615472808199979,      !- Coefficient2 x
+    -0.0021138182784795675,    !- Coefficient3 x2
+    0.00012747139770637704,    !- Coefficient4 y
+    -0.00014311394169956265,    !- Coefficient5 y2
+    2.207820387401587e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_lt150ton_0.61kWpton_0.55IPLV.IP_eir-f-t,    !- Name
+    0.5349680626128678,       !- Coefficient1 Constant
+    -0.03234655119833193,     !- Coefficient2 x
+    0.0006569627554648764,    !- Coefficient3 x2
+    0.035297347827754094,     !- Coefficient4 y
+    -0.0005079579655669418,    !- Coefficient5 y2
+    0.00026815417266491204,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_lt150ton_0.61kWpton_0.55IPLV.IP_cap-f-t,    !- Name
+    0.9455165041726395,       !- Coefficient1 Constant
+    0.04006985639847435,      !- Coefficient2 x
+    -0.0020510164484343605,    !- Coefficient3 x2
+    -0.003524450855259635,    !- Coefficient4 y
+    -0.00018740105698480627,    !- Coefficient5 y2
+    0.0007366284448344947,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte150lt300ton_0.61kWpton_0.55IPLV.IP_eir-f-t,    !- Name
+    0.49903617377431553,      !- Coefficient1 Constant
+    -0.030113115883910913,    !- Coefficient2 x
+    0.0005182257437524809,    !- Coefficient3 x2
+    0.03795308308331107,      !- Coefficient4 y
+    -0.0005702684805083111,    !- Coefficient5 y2
+    0.00028357270557319,      !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte150lt300ton_0.61kWpton_0.55IPLV.IP_cap-f-t,    !- Name
+    0.9980774035293941,       !- Coefficient1 Constant
+    0.036545382237382074,     !- Coefficient2 x
+    -0.001966340593921276,    !- Coefficient3 x2
+    -0.0064365214737208565,    !- Coefficient4 y
+    -0.00014388939274317592,    !- Coefficient5 y2
+    0.0008140324170562349,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte300lt400ton_0.56kWpton_0.52IPLV.IP_eir-f-t,    !- Name
+    0.618041334587768,        !- Coefficient1 Constant
+    -0.02280048287144669,     !- Coefficient2 x
+    0.000565796843805237,     !- Coefficient3 x2
+    0.02530011660430137,      !- Coefficient4 y
+    -0.0002952100570215796,    !- Coefficient5 y2
+    0.0001013081031180256,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte300lt400ton_0.56kWpton_0.52IPLV.IP_cap-f-t,    !- Name
+    1.0258061465173116,       !- Coefficient1 Constant
+    0.03538449059717537,      !- Coefficient2 x
+    -0.001970969308456984,    !- Coefficient3 x2
+    -0.006224044815703347,    !- Coefficient4 y
+    -0.00016446738381222106,    !- Coefficient5 y2
+    0.0007722746406042002,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte400lt600ton_0.56kWpton_0.5IPLV.IP_eir-f-t,    !- Name
+    0.5522462605100292,       !- Coefficient1 Constant
+    -0.03542185749179467,     !- Coefficient2 x
+    0.0009033396264636099,    !- Coefficient3 x2
+    0.03444833269563137,      !- Coefficient4 y
+    -0.0004890242550821904,    !- Coefficient5 y2
+    0.00027252338862498223,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte400lt600ton_0.56kWpton_0.5IPLV.IP_cap-f-t,    !- Name
+    0.8914723902403159,       !- Coefficient1 Constant
+    0.04513102011464221,      !- Coefficient2 x
+    -0.0023115290399704337,    !- Coefficient3 x2
+    -0.0016083649559218444,    !- Coefficient4 y
+    -0.0002012573712904747,    !- Coefficient5 y2
+    0.0006728489780317296,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte600ton_0.56kWpton_0.5IPLV.IP_eir-f-t,    !- Name
+    0.48277655919897755,      !- Coefficient1 Constant
+    -0.03414000757841867,     !- Coefficient2 x
+    0.0012762365028390148,    !- Coefficient3 x2
+    0.03674351149511523,      !- Coefficient4 y
+    -0.00046204826613885114,    !- Coefficient5 y2
+    3.510543081384877e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte600ton_0.56kWpton_0.5IPLV.IP_cap-f-t,    !- Name
+    0.8715432210291998,       !- Coefficient1 Constant
+    0.05751192813780752,      !- Coefficient2 x
+    -0.002810171318785787,    !- Coefficient3 x2
+    -0.00213390857740069,     !- Coefficient4 y
+    -0.000207187474534398,    !- Coefficient5 y2
+    0.0005717324058245104,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_lt528kW_5.771COP_6.401IPLV.SI_eir-f-t,    !- Name
+    0.5139101846015538,       !- Coefficient1 Constant
+    -0.029564759318770544,    !- Coefficient2 x
+    0.0004684051015076599,    !- Coefficient3 x2
+    0.03641712742482567,      !- Coefficient4 y
+    -0.0005387813060792209,    !- Coefficient5 y2
+    0.0002975268256308546,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_lt528kW_5.771COP_6.401IPLV.SI_cap-f-t,    !- Name
+    0.9242737977173608,       !- Coefficient1 Constant
+    0.030101310908731943,     !- Coefficient2 x
+    -0.0017430152825298074,    !- Coefficient3 x2
+    -0.0006372849930519264,    !- Coefficient4 y
+    -0.00023267768809945218,    !- Coefficient5 y2
+    0.0008521583040311216,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte528lt1055kW_5.771COP_6.401IPLV.SI_eir-f-t,    !- Name
+    0.5002333634599341,       !- Coefficient1 Constant
+    -0.030023790837715808,    !- Coefficient2 x
+    0.0005153157078653047,    !- Coefficient3 x2
+    0.03791256592043975,      !- Coefficient4 y
+    -0.0005690634597045883,    !- Coefficient5 y2
+    0.0002831563754266671,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte528lt1055kW_5.771COP_6.401IPLV.SI_cap-f-t,    !- Name
+    0.9929061688775664,       !- Coefficient1 Constant
+    0.03641626954872829,      !- Coefficient2 x
+    -0.0019591670343847224,    !- Coefficient3 x2
+    -0.006426897801435081,    !- Coefficient4 y
+    -0.00014361070866992877,    !- Coefficient5 y2
+    0.000810646194343677,     !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte1055lt1407kW_6.286COP_6.77IPLV.SI_eir-f-t,    !- Name
+    0.6187471275406977,       !- Coefficient1 Constant
+    -0.023869514442359574,    !- Coefficient2 x
+    0.0005619667727109511,    !- Coefficient3 x2
+    0.025587624995442575,     !- Coefficient4 y
+    -0.000305446424357284,    !- Coefficient5 y2
+    0.00013369587500594698,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte1055lt1407kW_6.286COP_6.77IPLV.SI_cap-f-t,    !- Name
+    1.065825216703573,        !- Coefficient1 Constant
+    0.03710973313362851,      !- Coefficient2 x
+    -0.0020132788665201008,    !- Coefficient3 x2
+    -0.008243364427603914,    !- Coefficient4 y
+    -0.00014932472016644942,    !- Coefficient5 y2
+    0.0007369071276115705,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte1407lt2110kW_6.286COP_7.041IPLV.SI_eir-f-t,    !- Name
+    0.5687636324189675,       !- Coefficient1 Constant
+    -0.037988114401801776,    !- Coefficient2 x
+    0.0010591476855026315,    !- Coefficient3 x2
+    0.03351896174457279,      !- Coefficient4 y
+    -0.00046334483322565565,    !- Coefficient5 y2
+    0.00026998299699955777,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte1407lt2110kW_6.286COP_7.041IPLV.SI_cap-f-t,    !- Name
+    0.8748615602581413,       !- Coefficient1 Constant
+    0.046629159783777116,     !- Coefficient2 x
+    -0.0025602077981787936,    !- Coefficient3 x2
+    -0.00011521364282366525,    !- Coefficient4 y
+    -0.0002553396033355686,    !- Coefficient5 y2
+    0.0007497455031090501,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte2110kW_6.286COP_7.041IPLV.SI_eir-f-t,    !- Name
+    0.48229810826664005,      !- Coefficient1 Constant
+    -0.03413806177391526,     !- Coefficient2 x
+    0.0012764397372018268,    !- Coefficient3 x2
+    0.03675160073579499,      !- Coefficient4 y
+    -0.00046199826991447736,    !- Coefficient5 y2
+    3.51104660811542e-05,     !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_cent_gte2110kW_6.286COP_7.041IPLV.SI_cap-f-t,    !- Name
+    0.8667664651020833,       !- Coefficient1 Constant
+    0.05726745320959152,      !- Coefficient2 x
+    -0.0027958733166719586,    !- Coefficient3 x2
+    -0.0021702484558275446,    !- Coefficient4 y
+    -0.0002050750191797391,    !- Coefficient5 y2
+    0.000566829170877598,     !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte75lt150ton_0.72kWpton_0.56IPLV.IP_eir-f-t,    !- Name
+    0.782293346601824,        !- Coefficient1 Constant
+    -0.03660356672617281,     !- Coefficient2 x
+    0.001793516211748926,     !- Coefficient3 x2
+    -0.001129006661208947,    !- Coefficient4 y
+    0.000581621101624733,     !- Coefficient5 y2
+    -0.00045221996330445315,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte75lt150ton_0.72kWpton_0.56IPLV.IP_cap-f-t,    !- Name
+    0.8442039386613653,       !- Coefficient1 Constant
+    0.06109378342290264,      !- Coefficient2 x
+    -0.0023046222867497126,    !- Coefficient3 x2
+    0.00033185243095382524,    !- Coefficient4 y
+    -0.00018834975705593824,    !- Coefficient5 y2
+    2.1929575925282467e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte150lt300ton_0.66kWpton_0.54IPLV.IP_eir-f-t,    !- Name
+    0.6512959418864332,       !- Coefficient1 Constant
+    -0.034998741285929356,    !- Coefficient2 x
+    0.0017875292543451833,    !- Coefficient3 x2
+    0.012889726293629713,     !- Coefficient4 y
+    0.00023343413356779046,    !- Coefficient5 y2
+    -0.0004031966427018174,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte150lt300ton_0.66kWpton_0.54IPLV.IP_cap-f-t,    !- Name
+    0.8218595550134553,       !- Coefficient1 Constant
+    0.036640987539086484,     !- Coefficient2 x
+    -0.0016846209798683652,    !- Coefficient3 x2
+    0.005851613749878007,     !- Coefficient4 y
+    -0.00025256318868182686,    !- Coefficient5 y2
+    0.00028172276347694387,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte300lt600ton_0.61kWpton_0.52IPLV.IP_eir-f-t,    !- Name
+    0.5982845703358808,       !- Coefficient1 Constant
+    -0.02904081019616552,     !- Coefficient2 x
+    0.0013977143858899988,    !- Coefficient3 x2
+    0.0199042557677985,       !- Coefficient4 y
+    2.2295887610419873e-05,    !- Coefficient5 y2
+    -0.0003670239304086056,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte300lt600ton_0.61kWpton_0.52IPLV.IP_cap-f-t,    !- Name
+    0.8496378455923366,       !- Coefficient1 Constant
+    0.022571710186712456,     !- Coefficient2 x
+    -0.0011637711395458112,    !- Coefficient3 x2
+    0.007190412023804823,     !- Coefficient4 y
+    -0.00026331449092685863,    !- Coefficient5 y2
+    0.000346886334490693,     !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_lt75ton_0.75kWpton_0.6IPLV.IP_eir-f-t,    !- Name
+    0.7757556531201992,       !- Coefficient1 Constant
+    -0.027277599108084687,    !- Coefficient2 x
+    0.0014413653547594206,    !- Coefficient3 x2
+    0.00014152861474872082,    !- Coefficient4 y
+    0.0005024315058999595,    !- Coefficient5 y2
+    -0.0004968795214357107,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_lt75ton_0.75kWpton_0.6IPLV.IP_cap-f-t,    !- Name
+    0.8521647850006089,       !- Coefficient1 Constant
+    0.057026941785650515,     !- Coefficient2 x
+    -0.00213327807912993,     !- Coefficient3 x2
+    0.00015379951585970351,    !- Coefficient4 y
+    -0.00017074847809994947,    !- Coefficient5 y2
+    2.9714484598692738e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte600ton_0.56kWpton_0.5IPLV.IP_eir-f-t,    !- Name
+    0.5527636590733496,       !- Coefficient1 Constant
+    -0.025411118518723203,    !- Coefficient2 x
+    0.0013110493730421635,    !- Coefficient3 x2
+    0.02223721075056697,      !- Coefficient4 y
+    -1.58025804336974e-05,    !- Coefficient5 y2
+    -0.0004204715719188148,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte600ton_0.56kWpton_0.5IPLV.IP_cap-f-t,    !- Name
+    0.8357332635022637,       !- Coefficient1 Constant
+    0.02136306152137532,      !- Coefficient2 x
+    -0.001147941161244733,    !- Coefficient3 x2
+    0.008219648074994172,     !- Coefficient4 y
+    -0.0002824336805762971,    !- Coefficient5 y2
+    0.0003852443432038863,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte264lt528kW_4.889COP_6.286IPLV.SI_eir-f-t,    !- Name
+    0.7778848497186511,       !- Coefficient1 Constant
+    -0.03625577564197793,     !- Coefficient2 x
+    0.0017756964621372768,    !- Coefficient3 x2
+    -0.0013777547889422138,    !- Coefficient4 y
+    0.0005823855689697263,    !- Coefficient5 y2
+    -0.00044722816797157803,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte264lt528kW_4.889COP_6.286IPLV.SI_cap-f-t,    !- Name
+    0.8410412192456345,       !- Coefficient1 Constant
+    0.06077381265373933,      !- Coefficient2 x
+    -0.00229262277413954,     !- Coefficient3 x2
+    0.00037081860432838266,    !- Coefficient4 y
+    -0.0001888237121421704,    !- Coefficient5 y2
+    2.236852813872813e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte528lt1055kW_5.334COP_6.519IPLV.SI_eir-f-t,    !- Name
+    0.6478163212845849,       !- Coefficient1 Constant
+    -0.03491087794705942,     !- Coefficient2 x
+    0.0017817244686373825,    !- Coefficient3 x2
+    0.012721281247768518,     !- Coefficient4 y
+    0.00023551282000437254,    !- Coefficient5 y2
+    -0.00040164119074001964,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte528lt1055kW_5.334COP_6.519IPLV.SI_cap-f-t,    !- Name
+    0.8187564968073575,       !- Coefficient1 Constant
+    0.036389836849541474,     !- Coefficient2 x
+    -0.0016777723768162441,    !- Coefficient3 x2
+    0.005927725495272512,     !- Coefficient4 y
+    -0.0002543098057988342,    !- Coefficient5 y2
+    0.00028463120033629365,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte1055lt2110kW_5.771COP_6.77IPLV.SI_eir-f-t,    !- Name
+    0.5672497924656554,       !- Coefficient1 Constant
+    -0.02482622862009601,     !- Coefficient2 x
+    0.0013331160315181354,    !- Coefficient3 x2
+    0.01943262692321136,      !- Coefficient4 y
+    5.566100486606573e-05,    !- Coefficient5 y2
+    -0.000437440903548487,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte1055lt2110kW_5.771COP_6.77IPLV.SI_cap-f-t,    !- Name
+    0.8540500864787358,       !- Coefficient1 Constant
+    0.022183802527657198,     !- Coefficient2 x
+    -0.0011727971416371596,    !- Coefficient3 x2
+    0.007135743106849448,     !- Coefficient4 y
+    -0.00026668760842032496,    !- Coefficient5 y2
+    0.0003527471911461393,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_lt264kW_4.694COP_5.867IPLV.SI_eir-f-t,    !- Name
+    0.7692171989227756,       !- Coefficient1 Constant
+    -0.027553452540202993,    !- Coefficient2 x
+    0.0014484829957592084,    !- Coefficient3 x2
+    0.00031215366734049267,    !- Coefficient4 y
+    0.0004959666035070974,    !- Coefficient5 y2
+    -0.0004907297671912773,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_lt264kW_4.694COP_5.867IPLV.SI_cap-f-t,    !- Name
+    0.8479736769892262,       !- Coefficient1 Constant
+    0.057017849466746665,     !- Coefficient2 x
+    -0.0021330182161592797,    !- Coefficient3 x2
+    0.00013673077602257763,    !- Coefficient4 y
+    -0.00016955537151383052,    !- Coefficient5 y2
+    2.8177049605350235e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte2110kW_6.286COP_7.041IPLV.SI_eir-f-t,    !- Name
+    0.544188937857492,        !- Coefficient1 Constant
+    -0.026194942579505272,    !- Coefficient2 x
+    0.0013300758109332103,    !- Coefficient3 x2
+    0.022776358019053262,     !- Coefficient4 y
+    -2.9715951788437082e-05,    !- Coefficient5 y2
+    -0.0003930687547557125,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_A_pdsp_gte2110kW_6.286COP_7.041IPLV.SI_cap-f-t,    !- Name
+    0.8674394695782227,       !- Coefficient1 Constant
+    0.021866085280538905,     !- Coefficient2 x
+    -0.0011857700707421663,    !- Coefficient3 x2
+    0.005670315793519214,     !- Coefficient4 y
+    -0.000237380043924591,    !- Coefficient5 y2
+    0.00038634872690915094,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_lt150ton_0.695kWpton_0.44IPLV.IP_eir-f-t,    !- Name
+    0.5876418019500069,       !- Coefficient1 Constant
+    -0.027240383041737228,    !- Coefficient2 x
+    0.0007370464852235983,    !- Coefficient3 x2
+    0.030472810415311642,     !- Coefficient4 y
+    -0.0004155884123970688,    !- Coefficient5 y2
+    0.0001239415412644036,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_lt150ton_0.695kWpton_0.44IPLV.IP_cap-f-t,    !- Name
+    1.150985032892307,        !- Coefficient1 Constant
+    0.038812584270006806,     !- Coefficient2 x
+    -0.0018837645433976199,    !- Coefficient3 x2
+    -0.018796749296264383,    !- Coefficient4 y
+    0.00010545700300929208,    !- Coefficient5 y2
+    0.0006921654134556586,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte150lt300ton_0.635kWpton_0.4IPLV.IP_eir-f-t,    !- Name
+    0.5603499131946978,       !- Coefficient1 Constant
+    -0.03018144410871725,     !- Coefficient2 x
+    0.0010316549881993972,    !- Coefficient3 x2
+    0.031206396617557707,     !- Coefficient4 y
+    -0.0003788070716621168,    !- Coefficient5 y2
+    2.3751954376554046e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte150lt300ton_0.635kWpton_0.4IPLV.IP_cap-f-t,    !- Name
+    0.9760160116049938,       !- Coefficient1 Constant
+    0.04078157605489914,      !- Coefficient2 x
+    -0.0020841119719943444,    !- Coefficient3 x2
+    -0.006392843087823085,    !- Coefficient4 y
+    -9.885076288112274e-05,    !- Coefficient5 y2
+    0.0006038318796680616,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte300lt400ton_0.595kWpton_0.39IPLV.IP_eir-f-t,    !- Name
+    0.6650204806877531,       !- Coefficient1 Constant
+    -0.036410524070916904,    !- Coefficient2 x
+    0.001326590517040299,     !- Coefficient3 x2
+    0.025498108965285204,     !- Coefficient4 y
+    -0.0002582957032827014,    !- Coefficient5 y2
+    -4.062218416753287e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte300lt400ton_0.595kWpton_0.39IPLV.IP_cap-f-t,    !- Name
+    0.9443778143921346,       !- Coefficient1 Constant
+    0.034142733957219645,     !- Coefficient2 x
+    -0.00186869677270912,     !- Coefficient3 x2
+    -0.0015697587166733978,    !- Coefficient4 y
+    -0.00019928832677248564,    !- Coefficient5 y2
+    0.000661860036617608,     !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte400lt600ton_0.585kWpton_0.38IPLV.IP_eir-f-t,    !- Name
+    0.6200772141835564,       !- Coefficient1 Constant
+    -0.0306322466082636,      !- Coefficient2 x
+    0.0009719530676841878,    !- Coefficient3 x2
+    0.025900440655329128,     !- Coefficient4 y
+    -0.00028248389765414756,    !- Coefficient5 y2
+    0.0001187708328866573,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte400lt600ton_0.585kWpton_0.38IPLV.IP_cap-f-t,    !- Name
+    0.9006968510934723,       !- Coefficient1 Constant
+    0.035783292793397495,     !- Coefficient2 x
+    -0.0021901545558913873,    !- Coefficient3 x2
+    0.004674612607010754,     !- Coefficient4 y
+    -0.0003983827624673826,    !- Coefficient5 y2
+    0.0008439868860499146,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte600ton_0.585kWpton_0.38IPLV.IP_eir-f-t,    !- Name
+    0.5708908824543374,       !- Coefficient1 Constant
+    -0.03686332194596767,     !- Coefficient2 x
+    0.0012696123119514463,    !- Coefficient3 x2
+    0.030683222546397354,     !- Coefficient4 y
+    -0.00034692220051230917,    !- Coefficient5 y2
+    8.082883133883015e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte600ton_0.585kWpton_0.38IPLV.IP_cap-f-t,    !- Name
+    0.8753606074122298,       !- Coefficient1 Constant
+    0.03514636438493135,      !- Coefficient2 x
+    -0.002066777639148281,    !- Coefficient3 x2
+    0.00262446467283658,      !- Coefficient4 y
+    -0.00027469037777945666,    !- Coefficient5 y2
+    0.0007281114135163934,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_lt528kW_5.065COP_8.001IPLV.SI_eir-f-t,    !- Name
+    0.5884049895096174,       !- Coefficient1 Constant
+    -0.027208093275168776,    !- Coefficient2 x
+    0.0007370180712254055,    !- Coefficient3 x2
+    0.030445020733711838,     !- Coefficient4 y
+    -0.00041442456751842384,    !- Coefficient5 y2
+    0.00012175841277014957,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_lt528kW_5.065COP_8.001IPLV.SI_cap-f-t,    !- Name
+    1.1429034801571047,       !- Coefficient1 Constant
+    0.03842476075511095,      !- Coefficient2 x
+    -0.0018655115304263372,    !- Coefficient3 x2
+    -0.018602621593437573,    !- Coefficient4 y
+    0.00010402526500023303,    !- Coefficient5 y2
+    0.0006856627088139285,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte528lt1055kW_5.544COP_8.801IPLV.SI_eir-f-t,    !- Name
+    0.5601793045287018,       !- Coefficient1 Constant
+    -0.030241648605764213,    !- Coefficient2 x
+    0.001033122143915472,     !- Coefficient3 x2
+    0.03126486037056462,      !- Coefficient4 y
+    -0.0003802805518803555,    !- Coefficient5 y2
+    2.474255350074929e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte528lt1055kW_5.544COP_8.801IPLV.SI_cap-f-t,    !- Name
+    0.9699929080723617,       !- Coefficient1 Constant
+    0.040605634756158596,     !- Coefficient2 x
+    -0.0020741441970982856,    !- Coefficient3 x2
+    -0.006344974084992294,    !- Coefficient4 y
+    -9.813200966842078e-05,    !- Coefficient5 y2
+    0.0006003273597318543,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte1055lt1407kW_5.917COP_9.207IPLV.SI_eir-f-t,    !- Name
+    0.6645500934459558,       !- Coefficient1 Constant
+    -0.03661964303509581,     !- Coefficient2 x
+    0.0013344237628453303,    !- Coefficient3 x2
+    0.02564301935321,         !- Coefficient4 y
+    -0.00026071002604835286,    !- Coefficient5 y2
+    -3.929006539287415e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte1055lt1407kW_5.917COP_9.207IPLV.SI_cap-f-t,    !- Name
+    0.9390095371647891,       !- Coefficient1 Constant
+    0.03408679981910279,      !- Coefficient2 x
+    -0.001863465895223869,    !- Coefficient3 x2
+    -0.0014915720017790006,    !- Coefficient4 y
+    -0.00019969842906510658,    !- Coefficient5 y2
+    0.0006579449484734419,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte1407lt2110kW_6.018COP_9.264IPLV.SI_eir-f-t,    !- Name
+    0.6165300639020508,       !- Coefficient1 Constant
+    -0.030542457253622892,    !- Coefficient2 x
+    0.0009697713679790798,    !- Coefficient3 x2
+    0.026055382612135115,     !- Coefficient4 y
+    -0.0002853388875863586,    !- Coefficient5 y2
+    0.00011853266812376066,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte1407lt2110kW_6.018COP_9.264IPLV.SI_cap-f-t,    !- Name
+    0.8972714735712088,       !- Coefficient1 Constant
+    0.0359371224215435,       !- Coefficient2 x
+    -0.0021877666413626633,    !- Coefficient3 x2
+    0.004644383193118834,     !- Coefficient4 y
+    -0.00039605527430810377,    !- Coefficient5 y2
+    0.0008356546951832507,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte2110kW_6.018COP_9.264IPLV.SI_eir-f-t,    !- Name
+    0.5028846156937462,       !- Coefficient1 Constant
+    -0.031845890414455395,    !- Coefficient2 x
+    0.0010836926917424802,    !- Coefficient3 x2
+    0.03379508296378149,      !- Coefficient4 y
+    -0.0004154540699786728,    !- Coefficient5 y2
+    0.00012853261609241251,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_cent_gte2110kW_6.018COP_9.264IPLV.SI_cap-f-t,    !- Name
+    0.8492182350172672,       !- Coefficient1 Constant
+    0.042950457896996044,     !- Coefficient2 x
+    -0.002303425716508878,    !- Coefficient3 x2
+    0.001669294871704293,     !- Coefficient4 y
+    -0.00024528379856157304,    !- Coefficient5 y2
+    0.000636538058890387,     !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte75lt150ton_0.75kWpton_0.49IPLV.IP_eir-f-t,    !- Name
+    0.8405285483166121,       !- Coefficient1 Constant
+    -0.035285972807525906,    !- Coefficient2 x
+    0.001770958313194273,     !- Coefficient3 x2
+    -0.007704454586417514,    !- Coefficient4 y
+    0.0007354071459736843,    !- Coefficient5 y2
+    -0.0004813863223894494,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte75lt150ton_0.75kWpton_0.49IPLV.IP_cap-f-t,    !- Name
+    0.8347673707127656,       !- Coefficient1 Constant
+    0.06006896276863591,      !- Coefficient2 x
+    -0.0022488043643246252,    !- Coefficient3 x2
+    0.0018861734037247096,    !- Coefficient4 y
+    -0.00022274223524607653,    !- Coefficient5 y2
+    1.0919776258043056e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte150lt300ton_0.68kWpton_0.44IPLV.IP_eir-f-t,    !- Name
+    0.6313079181145678,       !- Coefficient1 Constant
+    -0.02942202688476893,     !- Coefficient2 x
+    0.0016496783459188113,    !- Coefficient3 x2
+    0.01030258540151672,      !- Coefficient4 y
+    0.00031192357073605095,    !- Coefficient5 y2
+    -0.0004181599191660986,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte150lt300ton_0.68kWpton_0.44IPLV.IP_cap-f-t,    !- Name
+    0.8110639876538763,       !- Coefficient1 Constant
+    0.0424584246080439,       !- Coefficient2 x
+    -0.001768084504782252,    !- Coefficient3 x2
+    0.004861434893023854,     !- Coefficient4 y
+    -0.00021548953706920838,    !- Coefficient5 y2
+    0.00014282358202815732,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte300lt600ton_0.625kWpton_0.41IPLV.IP_eir-f-t,    !- Name
+    0.5933201671043501,       !- Coefficient1 Constant
+    -0.02785386961672555,     !- Coefficient2 x
+    0.0014986504389290496,    !- Coefficient3 x2
+    0.014703888044629063,     !- Coefficient4 y
+    0.00020441344520539872,    !- Coefficient5 y2
+    -0.0004290918906521208,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte300lt600ton_0.625kWpton_0.41IPLV.IP_cap-f-t,    !- Name
+    0.8275953552935508,       !- Coefficient1 Constant
+    0.023327266594879954,     !- Coefficient2 x
+    -0.0011678759970282983,    !- Coefficient3 x2
+    0.008891882719991443,     !- Coefficient4 y
+    -0.0002924811253178036,    !- Coefficient5 y2
+    0.0003080472505382042,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_lt75ton_0.78kWpton_0.5IPLV.IP_eir-f-t,    !- Name
+    0.9045751659011179,       !- Coefficient1 Constant
+    -0.0357413788421816,      !- Coefficient2 x
+    0.0017756138279122762,    !- Coefficient3 x2
+    -0.012745433512640895,    !- Coefficient4 y
+    0.0008348345311890396,    !- Coefficient5 y2
+    -0.00047621648264556475,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_lt75ton_0.78kWpton_0.5IPLV.IP_cap-f-t,    !- Name
+    0.8431615841977999,       !- Coefficient1 Constant
+    0.05646102644428788,      !- Coefficient2 x
+    -0.002107294416488861,    !- Coefficient3 x2
+    0.002778791677575051,     !- Coefficient4 y
+    -0.00024566477800257966,    !- Coefficient5 y2
+    2.6012590507763463e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte600ton_0.585kWpton_0.38IPLV.IP_eir-f-t,    !- Name
+    0.5437012113550799,       !- Coefficient1 Constant
+    -0.02622995917027438,     !- Coefficient2 x
+    0.0013912877342993637,    !- Coefficient3 x2
+    0.02150017861939024,      !- Coefficient4 y
+    1.9668925277765135e-05,    !- Coefficient5 y2
+    -0.0004107499315676898,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte600ton_0.585kWpton_0.38IPLV.IP_cap-f-t,    !- Name
+    0.8228380528991903,       !- Coefficient1 Constant
+    0.015900645505811776,     !- Coefficient2 x
+    -0.0009700551564984202,    !- Coefficient3 x2
+    0.009980052225483675,     !- Coefficient4 y
+    -0.0002947964077232963,    !- Coefficient5 y2
+    0.00038679359394182803,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte264lt528kW_4.694COP_7.184IPLV.SI_eir-f-t,    !- Name
+    0.8782024202788131,       !- Coefficient1 Constant
+    -0.03472139522959582,     !- Coefficient2 x
+    0.001739505762443323,     !- Coefficient3 x2
+    -0.011561520693636775,    !- Coefficient4 y
+    0.0008077815573119279,    !- Coefficient5 y2
+    -0.0004787915085857513,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte264lt528kW_4.694COP_7.184IPLV.SI_cap-f-t,    !- Name
+    0.8216095770276725,       !- Coefficient1 Constant
+    0.05879426399691284,      !- Coefficient2 x
+    -0.00217826590789975,     !- Coefficient3 x2
+    0.0031870412388448604,    !- Coefficient4 y
+    -0.00024557631238338127,    !- Coefficient5 y2
+    -4.890245425113164e-06,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte528lt1055kW_5.177COP_8.001IPLV.SI_eir-f-t,    !- Name
+    0.6314524772634167,       !- Coefficient1 Constant
+    -0.03471439173408894,     !- Coefficient2 x
+    0.0017545468773486003,    !- Coefficient3 x2
+    0.013507922560953766,     !- Coefficient4 y
+    0.0002154975158888995,    !- Coefficient5 y2
+    -0.0003505236821119568,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte528lt1055kW_5.177COP_8.001IPLV.SI_cap-f-t,    !- Name
+    0.7733216537383621,       !- Coefficient1 Constant
+    0.03576746352734983,      !- Coefficient2 x
+    -0.0015763793605312454,    !- Coefficient3 x2
+    0.008399016332146342,     !- Coefficient4 y
+    -0.0002681239402743963,    !- Coefficient5 y2
+    0.00020423688818468734,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte1055lt2110kW_5.633COP_8.586IPLV.SI_eir-f-t,    !- Name
+    0.5916282143854565,       !- Coefficient1 Constant
+    -0.02803319958671078,     !- Coefficient2 x
+    0.001496353434519193,     !- Coefficient3 x2
+    0.014646165282197312,     !- Coefficient4 y
+    0.00020039475419555682,    !- Coefficient5 y2
+    -0.0004212255848183449,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte1055lt2110kW_5.633COP_8.586IPLV.SI_cap-f-t,    !- Name
+    0.8260746360189426,       !- Coefficient1 Constant
+    0.023263739351057224,     !- Coefficient2 x
+    -0.0011656964798627098,    !- Coefficient3 x2
+    0.008841400149112335,     !- Coefficient4 y
+    -0.000290939951011982,    !- Coefficient5 y2
+    0.0003085822260682738,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_lt264kW_4.513COP_7.041IPLV.SI_eir-f-t,    !- Name
+    0.8973264773518391,       !- Coefficient1 Constant
+    -0.03534447763485897,     !- Coefficient2 x
+    0.0017566901942153437,    !- Coefficient3 x2
+    -0.012770830157002668,    !- Coefficient4 y
+    0.0008292118738965114,    !- Coefficient5 y2
+    -0.00047218445343413914,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_lt264kW_4.513COP_7.041IPLV.SI_cap-f-t,    !- Name
+    0.8403989553495841,       !- Coefficient1 Constant
+    0.056217831174747816,     !- Coefficient2 x
+    -0.0020973231332583097,    !- Coefficient3 x2
+    0.0028295826717669274,    !- Coefficient4 y
+    -0.00024597473468725124,    !- Coefficient5 y2
+    2.540400486837792e-05,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte2110kW_6.018COP_9.264IPLV.SI_eir-f-t,    !- Name
+    0.5410903439016289,       !- Coefficient1 Constant
+    -0.02625334743672924,     !- Coefficient2 x
+    0.00138370685921283,      !- Coefficient3 x2
+    0.021617171819870273,     !- Coefficient4 y
+    1.2678762491351027e-05,    !- Coefficient5 y2
+    -0.00040497423230613516,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+Curve:Biquadratic,
+    ASHRAE901_2019_wtr_B_pdsp_gte2110kW_6.018COP_9.264IPLV.SI_cap-f-t,    !- Name
+    0.8205623152958919,       !- Coefficient1 Constant
+    0.015666171280029038,     !- Coefficient2 x
+    -0.0009618860655775869,    !- Coefficient3 x2
+    0.00999598253118077,      !- Coefficient4 y
+    -0.00029391662581783687,    !- Coefficient5 y2
+    0.0003883447155134793,    !- Coefficient6 xy
+    4.0,                      !- Minimum Value of x
+    15.6,                     !- Maximum Value of x
+    10.0,                     !- Minimum Value of y
+    40.0,                     !- Maximum Value of y
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+
+!- End of performance curves for Chiller:Electric:EIR
+!----------------------------------------------------------
