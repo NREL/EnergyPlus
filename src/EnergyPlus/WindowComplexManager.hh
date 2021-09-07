@@ -146,6 +146,9 @@ namespace WindowComplexManager {
                                        int const TS                       // Timestep number
     );
 
+    void COGBSDFSolarTransmittance(EnergyPlusData& state,
+        int const ISurf);
+
     void CalcStaticProperties(EnergyPlusData &state);
 
     void CalculateBasisLength(EnergyPlusData &state,

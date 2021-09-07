@@ -283,7 +283,7 @@ namespace WindowManager {
                 hExtConvCoeff = 8.0;
                 hIntConvCoeff = 2.5;
             }
-            auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, isSummer);
+            auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, surface.Construction, hIntConvCoeff, isSummer);
 
             const double centerOfGlassUvalue = insulGlassUnit->getUValue();
 
@@ -308,9 +308,8 @@ namespace WindowManager {
                 dividerUvalue, dividerEdgeUValue, dividerProjectedDimension, dividerWettedLength, dividerAbsorptance};
 
 
-            //JG not sure what these values are (maybe visible transmittance and solar transmittance) and what they should be set to 
-            const auto tVis{0.6385};
-            const auto tSol{0.371589958668};
+            const auto tVis{state.dataConstruction->Construct(surface.Construction).VisTransNorm};
+            const auto tSol{state.dataConstruction->Construct(surface.Construction).SolTransNorm};
 
             if (vision == EnergyPlus::DataSurfaces::NfrcVisionType::Single) {
                 auto window = Tarcog::ISO15099::WindowSingleVision(windowWidth, windowHeight, tVis, tSol, insulGlassUnit);
@@ -321,10 +320,10 @@ namespace WindowManager {
                 window.setDividers(dividerData, numHorizDividers, numVertDividers);
 
                 if (isSummer) {
-                    vt = window.uValue();
+                    vt = window.vt();
                     shgc = window.shgc();
                 } else {
-                    uvalue = window.vt();
+                    uvalue = window.uValue();
                 }
             } else if (vision == EnergyPlus::DataSurfaces::NfrcVisionType::Single) {
                 auto window =
@@ -339,10 +338,10 @@ namespace WindowManager {
                 window.setDividers(dividerData, numHorizDividers, numVertDividers);
 
                 if (isSummer) {
-                    vt = window.uValue();
+                    vt = window.vt();
                     shgc = window.shgc();
                 } else {
-                    uvalue = window.vt();
+                    uvalue = window.uValue();
                 }
             } else if (vision == EnergyPlus::DataSurfaces::NfrcVisionType::Single) {
                 auto window = 
@@ -357,10 +356,10 @@ namespace WindowManager {
                 window.setDividers(dividerData, numHorizDividers, numVertDividers);
 
                 if (isSummer) {
-                    vt = window.uValue();
+                    vt = window.vt();
                     shgc = window.shgc();
                 } else {
-                    uvalue = window.vt();
+                    uvalue = window.uValue();
                 }
             } else {
                 auto window = Tarcog::ISO15099::WindowSingleVision(windowWidth, windowHeight, tVis, tSol, insulGlassUnit);
@@ -371,10 +370,10 @@ namespace WindowManager {
                 window.setDividers(dividerData, numHorizDividers, numVertDividers);
 
                 if (isSummer) {
-                    vt = window.uValue();
+                    vt = window.vt();
                     shgc = window.shgc();
                 } else {
-                    uvalue = window.vt();
+                    uvalue = window.uValue();
                 }
             }
         }
@@ -441,33 +440,41 @@ namespace WindowManager {
         return aSystem;
     }
 
-    std::shared_ptr<Tarcog::ISO15099::CSystem> CWCEHeatTransferFactory::getTarcogSystemForReporting(EnergyPlusData &state,
-                                                                                                    bool const useSummerConditions)
+    std::shared_ptr<Tarcog::ISO15099::IIGUSystem> CWCEHeatTransferFactory::getTarcogSystemForReporting(EnergyPlusData &state,
+        int ConstrNum, double hcInterior, bool const useSummerConditions)
     {
-        auto Indoor = getIndoorUvalueNfrc(useSummerConditions);
-        auto Outdoor = getOutdoorUvalueNfrc(useSummerConditions);
-        auto aIGU = getIGU();
+        std::shared_ptr<Tarcog::ISO15099::IIGUSystem> result;
+        if(state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
+            auto Indoor = getIndoorUvalueNfrc(useSummerConditions);
+            auto Outdoor = getOutdoorUvalueNfrc(useSummerConditions);
+            auto aIGU = getIGU();
 
-        // pick-up all layers and put them in IGU (this includes gap layers as well)
-        for (auto i = 0; i < m_TotLay; ++i) {
-            auto aLayer = getIGULayer(state, i + 1);
-            assert(aLayer != nullptr);
-            // IDF for "standard" windows do not insert gas between glass and shade. Tarcog needs that gas
-            // and it will be created here
-            if (m_ShadePosition == ShadePosition::Interior && i == m_TotLay - 1) {
-                auto aAirLayer = getShadeToGlassLayer(state, i + 1);
-                aIGU.addLayer(aAirLayer);
+            // pick-up all layers and put them in IGU (this includes gap layers as well)
+            for (auto i = 0; i < m_TotLay; ++i) {
+                auto aLayer = getIGULayer(state, i + 1);
+                assert(aLayer != nullptr);
+                // IDF for "standard" windows do not insert gas between glass and shade. Tarcog needs that gas
+                // and it will be created here
+                if (m_ShadePosition == ShadePosition::Interior && i == m_TotLay - 1) {
+                    auto aAirLayer = getShadeToGlassLayer(state, i + 1);
+                    aIGU.addLayer(aAirLayer);
+                }
+                aIGU.addLayer(aLayer);
+                if (m_ShadePosition == ShadePosition::Exterior && i == 0) {
+                    auto aAirLayer = getShadeToGlassLayer(state, i + 1);
+                    aIGU.addLayer(aAirLayer);
+                }
             }
-            aIGU.addLayer(aLayer);
-            if (m_ShadePosition == ShadePosition::Exterior && i == 0) {
-                auto aAirLayer = getShadeToGlassLayer(state, i + 1);
-                aIGU.addLayer(aAirLayer);
-            }
+
+            result = std::make_shared<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor);
+        }
+        else { // Need to retrieve legacy values while code is still active. This is constructed as simple IGU for the purpose of reporting. (Simon)
+            const auto COGUValue{state.dataHeatBal->NominalU(ConstrNum)};
+            const auto SHGCCOG{state.dataConstruction->Construct(ConstrNum).SummerSHGC};
+            result = std::make_shared<Tarcog::ISO15099::SimpleIGU>(COGUValue, SHGCCOG, hcInterior);
         }
 
-        auto aSystem = std::make_shared<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor);
-
-        return aSystem;
+        return result;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////

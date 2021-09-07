@@ -7781,9 +7781,13 @@ namespace WindowManager {
                 // (3) solar transmittance at normal incidence, and (4) visible transmittance at normal incidence.
 
                 CalcNominalWindowCond(state, ThisNum, 1, NominalConductanceWinter, SHGCWinter, TransSolNorm, TransVisNorm, errFlag);
+                CalcNominalWindowCond(state, ThisNum, 2, NominalConductanceSummer, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
 
                 if (errFlag == 1 || errFlag == 2) continue;
                 state.dataHeatBal->NominalU(ThisNum) = NominalConductanceWinter;
+                // Need to have this because of window assembly reports (Simon)
+                state.dataConstruction->Construct(ThisNum).SummerSHGC = SHGCSummer;
+                state.dataConstruction->Construct(ThisNum).VisTransNorm = TransVisNorm;
             }
         }
     }

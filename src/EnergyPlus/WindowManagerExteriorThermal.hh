@@ -67,6 +67,7 @@ namespace ISO15099 {
     class CIGU;
     class CSingleSystem;
     class CSystem;
+    class IIGUSystem;
 } // namespace ISO15099
 } // namespace Tarcog
 
@@ -123,8 +124,8 @@ namespace WindowManager {
         Tarcog::ISO15099::CIGU getIGU() const;
 
         // for assembly windoww reporting
-        std::shared_ptr<Tarcog::ISO15099::CSystem> getTarcogSystemForReporting(EnergyPlusData &state, 
-            bool const useSummerConditions);
+        std::shared_ptr<Tarcog::ISO15099::IIGUSystem> getTarcogSystemForReporting(EnergyPlusData &state,
+                                                                                  int ConstrNum, double hcInterior, bool const useSummerConditions);
 
         // This special case of interior shade is necessary only because of strange calculation of heat flow on interior side
         // It probably needs to be removed since calculation is no different from any other case. It is left over from

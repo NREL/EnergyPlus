@@ -893,6 +893,11 @@ namespace WindowComplexManager {
         RegWinIndex.deallocate();
     }
 
+    void COGBSDFSolarTransmittance(EnergyPlusData &state, int const ISurf)
+    {
+
+    }
+
     void CalcStaticProperties(EnergyPlusData &state)
     {
 
