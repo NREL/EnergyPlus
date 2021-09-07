@@ -2245,7 +2245,7 @@ Note 1: The corresponding view factor to the sky for diffuse solar radiation is 
 
 Note 2: The view factors to the sky and ground for thermal infrared (long-wave) radiation are not user inputs; they are calculated within EnergyPlus based on surface tilt and shadowing surfaces. Shadowing surfaces are considered to have the same emissivity and temperature as the ground, so they are lumped together with the ground in calculating the ground infrared view factor.
 
-Note 3: If the view factor to the ground is autosized and a \hyperref[daylightingdeviceshelf]{DaylightingDevice:Shelf} is present, EnergyPlus will adjust both the view factor to the ground and sky so that the sum of all three view factors (to the ground, to the sky, and to the shelf) does not exceed 1.0.
+Note 3: If the view factor to the ground is autosized and a \hyperref[daylightingdeviceshelf]{DaylightingDevice:Shelf} is present, EnergyPlus will adjust both the view factor to the ground first and then the sky so that the sum of all three view factors (to the ground, to the sky, and to the shelf) does not exceed 1.0.
 
 \paragraph{Field: Frame and Divider Name}\label{field-frame-and-divider-name-2}
 
