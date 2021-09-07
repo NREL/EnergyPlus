@@ -7816,11 +7816,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     EXPECT_NEAR(thisFanCoil.PLR, 0.78843, 0.00001);
     // check mass flow rates
     EXPECT_NEAR(PrimaryAirMassFlowRate, 0.2, 0.000001);
-    EXPECT_NEAR(SecondaryAirMassFlowRate, 0.369710, 0.000001);
+    EXPECT_NEAR(SecondaryAirMassFlowRate, 0.369714, 0.000001);
     EXPECT_NEAR(state->dataLoopNodes->Node(thisFanCoil.AirInNode).MassFlowRate, thisFan.InletAirMassFlowRate, 0.000001);
     EXPECT_NEAR(state->dataLoopNodes->Node(thisFanCoil.ATMixerPriNode).MassFlowRate, 0.2, 0.0001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(thisFanCoil.ATMixerSecNode).MassFlowRate, 0.369710, 0.000001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(thisFanCoil.ATMixerOutNode).MassFlowRate, 0.569710, 0.000001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisFanCoil.ATMixerSecNode).MassFlowRate, 0.369714, 0.000001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisFanCoil.ATMixerOutNode).MassFlowRate, 0.569714, 0.000001);
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
