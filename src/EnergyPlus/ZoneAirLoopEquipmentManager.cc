@@ -109,7 +109,11 @@ namespace ZoneAirLoopEquipmentManager {
 
         // Beginning of Code
 
-        GetZoneAirLoopEquipment(state);
+        // make sure the input data is read in only once
+        if (state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag) {
+            GetZoneAirLoopEquipment(state);
+            state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
+        }
 
         // Find the correct Zone Air Distribution Unit Equipment
         if (CompIndex == 0) {
@@ -191,13 +195,6 @@ namespace ZoneAirLoopEquipmentManager {
         Array1D_bool lAlphaBlanks(5);     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks(2);   // Logical array, numeric field input BLANK = .TRUE.
         bool DualDuctRecircIsUsed;        // local temporary for deciding if recirc side used by dual duct terminal
-
-        // make sure the input data is read in only once
-        if (!state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag) {
-            return;
-        } else {
-            state.dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
-        }
 
         state.dataDefineEquipment->NumAirDistUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 

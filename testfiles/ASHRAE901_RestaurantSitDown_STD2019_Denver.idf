@@ -2131,6 +2131,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Dining,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2147,6 +2148,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Dining,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2163,6 +2165,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Dining,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2179,6 +2182,7 @@
     Ceiling,                 !- Surface Type
     nonres_roof,             !- Construction Name
     Dining,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     attic-floor-dinning,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2195,6 +2199,7 @@
     Floor,                   !- Surface Type
     Dining_Floor_Ffactor,    !- Construction Name
     Dining,                  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2211,6 +2216,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Dining,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dining_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2227,6 +2233,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Kitchen,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2243,6 +2250,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Kitchen,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2259,6 +2267,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Kitchen,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2275,6 +2284,7 @@
     Ceiling,                 !- Surface Type
     nonres_roof,             !- Construction Name
     Kitchen,                 !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     attic-floor-kitchen,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2291,6 +2301,7 @@
     Floor,                   !- Surface Type
     Kitchen_Floor_Ffactor,   !- Construction Name
     Kitchen,                 !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2307,6 +2318,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Kitchen,                 !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dining_Wall_North,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2323,6 +2335,7 @@
     Roof,                    !- Surface Type
     AtticRoofDeck,           !- Construction Name
     attic,                   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2338,6 +2351,7 @@
     Roof,                    !- Surface Type
     AtticRoofDeck,           !- Construction Name
     attic,                   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2353,6 +2367,7 @@
     Roof,                    !- Surface Type
     AtticRoofDeck,           !- Construction Name
     attic,                   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2369,6 +2384,7 @@
     Floor,                   !- Surface Type
     nonres_roof_floor,       !- Construction Name
     attic,                   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Dining_Ceiling,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2385,6 +2401,7 @@
     Roof,                    !- Surface Type
     AtticRoofDeck,           !- Construction Name
     attic,                   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2401,6 +2418,7 @@
     Floor,                   !- Surface Type
     nonres_roof_floor,       !- Construction Name
     attic,                   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Kitchen_Ceiling,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2485,12 +2503,14 @@
     Dining_InternalMass_1,   !- Name
     InteriorFurnishings,     !- Construction Name
     Dining,                  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     743.4961;                !- Surface Area {m2}
 
   InternalMass,
     Kitchen_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Kitchen,                 !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     278.8105;                !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========

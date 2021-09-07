@@ -136,7 +136,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataSurface->SurfMaterialMovInsulExt.allocate(SurfNum);
     state->dataSurface->SurfMaterialMovInsulExt(SurfNum) = 1;
 
-    state->dataHeatBalSurf->TH.allocate(2, 2, 1);
+    state->dataHeatBalSurf->SurfOutsideTempHist.allocate(1);
+    state->dataHeatBalSurf->SurfOutsideTempHist(1).allocate(1);
     state->dataSurface->Surface.allocate(SurfNum);
     state->dataSurface->Surface(SurfNum).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataSurface->Surface(SurfNum).Area = 10.0;
@@ -163,7 +164,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
 
     EXPECT_TRUE(ErrorFlag);
     EXPECT_TRUE(compare_err_stream(error_string, true));
-    EXPECT_EQ(10.0 * 1.0 * (state->dataHeatBalSurf->TH(1, 1, SurfNum) - state->dataSurface->SurfOutDryBulbTemp(SurfNum)),
+    EXPECT_EQ(10.0 * 1.0 * (state->dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) - state->dataSurface->SurfOutDryBulbTemp(SurfNum)),
               state->dataHeatBalSurf->QAirExtReport(SurfNum));
 }
 
@@ -275,6 +276,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).WindowSurfaceLast = 1;
+    state->dataHeatBal->Zone(1).zoneRadEnclosureFirst = 1;
+    state->dataHeatBal->Zone(1).zoneRadEnclosureLast = 1;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
@@ -291,12 +294,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBalSurf->SurfAbsThermalInt.allocate(1);
 
     state->dataViewFactor->NumOfRadiantEnclosures = 1;
-    state->dataViewFactor->ZoneRadiantInfo.allocate(1);
+    state->dataViewFactor->EnclRadInfo.allocate(1);
     state->dataHeatBal->EnclRadReCalc.allocate(1);
     state->dataHeatBal->EnclRadReCalc(1) = true;
     state->dataHeatBal->EnclRadThermAbsMult.allocate(1);
-    state->dataViewFactor->ZoneRadiantInfo(1).SurfacePtr.allocate(1);
-    state->dataViewFactor->ZoneRadiantInfo(1).SurfacePtr(1) = 1;
+    state->dataViewFactor->EnclRadInfo(1).SurfacePtr.allocate(1);
+    state->dataViewFactor->EnclRadInfo(1).SurfacePtr(1) = 1;
 
     ComputeIntThermalAbsorpFactors(*state);
 
@@ -314,6 +317,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     state->dataHeatBal->AnyInternalHeatSourceInInput = true;
+    state->dataHeatBal->SimpleCTFOnly = false;
 
     AllocateSurfaceHeatBalArrays(*state); // allocates a host of variables related to CTF calculations
 
@@ -324,6 +328,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     state->dataSurface->Surface(1).Construction = 1;
     state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
 
     state->dataConstruction->Construct(1).NumCTFTerms = 2;
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
@@ -333,7 +339,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     state->dataConstruction->Construct(1).CTFTUserSource(0) = 0.25;
 
     state->dataHeatBalSurf->SurfCurrNumHist(1) = 0;
-    state->dataHeatBalSurf->TH(1, 1, 1) = 20.0;
+    state->dataHeatBalSurf->SurfOutsideTempHist(1)(1) = 20.0;
     state->dataHeatBalSurf->SurfTempIn(1) = 10.0;
 
     state->dataHeatBalFanSys->CTFTuserConstPart(1) = 0.0;
@@ -604,6 +610,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -620,6 +627,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -636,6 +644,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -652,6 +661,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -667,6 +677,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
         "    FLOOR,                   !- Surface Type",
         "    FLOOR:LIVING,            !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Living:Floor,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -683,6 +694,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
         "    ROOF,                 !- Surface Type",
         "    ROOF,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -758,13 +770,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
-    state->dataHeatBalSurf->TH.allocate(2, 2, 6);
-    state->dataHeatBalSurf->TH(1, 1, 1) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 2) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 3) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 4) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 5) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 6) = 20;
     state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
     state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
@@ -784,6 +789,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
 
+    for (int loop = 1; loop <= state->dataSurface->TotSurfaces; ++loop) {
+        state->dataHeatBalSurf->SurfOutsideTempHist(1)(loop) = 20.0;
+    }
     state->dataSurface->SurfTAirRef(1) = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->SurfTAirRef(2) = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->SurfTAirRef(3) = DataSurfaces::ZoneSupplyAirTemp;
@@ -811,7 +819,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataLoopNodes->Node.deallocate();
     state->dataGlobal->KickOffSimulation = false;
     state->dataHeatBalSurf->SurfTempInTmp.deallocate();
-    state->dataHeatBalSurf->TH.deallocate();
     state->dataHeatBalSurf->SurfHConvInt.deallocate();
     state->dataMstBal->HConvInFD.deallocate();
     state->dataMstBal->RhoVaporAirIn.deallocate();
@@ -1086,6 +1093,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
                           "    Wall,                    !- Surface Type",
                           "    EXTWALL:LIVING,          !- Construction Name",
                           "    LIVING ZONE,             !- Zone Name",
+                          "    ,                        !- Space Name",
                           "    Outdoors,                !- Outside Boundary Condition",
                           "    ,                        !- Outside Boundary Condition Object",
                           "    SunExposed,              !- Sun Exposure",
@@ -1102,6 +1110,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
                           "    Wall,                    !- Surface Type",
                           "    EXTWALL:LIVING,          !- Construction Name",
                           "    LIVING ZONE,             !- Zone Name",
+                          "    ,                        !- Space Name",
                           "    Outdoors,                !- Outside Boundary Condition",
                           "    ,                        !- Outside Boundary Condition Object",
                           "    SunExposed,              !- Sun Exposure",
@@ -1118,6 +1127,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
                           "    Wall,                    !- Surface Type",
                           "    EXTWALL:LIVING,          !- Construction Name",
                           "    LIVING ZONE,             !- Zone Name",
+                          "    ,                        !- Space Name",
                           "    Outdoors,                !- Outside Boundary Condition",
                           "    ,                        !- Outside Boundary Condition Object",
                           "    SunExposed,              !- Sun Exposure",
@@ -1134,6 +1144,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
                           "    Wall,                    !- Surface Type",
                           "    EXTWALL:LIVING,          !- Construction Name",
                           "    LIVING ZONE,             !- Zone Name",
+                          "    ,                        !- Space Name",
                           "    Outdoors,                !- Outside Boundary Condition",
                           "    ,                        !- Outside Boundary Condition Object",
                           "    SunExposed,              !- Sun Exposure",
@@ -1149,6 +1160,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
                           "    FLOOR,                   !- Surface Type",
                           "    FLOOR:LIVING,            !- Construction Name",
                           "    LIVING ZONE,             !- Zone Name",
+                          "    ,                        !- Space Name",
                           "    Surface,                 !- Outside Boundary Condition",
                           "    Living:Floor,            !- Outside Boundary Condition Object",
                           "    NoSun,                   !- Sun Exposure",
@@ -1165,6 +1177,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
                           "    ROOF,                 !- Surface Type",
                           "    ROOF,          !- Construction Name",
                           "    LIVING ZONE,             !- Zone Name",
+                          "    ,                        !- Space Name",
                           "    Outdoors,                !- Outside Boundary Condition",
                           "    ,                        !- Outside Boundary Condition Object",
                           "    SunExposed,              !- Sun Exposure",
@@ -1294,13 +1307,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
-    state->dataHeatBalSurf->TH.allocate(2, 2, 6);
-    state->dataHeatBalSurf->TH(1, 1, 1) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 2) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 3) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 4) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 5) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 6) = 20;
     state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
     state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
@@ -1331,6 +1337,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataScheduleMgr->Schedule(2).CurrentValue = 20.0;
     state->dataScheduleMgr->Schedule(3).CurrentValue = 1.5;
     state->dataScheduleMgr->Schedule(4).CurrentValue = 90.0;
+    for (int loop = 1; loop <= state->dataSurface->TotSurfaces; ++loop) {
+        state->dataHeatBalSurf->SurfOutsideTempHist(1)(loop) = 20.0;
+    }
     state->dataSurface->SurfTAirRef(1) = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->SurfTAirRef(2) = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->SurfTAirRef(3) = DataSurfaces::ZoneSupplyAirTemp;
@@ -1627,6 +1636,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1643,6 +1653,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1659,6 +1670,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1675,6 +1687,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
         "    Wall,                    !- Surface Type",
         "    EXTWALL:LIVING,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1691,6 +1704,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR:LIVING,            !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Living:Floor,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1707,6 +1721,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
         "    ROOF,                 !- Surface Type",
         "    ROOF,          !- Construction Name",
         "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1870,7 +1885,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
-    state->dataHeatBalSurf->TH.allocate(2, 2, 6);
     state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
     state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
@@ -1908,10 +1922,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataScheduleMgr->Schedule(2).CurrentValue = 15.0; // Sky temp
     state->dataScheduleMgr->Schedule(3).CurrentValue = 22.0; // Grd temp
 
-    int SurfNum;
-    for (SurfNum = 1; SurfNum <= 6; SurfNum++) {
-        state->dataHeatBalSurf->TH(1, 1, SurfNum) = 20;       // Surf temp
-        state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 22; // Air temp
+    for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
+        state->dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = 20; // Surf temp
+        state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 22;         // Air temp
         state->dataSurface->SurfExtConvCoeffIndex(SurfNum) = -6;
         state->dataSurface->SurfAirSkyRadSplit(SurfNum) = 1.0;
     }
@@ -2252,6 +2265,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
                           "    Wall,                    !- Surface Type",
                           "    EXTWALL:LIVING,          !- Construction Name",
                           "    LIVING ZONE,             !- Zone Name",
+                          "    ,                        !- Space Name",
                           "    Outdoors,                !- Outside Boundary Condition",
                           "    ,                        !- Outside Boundary Condition Object",
                           "    SunExposed,              !- Sun Exposure",
@@ -2268,6 +2282,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
                           "    Wall,                    !- Surface Type",
                           "    EXTWALL:LIVING,          !- Construction Name",
                           "    LIVING ZONE,             !- Zone Name",
+                          "    ,                        !- Space Name",
                           "    Outdoors,                !- Outside Boundary Condition",
                           "    ,                        !- Outside Boundary Condition Object",
                           "    SunExposed,              !- Sun Exposure",
@@ -2284,6 +2299,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
                           "    Wall,                    !- Surface Type",
                           "    EXTWALL:LIVING,          !- Construction Name",
                           "    LIVING ZONE,             !- Zone Name",
+                          "    ,                        !- Space Name",
                           "    Outdoors,                !- Outside Boundary Condition",
                           "    ,                        !- Outside Boundary Condition Object",
                           "    SunExposed,              !- Sun Exposure",
@@ -2300,6 +2316,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
                           "    Wall,                    !- Surface Type",
                           "    EXTWALL:LIVING,          !- Construction Name",
                           "    LIVING ZONE,             !- Zone Name",
+                          "    ,                        !- Space Name",
                           "    Outdoors,                !- Outside Boundary Condition",
                           "    ,                        !- Outside Boundary Condition Object",
                           "    SunExposed,              !- Sun Exposure",
@@ -2315,6 +2332,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
                           "    FLOOR,                   !- Surface Type",
                           "    FLOOR:LIVING,            !- Construction Name",
                           "    LIVING ZONE,             !- Zone Name",
+                          "    ,                        !- Space Name",
                           "    Surface,                 !- Outside Boundary Condition",
                           "    Living:Floor,            !- Outside Boundary Condition Object",
                           "    NoSun,                   !- Sun Exposure",
@@ -2331,6 +2349,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
                           "    ROOF,                 !- Surface Type",
                           "    ROOF,          !- Construction Name",
                           "    LIVING ZONE,             !- Zone Name",
+                          "    ,                        !- Space Name",
                           "    Outdoors,                !- Outside Boundary Condition",
                           "    ,                        !- Outside Boundary Condition Object",
                           "    SunExposed,              !- Sun Exposure",
@@ -2438,13 +2457,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
-    state->dataHeatBalSurf->TH.allocate(2, 2, 6);
-    state->dataHeatBalSurf->TH(1, 1, 1) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 2) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 3) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 4) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 5) = 20;
-    state->dataHeatBalSurf->TH(1, 1, 6) = 20;
     state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
     state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
@@ -2472,6 +2484,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
+    for (int loop = 1; loop <= state->dataSurface->TotSurfaces; ++loop) {
+        state->dataHeatBalSurf->SurfOutsideTempHist(1)(loop) = 20.0;
+    }
     state->dataSurface->SurfTAirRef(1) = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->SurfTAirRef(2) = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->SurfTAirRef(3) = DataSurfaces::ZoneSupplyAirTemp;
@@ -2495,7 +2510,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataGlobal->KickOffSimulation = false;
     state->dataHeatBalSurf->SurfTempInTmp.deallocate();
     state->dataHeatBal->SurfTempEffBulkAir.deallocate();
-    state->dataHeatBalSurf->TH.deallocate();
     state->dataHeatBalSurf->SurfHConvInt.deallocate();
     state->dataMstBal->HConvInFD.deallocate();
     state->dataMstBal->RhoVaporAirIn.deallocate();
@@ -2547,11 +2561,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRa
     state->dataSurface->SurfOutWetBulbTemp.allocate(1);
     state->dataSurface->SurfOutDryBulbTemp.allocate(1);
     state->dataHeatBalSurf->SurfHcExt.allocate(1);
-    state->dataHeatBalSurf->TH.allocate(1, 1, 1);
+    state->dataHeatBalSurf->SurfOutsideTempHist.allocate(1);
+    state->dataHeatBalSurf->SurfOutsideTempHist(1).allocate(1);
 
     state->dataSurface->Surface(1).Area = 58.197;
     state->dataHeatBalSurf->SurfHcExt(1) = 1000;
-    state->dataHeatBalSurf->TH(1, 1, 1) = 6.71793958923051;
+    state->dataHeatBalSurf->SurfOutsideTempHist(1)(1) = 6.71793958923051;
     state->dataSurface->SurfOutWetBulbTemp(1) = 6.66143784594778;
     state->dataSurface->SurfOutDryBulbTemp(1) = 7.2;
 
@@ -2966,6 +2981,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
                                                       "    Wall,                    !- Surface Type",
                                                       "    EXTWALL:LIVING,          !- Construction Name",
                                                       "    LIVING ZONE,             !- Zone Name",
+                                                      "    ,                        !- Space Name",
                                                       "    Outdoors,                !- Outside Boundary Condition",
                                                       "    ,                        !- Outside Boundary Condition Object",
                                                       "    SunExposed,              !- Sun Exposure",
@@ -2982,6 +2998,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
                                                       "    Wall,                    !- Surface Type",
                                                       "    EXTWALL:LIVING,          !- Construction Name",
                                                       "    LIVING ZONE,             !- Zone Name",
+                                                      "    ,                        !- Space Name",
                                                       "    Outdoors,                !- Outside Boundary Condition",
                                                       "    ,                        !- Outside Boundary Condition Object",
                                                       "    SunExposed,              !- Sun Exposure",
@@ -2998,6 +3015,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
                                                       "    Wall,                    !- Surface Type",
                                                       "    EXTWALL:LIVING,          !- Construction Name",
                                                       "    LIVING ZONE,             !- Zone Name",
+                                                      "    ,                        !- Space Name",
                                                       "    Outdoors,                !- Outside Boundary Condition",
                                                       "    ,                        !- Outside Boundary Condition Object",
                                                       "    SunExposed,              !- Sun Exposure",
@@ -3014,6 +3032,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
                                                       "    Wall,                    !- Surface Type",
                                                       "    EXTWALL:LIVING,          !- Construction Name",
                                                       "    LIVING ZONE,             !- Zone Name",
+                                                      "    ,                        !- Space Name",
                                                       "    Outdoors,                !- Outside Boundary Condition",
                                                       "    ,                        !- Outside Boundary Condition Object",
                                                       "    SunExposed,              !- Sun Exposure",
@@ -3030,6 +3049,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
                                                       "    FLOOR,                   !- Surface Type",
                                                       "    FLOOR:LIVING,            !- Construction Name",
                                                       "    LIVING ZONE,             !- Zone Name",
+                                                      "    ,                        !- Space Name",
                                                       "    Surface,                 !- Outside Boundary Condition",
                                                       "    Living:Floor,            !- Outside Boundary Condition Object",
                                                       "    NoSun,                   !- Sun Exposure",
@@ -3046,6 +3066,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
                                                       "    ROOF,                 !- Surface Type",
                                                       "    ROOF,          !- Construction Name",
                                                       "    LIVING ZONE,             !- Zone Name",
+                                                      "    ,                        !- Space Name",
                                                       "    Outdoors,                !- Outside Boundary Condition",
                                                       "    ,                        !- Outside Boundary Condition Object",
                                                       "    SunExposed,              !- Sun Exposure",
@@ -3084,7 +3105,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
 
     state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
 
-    state->dataHeatBalSurf->TH.allocate(2, 2, 6);
     state->dataHeatBalSurf->SurfHConvInt.allocate(6);
     state->dataMstBal->HConvInFD.allocate(6);
     state->dataMstBal->RhoVaporAirIn.allocate(6);
@@ -3125,5 +3145,399 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     state->dataEnvrn->SunIsUp = true;
     InitIntSolarDistribution(*state);
     EXPECT_NEAR(1.666667, state->dataHeatBal->SurfIntBmIncInsSurfIntensRep(1), 0.00001);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBDaylightingNoExtWindow)
+{
+
+    std::string const idf_objects1 = R"IDF(
+    Building,
+        Building,                !- Name
+        0,                       !- North Axis {deg}
+        Suburbs,                 !- Terrain
+        0.04,                    !- Loads Convergence Tolerance Value {W}
+        0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
+        FullExterior,            !- Solar Distribution
+        25,                      !- Maximum Number of Warmup Days
+        6;                       !- Minimum Number of Warmup Days
+
+    Timestep,6;
+
+    SimulationControl,
+        No,                      !- Do Zone Sizing Calculation
+        No,                      !- Do System Sizing Calculation
+        No,                      !- Do Plant Sizing Calculation
+        No,                     !- Run Simulation for Sizing Periods
+        YES;                     !- Run Simulation for Weather File Run Periods
+
+    RunPeriod,
+        TESTSim,                 !- Name
+        1,                       !- Begin Month
+        1,                       !- Begin Day of Month
+        ,                        !- Begin Year
+        12,                      !- End Month
+        31,                      !- End Day of Month
+        ,                        !- End Year
+        Sunday,                  !- Day of Week for Start Day
+        No,                      !- Use Weather File Holidays and Special Days
+        No,                      !- Use Weather File Daylight Saving Period
+        No,                      !- Apply Weekend Holiday Rule
+        Yes,                     !- Use Weather File Rain Indicators
+        Yes,                     !- Use Weather File Snow Indicators
+        No;                      !- Treat Weather as Actual
+
+    Site:GroundTemperature:BuildingSurface,
+        18,                      !- January Ground Temperature {C}
+        18,                      !- February Ground Temperature {C}
+        18,                      !- March Ground Temperature {C}
+        18,                      !- April Ground Temperature {C}
+        18,                      !- May Ground Temperature {C}
+        18,                      !- June Ground Temperature {C}
+        18,                      !- July Ground Temperature {C}
+        18,                      !- August Ground Temperature {C}
+        18,                      !- September Ground Temperature {C}
+        18,                      !- October Ground Temperature {C}
+        18,                      !- November Ground Temperature {C}
+        18;                      !- December Ground Temperature {C}
+
+    ! Materials
+    Material,
+        defaultMat_0.25_defaultConstruction ,  !- Name
+        Rough,                   !- Roughness
+        0.25,                    !- Thickness {m}
+        2.3,                     !- Conductivity {W/m-K}
+        2400,                    !- Density {kg/m3}
+        840,                     !- Specific Heat {J/kg-K}
+        0.9,                     !- Thermal Absorptance
+        0.7,                     !- Solar Absorptance
+        0.7;                     !- Visible Absorptance
+
+    ! Materials
+    Material,
+        Mineral Wool_0.194_UVal_0.2_Mass ,  !- Name
+        Rough,                   !- Roughness
+        0.194,                   !- Thickness {m}
+        0.041,                   !- Conductivity {W/m-K}
+        155,                     !- Density {kg/m3}
+        1130,                    !- Specific Heat {J/kg-K}
+        0.9,                     !- Thermal Absorptance
+        0.7,                     !- Solar Absorptance
+        0.7;                     !- Visible Absorptance
+
+    Material,
+        General Concrete_0.2_UVal_0.2_Mass ,  !- Name
+        Rough,                   !- Roughness
+        0.2,                     !- Thickness {m}
+        2,                       !- Conductivity {W/m-K}
+        2400,                    !- Density {kg/m3}
+        950,                     !- Specific Heat {J/kg-K}
+        0.9,                     !- Thermal Absorptance
+        0.7,                     !- Solar Absorptance
+        0.7;                     !- Visible Absorptance
+
+    Construction,
+        defaultConstruction,     !- Name
+        defaultMat_0.25_defaultConstruction;  !- Outside Layer
+
+    Construction,
+        defaultConstruction_FLIPPED,  !- Name
+        defaultMat_0.25_defaultConstruction;  !- Outside Layer
+
+    ! UVal_0.2_Mass Type: Facade
+    Construction,
+        UVal_0.2_Mass,           !- Name
+        Mineral Wool_0.194_UVal_0.2_Mass,  !- Outside Layer
+        General Concrete_0.2_UVal_0.2_Mass;  !- Layer 2
+
+    Construction,
+        UVal_0.2_Mass_FLIPPED,   !- Name
+        General Concrete_0.2_UVal_0.2_Mass,  !- Outside Layer
+        Mineral Wool_0.194_UVal_0.2_Mass;  !- Layer 2
+
+    Zone,
+        Zone_0,                  !- Name
+        0,                       !- Direction of Relative North {deg}
+        0,                       !- X Origin {m}
+        0,                       !- Y Origin {m}
+        0,                       !- Z Origin {m}
+        1,                       !- Type
+        1.0,                     !- Multiplier
+        ,                        !- Ceiling Height {m}
+        8197.0573178193,         !- Volume {m3}
+        631.643058536491,        !- Floor Area {m2}
+        TARP,                    !- Zone Inside Convection Algorithm
+        DOE-2;                   !- Zone Outside Convection Algorithm
+
+    GlobalGeometryRules,
+        LowerLeftCorner,         !- Starting Vertex Position
+        CounterClockWise,        !- Vertex Entry Direction
+        Relative;                !- Coordinate System
+
+    BuildingSurface:Detailed,
+        Zone_0:f0,               !- Name
+        Wall,                    !- Surface Type
+        UVal_0.2_Mass,           !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Outdoors,                !- Outside Boundary Condition
+        ,                        !- Outside Boundary Condition Object
+        SunExposed,              !- Sun Exposure
+        WindExposed,             !- Wind Exposure
+        Autocalculate,           !- View Factor to Ground
+        4,                       !- Number of Vertices
+        -2.6475,                 !- Vertex 1 X-coordinate {m}
+        16.8426,                 !- Vertex 1 Y-coordinate {m}
+        0.0000,                  !- Vertex 1 Z-coordinate {m}
+        24.7463,                 !- Vertex 2 X-coordinate {m}
+        16.8426,                 !- Vertex 2 Y-coordinate {m}
+        0.0000,                  !- Vertex 2 Z-coordinate {m}
+        24.7463,                 !- Vertex 3 X-coordinate {m}
+        16.8426,                 !- Vertex 3 Y-coordinate {m}
+        12.9774,                 !- Vertex 3 Z-coordinate {m}
+        -2.6475,                 !- Vertex 4 X-coordinate {m}
+        16.8426,                 !- Vertex 4 Y-coordinate {m}
+        12.9774;                 !- Vertex 4 Z-coordinate {m}
+
+    ! FACE NORMAL  1 3.46944695195361E-17 0
+    BuildingSurface:Detailed,
+        Zone_0:f1,               !- Name
+        Wall,                    !- Surface Type
+        UVal_0.2_Mass,           !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Outdoors,                !- Outside Boundary Condition
+        ,                        !- Outside Boundary Condition Object
+        SunExposed,              !- Sun Exposure
+        WindExposed,             !- Wind Exposure
+        Autocalculate,           !- View Factor to Ground
+        4,                       !- Number of Vertices
+        24.7463,                 !- Vertex 1 X-coordinate {m}
+        16.8426,                 !- Vertex 1 Y-coordinate {m}
+        0.0000,                  !- Vertex 1 Z-coordinate {m}
+        24.7463,                 !- Vertex 2 X-coordinate {m}
+        39.9005,                 !- Vertex 2 Y-coordinate {m}
+        0.0000,                  !- Vertex 2 Z-coordinate {m}
+        24.7463,                 !- Vertex 3 X-coordinate {m}
+        39.9005,                 !- Vertex 3 Y-coordinate {m}
+        12.9774,                 !- Vertex 3 Z-coordinate {m}
+        24.7463,                 !- Vertex 4 X-coordinate {m}
+        16.8426,                 !- Vertex 4 Y-coordinate {m}
+        12.9774;                 !- Vertex 4 Z-coordinate {m}
+
+    ! FACE NORMAL  -4.16333634234434E-17 1 0
+    BuildingSurface:Detailed,
+        Zone_0:f2,               !- Name
+        Wall,                    !- Surface Type
+        defaultConstruction,     !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Surface,                 !- Outside Boundary Condition
+        Zone_0:f2,               !- Outside Boundary Condition Object
+        NoSun,                   !- Sun Exposure
+        NoWind,                  !- Wind Exposure
+        Autocalculate,           !- View Factor to Ground
+        4,                       !- Number of Vertices
+        24.7463,                 !- Vertex 1 X-coordinate {m}
+        39.9005,                 !- Vertex 1 Y-coordinate {m}
+        0.0000,                  !- Vertex 1 Z-coordinate {m}
+        -2.6475,                 !- Vertex 2 X-coordinate {m}
+        39.9005,                 !- Vertex 2 Y-coordinate {m}
+        0.0000,                  !- Vertex 2 Z-coordinate {m}
+        -2.6475,                 !- Vertex 3 X-coordinate {m}
+        39.9005,                 !- Vertex 3 Y-coordinate {m}
+        12.9774,                 !- Vertex 3 Z-coordinate {m}
+        24.7463,                 !- Vertex 4 X-coordinate {m}
+        39.9005,                 !- Vertex 4 Y-coordinate {m}
+        12.9774;                 !- Vertex 4 Z-coordinate {m}
+
+    ! FACE NORMAL  -1 6.07153216591882E-18 0
+    BuildingSurface:Detailed,
+        Zone_0:f3,               !- Name
+        Wall,                    !- Surface Type
+        UVal_0.2_Mass,           !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Outdoors,                !- Outside Boundary Condition
+        ,                        !- Outside Boundary Condition Object
+        SunExposed,              !- Sun Exposure
+        WindExposed,             !- Wind Exposure
+        Autocalculate,           !- View Factor to Ground
+        4,                       !- Number of Vertices
+        -2.6475,                 !- Vertex 1 X-coordinate {m}
+        39.9005,                 !- Vertex 1 Y-coordinate {m}
+        0.0000,                  !- Vertex 1 Z-coordinate {m}
+        -2.6475,                 !- Vertex 2 X-coordinate {m}
+        16.8426,                 !- Vertex 2 Y-coordinate {m}
+        0.0000,                  !- Vertex 2 Z-coordinate {m}
+        -2.6475,                 !- Vertex 3 X-coordinate {m}
+        16.8426,                 !- Vertex 3 Y-coordinate {m}
+        12.9774,                 !- Vertex 3 Z-coordinate {m}
+        -2.6475,                 !- Vertex 4 X-coordinate {m}
+        39.9005,                 !- Vertex 4 Y-coordinate {m}
+        12.9774;                 !- Vertex 4 Z-coordinate {m}
+
+    ! FACE NORMAL  0 0 -1
+    BuildingSurface:Detailed,
+        Zone_0:f4,               !- Name
+        Floor,                   !- Surface Type
+        defaultConstruction,     !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Surface,                 !- Outside Boundary Condition
+        Zone_0:f4,               !- Outside Boundary Condition Object
+        NoSun,                   !- Sun Exposure
+        NoWind,                  !- Wind Exposure
+        Autocalculate,           !- View Factor to Ground
+        4,                       !- Number of Vertices
+        -2.6475,                 !- Vertex 1 X-coordinate {m}
+        39.9005,                 !- Vertex 1 Y-coordinate {m}
+        0.0000,                  !- Vertex 1 Z-coordinate {m}
+        24.7463,                 !- Vertex 2 X-coordinate {m}
+        39.9005,                 !- Vertex 2 Y-coordinate {m}
+        0.0000,                  !- Vertex 2 Z-coordinate {m}
+        24.7463,                 !- Vertex 3 X-coordinate {m}
+        30.1033,                 !- Vertex 3 Y-coordinate {m}
+        0.0000,                  !- Vertex 3 Z-coordinate {m}
+        -2.6475,                 !- Vertex 4 X-coordinate {m}
+        30.1033,                 !- Vertex 4 Y-coordinate {m}
+        0.0000;                  !- Vertex 4 Z-coordinate {m}
+
+    ! FACE NORMAL  0 0 1
+    BuildingSurface:Detailed,
+        Zone_0:f5,               !- Name
+        Roof,                    !- Surface Type
+        UVal_0.2_Mass,           !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Outdoors,                !- Outside Boundary Condition
+        ,                        !- Outside Boundary Condition Object
+        SunExposed,              !- Sun Exposure
+        WindExposed,             !- Wind Exposure
+        0,                       !- View Factor to Ground
+        4,                       !- Number of Vertices
+        24.7463,                 !- Vertex 1 X-coordinate {m}
+        16.8426,                 !- Vertex 1 Y-coordinate {m}
+        12.9774,                 !- Vertex 1 Z-coordinate {m}
+        24.7463,                 !- Vertex 2 X-coordinate {m}
+        39.9005,                 !- Vertex 2 Y-coordinate {m}
+        12.9774,                 !- Vertex 2 Z-coordinate {m}
+        -2.6475,                 !- Vertex 3 X-coordinate {m}
+        39.9005,                 !- Vertex 3 Y-coordinate {m}
+        12.9774,                 !- Vertex 3 Z-coordinate {m}
+        -2.6475,                 !- Vertex 4 X-coordinate {m}
+        16.8426,                 !- Vertex 4 Y-coordinate {m}
+        12.9774;                 !- Vertex 4 Z-coordinate {m}
+
+    ! FACE NORMAL  0 0 -1
+    BuildingSurface:Detailed,
+        Zone_0:f6,               !- Name
+        Floor,                   !- Surface Type
+        defaultConstruction,     !- Construction Name
+        Zone_0,                  !- Zone Name
+        ,                        !- Space Name
+        Surface,                 !- Outside Boundary Condition
+        Zone_0:f6,               !- Outside Boundary Condition Object
+        NoSun,                   !- Sun Exposure
+        NoWind,                  !- Wind Exposure
+        Autocalculate,           !- View Factor to Ground
+        4,                       !- Number of Vertices
+        24.7463,                 !- Vertex 1 X-coordinate {m}
+        30.1033,                 !- Vertex 1 Y-coordinate {m}
+        0.0000,                  !- Vertex 1 Z-coordinate {m}
+        24.7463,                 !- Vertex 2 X-coordinate {m}
+        16.8426,                 !- Vertex 2 Y-coordinate {m}
+        0.0000,                  !- Vertex 2 Z-coordinate {m}
+        -2.6475,                 !- Vertex 3 X-coordinate {m}
+        16.8426,                 !- Vertex 3 Y-coordinate {m}
+        0.0000,                  !- Vertex 3 Z-coordinate {m}
+        -2.6475,                 !- Vertex 4 X-coordinate {m}
+        30.1033,                 !- Vertex 4 Y-coordinate {m}
+        0.0000;                  !- Vertex 4 Z-coordinate {m}
+    )IDF";
+
+    std::string const idf_objects2 = R"IDF(
+    Daylighting:Controls,
+        Zone_0_DaylCtrl,         !- Name
+        Zone_0,                  !- Zone Name
+        SplitFlux,               !- Daylighting Method
+        lightsOffice,            !- Availability Schedule Name
+        Continuous,              !- Lighting Control Type
+        0.1,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+        0.1,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+        3,                       !- Number of Stepped Control Steps
+        1,                       !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+        ,                        !- Glare Calculation Daylighting Reference Point Name
+        ,                        !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
+        22,                      !- Maximum Allowable Discomfort Glare Index
+        ,                        !- DElight Gridding Resolution {m2}
+        Zone_0_DaylCtrlRefPt1,   !- Daylighting Reference Point 1 Name
+        1,                       !- Fraction of Zone Controlled by Reference Point 1
+        500;                     !- Illuminance Setpoint at Reference Point 1 {lux}
+
+    Daylighting:ReferencePoint,
+        Zone_0_DaylCtrlRefPt1,   !- Name
+        Zone_0,                  !- Zone Name
+        11.0493979164892,        !- X-Coordinate of Reference Point {m}
+        28.3715348505495,        !- Y-Coordinate of Reference Point {m}
+        0.85;                    !- Z-Coordinate of Reference Point {m}
+    )IDF";
+
+    std::string const idf_objects = idf_objects1 + idf_objects2;
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    SurfaceGeometry::SetupZoneGeometry(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
+
+    state->dataHeatBalSurf->SurfHConvInt.allocate(6);
+    state->dataMstBal->HConvInFD.allocate(6);
+    state->dataMstBal->RhoVaporAirIn.allocate(6);
+    state->dataMstBal->HMassConvInFD.allocate(6);
+
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->KickOffSimulation = true;
+    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
+    state->dataGlobal->TimeStepZoneSec = 900;
+    state->dataGlobal->NumOfTimeStepInHour = 6;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->TimeStep = 1;
+
+    AllocateSurfaceHeatBalArrays(*state);
+    createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
+    SolarShading::AllocateModuleArrays(*state);
+    SolarShading::DetermineShadowingCombinations(*state);
+
+    state->dataEnvrn->SunIsUp = true;
+    state->dataEnvrn->BeamSolarRad = 50;
+    state->dataEnvrn->GndSolarRad = 50;
+    state->dataEnvrn->DifSolarRad = 0;
+    state->dataSurface->Surface(1).SolarEnclIndex = 1;
+    state->dataSurface->Surface(2).SolarEnclIndex = 1;
+    state->dataSurface->Surface(3).SolarEnclIndex = 1;
+    state->dataSurface->Surface(4).SolarEnclIndex = 1;
+    state->dataSurface->Surface(5).SolarEnclIndex = 1;
+    state->dataSurface->Surface(6).SolarEnclIndex = 1;
+    state->dataSurface->Surface(7).SolarEnclIndex = 1;
+    state->dataDaylightingData->ZoneDaylight(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints = 1;
+    InitSurfaceHeatBalance(*state);
+    EXPECT_FALSE(has_err_output(true));
 }
 } // namespace EnergyPlus

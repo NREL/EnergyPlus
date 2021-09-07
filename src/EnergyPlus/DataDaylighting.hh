@@ -116,6 +116,13 @@ namespace DataDaylighting {
         }
     };
 
+    struct EnclDaylightCalc
+    {
+        Real64 aveVisDiffReflect = 0.0; // Area-weighted average inside surface visible reflectance of zone
+        Real64 totInsSurfArea = 0.0;    // Total inside surface area of a daylit zone (m2)
+        Real64 floorVisRefl = 0.0;      // Area-weighted visible reflectance of floor of a daylit zone
+    };
+
     struct ZoneDaylightCalc
     {
         // Members
@@ -141,7 +148,6 @@ namespace DataDaylighting {
         int LightControlSteps;                     // Number of levels (excluding zero) of stepped control system
         Real64 LightControlProbability;            // For manual control of stepped systems, probability that lighting will
         int TotalExtWindows;                       // Total number of exterior windows in the zone or same solar enclosure
-        Real64 AveVisDiffReflect;                  // Area-weighted average inside surface visible reflectance of zone
         Real64 DElightGriddingResolution;          // Field: Delight Gridding Resolution
         Array1D<Real64> RefPtPowerReductionFactor; // =1.0  ! Electric power reduction factor at reference points
         // due to daylighting
@@ -163,8 +169,6 @@ namespace DataDaylighting {
         // sublists a just a single index to a fenestration surface if they are deployed one at a time.
         Array1D_int MapShdOrdToLoopNum; // list that maps back the original loop order when using ShadeDeployOrderExtWins for shade deployment
         Real64 MinIntWinSolidAng;       // Minimum solid angle subtended by an interior window in a zone
-        Real64 TotInsSurfArea;          // Total inside surface area of a daylit zone (m2)
-        Real64 FloorVisRefl;            // Area-weighted visible reflectance of floor of a daylit zone
         Real64 InterReflIllFrIntWins;   // Inter-reflected illuminance due to beam and diffuse solar passing
         //  through a zone's interior windows (lux)
         Array1D<Real64> BacLum;                  // =0.0 ! Background luminance at each reference point (cd/m2)
@@ -209,9 +213,9 @@ namespace DataDaylighting {
         ZoneDaylightCalc()
             : DaylightMethod(iDaylightingMethod::NoDaylighting), AvailSchedNum(0), TotalDaylRefPoints(0), LightControlType(iLtgCtrlType::Continuous),
               glareRefPtNumber(0), ViewAzimuthForGlare(0.0), MaxGlareallowed(0), MinPowerFraction(0.0), MinLightFraction(0.0), LightControlSteps(0),
-              LightControlProbability(0.0), TotalExtWindows(0), AveVisDiffReflect(0.0), DElightGriddingResolution(0.0), ZonePowerReductionFactor(1.0),
-              NumOfIntWinAdjZones(0), NumOfIntWinAdjZoneExtWins(0), NumOfDayltgExtWins(0), MinIntWinSolidAng(0.0), TotInsSurfArea(0.0),
-              FloorVisRefl(0.0), InterReflIllFrIntWins(0.0), AdjZoneHasDayltgCtrl(false), MapCount(0)
+              LightControlProbability(0.0), TotalExtWindows(0), DElightGriddingResolution(0.0), ZonePowerReductionFactor(1.0), NumOfIntWinAdjZones(0),
+              NumOfIntWinAdjZoneExtWins(0), NumOfDayltgExtWins(0), MinIntWinSolidAng(0.0), InterReflIllFrIntWins(0.0), AdjZoneHasDayltgCtrl(false),
+              MapCount(0)
         {
         }
     };
@@ -329,6 +333,7 @@ struct DaylightingData : BaseGlobalStruct
     bool DFSReportAllShadowCalculationDays = false;
     int TotDElightCFS = 0;
 
+    Array1D<DataDaylighting::EnclDaylightCalc> enclDaylight;
     Array1D<DataDaylighting::ZoneDaylightCalc> ZoneDaylight;
     Array1D<DataDaylighting::IllumMapData> IllumMap;
     Array1D<DataDaylighting::MapCalcData> IllumMapCalc;

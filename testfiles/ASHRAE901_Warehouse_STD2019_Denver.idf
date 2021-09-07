@@ -2629,6 +2629,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone1 Office,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2640,15 +2641,12 @@
     25.9067365494966,0,0,  !- X,Y,Z ==> Vertex 3 {m}
     25.9067365494966,0,4.26699190227003;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  4 {m}
-                                        !- X,Y,Z  1 {m}
-                                        !- X,Y,Z  3 {m}
-
   BuildingSurface:Detailed,
     Office Right Wall,       !- Name
     Wall,                    !- Surface Type
     Interior Wall,           !- Construction Name
     Zone1 Office,            !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Zone2 Fine Storage,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2660,15 +2658,12 @@
     25.9067365494966,9.14355407629293,0,  !- X,Y,Z ==> Vertex 3 {m}
     25.9067365494966,9.14355407629293,4.26699190227003;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  4 {m}
-                                        !- X,Y,Z  1 {m}
-                                        !- X,Y,Z  2 {m}
-
   BuildingSurface:Detailed,
     Office Rear Wall,        !- Name
     Wall,                    !- Surface Type
     Interior Wall,           !- Construction Name
     Zone1 Office,            !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Zone2 Fine Storage,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2680,14 +2675,12 @@
     0,9.14355407629293,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,9.14355407629293,4.26699190227003;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  4 {m}
-                                        !- X,Y,Z  1 {m}
-
   BuildingSurface:Detailed,
     Office Left Wall,        !- Name
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone1 Office,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2699,13 +2692,13 @@
     0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,4.26699190227003;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  1 {m}
 
   BuildingSurface:Detailed,
     Fine Storage Front Wall, !- Name
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2717,15 +2710,12 @@
     45.7177703814647,0,0,  !- X,Y,Z ==> Vertex 3 {m}
     45.7177703814647,0,8.53398380454007;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  4 {m}
-                                        !- X,Y,Z  1 {m}
-                                        !- X,Y,Z  3 {m}
-
   BuildingSurface:Detailed,
     Fine Storage Right Wall, !- Name
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2737,16 +2727,12 @@
     45.7177703814647,30.4785135876431,0,  !- X,Y,Z ==> Vertex 3 {m}
     45.7177703814647,30.4785135876431,8.53398380454007;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  4 {m}
-                                        !- X,Y,Z  1 {m}
-                                        !- X,Y,Z  2 {m}
-                                        !- X,Y,Z  3 {m}
-
   BuildingSurface:Detailed,
     Bulk Storage Front Wall, !- Name
     Wall,                    !- Surface Type
     semiheated_ext_wall,     !- Construction Name
     Zone3 Bulk Storage,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Zone2 Fine Storage,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2758,13 +2744,13 @@
     45.7177703814647,30.4785135876431,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,30.4785135876431,0;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  1 {m}
 
   BuildingSurface:Detailed,
     Fine Storage Left Wall,  !- Name
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2776,16 +2762,13 @@
     0,9.14355407629293,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,9.14355407629293,8.53398380454007;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  4 {m}
-                                        !- X,Y,Z  1 {m}
-                                        !- X,Y,Z  2 {m}
-                                        !- X,Y,Z  3 {m}
 
   BuildingSurface:Detailed,
     Bulk Storage Right Wall, !- Name
     Wall,                    !- Surface Type
     semiheated_ext_wall,     !- Construction Name
     Zone3 Bulk Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2797,15 +2780,12 @@
     45.7177703814647,100.579094839222,0,  !- X,Y,Z ==> Vertex 3 {m}
     45.7177703814647,100.579094839222,8.53398380454007;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  4 {m}
-                                        !- X,Y,Z  1 {m}
-                                        !- X,Y,Z  2 {m}
-
   BuildingSurface:Detailed,
     Bulk Storage Rear Wall,  !- Name
     Wall,                    !- Surface Type
     semiheated_ext_wall,     !- Construction Name
     Zone3 Bulk Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2817,14 +2797,12 @@
     0,100.579094839222,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,100.579094839222,8.53398380454007;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  4 {m}
-                                        !- X,Y,Z  1 {m}
-
   BuildingSurface:Detailed,
     Bulk Storage Left Wall,  !- Name
     Wall,                    !- Surface Type
     semiheated_ext_wall,     !- Construction Name
     Zone3 Bulk Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2836,16 +2814,12 @@
     0,30.4785135876431,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,30.4785135876431,8.53398380454007;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  4 {m}
-                                        !- X,Y,Z  1 {m}
-                                        !- X,Y,Z  2 {m}
-                                        !- X,Y,Z  3 {m}
-
   BuildingSurface:Detailed,
     Office Roof,             !- Name
     Roof,                    !- Surface Type
     InsulatedCeiling,        !- Construction Name
     Zone1 Office,            !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Zone2 Fine Storage,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2857,15 +2831,12 @@
     0,9.14355407629293,4.26699190227003,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,4.26699190227003;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  1 {m}
-                                        !- X,Y,Z  2 {m}
-                                        !- X,Y,Z  3 {m}
-
   BuildingSurface:Detailed,
     Fine Storage Roof,       !- Name
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2877,15 +2848,12 @@
     0,30.4785135876431,8.53398380454007,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,8.53398380454007;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  1 {m}
-                                        !- X,Y,Z  2 {m}
-                                        !- X,Y,Z  3 {m}
-
   BuildingSurface:Detailed,
     Bulk Storage Roof,       !- Name
     Roof,                    !- Surface Type
     semiheated_roof,         !- Construction Name
     Zone3 Bulk Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2897,14 +2865,12 @@
     45.7177703814647,30.4785135876431,8.53398380454007,  !- X,Y,Z ==> Vertex 3 {m}
     45.7177703814647,100.579094839222,8.53398380454007;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  4 {m}
-                                        !- X,Y,Z  3 {m}
-
   BuildingSurface:Detailed,
     Fine Storage Office Front Wall,  !- Name
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2916,15 +2882,12 @@
     25.9067365494966,0,4.26699190227003,  !- X,Y,Z ==> Vertex 3 {m}
     25.9067365494966,0,8.53398380454007;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  4 {m}
-                                        !- X,Y,Z  1 {m}
-                                        !- X,Y,Z  2 {m}
-
   BuildingSurface:Detailed,
     Fine Storage Office Left Wall,  !- Name
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2936,13 +2899,12 @@
     0,0,4.26699190227003,  !- X,Y,Z ==> Vertex 3 {m}
     0,0,8.53398380454007;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  1 {m}
-
   BuildingSurface:Detailed,
     Office Floor,            !- Name
     Floor,                   !- Surface Type
     OfficeFloor_Ffactor,     !- Construction Name
     Zone1 Office,            !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2954,14 +2916,12 @@
     0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
     0,9.14355407629293,0;  !- X,Y,Z ==> Vertex 4 {m}
 
-                                        !- X,Y,Z  1 {m}
-                                        !- X,Y,Z  4 {m}
-
   BuildingSurface:Detailed,
     Fine Storage Floor,      !- Name
     Floor,                   !- Surface Type
     FineStorageFloor_Ffactor,!- Construction Name
     Zone2 Fine Storage,      !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2975,14 +2935,12 @@
     0,9.14355407629293,0,  !- X,Y,Z ==> Vertex 5 {m}
     0,30.4785135876431,0;  !- X,Y,Z ==> Vertex 6 {m}
 
-                                        !- X,Y,Z  1 {m}
-                                        !- X,Y,Z  2 {m}
-
   BuildingSurface:Detailed,
     Bulk Storage Floor,      !- Name
     Floor,                   !- Surface Type
     BulkStorageFloor_Ffactor,!- Construction Name
     Zone3 Bulk Storage,      !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4374,6 +4332,7 @@
     Bulk Storage Products Surface,  !- Name
     Bulk Storage Products,   !- Construction Name
     Zone3 Bulk Storage,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     6028.44715712782;        !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========

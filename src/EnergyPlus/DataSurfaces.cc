@@ -327,7 +327,12 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             }
             // a weighted average of the inlet temperatures.
-            RefAirTemp = SumSysMCpT / SumSysMCp;
+            if (SumSysMCp > 0.0) {
+                // a weighted average of the inlet temperatures.
+                RefAirTemp = SumSysMCpT / SumSysMCp;
+            } else {
+                RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
+            }
         } else {
             // currently set to mean air temp but should add error warning here
             RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
@@ -595,6 +600,61 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
         averageHeight += 0.5 * (v.y + v2->y) * (v2->x - v.x) / totalWidth;
     }
     return std::abs(averageHeight) / SinTilt;
+}
+
+void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
+{
+    calcHashKey = SurfaceCalcHashKey();
+    calcHashKey.Construction = Construction;
+    calcHashKey.Azimuth = round(Azimuth * 10.0) / 10.0;
+    calcHashKey.Tilt = round(Tilt * 10.0) / 10.0;
+    calcHashKey.Height = round(Height * 10.0) / 10.0;
+    calcHashKey.Zone = Zone;
+    calcHashKey.EnclIndex = SolarEnclIndex;
+    calcHashKey.TAirRef = state.dataSurface->SurfTAirRef(SurfNum);
+
+    auto extBoundCond = state.dataSurface->Surface(SurfNum).ExtBoundCond;
+    if (extBoundCond > 0) {
+        calcHashKey.ExtZone = state.dataSurface->Surface(extBoundCond).Zone;
+        calcHashKey.ExtEnclIndex = state.dataSurface->Surface(extBoundCond).SolarEnclIndex;
+    } else {
+        calcHashKey.ExtZone = 0;
+        calcHashKey.ExtEnclIndex = 0;
+    }
+
+    calcHashKey.ExtSolar = ExtSolar;
+    calcHashKey.ExtWind = ExtWind;
+    calcHashKey.ViewFactorGround = round(ViewFactorGround * 10.0) / 10.0;
+    calcHashKey.ViewFactorSky = round(ViewFactorSky * 10.0) / 10.0;
+
+    calcHashKey.HeatTransferAlgorithm = HeatTransferAlgorithm;
+    calcHashKey.IntConvCoeff = state.dataSurface->SurfIntConvCoeffIndex(SurfNum);
+    calcHashKey.ExtConvCoeff = state.dataSurface->SurfExtConvCoeffIndex(SurfNum);
+    calcHashKey.OSCPtr = OSCPtr;
+    calcHashKey.OSCMPtr = OSCMPtr;
+
+    calcHashKey.FrameDivider = FrameDivider;
+    calcHashKey.SurfWinStormWinConstr = state.dataSurface->SurfWinStormWinConstr(SurfNum);
+
+    calcHashKey.MaterialMovInsulExt = state.dataSurface->SurfMaterialMovInsulExt(SurfNum);
+    calcHashKey.MaterialMovInsulInt = state.dataSurface->SurfMaterialMovInsulInt(SurfNum);
+    calcHashKey.SchedMovInsulExt = state.dataSurface->SurfSchedMovInsulExt(SurfNum);
+    calcHashKey.SchedMovInsulInt = state.dataSurface->SurfSchedMovInsulInt(SurfNum);
+    calcHashKey.ExternalShadingSchInd = state.dataSurface->SurfExternalShadingSchInd(SurfNum);
+    calcHashKey.SurroundingSurfacesNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
+    calcHashKey.LinkedOutAirNode = state.dataSurface->SurfLinkedOutAirNode(SurfNum);
+    calcHashKey.OutsideHeatSourceTermSchedule = OutsideHeatSourceTermSchedule;
+    calcHashKey.InsideHeatSourceTermSchedule = InsideHeatSourceTermSchedule;
+}
+
+void SurfaceData::set_representative_surface(EnergyPlusData &state, const int SurfNum)
+{
+    // Make hash key for this surface (used to determine uniqueness)
+    state.dataSurface->Surface(SurfNum).make_hash_key(state, SurfNum);
+    // Insert surface key into map. If key already exists, it will not be added.
+    // Assign the representative surface number based on the first instance of the identical key
+    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum =
+        state.dataSurface->RepresentativeSurfaceMap.insert({state.dataSurface->Surface(SurfNum).calcHashKey, SurfNum}).first->second;
 }
 
 // Functions

@@ -2463,6 +2463,7 @@
     Wall,                    !- Surface Type
     Basement_Wall_East_Cfactor,  !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2484,6 +2485,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_2_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2505,6 +2507,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_1_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2526,6 +2529,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     GroundFloor_Plenum,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2547,6 +2551,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_basement_ZN_6_Ceiling-Core_bot_ZN_5,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2568,6 +2573,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2589,6 +2595,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_bot_ZN_6_Wall_East-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2610,6 +2617,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2631,6 +2639,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_East-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2652,6 +2661,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2673,6 +2683,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Floor,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2694,6 +2705,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2715,6 +2727,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_mid_ZN_6_Wall_East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2736,6 +2749,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2757,6 +2771,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_East-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2778,6 +2793,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     TopFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2799,6 +2815,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Floor,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2820,6 +2837,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2841,6 +2859,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_top_ZN_6_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2862,6 +2881,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2883,6 +2903,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_East-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2904,6 +2925,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2925,6 +2947,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     GroundFloor_Plenum,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2946,6 +2969,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_3_Floor-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2967,6 +2991,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_3_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2988,6 +3013,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_North,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3009,6 +3035,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_2_Wall_North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3030,6 +3057,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3051,6 +3079,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     GroundFloor_Plenum,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3072,6 +3101,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_2_Floor-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3093,6 +3123,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_2_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3114,6 +3145,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_East, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3135,6 +3167,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_1_Wall_East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3156,6 +3189,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3177,6 +3211,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     GroundFloor_Plenum,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3198,6 +3233,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_basement_ZN_6_Ceiling-Perimeter_bot_ZN_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3219,6 +3255,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_1_Wall_East-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3240,6 +3277,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_bot_ZN_6_Wall_South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3261,6 +3299,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_4_Wall_South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3282,6 +3321,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3303,6 +3343,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     GroundFloor_Plenum,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3324,6 +3365,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_4_Floor-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3345,6 +3387,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_4_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3366,6 +3409,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_bot_ZN_6_Wall_West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3387,6 +3431,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_3_Wall_West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3408,6 +3453,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3429,6 +3475,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3450,6 +3497,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_3_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3471,6 +3519,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_3_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3492,6 +3541,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_North,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3513,6 +3563,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_2_Wall_North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3534,6 +3585,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3555,6 +3607,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3576,6 +3629,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_2_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3597,6 +3651,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_2_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3618,6 +3673,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_East, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3639,6 +3695,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_1_Wall_East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3660,6 +3717,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_1_Wall_East-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3681,6 +3739,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3702,6 +3761,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3723,6 +3783,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_1_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3744,6 +3805,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_mid_ZN_6_Wall_South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3765,6 +3827,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_4_Wall_South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3786,6 +3849,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3807,6 +3871,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3828,6 +3893,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_4_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3849,6 +3915,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_4_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3870,6 +3937,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_mid_ZN_6_Wall_West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3891,6 +3959,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_3_Wall_West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3912,6 +3981,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3933,6 +4003,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     TopFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3954,6 +4025,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_3_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3975,6 +4047,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_3_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3996,6 +4069,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_North,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4017,6 +4091,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_2_Wall_North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4038,6 +4113,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4059,6 +4135,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     TopFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4080,6 +4157,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_2_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4101,6 +4179,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_2_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4122,6 +4201,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_East, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4143,6 +4223,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Int-Per3S-NE,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4164,6 +4245,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4185,6 +4267,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     TopFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4206,6 +4289,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_1_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4227,6 +4311,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Int-Per3S-NE-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4248,6 +4333,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_top_ZN_6_Wall_South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4269,6 +4355,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_4_Wall_South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4290,6 +4377,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4311,6 +4399,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     TopFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4332,6 +4421,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_4_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4353,6 +4443,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_4_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4374,6 +4465,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_top_ZN_6_Wall_West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4395,6 +4487,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_3_Wall_West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4416,6 +4509,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     GroundFloor_Plenum,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4437,6 +4531,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     GroundFloor_Plenum,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4458,6 +4553,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     GroundFloor_Plenum,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4479,6 +4575,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     GroundFloor_Plenum,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4500,6 +4597,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     MidFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4521,6 +4619,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     MidFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4542,6 +4641,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     MidFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4563,6 +4663,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     MidFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4584,6 +4685,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     TopFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4605,6 +4707,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     TopFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4626,6 +4729,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     TopFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4647,6 +4751,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     TopFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4668,6 +4773,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     TopFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4689,6 +4795,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     GroundFloor_Plenum,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     GroundFloor_Plenum_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4710,6 +4817,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     MidFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     MidFloor_Plenum_Ceiling, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4731,6 +4839,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     DataCenter_bot_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_bot_ZN_6_Floor-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4752,6 +4861,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     DataCenter_bot_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_bot_ZN_6_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4773,6 +4883,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     DataCenter_bot_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_bot_ZN_6_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4794,6 +4905,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     DataCenter_bot_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_West, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4815,6 +4927,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     DataCenter_bot_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     GroundFloor_Plenum,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4836,6 +4949,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     DataCenter_bot_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_bot_ZN_6_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4857,6 +4971,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_bot_ZN_6_Wall_North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4878,6 +4993,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_South,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4899,6 +5015,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     DataCenter_mid_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_mid_ZN_6_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4920,6 +5037,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     DataCenter_mid_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_mid_ZN_6_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4941,6 +5059,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     DataCenter_mid_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_mid_ZN_6_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4962,6 +5081,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     DataCenter_mid_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_West, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4983,6 +5103,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     DataCenter_mid_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_mid_ZN_6_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5004,6 +5125,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     DataCenter_mid_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5025,6 +5147,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_South,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5046,6 +5169,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_mid_ZN_6_Wall_North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5067,6 +5191,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_top_ZN_6_Wall_North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5088,6 +5213,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_South,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5109,6 +5235,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     DataCenter_top_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_top_ZN_6_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5130,6 +5257,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     DataCenter_top_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_West, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5151,6 +5279,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     DataCenter_top_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_top_ZN_6_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5172,6 +5301,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     DataCenter_top_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_top_ZN_6_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5193,6 +5323,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     DataCenter_top_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     TopFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5214,6 +5345,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     DataCenter_top_ZN_6,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_top_ZN_6_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5235,6 +5367,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Floor,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5256,6 +5389,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Floor-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5277,6 +5411,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_3_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5298,6 +5433,7 @@
     Wall,                    !- Surface Type
     Basement_Wall_South_Cfactor,  !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5319,6 +5455,7 @@
     Floor,                   !- Surface Type
     ext_slab_8in_with_carpet,!- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5340,6 +5477,7 @@
     Wall,                    !- Surface Type
     Basement_Wall_North_Cfactor,  !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5361,6 +5499,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_basement_ZN_6_Wall_East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5382,6 +5521,7 @@
     Floor,                   !- Surface Type
     ext_slab_8in_with_carpet,!- Construction Name
     DataCenter_basement_ZN_6,!- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5403,6 +5543,7 @@
     Wall,                    !- Surface Type
     DataCenter_basement_ZN_6_Wall_North_Cfactor,  !- Construction Name
     DataCenter_basement_ZN_6,!- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5424,6 +5565,7 @@
     Wall,                    !- Surface Type
     DataCenter_basement_ZN_6_Wall_South_Cfactor,  !- Construction Name
     DataCenter_basement_ZN_6,!- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5445,6 +5587,7 @@
     Wall,                    !- Surface Type
     DataCenter_basement_ZN_6_Wall_West_Cfactor,  !- Construction Name
     DataCenter_basement_ZN_6,!- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5466,6 +5609,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     DataCenter_basement_ZN_6,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_bot_ZN_6_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5487,6 +5631,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     DataCenter_basement_ZN_6,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_basement_ZN_6_Ceiling-Core_bot_ZN_5-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5508,6 +5653,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     DataCenter_basement_ZN_6,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_4_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5529,6 +5675,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     DataCenter_basement_ZN_6,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_basement_ZN_6-Perimeter_bot_ZN_1-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5550,6 +5697,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     DataCenter_basement_ZN_6,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_basement_ZN_6_Ceiling-Perimeter_bot_ZN_3-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5571,6 +5719,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_1_Floor-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5592,6 +5741,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     DataCenter_basement_ZN_6_Ceiling-Perimeter_bot_ZN_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5613,6 +5763,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     DataCenter_basement_ZN_6,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Basement_Wall_West,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6281,96 +6432,112 @@
     Basement_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     Basement,                !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     7126.2120;               !- Surface Area {m2}
 
   InternalMass,
     Core_bottom_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Core_bottom,             !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     5064.6526;               !- Surface Area {m2}
 
   InternalMass,
     Core_mid_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     Core_mid,                !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     5064.6526;               !- Surface Area {m2}
 
   InternalMass,
     Core_top_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     Core_top,                !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     5064.6526;               !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     626.8258;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     403.9504;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     626.8354;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     403.9478;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     626.8258;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     403.9504;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     626.8354;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     403.9478;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     626.8258;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     403.9504;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     626.8354;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     403.9478;                !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
@@ -11392,7 +11559,7 @@
     VAV_top WITH REHEAT_DCV, !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedureWithLimit,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Core_top,                !- Zone or ZoneList 1 Name
     CM DSOA Core_top,        !- Design Specification Outdoor Air Object Name 1
@@ -11414,7 +11581,7 @@
     VAV_bot WITH REHEAT_DCV, !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedureWithLimit,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Core_bottom,             !- Zone or ZoneList 1 Name
     CM DSOA Core_bottom,     !- Design Specification Outdoor Air Object Name 1
@@ -11436,7 +11603,7 @@
     VAV_mid WITH REHEAT_DCV, !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedureWithLimit,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Core_mid,                !- Zone or ZoneList 1 Name
     CM DSOA Core_mid,        !- Design Specification Outdoor Air Object Name 1
@@ -14478,24 +14645,6 @@
     Schedule Value;          !- Actuated Component Control Type
 
   EnergyManagementSystem:Actuator,
-    VAV_bot_WITH_REHEAT_MAX_OA_FRAC,  !- Name
-    VAV_bot WITH REHEAT Max OA Fraction,  !- Actuated Component Unique Name
-    Schedule:Constant,       !- Actuated Component Type
-    Schedule Value;          !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    VAV_mid_WITH_REHEAT_MAX_OA_FRAC,  !- Name
-    VAV_mid WITH REHEAT Max OA Fraction,  !- Actuated Component Unique Name
-    Schedule:Constant,       !- Actuated Component Type
-    Schedule Value;          !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    VAV_top_WITH_REHEAT_MAX_OA_FRAC,  !- Name
-    VAV_top WITH REHEAT Max OA Fraction,  !- Actuated Component Unique Name
-    Schedule:Constant,       !- Actuated Component Type
-    Schedule Value;          !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
     TowerCurveOutput,        !- Name
     Tower_Fan_Curve,         !- Actuated Component Unique Name
     Curve,                   !- Actuated Component Type
@@ -14659,21 +14808,6 @@
     DataCenter_Main;         !- Program Name 1
 
   EnergyManagementSystem:ProgramCallingManager,
-    VAV_bot_WITH_REHEAT_MAX_OA_FRAC_Prog_Manager,  !- Name
-    InsideHVACSystemIterationLoop,  !- EnergyPlus Model Calling Point
-    VAV_bot_WITH_REHEAT_MAX_OA_FRAC;  !- Program Name 1
-
-  EnergyManagementSystem:ProgramCallingManager,
-    VAV_mid_WITH_REHEAT_MAX_OA_FRAC_Prog_Manager,  !- Name
-    InsideHVACSystemIterationLoop,  !- EnergyPlus Model Calling Point
-    VAV_mid_WITH_REHEAT_MAX_OA_FRAC;  !- Program Name 1
-
-  EnergyManagementSystem:ProgramCallingManager,
-    VAV_top_WITH_REHEAT_MAX_OA_FRAC_Prog_Manager,  !- Name
-    InsideHVACSystemIterationLoop,  !- EnergyPlus Model Calling Point
-    VAV_top_WITH_REHEAT_MAX_OA_FRAC;  !- Program Name 1
-
-  EnergyManagementSystem:ProgramCallingManager,
     Transformer_Load_Prog_Manager,  !- Name
     AfterPredictorAfterHVACManagers,  !- EnergyPlus Model Calling Point
     Transformer_Load_Prog;   !- Program Name 1
@@ -14803,42 +14937,6 @@
     SET DataCenter_ExtraWaterHeatC_SP = DataCenter_AfterElecHeatC_Temp + DataCenter_PreheatDeltaT,  !- <none>
     ELSE,                    !- <none>
     SET DataCenter_ExtraWaterHeatC_Status = 0,  !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:Program,
-    VAV_bot_WITH_REHEAT_MAX_OA_FRAC,  !- Name
-    IF VAV_bot_WITH_REHEAT_OA > VAV_bot_WITH_REHEAT_OA_VRP,  !- Program Line 1
-    SET VAV_bot_WITH_REHEAT_MAX_OA_FRAC = NULL,  !- Program Line 2
-    ELSE,                    !- <none>
-    IF VAV_bot_SUPPLY_FLOW > 0,  !- <none>
-    SET VAV_bot_WITH_REHEAT_MAX_OA_FRAC =      2.0304 / VAV_bot_SUPPLY_FLOW,  !- <none>
-    ELSE,                    !- <none>
-    SET VAV_bot_WITH_REHEAT_MAX_OA_FRAC = NULL,  !- <none>
-    ENDIF,                   !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:Program,
-    VAV_mid_WITH_REHEAT_MAX_OA_FRAC,  !- Name
-    IF VAV_mid_WITH_REHEAT_OA > VAV_mid_WITH_REHEAT_OA_VRP,  !- Program Line 1
-    SET VAV_mid_WITH_REHEAT_MAX_OA_FRAC = NULL,  !- Program Line 2
-    ELSE,                    !- <none>
-    IF VAV_mid_SUPPLY_FLOW > 0,  !- <none>
-    SET VAV_mid_WITH_REHEAT_MAX_OA_FRAC =      20.304 / VAV_mid_SUPPLY_FLOW,  !- <none>
-    ELSE,                    !- <none>
-    SET VAV_mid_WITH_REHEAT_MAX_OA_FRAC = NULL,  !- <none>
-    ENDIF,                   !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:Program,
-    VAV_top_WITH_REHEAT_MAX_OA_FRAC,  !- Name
-    IF VAV_top_WITH_REHEAT_OA > VAV_top_WITH_REHEAT_OA_VRP,  !- Program Line 1
-    SET VAV_top_WITH_REHEAT_MAX_OA_FRAC = NULL,  !- Program Line 2
-    ELSE,                    !- <none>
-    IF VAV_top_SUPPLY_FLOW > 0,  !- <none>
-    SET VAV_top_WITH_REHEAT_MAX_OA_FRAC =      2.0304 / VAV_top_SUPPLY_FLOW,  !- <none>
-    ELSE,                    !- <none>
-    SET VAV_top_WITH_REHEAT_MAX_OA_FRAC = NULL,  !- <none>
-    ENDIF,                   !- <none>
     ENDIF;                   !- <none>
 
   EnergyManagementSystem:Program,

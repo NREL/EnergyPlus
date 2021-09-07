@@ -3971,6 +3971,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3987,6 +3988,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_1_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4003,6 +4005,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4019,6 +4022,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4035,6 +4039,7 @@
     Floor,                   !- Surface Type
     Corner_Class_1_Pod_1_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4051,6 +4056,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_1_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4067,6 +4073,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4083,6 +4090,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_1_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4099,6 +4107,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_ZN_1_FLR_2_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4115,6 +4124,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4131,6 +4141,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_1_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4147,6 +4158,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4163,6 +4175,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4179,6 +4192,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_ZN_1_FLR_1_Wall_5, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4195,6 +4209,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4211,6 +4226,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_1_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4227,6 +4243,7 @@
     Floor,                   !- Surface Type
     Mult_Class_1_Pod_1_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4243,6 +4260,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_1_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4259,6 +4277,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4275,6 +4294,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_ZN_1_FLR_2_Wall_5, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4291,6 +4311,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4307,6 +4328,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_1_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4323,6 +4345,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_1_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4339,6 +4362,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4355,6 +4379,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_1_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4371,6 +4396,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_1_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4387,6 +4413,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_ZN_1_FLR_1_Wall_4, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4403,6 +4430,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_1_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4419,6 +4447,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_1_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4435,6 +4464,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4451,6 +4481,7 @@
     Floor,                   !- Surface Type
     Corridor_Pod_1_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4467,6 +4498,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4483,6 +4515,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_1_ZN_1_FLR_2_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4499,6 +4532,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_1_ZN_1_FLR_2_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4515,6 +4549,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_ZN_1_FLR_2_Wall_4, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4531,6 +4566,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_1_ZN_1_FLR_2_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4547,6 +4583,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_1_ZN_1_FLR_2_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4563,6 +4600,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4579,6 +4617,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4595,6 +4634,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4611,6 +4651,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_ZN_1_FLR_1_Wall_5,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4627,6 +4668,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_1_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4643,6 +4685,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4659,6 +4702,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4675,6 +4719,7 @@
     Floor,                   !- Surface Type
     Corner_Class_2_Pod_1_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4691,6 +4736,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_1_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4707,6 +4753,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_ZN_1_FLR_2_Wall_5,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4723,6 +4770,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_1_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4739,6 +4787,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4755,6 +4804,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4771,6 +4821,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_1_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4787,6 +4838,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4803,6 +4855,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4819,6 +4872,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_1_Wall_12,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4835,6 +4889,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4851,6 +4906,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_1_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4867,6 +4923,7 @@
     Floor,                   !- Surface Type
     Mult_Class_2_Pod_1_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4883,6 +4940,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_1_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4899,6 +4957,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4915,6 +4974,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_2_Wall_12,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4931,6 +4991,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4947,6 +5008,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_1_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4963,6 +5025,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_1_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4979,6 +5042,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4995,6 +5059,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5011,6 +5076,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_2_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5027,6 +5093,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_2_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5043,6 +5110,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5059,6 +5127,7 @@
     Floor,                   !- Surface Type
     Corner_Class_1_Pod_2_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5075,6 +5144,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_2_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5091,6 +5161,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5107,6 +5178,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_2_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5123,6 +5195,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_2_ZN_1_FLR_2_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5139,6 +5212,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5155,6 +5229,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_2_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5171,6 +5246,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5187,6 +5263,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5203,6 +5280,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_1_Wall_10,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5219,6 +5297,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_2_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5235,6 +5314,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_2_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5251,6 +5331,7 @@
     Floor,                   !- Surface Type
     Mult_Class_1_Pod_2_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5267,6 +5348,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_2_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5283,6 +5365,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5299,6 +5382,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_2_Wall_10,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5315,6 +5399,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_2_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5331,6 +5416,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_2_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5347,6 +5433,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_2_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5363,6 +5450,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5379,6 +5467,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_2_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5395,6 +5484,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_2_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5411,6 +5501,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_1_Wall_9,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5427,6 +5518,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_2_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5443,6 +5535,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_2_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5459,6 +5552,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5475,6 +5569,7 @@
     Floor,                   !- Surface Type
     Corridor_Pod_2_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5491,6 +5586,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_2_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5507,6 +5603,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_2_ZN_1_FLR_2_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5523,6 +5620,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_2_ZN_1_FLR_2_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5539,6 +5637,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_2_Wall_9,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5555,6 +5654,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_2_ZN_1_FLR_2_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5571,6 +5671,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_2_ZN_1_FLR_2_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5587,6 +5688,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5603,6 +5705,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_2_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5619,6 +5722,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5635,6 +5739,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_2_ZN_1_FLR_1_Wall_5,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5651,6 +5756,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_2_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5667,6 +5773,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5683,6 +5790,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5699,6 +5807,7 @@
     Floor,                   !- Surface Type
     Corner_Class_2_Pod_2_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5715,6 +5824,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_2_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5731,6 +5841,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_2_ZN_1_FLR_2_Wall_5,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5747,6 +5858,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_2_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5763,6 +5875,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5779,6 +5892,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5795,6 +5909,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_2_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5811,6 +5926,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5827,6 +5943,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_2_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5843,6 +5960,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_1_Wall_8,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5859,6 +5977,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5875,6 +5994,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_2_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5891,6 +6011,7 @@
     Floor,                   !- Surface Type
     Mult_Class_2_Pod_2_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5907,6 +6028,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_2_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5923,6 +6045,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_2_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5939,6 +6062,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_2_Wall_8,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5955,6 +6079,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5971,6 +6096,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_2_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5987,6 +6113,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_2_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6003,6 +6130,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6019,6 +6147,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6035,6 +6164,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_3_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6051,6 +6181,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_3_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6067,6 +6198,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6083,6 +6215,7 @@
     Floor,                   !- Surface Type
     Corner_Class_1_Pod_3_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6099,6 +6232,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_3_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6115,6 +6249,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6131,6 +6266,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_3_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6147,6 +6283,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_3_ZN_1_FLR_2_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6163,6 +6300,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6179,6 +6317,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_3_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6195,6 +6334,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6211,6 +6351,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6227,6 +6368,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_1_Wall_6,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6243,6 +6385,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_3_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6259,6 +6402,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_3_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6275,6 +6419,7 @@
     Floor,                   !- Surface Type
     Mult_Class_1_Pod_3_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6291,6 +6436,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_3_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6307,6 +6453,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6323,6 +6470,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_2_Wall_6,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6339,6 +6487,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_3_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6355,6 +6504,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_3_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6371,6 +6521,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_3_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6387,6 +6538,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6403,6 +6555,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_3_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6419,6 +6572,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_3_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6435,6 +6589,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bathrooms_ZN_1_FLR_1_Wall_6,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6451,6 +6606,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_3_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6467,6 +6623,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_3_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6483,6 +6640,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6499,6 +6657,7 @@
     Floor,                   !- Surface Type
     Corridor_Pod_3_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6515,6 +6674,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_3_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6531,6 +6691,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_1_Pod_3_ZN_1_FLR_2_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6547,6 +6708,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_3_ZN_1_FLR_2_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6563,6 +6725,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bathrooms_ZN_1_FLR_2_Wall_6,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6579,6 +6742,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_3_ZN_1_FLR_2_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6595,6 +6759,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_3_ZN_1_FLR_2_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6611,6 +6776,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6627,6 +6793,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_3_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6643,6 +6810,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6659,6 +6827,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_3_ZN_1_FLR_1_Wall_5,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6675,6 +6844,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_3_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6691,6 +6861,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6707,6 +6878,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6723,6 +6895,7 @@
     Floor,                   !- Surface Type
     Corner_Class_2_Pod_3_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6739,6 +6912,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_3_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6755,6 +6929,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_3_ZN_1_FLR_2_Wall_5,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6771,6 +6946,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_3_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6787,6 +6963,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6803,6 +6980,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6819,6 +6997,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_3_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6835,6 +7014,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6851,6 +7031,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_3_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6867,6 +7048,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bathrooms_ZN_1_FLR_1_Wall_5,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6883,6 +7065,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6899,6 +7082,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_3_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6915,6 +7099,7 @@
     Floor,                   !- Surface Type
     Mult_Class_2_Pod_3_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6931,6 +7116,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_3_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6947,6 +7133,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_3_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6963,6 +7150,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bathrooms_ZN_1_FLR_2_Wall_5,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6979,6 +7167,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6995,6 +7184,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corner_Class_2_Pod_3_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7011,6 +7201,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_3_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7027,6 +7218,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7043,6 +7235,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_ZN_1_FLR_1_Wall_3, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7059,6 +7252,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gym_ZN_1_FLR_1_Wall_4,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7075,6 +7269,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7091,6 +7286,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Auditorium_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7107,6 +7303,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bathrooms_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7123,6 +7320,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_3_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7139,6 +7337,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7155,6 +7354,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_2_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7171,6 +7371,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_2_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7187,6 +7388,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_2_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7203,6 +7405,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7219,6 +7422,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_1_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7235,6 +7439,7 @@
     Floor,                   !- Surface Type
     Main_Corridor_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7251,6 +7456,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7267,6 +7473,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_ZN_1_FLR_2_Wall_3, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7283,6 +7490,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gym_ZN_1_FLR_2_Wall_4,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7299,6 +7507,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7315,6 +7524,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Auditorium_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7331,6 +7541,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bathrooms_ZN_1_FLR_2_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7347,6 +7558,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_3_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7363,6 +7575,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7379,6 +7592,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_2_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7395,6 +7609,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_2_ZN_1_FLR_2_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7411,6 +7626,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_2_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7427,6 +7643,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7443,6 +7660,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_1_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7459,6 +7677,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7475,6 +7694,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7491,6 +7711,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Lobby_ZN_1_FLR_1,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7507,6 +7728,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Lobby_ZN_1_FLR_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Offices_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7523,6 +7745,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Lobby_ZN_1_FLR_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7539,6 +7762,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Lobby_ZN_1_FLR_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7555,6 +7779,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Lobby_ZN_1_FLR_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_1_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7571,6 +7796,7 @@
     Floor,                   !- Surface Type
     Lobby_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Lobby_ZN_1_FLR_1,        !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7587,6 +7813,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Lobby_ZN_1_FLR_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7603,6 +7830,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Lobby_ZN_1_FLR_2,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7619,6 +7847,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Lobby_ZN_1_FLR_2,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Offices_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7635,6 +7864,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Lobby_ZN_1_FLR_2,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_2_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7651,6 +7881,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Lobby_ZN_1_FLR_2,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_1_ZN_1_FLR_2_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7667,6 +7898,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Lobby_ZN_1_FLR_2,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_1_Pod_1_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7683,6 +7915,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Lobby_ZN_1_FLR_2,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_ZN_1_FLR_1_Ceiling,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7699,6 +7932,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Lobby_ZN_1_FLR_2,        !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7715,6 +7949,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Bathrooms_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_1_Wall_5,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7731,6 +7966,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Bathrooms_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Auditorium_ZN_1_FLR_1_Wall_4A,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7747,6 +7983,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Bathrooms_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7763,6 +8000,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Bathrooms_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7779,6 +8017,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Bathrooms_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_3_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7795,6 +8034,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Bathrooms_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_3_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7811,6 +8051,7 @@
     Floor,                   !- Surface Type
     Bathrooms_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Bathrooms_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7827,6 +8068,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Bathrooms_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bathrooms_ZN_1_FLR_2_Floor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7843,6 +8085,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Bathrooms_ZN_1_FLR_2,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_2_Wall_5,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7859,6 +8102,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Bathrooms_ZN_1_FLR_2,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Auditorium_ZN_1_FLR_2_Wall_4A,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7875,6 +8119,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Bathrooms_ZN_1_FLR_2,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7891,6 +8136,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Bathrooms_ZN_1_FLR_2,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7907,6 +8153,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Bathrooms_ZN_1_FLR_2,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mult_Class_2_Pod_3_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7923,6 +8170,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Bathrooms_ZN_1_FLR_2,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Corridor_Pod_3_ZN_1_FLR_2_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7939,6 +8187,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Bathrooms_ZN_1_FLR_2,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bathrooms_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7955,6 +8204,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Bathrooms_ZN_1_FLR_2,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7971,6 +8221,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Offices_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7987,6 +8238,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Offices_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8003,6 +8255,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Offices_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gym_ZN_1_FLR_1_Wall_1,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8019,6 +8272,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Offices_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_ZN_1_FLR_1_Wall_2, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8035,6 +8289,7 @@
     Floor,                   !- Surface Type
     Offices_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Offices_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8051,6 +8306,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Offices_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Offices_ZN_1_FLR_2_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8067,6 +8323,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Offices_ZN_1_FLR_2,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8083,6 +8340,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Offices_ZN_1_FLR_2,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8099,6 +8357,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Offices_ZN_1_FLR_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gym_ZN_1_FLR_2_Wall_1,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8115,6 +8374,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Offices_ZN_1_FLR_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Lobby_ZN_1_FLR_2_Wall_2, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8131,6 +8391,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Offices_ZN_1_FLR_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Offices_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8147,6 +8408,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Offices_ZN_1_FLR_2,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8163,6 +8425,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Gym_ZN_1_FLR_1,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Offices_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8179,6 +8442,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Gym_ZN_1_FLR_1,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Aux_Gym_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8195,6 +8459,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Gym_ZN_1_FLR_1,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8211,6 +8476,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Gym_ZN_1_FLR_1,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8227,6 +8493,7 @@
     Floor,                   !- Surface Type
     Gym_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Gym_ZN_1_FLR_1,          !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8243,6 +8510,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Gym_ZN_1_FLR_1,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Offices_ZN_1_FLR_2_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8259,6 +8527,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Gym_ZN_1_FLR_1,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Aux_Gym_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8275,6 +8544,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Gym_ZN_1_FLR_1,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_ZN_1_FLR_2_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8291,6 +8561,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Gym_ZN_1_FLR_1,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8307,6 +8578,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Gym_ZN_1_FLR_1,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8327,6 +8599,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Aux_Gym_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8348,6 +8621,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Aux_Gym_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8366,6 +8640,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Aux_Gym_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Kitchen_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8382,6 +8657,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Aux_Gym_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gym_ZN_1_FLR_1_Wall_2,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8398,6 +8674,7 @@
     Floor,                   !- Surface Type
     Aux_Gym_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Aux_Gym_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8414,6 +8691,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Aux_Gym_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LIBRARY_MEDIA_CENTER_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8430,6 +8708,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Aux_Gym_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gym_ZN_1_FLR_2_Wall_2,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8446,6 +8725,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Aux_Gym_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8462,6 +8742,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Auditorium_ZN_1_FLR_1,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8478,6 +8759,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Auditorium_ZN_1_FLR_1,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Cafeteria_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8498,6 +8780,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Auditorium_ZN_1_FLR_1,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8519,6 +8802,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Auditorium_ZN_1_FLR_1,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8537,6 +8821,7 @@
     Floor,                   !- Surface Type
     Auditorium_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Auditorium_ZN_1_FLR_1,   !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8553,6 +8838,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Auditorium_ZN_1_FLR_1,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_ZN_1_FLR_2_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8569,6 +8855,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Auditorium_ZN_1_FLR_1,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LIBRARY_MEDIA_CENTER_Wall_4_B,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8589,6 +8876,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Auditorium_ZN_1_FLR_1,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_2_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8607,6 +8895,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Auditorium_ZN_1_FLR_1,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8623,6 +8912,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Kitchen_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Aux_Gym_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8639,6 +8929,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Kitchen_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8655,6 +8946,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Kitchen_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Cafeteria_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8671,6 +8963,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Kitchen_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8687,6 +8980,7 @@
     Floor,                   !- Surface Type
     Kitchen_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Kitchen_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8703,6 +8997,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Kitchen_ZN_1_FLR_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LIBRARY_MEDIA_CENTER_Floor_A,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8719,6 +9014,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Aux_Gym_ZN_1_FLR_2_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8735,6 +9031,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8751,6 +9048,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8767,6 +9065,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Kitchen_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8783,6 +9082,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8799,6 +9099,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8815,6 +9116,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Auditorium_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8831,6 +9133,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Cafeteria_ZN_1_FLR_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8847,6 +9150,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Cafeteria_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Kitchen_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8863,6 +9167,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Cafeteria_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8879,6 +9184,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Cafeteria_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8895,6 +9201,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Cafeteria_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Auditorium_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8911,6 +9218,7 @@
     Floor,                   !- Surface Type
     Cafeteria_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Cafeteria_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8927,6 +9235,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Cafeteria_ZN_1_FLR_1,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LIBRARY_MEDIA_CENTER_Floor_B,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8943,6 +9252,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mech_ZN_1_FLR_1,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gym_ZN_1_FLR_1_Wall_3,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8959,6 +9269,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mech_ZN_1_FLR_1,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Kitchen_ZN_1_FLR_1_Wall_4,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8975,6 +9286,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mech_ZN_1_FLR_1,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Auditorium_ZN_1_FLR_1_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8991,6 +9303,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mech_ZN_1_FLR_1,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_1_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9007,6 +9320,7 @@
     Floor,                   !- Surface Type
     Mech_ZN_1_FLR_1_Floor_Ffactor,  !- Construction Name
     Mech_ZN_1_FLR_1,         !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9023,6 +9337,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Mech_ZN_1_FLR_1,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_ZN_1_FLR_2_Floor,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9039,6 +9354,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mech_ZN_1_FLR_2,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gym_ZN_1_FLR_2_Wall_3,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9055,6 +9371,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mech_ZN_1_FLR_2,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LIBRARY_MEDIA_CENTER_Wall_4_A,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9071,6 +9388,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mech_ZN_1_FLR_2,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Auditorium_ZN_1_FLR_2_Wall_1,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9087,6 +9405,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Mech_ZN_1_FLR_2,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_Corridor_ZN_1_FLR_2_Wall_3,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9103,6 +9422,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Mech_ZN_1_FLR_2,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mech_ZN_1_FLR_1_Ceiling, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9119,6 +9439,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     Mech_ZN_1_FLR_2,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9139,6 +9460,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Auditorium_ZN_1_FLR_1,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bathrooms_ZN_1_FLR_2_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9160,6 +9482,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Auditorium_ZN_1_FLR_1,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bathrooms_ZN_1_FLR_1_Wall_2,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -12737,276 +13060,322 @@
     Corner_Class_1_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corridor_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Main_Corridor_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Main_Corridor_ZN_1_FLR_1,!- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     2280.0000;               !- Surface Area {m2}
 
   InternalMass,
     Main_Corridor_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Main_Corridor_ZN_1_FLR_2,!- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     2280.0000;               !- Surface Area {m2}
 
   InternalMass,
     Lobby_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Lobby_ZN_1_FLR_1,        !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     420.0000;                !- Surface Area {m2}
 
   InternalMass,
     Lobby_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Lobby_ZN_1_FLR_2,        !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     420.0000;                !- Surface Area {m2}
 
   InternalMass,
     Bathrooms_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Bathrooms_ZN_1_FLR_1,    !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     420.0000;                !- Surface Area {m2}
 
   InternalMass,
     Bathrooms_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Bathrooms_ZN_1_FLR_2,    !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     420.0000;                !- Surface Area {m2}
 
   InternalMass,
     Offices_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Offices_ZN_1_FLR_1,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     1064.0000;               !- Surface Area {m2}
 
   InternalMass,
     Offices_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Offices_ZN_1_FLR_2,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     1064.0000;               !- Surface Area {m2}
 
   InternalMass,
     Gym_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Gym_ZN_1_FLR_1,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     3952.0000;               !- Surface Area {m2}
 
   InternalMass,
     Aux_Gym_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Aux_Gym_ZN_1_FLR_1,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     2496.0000;               !- Surface Area {m2}
 
   InternalMass,
     Auditorium_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Auditorium_ZN_1_FLR_1,   !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     1976.0000;               !- Surface Area {m2}
 
   InternalMass,
     Kitchen_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Kitchen_ZN_1_FLR_1,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     432.0000;                !- Surface Area {m2}
 
   InternalMass,
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     1680.0000;               !- Surface Area {m2}
 
   InternalMass,
     Cafeteria_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Cafeteria_ZN_1_FLR_1,    !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     1248.0000;               !- Surface Area {m2}
 
   InternalMass,
     Mech_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mech_ZN_1_FLR_1,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     684.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mech_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Mech_ZN_1_FLR_2,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     684.0000;                !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
@@ -23919,7 +24288,7 @@
     VAV_POD_1_MultiZone,     !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedureWithLimit,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList 1 Name
     Design_Spec_OA_Classroom,!- Design Specification Outdoor Air Object Name 1
@@ -23956,7 +24325,7 @@
     VAV_POD_2_MultiZone,     !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedureWithLimit,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList 1 Name
     Design_Spec_OA_Classroom,!- Design Specification Outdoor Air Object Name 1
@@ -23993,7 +24362,7 @@
     VAV_POD_3_MultiZone,     !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedureWithLimit,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList 1 Name
     Design_Spec_OA_Classroom,!- Design Specification Outdoor Air Object Name 1
@@ -24030,7 +24399,7 @@
     VAV_OTHER_MultiZone,     !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedureWithLimit,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Main_Corridor_ZN_1_FLR_1,!- Zone or ZoneList 1 Name
     Design_Spec_OA_Corridor, !- Design Specification Outdoor Air Object Name 1
@@ -27286,30 +27655,6 @@
     Lights,                  !- Actuated Component Type
     Electricity Rate;        !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    VAV_POD_1_MAX_OA_FRAC,   !- Name
-    VAV_POD_1 Max OA Fraction,  !- Actuated Component Unique Name
-    Schedule:Constant,       !- Actuated Component Type
-    Schedule Value;          !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    VAV_POD_2_MAX_OA_FRAC,   !- Name
-    VAV_POD_2 Max OA Fraction,  !- Actuated Component Unique Name
-    Schedule:Constant,       !- Actuated Component Type
-    Schedule Value;          !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    VAV_POD_3_MAX_OA_FRAC,   !- Name
-    VAV_POD_3 Max OA Fraction,  !- Actuated Component Unique Name
-    Schedule:Constant,       !- Actuated Component Type
-    Schedule Value;          !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    VAV_OTHER_MAX_OA_FRAC,   !- Name
-    VAV_OTHER Max OA Fraction,  !- Actuated Component Unique Name
-    Schedule:Constant,       !- Actuated Component Type
-    Schedule Value;          !- Actuated Component Control Type
-
 !-   ===========  ALL OBJECTS IN CLASS: ENERGYMANAGEMENTSYSTEM:PROGRAMCALLINGMANAGER ===========
 
   EnergyManagementSystem:ProgramCallingManager,
@@ -27561,26 +27906,6 @@
     SET_LMC_ZN_1_FLR_2_Light_EMS_Program_Prog_Manager,  !- Name
     BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
     SET_LMC_ZN_1_FLR_2_Light_EMS_Program;  !- Program Name 1
-
-  EnergyManagementSystem:ProgramCallingManager,
-    VAV_POD_1_MAX_OA_FRAC_Prog_Manager,  !- Name
-    AfterPredictorAfterHVACManagers,  !- EnergyPlus Model Calling Point
-    VAV_POD_1_MAX_OA_FRAC;   !- Program Name 1
-
-  EnergyManagementSystem:ProgramCallingManager,
-    VAV_POD_2_MAX_OA_FRAC_Prog_Manager,  !- Name
-    AfterPredictorAfterHVACManagers,  !- EnergyPlus Model Calling Point
-    VAV_POD_2_MAX_OA_FRAC;   !- Program Name 1
-
-  EnergyManagementSystem:ProgramCallingManager,
-    VAV_POD_3_MAX_OA_FRAC_Prog_Manager,  !- Name
-    AfterPredictorAfterHVACManagers,  !- EnergyPlus Model Calling Point
-    VAV_POD_3_MAX_OA_FRAC;   !- Program Name 1
-
-  EnergyManagementSystem:ProgramCallingManager,
-    VAV_OTHER_MAX_OA_FRAC_Prog_Manager,  !- Name
-    AfterPredictorAfterHVACManagers,  !- EnergyPlus Model Calling Point
-    VAV_OTHER_MAX_OA_FRAC;   !- Program Name 1
 
 !-   ===========  ALL OBJECTS IN CLASS: ENERGYMANAGEMENTSYSTEM:PROGRAM ===========
 
@@ -28079,54 +28404,6 @@
     SET LMC_ZN_1_FLR_2_LAr = 0.02*LMC_ZN_1_FLR_2_Area/0.09290304,  !- <none>
     ELSE,                    !- <none>
     SET LMC_ZN_1_FLR_2_LAr = NULL,  !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:Program,
-    VAV_POD_1_MAX_OA_FRAC,   !- Name
-    IF VAV_POD_1_OA > VAV_POD_1_OA_VRP,  !- Program Line 1
-    SET VAV_POD_1_MAX_OA_FRAC = NULL,  !- Program Line 2
-    ELSE,                    !- <none>
-    IF VAV_POD_1_SUPPLY_FLOW > 0,  !- <none>
-    SET VAV_POD_1_MAX_OA_FRAC =      7.5943 / VAV_POD_1_SUPPLY_FLOW,  !- <none>
-    ELSE,                    !- <none>
-    SET VAV_POD_1_MAX_OA_FRAC = NULL,  !- <none>
-    ENDIF,                   !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:Program,
-    VAV_POD_2_MAX_OA_FRAC,   !- Name
-    IF VAV_POD_2_OA > VAV_POD_2_OA_VRP,  !- Program Line 1
-    SET VAV_POD_2_MAX_OA_FRAC = NULL,  !- Program Line 2
-    ELSE,                    !- <none>
-    IF VAV_POD_2_SUPPLY_FLOW > 0,  !- <none>
-    SET VAV_POD_2_MAX_OA_FRAC =      7.5943 / VAV_POD_2_SUPPLY_FLOW,  !- <none>
-    ELSE,                    !- <none>
-    SET VAV_POD_2_MAX_OA_FRAC = NULL,  !- <none>
-    ENDIF,                   !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:Program,
-    VAV_POD_3_MAX_OA_FRAC,   !- Name
-    IF VAV_POD_3_OA > VAV_POD_3_OA_VRP,  !- Program Line 1
-    SET VAV_POD_3_MAX_OA_FRAC = NULL,  !- Program Line 2
-    ELSE,                    !- <none>
-    IF VAV_POD_3_SUPPLY_FLOW > 0,  !- <none>
-    SET VAV_POD_3_MAX_OA_FRAC =      7.5943 / VAV_POD_3_SUPPLY_FLOW,  !- <none>
-    ELSE,                    !- <none>
-    SET VAV_POD_3_MAX_OA_FRAC = NULL,  !- <none>
-    ENDIF,                   !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:Program,
-    VAV_OTHER_MAX_OA_FRAC,   !- Name
-    IF VAV_OTHER_OA > VAV_OTHER_OA_VRP,  !- Program Line 1
-    SET VAV_OTHER_MAX_OA_FRAC = NULL,  !- Program Line 2
-    ELSE,                    !- <none>
-    IF VAV_OTHER_SUPPLY_FLOW > 0,  !- <none>
-    SET VAV_OTHER_MAX_OA_FRAC =   / VAV_OTHER_SUPPLY_FLOW,  !- <none>
-    ELSE,                    !- <none>
-    SET VAV_OTHER_MAX_OA_FRAC = NULL,  !- <none>
-    ENDIF,                   !- <none>
     ENDIF;                   !- <none>
 
 !-   ===========  ALL OBJECTS IN CLASS: ENERGYMANAGEMENTSYSTEM:GLOBALVARIABLE ===========

@@ -2767,6 +2767,7 @@
     Roof,                    !- Surface Type
     nonres_roof,             !- Construction Name
     TopFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2783,6 +2784,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     FirstFloor_Plenum,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2799,6 +2801,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     FirstFloor_Plenum,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2815,6 +2818,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     FirstFloor_Plenum,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2831,6 +2835,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     FirstFloor_Plenum,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2847,6 +2852,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     FirstFloor_Plenum,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2863,6 +2869,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2879,6 +2886,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2895,6 +2903,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2911,6 +2920,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2927,6 +2937,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2943,6 +2954,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     TopFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2959,6 +2971,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     TopFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2975,6 +2988,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     TopFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2991,6 +3005,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     TopFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3007,6 +3022,7 @@
     Ceiling,                 !- Surface Type
     DropCeiling,             !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     TopFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3023,6 +3039,7 @@
     Floor,                   !- Surface Type
     Perimeter_bot_ZN_1_Floor_Ffactor,  !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3039,6 +3056,7 @@
     Floor,                   !- Surface Type
     Perimeter_bot_ZN_2_Floor_Ffactor,  !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3055,6 +3073,7 @@
     Floor,                   !- Surface Type
     Perimeter_bot_ZN_3_Floor_Ffactor,  !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3071,6 +3090,7 @@
     Floor,                   !- Surface Type
     Perimeter_bot_ZN_4_Floor_Ffactor,  !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3087,6 +3107,7 @@
     Floor,                   !- Surface Type
     Core_bot_ZN_5_Floor_Ffactor,  !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3103,6 +3124,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     FirstFloor_Plenum,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3119,6 +3141,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     FirstFloor_Plenum,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3135,6 +3158,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     FirstFloor_Plenum,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3151,6 +3175,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     FirstFloor_Plenum,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3167,6 +3192,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     FirstFloor_Plenum,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3183,6 +3209,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3199,6 +3226,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3215,6 +3243,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3231,6 +3260,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3247,6 +3277,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     MidFloor_Plenum,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3263,6 +3294,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3279,6 +3311,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_bot_ZN_2,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3295,6 +3328,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3311,6 +3345,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_bot_ZN_3,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3327,6 +3362,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3343,6 +3379,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_bot_ZN_4,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3359,6 +3396,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3375,6 +3413,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_bot_ZN_1,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3391,6 +3430,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_bot_ZN_1,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3407,6 +3447,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_bot_ZN_2,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3423,6 +3464,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_bot_ZN_3,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3439,6 +3481,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_bot_ZN_4,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3455,6 +3498,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3471,6 +3515,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_mid_ZN_2,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3487,6 +3532,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3503,6 +3549,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_mid_ZN_3,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3519,6 +3566,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3535,6 +3583,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_mid_ZN_4,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3551,6 +3600,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3567,6 +3617,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_mid_ZN_1,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3583,6 +3634,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_mid_ZN_3,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3599,6 +3651,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_mid_ZN_2,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3615,6 +3668,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_mid_ZN_1,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3631,6 +3685,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_mid_ZN_4,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3647,6 +3702,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3663,6 +3719,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_top_ZN_2,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3679,6 +3736,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3695,6 +3753,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_top_ZN_3,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3711,6 +3770,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3727,6 +3787,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_top_ZN_4,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3743,6 +3804,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3759,6 +3821,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_top_ZN_1,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3775,6 +3838,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_top_ZN_3,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3791,6 +3855,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_top_ZN_2,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3807,6 +3872,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_top_ZN_1,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3823,6 +3889,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Perimeter_top_ZN_4,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3839,6 +3906,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     FirstFloor_Plenum,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3855,6 +3923,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     FirstFloor_Plenum,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3871,6 +3940,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     FirstFloor_Plenum,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3887,6 +3957,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     FirstFloor_Plenum,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3903,6 +3974,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     MidFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3919,6 +3991,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     MidFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3935,6 +4008,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     MidFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3951,6 +4025,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     MidFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3967,6 +4042,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     TopFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3983,6 +4059,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     TopFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3999,6 +4076,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     TopFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4015,6 +4093,7 @@
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
     TopFloor_Plenum,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4454,90 +4533,105 @@
     Core_bottom_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Core_bottom,             !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     1967.0770;               !- Surface Area {m2}
 
   InternalMass,
     Core_mid_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     Core_mid,                !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     1967.0770;               !- Surface Area {m2}
 
   InternalMass,
     Core_top_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     Core_top,                !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     1967.0770;               !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_3,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     414.6750;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_2,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     262.5073;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_1,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     414.6723;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_top_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_4,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     262.5056;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     414.6750;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     262.5073;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     414.6723;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_bot_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     262.5056;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     414.6750;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     262.5073;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     414.6723;                !- Surface Area {m2}
 
   InternalMass,
     Perimeter_mid_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     262.5056;                !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
@@ -8104,7 +8198,7 @@
     PACU_VAV_BOT_DCV,        !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedureWithLimit,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Core_bottom,             !- Zone or ZoneList 1 Name
     CM DSOA Core_bottom,     !- Design Specification Outdoor Air Object Name 1
@@ -8126,7 +8220,7 @@
     PACU_VAV_TOP_DCV,        !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedureWithLimit,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Core_top,                !- Zone or ZoneList 1 Name
     CM DSOA Core_top,        !- Design Specification Outdoor Air Object Name 1
@@ -8148,7 +8242,7 @@
     PACU_VAV_MID_DCV,        !- Name
     MinOA_MotorizedDamper_Sched,  !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    VentilationRateProcedure,!- System Outdoor Air Method
+    Standard62.1VentilationRateProcedureWithLimit,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     Core_mid,                !- Zone or ZoneList 1 Name
     CM DSOA Core_mid,        !- Design Specification Outdoor Air Object Name 1
@@ -9317,24 +9411,6 @@
     Lights,                  !- Actuated Component Type
     Electricity Rate;        !- Actuated Component Control Type
 
-  EnergyManagementSystem:Actuator,
-    VAV_bot_MAX_OA_FRAC,     !- Name
-    VAV_bot Max OA Fraction, !- Actuated Component Unique Name
-    Schedule:Constant,       !- Actuated Component Type
-    Schedule Value;          !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    VAV_mid_MAX_OA_FRAC,     !- Name
-    VAV_mid Max OA Fraction, !- Actuated Component Unique Name
-    Schedule:Constant,       !- Actuated Component Type
-    Schedule Value;          !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    VAV_top_MAX_OA_FRAC,     !- Name
-    VAV_top Max OA Fraction, !- Actuated Component Unique Name
-    Schedule:Constant,       !- Actuated Component Type
-    Schedule Value;          !- Actuated Component Control Type
-
 !-   ===========  ALL OBJECTS IN CLASS: ENERGYMANAGEMENTSYSTEM:PROGRAMCALLINGMANAGER ===========
 
   EnergyManagementSystem:ProgramCallingManager,
@@ -9421,21 +9497,6 @@
     SET_Perimeter_mid_ZN_4_Light_EMS_Program_Prog_Manager,  !- Name
     BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
     SET_Perimeter_mid_ZN_4_Light_EMS_Program;  !- Program Name 1
-
-  EnergyManagementSystem:ProgramCallingManager,
-    VAV_bot_MAX_OA_FRAC_Prog_Manager,  !- Name
-    InsideHVACSystemIterationLoop,  !- EnergyPlus Model Calling Point
-    VAV_bot_MAX_OA_FRAC;     !- Program Name 1
-
-  EnergyManagementSystem:ProgramCallingManager,
-    VAV_mid_MAX_OA_FRAC_Prog_Manager,  !- Name
-    InsideHVACSystemIterationLoop,  !- EnergyPlus Model Calling Point
-    VAV_mid_MAX_OA_FRAC;     !- Program Name 1
-
-  EnergyManagementSystem:ProgramCallingManager,
-    VAV_top_MAX_OA_FRAC_Prog_Manager,  !- Name
-    InsideHVACSystemIterationLoop,  !- EnergyPlus Model Calling Point
-    VAV_top_MAX_OA_FRAC;     !- Program Name 1
 
 !-   ===========  ALL OBJECTS IN CLASS: ENERGYMANAGEMENTSYSTEM:PROGRAM ===========
 
@@ -9601,42 +9662,6 @@
     SET Perimeter_mid_ZN_4_Light_Actuator = 0.02*Perimeter_mid_ZN_4_Area/0.09290304,  !- <none>
     ELSE,                    !- <none>
     SET Perimeter_mid_ZN_4_Light_Actuator = NULL,  !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:Program,
-    VAV_bot_MAX_OA_FRAC,     !- Name
-    IF VAV_bot_OA > VAV_bot_OA_VRP,  !- Program Line 1
-    SET VAV_bot_MAX_OA_FRAC = NULL,  !- Program Line 2
-    ELSE,                    !- <none>
-    IF VAV_bot_SUPPLY_FLOW > 0,  !- <none>
-    SET VAV_bot_MAX_OA_FRAC =      0.9561 / VAV_bot_SUPPLY_FLOW,  !- <none>
-    ELSE,                    !- <none>
-    SET VAV_bot_MAX_OA_FRAC = NULL,  !- <none>
-    ENDIF,                   !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:Program,
-    VAV_mid_MAX_OA_FRAC,     !- Name
-    IF VAV_mid_OA > VAV_mid_OA_VRP,  !- Program Line 1
-    SET VAV_mid_MAX_OA_FRAC = NULL,  !- Program Line 2
-    ELSE,                    !- <none>
-    IF VAV_mid_SUPPLY_FLOW > 0,  !- <none>
-    SET VAV_mid_MAX_OA_FRAC =      0.9561 / VAV_mid_SUPPLY_FLOW,  !- <none>
-    ELSE,                    !- <none>
-    SET VAV_mid_MAX_OA_FRAC = NULL,  !- <none>
-    ENDIF,                   !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:Program,
-    VAV_top_MAX_OA_FRAC,     !- Name
-    IF VAV_top_OA > VAV_top_OA_VRP,  !- Program Line 1
-    SET VAV_top_MAX_OA_FRAC = NULL,  !- Program Line 2
-    ELSE,                    !- <none>
-    IF VAV_top_SUPPLY_FLOW > 0,  !- <none>
-    SET VAV_top_MAX_OA_FRAC =      0.9561 / VAV_top_SUPPLY_FLOW,  !- <none>
-    ELSE,                    !- <none>
-    SET VAV_top_MAX_OA_FRAC = NULL,  !- <none>
-    ENDIF,                   !- <none>
     ENDIF;                   !- <none>
 
 !-   ===========  ALL OBJECTS IN CLASS: ENERGYMANAGEMENTSYSTEM:GLOBALVARIABLE ===========

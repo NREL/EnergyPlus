@@ -6987,8 +6987,8 @@ void SetWaterCoilData(EnergyPlusData &state,
                       int const CoilNum,                       // Number of hot water heating Coil
                       bool &ErrorsFound,                       // Set to true if certain errors found
                       Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-                      Optional_int DesiccantDehumIndex         // Index for the desiccant dehum system where this caoil is used
-)
+                      Optional_int DesiccantDehumIndex,        // Index for the desiccant dehum system where this caoil is used
+                      Optional_bool heatRecoveryCoil)          // true if water coil is connected to heat recovery loop
 {
 
     // FUNCTION INFORMATION:
@@ -7022,6 +7022,10 @@ void SetWaterCoilData(EnergyPlusData &state,
 
     if (present(DesiccantDehumIndex)) {
         state.dataWaterCoils->WaterCoil(CoilNum).DesiccantDehumNum = DesiccantDehumIndex;
+    }
+
+    if (present(heatRecoveryCoil)) {
+        state.dataWaterCoils->WaterCoil(CoilNum).heatRecoveryCoil = heatRecoveryCoil;
     }
 }
 

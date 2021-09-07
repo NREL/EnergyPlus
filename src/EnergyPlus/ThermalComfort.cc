@@ -1926,7 +1926,6 @@ namespace ThermalComfort {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const AngleFacLimit(0.01); // To set the limit of sum of angle factors
-        int const MaxSurfaces(20);        // Maximum number of surfaces in each AngleFactor List
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AllAngleFacSummed; // Sum of angle factors in each zone
@@ -1977,13 +1976,6 @@ namespace ThermalComfort {
             }
 
             thisAngFacList.TotAngleFacSurfaces = NumNumbers;
-            if (thisAngFacList.TotAngleFacSurfaces > MaxSurfaces) {
-                ShowSevereError(state,
-                                cCurrentModuleObject + ": Too many surfaces specified in " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                    state.dataIPShortCut->cAlphaArgs(1));
-                ErrorsFound = true;
-            }
-
             thisAngFacList.SurfaceName.allocate(thisAngFacList.TotAngleFacSurfaces);
             thisAngFacList.SurfacePtr.allocate(thisAngFacList.TotAngleFacSurfaces);
             thisAngFacList.AngleFactor.allocate(thisAngFacList.TotAngleFacSurfaces);
@@ -2026,7 +2018,7 @@ namespace ThermalComfort {
             if (std::abs(AllAngleFacSummed - 1.0) > AngleFacLimit) {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid - Sum[AngleFactors]");
                 ShowContinueError(state,
-                                  format("...Sum of Angle Factors [{:.3R}] exceed expected sum [1.0] by more than limit [{:.3R}].",
+                                  format("...Sum of Angle Factors [{:.3R}] should not deviate from expected sum [1.0] by more than limit [{:.3R}].",
                                          AllAngleFacSummed,
                                          AngleFacLimit));
                 ErrorsFound = true;
@@ -2091,7 +2083,7 @@ namespace ThermalComfort {
         auto &thisAngFacList(state.dataThermalComforts->AngleFactorList(AngleFacNum));
 
         for (SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
-            SurfaceTemp = state.dataHeatBalSurf->TH(2, 1, thisAngFacList.SurfacePtr(SurfNum)) + DataGlobalConstants::KelvinConv;
+            SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(thisAngFacList.SurfacePtr(SurfNum)) + DataGlobalConstants::KelvinConv;
             SurfEAF =
                 state.dataConstruction->Construct(state.dataSurface->Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal *
                 thisAngFacList.AngleFactor(SurfNum);
@@ -2155,21 +2147,22 @@ namespace ThermalComfort {
                 state.dataThermalComforts->SurfaceAE(SurfNum2) =
                     state.dataSurface->Surface(SurfNum2).Area *
                     state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
-                SumAET += state.dataThermalComforts->SurfaceAE(SurfNum2) * state.dataHeatBalSurf->TH(2, 1, SurfNum2);
+                SumAET += state.dataThermalComforts->SurfaceAE(SurfNum2) * state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum2);
                 state.dataThermalComforts->ZoneAESum(ZoneNum) += state.dataThermalComforts->SurfaceAE(SurfNum2);
             }
         }
 
         // Now weight the MRT--half comes from the surface used for weighting (SurfNum) and the rest from the adjusted MRT that excludes this surface
         if (state.dataThermalComforts->ZoneAESum(ZoneNum) > 0.01) {
-            CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->TH(2, 1, SurfNum) + (SumAET / state.dataThermalComforts->ZoneAESum(ZoneNum)));
+            CalcSurfaceWeightedMRT =
+                0.5 * (state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) + (SumAET / state.dataThermalComforts->ZoneAESum(ZoneNum)));
         } else {
             if (state.dataThermalComforts->FirstTimeError) {
                 ShowWarningError(
                     state, "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\"");
                 ShowContinueError(state, "As a result, MAT will be used for MRT when calculating a surface weighted MRT for this zone.");
                 state.dataThermalComforts->FirstTimeError = false;
-                CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->TH(2, 1, SurfNum) + state.dataHeatBalFanSys->MAT(ZoneNum));
+                CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) + state.dataHeatBalFanSys->MAT(ZoneNum));
             }
         }
 
@@ -2261,7 +2254,7 @@ namespace ThermalComfort {
                 state.dataThermalComforts->RadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
             } else if (SELECT_CASE_var == DataHeatBalance::CalcMRT::SurfaceWeighted) {
                 ZoneRadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
-                SurfaceTemp = state.dataHeatBalSurf->TH(2, 1, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
+                SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataHeatBal->People(PeopleListNum).SurfacePtr);
                 state.dataThermalComforts->RadTemp =
                     CalcSurfaceWeightedMRT(state, state.dataThermalComforts->ZoneNum, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
             } else if (SELECT_CASE_var == DataHeatBalance::CalcMRT::AngleFactor) {

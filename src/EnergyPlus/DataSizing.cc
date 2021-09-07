@@ -48,8 +48,10 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 
@@ -498,6 +500,87 @@ Real64 ZoneAirDistributionData::calculateEz(EnergyPlusData &state, int const Zon
         zoneEz = 1.0;
     }
     return zoneEz;
+}
+
+Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
+                                          int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
+                                          int const ActualZoneNum,    // Zone index
+                                          bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
+                                          bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
+                                          bool const PerPersonNotSet, // when calculation should not include occupants (e.g., dual duct)
+                                          bool const MaxOAVolFlowFlag // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
+)
+{
+    if (this->numDSOA == 1) {
+        return DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+            state, DSOAPtr, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet, MaxOAVolFlowFlag);
+    } else {
+        Real64 totOAFlowRate = 0.0;
+        for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
+            totOAFlowRate += DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state,
+                                                                                  this->dsoaIndexes(dsoaCount),
+                                                                                  ActualZoneNum,
+                                                                                  UseOccSchFlag,
+                                                                                  UseMinOASchFlag,
+                                                                                  PerPersonNotSet,
+                                                                                  MaxOAVolFlowFlag,
+                                                                                  this->dsoaSpaceIndexes(dsoaCount));
+        }
+        return totOAFlowRate;
+    }
+}
+
+Real64 OARequirementsData::desFlowPerZoneArea(EnergyPlusData &state,
+                                              int const actualZoneNum // Zone index
+)
+{
+    Real64 desFlowPA = 0.0;
+    if (this->numDSOA == 1) {
+        if (this->OAFlowMethod != DataSizing::OAFlowPPer && this->OAFlowMethod != DataSizing::OAFlow && this->OAFlowMethod != DataSizing::OAFlowACH) {
+            desFlowPA = this->OAFlowPerArea;
+        }
+    } else {
+        Real64 sumAreaOA = 0.0;
+        for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
+            auto const thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
+            if (thisDSOA.OAFlowMethod != DataSizing::OAFlowPPer && thisDSOA.OAFlowMethod != DataSizing::OAFlow &&
+                thisDSOA.OAFlowMethod != DataSizing::OAFlowACH) {
+                Real64 spaceArea = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).floorArea;
+                sumAreaOA += thisDSOA.OAFlowPerArea * spaceArea;
+            }
+        }
+        if (state.dataHeatBal->Zone(actualZoneNum).FloorArea) {
+            desFlowPA = sumAreaOA / state.dataHeatBal->Zone(actualZoneNum).FloorArea;
+        }
+    }
+    return desFlowPA;
+}
+
+Real64 OARequirementsData::desFlowPerZonePerson(EnergyPlusData &state,
+                                                int const actualZoneNum // Zone index
+)
+{
+    Real64 desFlowPP = 0.0;
+    if (this->numDSOA == 1) {
+        if (this->OAFlowMethod != DataSizing::OAFlowPerArea && this->OAFlowMethod != DataSizing::OAFlow &&
+            this->OAFlowMethod != DataSizing::OAFlowACH) {
+            desFlowPP = this->OAFlowPerPerson;
+        }
+    } else {
+        Real64 sumPeopleOA = 0.0;
+        for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
+            auto const thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
+            if (thisDSOA.OAFlowMethod != DataSizing::OAFlowPerArea && thisDSOA.OAFlowMethod != DataSizing::OAFlow &&
+                thisDSOA.OAFlowMethod != DataSizing::OAFlowACH) {
+                Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).totOccupants;
+                sumPeopleOA += thisDSOA.OAFlowPerPerson * spacePeople;
+            }
+        }
+        if (state.dataHeatBal->Zone(actualZoneNum).TotOccupants > 0.0) {
+            desFlowPP = sumPeopleOA / state.dataHeatBal->Zone(actualZoneNum).TotOccupants;
+        }
+    }
+    return desFlowPP;
 }
 
 } // namespace EnergyPlus::DataSizing

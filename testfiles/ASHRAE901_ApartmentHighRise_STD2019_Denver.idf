@@ -2963,6 +2963,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     G SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2979,6 +2980,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     G SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2995,6 +2997,7 @@
     Floor,                   !- Surface Type
     gGFloorSWA_Ffactor,      !- Construction Name
     G SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3011,6 +3014,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     G SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 GFloor SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3027,6 +3031,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     G SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     G Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3043,6 +3048,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     G SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     G S1 Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3059,6 +3065,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     G NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3075,6 +3082,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     G NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3091,6 +3099,7 @@
     Floor,                   !- Surface Type
     gGFloorNWA_Ffactor,      !- Construction Name
     G NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3107,6 +3116,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     G NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 GFloor NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3123,6 +3133,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     G NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     G Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3139,6 +3150,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     G NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     G N1 Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3155,6 +3167,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3171,6 +3184,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3187,6 +3201,7 @@
     Floor,                   !- Surface Type
     gGFloorSEA_Ffactor,      !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3203,6 +3218,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 GFloor SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3219,6 +3235,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     G Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3235,6 +3252,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     G NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3251,6 +3269,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     G NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3267,6 +3286,7 @@
     Floor,                   !- Surface Type
     gGFloorNEA_Ffactor,      !- Construction Name
     G NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3283,6 +3303,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     G NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 GFloor NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3299,6 +3320,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     G NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     G Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3315,6 +3337,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     G N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3331,6 +3354,7 @@
     Floor,                   !- Surface Type
     gGFloorN1A_Ffactor,      !- Construction Name
     G N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3347,6 +3371,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     G N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 GFloor N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3363,6 +3388,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     G N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     G Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3379,6 +3405,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     G N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     G N2 Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3395,6 +3422,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     G N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3411,6 +3439,7 @@
     Floor,                   !- Surface Type
     gGFloorN2A_Ffactor,      !- Construction Name
     G N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3427,6 +3456,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     G N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 GFloor N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3443,6 +3473,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     G N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     G Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3459,6 +3490,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     G N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     G NE Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3475,6 +3507,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     G S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3491,6 +3524,7 @@
     Floor,                   !- Surface Type
     gGFloorS1A_Ffactor,      !- Construction Name
     G S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3507,6 +3541,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     G S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 GFloor S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3523,6 +3558,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     G S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     G Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3539,6 +3575,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     G S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     G S2 Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3555,6 +3592,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     G S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3571,6 +3609,7 @@
     Floor,                   !- Surface Type
     gGFloorS2A_Ffactor,      !- Construction Name
     G S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3587,6 +3626,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     G S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 GFloor S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3603,6 +3643,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     G S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     G Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3619,6 +3660,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     G S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Office,                  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3635,6 +3677,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3651,6 +3694,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3667,6 +3711,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 Floor C,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3683,6 +3728,7 @@
     Floor,                   !- Surface Type
     gFloorC_Ffactor,         !- Construction Name
     G Corridor,              !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3699,6 +3745,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3715,6 +3762,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F2 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3731,6 +3779,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F2 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 GFloor SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3747,6 +3796,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3763,6 +3813,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3779,6 +3830,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 S1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3795,6 +3847,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3811,6 +3864,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3827,6 +3881,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F2 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3843,6 +3898,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F2 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 GFloor NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3859,6 +3915,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3875,6 +3932,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 N1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3891,6 +3949,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3907,6 +3966,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F2 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin SEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3923,6 +3983,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F2 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 GFloor SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3939,6 +4000,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3955,6 +4017,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3971,6 +4034,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3987,6 +4051,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4003,6 +4068,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F2 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin NEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4019,6 +4085,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F2 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 GFloor NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4035,6 +4102,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4051,6 +4119,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4067,6 +4136,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F2 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4083,6 +4153,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F2 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 GFloor N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4099,6 +4170,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4115,6 +4187,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 N2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4131,6 +4204,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4147,6 +4221,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F2 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4163,6 +4238,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F2 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 GFloor N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4179,6 +4255,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4195,6 +4272,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 NE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4211,6 +4289,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F2 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4227,6 +4306,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F2 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 GFloor S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4243,6 +4323,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4259,6 +4340,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4275,6 +4357,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 S2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4291,6 +4374,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F2 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceilin S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4307,6 +4391,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F2 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 GFloor S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4323,6 +4408,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4339,6 +4425,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4355,6 +4442,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F2 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F2 SE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4371,6 +4459,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4387,6 +4476,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F2 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4403,6 +4493,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F2 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 Floor C,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4419,6 +4510,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F2 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     g Ceiling C,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4435,6 +4527,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4451,6 +4544,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F3 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 Ceilin SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4467,6 +4561,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F3 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 GFloor SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4483,6 +4578,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4499,6 +4595,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4515,6 +4612,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 S1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4531,6 +4629,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4547,6 +4646,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4563,6 +4663,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F3 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 Ceilin NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4579,6 +4680,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F3 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 GFloor NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4595,6 +4697,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4611,6 +4714,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 N1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4627,6 +4731,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4643,6 +4748,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F3 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 Ceilin SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4659,6 +4765,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F3 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 GFloor SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4675,6 +4782,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4691,6 +4799,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4707,6 +4816,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4723,6 +4833,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4739,6 +4850,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F3 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 Ceilin NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4755,6 +4867,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F3 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 GFloor NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4771,6 +4884,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4787,6 +4901,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4803,6 +4918,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F3 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 Ceilin N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4819,6 +4935,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F3 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 GFloor N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4835,6 +4952,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4851,6 +4969,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 N2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4867,6 +4986,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4883,6 +5003,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F3 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 Ceilin N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4899,6 +5020,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F3 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 GFloor N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4915,6 +5037,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4931,6 +5054,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 NE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4947,6 +5071,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F3 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 Ceilin S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4963,6 +5088,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F3 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 GFloor S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4979,6 +5105,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4995,6 +5122,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5011,6 +5139,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 S2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5027,6 +5156,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F3 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 Ceilin S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5043,6 +5173,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F3 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 GFloor S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5059,6 +5190,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5075,6 +5207,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5091,6 +5224,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F3 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F3 SE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5107,6 +5241,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5123,6 +5258,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F3 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5139,6 +5275,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F3 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 Floor C,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5155,6 +5292,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F3 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F2 Ceiling C,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5171,6 +5309,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5187,6 +5326,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F4 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 Ceilin SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5203,6 +5343,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F4 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5219,6 +5360,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5235,6 +5377,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5251,6 +5394,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 S1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5267,6 +5411,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5283,6 +5428,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5299,6 +5445,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F4 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 Ceilin NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5315,6 +5462,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F4 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5331,6 +5479,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5347,6 +5496,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 N1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5363,6 +5513,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5379,6 +5530,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F4 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 Ceilin SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5395,6 +5547,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F4 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor SEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5411,6 +5564,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5427,6 +5581,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5443,6 +5598,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5459,6 +5615,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5475,6 +5632,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F4 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 Ceilin NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5491,6 +5649,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F4 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor NEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5507,6 +5666,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5523,6 +5683,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5539,6 +5700,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F4 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 Ceilin N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5555,6 +5717,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F4 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5571,6 +5734,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5587,6 +5751,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 N2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5603,6 +5768,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5619,6 +5785,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F4 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 Ceilin N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5635,6 +5802,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F4 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5651,6 +5819,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5667,6 +5836,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 NE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5683,6 +5853,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F4 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 Ceilin S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5699,6 +5870,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F4 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5715,6 +5887,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5731,6 +5904,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5747,6 +5921,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 S2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5763,6 +5938,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F4 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 Ceilin S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5779,6 +5955,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F4 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m GFloor S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5795,6 +5972,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5811,6 +5989,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5827,6 +6006,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F4 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F4 SE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5843,6 +6023,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5859,6 +6040,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F4 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5875,6 +6057,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F4 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Floor C,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5891,6 +6074,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F4 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F3 Ceiling C,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5907,6 +6091,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5923,6 +6108,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     M SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 Ceilin SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5939,6 +6125,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     M SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 GFloor SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5955,6 +6142,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5971,6 +6159,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5987,6 +6176,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M S1 Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6003,6 +6193,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6019,6 +6210,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6035,6 +6227,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     M NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 Ceilin NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6051,6 +6244,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     M NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 GFloor NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6067,6 +6261,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6083,6 +6278,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M N1 Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6099,6 +6295,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6115,6 +6312,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     M SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 Ceilin SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6131,6 +6329,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     M SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 GFloor SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6147,6 +6346,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6163,6 +6363,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6179,6 +6380,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6195,6 +6397,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6211,6 +6414,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     M NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 Ceilin NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6227,6 +6431,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     M NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 GFloor NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6243,6 +6448,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6259,6 +6465,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6275,6 +6482,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     M N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 Ceilin N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6291,6 +6499,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     M N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 GFloor N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6307,6 +6516,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6323,6 +6533,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M N2 Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6339,6 +6550,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6355,6 +6567,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     M N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 Ceilin N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6371,6 +6584,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     M N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 GFloor N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6387,6 +6601,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6403,6 +6618,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M NE Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6419,6 +6635,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     M S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 Ceilin S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6435,6 +6652,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     M S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 GFloor S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6451,6 +6669,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6467,6 +6686,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6483,6 +6703,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M S2 Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6499,6 +6720,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     M S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 Ceilin S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6515,6 +6737,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     M S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 GFloor S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6531,6 +6754,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6547,6 +6771,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6563,6 +6788,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     M S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     M SE Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6579,6 +6805,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6595,6 +6822,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6611,6 +6839,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 Floor C,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6627,6 +6856,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     M Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F4 Ceiling C,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6643,6 +6873,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6659,6 +6890,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F6 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6675,6 +6907,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F6 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 GFloor SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6691,6 +6924,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6707,6 +6941,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6723,6 +6958,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 S1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6739,6 +6975,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6755,6 +6992,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6771,6 +7009,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F6 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6787,6 +7026,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F6 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 GFloor NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6803,6 +7043,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6819,6 +7060,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 N1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6835,6 +7077,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6851,6 +7094,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F6 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin SEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6867,6 +7111,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F6 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 GFloor SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6883,6 +7128,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6899,6 +7145,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6915,6 +7162,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6931,6 +7179,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6947,6 +7196,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F6 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin NEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6963,6 +7213,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F6 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 GFloor NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6979,6 +7230,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6995,6 +7247,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7011,6 +7264,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F6 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7027,6 +7281,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F6 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 GFloor N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7043,6 +7298,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7059,6 +7315,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 N2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7075,6 +7332,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7091,6 +7349,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F6 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7107,6 +7366,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F6 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 GFloor N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7123,6 +7383,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7139,6 +7400,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 NE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7155,6 +7417,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F6 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7171,6 +7434,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F6 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 GFloor S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7187,6 +7451,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7203,6 +7468,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7219,6 +7485,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 S2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7235,6 +7502,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F6 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceilin S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7251,6 +7519,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F6 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 GFloor S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7267,6 +7536,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7283,6 +7553,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7299,6 +7570,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F6 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F6 SE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7315,6 +7587,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7331,6 +7604,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F6 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7347,6 +7621,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F6 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 Floor C,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7363,6 +7638,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F6 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     m Ceiling C,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7379,6 +7655,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7395,6 +7672,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F7 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 Ceilin SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7411,6 +7689,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F7 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 GFloor SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7427,6 +7706,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7443,6 +7723,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7459,6 +7740,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 S1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7475,6 +7757,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7491,6 +7774,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7507,6 +7791,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F7 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 Ceilin NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7523,6 +7808,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F7 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 GFloor NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7539,6 +7825,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7555,6 +7842,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 N1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7571,6 +7859,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7587,6 +7876,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F7 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 Ceilin SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7603,6 +7893,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F7 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 GFloor SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7619,6 +7910,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7635,6 +7927,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7651,6 +7944,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7667,6 +7961,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7683,6 +7978,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F7 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 Ceilin NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7699,6 +7995,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F7 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 GFloor NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7715,6 +8012,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7731,6 +8029,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7747,6 +8046,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F7 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 Ceilin N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7763,6 +8063,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F7 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 GFloor N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7779,6 +8080,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7795,6 +8097,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 N2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7811,6 +8114,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7827,6 +8131,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F7 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 Ceilin N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7843,6 +8148,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F7 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 GFloor N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7859,6 +8165,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7875,6 +8182,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 NE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7891,6 +8199,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F7 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 Ceilin S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7907,6 +8216,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F7 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 GFloor S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7923,6 +8233,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7939,6 +8250,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7955,6 +8267,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 S2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7971,6 +8284,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F7 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 Ceilin S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7987,6 +8301,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F7 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 GFloor S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8003,6 +8318,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8019,6 +8335,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8035,6 +8352,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F7 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F7 SE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8051,6 +8369,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8067,6 +8386,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F7 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8083,6 +8403,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F7 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 Floor C,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8099,6 +8420,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F7 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F6 Ceiling C,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8115,6 +8437,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8131,6 +8454,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F8 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 Ceilin SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8147,6 +8471,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F8 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 GFloor SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8163,6 +8488,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8179,6 +8505,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8195,6 +8522,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 S1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8211,6 +8539,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8227,6 +8556,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8243,6 +8573,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F8 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 Ceilin NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8259,6 +8590,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F8 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 GFloor NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8275,6 +8607,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8291,6 +8624,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 N1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8307,6 +8641,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8323,6 +8658,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F8 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 Ceilin SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8339,6 +8675,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F8 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 GFloor SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8355,6 +8692,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8371,6 +8709,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8387,6 +8726,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8403,6 +8743,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8419,6 +8760,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F8 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 Ceilin NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8435,6 +8777,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F8 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 GFloor NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8451,6 +8794,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8467,6 +8811,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8483,6 +8828,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F8 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 Ceilin N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8499,6 +8845,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F8 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 GFloor N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8515,6 +8862,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8531,6 +8879,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 N2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8547,6 +8896,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8563,6 +8913,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F8 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 Ceilin N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8579,6 +8930,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F8 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 GFloor N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8595,6 +8947,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8611,6 +8964,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 NE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8627,6 +8981,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F8 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 Ceilin S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8643,6 +8998,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F8 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 GFloor S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8659,6 +9015,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8675,6 +9032,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8691,6 +9049,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 S2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8707,6 +9066,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F8 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 Ceilin S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8723,6 +9083,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F8 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 GFloor S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8739,6 +9100,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8755,6 +9117,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8771,6 +9134,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F8 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F8 SE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8787,6 +9151,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8803,6 +9168,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F8 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8819,6 +9185,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F8 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 Floor C,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8835,6 +9202,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F8 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F7 Ceiling C,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8851,6 +9219,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8867,6 +9236,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F9 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 Ceilin SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8883,6 +9253,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F9 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor SWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8899,6 +9270,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8915,6 +9287,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8931,6 +9304,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 SW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 S1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8947,6 +9321,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8963,6 +9338,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -8979,6 +9355,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F9 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 Ceilin NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -8995,6 +9372,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F9 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor NWA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9011,6 +9389,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9027,6 +9406,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 NW Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 N1 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9043,6 +9423,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9059,6 +9440,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F9 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 Ceilin SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9075,6 +9457,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F9 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor SEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9091,6 +9474,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9107,6 +9491,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 SE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9123,6 +9508,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9139,6 +9525,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9155,6 +9542,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F9 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 Ceilin NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9171,6 +9559,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F9 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor NEA,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9187,6 +9576,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 NE Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9203,6 +9593,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9219,6 +9610,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F9 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 Ceilin N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9235,6 +9627,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F9 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor N1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9251,6 +9644,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9267,6 +9661,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 N1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 N2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9283,6 +9678,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9299,6 +9695,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F9 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 Ceilin N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9315,6 +9712,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F9 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor N2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9331,6 +9729,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9347,6 +9746,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 N2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 NE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9363,6 +9763,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F9 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 Ceilin S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9379,6 +9780,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F9 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor S1A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9395,6 +9797,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9411,6 +9814,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9427,6 +9831,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 S1 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 S2 Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9443,6 +9848,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F9 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 Ceilin S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9459,6 +9865,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F9 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t GFloor S2A,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9475,6 +9882,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9491,6 +9899,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 Corridor,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9507,6 +9916,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     F9 S2 Apartment,         !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     F9 SE Apartment,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9523,6 +9933,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9539,6 +9950,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     F9 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9555,6 +9967,7 @@
     Ceiling,                 !- Surface Type
     int_slab_ceiling,        !- Construction Name
     F9 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     t Floor C,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9571,6 +9984,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     F9 Corridor,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F8 Ceiling C,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9587,6 +10001,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9603,6 +10018,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     T SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 Ceilin SWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9619,6 +10035,7 @@
     Roof,                    !- Surface Type
     res_roof,                !- Construction Name
     T SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9635,6 +10052,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9651,6 +10069,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9667,6 +10086,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T SW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T S1 Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9683,6 +10103,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9699,6 +10120,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9715,6 +10137,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     T NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 Ceilin NWA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9731,6 +10154,7 @@
     Roof,                    !- Surface Type
     res_roof,                !- Construction Name
     T NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9747,6 +10171,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9763,6 +10188,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T NW Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T N1 Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9779,6 +10205,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9795,6 +10222,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     T SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 Ceilin SEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9811,6 +10239,7 @@
     Roof,                    !- Surface Type
     res_roof,                !- Construction Name
     T SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9827,6 +10256,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9843,6 +10273,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T SE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9859,6 +10290,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9875,6 +10307,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9891,6 +10324,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     T NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 Ceilin NEA,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9907,6 +10341,7 @@
     Roof,                    !- Surface Type
     res_roof,                !- Construction Name
     T NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9923,6 +10358,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T NE Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9939,6 +10375,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9955,6 +10392,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     T N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 Ceilin N1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -9971,6 +10409,7 @@
     Roof,                    !- Surface Type
     res_roof,                !- Construction Name
     T N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -9987,6 +10426,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -10003,6 +10443,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T N1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T N2 Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -10019,6 +10460,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -10035,6 +10477,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     T N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 Ceilin N2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -10051,6 +10494,7 @@
     Roof,                    !- Surface Type
     res_roof,                !- Construction Name
     T N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -10067,6 +10511,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -10083,6 +10528,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T N2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T NE Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -10099,6 +10545,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     T S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 Ceilin S1A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -10115,6 +10562,7 @@
     Roof,                    !- Surface Type
     res_roof,                !- Construction Name
     T S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -10131,6 +10579,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -10147,6 +10596,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -10163,6 +10613,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T S1 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T S2 Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -10179,6 +10630,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     T S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 Ceilin S2A,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -10195,6 +10647,7 @@
     Roof,                    !- Surface Type
     res_roof,                !- Construction Name
     T S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -10211,6 +10664,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -10227,6 +10681,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T Corridor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -10243,6 +10698,7 @@
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
     T S2 Apartment,          !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     T SE Apartment,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -10259,6 +10715,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -10275,6 +10732,7 @@
     Wall,                    !- Surface Type
     res_ext_wall,            !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -10291,6 +10749,7 @@
     Roof,                    !- Surface Type
     res_roof,                !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -10307,6 +10766,7 @@
     Floor,                   !- Surface Type
     int_slab_floor,          !- Construction Name
     T Corridor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     F9 Ceiling C,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -12426,480 +12886,560 @@
     G SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     G SW Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     G NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     G NW Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     Office_InternalMass_1,   !- Name
     InteriorFurnishings,     !- Construction Name
     Office,                  !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     G NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     G NE Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     G N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     G N1 Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     G N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     G N2 Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     G S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     G S1 Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     G S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     G S2 Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     F2 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F2 SW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F2 NW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F2 SE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F2 NE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F2 N1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F2 N2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F2 S1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F2 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F2 S2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F3 SW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F3 NW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F3 SE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F3 NE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F3 N1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F3 N2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F3 S1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F3 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F3 S2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F4 SW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F4 NW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F4 SE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F4 NE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F4 N1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F4 N2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F4 S1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F4 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F4 S2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     M SW Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     M NW Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     M SE Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     M NE Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     M N1 Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     M N2 Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     M S1 Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     M S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     M S2 Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F6 SW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F6 NW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F6 SE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F6 NE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F6 N1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F6 N2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F6 S1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F6 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F6 S2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F7 SW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F7 NW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F7 SE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F7 NE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F7 N1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F7 N2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F7 S1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F7 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F7 S2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F8 SW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F8 NW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F8 SE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F8 NE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F8 N1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F8 N2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F8 S1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F8 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F8 S2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F9 SW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F9 NW Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F9 SE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F9 NE Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F9 N1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F9 N2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F9 S1 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     F9 S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     F9 S2 Apartment,         !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     176.4981;                !- Surface Area {m2}
 
   InternalMass,
     T SW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     T SW Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T NW Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     T NW Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T SE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     T SE Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T NE Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     T NE Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T N1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     T N1 Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T N2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     T N2 Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T S1 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     T S1 Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
   InternalMass,
     T S2 Apartment_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     T S2 Apartment,          !- Zone or ZoneList Name
+    ,                        !- Space or SpaceList Name
     88.2492727;              !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
