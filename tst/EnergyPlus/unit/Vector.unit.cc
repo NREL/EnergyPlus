@@ -59,7 +59,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataVectorTypes;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, VectorTest_Basic)
 {

@@ -82,7 +82,6 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalSurface;
 // using namespace EnergyPlus::ScheduleManager;
 using namespace SimulationManager;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 {
@@ -966,11 +965,12 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBalFanSys->ZoneAirHumRatAvgComf.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneDV.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneUI.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QHTRadSysToPerson.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QCoolingPanelToPerson.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QHWBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QSteamBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QElecBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQdotRadHVACToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQHTRadSysToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQCoolingPanelToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQHWBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQSteamBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQElecBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
 
     state->dataHeatBal->People(1).ZonePtr = 1;
     state->dataHeatBal->People(1).NumberOfPeoplePtr = -1;
@@ -989,11 +989,11 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->People(1).ClothingType = 1;
 
     state->dataRoomAirMod->IsZoneDV(1) = state->dataRoomAirMod->IsZoneUI(1) = false;
-    state->dataHeatBalFanSys->QHTRadSysToPerson(1) = 0.0;
-    state->dataHeatBalFanSys->QCoolingPanelToPerson(1) = 0.0;
-    state->dataHeatBalFanSys->QHWBaseboardToPerson(1) = 0.0;
-    state->dataHeatBalFanSys->QSteamBaseboardToPerson(1) = 0.0;
-    state->dataHeatBalFanSys->QElecBaseboardToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQHTRadSysToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQCoolingPanelToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQHWBaseboardToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQSteamBaseboardToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQElecBaseboardToPerson(1) = 0.0;
     Real64 BodySurfaceArea = 1.8258;
     state->dataEnvrn->OutBaroPress = 101325.;
     Real64 WorkEff = 0.0;
