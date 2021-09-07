@@ -157,15 +157,9 @@ void KivaInstanceMap::initGround(EnergyPlusData &state, const KivaWeatherData &k
     gp = Kiva::GroundPlot(ss, ground.domain, ground.foundation);
 #endif
 
-    // Determine accelerated intervals
     int numAccelaratedTimesteps = 3;
     int acceleratedTimestep = 30; // days
-    int accDate =
-        state.dataEnvrn->DayOfYear - 1 - acceleratedTimestep * (numAccelaratedTimesteps + 1); // date time = last timestep from the day before
-    while (accDate < 0) {
-        accDate = accDate + 365 + state.dataWeatherManager->LeapYearAdd;
-    }
-
+    int accDate = getAccDate(state, numAccelaratedTimesteps, acceleratedTimestep);
     // Initialize with steady state before accelerated timestepping
     instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_STEADY_STATE;
     setInitialBoundaryConditions(state, kivaWeather, accDate, 24, state.dataGlobal->NumOfTimeStepInHour);
@@ -188,6 +182,17 @@ void KivaInstanceMap::initGround(EnergyPlusData &state, const KivaWeatherData &k
 
     instance.calculate_surface_averages();
     instance.foundation->numericalScheme = Kiva::Foundation::NS_ADI;
+}
+
+int KivaInstanceMap::getAccDate(EnergyPlusData &state, const int numAccelaratedTimesteps, const int acceleratedTimestep)
+{
+    // Determine accelerated intervals
+    int accDate =
+        state.dataEnvrn->DayOfYear - 1 - acceleratedTimestep * (numAccelaratedTimesteps + 1); // date time = last timestep from the day before
+    while (accDate <= 0) {
+        accDate = accDate + 365 + state.dataWeatherManager->LeapYearAdd;
+    }
+    return accDate;
 }
 
 void KivaInstanceMap::setInitialBoundaryConditions(
@@ -369,11 +374,9 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
     bcs->diffuseHorizontalFlux = state.dataEnvrn->DifSolarRad;
     bcs->skyEmissivity = pow4(state.dataEnvrn->SkyTempKelvin) / pow4(bcs->outdoorTemp);
 
-    bcs->slabAbsRadiation = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(floorSurface) + // solar
-                            state.dataHeatBal->SurfQRadThermInAbs(floorSurface) +      // internal gains
-                            state.dataHeatBalFanSys->QHTRadSysSurf(floorSurface) + state.dataHeatBalFanSys->QHWBaseboardSurf(floorSurface) +
-                            state.dataHeatBalFanSys->QCoolingPanelSurf(floorSurface) + state.dataHeatBalFanSys->QSteamBaseboardSurf(floorSurface) +
-                            state.dataHeatBalFanSys->QElecBaseboardSurf(floorSurface); // HVAC
+    bcs->slabAbsRadiation = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(floorSurface) +     // solar
+                            state.dataHeatBal->SurfQRadThermInAbs(floorSurface) +          // internal gains
+                            state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(floorSurface); // HVAC
 
     bcs->slabConvectiveTemp = state.dataHeatBal->SurfTempEffBulkAir(floorSurface) + DataGlobalConstants::KelvinConv;
     bcs->slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, floorSurface) + DataGlobalConstants::KelvinConv;
@@ -387,11 +390,9 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
     Real64 TARadTotal = 0.0;
     Real64 TAConvTotal = 0.0;
     for (auto &wl : wallSurfaces) {
-        Real64 Q = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(wl) + // solar
-                   state.dataHeatBal->SurfQRadThermInAbs(wl) +      // internal gains
-                   state.dataHeatBalFanSys->QHTRadSysSurf(wl) + state.dataHeatBalFanSys->QHWBaseboardSurf(floorSurface) +
-                   state.dataHeatBalFanSys->QCoolingPanelSurf(wl) + state.dataHeatBalFanSys->QSteamBaseboardSurf(floorSurface) +
-                   state.dataHeatBalFanSys->QElecBaseboardSurf(wl); // HVAC
+        Real64 Q = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(wl) +     // solar
+                   state.dataHeatBal->SurfQRadThermInAbs(wl) +          // internal gains
+                   state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(wl); // HVAC
 
         Real64 &A = state.dataSurface->Surface(wl).Area;
 
@@ -988,18 +989,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
                 }
 
                 Real64 initDeepGroundDepth = fnd.deepGroundDepth;
-                for (auto &block : fnd.inputBlocks) {
-                    // Change temporary zero depth indicators to default foundation depth
-                    if (block.depth == 0.0) {
-                        block.depth = fnd.foundationDepth;
-                    }
-                    if (settings.deepGroundBoundary == Settings::AUTO) {
-                        // Ensure automatically set deep ground depth is at least 1 meater below lowest block
-                        if (block.z + block.depth + 1.0 > fnd.deepGroundDepth) {
-                            fnd.deepGroundDepth = block.z + block.depth + 1.0;
-                        }
-                    }
-                }
+                fnd.deepGroundDepth = getDeepGroundDepth(fnd);
 
                 if (fnd.deepGroundDepth > initDeepGroundDepth) {
                     ShowWarningError(state,
@@ -1108,7 +1098,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
             wallSurfaceString += "," + state.dataSurface->Surface(wl).Name;
         }
 
-        static constexpr fmt::string_view fmt = "{},{},{},{},{:.2R},{:.2R},{:.2R},{},{}{}\n";
+        static constexpr std::string_view fmt = "{},{},{},{},{:.2R},{:.2R},{:.2R},{},{}{}\n";
         print(state.files.eio,
               fmt,
               foundationInputs[state.dataSurface->Surface(kv.floorSurface).OSCPtr].name,
@@ -1124,6 +1114,27 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
     }
 
     return ErrorsFound;
+}
+
+Real64 KivaManager::getDeepGroundDepth(Kiva::Foundation fnd)
+{
+    Real64 totalDepthOfWallBelowGrade = fnd.wall.depthBelowSlab + (fnd.foundationDepth - fnd.wall.heightAboveGrade) + fnd.slab.totalWidth();
+    if (fnd.deepGroundDepth < totalDepthOfWallBelowGrade + 1.0) {
+        fnd.deepGroundDepth = totalDepthOfWallBelowGrade + 1.0;
+    }
+    for (auto &block : fnd.inputBlocks) {
+        // Change temporary zero depth indicators to default foundation depth
+        if (block.depth == 0.0) {
+            block.depth = fnd.foundationDepth;
+        }
+        if (settings.deepGroundBoundary == Settings::AUTO) {
+            // Ensure automatically set deep ground depth is at least 1 meter below lowest block
+            if (block.z + block.depth + 1.0 > fnd.deepGroundDepth) {
+                fnd.deepGroundDepth = block.z + block.depth + 1.0;
+            }
+        }
+    }
+    return fnd.deepGroundDepth;
 }
 
 void KivaManager::initKivaInstances(EnergyPlusData &state)

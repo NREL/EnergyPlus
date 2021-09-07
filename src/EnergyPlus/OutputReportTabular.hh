@@ -607,7 +607,7 @@ namespace OutputReportTabular {
                                             const bool produceTabular,
                                             const bool produceSQLite);
 
-    std::string ResourceWarningMessage(std::string resource);
+    std::string ResourceWarningMessage(std::string const &resource);
 
     Real64 WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor);
 
@@ -835,13 +835,13 @@ namespace OutputReportTabular {
 
     std::string RealToStr(Real64 const RealIn, int const numDigits);
 
-    Real64 StrToReal(std::string const &stringIn);
+    Real64 StrToReal(std::string_view stringIn);
 
     std::string DateToString(int const codedDate); // word containing encoded month, day, hour, minute
 
     bool isNumber(std::string const &s);
 
-    int digitsAferDecimal(std::string s);
+    int digitsAferDecimal(std::string const &s);
 
     void AddTOCEntry(EnergyPlusData &state, std::string const &nameSection, std::string const &nameReport);
 

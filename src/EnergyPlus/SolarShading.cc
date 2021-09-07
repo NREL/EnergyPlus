@@ -165,7 +165,7 @@ void InitSolarCalculations(EnergyPlusData &state)
     if (state.dataGlobal->BeginSimFlag) {
         if (state.files.outputControl.shd) {
             state.dataSolarShading->shd_stream =
-                std::unique_ptr<std::iostream>(new std::fstream(state.dataStrGlobals->outputShdFilePath, std::ios_base::out | std::ios_base::trunc));
+                std::make_unique<std::fstream>(state.dataStrGlobals->outputShdFilePath, std::ios_base::out | std::ios_base::trunc);
             if (!state.dataSolarShading->shd_stream) {
                 ShowFatalError(state,
                                "InitSolarCalculations: Could not open file \"" + state.dataStrGlobals->outputShdFilePath.string() +
@@ -8568,7 +8568,7 @@ void CalcAbsorbedOnExteriorOpaqueSurfaces(EnergyPlusData &state)
                 state.dataSurface->SurfOpaqAO(SurfNum) = state.dataConstruction->Construct(ConstrNum).OutsideAbsorpSolar * CosInc * SunLitFract;
 
                 // Note: movable insulation, if present, is accounted for in subr. InitIntSolarDistribution,
-                // where QRadSWOutMvIns is calculated from QRadSWOutAbs and insulation solar absorptance
+                // where SurfQRadSWOutMvIns is calculated from SurfOpaqQRadSWOutAbs and insulation solar absorptance
             }
         }
     }
@@ -8643,8 +8643,8 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
                     auto CurrentState = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.CurrentState;
                     auto &cplxState = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(CurrentState);
                     for (size_t Lay = 1; Lay <= numOfLayers; ++Lay) {
-                        // Simon: Imporant note about this equation is to use BeamSolarRad and not QRadSWOutIncident
-                        // is becuase BeamSolarRad is direct normal radiation (looking at the Sun) while QRadSWOutIncident
+                        // Simon: Imporant note about this equation is to use BeamSolarRad and not SurfQRadSWOutIncident
+                        // is becuase BeamSolarRad is direct normal radiation (looking at the Sun) while SurfRadSWOutIncident
                         // is normal to window incidence. Since BSDF coefficients are taking into account angle of incidence,
                         // BeamSolarRad should be used in this case
                         state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) =

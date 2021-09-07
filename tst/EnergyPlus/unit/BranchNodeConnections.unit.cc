@@ -88,7 +88,6 @@ using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::OutputReportTabular;
 using namespace SimulationManager;
-using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 
@@ -962,7 +961,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
         "  DCVObject,               !- Name",
         "  AvailSched,              !- Availability Schedule Name",
         "  Yes,                     !- Demand Controlled Ventilation",
-        "  VentilationRateProcedure,!- System Outdoor Air Method",
+        "  Standard62.1VentilationRateProcedure,!- System Outdoor Air Method",
         "  ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}",
         "  Space,  !- Zone 1 Name",
         "  Space DSOA Design OA Spec,  !- Design Specification Outdoor Air Object Name 1",
@@ -1982,7 +1981,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
         "  DCVObject,               !- Name",
         "  AvailSched,              !- Availability Schedule Name",
         "  Yes,                     !- Demand Controlled Ventilation",
-        "  VentilationRateProcedure,!- System Outdoor Air Method",
+        "  Standard62.1VentilationRateProcedure,!- System Outdoor Air Method",
         "  ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}",
         "  Space,  !- Zone 1 Name",
         "  Space DSOA Design OA Spec,  !- Design Specification Outdoor Air Object Name 1",

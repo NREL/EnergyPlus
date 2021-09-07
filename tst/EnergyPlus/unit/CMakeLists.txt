@@ -154,6 +154,7 @@ set(test_src
     MixerComponent.unit.cc
     NodeInputManager.unit.cc
     OASystemHWPreheatCoil.unit.cc
+    OccupantDiversity.unit.cc
     OutAirNodeManager.unit.cc
     OutdoorAirUnit.unit.cc
     OutputFiles.unit.cc
@@ -206,6 +207,7 @@ set(test_src
     SolarShading.unit.cc
     SortAndStringUtilities.unit.cc
     SQLite.unit.cc
+    Standard621SimplifiedProcedure.unit.cc
     StandardRatings.unit.cc
     StringUtilities.unit.cc
     SurfaceGeometry.unit.cc
@@ -232,6 +234,7 @@ set(test_src
     WaterThermalTanks.unit.cc
     WaterToAirHeatPump.unit.cc
     WaterToAirHeatPumpSimple.unit.cc
+    WaterUse.unit.cc
     WeatherManager.unit.cc
     WinCalcEngine.unit.cc
     WindowAC.unit.cc

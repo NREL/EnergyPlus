@@ -410,7 +410,7 @@ TEST_F(InputProcessorFixture, parse_empty_fields)
             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
-                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
             }
         }
     }
@@ -449,7 +449,7 @@ TEST_F(InputProcessorFixture, parse_utf_8)
             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
-                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
             }
         }
     }
@@ -639,7 +639,7 @@ TEST_F(InputProcessorFixture, parse_latin1_json)
     json &epJSON = getEpJSON();
 
     auto it = epJSON.find("Construction");
-    ASSERT_NE(it, epJSON.end());
+    ASSERT_TRUE(it != epJSON.end());
     auto iit = it->begin();
     EXPECT_EQ("1\xB0piano", iit.key());
 }
@@ -750,7 +750,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
-                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
             }
         }
     }
@@ -818,7 +818,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_non_extensible_objects)
             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
-                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
             }
         }
     }
@@ -947,16 +947,17 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_extensibles)
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
                 if (!tmp.is_array()) {
-                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
                 } else {
                     for (size_t i = 0; i < it_in_in.value().size(); i++) {
                         for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
                             if (it_ext.value().empty()) {
-                                EXPECT_EQ(epJSON[it.key()][it_in.key()][it_in_in.key()][i].empty(), it_ext.value().empty());
+                                EXPECT_EQ(epJSON[it.key()][it_in.key()][it_in_in.key()][i].empty(), it_ext.value().empty())
+                                    << "key: " << it_ext.key();
                                 continue;
                             }
                             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
-                            EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                            EXPECT_EQ(tmp.dump(), it_ext.value().dump()) << "key: " << it_ext.key();
                         }
                     }
                 }
@@ -1054,12 +1055,12 @@ TEST_F(InputProcessorFixture, parse_idf_extensible_blank_required_extensible_fie
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
                 if (!tmp.is_array()) {
-                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
                 } else {
                     for (size_t i = 0; i < it_in_in.value().size(); i++) {
                         for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
                             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
-                            EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                            EXPECT_EQ(tmp.dump(), it_ext.value().dump()) << "key: " << it_ext.key();
                         }
                     }
                 }
@@ -1116,12 +1117,12 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_extensible)
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
                 if (!tmp.is_array()) {
-                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
                 } else {
                     for (size_t i = 0; i < it_in_in.value().size(); i++) {
                         for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
                             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
-                            EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                            EXPECT_EQ(tmp.dump(), it_ext.value().dump()) << "key: " << it_ext.key();
                         }
                     }
                 }
@@ -1230,12 +1231,12 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_extensible_objects)
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
                 if (!tmp.is_array()) {
-                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
                 } else {
                     for (size_t i = 0; i < it_in_in.value().size(); i++) {
                         for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
                             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
-                            EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                            EXPECT_EQ(tmp.dump(), it_ext.value().dump()) << "key: " << it_ext.key();
                         }
                     }
                 }
@@ -1338,7 +1339,7 @@ TEST_F(InputProcessorFixture, parse_idf)
             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
-                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
             }
         }
     }
@@ -1397,7 +1398,7 @@ TEST_F(InputProcessorFixture, parse_idf_two_objects)
             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()]);
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
-                EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
             }
         }
     }
@@ -1449,12 +1450,12 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles)
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
                 if (!tmp.is_array()) {
-                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
                 } else {
                     for (size_t i = 0; i < it_in_in.value().size(); i++) {
                         for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
                             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
-                            EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                            EXPECT_EQ(tmp.dump(), it_ext.value().dump()) << "key: " << it_ext.key();
                         }
                     }
                 }
@@ -1541,12 +1542,12 @@ TEST_F(InputProcessorFixture, parse_idf_extensibles_two_objects)
             for (auto it_in_in = it_in.value().begin(); it_in_in != it_in.value().end(); ++it_in_in) {
                 ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()]);
                 if (!tmp.is_array()) {
-                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump());
+                    EXPECT_EQ(tmp.dump(), it_in_in.value().dump()) << "key: " << it_in_in.key();
                 } else {
                     for (size_t i = 0; i < it_in_in.value().size(); i++) {
                         for (auto it_ext = it_in_in.value()[i].begin(); it_ext != it_in_in.value()[i].end(); ++it_ext) {
                             ASSERT_NO_THROW(tmp = epJSON[it.key()][it_in.key()][it_in_in.key()][i][it_ext.key()]);
-                            EXPECT_EQ(tmp.dump(), it_ext.value().dump());
+                            EXPECT_EQ(tmp.dump(), it_ext.value().dump()) << "key: " << it_ext.key();
                         }
                     }
                 }
@@ -1566,7 +1567,7 @@ TEST_F(InputProcessorFixture, validate_idf_parametric_ght_HVACtemplate)
                                             "$bldgArea = 300.0,       !- Parametric Logic Line 5",
                                             "$depth = SQRT($bldgArea / $aspectRatio),  !- Parametric Logic Line 6",
                                             "$width = $depth * $aspectRatio,  !- Parametric Logic Line 7",
-                                            "$height = 4.0;           !- Parametric Logic Line 8"
+                                            "$height = 4.0;           !- Parametric Logic Line 8",
                                             "",
                                             "GroundHeatTransfer:Control,",
                                             "GHT Control, !- Name",
@@ -1803,41 +1804,31 @@ TEST_F(InputProcessorFixture, eat_comment)
 TEST_F(InputProcessorFixture, parse_string)
 {
     size_t index = 0;
-    bool success = true;
     std::string output_string;
 
-    output_string = parse_string("test_string", index, success);
+    output_string = parse_string("test_string", index);
     EXPECT_EQ("test_string", output_string);
     EXPECT_EQ(11ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    success = true;
-    output_string = parse_string("-1234.1234", index, success);
+    output_string = parse_string("-1234.1234", index);
     EXPECT_EQ("-1234.1234", output_string);
     EXPECT_EQ(10ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    success = true;
-    output_string = parse_string(R"(\b\t/\\\";)", index, success);
+    output_string = parse_string(R"(\b\t/\\\";)", index);
     EXPECT_EQ(R"(\b\t/\\\")", output_string);
     EXPECT_EQ(9ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    success = true;
-    output_string = parse_string(R"(test \n string)", index, success);
+    output_string = parse_string(R"(test \n string)", index);
     EXPECT_EQ(R"(test \n string)", output_string);
     EXPECT_EQ(14ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    success = true;
-    output_string = parse_string(R"(! this is a comment \n)", index, success);
+    output_string = parse_string(R"(! this is a comment \n)", index);
     EXPECT_EQ("", output_string);
     EXPECT_EQ(0ul, index);
-    EXPECT_TRUE(success);
 }
 
 TEST_F(InputProcessorFixture, parse_value)
@@ -1869,136 +1860,119 @@ TEST_F(InputProcessorFixture, parse_value)
 TEST_F(InputProcessorFixture, parse_number)
 {
     size_t index = 0;
-    bool success = true;
     json output;
 
-    output = parse_number("4.5,", index, success);
+    output = parse_number("+0.5,", index);
+    EXPECT_EQ(0.5, output.get<double>());
+    EXPECT_EQ(4ul, index);
+
+    index = 0;
+    output = parse_number("4.5,", index);
     EXPECT_EQ(4.5, output.get<double>());
     EXPECT_EQ(3ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number("0.53;", index, success);
+    output = parse_number("0.53;", index);
     EXPECT_EQ(0.53, output.get<double>());
     EXPECT_EQ(4ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number("1.53  ;", index, success);
+    output = parse_number("1.53  ;", index);
     EXPECT_EQ(1.53, output.get<double>());
     EXPECT_EQ(4ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number(" 1.53  ;", index, success);
+    output = parse_number(" 1.53  ;", index);
     EXPECT_EQ(1.53, output.get<double>());
     EXPECT_EQ(5ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number("2.510035e5;", index, success);
+    output = parse_number("2.510035e5;", index);
     EXPECT_EQ(251003.5, output.get<double>());
     EXPECT_EQ(10ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number("2.510035e-05;", index, success);
+    output = parse_number("2.510035e-05;", index);
     EXPECT_EQ(0.00002510035, output.get<double>());
     EXPECT_EQ(12ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number("1.0E-05;", index, success);
+    output = parse_number("1.0E-05;", index);
     EXPECT_EQ(0.000010, output.get<double>());
     EXPECT_EQ(7ul, index);
-    EXPECT_TRUE(success);
 
     // handling weird scientific notation
     index = 0;
-    output = parse_number("5E-5;", index, success);
+    output = parse_number("5E-5;", index);
     EXPECT_EQ(0.00005, output.get<double>());
     EXPECT_EQ(4ul, index);
-    EXPECT_TRUE(success);
 
     // handling weird scientific notation
     index = 0;
-    output = parse_number("5E-05;", index, success);
+    output = parse_number("5E-05;", index);
     EXPECT_EQ(0.00005, output.get<double>());
     EXPECT_EQ(5ul, index);
-    EXPECT_TRUE(success);
 
     // handling weird scientific notation
     index = 0;
-    output = parse_number("5.E-05;", index, success);
+    output = parse_number("5.E-05;", index);
     EXPECT_EQ(0.00005, output.get<double>());
     EXPECT_EQ(6ul, index);
-    EXPECT_TRUE(success);
 
     index = 0;
-    output = parse_number("11th of April,", index, success);
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    output = parse_number("11th of April,", index);
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(13ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("-+4,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("-+4,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(3ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4..0,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4..0,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(4ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("++4,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("++4,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(3ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("--4,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("--4,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(3ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4++,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4++,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(3ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4--,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4--,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(3ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4ee5,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4ee5,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(4ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4EE5,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4EE5,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(4ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4eE5,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4eE5,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(4ul, index);
 
     index = 0;
-    EXPECT_NO_THROW(output = parse_number("4Ee5,", index, success));
-    EXPECT_TRUE(output.is_null());
-    EXPECT_EQ(0ul, index);
-    EXPECT_FALSE(success);
+    EXPECT_NO_THROW(output = parse_number("4Ee5,", index));
+    EXPECT_TRUE(output.is_string());
+    EXPECT_EQ(4ul, index);
 }
 
 TEST_F(InputProcessorFixture, look_ahead)
@@ -2007,31 +1981,31 @@ TEST_F(InputProcessorFixture, look_ahead)
     size_t index = 0;
     IdfParser::Token token = look_ahead(test_input, index);
     EXPECT_EQ(0ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     index = 2;
     token = look_ahead(test_input, index);
     EXPECT_EQ(2ul, index);
-    EXPECT_EQ(IdfParser::Token::COMMA, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::COMMA, token));
     index = 3;
     token = look_ahead(test_input, index);
     EXPECT_EQ(3ul, index);
-    EXPECT_EQ(IdfParser::Token::EXCLAMATION, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::EXCLAMATION, token));
     index = 5;
     token = look_ahead(test_input, index);
     EXPECT_EQ(5ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     index = 7;
     token = look_ahead(test_input, index);
     EXPECT_EQ(7ul, index);
-    EXPECT_EQ(IdfParser::Token::SEMICOLON, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::SEMICOLON, token));
     index = 9;
     token = look_ahead(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     index = test_input.size();
     token = look_ahead(test_input, index);
     EXPECT_EQ(test_input.size(), index);
-    EXPECT_EQ(IdfParser::Token::END, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::END, token));
 }
 
 TEST_F(InputProcessorFixture, next_token)
@@ -2041,26 +2015,26 @@ TEST_F(InputProcessorFixture, next_token)
     std::string const test_input("B , ! t ; `");
     IdfParser::Token token = next_token(test_input, index);
     EXPECT_EQ(1ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     token = next_token(test_input, index);
     EXPECT_EQ(3ul, index);
-    EXPECT_EQ(IdfParser::Token::COMMA, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::COMMA, token));
     token = next_token(test_input, index);
     EXPECT_EQ(5ul, index);
-    EXPECT_EQ(IdfParser::Token::EXCLAMATION, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::EXCLAMATION, token));
     token = next_token(test_input, index);
     EXPECT_EQ(7ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     token = next_token(test_input, index);
     EXPECT_EQ(9ul, index);
-    EXPECT_EQ(IdfParser::Token::SEMICOLON, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::SEMICOLON, token));
     token = next_token(test_input, index);
     EXPECT_EQ(11ul, index);
-    EXPECT_EQ(IdfParser::Token::STRING, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::STRING, token));
     index = test_input.size();
     token = next_token(test_input, index);
     EXPECT_EQ(test_input.size(), index);
-    EXPECT_EQ(IdfParser::Token::END, token);
+    EXPECT_TRUE(compare_enums(IdfParser::Token::END, token));
 }
 
 TEST_F(InputProcessorFixture, getObjectItem_json1)
@@ -2669,10 +2643,10 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, true, true, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(26, NumNumbers);
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8, 16.7,   0.0085, 0.0085, 0,      0, 0,
-                                                        0,      0,   0, 0,      0,    0,      1,    -99999, 0,      0,      -99999, 0, 0}),
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8,   16.7, 0.0085, 0.0085, 0, 0, 0, 0,
+                                                        0,      0,   0, 0,      0,    1,      -99999, 0,    0,      -99999, 0, 0, 0}),
                                    Numbers));
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true, true,
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true, true, true,
                                                       true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true, true, true}),
                                    lNumericBlanks));
     EXPECT_EQ(1, IOStatus);

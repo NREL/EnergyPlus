@@ -1344,7 +1344,8 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
         int SysSizNum = UtilityRoutines::FindItemInList(
             FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
-        if (FinalSysSizing(AirLoopNum).OAAutoSized && state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP &&
+        if (FinalSysSizing(AirLoopNum).OAAutoSized &&
+            (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP || state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) &&
             state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones > 1 && FinalSysSizing(AirLoopNum).LoadSizeType != Ventilation) {
 
             // Loop over all zones connected to air loop, redo both cooling and heating calcs for Zdz minimum discharge outdoor air fraction for
@@ -1446,7 +1447,14 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                     Real64 Er = TermUnitFinalZoneSizing(termUnitSizingIndex)
                                     .ZoneSecondaryRecirculation; // user input in Zone Air Distribution design spec object
 
-                    if (Er > 0.0) { // multi path zone
+                    if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+                        if (state.dataSize->DBySys(AirLoopNum) < 0.60) {
+                            state.dataSize->EvzByZoneHeat(termUnitSizingIndex) = 0.88 * state.dataSize->DBySys(AirLoopNum) + 0.22;
+                        } else {
+                            state.dataSize->EvzByZoneHeat(termUnitSizingIndex) = 0.75;
+                        }
+                        state.dataSize->EvzByZoneCool(termUnitSizingIndex) = state.dataSize->EvzByZoneHeat(termUnitSizingIndex);
+                    } else if (Er > 0.0) { // 62.1 ventilation rate procedure - multi path zone
                         // Find Evz for cooling
                         Real64 Ep_Clg =
                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction; // as adjusted in ManageSystemSizingAdjustments();
@@ -1478,7 +1486,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                             (Fa_Htg + state.dataSize->XsBySysHeat(AirLoopNum) * Fb_Htg - state.dataSize->ZdzHtgByZone(termUnitSizingIndex) * Fc_Htg) /
                             Fa_Htg;
 
-                    } else { // single path zone
+                    } else { // 62.1 ventilation rate procedure - single path zone
                         state.dataSize->EvzByZoneCool(termUnitSizingIndex) =
                             1.0 + state.dataSize->XsBySysCool(AirLoopNum) - state.dataSize->ZdzClgByZone(termUnitSizingIndex);
                         SimAirServingZones::LimitZoneVentEff(state,
@@ -1585,6 +1593,17 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                  4); // Pz-sum
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchS62svrClD, FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->DBySys(AirLoopNum), 4); // D
+        // Origin of D
+        int SysSizNum = UtilityRoutines::FindItemInList(
+            FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
+        if (state.dataSize->SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchS62svrClDorg, FinalSysSizing(AirLoopNum).AirPriLoopName, "Calculated from schedules");
+        } else {
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchS62svrClDorg, FinalSysSizing(AirLoopNum).AirPriLoopName, "User-specified");
+        }
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchS62svrClVou,
                                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
@@ -1605,6 +1624,21 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                                  state.dataSize->EvzMinBySysCool(AirLoopNum),
                                                  4); // Ev
+        // Ev Calculation Methodology
+        if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP) {
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchS62svrClEvMthd,
+                                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                                     "Standard 62.1 Ventilation Rate Procedure");
+        } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchS62svrClEvMthd,
+                                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                                     "Standard 62.1 Simplified Procedure");
+        } else {
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchS62svrClEvMthd, FinalSysSizing(AirLoopNum).AirPriLoopName, "Not calculated");
+        }
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchS62svrClVot,
                                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
@@ -1644,6 +1678,14 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                  4); // Pz-sum
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchS62svrHtD, FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->DBySys(AirLoopNum), 4); // D
+        // Origin of D
+        if (state.dataSize->SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchS62svrHtDorg, FinalSysSizing(AirLoopNum).AirPriLoopName, "Calculated from schedules");
+        } else {
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchS62svrHtDorg, FinalSysSizing(AirLoopNum).AirPriLoopName, "User-specified");
+        }
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchS62svrHtVou,
                                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
@@ -1664,6 +1706,21 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
                                                  state.dataSize->EvzMinBySysHeat(AirLoopNum),
                                                  4); // Ev
+        // Ev Calculation Methodology
+        if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP) {
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchS62svrHtEvMthd,
+                                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                                     "Standard 62.1 Ventilation Rate Procedure");
+        } else if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchS62svrHtEvMthd,
+                                                     FinalSysSizing(AirLoopNum).AirPriLoopName,
+                                                     "Standard 62.1 Simplified Procedure");
+        } else {
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchS62svrHtEvMthd, FinalSysSizing(AirLoopNum).AirPriLoopName, "Not calculated");
+        }
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchS62svrHtVot,
                                                  FinalSysSizing(AirLoopNum).AirPriLoopName,
@@ -1846,6 +1903,14 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                              TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                              state.dataSize->VpzMinClgByZone(termUnitSizingIndex),
                                                              4); // Vpz-min
+                    // Vpz-min, simplified procedure?
+                    if (TermUnitFinalZoneSizing(termUnitSizingIndex).VpzMinByZoneSPSized) {
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchS62zcdVpzminSPSize, TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName, "Yes");
+                    } else {
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchS62zcdVpzminSPSize, TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName, "No");
+                    }
                     Real64 VozClg = 0.0;
                     if (TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling > 0.0) {
                         VozClg = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
@@ -1920,6 +1985,14 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                                                              TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                              state.dataSize->VpzMinHtgByZone(termUnitSizingIndex),
                                                              4); // Vpz-min
+                    // Vpz-min, simplified procedure?
+                    if (TermUnitFinalZoneSizing(termUnitSizingIndex).VpzMinByZoneSPSized) {
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchS62zhdVpzminSPSize, TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName, "Yes");
+                    } else {
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchS62zhdVpzminSPSize, TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName, "No");
+                    }
                     Real64 VozHtg = 0.0;
                     if (TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating != 0.0) {
                         VozHtg = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating;
@@ -2074,13 +2147,14 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
 {
 
     auto &FinalSysSizing(state.dataSize->FinalSysSizing);
+    auto &SysSizInput(state.dataSize->SysSizInput);
 
     // determine Pz sum, Ps, and D for each air system for standard 62.1
 
     // first determine if any airloops use VRP, if not then don't need to march thru year of schedules for performance
     bool anyVRPinModel(false);
     for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-        if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_VRP) {
+        if (FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_VRP || FinalSysSizing(AirLoopNum).SystemOAMethod == SOAM_SP) {
             anyVRPinModel = true;
             break;
         }
@@ -2090,7 +2164,8 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
         int SysSizNum = UtilityRoutines::FindItemInList(
             FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
-        if (FinalSysSizing(AirLoopNum).OAAutoSized) {
+        // only retrieve data if the occupant density is set to be autosized
+        if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
             state.dataSize->PzSumBySys(AirLoopNum) = 0.0;
             state.dataSize->PsBySys(AirLoopNum) = 0.0;
             for (int zoneNumOnLoop = 1; zoneNumOnLoop <= state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones; ++zoneNumOnLoop) {
@@ -2114,7 +2189,7 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
         return; // early return to not march through schedules
     }
 
-    DisplayString(state, "Standard 62.1 Ventilation Rate Procedure: Process Concurrent People by Air System");
+    DisplayString(state, "Standard 62.1 Ventilation Rate Procedure: Determine System Occupant Diversity");
     // now march through all zone timesteps for entire year to find the concurrent max
     int DaysInYear(366);  // assume leap year
     int dayOfWeekType(1); // assume year starts on Sunday
@@ -2135,7 +2210,7 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
                     int SysSizNum = UtilityRoutines::FindItemInList(
                         FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
                     if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
-                    if (FinalSysSizing(AirLoopNum).OAAutoSized) {
+                    if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
 
                         // Loop over all zones connected to air loop
                         Real64 TotConcurrentPeopleOnSys = 0.0;
@@ -2180,16 +2255,31 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
 
     // compute D for standard 62.1 by system
     for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-        if (state.dataSize->PzSumBySys(AirLoopNum) > 0.0) {
-            state.dataSize->DBySys(AirLoopNum) = state.dataSize->PsBySys(AirLoopNum) / state.dataSize->PzSumBySys(AirLoopNum);
+        int SysSizNum = UtilityRoutines::FindItemInList(
+            FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
+
+        // compute D if set to autosize
+        if (SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
+            if (state.dataSize->PzSumBySys(AirLoopNum) > 0.0) {
+                state.dataSize->DBySys(AirLoopNum) = state.dataSize->PsBySys(AirLoopNum) / state.dataSize->PzSumBySys(AirLoopNum);
+            } else {
+                state.dataSize->DBySys(AirLoopNum) = 1.0;
+            }
+            state.dataSize->DBySys(AirLoopNum) = min(1.0, state.dataSize->DBySys(AirLoopNum));
         } else {
-            state.dataSize->DBySys(AirLoopNum) = 1.0;
+            // set the occupant diversity based on user-specified value
+            state.dataSize->DBySys(AirLoopNum) = SysSizInput(SysSizNum).OccupantDiversity;
         }
-        state.dataSize->DBySys(AirLoopNum) = min(1.0, state.dataSize->DBySys(AirLoopNum));
 
         // For single zone systems, D should be 1.0.
         if (state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones == 1) {
             state.dataSize->DBySys(AirLoopNum) = 1.0;
+            ShowWarningError(
+                state,
+                format("The {} air loop serves a single zone. The Occupant Diversity was calculated or set to a value less than 1.0. Single-zone air "
+                       "loops should have an Occupant Diversity of 1.0. The Occupant Diversity value for that air loop has been reset to 1.0",
+                       FinalSysSizing(AirLoopNum).AirPriLoopName));
         }
     }
 }
@@ -3011,9 +3101,9 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lNumericFieldBlanks(3)) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatDesTemp = 0.0;
                 } else if (state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnHeatDgnSAMethod == SupplyAirTemperature) {
-                    ReportTemperatureInputError(state, cCurrentModuleObject, 1, lowTempLimit, false, ErrorsFound);
+                    ReportTemperatureInputError(state, cCurrentModuleObject, 3, lowTempLimit, false, ErrorsFound);
                     ReportTemperatureInputError(
-                        state, cCurrentModuleObject, 1, state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp, true, ErrorsFound);
+                        state, cCurrentModuleObject, 3, state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp, true, ErrorsFound);
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatDesTemp = state.dataIPShortCut->rNumericArgs(3);
                 } else {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatDesTemp = 0.0;
@@ -3407,7 +3497,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
 void ReportTemperatureInputError(
     EnergyPlusData &state, std::string cObjectName, int const paramNum, Real64 comparisonTemperature, bool const shouldFlagSevere, bool &ErrorsFound)
 {
-    if (state.dataIPShortCut->rNumericArgs(1) < comparisonTemperature) {
+    if (state.dataIPShortCut->rNumericArgs(paramNum) < comparisonTemperature) {
         if (shouldFlagSevere) { // heating supply air temperature is lower than cooling supply air temperature--not allowed
             ShowSevereError(state, cObjectName + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid data.");
             ShowContinueError(state,
@@ -3573,6 +3663,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
     constexpr int iHeatDesignCapacityNumericNum(24);          // N24, \field Heating Design Capacity {W}
     constexpr int iHeatCapacityPerFloorAreaNumericNum(25);    // N25, \field Heating Design Capacity Per Floor Area {W/m2}
     constexpr int iHeatFracOfAutosizedCapacityNumericNum(26); // N26, \field Fraction of Autosized Cooling Design Capacity {-}
+    constexpr int iOccupantDiversity = 27;                    // N26, \field Occupant Diversity
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SysSizIndex;         // loop index
@@ -3911,7 +4002,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
             auto const systemOAMethod(state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum));
             if (systemOAMethod == "ZONESUM") {
                 SysSizInput(SysSizIndex).SystemOAMethod = SOAM_ZoneSum;
-            } else if (systemOAMethod == "VENTILATIONRATEPROCEDURE") {
+            } else if (systemOAMethod == "STANDARD62.1VENTILATIONRATEPROCEDURE") {
                 SysSizInput(SysSizIndex).SystemOAMethod = SOAM_VRP;
                 if (SysSizInput(SysSizIndex).LoadSizeType == Ventilation) {
                     ShowWarningError(
@@ -3931,12 +4022,14 @@ void GetSystemSizingInput(EnergyPlusData &state)
                                               " > 0, user entry will be ignored.");
                     }
                 }
+            } else if (systemOAMethod == "STANDARD62.1SIMPLIFIEDPROCEDURE") {
+                SysSizInput(SysSizIndex).SystemOAMethod = SOAM_SP;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
                 ShowContinueError(state,
                                   "... incorrect " + state.dataIPShortCut->cAlphaFieldNames(iSystemOASMethodAlphaNum) + "=\"" +
                                       state.dataIPShortCut->cAlphaArgs(iSystemOASMethodAlphaNum) + "\".");
-                ShowContinueError(state, "... valid values are ZoneSum or VentilationRateProcedure.");
+                ShowContinueError(state, "... valid values are ZoneSum or Standard62.1VentilationRateProcedure.");
                 ErrorsFound = true;
             }
         }
@@ -4097,6 +4190,33 @@ void GetSystemSizingInput(EnergyPlusData &state)
             ShowContinueError(state,
                               "... valid values are HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedHeatingCapacity, or None.");
             ErrorsFound = true;
+        }
+
+        //  N27; \field Occupant Diversity
+        //      \type real
+        //      \maximum 1.0
+        //      \minimum> 0.0
+        // int const  iOccupantDiversity = 27;     // N27, \field Occupant Diversity
+        if (state.dataIPShortCut->lNumericFieldBlanks(iOccupantDiversity)) {
+            SysSizInput(SysSizIndex).OccupantDiversity = AutoSize;
+        } else if (state.dataIPShortCut->rNumericArgs(iOccupantDiversity) <= 0.0 &&
+                   state.dataIPShortCut->rNumericArgs(iOccupantDiversity) != AutoSize) {
+            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+            ShowContinueError(state,
+                              format("... incorrect {}=[{:.2R}],  value should not be negative.",
+                                     state.dataIPShortCut->cNumericFieldNames(iOccupantDiversity),
+                                     state.dataIPShortCut->rNumericArgs(iOccupantDiversity)));
+            ErrorsFound = true;
+        } else if (state.dataIPShortCut->rNumericArgs(iOccupantDiversity) > 1.0 &&
+                   state.dataIPShortCut->rNumericArgs(iOccupantDiversity) != AutoSize) {
+            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(iNameAlphaNum) + "\", invalid data.");
+            ShowContinueError(state,
+                              format("... incorrect {}=[{:.2R}],  value should not be greater than 1.0.",
+                                     state.dataIPShortCut->cNumericFieldNames(iOccupantDiversity),
+                                     state.dataIPShortCut->rNumericArgs(iOccupantDiversity)));
+            ErrorsFound = true;
+        } else {
+            SysSizInput(SysSizIndex).OccupantDiversity = state.dataIPShortCut->rNumericArgs(iOccupantDiversity);
         }
     }
 
@@ -4352,7 +4472,7 @@ void ReportZoneSizing(EnergyPlusData &state,
     // This subroutine writes one item of zone sizing data to the "eio" file..
 
     if (state.dataSizingManager->ReportZoneSizingMyOneTimeFlag) {
-        static constexpr fmt::string_view Format_990(
+        static constexpr std::string_view Format_990(
             "! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "
             "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
             "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
@@ -4361,7 +4481,7 @@ void ReportZoneSizing(EnergyPlusData &state,
         state.dataSizingManager->ReportZoneSizingMyOneTimeFlag = false;
     }
 
-    static constexpr fmt::string_view Format_991(
+    static constexpr std::string_view Format_991(
         " Zone Sizing Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
     print(state.files.eio,
           Format_991,

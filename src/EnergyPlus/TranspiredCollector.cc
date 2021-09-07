@@ -967,7 +967,7 @@ namespace TranspiredCollector {
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        using namespace DataHeatBalance; // , ONLY: QRadSWOutIncident, Construct, Material
+        using namespace DataHeatBalance; // , ONLY: SurfQRadSWOutIncident, Construct, Material
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const nu(15.66e-6); // kinematic viscosity (m**2/s) for air at 300 K
@@ -1135,7 +1135,7 @@ namespace TranspiredCollector {
                 state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
             AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
-            TsoK = state.dataHeatBalSurf->TH(1, 1, SurfPtr) + DataGlobalConstants::KelvinConv;
+            TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + DataGlobalConstants::KelvinConv;
             TscollK = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast + DataGlobalConstants::KelvinConv;
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
         }
@@ -1168,7 +1168,7 @@ namespace TranspiredCollector {
         HrPlen = sum(HPlenARR * Area) / AreaSum;
         HPlenARR.deallocate();
 
-        //        Isc = sum( QRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum;
+        //        Isc = sum( SurfQRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum;
         ////Autodesk:F2C++ Array subscript usage: Replaced by below
         Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident,
                               state.dataSurface->Surface,
@@ -1177,7 +1177,7 @@ namespace TranspiredCollector {
               AreaSum; // Autodesk:F2C++ Functions handle array subscript usage
         //        Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array
         // subscript usage: Replaced by below
-        Tso = sum_product_sub(state.dataHeatBalSurf->TH(1, 1, _),
+        Tso = sum_product_sub(state.dataHeatBalSurf->SurfOutsideTempHist(1),
                               state.dataSurface->Surface,
                               &SurfaceData::Area,
                               state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /

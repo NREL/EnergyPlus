@@ -50,6 +50,7 @@
 #include <fstream>
 #include <iostream>
 #include <istream>
+#include <memory>
 #include <unordered_set>
 
 #include <ObjexxFCL/Array1S.hh>
@@ -71,6 +72,8 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+
+#include <fmt/os.h>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
 
@@ -102,27 +105,27 @@ static std::string const BlankString;
 
 using json = nlohmann::json;
 
-InputProcessor::InputProcessor() : idf_parser(std::unique_ptr<IdfParser>(new IdfParser())), data(std::unique_ptr<DataStorage>(new DataStorage()))
+InputProcessor::InputProcessor() : idf_parser(std::make_unique<IdfParser>()), data(std::make_unique<DataStorage>())
 {
     auto const embeddedEpJSONSchema = EmbeddedEpJSONSchema::embeddedEpJSONSchema();
-    schema = json::from_cbor(embeddedEpJSONSchema.first, embeddedEpJSONSchema.second);
+    schema = json::from_cbor(embeddedEpJSONSchema);
 
     const json &loc = schema["properties"];
     caseInsensitiveObjectMap.reserve(loc.size());
     for (auto it = loc.begin(); it != loc.end(); ++it) {
         caseInsensitiveObjectMap.emplace(convertToUpper(it.key()), it.key());
     }
-    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
-    data = std::unique_ptr<DataStorage>(new DataStorage());
+    idf_parser = std::make_unique<IdfParser>();
+    data = std::make_unique<DataStorage>();
     epJSON = json::object();
     //    objectCacheMap.clear();
     //    unusedInputs.clear();
-    validation = std::unique_ptr<Validation>(new Validation(&schema));
+    validation = std::make_unique<Validation>(&schema);
 }
 
 std::unique_ptr<InputProcessor> InputProcessor::factory()
 {
-    auto ret = std::unique_ptr<InputProcessor>(new InputProcessor());
+    auto ret = std::make_unique<InputProcessor>();
     return ret;
 }
 
@@ -181,12 +184,12 @@ json const &InputProcessor::getPatternProperties(EnergyPlusData &state, json con
 // Functions
 
 // void InputProcessor::clear_state() {
-//    idf_parser = std::unique_ptr<IdfParser>(new IdfParser());
-//    data = std::unique_ptr<DataStorage>(new DataStorage());
+//    idf_parser = std::make_unique<IdfParser>();
+//    data = std::make_unique<DataStorage>();
 //    epJSON = json::object();
 //    objectCacheMap.clear();
 //    unusedInputs.clear();
-//    validation = std::unique_ptr<Validation>(new Validation(&schema));
+//    validation = std::make_unique<Validation>(&schema);
 //}
 
 std::vector<std::string> const &InputProcessor::validationErrors()
@@ -252,43 +255,14 @@ void cleanEPJSON(json &epjson)
 
 void InputProcessor::processInput(EnergyPlusData &state)
 {
-    std::ifstream input_stream(state.dataStrGlobals->inputFilePath, std::ifstream::in | std::ifstream::binary);
-    if (!input_stream.is_open()) {
+    if (!FileSystem::fileExists(state.dataStrGlobals->inputFilePath)) {
         ShowFatalError(state, "Input file path " + state.dataStrGlobals->inputFilePath.string() + " not found");
         return;
     }
 
-    // For some reason this does not work properly on Windows. This will be faster so should investigate in future.
-    // std::ifstream::pos_type size = input_stream.tellg();
-    // char *memblock = new char[(size_t) size + 1];
-    // input_stream.seekg(0, std::ios::beg);
-    // input_stream.read(memblock, size);
-    // memblock[size] = '\0';
-    // input_stream.close();
-    // std::string input_file = memblock;
-    // delete[] memblock;
-
-    // Potential C approach to reading file
-    // std::vector<char> v;
-    // if (FILE *fp = fopen("filename", "r"))
-    // {
-    //  char buf[1024];
-    //  while (size_t len = fread(buf, 1, sizeof(buf), fp))
-    //      v.insert(v.end(), buf, buf + len);
-    //  fclose(fp);
-    // }
-
     try {
         if (!state.dataGlobal->isEpJSON) {
-            std::string input_file;
-            std::string line;
-            while (std::getline(input_stream, line)) {
-                input_file.append(line + '\n');
-            }
-            if (input_file.empty()) {
-                ShowFatalError(state, "Failed to read input file: " + state.dataStrGlobals->inputFilePath.string());
-                return;
-            }
+            auto input_file = FileSystem::readFile(state.dataStrGlobals->inputFilePath);
 
             bool success = true;
             epJSON = idf_parser->decode(input_file, schema, success);
@@ -296,23 +270,12 @@ void InputProcessor::processInput(EnergyPlusData &state)
             if (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly) {
                 json epJSONClean = epJSON;
                 cleanEPJSON(epJSONClean);
-                input_file = epJSONClean.dump(4, ' ', false, json::error_handler_t::replace);
-                // input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
                 fs::path convertedIDF = FileSystem::makeNativePath(
-                    FileSystem::replaceFileExtension(state.dataStrGlobals->outputDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".epJSON"));
-                std::ofstream convertedFS(convertedIDF, std::ofstream::out);
-                convertedFS << input_file << std::endl;
+                    FileSystem::replaceFileExtension(state.dataStrGlobals->outDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".epJSON"));
+                FileSystem::writeFile<FileSystem::FileTypes::EpJSON>(convertedIDF, epJSONClean);
             }
-        } else if (state.dataGlobal->isCBOR) {
-            epJSON = json::from_cbor(input_stream);
-        } else if (state.dataGlobal->isMsgPack) {
-            epJSON = json::from_msgpack(input_stream);
-        } else if (state.dataGlobal->isUBJSON) {
-            epJSON = json::from_ubjson(input_stream);
-        } else if (state.dataGlobal->isBSON) {
-            epJSON = json::from_bson(input_stream);
         } else {
-            epJSON = json::parse(input_stream);
+            epJSON = FileSystem::readJSON(state.dataStrGlobals->inputFilePath, std::ios_base::in | std::ios_base::binary);
         }
     } catch (const std::exception &e) {
         ShowSevereError(state, e.what());
@@ -332,9 +295,8 @@ void InputProcessor::processInput(EnergyPlusData &state)
         if (versionMatch) {
             std::string const encoded = idf_parser->encode(epJSON, schema);
             fs::path convertedEpJSON = FileSystem::makeNativePath(
-                FileSystem::replaceFileExtension(state.dataStrGlobals->outputDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".idf"));
-            std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
-            convertedFS << encoded << std::endl;
+                FileSystem::replaceFileExtension(state.dataStrGlobals->outDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".idf"));
+            FileSystem::writeFile<FileSystem::FileTypes::IDF>(convertedEpJSON, encoded);
         } else {
             ShowWarningError(state, "Skipping conversion of epJSON to IDF due to mismatched Version.");
         }
@@ -363,7 +325,7 @@ bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
     auto it = epJSON.find("Version");
     if (it != epJSON.end()) {
         for (auto const &version : it.value()) {
-            std::string v = version["version_identifier"];
+            std::string v = version["version_identifier"].get<std::string>();
             if (v.empty()) {
                 ShowWarningError(state, "Input errors occurred and version ID was left blank, verify file version");
             } else {
@@ -797,11 +759,11 @@ InputProcessor::MaxFields InputProcessor::findMaxFields(
     if (!state.dataGlobal->isEpJSON) {
         auto found_idf_max_fields = ep_object.find("idf_max_fields");
         if (found_idf_max_fields != ep_object.end()) {
-            maxFields.max_fields = *found_idf_max_fields;
+            maxFields.max_fields = found_idf_max_fields->get<size_t>();
         }
         auto found_idf_max_extensible_fields = ep_object.find("idf_max_extensible_fields");
         if (found_idf_max_extensible_fields != ep_object.end()) {
-            maxFields.max_extensible_fields = *found_idf_max_extensible_fields;
+            maxFields.max_extensible_fields = found_idf_max_extensible_fields->get<size_t>();
         }
     } else {
         auto const &legacy_idd_fields = legacy_idd["fields"];
@@ -997,7 +959,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
     auto const &found_min_fields = epJSON_schema_it_val.find("min_fields");
     size_t min_fields = 0;
     if (found_min_fields != epJSON_schema_it_val.end()) {
-        min_fields = found_min_fields.value();
+        min_fields = found_min_fields.value().get<size_t>();
     }
 
     auto key = legacy_idd.find("extension");
@@ -1035,7 +997,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
     }
 
     for (size_t i = 0; i < legacy_idd_fields.size(); ++i) {
-        std::string const &field = legacy_idd_fields[i];
+        std::string const &field = legacy_idd_fields[i].get<std::string>();
         auto const &field_info = legacy_idd_field_info.find(field);
         auto const &field_info_val = field_info.value();
         if (field_info == legacy_idd_field_info.end()) {
@@ -1090,7 +1052,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
             for (auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it) {
                 auto const &epJSON_extension_obj = it.value();
                 for (size_t i = 0; i < legacy_idd_extensibles.size(); i++, extensible_count++) {
-                    std::string const &field_name = legacy_idd_extensibles[i];
+                    std::string const &field_name = legacy_idd_extensibles[i].get<std::string>();
                     auto const &field_info = legacy_idd_field_info.find(field_name);
                     auto const &field_info_val = field_info.value();
 
@@ -1149,7 +1111,7 @@ int InputProcessor::getIDFObjNum(EnergyPlusData &state, std::string const &Objec
 
     // get list of saved object numbers from idf processing
     for (auto it = obj->begin(); it != obj->end(); ++it) {
-        int objNum = it.value()["idf_order"];
+        int objNum = it.value()["idf_order"].get<int>();
         idfObjNums.emplace_back(objNum);
     }
 
@@ -1192,7 +1154,7 @@ int InputProcessor::getJSONObjNum(EnergyPlusData &state, std::string const &Obje
 
     // get list of saved object numbers from idf processing
     for (auto it = obj->begin(); it != obj->end(); ++it) {
-        int objNum = it.value()["idf_order"];
+        int objNum = it.value()["idf_order"].get<int>();
         idfObjNums.emplace_back(objNum);
     }
 
@@ -1274,7 +1236,7 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     for (auto it = obj->begin(); it != obj->end(); ++it) {
         auto it2 = it.value().find(NameTypeVal);
 
-        if ((it2 != it.value().end()) && (UtilityRoutines::MakeUPPERCase(AsString(it2.value())) == upperObjName)) {
+        if ((it2 != it.value().end()) && (UtilityRoutines::MakeUPPERCase(it2.value().get<std::string>()) == upperObjName)) {
             found = true;
             break;
         }
@@ -1623,7 +1585,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
             // Loop on all regular fields
             for (size_t i = 0; i < legacy_idd_fields.size(); ++i) {
 
-                std::string const &field = legacy_idd_fields[i];
+                std::string const &field = legacy_idd_fields[i].get<std::string>();
 
                 // This is weird, but some objects like Building have a Name default... and it's not in the patternProperties
                 if (has_idd_name_field && field == "name") {
@@ -1655,7 +1617,7 @@ void InputProcessor::reportIDFRecordsStats(EnergyPlusData &state)
                     for (auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it) {
                         auto const &epJSON_extension_obj = it.value();
                         for (size_t i = 0; i < legacy_idd_extensibles.size(); ++i) {
-                            std::string const &field = legacy_idd_extensibles[i];
+                            std::string const &field = legacy_idd_extensibles[i].get<std::string>();
                             auto const &schema_extension_field_obj = schema_extension_fields[field];
 
                             processField(field, epJSON_extension_obj, schema_extension_field_obj);
@@ -1911,9 +1873,9 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             auto it = fields.find("key_value");
             if (it != fields.end() && !it.value().empty()) {
-                addRecordToOutputVariableStructure(state, it.value(), fields.at("variable_name"));
+                addRecordToOutputVariableStructure(state, it.value().get<std::string>(), fields.at("variable_name").get<std::string>());
             } else {
-                addRecordToOutputVariableStructure(state, "*", fields.at("variable_name"));
+                addRecordToOutputVariableStructure(state, "*", fields.at("variable_name").get<std::string>());
             }
         }
     }
@@ -1931,9 +1893,10 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             for (auto const &extensions : fields[extension_key]) {
                 auto it = extensions.find("key_name");
                 if (it != extensions.end() && !obj.key().empty()) {
-                    addRecordToOutputVariableStructure(state, it.value(), extensions.at("output_variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(
+                        state, it.value().get<std::string>(), extensions.at("output_variable_or_meter_name").get<std::string>());
                 } else {
-                    addRecordToOutputVariableStructure(state, "*", extensions.at("output_variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(state, "*", extensions.at("output_variable_or_meter_name").get<std::string>());
                 }
             }
         }
@@ -1952,9 +1915,10 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             for (auto const &extensions : fields[extension_key]) {
                 auto it = extensions.find("key_name");
                 if (it != extensions.end() && !obj.key().empty()) {
-                    addRecordToOutputVariableStructure(state, it.value(), extensions.at("output_variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(
+                        state, it.value().get<std::string>(), extensions.at("output_variable_or_meter_name").get<std::string>());
                 } else {
-                    addRecordToOutputVariableStructure(state, "*", extensions.at("output_variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(state, "*", extensions.at("output_variable_or_meter_name").get<std::string>());
                 }
             }
         }
@@ -1967,9 +1931,10 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             auto it = fields.find("output_variable_or_output_meter_index_key_name");
             if (it != fields.end() && !it.value().empty()) {
-                addRecordToOutputVariableStructure(state, it.value(), fields.at("output_variable_or_output_meter_name"));
+                addRecordToOutputVariableStructure(
+                    state, it.value().get<std::string>(), fields.at("output_variable_or_output_meter_name").get<std::string>());
             } else {
-                addRecordToOutputVariableStructure(state, "*", fields.at("output_variable_or_output_meter_name"));
+                addRecordToOutputVariableStructure(state, "*", fields.at("output_variable_or_output_meter_name").get<std::string>());
             }
         }
     }
@@ -1992,9 +1957,9 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
             if (!obj.key().empty()) {
-                addRecordToOutputVariableStructure(state, obj.key(), fields.at("key_value"));
+                addRecordToOutputVariableStructure(state, obj.key(), fields.at("key_value").get<std::string>());
             } else {
-                addRecordToOutputVariableStructure(state, "*", fields.at("key_value"));
+                addRecordToOutputVariableStructure(state, "*", fields.at("key_value").get<std::string>());
             }
         }
     }
@@ -2011,7 +1976,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    addRecordToOutputVariableStructure(state, "*", extensions.at("variable_or_meter_name"));
+                    addRecordToOutputVariableStructure(state, "*", extensions.at("variable_or_meter_name").get<std::string>());
                 } catch (...) {
                     continue; // blank or erroneous fields are handled at the get input function for the object
                 }
@@ -2031,7 +1996,8 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    addRecordToOutputVariableStructure(state, "*", extensions.at("variable_or_meter_or_ems_variable_or_field_name"));
+                    addRecordToOutputVariableStructure(
+                        state, "*", extensions.at("variable_or_meter_or_ems_variable_or_field_name").get<std::string>());
                 } catch (...) {
                     continue; // blank or erroneous fields are handled at the get input function for the object
                 }
@@ -2051,7 +2017,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    auto const report_name = UtilityRoutines::MakeUPPERCase(AsString(extensions.at("report_name")));
+                    auto const report_name = UtilityRoutines::MakeUPPERCase(extensions.at("report_name").get<std::string>());
                     if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
                         for (int i = 1; i <= DataOutputs::NumMonthlyReports; ++i) {
                             addVariablesForMonthlyReport(state, DataOutputs::MonthlyNamedReports(i));
