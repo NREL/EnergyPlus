@@ -640,19 +640,10 @@ namespace UserDefinedComponents {
                             state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes " + LoopStr);
 
                         {
-                            auto const SELECT_CASE_var(cAlphaArgs(aArgCount + 2));
-                            if (SELECT_CASE_var == "DEMANDSLOAD") {
-                                state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
-                                    DataPlant::HowMet::NoneDemand;
-                            } else if (SELECT_CASE_var == "MEETSLOADWITHPASSIVECAPACITY") {
-                                state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
-                                    DataPlant::HowMet::PassiveCap;
-                            } else if (SELECT_CASE_var == "MEETSLOADWITHNOMINALCAPACITY") {
-                                state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
-                                    DataPlant::HowMet::ByNominalCap;
-                            } else if (SELECT_CASE_var == "MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMIT") {
-                                state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
-                                    DataPlant::HowMet::ByNominalCapLowOutLimit;
+                            state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
+                                static_cast<DataPlant::HowMet>(getEnumerationValue(DataPlant::HowMetTypeNamesUC, cAlphaArgs(aArgCount + 2)));
+                            if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed ==
+                                DataPlant::HowMet::ByNominalCapLowOutLimit) {
                                 // actuator for low out limit
                                 SetupEMSActuator(state,
                                                  "Plant Connection " + LoopStr,
@@ -661,9 +652,8 @@ namespace UserDefinedComponents {
                                                  "[C]",
                                                  state.dataUserDefinedComponents->lDummy_EMSActuatedPlantComp,
                                                  state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).LowOutTempLimit);
-                            } else if (SELECT_CASE_var == "MEETSLOADWITHNOMINALCAPACITYHIOUTLIMIT") {
-                                state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
-                                    DataPlant::HowMet::ByNominalCapHiOutLimit;
+                            } else if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed ==
+                                       DataPlant::HowMet::ByNominalCapHiOutLimit) {
                                 // actuator for hi out limit
                                 SetupEMSActuator(state,
                                                  "Plant Connection " + LoopStr,
@@ -676,17 +666,9 @@ namespace UserDefinedComponents {
                         }
 
                         {
-                            auto const SELECT_CASE_var(cAlphaArgs(aArgCount + 3));
-                            if (SELECT_CASE_var == "NEEDSFLOWIFLOOPON") {
-                                state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).FlowPriority =
-                                    DataPlant::LoopFlowStatus::NeedyIfLoopOn;
-                            } else if (SELECT_CASE_var == "NEEDSFLOWANDTURNSLOOPON") {
-                                state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).FlowPriority =
-                                    DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
-                            } else if (SELECT_CASE_var == "RECEIVESWHATEVERFLOWAVAILABLE") {
-                                state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).FlowPriority =
-                                    DataPlant::LoopFlowStatus::TakesWhatGets;
-                            }
+                            state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).FlowPriority =
+                                static_cast<DataPlant::LoopFlowStatus>(
+                                    getEnumerationValue(DataPlant::LoopFlowStatusTypeNamesUC, cAlphaArgs(aArgCount + 3)));
                         }
 
                         // find program manager for initial setup, begin environment and sizing of this plant connection

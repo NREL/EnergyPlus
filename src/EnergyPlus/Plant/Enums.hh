@@ -58,7 +58,8 @@ enum class LoopFlowStatus
                          // most conditions
     NeedyIfLoopOn, // component is a "winner" for loop flow requests but doesn't normally get the loop going to start with once loop is going, may
                    // increase needs, non-zero minimums
-    TakesWhatGets  // component is a "loser" for loop flow requests, but if the loop is on it, it does make flow requests (for s/m resolution)
+    TakesWhatGets, // component is a "loser" for loop flow requests, but if the loop is on it, it does make flow requests (for s/m resolution)
+    NUM
 };
 
 // Parameters for scheme types
@@ -94,14 +95,15 @@ enum OpSchemeType
 //  used in %HowLoadServed to facilitate load dispatch logic
 enum class HowMet
 {
-    Unknown = -1,                        // not yet set
-    NoneDemand,                          // does not meet a load, demand component
-    PassiveCap,                          // Passive machine, does what conditions allow but
-    ByNominalCap,                        // MaxLoad, MinLoad, OptLoad should work
-    ByNominalCapLowOutLimit,             // MaxLoad, MinLoad, OptLoad but with low limit temp on outlet
-    ByNominalCapHiOutLimit,              // MaxLoad, MinLoad, OptLoad but with high limit temp on outlet
-    ByNominalCapFreeCoolCntrl,           // HowMet_ByNominalCap with free cool shutdown
-    ByNominalCapLowOutLimitFreeCoolCntrl // HowMet_ByNominalCapLowOutLimit with free cool shutdown
+    Unknown = -1,                         // not yet set
+    NoneDemand,                           // does not meet a load, demand component
+    PassiveCap,                           // Passive machine, does what conditions allow but
+    ByNominalCap,                         // MaxLoad, MinLoad, OptLoad should work
+    ByNominalCapLowOutLimit,              // MaxLoad, MinLoad, OptLoad but with low limit temp on outlet
+    ByNominalCapHiOutLimit,               // MaxLoad, MinLoad, OptLoad but with high limit temp on outlet
+    ByNominalCapFreeCoolCntrl,            // HowMet_ByNominalCap with free cool shutdown
+    ByNominalCapLowOutLimitFreeCoolCntrl, // HowMet_ByNominalCapLowOutLimit with free cool shutdown
+    NUM
 };
 
 enum class iLoadingScheme
@@ -198,6 +200,17 @@ enum class BrLoopType
     Condenser,
     NoMatch
 };
+
+constexpr std::array<std::string_view, static_cast<int>(HowMet::NUM)> HowMetTypeNamesUC = {"DEMANDSLOAD",
+                                                                                           "MEETSLOADWITHPASSIVECAPACITY",
+                                                                                           "MEETSLOADWITHNOMINALCAPACITY",
+                                                                                           "MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMIT",
+                                                                                           "MEETSLOADWITHNOMINALCAPACITYHIOUTLIMIT",
+                                                                                           "MEETSLOADWITHNOMINALCAPACITYFREECOOLCONTROL",
+                                                                                           "MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMITFREECOOLCONTROL"};
+
+constexpr std::array<std::string_view, static_cast<int>(LoopFlowStatus::NUM)> LoopFlowStatusTypeNamesUC = {
+    "NEEDSFLOWANDTURNSLOOPON", "NEEDSFLOWIFLOOPON", "RECEIVESWHATEVERFLOWAVAILABLE"};
 
 } // namespace EnergyPlus::DataPlant
 

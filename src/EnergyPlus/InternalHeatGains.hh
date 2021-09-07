@@ -110,9 +110,9 @@ namespace InternalHeatGains {
         int const spaceIndex = 0);                                 // space index pointer, sum gains only for this space
 
     int GetInternalGainDeviceIndex(EnergyPlusData &state,
-                                   int const ZoneNum,                                   // zone index pointer for which zone to sum gains for
-                                   DataHeatBalance::IntGainType const IntGainTypeOfNum, // zone internal gain type enum
-                                   std::string_view const &IntGainName);                // Internal gain name
+                                   int const ZoneNum,                              // zone index pointer for which zone to sum gains for
+                                   DataHeatBalance::IntGainType const IntGainType, // zone internal gain type enum
+                                   std::string_view const IntGainName);            // Internal gain name
 
     Real64 SumInternalConvectionGainsByIndices(
         EnergyPlusData &state,

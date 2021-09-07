@@ -9266,9 +9266,9 @@ namespace InternalHeatGains {
     }
 
     int GetInternalGainDeviceIndex(EnergyPlusData &state,
-                                   int const spaceNum,                                  // space index pointer for which space to sum gains for
-                                   DataHeatBalance::IntGainType const intGainTypeOfNum, // space internal gain type enum
-                                   std::string_view const &intGainName)                 // Internal gain name
+                                   int const spaceNum,                             // space index pointer for which space to sum gains for
+                                   DataHeatBalance::IntGainType const intGainType, // space internal gain type enum
+                                   std::string_view const intGainName)             // Internal gain name
     {
 
         // SUBROUTINE INFORMATION:
@@ -9288,7 +9288,7 @@ namespace InternalHeatGains {
         for (DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
             if ((UtilityRoutines::SameString(state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompObjectName,
                                              intGainName.data())) &&
-                (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == intGainTypeOfNum)) {
+                (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType == intGainType)) {
                 DeviceIndex = DeviceNum;
                 break;
             } else {
