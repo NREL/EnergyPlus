@@ -698,7 +698,7 @@ namespace GeneratorFuelSupply {
         print(state.files.eio,
               "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
               "Heating Value [KJ/kg],  Molecular Weight [g/mol] \n");
-        static constexpr fmt::string_view Format_501(" Fuel Supply, {},{:13.6N},{:13.6N},{:13.6N},{:13.6N}\n");
+        static constexpr std::string_view Format_501(" Fuel Supply, {},{:13.6N},{:13.6N},{:13.6N},{:13.6N}\n");
         print(state.files.eio,
               Format_501,
               state.dataGenerator->FuelSupply(FuelSupplyNum).Name,

@@ -107,12 +107,12 @@ using namespace SimulationManager;
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmSetUnitsStyleFromString)
 {
 
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::None, SetUnitsStyleFromString("None"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::JtoKWH, SetUnitsStyleFromString("JTOKWH"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::JtoMJ, SetUnitsStyleFromString("JTOMJ"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::JtoGJ, SetUnitsStyleFromString("JTOGJ"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::InchPound, SetUnitsStyleFromString("INCHPOUND"));
-    EXPECT_EQ(OutputReportTabular::iUnitsStyle::NotFound, SetUnitsStyleFromString("qqq"));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::None, SetUnitsStyleFromString("None")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoKWH, SetUnitsStyleFromString("JTOKWH")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoMJ, SetUnitsStyleFromString("JTOMJ")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoGJ, SetUnitsStyleFromString("JTOGJ")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::InchPound, SetUnitsStyleFromString("INCHPOUND")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::NotFound, SetUnitsStyleFromString("qqq")));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_Basic)
@@ -8243,7 +8243,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     bool isKoppen = false;
     std::string coolingLineGoodDegrees = "    - 2874 annual (standard) cooling degree-days (10°C baseline)";
     parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_EQ((int)StatLineType::stdCDDLine, (int)lineTypeReturn);
+    EXPECT_TRUE(compare_enums(StatLineType::stdCDDLine, lineTypeReturn));
 
     lineTypeReturn = StatLineType::Initialized;
     desCondLinePassed = false;
@@ -8252,7 +8252,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     isKoppen = false;
     std::string coolingLineBadDegrees = "    - 2874 annual (standard) cooling degree-days (10_BADDEGREESYMBOL_C baseline)";
     parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_EQ((int)StatLineType::stdCDDLine, (int)lineTypeReturn);
+    EXPECT_TRUE(compare_enums(StatLineType::stdCDDLine, lineTypeReturn));
 
     lineTypeReturn = StatLineType::Initialized;
     desCondLinePassed = false;
@@ -8261,7 +8261,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     isKoppen = false;
     std::string koppenLineWithDots = " - Climate type \"Cfa\" (Köppen classification)**";
     parseStatLine(koppenLineWithDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_EQ((int)StatLineType::KoppenLine, (int)lineTypeReturn);
+    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, lineTypeReturn));
 
     lineTypeReturn = StatLineType::Initialized;
     desCondLinePassed = false;
@@ -8270,7 +8270,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     isKoppen = false;
     std::string koppenLineNoDots = " - Climate type \"Cfa\" (Koppen classification)**";
     parseStatLine(koppenLineNoDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_EQ((int)StatLineType::KoppenLine, (int)lineTypeReturn);
+    EXPECT_TRUE(compare_enums(StatLineType::KoppenLine, lineTypeReturn));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_test)
@@ -8613,8 +8613,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -8635,8 +8635,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
     state->dataStrGlobals->outputSqliteErrFilePath = "eplusout2.sql";
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -8657,8 +8657,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
     state->dataStrGlobals->outputSqliteErrFilePath = "eplusout3.sql";
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -8680,8 +8680,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 
@@ -8704,8 +8704,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
-    EXPECT_NE(state->dataSQLiteProcedures->sqlite, nullptr);
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
 

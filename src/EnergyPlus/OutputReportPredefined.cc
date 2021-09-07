@@ -1334,8 +1334,10 @@ namespace OutputReportPredefined {
         }
 
         if (tableEntryReal < 1e8) { // change from 1e10 for more robust entry writing
+            // something changed in FMT 7.x and "{:#12.{}F}" now outputs 13. So changing it to 11.{}F to maintain existing functionality. Likely
+            // related to https://github.com/fmtlib/fmt/issues/1893
             state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry =
-                format("{:#12.{}F}", tableEntryReal, sigDigitCount);
+                format("{:#11.{}F}", tableEntryReal, sigDigitCount);
         } else {
             // Formatting in scientific notation, zero sigDigits makes zero sense.
             // **for something greater than 1E+08**, one sigDigits is very unhelpful (you're having an accuracy of 0.5E+07 at best)
