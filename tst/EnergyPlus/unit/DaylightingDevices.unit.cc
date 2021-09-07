@@ -109,12 +109,24 @@ TEST_F(EnergyPlusFixture, DaylightingDevices_adjustViewFactorsWithShelfTest)
     EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
 
     // Test 4: Sky and Ground are both positive, Sky + Shelf + Ground > 1.0 (leave Shelf alone, adjust others)
-    vfShelfSet = 0.34;
-    vfSkySet = 0.4;
+    vfShelfSet = 0.36;
+    vfSkySet = 0.34;
     vfGroundSet = 0.6;
-    vfShelfResult = 0.34;
-    vfSkyResult = 0.264;
-    vfGroundResult = 0.396;
+    vfShelfResult = 0.36;
+    vfSkyResult = 0.34;
+    vfGroundResult = 0.3;
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(vfShelfSet, vfSkySet, vfGroundSet);
+    EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
+    EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
+    EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
+
+    // Test 5: Sky and Ground are both positive, Sky + Shelf + Ground > 1.0 (leave Shelf alone, adjust others)
+    vfShelfSet = 0.5;
+    vfSkySet = 0.55;
+    vfGroundSet = 0.45;
+    vfShelfResult = 0.5;
+    vfSkyResult = 0.5;
+    vfGroundResult = 0.0;
     EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(vfShelfSet, vfSkySet, vfGroundSet);
     EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
     EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);

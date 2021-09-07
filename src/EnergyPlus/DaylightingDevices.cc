@@ -416,10 +416,11 @@ namespace DaylightingDevices {
                     ShowContinueError(
                         state,
                         format("Due to the presence of the light shelf and view factors adding up to greater than 1, the view factors to the"));
-                    ShowContinueError(state,
-                                      format("ground [{:.2R}] and sky [{:.2R}] have been adjusted from the input file or autosized values.",
-                                             state.dataSurface->Surface(WinSurf).ViewFactorGround,
-                                             state.dataSurface->Surface(WinSurf).ViewFactorSky));
+                    ShowContinueError(
+                        state,
+                        format("ground [{:.2R}] and potentially sky [{:.2R}] have been adjusted from the input file or autosized values.",
+                               state.dataSurface->Surface(WinSurf).ViewFactorGround,
+                               state.dataSurface->Surface(WinSurf).ViewFactorSky));
                     ShowContinueError(
                         state,
                         format(
@@ -1632,14 +1633,22 @@ namespace DaylightingDevices {
 
     void adjustViewFactorsWithShelf(Real64 &viewFactorToShelf, Real64 &viewFactorToSky, Real64 &viewFactorToGround)
     {
+        // Light shelf should be along the bottom of the upper window (most common case) so subtract first from view to ground, then sky
         if (viewFactorToSky <= 0.0) viewFactorToSky = 0.0;       // Just to make sure
         if (viewFactorToGround <= 0.0) viewFactorToGround = 0.0; // Just to make sure
         if (viewFactorToShelf + viewFactorToSky + viewFactorToGround > 1.0) {
             if (viewFactorToSky + viewFactorToGround > 0.0) {
-                Real64 leftoverViewFactor = 1.0 - viewFactorToShelf;
-                Real64 fractionSkyToNonShelf = viewFactorToSky / (viewFactorToSky + viewFactorToGround);
-                viewFactorToSky = fractionSkyToNonShelf * leftoverViewFactor;
-                viewFactorToGround = leftoverViewFactor - viewFactorToSky;
+                Real64 leftoverViewFactor = 1.0 - viewFactorToShelf - viewFactorToSky;
+                if (leftoverViewFactor >= 0.0) {
+                    viewFactorToGround = leftoverViewFactor; // Other view factors okay
+                } else {
+                    viewFactorToGround = 0.0;
+                    viewFactorToSky = 1.0 - viewFactorToShelf;
+                    if (viewFactorToSky < 0.0) {
+                        viewFactorToSky = 0.0;
+                        viewFactorToShelf = 1.0;
+                    }
+                }
             } else {
                 viewFactorToShelf = 1.0; // Somehow this got assigned to greater than 1 (not allowed)
             }
