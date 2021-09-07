@@ -60,6 +60,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BITF.hh>
+#include <EnergyPlus/ConvectionConstants.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -192,12 +193,6 @@ namespace DataSurfaces {
     constexpr int LowerRightCorner(3);
     constexpr int UpperRightCorner(4);
 
-    // Parameters to indicate user specified convection coefficients (for surface)
-    constexpr int ConvCoefValue(1);          // User specified "value" as the override type
-    constexpr int ConvCoefSchedule(2);       // User specified "schedule" as the override type
-    constexpr int ConvCoefUserCurve(3);      // User specified "UserCurve" as the override type
-    constexpr int ConvCoefSpecifiedModel(4); // one of the direct named model equation keys
-
     // Parameters to indicate reference air temperatures for inside surface temperature calculations
     constexpr int ZoneMeanAirTemp(1);   // mean air temperature of the zone => MAT
     constexpr int AdjacentAirTemp(2);   // air temperature adjacent ot surface => TempEffBulkAir
@@ -214,9 +209,9 @@ namespace DataSurfaces {
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential
 
-    enum class iHeatTransferModel
+    enum class iHeatTransferModel : int
     {
-        NotSet,
+        NotSet = -1,
         None, // shading surfaces
         CTF,
         EMPD,
@@ -227,7 +222,20 @@ namespace DataSurfaces {
         TDD,                 // tubular daylighting device
         Kiva,                // Kiva ground calculations
         AirBoundaryNoHT,     // Construction:AirBoundary - not IRT or interior window
+        Num,                 // count, always the final element
     };
+
+    constexpr std::array<std::string_view, (int)DataSurfaces::iHeatTransferModel::Num> HeatTransAlgoStrs = {
+        "None",
+        "CTF - ConductionTransferFunction",
+        "EMPD - MoisturePenetrationDepthConductionTransferFunction",
+        "CondFD - ConductionFiniteDifference",
+        "HAMT - CombinedHeatAndMoistureFiniteElement",
+        "Window5 Detailed Fenestration",
+        "Window7 Complex Fenestration",
+        "Tubular Daylighting Device",
+        "KivaFoundation - TwoDimensionalFiniteDifference",
+        "Air Boundary - No Heat Transfer"};
 
     // Parameters to indicate surface roughness for use with the Material
     // derived type:
@@ -241,33 +249,6 @@ namespace DataSurfaces {
         Smooth,
         VerySmooth
     };
-
-    inline std::string HeatTransferModelNames(iHeatTransferModel const &m)
-    {
-        switch (m) {
-        case iHeatTransferModel::CTF:
-            return "CTF - ConductionTransferFunction";
-        case iHeatTransferModel::EMPD:
-            return "EMPD - MoisturePenetrationDepthConductionTransferFunction";
-        case iHeatTransferModel::CondFD:
-            return "CondFD - ConductionFiniteDifference";
-        case iHeatTransferModel::HAMT:
-            return "HAMT - CombinedHeatAndMoistureFiniteElement";
-        case iHeatTransferModel::Window5:
-            return "Window - Detailed layer-by-layer";
-        case iHeatTransferModel::ComplexFenestration:
-            return "Window - ComplexFenestration";
-        case iHeatTransferModel::TDD:
-            return "Tubular daylighting device";
-        case iHeatTransferModel::Kiva:
-            return "KivaFoundation - TwoDimensionalFiniteDifference";
-        case iHeatTransferModel::None:
-        case iHeatTransferModel::AirBoundaryNoHT:
-        case iHeatTransferModel::NotSet:
-        default:
-            return "";
-        }
-    }
 
     // IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
     // original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
@@ -325,67 +306,6 @@ namespace DataSurfaces {
     {
         return BITF_TEST_ANY(BITF(ShadingFlag), BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind));
     }
-
-    // Parameters for classification of outside face of surfaces
-    constexpr int OutConvClass_WindwardVertWall(101);
-    constexpr int OutConvClass_LeewardVertWall(102);
-    constexpr int OutConvClass_RoofStable(103);
-    constexpr int OutConvClass_RoofUnstable(104);
-
-    // Parameters for adpative convection algorithm's classification of inside face of surfaces
-    constexpr int InConvClass_A1_VertWalls(1);           // flow regime A1, vertical walls
-    constexpr int InConvClass_A1_StableHoriz(2);         // flow regime A1
-    constexpr int InConvClass_A1_UnstableHoriz(3);       // flow regime A1
-    constexpr int InConvClass_A1_HeatedFloor(4);         // flow regime A1
-    constexpr int InConvClass_A1_ChilledCeil(5);         // flow regime A1
-    constexpr int InConvClass_A1_StableTilted(6);        // flow regime A1
-    constexpr int InConvClass_A1_UnstableTilted(7);      // flow regime A1
-    constexpr int InConvClass_A1_Windows(8);             // flow regime A1
-    constexpr int InConvClass_A2_VertWallsNonHeated(9);  // flow regime A2
-    constexpr int InConvClass_A2_HeatedVerticalWall(10); // flow regime A2
-    constexpr int InConvClass_A2_StableHoriz(11);        // flow regime A2
-    constexpr int InConvClass_A2_UnstableHoriz(12);      // flow regime A2
-    constexpr int InConvClass_A2_StableTilted(13);       // flow regime A2
-    constexpr int InConvClass_A2_UnstableTilted(14);     // flow regime A2
-    constexpr int InConvClass_A2_Windows(15);            // flow regime A2
-    constexpr int InConvClass_A3_VertWalls(16);          // flow regime A3
-    constexpr int InConvClass_A3_StableHoriz(17);        // flow regime A3
-    constexpr int InConvClass_A3_UnstableHoriz(18);      // flow regime A3
-    constexpr int InConvClass_A3_StableTilted(19);       // flow regime A3
-    constexpr int InConvClass_A3_UnstableTilted(20);     // flow regime A3
-    constexpr int InConvClass_A3_Windows(21);            // flow regime A3
-    constexpr int InConvClass_B_VertWalls(22);           // flow regime B
-    constexpr int InConvClass_B_VertWallsNearHeat(23);   // flow regime B
-    constexpr int InConvClass_B_StableHoriz(24);         // flow regime B
-    constexpr int InConvClass_B_UnstableHoriz(25);       // flow regime B
-    constexpr int InConvClass_B_StableTilted(26);        // flow regime B
-    constexpr int InConvClass_B_UnstableTilted(27);      // flow regime B
-    constexpr int InConvClass_B_Windows(28);             // flow regime B
-    constexpr int InConvClass_C_Walls(29);               // flow regime C
-    constexpr int InConvClass_C_Ceiling(30);             // flow regime C
-    constexpr int InConvClass_C_Floor(31);               // flow regime C
-    constexpr int InConvClass_C_Windows(32);             // flow regime C
-    constexpr int InConvClass_D_Walls(33);               // flow regime D
-    constexpr int InConvClass_D_StableHoriz(34);         // flow regime D
-    constexpr int InConvClass_D_UnstableHoriz(35);       // flow regime D
-    constexpr int InConvClass_D_StableTilted(36);        // flow regime D
-    constexpr int InConvClass_D_UnstableTilted(37);      // flow regime D
-    constexpr int InConvClass_D_Windows(38);             // flow regime D
-    constexpr int InConvClass_E_AssistFlowWalls(39);     // flow regime E
-    constexpr int InConvClass_E_OpposFlowWalls(40);      // flow regime E
-    constexpr int InConvClass_E_StableFloor(41);         // flow regime E
-    constexpr int InConvClass_E_UnstableFloor(42);       // flow regime E
-    constexpr int InConvClass_E_StableCeiling(43);       // flow regime E
-    constexpr int InConvClass_E_UnstableCieling(44);     // flow regime E
-    constexpr int InConvClass_E_Windows(45);             // flow regime E
-
-    // Parameters for fenestration relative location in zone
-    constexpr int InConvWinLoc_NotSet(0);
-    constexpr int InConvWinLoc_LowerPartOfExteriorWall(1); // this is a window in the lower part of wall
-    constexpr int InConvWinLoc_UpperPartOfExteriorWall(2); // this is a window in the upper part of wall
-    constexpr int InConvWinLoc_WindowAboveThis(3);         // this is a wall with window above it
-    constexpr int InConvWinLoc_WindowBelowThis(4);         // this is a wall with window below it
-    constexpr int InConvWinLoc_LargePartOfExteriorWall(5); // this is a big window taking up most of wall
 
     // Parameters for window shade status
     constexpr int NoShade(-1);
@@ -804,6 +724,8 @@ namespace DataSurfaces {
         int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, EnclSolInfo(n).SurfacePtr(SolarEnclSurfIndex) points to this surface
         bool IsAirBoundarySurf; // True if surface is an air boundary surface (Construction:AirBoundary)
 
+        ConvectionConstants::SurfConvOrientation ConvOrientation; // Surface orientation for convection calculations
+
         SurfaceCalcHashKey calcHashKey; // Hash key used for determining if this surface requires unique calculations.
 
         // Default Constructor
@@ -813,13 +735,13 @@ namespace DataSurfaces {
               Width(0.0), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
               lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
-
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
               HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
               ExtSolar(false), ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0),
               OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
               SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),
-              FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false)
+              FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false),
+              ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid)
         {
         }
 
@@ -834,8 +756,6 @@ namespace DataSurfaces {
         void SetWindSpeedAt(EnergyPlusData &state, int const SurfNum, Real64 const fac);
 
         Real64 getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
-
-        static Real64 getInsideIR(EnergyPlusData &state, const int t_SurfNum);
 
         Real64 getOutsideAirTemperature(EnergyPlusData &state, int t_SurfNum) const;
 
@@ -1132,17 +1052,19 @@ namespace DataSurfaces {
     struct ConvectionCoefficient
     {
         // Members
-        int WhichSurface;         // Which surface number this is applied to
-        std::string SurfaceName;  // Which surface (name)
-        int OverrideType;         // Override type, 1=value, 2=schedule, 3=model, 4=user curve
-        Real64 OverrideValue;     // User specified value
-        std::string ScheduleName; // Which surface (name)
-        int ScheduleIndex;        // if type="schedule" is used
-        int UserCurveIndex;       // if type=UserCurve is used
-        int HcModelEq;            // if type is one of specific model equations
+        int WhichSurface;                                       // Which surface number this is applied to
+        std::string SurfaceName;                                // Which surface (name)
+        ConvectionConstants::ConvCoefOverrideType OverrideType; // Override type, 1=value, 2=schedule, 3=model, 4=user curve
+        Real64 OverrideValue;                                   // User specified value
+        std::string ScheduleName;                               // Which surface (name)
+        int ScheduleIndex;                                      // if type="schedule" is used
+        int UserCurveIndex;                                     // if type=UserCurve is used
+        int HcModelEq;                                          // if type is one of specific model equations
 
         // Default Constructor
-        ConvectionCoefficient() : WhichSurface(0), OverrideType(0), OverrideValue(0.0), ScheduleIndex(0), UserCurveIndex(0), HcModelEq(0)
+        ConvectionCoefficient()
+            : WhichSurface(0), OverrideType(ConvectionConstants::ConvCoefOverrideType::Invalid), OverrideValue(0.0), ScheduleIndex(0),
+              UserCurveIndex(0), HcModelEq(0)
         {
         }
     };
@@ -1465,13 +1387,17 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIsRadSurfOrVentSlabOrPool;    // surface cannot be part of both a radiant surface & ventilated slab group
 
     // Surface ConvCoeff Properties
-    Array1D<int> SurfTAirRef;                     // Flag for reference air temperature
-    Array1D<int> SurfIntConvCoeffIndex;           // Interior Convection Coefficient pointer (different data structure) when being overridden
-    Array1D<int> SurfExtConvCoeffIndex;           // Exterior Convection Coefficient pointer (different data structure) when being overridden
-    Array1D<int> SurfIntConvClassification;       // current classification for inside face air flow regime and surface orientation
-    Array1D<int> SurfIntConvHcModelEq;            // current convection model for inside face
-    Array1D<int> SurfIntConvHcUserCurveIndex;     // current index to user convection model if used
-    Array1D<int> SurfOutConvClassification;       // current classification for outside face wind regime and convection orientation
+    Array1D<int> SurfTAirRef;           // Flag for reference air temperature
+    Array1D<int> SurfIntConvCoeffIndex; // Interior Convection Coefficient pointer (different data structure) when being overridden
+    Array1D<int> SurfExtConvCoeffIndex; // Exterior Convection Coefficient pointer (different data structure) when being overridden
+    Array1D<ConvectionConstants::InConvClass>
+        SurfIntConvClassification;             // current classification for inside face air flow regime and surface orientation
+    Array1D<int> SurfIntConvClassificationRpt; // current classification for inside face air flow regime and surface orientation for reporting
+    Array1D<int> SurfIntConvHcModelEq;         // current convection model for inside face
+    Array1D<int> SurfIntConvHcUserCurveIndex;  // current index to user convection model if used
+    Array1D<ConvectionConstants::OutConvClass>
+        SurfOutConvClassification;                // current classification for outside face wind regime and convection orientation
+    Array1D<int> SurfOutConvClassificationRpt;    // current classification for outside face wind regime and convection orientation for reporting
     Array1D<int> SurfOutConvHfModelEq;            // current convection model for forced convection at outside face
     Array1D<int> SurfOutConvHfUserCurveIndex;     // current index to user forced convection model if used
     Array1D<int> SurfOutConvHnModelEq;            // current Convection model for natural convection at outside face
@@ -1483,7 +1409,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfIntConvZonePerimLength;   // [m] length of perimeter zone's exterior wall
     Array1D<Real64> SurfIntConvZoneHorizHydrDiam; // [m] hydraulic diameter, usually 4 times the zone floor area div by perimeter
     Array1D<Real64> SurfIntConvWindowWallRatio;   // [-] area of windows over area of exterior wall for zone
-    Array1D<int> SurfIntConvWindowLocation;       // relative location of window in zone for interior Hc models
+    Array1D<ConvectionConstants::InConvWinLoc> SurfIntConvWindowLocation; // relative location of window in zone for interior Hc models
     Array1D<bool> SurfIntConvSurfGetsRadiantHeat;
     Array1D<bool> SurfIntConvSurfHasActiveInIt;
 

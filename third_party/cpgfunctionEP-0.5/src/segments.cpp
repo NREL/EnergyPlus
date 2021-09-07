@@ -2,10 +2,11 @@
 // Created by jackcook on 7/15/21.
 //
 
-#include <iostream>
 #include <cmath>
-#include <cpgfunction/segments.h>
 #include <cpgfunction/interpolation.h>
+#include <cpgfunction/segments.h>
+#include <iostream>
+#include <stdexcept>
 
 using namespace std;
 

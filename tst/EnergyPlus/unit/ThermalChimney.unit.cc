@@ -84,7 +84,6 @@ using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalSurface;
 using namespace SimulationManager;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
 {

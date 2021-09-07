@@ -64,7 +64,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::VentilatedSlab;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataLoopNode;
