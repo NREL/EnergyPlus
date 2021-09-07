@@ -1408,15 +1408,15 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedNum, 2);
     EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).CycRatio, 1.0);
-    EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedRatio, 0.4686, 0.0001);
+    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedRatio, 1.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 37.41738, 0.0001);
 
     state->dataHVACMultiSpdHP->MSHeatPump(2).EMSOverrideCoilSpeedNumValue = 1;
-    QZnReq = 10000.00;
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
-    EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 26.546664, 0.0001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(22).HumRat, 0.008, 0.0001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(22).Enthalpy, 47077.4613, 0.0001);
-    EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPump(2).CompPartLoadRatio, 0.1530992, 0.0001);
+    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedNum, 1);
+    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedRatio, 1.0);
+    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPump(2).CompPartLoadRatio, 1.0);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 36.73345, 0.0001);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
