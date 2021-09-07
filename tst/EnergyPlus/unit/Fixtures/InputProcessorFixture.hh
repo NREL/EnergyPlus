@@ -116,60 +116,70 @@ protected:
     void eat_whitespace(std::string const &idf, size_t &index)
     {
         IdfParser idfParser;
+        idfParser.idf_size = idf.size();
         idfParser.eat_whitespace(idf, index);
     }
 
     void eat_comment(std::string const &idf, size_t &index)
     {
         IdfParser idfParser;
+        idfParser.idf_size = idf.size();
         idfParser.eat_comment(idf, index);
     }
 
-    std::string parse_string(std::string const &idf, size_t &index, bool &success)
+    std::string parse_string(std::string const &idf, size_t &index)
     {
         IdfParser idfParser;
-        return idfParser.parse_string(idf, index, success);
+        idfParser.idf_size = idf.size();
+        return idfParser.parse_string(idf, index);
     }
 
     json parse_value(std::string const &idf, size_t &index, bool &success)
     {
         IdfParser idfParser;
+        idfParser.idf_size = idf.size();
         return idfParser.parse_value(idf, index, success, state->dataInputProcessing->inputProcessor->schema["properties"]);
     }
 
     json parse_value(std::string const &idf, size_t &index, bool &success, json const &field_loc)
     {
         IdfParser idfParser;
+        idfParser.idf_size = idf.size();
         return idfParser.parse_value(idf, index, success, field_loc);
     }
 
-    json parse_number(std::string const &idf, size_t &index, bool &success)
+    json parse_number(std::string const &idf, size_t &index)
     {
         IdfParser idfParser;
-        return idfParser.parse_number(idf, index, success);
+        idfParser.idf_size = idf.size();
+        return idfParser.parse_number(idf, index);
     }
 
     IdfParser::Token look_ahead(std::string const &idf, size_t index)
     {
         IdfParser idfParser;
+        idfParser.idf_size = idf.size();
         return idfParser.look_ahead(idf, index);
     }
 
     IdfParser::Token next_token(std::string const &idf, size_t &index)
     {
         IdfParser idfParser;
+        idfParser.idf_size = idf.size();
         return idfParser.next_token(idf, index);
     }
 
     json parse_idf(std::string const &idf, size_t &index, bool &success, json const &schema)
     {
         IdfParser idfParser;
+        idfParser.idf_size = idf.size();
         return idfParser.parse_idf(idf, index, success, schema);
     }
 
     json parse_object(std::string const &idf, size_t &index, bool &success, json const &schema_loc, json const &obj_loc, int idfObjectCount)
     {
         IdfParser idfParser;
+        idfParser.idf_size = idf.size();
         return idfParser.parse_object(idf, index, success, schema_loc, obj_loc, idfObjectCount);
     }
 };

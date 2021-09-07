@@ -1459,15 +1459,15 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     }
     // Formats
     print(state.files.eio, "! <Load Timesteps in Zone Design Calculation Averaging Window>, Value\n");
-    static constexpr fmt::string_view Format_891(" Load Timesteps in Zone Design Calculation Averaging Window, {:4}\n");
+    static constexpr std::string_view Format_891(" Load Timesteps in Zone Design Calculation Averaging Window, {:4}\n");
     print(state.files.eio, Format_891, state.dataSize->NumTimeStepsInAvg);
     print(state.files.eio, "! <Heating Sizing Factor Information>, Sizing Factor ID, Value\n");
-    static constexpr fmt::string_view Format_991(" Heating Sizing Factor Information, Global, {:12.5N}\n");
+    static constexpr std::string_view Format_991(" Heating Sizing Factor Information, Global, {:12.5N}\n");
     print(state.files.eio, Format_991, state.dataSize->GlobalHeatSizingFactor);
     for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
         if (state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatSizingFactor != 1.0) {
-            static constexpr fmt::string_view Format_992(" Heating Sizing Factor Information, Zone {}, {:12.5N}\n");
+            static constexpr std::string_view Format_992(" Heating Sizing Factor Information, Zone {}, {:12.5N}\n");
             print(state.files.eio,
                   Format_992,
                   state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
@@ -1475,12 +1475,12 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         }
     }
     print(state.files.eio, "! <Cooling Sizing Factor Information>, Sizing Factor ID, Value\n");
-    static constexpr fmt::string_view Format_994(" Cooling Sizing Factor Information, Global, {:12.5N}\n");
+    static constexpr std::string_view Format_994(" Cooling Sizing Factor Information, Global, {:12.5N}\n");
     print(state.files.eio, Format_994, state.dataSize->GlobalCoolSizingFactor);
     for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
         if (state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolSizingFactor != 1.0) {
-            static constexpr fmt::string_view Format_995(" Cooling Sizing Factor Information, Zone {}, {:12.5N}\n");
+            static constexpr std::string_view Format_995(" Cooling Sizing Factor Information, Zone {}, {:12.5N}\n");
             print(state.files.eio,
                   Format_995,
                   state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
@@ -2050,7 +2050,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                 for (I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(I).IsControlled) continue;
 
-                    static constexpr fmt::string_view ZSizeFmt11("{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}");
+                    static constexpr std::string_view ZSizeFmt11("{}{}:{}{}{}{}:{}{}{}{}:{}{}{}{}:{}{}");
                     print(state.files.zsz,
                           ZSizeFmt11,
                           state.dataSize->SizingFileColSep,
@@ -2219,11 +2219,11 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                             }
                         }
 
-                        static constexpr fmt::string_view ZSizeFmt20("{:02}:{:02}:00");
+                        static constexpr std::string_view ZSizeFmt20("{:02}:{:02}:00");
                         print(state.files.zsz, ZSizeFmt20, HourPrint, Minutes);
                         for (I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
                             if (!state.dataZoneEquip->ZoneEquipConfig(I).IsControlled) continue;
-                            static constexpr fmt::string_view ZSizeFmt21("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
+                            static constexpr std::string_view ZSizeFmt21("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
                             print(state.files.zsz,
                                   ZSizeFmt21,
                                   state.dataSize->SizingFileColSep,
@@ -2243,7 +2243,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                 for (I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(I).IsControlled) continue;
 
-                    static constexpr fmt::string_view ZSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
+                    static constexpr std::string_view ZSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
                     print(state.files.zsz,
                           ZSizeFmt31,
                           state.dataSize->SizingFileColSep,
@@ -2260,7 +2260,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                 print(state.files.zsz, "\nPeak Vol Flow (m3/s)");
                 for (I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(I).IsControlled) continue;
-                    static constexpr fmt::string_view ZSizeFmt41("{}{}{}{:12.6E}{}{:12.6E}");
+                    static constexpr std::string_view ZSizeFmt41("{}{}{}{:12.6E}{}{:12.6E}");
                     print(state.files.zsz,
                           ZSizeFmt41,
                           state.dataSize->SizingFileColSep,
@@ -6389,7 +6389,7 @@ void ReportZoneSizingDOASInputs(EnergyPlusData &state,
     // Using/Aliasing
 
     // Formats
-    static constexpr fmt::string_view Format_990(
+    static constexpr std::string_view Format_990(
         "! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature "
         "{C}, DOAS Design High Setpoint Temperature {C} ");
 
@@ -6398,7 +6398,7 @@ void ReportZoneSizingDOASInputs(EnergyPlusData &state,
         state.dataZoneEquipmentManager->reportDOASZoneSizingHeader = false;
     }
 
-    static constexpr fmt::string_view Format_991(" Zone Sizing DOAS Inputs, {}, {}, {:.3R}, {:.3R}\n");
+    static constexpr std::string_view Format_991(" Zone Sizing DOAS Inputs, {}, {}, {:.3R}, {:.3R}\n");
     print(state.files.eio, Format_991, ZoneName, DOASCtrlStrategy, DOASLowTemp, DOASHighTemp);
 
     // BSLLC Start

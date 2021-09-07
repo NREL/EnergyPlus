@@ -4644,7 +4644,7 @@ namespace HeatBalanceManager {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
-                std::string construction_name{UtilityRoutines::MakeUPPERCase(AsString(fields.at("construction_name")))};
+                std::string construction_name{UtilityRoutines::MakeUPPERCase(fields.at("construction_name").get<std::string>())};
                 int source_after_layer_number{fields.at("thermal_source_present_after_layer_number")};
                 int calculation_after_layer_number{fields.at("temperature_calculation_requested_after_layer_number")};
                 int ctf_dimensions{fields.at("dimensions_for_the_ctf_calculation")};
@@ -4684,7 +4684,7 @@ namespace HeatBalanceManager {
                 thisConstruct.SourceAfterLayer = source_after_layer_number;
                 thisConstruct.TempAfterLayer = calculation_after_layer_number;
                 thisConstruct.SolutionDimensions = ctf_dimensions;
-                thisConstruct.ThicknessPerpend = tube_spacing / 2.0;
+                thisConstruct.ThicknessPerpend = thisConstruct.setThicknessPerpendicular(state, tube_spacing);
                 thisConstruct.userTemperatureLocationPerpendicular =
                     thisConstruct.setUserTemperatureLocationPerpendicular(state, calculation_position);
 
@@ -5924,11 +5924,12 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumConvPool.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumLatentPool.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->QHTRadSysToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->QHWBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->QSteamBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->QElecBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBalFanSys->QCoolingPanelToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneQdotRadHVACToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneQHTRadSysToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->XMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
         state.dataHeatBalFanSys->XM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
         state.dataHeatBalFanSys->XM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
@@ -8027,11 +8028,11 @@ namespace HeatBalanceManager {
                 thisConstruct.IsUsedCTF = false;
 
                 // Air Exchange Method
-                std::string const airMethod = fields.at("air_exchange_method");
+                std::string const airMethod = fields.at("air_exchange_method").get<std::string>();
                 if (UtilityRoutines::SameString(airMethod, "SimpleMixing")) {
                     thisConstruct.TypeIsAirBoundaryMixing = true;
                     if (fields.find("simple_mixing_air_changes_per_hour") != fields.end()) {
-                        thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour");
+                        thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour").get<Real64>();
                     } else {
                         if (!state.dataInputProcessing->inputProcessor->getDefaultValue(
                                 state, cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH)) {
@@ -8039,7 +8040,7 @@ namespace HeatBalanceManager {
                         }
                     }
                     if (fields.find("simple_mixing_schedule_name") != fields.end()) {
-                        const std::string &schedName = fields.at("simple_mixing_schedule_name");
+                        const std::string &schedName = fields.at("simple_mixing_schedule_name").get<std::string>();
                         thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(state, UtilityRoutines::MakeUPPERCase(schedName));
                         if (thisConstruct.AirBoundaryMixingSched == 0) {
                             ShowSevereError(state,
