@@ -1070,8 +1070,8 @@ namespace ElectricBaseboardRadiator {
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
         // Initialize arrays
-        state.dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
-        state.dataHeatBalFanSys->QElecBaseboardToPerson = 0.0;
+        state.dataHeatBalFanSys->SurfQElecBaseboard = 0.0;
+        state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson = 0.0;
 
         auto &ElecBaseboard = state.dataElectBaseboardRad->ElecBaseboard;
         for (BaseboardNum = 1; BaseboardNum <= state.dataElectBaseboardRad->NumElecBaseboards; ++BaseboardNum) {
@@ -1079,7 +1079,7 @@ namespace ElectricBaseboardRadiator {
             if (ElecBaseboard(BaseboardNum).ZonePtr >
                 0) { // issue 5806 can be zero during first calls to baseboards, will be set after all are modeled
                 ZoneNum = ElecBaseboard(BaseboardNum).ZonePtr;
-                state.dataHeatBalFanSys->QElecBaseboardToPerson(ZoneNum) +=
+                state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson(ZoneNum) +=
                     state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum) * ElecBaseboard(BaseboardNum).FracDistribPerson;
 
                 for (RadSurfNum = 1; RadSurfNum <= ElecBaseboard(BaseboardNum).TotSurfToDistrib; ++RadSurfNum) {
@@ -1087,7 +1087,8 @@ namespace ElectricBaseboardRadiator {
                     if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                         ThisSurfIntensity = (state.dataElectBaseboardRad->QBBElecRadSource(BaseboardNum) *
                                              ElecBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
-                        state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum) += ThisSurfIntensity;
+                        state.dataHeatBalFanSys->SurfQElecBaseboard(SurfNum) += ThisSurfIntensity;
+                        state.dataHeatBalSurf->AnyRadiantSystems = true;
                         if (ThisSurfIntensity > MaxRadHeatFlux) {
                             ShowSevereError(state, "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected");
                             ShowContinueError(state, "Surface = " + state.dataSurface->Surface(SurfNum).Name);

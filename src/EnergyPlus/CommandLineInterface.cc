@@ -295,33 +295,32 @@ namespace CommandLineInterface {
         state.dataStrGlobals->inputFilePathNameOnly = FileSystem::removeFileExtension(FileSystem::getFileName(state.dataStrGlobals->inputFilePath));
         state.dataStrGlobals->inputDirPath = FileSystem::getParentDirectoryPath(state.dataStrGlobals->inputFilePath);
 
-        // TODO: would this be better?
-        // FileSystem::InputFileType fileType = FileSystem::getInputFileType(state.dataStrGlobals->inputFilePath);
         {
-            auto inputFileExt = state.dataStrGlobals->inputFilePath.extension().string();
-            std::transform(inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper);
-
-            if (inputFileExt == ".EPJSON" || inputFileExt == ".JSON") {
-                state.dataGlobal->isEpJSON = true;
-            } else if (inputFileExt == ".IDF" || inputFileExt == ".IMF") {
-                state.dataGlobal->isEpJSON = false;
-            } else if (inputFileExt == ".CBOR") {
-                state.dataGlobal->isEpJSON = true;
+            auto const fileType = FileSystem::getFileType(state.dataStrGlobals->inputFilePath);
+            state.dataGlobal->isEpJSON = FileSystem::is_all_json_type(fileType);
+            switch (fileType) {
+            case FileSystem::FileTypes::IDF:
+            case FileSystem::FileTypes::IMF:
+            case FileSystem::FileTypes::EpJSON:
+            case FileSystem::FileTypes::JSON:
+                break;
+            case FileSystem::FileTypes::CBOR:
                 state.dataGlobal->isCBOR = true;
                 DisplayString(state, "CBOR input format is experimental and unsupported.");
-            } else if (inputFileExt == ".MSGPACK") {
-                state.dataGlobal->isEpJSON = true;
+                break;
+            case FileSystem::FileTypes::MsgPack:
                 state.dataGlobal->isMsgPack = true;
                 DisplayString(state, "MsgPack input format is experimental and unsupported.");
-            } else if (inputFileExt == ".UBJSON") {
-                state.dataGlobal->isEpJSON = true;
+                break;
+            case FileSystem::FileTypes::UBJSON:
                 state.dataGlobal->isUBJSON = true;
                 DisplayString(state, "UBJSON input format is experimental and unsupported.");
-            } else if (inputFileExt == ".BSON") {
-                state.dataGlobal->isEpJSON = true;
+                break;
+            case FileSystem::FileTypes::BSON:
                 state.dataGlobal->isBSON = true;
                 DisplayString(state, "BSON input format is experimental and unsupported.");
-            } else {
+                break;
+            default:
                 DisplayString(state, "ERROR: Input file must have IDF, IMF, or epJSON extension.");
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
