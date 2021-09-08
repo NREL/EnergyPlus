@@ -4089,19 +4089,19 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCoilDesuperheater);
 
         if (state.dataWaterThermalTanks->numWaterThermalTank > 0) {
-            static constexpr fmt::string_view Format_720(
+            static constexpr std::string_view Format_720(
                 "! <Water Heater Information>,Type,Name,Volume {{m3}},Maximum Capacity {{W}},Standard Rated Recovery Efficiency, "
                 "Standard Rated Energy Factor\n");
-            static constexpr fmt::string_view Format_721(
+            static constexpr std::string_view Format_721(
                 "! <Heat Pump Water Heater Information>,Type,Name,Volume {{m3}},Maximum Capacity {{W}},Standard Rated Recovery "
                 "Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {{W, HPWH Only}}\"\n");
-            static constexpr fmt::string_view Format_722(
+            static constexpr std::string_view Format_722(
                 "! <Water Heater Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},Maximum Capacity "
                 "{{W}},Off-Cycle UA {{W/K}},On-Cycle UA {{W/K}},Number Of Inlets,Number Of Outlets\n");
-            static constexpr fmt::string_view Format_725(
+            static constexpr std::string_view Format_725(
                 "! <Chilled Water Tank Information>,Type,Name,Volume {{m3}},Use Side Design Flow Rate {{m3/s}}, "
                 "Source Side Design Flow Rate {{m3/s}}\n");
-            static constexpr fmt::string_view Format_726(
+            static constexpr std::string_view Format_726(
                 "! <Chilled Water Tank Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},UA {{W/K}},Number Of "
                 "Inlets,Number Of Outlets\n");
 
@@ -5017,7 +5017,7 @@ void WaterThermalTankData::setupChilledWaterTankOutputVars(EnergyPlusData &state
     if (this->TypeNum == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {
 
         for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-            static constexpr fmt::string_view Format_724("Chilled Water Tank Stratified Node Information,{},{:.4T},{:.4T},{:.4T},{},{}\n");
+            static constexpr std::string_view Format_724("Chilled Water Tank Stratified Node Information,{},{:.4T},{:.4T},{:.4T},{},{}\n");
 
             print(state.files.eio,
                   Format_724,
@@ -5655,7 +5655,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
     if (this->TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified) {
 
         for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-            static constexpr fmt::string_view Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:.4T},{},{}\n");
+            static constexpr std::string_view Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:.4T},{},{}\n");
             print(state.files.eio,
                   Format_723,
                   NodeNum,
@@ -7878,22 +7878,22 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
             }
 
             // Make adjustments to A and B to account for heaters being on or off now
-            if (this->HeaterOn1 and !PrevHeaterOn1) {
+            if (this->HeaterOn1 && !PrevHeaterOn1) {
                 // If heater 1 is on now and wasn't before add the heat rate to the B term
                 B[this->HeaterNode1 - 1] += Qheater1 / (this->Node(this->HeaterNode1).Mass * Cp);
-            } else if (!this->HeaterOn1 and PrevHeaterOn1) {
+            } else if (!this->HeaterOn1 && PrevHeaterOn1) {
                 // If heater 1 is off now and was on before, remove the heat rate from the B term
                 B[this->HeaterNode1 - 1] -= this->MaxCapacity / (this->Node(this->HeaterNode1).Mass * Cp);
             }
-            if (this->HeaterOn2 and !PrevHeaterOn2) {
+            if (this->HeaterOn2 && !PrevHeaterOn2) {
                 // If heater 2 is on now and wasn't before add the heat rate to the B term
                 B[this->HeaterNode2 - 1] += Qheater2 / (this->Node(this->HeaterNode2).Mass * Cp);
-            } else if (!this->HeaterOn2 and PrevHeaterOn2) {
+            } else if (!this->HeaterOn2 && PrevHeaterOn2) {
                 // If heater 1 is off now and was on before, remove the heat rate from the B term
                 B[this->HeaterNode2 - 1] -= this->MaxCapacity / (this->Node(this->HeaterNode2).Mass * Cp);
             }
 
-            if ((this->HeaterOn1 || this->HeaterOn2) and !(PrevHeaterOn1 || PrevHeaterOn2)) {
+            if ((this->HeaterOn1 || this->HeaterOn2) && !(PrevHeaterOn1 || PrevHeaterOn2)) {
                 // Remove off cycle loads
                 // Apply on cycle loads
                 for (int i = 0; i < nTankNodes; i++) {
@@ -7903,7 +7903,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
                     B[i] += (-node.OffCycParaLoad + node.OnCycParaLoad + (node.OnCycLossCoeff - node.OffCycLossCoeff) * this->AmbientTemp) /
                             NodeCapacitance;
                 }
-            } else if (!(this->HeaterOn1 || this->HeaterOn2) and (PrevHeaterOn1 || PrevHeaterOn2)) {
+            } else if (!(this->HeaterOn1 || this->HeaterOn2) && (PrevHeaterOn1 || PrevHeaterOn2)) {
                 // Remove on cycle loads
                 // Apply off cycle loads
                 for (int i = 0; i < nTankNodes; i++) {
@@ -8046,7 +8046,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
                     for (m = j; m < nTankNodes; ++m) {
                         Tmixed += Tfinal[m] * this->Node[m].Mass;
                         MassMixed += this->Node[m].Mass;
-                        if ((m == nTankNodes - 1) or (Tmixed / MassMixed > Tfinal[m + 1])) break;
+                        if ((m == nTankNodes - 1) || (Tmixed / MassMixed > Tfinal[m + 1])) break;
                     }
                     Tmixed /= MassMixed;
 
@@ -12518,10 +12518,10 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
             MaxCapacity_loc = this->MaxCapacity;
         }
 
-        static constexpr fmt::string_view Format_720("Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T}\n");
+        static constexpr std::string_view Format_720("Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T}\n");
         print(state.files.eio, Format_720, this->Type, this->Name, this->Volume, MaxCapacity_loc, RecoveryEfficiency, EnergyFactor);
     } else {
-        static constexpr fmt::string_view Format_721("Heat Pump Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T},{:.0T}\n");
+        static constexpr std::string_view Format_721("Heat Pump Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T},{:.0T}\n");
         print(state.files.eio,
               Format_721,
               state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Type,
@@ -12557,7 +12557,7 @@ void WaterThermalTankData::ReportCWTankInits(EnergyPlusData &state)
         return;
     }
 
-    static constexpr fmt::string_view Format_728("Chilled Water Tank Information,{},{},{:.4T},{:.4T},{:.4T}\n");
+    static constexpr std::string_view Format_728("Chilled Water Tank Information,{},{},{:.4T},{:.4T},{:.4T}\n");
     print(state.files.eio, Format_728, this->Type, this->Name, this->Volume, this->UseDesignVolFlowRate, this->SourceDesignVolFlowRate);
 
     this->AlreadyReported = true;

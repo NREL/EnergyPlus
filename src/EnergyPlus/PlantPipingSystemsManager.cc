@@ -364,13 +364,13 @@ namespace PlantPipingSystemsManager {
 
         if (state.dataPlantPipingSysMgr->WriteEIOFlag) {
             // Write eio header
-            static constexpr fmt::string_view DomainCellsToEIOHeader(
+            static constexpr std::string_view DomainCellsToEIOHeader(
                 "! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells\n");
             print(state.files.eio, DomainCellsToEIOHeader);
 
             // Write eio data
             for (auto &thisDomain : state.dataPlantPipingSysMgr->domains) {
-                static constexpr fmt::string_view DomainCellsToEIO("{},{:5},{:5},{:5}\n");
+                static constexpr std::string_view DomainCellsToEIO("{},{:5},{:5},{:5}\n");
                 print(state.files.eio,
                       DomainCellsToEIO,
                       thisDomain.Name,

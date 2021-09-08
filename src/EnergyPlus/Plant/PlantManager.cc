@@ -2766,7 +2766,7 @@ void UpdateNodeThermalHistory(EnergyPlusData &state)
                     // Accumulate total time loop is active
                     side.LoopSideInlet_TotalTime += state.dataHVACGlobal->TimeStepSys;
                     // Determine excessive storage - if both are moving in the same direction and McpDTdt is larger than MdotCpDeltaT
-                    if ((abs(side.LoopSideInlet_MdotCpDeltaT) > DataHVACGlobals::SmallLoad) &&
+                    if ((std::abs(side.LoopSideInlet_MdotCpDeltaT) > DataHVACGlobals::SmallLoad) &&
                         ((side.LoopSideInlet_McpDTdt / side.LoopSideInlet_MdotCpDeltaT) > 1.1)) {
                         side.LoopSideInlet_CapExcessStorageTimeReport = state.dataHVACGlobal->TimeStepSys;
                         side.LoopSideInlet_CapExcessStorageTime += state.dataHVACGlobal->TimeStepSys;

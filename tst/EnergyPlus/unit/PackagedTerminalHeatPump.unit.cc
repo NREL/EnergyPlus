@@ -114,7 +114,6 @@ using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::VariableSpeedCoils;
 using namespace EnergyPlus::ZoneAirLoopEquipmentManager;
 using namespace EnergyPlus::ZoneTempPredictorCorrector;
-using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 
