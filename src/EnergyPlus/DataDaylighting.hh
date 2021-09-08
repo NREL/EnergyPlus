@@ -136,29 +136,6 @@ namespace DataDaylighting {
         Real64 MinIntWinSolidAng = 0.0;     // Minimum solid angle subtended by an interior window in a zone
         Real64 InterReflIllFrIntWins = 0.0; // Inter-reflected illuminance due to beam and diffuse solar passing
         //  through a zone's interior windows (lux)
-        // Arguments (dimensions) for Dayl---Sun are:
-        //  1: Sun position index / HourOfDay (1 to 24)
-        //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
-        //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
-        //  3: Reference point number (1 to Total Daylighting Reference Points)
-        //  4: Daylit window number (1 to NumOfDayltgExtWins)
-        Array5D<Real64> DaylIllFacSky;
-        Array5D<Real64> DaylSourceFacSky;
-        Array5D<Real64> DaylBackFacSky;
-        // Allocatable daylight factor arrays
-        // Arguments (dimensions) for Dayl---Sky are:
-        //  1: Sun position index / HourOfDay (1 to 24)
-        //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
-        //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
-        //  3: Reference point number (1 to Total Daylighting Reference Points)
-        //  4: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
-        //  5: Daylit window number (1 to NumOfDayltgExtWins)
-        Array4D<Real64> DaylIllFacSun;
-        Array4D<Real64> DaylIllFacSunDisk;
-        Array4D<Real64> DaylSourceFacSun;
-        Array4D<Real64> DaylSourceFacSunDisk;
-        Array4D<Real64> DaylBackFacSun;
-        Array4D<Real64> DaylBackFacSunDisk;
         bool hasSplitFluxDaylighting = false;
         EPVector<int> daylightControlIndexes; // Indexes to daylighting:controls object operating in this enclosure
     };
@@ -201,6 +178,29 @@ namespace DataDaylighting {
         Array3D<Real64> BackLumFromWinAtRefPt;   // (Number of Zones, 2, Total Daylighting Reference Points)
         Array3D<Real64> SourceLumFromWinAtRefPt; // (Number of Zones, 2, Total Daylighting Reference Points)
         Array1D<Real64> TimeExceedingGlareIndexSPAtRefPt;
+        // Allocatable daylight factor arrays
+        // Arguments (dimensions) for Dayl---Sky are:
+        //  1: Sun position index / HourOfDay (1 to 24)
+        //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
+        //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
+        //  3: Reference point number (1 to Total Daylighting Reference Points)
+        //  4: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
+        //  5: Daylit window number (1 to NumOfDayltgExtWins)
+        Array5D<Real64> DaylIllFacSky;
+        Array5D<Real64> DaylSourceFacSky;
+        Array5D<Real64> DaylBackFacSky;
+        // Arguments (dimensions) for Dayl---Sun are:
+        //  1: Sun position index / HourOfDay (1 to 24)
+        //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
+        //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
+        //  3: Reference point number (1 to Total Daylighting Reference Points)
+        //  4: Daylit window number (1 to NumOfDayltgExtWins)
+        Array4D<Real64> DaylIllFacSun;
+        Array4D<Real64> DaylIllFacSunDisk;
+        Array4D<Real64> DaylSourceFacSun;
+        Array4D<Real64> DaylSourceFacSunDisk;
+        Array4D<Real64> DaylBackFacSun;
+        Array4D<Real64> DaylBackFacSunDisk;
         // Time exceeding daylight illuminance setpoint at reference points (hours)
         Array1D<Real64> TimeExceedingDaylightIlluminanceSPAtRefPt;
         std::vector<std::vector<int>> ShadeDeployOrderExtWins; // describes how the fenestration surfaces should deploy the shades.

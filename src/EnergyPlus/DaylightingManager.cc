@@ -614,7 +614,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                                 }
 
                                 for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
-                                    DaylFac = thisEnclDaylight.DaylIllFacSky(12, 1, static_cast<int>(skyType), refPtNum, windowCounter);
+                                    DaylFac = thisDaylightControl.DaylIllFacSky(12, 1, static_cast<int>(skyType), refPtNum, windowCounter);
                                     print(state.files.eio,
                                           " Sky Daylight Factors,{},{},{},{},{},{:.4R}\n",
                                           skyTypeString,
@@ -721,13 +721,13 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                     for (int IHR = 1; IHR <= 24; ++IHR) {
                         // For each Daylight Reference Point
                         for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
-                            DFClrSky = thisEnclDaylight.DaylIllFacSky(
+                            DFClrSky = thisDaylightControl.DaylIllFacSky(
                                 IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Clear), refPtNum, windowCounter);
-                            DFClrTbSky = thisEnclDaylight.DaylIllFacSky(
+                            DFClrTbSky = thisDaylightControl.DaylIllFacSky(
                                 IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::ClearTurbid), refPtNum, windowCounter);
-                            DFIntSky = thisEnclDaylight.DaylIllFacSky(
+                            DFIntSky = thisDaylightControl.DaylIllFacSky(
                                 IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Intermediate), refPtNum, windowCounter);
-                            DFOcSky = thisEnclDaylight.DaylIllFacSky(
+                            DFOcSky = thisDaylightControl.DaylIllFacSky(
                                 IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Overcast), refPtNum, windowCounter);
 
                             // write daylight factors - 4 sky types for each daylight ref point
@@ -914,34 +914,34 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
 
     if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
 
-        thisEnclDaylight.DaylIllFacSky = 0.0;
-        thisEnclDaylight.DaylSourceFacSky = 0.0;
-        thisEnclDaylight.DaylBackFacSky = 0.0;
-        thisEnclDaylight.DaylIllFacSun = 0.0;
-        thisEnclDaylight.DaylIllFacSunDisk = 0.0;
-        thisEnclDaylight.DaylSourceFacSun = 0.0;
-        thisEnclDaylight.DaylSourceFacSunDisk = 0.0;
-        thisEnclDaylight.DaylBackFacSun = 0.0;
-        thisEnclDaylight.DaylBackFacSunDisk = 0.0;
+        thisDaylightControl.DaylIllFacSky = 0.0;
+        thisDaylightControl.DaylSourceFacSky = 0.0;
+        thisDaylightControl.DaylBackFacSky = 0.0;
+        thisDaylightControl.DaylIllFacSun = 0.0;
+        thisDaylightControl.DaylIllFacSunDisk = 0.0;
+        thisDaylightControl.DaylSourceFacSun = 0.0;
+        thisDaylightControl.DaylSourceFacSunDisk = 0.0;
+        thisDaylightControl.DaylBackFacSun = 0.0;
+        thisDaylightControl.DaylBackFacSunDisk = 0.0;
     } else {
         int numRefPts = thisDaylightControl.TotalDaylRefPoints;
-        thisEnclDaylight.DaylIllFacSky(
+        thisDaylightControl.DaylIllFacSky(
             state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-        thisEnclDaylight.DaylSourceFacSky(
+        thisDaylightControl.DaylSourceFacSky(
             state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-        thisEnclDaylight.DaylBackFacSky(
+        thisDaylightControl.DaylBackFacSky(
             state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-        thisEnclDaylight.DaylIllFacSun(state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) =
-            0.0;
-        thisEnclDaylight.DaylIllFacSunDisk(
+        thisDaylightControl.DaylIllFacSun(
             state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-        thisEnclDaylight.DaylSourceFacSun(
+        thisDaylightControl.DaylIllFacSunDisk(
             state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-        thisEnclDaylight.DaylSourceFacSunDisk(
+        thisDaylightControl.DaylSourceFacSun(
             state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-        thisEnclDaylight.DaylBackFacSun(state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) =
-            0.0;
-        thisEnclDaylight.DaylBackFacSunDisk(
+        thisDaylightControl.DaylSourceFacSunDisk(
+            state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
+        thisDaylightControl.DaylBackFacSun(
+            state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
+        thisDaylightControl.DaylBackFacSunDisk(
             state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
     }
 
@@ -1163,7 +1163,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
             if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
                 ISunPos = 0;
                 for (IHR = 1; IHR <= 24; ++IHR) {
-                    FigureRefPointDayltgFactorsToAddIllums(state, thisDaylightControl.enclIndex, ILB, IHR, ISunPos, IWin, loopwin, NWX, NWY, ICtrl);
+                    FigureRefPointDayltgFactorsToAddIllums(state, daylightCtrlNum, ILB, IHR, ISunPos, IWin, loopwin, NWX, NWY, ICtrl);
 
                 } // End of sun position loop, IHR
             } else {
@@ -1179,7 +1179,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
                     ISunPos = -1;
                 }
                 FigureRefPointDayltgFactorsToAddIllums(
-                    state, thisDaylightControl.enclIndex, ILB, state.dataGlobal->HourOfDay, ISunPos, IWin, loopwin, NWX, NWY, ICtrl);
+                    state, daylightCtrlNum, ILB, state.dataGlobal->HourOfDay, ISunPos, IWin, loopwin, NWX, NWY, ICtrl);
             }
         } // End of window loop, loopwin - IWin
 
@@ -3845,7 +3845,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 }
 
 void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
-                                            int const enclNum, // Daylighting enclosure index
+                                            int const daylightCtrlNum, // Current daylighting control number
                                             int const iRefPoint,
                                             int const iHour,
                                             int &ISunPos,
@@ -3889,7 +3889,8 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     // Azimuth of sun in absolute coord sys
     state.dataDaylightingManager->THSUN = state.dataDaylightingManager->THSUNHR(iHour);
 
-    auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
+    auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
+    int enclNum = thisDaylightControl.enclIndex;
     for (ISky = 1; ISky <= 4; ++ISky) { // Loop over sky types
 
         // Loop over shading index (1=bare window; 2=diffusing glazing, shade, screen or fixed slat-angle blind;
@@ -3905,49 +3906,49 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
             if (!state.dataSurface->SurfWinMovableSlats(IWin) && JSH > 2) break;
 
             if (state.dataDaylightingManager->GILSK(iHour, ISky) > tmpDFCalc) {
-                thisEnclDaylight.DaylIllFacSky(iHour, JSH, ISky, iRefPoint, loopwin) =
+                thisDaylightControl.DaylIllFacSky(iHour, JSH, ISky, iRefPoint, loopwin) =
                     (state.dataDaylightingManager->EDIRSK(iHour, JSH, ISky) + state.dataDaylightingManager->EINTSK(iHour, JSH, ISky)) /
                     state.dataDaylightingManager->GILSK(iHour, ISky);
-                thisEnclDaylight.DaylSourceFacSky(iHour, JSH, ISky, iRefPoint, loopwin) =
+                thisDaylightControl.DaylSourceFacSky(iHour, JSH, ISky, iRefPoint, loopwin) =
                     state.dataDaylightingManager->AVWLSK(iHour, JSH, ISky) / (NWX * NWY * state.dataDaylightingManager->GILSK(iHour, ISky));
-                thisEnclDaylight.DaylBackFacSky(iHour, JSH, ISky, iRefPoint, loopwin) =
+                thisDaylightControl.DaylBackFacSky(iHour, JSH, ISky, iRefPoint, loopwin) =
                     state.dataDaylightingManager->EINTSK(iHour, JSH, ISky) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect /
                     (DataGlobalConstants::Pi * state.dataDaylightingManager->GILSK(iHour, ISky));
             } else {
-                thisEnclDaylight.DaylIllFacSky(iHour, JSH, ISky, iRefPoint, loopwin) = 0.0;
-                thisEnclDaylight.DaylSourceFacSky(iHour, JSH, ISky, iRefPoint, loopwin) = 0.0;
-                thisEnclDaylight.DaylBackFacSky(iHour, JSH, ISky, iRefPoint, loopwin) = 0.0;
+                thisDaylightControl.DaylIllFacSky(iHour, JSH, ISky, iRefPoint, loopwin) = 0.0;
+                thisDaylightControl.DaylSourceFacSky(iHour, JSH, ISky, iRefPoint, loopwin) = 0.0;
+                thisDaylightControl.DaylBackFacSky(iHour, JSH, ISky, iRefPoint, loopwin) = 0.0;
             }
 
             if (ISky == 1) {
                 if (state.dataDaylightingManager->GILSU(iHour) > tmpDFCalc) {
-                    thisEnclDaylight.DaylIllFacSun(iHour, JSH, iRefPoint, loopwin) =
+                    thisDaylightControl.DaylIllFacSun(iHour, JSH, iRefPoint, loopwin) =
                         (state.dataDaylightingManager->EDIRSU(iHour, JSH) + state.dataDaylightingManager->EINTSU(iHour, JSH)) /
                         (state.dataDaylightingManager->GILSU(iHour) + 0.0001);
-                    thisEnclDaylight.DaylIllFacSunDisk(iHour, JSH, iRefPoint, loopwin) =
+                    thisDaylightControl.DaylIllFacSunDisk(iHour, JSH, iRefPoint, loopwin) =
                         (state.dataDaylightingManager->EDIRSUdisk(iHour, JSH) + state.dataDaylightingManager->EINTSUdisk(iHour, JSH)) /
                         (state.dataDaylightingManager->GILSU(iHour) + 0.0001);
 
-                    thisEnclDaylight.DaylSourceFacSun(iHour, JSH, iRefPoint, loopwin) =
+                    thisDaylightControl.DaylSourceFacSun(iHour, JSH, iRefPoint, loopwin) =
                         state.dataDaylightingManager->AVWLSU(iHour, JSH) / (NWX * NWY * (state.dataDaylightingManager->GILSU(iHour) + 0.0001));
-                    thisEnclDaylight.DaylSourceFacSunDisk(iHour, JSH, iRefPoint, loopwin) =
+                    thisDaylightControl.DaylSourceFacSunDisk(iHour, JSH, iRefPoint, loopwin) =
                         state.dataDaylightingManager->AVWLSUdisk(iHour, JSH) / (NWX * NWY * (state.dataDaylightingManager->GILSU(iHour) + 0.0001));
 
-                    thisEnclDaylight.DaylBackFacSun(iHour, JSH, iRefPoint, loopwin) =
+                    thisDaylightControl.DaylBackFacSun(iHour, JSH, iRefPoint, loopwin) =
                         state.dataDaylightingManager->EINTSU(iHour, JSH) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect /
                         (DataGlobalConstants::Pi * (state.dataDaylightingManager->GILSU(iHour) + 0.0001));
-                    thisEnclDaylight.DaylBackFacSunDisk(iHour, JSH, iRefPoint, loopwin) =
+                    thisDaylightControl.DaylBackFacSunDisk(iHour, JSH, iRefPoint, loopwin) =
                         state.dataDaylightingManager->EINTSUdisk(iHour, JSH) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect /
                         (DataGlobalConstants::Pi * (state.dataDaylightingManager->GILSU(iHour) + 0.0001));
                 } else {
-                    thisEnclDaylight.DaylIllFacSun(iHour, JSH, iRefPoint, loopwin) = 0.0;
-                    thisEnclDaylight.DaylIllFacSunDisk(iHour, JSH, iRefPoint, loopwin) = 0.0;
+                    thisDaylightControl.DaylIllFacSun(iHour, JSH, iRefPoint, loopwin) = 0.0;
+                    thisDaylightControl.DaylIllFacSunDisk(iHour, JSH, iRefPoint, loopwin) = 0.0;
 
-                    thisEnclDaylight.DaylSourceFacSun(iHour, JSH, iRefPoint, loopwin) = 0.0;
-                    thisEnclDaylight.DaylSourceFacSunDisk(iHour, JSH, iRefPoint, loopwin) = 0.0;
+                    thisDaylightControl.DaylSourceFacSun(iHour, JSH, iRefPoint, loopwin) = 0.0;
+                    thisDaylightControl.DaylSourceFacSunDisk(iHour, JSH, iRefPoint, loopwin) = 0.0;
 
-                    thisEnclDaylight.DaylBackFacSun(iHour, JSH, iRefPoint, loopwin) = 0.0;
-                    thisEnclDaylight.DaylBackFacSunDisk(iHour, JSH, iRefPoint, loopwin) = 0.0;
+                    thisDaylightControl.DaylBackFacSun(iHour, JSH, iRefPoint, loopwin) = 0.0;
+                    thisDaylightControl.DaylBackFacSunDisk(iHour, JSH, iRefPoint, loopwin) = 0.0;
                 }
             }
         } // End of shading index loop, JSH
@@ -3956,24 +3957,25 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
         if (ICtrl > 0) {
             if (state.dataSurface->WindowShadingControl(ICtrl).ShadingType == WinShadingType::SwitchableGlazing) {
                 VTR = state.dataSurface->SurfWinVisTransRatio(IWin);
-                thisEnclDaylight.DaylIllFacSky(iHour, 2, ISky, iRefPoint, loopwin) =
-                    thisEnclDaylight.DaylIllFacSky(iHour, 1, ISky, iRefPoint, loopwin) * VTR;
-                thisEnclDaylight.DaylSourceFacSky(iHour, 2, ISky, iRefPoint, loopwin) =
-                    thisEnclDaylight.DaylSourceFacSky(iHour, 1, ISky, iRefPoint, loopwin) * VTR;
-                thisEnclDaylight.DaylBackFacSky(iHour, 2, ISky, iRefPoint, loopwin) =
-                    thisEnclDaylight.DaylBackFacSky(iHour, 1, ISky, iRefPoint, loopwin) * VTR;
+                thisDaylightControl.DaylIllFacSky(iHour, 2, ISky, iRefPoint, loopwin) =
+                    thisDaylightControl.DaylIllFacSky(iHour, 1, ISky, iRefPoint, loopwin) * VTR;
+                thisDaylightControl.DaylSourceFacSky(iHour, 2, ISky, iRefPoint, loopwin) =
+                    thisDaylightControl.DaylSourceFacSky(iHour, 1, ISky, iRefPoint, loopwin) * VTR;
+                thisDaylightControl.DaylBackFacSky(iHour, 2, ISky, iRefPoint, loopwin) =
+                    thisDaylightControl.DaylBackFacSky(iHour, 1, ISky, iRefPoint, loopwin) * VTR;
                 if (ISky == 1) {
-                    thisEnclDaylight.DaylIllFacSun(iHour, 2, iRefPoint, loopwin) = thisEnclDaylight.DaylIllFacSun(iHour, 1, iRefPoint, loopwin) * VTR;
-                    thisEnclDaylight.DaylSourceFacSun(iHour, 2, iRefPoint, loopwin) =
-                        thisEnclDaylight.DaylSourceFacSun(iHour, 1, iRefPoint, loopwin) * VTR;
-                    thisEnclDaylight.DaylBackFacSun(iHour, 2, iRefPoint, loopwin) =
-                        thisEnclDaylight.DaylBackFacSun(iHour, 1, iRefPoint, loopwin) * VTR;
-                    thisEnclDaylight.DaylIllFacSunDisk(iHour, 2, iRefPoint, loopwin) =
-                        thisEnclDaylight.DaylIllFacSunDisk(iHour, 1, iRefPoint, loopwin) * VTR;
-                    thisEnclDaylight.DaylSourceFacSunDisk(iHour, 2, iRefPoint, loopwin) =
-                        thisEnclDaylight.DaylSourceFacSunDisk(iHour, 1, iRefPoint, loopwin) * VTR;
-                    thisEnclDaylight.DaylBackFacSunDisk(iHour, 2, iRefPoint, loopwin) =
-                        thisEnclDaylight.DaylBackFacSunDisk(iHour, 1, iRefPoint, loopwin) * VTR;
+                    thisDaylightControl.DaylIllFacSun(iHour, 2, iRefPoint, loopwin) =
+                        thisDaylightControl.DaylIllFacSun(iHour, 1, iRefPoint, loopwin) * VTR;
+                    thisDaylightControl.DaylSourceFacSun(iHour, 2, iRefPoint, loopwin) =
+                        thisDaylightControl.DaylSourceFacSun(iHour, 1, iRefPoint, loopwin) * VTR;
+                    thisDaylightControl.DaylBackFacSun(iHour, 2, iRefPoint, loopwin) =
+                        thisDaylightControl.DaylBackFacSun(iHour, 1, iRefPoint, loopwin) * VTR;
+                    thisDaylightControl.DaylIllFacSunDisk(iHour, 2, iRefPoint, loopwin) =
+                        thisDaylightControl.DaylIllFacSunDisk(iHour, 1, iRefPoint, loopwin) * VTR;
+                    thisDaylightControl.DaylSourceFacSunDisk(iHour, 2, iRefPoint, loopwin) =
+                        thisDaylightControl.DaylSourceFacSunDisk(iHour, 1, iRefPoint, loopwin) * VTR;
+                    thisDaylightControl.DaylBackFacSunDisk(iHour, 2, iRefPoint, loopwin) =
+                        thisDaylightControl.DaylBackFacSunDisk(iHour, 1, iRefPoint, loopwin) * VTR;
                 }
             }
         } // ICtrl > 0
@@ -6230,131 +6232,131 @@ void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum) // Da
                 // ===Bare window===
                 DFSKHR(1, ISky) =
                     VTRatio *
-                    (state.dataGlobal->WeightNow * thisEnclDaylight.DaylIllFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
-                     state.dataGlobal->WeightPreviousHour * thisEnclDaylight.DaylIllFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
+                    (state.dataGlobal->WeightNow * thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
+                     state.dataGlobal->WeightPreviousHour * thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
 
                 if (ISky == 1)
                     DFSUHR(1) =
                         VTRatio *
-                        (state.dataGlobal->WeightNow * (thisEnclDaylight.DaylIllFacSun(state.dataGlobal->HourOfDay, 1, IL, loop) +
-                                                        thisEnclDaylight.DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 1, IL, loop)) +
-                         state.dataGlobal->WeightPreviousHour * (thisEnclDaylight.DaylIllFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
-                                                                 thisEnclDaylight.DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 1, IL, loop)));
+                        (state.dataGlobal->WeightNow * (thisDaylightControl.DaylIllFacSun(state.dataGlobal->HourOfDay, 1, IL, loop) +
+                                                        thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 1, IL, loop)) +
+                         state.dataGlobal->WeightPreviousHour * (thisDaylightControl.DaylIllFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
+                                                                 thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 1, IL, loop)));
 
                 BFSKHR(1, ISky) =
                     VTRatio *
-                    (state.dataGlobal->WeightNow * thisEnclDaylight.DaylBackFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
-                     state.dataGlobal->WeightPreviousHour * thisEnclDaylight.DaylBackFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
+                    (state.dataGlobal->WeightNow * thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
+                     state.dataGlobal->WeightPreviousHour * thisDaylightControl.DaylBackFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
 
                 if (ISky == 1)
                     BFSUHR(1) =
-                        VTRatio *
-                        (state.dataGlobal->WeightNow * (thisEnclDaylight.DaylBackFacSun(state.dataGlobal->HourOfDay, 1, IL, loop) +
-                                                        thisEnclDaylight.DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 1, IL, loop)) +
-                         state.dataGlobal->WeightPreviousHour * (thisEnclDaylight.DaylBackFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
-                                                                 thisEnclDaylight.DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 1, IL, loop)));
+                        VTRatio * (state.dataGlobal->WeightNow * (thisDaylightControl.DaylBackFacSun(state.dataGlobal->HourOfDay, 1, IL, loop) +
+                                                                  thisDaylightControl.DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 1, IL, loop)) +
+                                   state.dataGlobal->WeightPreviousHour *
+                                       (thisDaylightControl.DaylBackFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
+                                        thisDaylightControl.DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 1, IL, loop)));
 
                 SFSKHR(1, ISky) =
                     VTRatio *
-                    (state.dataGlobal->WeightNow * thisEnclDaylight.DaylSourceFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
-                     state.dataGlobal->WeightPreviousHour * thisEnclDaylight.DaylSourceFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
+                    (state.dataGlobal->WeightNow * thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, 1, ISky, IL, loop) +
+                     state.dataGlobal->WeightPreviousHour * thisDaylightControl.DaylSourceFacSky(state.dataGlobal->PreviousHour, 1, ISky, IL, loop));
 
                 if (ISky == 1)
-                    SFSUHR(1) =
-                        VTRatio *
-                        (state.dataGlobal->WeightNow * (thisEnclDaylight.DaylSourceFacSun(state.dataGlobal->HourOfDay, 1, IL, loop) +
-                                                        thisEnclDaylight.DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, 1, IL, loop)) +
-                         state.dataGlobal->WeightPreviousHour * (thisEnclDaylight.DaylSourceFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
-                                                                 thisEnclDaylight.DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 1, IL, loop)));
+                    SFSUHR(1) = VTRatio *
+                                (state.dataGlobal->WeightNow * (thisDaylightControl.DaylSourceFacSun(state.dataGlobal->HourOfDay, 1, IL, loop) +
+                                                                thisDaylightControl.DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, 1, IL, loop)) +
+                                 state.dataGlobal->WeightPreviousHour *
+                                     (thisDaylightControl.DaylSourceFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
+                                      thisDaylightControl.DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 1, IL, loop)));
 
                 if (ShadedOrDiffusingGlassWin) {
 
                     // ===Shaded window or window with diffusing glass===
                     if (!state.dataSurface->SurfWinMovableSlats(IWin)) {
                         // Shade, screen, blind with fixed slats, or diffusing glass
-                        DFSKHR(2, ISky) =
-                            VTRatio * (state.dataGlobal->WeightNow * thisEnclDaylight.DaylIllFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
-                                       state.dataGlobal->WeightPreviousHour *
-                                           thisEnclDaylight.DaylIllFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
+                        DFSKHR(2, ISky) = VTRatio * (state.dataGlobal->WeightNow *
+                                                         thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
+                                                     state.dataGlobal->WeightPreviousHour *
+                                                         thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
 
                         if (ISky == 1) {
                             DFSUHR(2) =
-                                VTRatio *
-                                (state.dataGlobal->WeightNow * thisEnclDaylight.DaylIllFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
-                                 state.dataGlobal->WeightPreviousHour * thisEnclDaylight.DaylIllFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
+                                VTRatio * (state.dataGlobal->WeightNow * thisDaylightControl.DaylIllFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                           state.dataGlobal->WeightPreviousHour *
+                                               thisDaylightControl.DaylIllFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
 
                             if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin))
                                 DFSUHR(2) += VTRatio * (state.dataGlobal->WeightNow *
-                                                            thisEnclDaylight.DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                                            thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
                                                         state.dataGlobal->WeightPreviousHour *
-                                                            thisEnclDaylight.DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
+                                                            thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
                         }
 
-                        BFSKHR(2, ISky) =
-                            VTRatio * (state.dataGlobal->WeightNow * thisEnclDaylight.DaylBackFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
-                                       state.dataGlobal->WeightPreviousHour *
-                                           thisEnclDaylight.DaylBackFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
+                        BFSKHR(2, ISky) = VTRatio * (state.dataGlobal->WeightNow *
+                                                         thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
+                                                     state.dataGlobal->WeightPreviousHour *
+                                                         thisDaylightControl.DaylBackFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
 
                         if (ISky == 1) {
-                            BFSUHR(2) =
-                                VTRatio *
-                                (state.dataGlobal->WeightNow * thisEnclDaylight.DaylBackFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
-                                 state.dataGlobal->WeightPreviousHour * thisEnclDaylight.DaylBackFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
+                            BFSUHR(2) = VTRatio *
+                                        (state.dataGlobal->WeightNow * thisDaylightControl.DaylBackFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                         state.dataGlobal->WeightPreviousHour *
+                                             thisDaylightControl.DaylBackFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
                             if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin))
                                 BFSUHR(2) += VTRatio * (state.dataGlobal->WeightNow *
-                                                            thisEnclDaylight.DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                                            thisDaylightControl.DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
                                                         state.dataGlobal->WeightPreviousHour *
-                                                            thisEnclDaylight.DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
+                                                            thisDaylightControl.DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
                         }
 
                         SFSKHR(2, ISky) = VTRatio * (state.dataGlobal->WeightNow *
-                                                         thisEnclDaylight.DaylSourceFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
+                                                         thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
                                                      state.dataGlobal->WeightPreviousHour *
-                                                         thisEnclDaylight.DaylSourceFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
+                                                         thisDaylightControl.DaylSourceFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
 
                         if (ISky == 1) {
-                            SFSUHR(2) =
-                                VTRatio * (state.dataGlobal->WeightNow * thisEnclDaylight.DaylSourceFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
-                                           state.dataGlobal->WeightPreviousHour *
-                                               thisEnclDaylight.DaylSourceFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
+                            SFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow *
+                                                       thisDaylightControl.DaylSourceFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                                   state.dataGlobal->WeightPreviousHour *
+                                                       thisDaylightControl.DaylSourceFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
                             if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin))
                                 SFSUHR(2) += VTRatio * (state.dataGlobal->WeightNow *
-                                                            thisEnclDaylight.DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
+                                                            thisDaylightControl.DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
                                                         state.dataGlobal->WeightPreviousHour *
-                                                            thisEnclDaylight.DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
+                                                            thisDaylightControl.DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
                         }
 
                     } else { // Blind with movable slats
                         int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(IWin);
                         Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(IWin);
                         Real64 DaylIllFacSkyNow = General::InterpGeneral(
-                            thisEnclDaylight.DaylIllFacSky(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, ISky, IL, loop),
-                            thisEnclDaylight.DaylIllFacSky(
+                            thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, ISky, IL, loop),
+                            thisDaylightControl.DaylIllFacSky(
                                 state.dataGlobal->HourOfDay, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), ISky, IL, loop),
                             SurfWinSlatsAngInterpFac);
                         Real64 DaylBackFacSkyNow = General::InterpGeneral(
-                            thisEnclDaylight.DaylBackFacSky(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, ISky, IL, loop),
-                            thisEnclDaylight.DaylBackFacSky(
+                            thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, ISky, IL, loop),
+                            thisDaylightControl.DaylBackFacSky(
                                 state.dataGlobal->HourOfDay, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), ISky, IL, loop),
                             SurfWinSlatsAngInterpFac);
                         Real64 DaylSourceFacSkyNow = General::InterpGeneral(
-                            thisEnclDaylight.DaylSourceFacSky(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, ISky, IL, loop),
-                            thisEnclDaylight.DaylSourceFacSky(
+                            thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, ISky, IL, loop),
+                            thisDaylightControl.DaylSourceFacSky(
                                 state.dataGlobal->HourOfDay, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), ISky, IL, loop),
                             SurfWinSlatsAngInterpFac);
                         Real64 DaylIllFacSkyPrev = General::InterpGeneral(
-                            thisEnclDaylight.DaylIllFacSky(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, ISky, IL, loop),
-                            thisEnclDaylight.DaylIllFacSky(
+                            thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, ISky, IL, loop),
+                            thisDaylightControl.DaylIllFacSky(
                                 state.dataGlobal->PreviousHour, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), ISky, IL, loop),
                             SurfWinSlatsAngInterpFac);
                         Real64 DaylBackFacSkyPrev = General::InterpGeneral(
-                            thisEnclDaylight.DaylBackFacSky(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, ISky, IL, loop),
-                            thisEnclDaylight.DaylBackFacSky(
+                            thisDaylightControl.DaylBackFacSky(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, ISky, IL, loop),
+                            thisDaylightControl.DaylBackFacSky(
                                 state.dataGlobal->PreviousHour, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), ISky, IL, loop),
                             SurfWinSlatsAngInterpFac);
                         Real64 DaylSourceFacSkyPrev = General::InterpGeneral(
-                            thisEnclDaylight.DaylSourceFacSky(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, ISky, IL, loop),
-                            thisEnclDaylight.DaylSourceFacSky(
+                            thisDaylightControl.DaylSourceFacSky(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, ISky, IL, loop),
+                            thisDaylightControl.DaylSourceFacSky(
                                 state.dataGlobal->PreviousHour, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), ISky, IL, loop),
                             SurfWinSlatsAngInterpFac);
 
@@ -6367,33 +6369,33 @@ void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum) // Da
 
                         if (ISky == 1) {
                             Real64 DaylIllFacSunNow = General::InterpGeneral(
-                                thisEnclDaylight.DaylIllFacSun(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, IL, loop),
-                                thisEnclDaylight.DaylIllFacSun(
+                                thisDaylightControl.DaylIllFacSun(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, IL, loop),
+                                thisDaylightControl.DaylIllFacSun(
                                     state.dataGlobal->HourOfDay, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                 SurfWinSlatsAngInterpFac);
                             Real64 DaylBackFacSunNow = General::InterpGeneral(
-                                thisEnclDaylight.DaylBackFacSun(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, IL, loop),
-                                thisEnclDaylight.DaylBackFacSun(
+                                thisDaylightControl.DaylBackFacSun(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, IL, loop),
+                                thisDaylightControl.DaylBackFacSun(
                                     state.dataGlobal->HourOfDay, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                 SurfWinSlatsAngInterpFac);
                             Real64 DaylSourceFacSunNow = General::InterpGeneral(
-                                thisEnclDaylight.DaylSourceFacSun(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, IL, loop),
-                                thisEnclDaylight.DaylSourceFacSun(
+                                thisDaylightControl.DaylSourceFacSun(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, IL, loop),
+                                thisDaylightControl.DaylSourceFacSun(
                                     state.dataGlobal->HourOfDay, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                 SurfWinSlatsAngInterpFac);
                             Real64 DaylIllFacSunPrev = General::InterpGeneral(
-                                thisEnclDaylight.DaylIllFacSun(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, IL, loop),
-                                thisEnclDaylight.DaylIllFacSun(
+                                thisDaylightControl.DaylIllFacSun(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, IL, loop),
+                                thisDaylightControl.DaylIllFacSun(
                                     state.dataGlobal->PreviousHour, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                 SurfWinSlatsAngInterpFac);
                             Real64 DaylBackFacSunPrev = General::InterpGeneral(
-                                thisEnclDaylight.DaylBackFacSun(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, IL, loop),
-                                thisEnclDaylight.DaylBackFacSun(
+                                thisDaylightControl.DaylBackFacSun(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, IL, loop),
+                                thisDaylightControl.DaylBackFacSun(
                                     state.dataGlobal->PreviousHour, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                 SurfWinSlatsAngInterpFac);
                             Real64 DaylSourceFacSunPrev = General::InterpGeneral(
-                                thisEnclDaylight.DaylSourceFacSun(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, IL, loop),
-                                thisEnclDaylight.DaylSourceFacSun(
+                                thisDaylightControl.DaylSourceFacSun(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, IL, loop),
+                                thisDaylightControl.DaylSourceFacSun(
                                     state.dataGlobal->PreviousHour, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                 SurfWinSlatsAngInterpFac);
                             DFSUHR(2) =
@@ -6407,33 +6409,33 @@ void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum) // Da
                             // TH CR 8010, DaylIllFacSunDisk needs to be interpolated
                             if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin)) {
                                 Real64 DaylIllFacSunDiskNow = General::InterpGeneral(
-                                    thisEnclDaylight.DaylIllFacSunDisk(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, IL, loop),
-                                    thisEnclDaylight.DaylIllFacSunDisk(
+                                    thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, IL, loop),
+                                    thisDaylightControl.DaylIllFacSunDisk(
                                         state.dataGlobal->HourOfDay, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                     SurfWinSlatsAngInterpFac);
                                 Real64 DaylBackFacSunDiskNow = General::InterpGeneral(
-                                    thisEnclDaylight.DaylBackFacSunDisk(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, IL, loop),
-                                    thisEnclDaylight.DaylBackFacSunDisk(
+                                    thisDaylightControl.DaylBackFacSunDisk(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, IL, loop),
+                                    thisDaylightControl.DaylBackFacSunDisk(
                                         state.dataGlobal->HourOfDay, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                     SurfWinSlatsAngInterpFac);
                                 Real64 DaylSourceFacSunDiskNow = General::InterpGeneral(
-                                    thisEnclDaylight.DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, IL, loop),
-                                    thisEnclDaylight.DaylSourceFacSunDisk(
+                                    thisDaylightControl.DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, SurfWinSlatsAngIndex + 1, IL, loop),
+                                    thisDaylightControl.DaylSourceFacSunDisk(
                                         state.dataGlobal->HourOfDay, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                     SurfWinSlatsAngInterpFac);
                                 Real64 DaylIllFacSunDiskPrev = General::InterpGeneral(
-                                    thisEnclDaylight.DaylIllFacSunDisk(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, IL, loop),
-                                    thisEnclDaylight.DaylIllFacSunDisk(
+                                    thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, IL, loop),
+                                    thisDaylightControl.DaylIllFacSunDisk(
                                         state.dataGlobal->PreviousHour, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                     SurfWinSlatsAngInterpFac);
                                 Real64 DaylBackFacSunDiskPrev = General::InterpGeneral(
-                                    thisEnclDaylight.DaylBackFacSunDisk(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, IL, loop),
-                                    thisEnclDaylight.DaylBackFacSunDisk(
+                                    thisDaylightControl.DaylBackFacSunDisk(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, IL, loop),
+                                    thisDaylightControl.DaylBackFacSunDisk(
                                         state.dataGlobal->PreviousHour, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                     SurfWinSlatsAngInterpFac);
                                 Real64 DaylSourceFacSunDiskPrev = General::InterpGeneral(
-                                    thisEnclDaylight.DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, IL, loop),
-                                    thisEnclDaylight.DaylSourceFacSunDisk(
+                                    thisDaylightControl.DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, SurfWinSlatsAngIndex + 1, IL, loop),
+                                    thisDaylightControl.DaylSourceFacSunDisk(
                                         state.dataGlobal->PreviousHour, std::min(MaxSlatAngs + 1, SurfWinSlatsAngIndex + 2), IL, loop),
                                     SurfWinSlatsAngInterpFac);
                                 DFSUHR(2) += VTRatio * (state.dataGlobal->WeightNow * DaylIllFacSunDiskNow +
@@ -10286,15 +10288,18 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
 
             thisEnclDaylight.NumOfDayltgExtWins = enclExtWin(enclNum);
             int winSize = enclExtWin(enclNum);
-            thisEnclDaylight.DaylIllFacSky.allocate(24, MaxSlatAngs + 1, 4, thisEnclNumRefPoints, winSize);
-            thisEnclDaylight.DaylSourceFacSky.allocate(24, MaxSlatAngs + 1, 4, thisEnclNumRefPoints, winSize);
-            thisEnclDaylight.DaylBackFacSky.allocate(24, MaxSlatAngs + 1, 4, thisEnclNumRefPoints, winSize);
-            thisEnclDaylight.DaylIllFacSun.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
-            thisEnclDaylight.DaylIllFacSunDisk.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
-            thisEnclDaylight.DaylSourceFacSun.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
-            thisEnclDaylight.DaylSourceFacSunDisk.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
-            thisEnclDaylight.DaylBackFacSun.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
-            thisEnclDaylight.DaylBackFacSunDisk.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
+            for (int controlNum : thisEnclDaylight.daylightControlIndexes) {
+                auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
+                thisDaylightControl.DaylIllFacSky.allocate(24, MaxSlatAngs + 1, 4, thisEnclNumRefPoints, winSize);
+                thisDaylightControl.DaylSourceFacSky.allocate(24, MaxSlatAngs + 1, 4, thisEnclNumRefPoints, winSize);
+                thisDaylightControl.DaylBackFacSky.allocate(24, MaxSlatAngs + 1, 4, thisEnclNumRefPoints, winSize);
+                thisDaylightControl.DaylIllFacSun.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
+                thisDaylightControl.DaylIllFacSunDisk.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
+                thisDaylightControl.DaylSourceFacSun.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
+                thisDaylightControl.DaylSourceFacSunDisk.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
+                thisDaylightControl.DaylBackFacSun.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
+                thisDaylightControl.DaylBackFacSunDisk.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
+            }
         } // End of check if thisEnclNumRefPoints > 0
 
         if (state.dataSurface->TotWinShadingControl > 0) {
@@ -10336,18 +10341,20 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
         }
     } // End of zone loop
 
-    // TODO MJW: These eio headings need to change from zone to enclosure
+    // TODO MJW: These eio outputs need to change from zone to enclosure
     static constexpr std::string_view Format_700(
         "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones\n");
     print(state.files.eio, Format_700);
-    for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        int enclNum = state.dataHeatBal->Zone(ZoneNum).zoneFirstSpaceSolEnclosure;
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
         if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
         if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
+        if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
         static constexpr std::string_view Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
         print(state.files.eio,
               Format_701,
-              state.dataViewFactor->EnclSolInfo(enclNum).Name,
+              state.dataHeatBal->Zone(ZoneNum).Name,
               thisEnclDaylight.TotalExtWindows,
               (thisEnclDaylight.NumOfDayltgExtWins - thisEnclDaylight.TotalExtWindows));
     }
@@ -10355,12 +10362,14 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
         "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent "
         "Zone Names - 1st 100 (max)\n");
     print(state.files.eio, Format_702);
-    for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        int enclNum = state.dataHeatBal->Zone(ZoneNum).zoneFirstSpaceSolEnclosure;
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
         if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
         if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
+        if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
         static constexpr std::string_view Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
-        print(state.files.eio, Format_703, state.dataViewFactor->EnclSolInfo(enclNum).Name, thisEnclDaylight.NumOfIntWinAdjEncls);
+        print(state.files.eio, Format_703, state.dataHeatBal->Zone(ZoneNum).Name, thisEnclDaylight.NumOfIntWinAdjEncls);
         for (int loop = 1, loop_end = min(thisEnclDaylight.NumOfIntWinAdjEncls, 100); loop <= loop_end; ++loop) {
             print(state.files.eio, ",{}", state.dataViewFactor->EnclSolInfo(thisEnclDaylight.AdjIntWinEnclNums(loop)).Name);
         }
