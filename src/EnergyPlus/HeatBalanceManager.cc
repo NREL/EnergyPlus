@@ -363,6 +363,12 @@ namespace HeatBalanceManager {
         // following is done to "get internal heat gains" input so that lights are gotten before
         // daylighting input
         ManageInternalHeatGains(state, true);
+
+        // following is done so that people are gotten before for thermal comfort calculations
+        // Setup Kiva instances
+        if (state.dataHeatBal->AnyKiva) {
+            state.dataSurfaceGeometry->kivaManager.setupKivaInstances(state);
+        }
     }
 
     void CheckUsedConstructions(EnergyPlusData &state, bool &ErrorsFound)

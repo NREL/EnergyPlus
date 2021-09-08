@@ -652,13 +652,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 {
     Kiva::setMessageCallback(kivaErrorCallback, nullptr);
     bool ErrorsFound = false;
-
-    // Need to process People objects before getting air setpoints for thermal comfort calculations
-    if (state.dataInternalHeatGains->GetInternalHeatGainsInputFlag) {
-        InternalHeatGains::GetInternalHeatGainsInput(state);
-        state.dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
-    }
-
+    
     if (state.dataZoneCtrls->GetZoneAirStatsInputFlag) {
         ZoneTempPredictorCorrector::GetZoneAirSetPoints(state);
         state.dataZoneCtrls->GetZoneAirStatsInputFlag = false;
