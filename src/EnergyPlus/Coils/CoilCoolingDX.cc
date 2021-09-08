@@ -171,7 +171,9 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                    DataLoopNode::ObjectIsNotParent);
 
     // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
-    if (!OutAirNodeManager::CheckOutAirNodeNumber(state, this->condInletNodeIndex)) {
+    bool isOK = false;
+    OutAirNodeManager::CheckAndAddAirNodeNumber(state, this->condInletNodeIndex, isOK);
+    if (!isOK) {
         ShowWarningError(state,
                          std::string{routineName} + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
         ShowContinueError(state,
