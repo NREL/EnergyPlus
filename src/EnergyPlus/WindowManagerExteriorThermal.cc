@@ -52,12 +52,11 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowManager.hh>
-#include <EnergyPlus/DataSurfaces.hh>
-
 
 // Windows library headers
 #include <WCETarcog.hpp>
@@ -260,7 +259,7 @@ namespace WindowManager {
         }
     }
 
-     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
+    void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
                                         int const surfNum,
                                         double windowWidth,
                                         double windowHeight,
@@ -293,8 +292,7 @@ namespace WindowManager {
             const double frameWettedLength{frameProjectedDimension + frameDivider.FrameProjectionIn};
             const double frameAbsorptance{frameDivider.FrameSolAbsorp};
 
-            Tarcog::ISO15099::FrameData frameData{
-                frameUvalue, frameEdgeUValue, frameProjectedDimension, frameWettedLength, frameAbsorptance};
+            Tarcog::ISO15099::FrameData frameData{frameUvalue, frameEdgeUValue, frameProjectedDimension, frameWettedLength, frameAbsorptance};
 
             const double dividerUvalue = aFactory.overallUfactorFromFilmsAndCond(frameDivider.DividerConductance, hIntConvCoeff, hExtConvCoeff);
             const double dividerEdgeUValue{centerOfGlassUvalue * frameDivider.DivEdgeToCenterGlCondRatio}; // not sure about this
@@ -306,7 +304,6 @@ namespace WindowManager {
 
             Tarcog::ISO15099::FrameData dividerData{
                 dividerUvalue, dividerEdgeUValue, dividerProjectedDimension, dividerWettedLength, dividerAbsorptance};
-
 
             const auto tVis{state.dataConstruction->Construct(surface.Construction).VisTransNorm};
             const auto tSol{state.dataConstruction->Construct(surface.Construction).SolTransNorm};
@@ -344,8 +341,7 @@ namespace WindowManager {
                     uvalue = window.uValue();
                 }
             } else if (vision == EnergyPlus::DataSurfaces::NfrcVisionType::Single) {
-                auto window = 
-                    Tarcog::ISO15099::DualVisionVertical(windowWidth, windowHeight, tVis, tSol, insulGlassUnit, tVis, tSol, insulGlassUnit);
+                auto window = Tarcog::ISO15099::DualVisionVertical(windowWidth, windowHeight, tVis, tSol, insulGlassUnit, tVis, tSol, insulGlassUnit);
                 window.setFrameTop(frameData);
                 window.setFrameBottom(frameData);
                 window.setFrameTopLeft(frameData);
@@ -440,11 +436,11 @@ namespace WindowManager {
         return aSystem;
     }
 
-    std::shared_ptr<Tarcog::ISO15099::IIGUSystem> CWCEHeatTransferFactory::getTarcogSystemForReporting(EnergyPlusData &state,
-        int ConstrNum, double hcInterior, bool const useSummerConditions)
+    std::shared_ptr<Tarcog::ISO15099::IIGUSystem>
+    CWCEHeatTransferFactory::getTarcogSystemForReporting(EnergyPlusData &state, int ConstrNum, double hcInterior, bool const useSummerConditions)
     {
         std::shared_ptr<Tarcog::ISO15099::IIGUSystem> result;
-        if(state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
+        if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
             auto Indoor = getIndoorUvalueNfrc(useSummerConditions);
             auto Outdoor = getOutdoorUvalueNfrc(useSummerConditions);
             auto aIGU = getIGU();
@@ -467,8 +463,7 @@ namespace WindowManager {
             }
 
             result = std::make_shared<Tarcog::ISO15099::CSystem>(aIGU, Indoor, Outdoor);
-        }
-        else { // Need to retrieve legacy values while code is still active. This is constructed as simple IGU for the purpose of reporting. (Simon)
+        } else { // Need to retrieve legacy values while code is still active. This is constructed as simple IGU for the purpose of reporting. (Simon)
             const auto COGUValue{state.dataHeatBal->NominalU(ConstrNum)};
             const auto SHGCCOG{state.dataConstruction->Construct(ConstrNum).SummerSHGC};
             result = std::make_shared<Tarcog::ISO15099::SimpleIGU>(COGUValue, SHGCCOG, hcInterior);
@@ -847,7 +842,7 @@ namespace WindowManager {
         auto airTemperature{-18.0 + DataGlobalConstants::KelvinConv}; // Kelvins
         auto airSpeed{5.5};                                           // meters per second
         auto tSky{-18.0 + DataGlobalConstants::KelvinConv};           // Kelvins
-        auto solarRadiation{0.};                                       // W/m2
+        auto solarRadiation{0.};                                      // W/m2
         if (useSummerConditions) {
             // NFRC 200 Section 4.3.1
             airTemperature = 32.0 + DataGlobalConstants::KelvinConv;
@@ -875,17 +870,16 @@ namespace WindowManager {
 
     double CWCEHeatTransferFactory::overallUfactorFromFilmsAndCond(double conductance, double insideFilm, double outsideFilm)
     {
-        double rOverall(0.); 
+        double rOverall(0.);
         double uFactor(0.);
-        if (insideFilm !=0 && outsideFilm != 0. && conductance != 0.) {
-            rOverall = 1 / insideFilm + 1/conductance + 1 / outsideFilm;
-        } 
+        if (insideFilm != 0 && outsideFilm != 0. && conductance != 0.) {
+            rOverall = 1 / insideFilm + 1 / conductance + 1 / outsideFilm;
+        }
         if (rOverall != 0.) {
             uFactor = 1 / rOverall;
-        } 
+        }
         return uFactor;
     }
-
 
 } // namespace WindowManager
 } // namespace EnergyPlus

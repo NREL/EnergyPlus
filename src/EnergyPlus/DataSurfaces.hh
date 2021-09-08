@@ -833,16 +833,22 @@ namespace DataSurfaces {
     };
 
     constexpr std::array<NfrcVisionType, static_cast<int>(NfrcProductOptions::Num)> NfrcVision = {
-        NfrcVisionType::DualHorizontal, NfrcVisionType::Single,         NfrcVisionType::DualVertical,   //  CasementDouble,  CasementSingle,    DualAction,
-        NfrcVisionType::Single,         NfrcVisionType::Single,         NfrcVisionType::Single,         //  Fixed,           Garage,            Greenhouse,
-        NfrcVisionType::Single,         NfrcVisionType::DualHorizontal, NfrcVisionType::Single,         //  HingedEscape,    HorizontalSlider,  Jal,
-        NfrcVisionType::Single,         NfrcVisionType::Single,         NfrcVisionType::DualHorizontal, //  Pivoted,         ProjectingSingle,  ProjectingDual,
-        NfrcVisionType::Single,         NfrcVisionType::Single,         NfrcVisionType::DualHorizontal, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
-        NfrcVisionType::Single,         NfrcVisionType::Single,         NfrcVisionType::Single,         //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
-        NfrcVisionType::Single,         NfrcVisionType::Single,         NfrcVisionType::Single,         //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
-        NfrcVisionType::DualVertical                                                                    //  VerticalSlider
+        NfrcVisionType::DualHorizontal, NfrcVisionType::Single,
+        NfrcVisionType::DualVertical, //  CasementDouble,  CasementSingle,    DualAction,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::Single, //  Fixed,           Garage,            Greenhouse,
+        NfrcVisionType::Single,         NfrcVisionType::DualHorizontal,
+        NfrcVisionType::Single, //  HingedEscape,    HorizontalSlider,  Jal,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::DualHorizontal, //  Pivoted,         ProjectingSingle,  ProjectingDual,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::DualHorizontal, //  DoorSidelite,    Skylight,          SlidingPatioDoor,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::Single, //  CurtainWall,     SpandrelPanel,     SideHingedDoor,
+        NfrcVisionType::Single,         NfrcVisionType::Single,
+        NfrcVisionType::Single,      //  DoorTransom,     TropicalAwning,    TubularDaylightingDevice,
+        NfrcVisionType::DualVertical //  VerticalSlider
     };
-
 
     struct FrameDividerProperties
     {

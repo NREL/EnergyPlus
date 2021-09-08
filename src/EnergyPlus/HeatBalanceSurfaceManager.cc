@@ -121,10 +121,7 @@
 #include <WCECommon.hpp>
 #include <WCEMultiLayerOptics.hpp>
 #include <WCESingleLayerOptics.hpp>
-
-
-#include "WCETarcog.hpp"
-
+#include <WCETarcog.hpp>
 
 namespace EnergyPlus::HeatBalanceSurfaceManager {
 
@@ -952,7 +949,8 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                                          3);
 
                         // report the selected NRFC product type (specific sizes) and the NFRC rating for the assembly (glass + frame + divider)
-                        std::string_view NFRCname = DataSurfaces::NfrcProductName[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
+                        std::string_view NFRCname =
+                            DataSurfaces::NfrcProductName[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                         const auto windowWidth = NfrcWidth[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                         const auto windowHeight = NfrcHeight[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
                         const auto vision = NfrcVision[static_cast<int>(state.dataSurface->FrameDivider(frameDivNum).NfrcProductType)];
@@ -986,8 +984,6 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                             CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
                         }
                     }
-
-
 
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSHGC, surfName, SHGCSummer, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenVisTr, surfName, TransVisNorm, 3);
@@ -1317,7 +1313,6 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     PreDefTableEntry(
         state, state.dataOutRptPredefined->pdchSurfCntExt, "Tubular Daylighting Device Diffuser", numExtSurfaces(int(SurfaceClass::TDD_Diffuser)));
 }
-
 
 void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
 {
