@@ -87,14 +87,6 @@ void ConvertCaseToLower(std::string_view InputString, // Input string
                         std::string &OutputString     // Output string (in LowerCase)
 );
 
-int getEnumerationValue(gsl::span<const std::string_view> sList, const std::string_view s);
-
-// useful for forcing a conversion to a string reference for JSON objects
-inline const std::string &AsString(const std::string &value)
-{
-    return value;
-}
-
 std::string::size_type FindNonSpace(std::string const &String); // String to be scanned
 
 template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>> inline constexpr T pow2(T x)
