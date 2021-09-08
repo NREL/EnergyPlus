@@ -168,34 +168,29 @@ namespace OutputReportPredefined {
     // is a real variable. numSigDigits defaults to 2, and if supplied must be in [0-9]
     // Internally it uses a Fortran-Style write statement, meaning numbers are rounded rather than trimmed
     void PreDefTableEntry(
-        EnergyPlusData &state, int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits = _);
+        EnergyPlusData &state, int const columnIndex, std::string_view objName, Real64 const tableEntryReal, Optional_int_const numSigDigits = _);
 
-    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, std::string const &tableEntryChar);
+    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string_view objName, std::string_view tableEntryChar);
 
-    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName, int const tableEntryInt);
+    void PreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string_view objName, int const tableEntryInt);
 
-    std::string RetrievePreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string const &objName);
+    std::string RetrievePreDefTableEntry(EnergyPlusData &state, int const columnIndex, std::string_view objName);
 
     void incrementTableEntry(EnergyPlusData &state);
 
-    void AddCompSizeTableEntry(EnergyPlusData &state,
-                               std::string const &FieldType,
-                               std::string const &FieldName,
-                               std::string const &FieldDescription,
-                               Real64 const FieldValue);
+    void AddCompSizeTableEntry(
+        EnergyPlusData &state, std::string_view FieldType, std::string_view FieldName, std::string_view FieldDescription, Real64 const FieldValue);
 
     void AddShadowRelateTableEntry(EnergyPlusData &state, int const castingField, int const receivingField, int const receivingKind);
 
-    int newPreDefReport(EnergyPlusData &state,
-                        std::string const &inReportName,
-                        std::string const &inReportAbrev,
-                        std::string const &inReportNamewithSpaces);
+    int
+    newPreDefReport(EnergyPlusData &state, std::string_view inReportName, std::string_view inReportAbrev, std::string_view inReportNamewithSpaces);
 
-    int newPreDefSubTable(EnergyPlusData &state, int const reportIndex, std::string const &subTableName);
+    int newPreDefSubTable(EnergyPlusData &state, int const reportIndex, std::string_view subTableName);
 
-    void addFootNoteSubTable(EnergyPlusData &state, int const subTableIndex, std::string const &footnoteText);
+    void addFootNoteSubTable(EnergyPlusData &state, int const subTableIndex, std::string_view footnoteText);
 
-    int newPreDefColumn(EnergyPlusData &state, int const subTableIndex, std::string const &columnHeading);
+    int newPreDefColumn(EnergyPlusData &state, int const subTableIndex, std::string_view columnHeading);
 
 } // namespace OutputReportPredefined
 
@@ -220,6 +215,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchMechType = 0;
     int pdchMechNomCap = 0;
     int pdchMechNomEff = 0;
+    int pdchMechRatCap = 0;
+    int pdchMechRatEff = 0;
     int pdchMechIPLVSI = 0;
     int pdchMechIPLVIP = 0;
 
@@ -408,6 +405,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdrLighting = 0;
     int pdstInLite = 0;
     int pdchInLtZone = 0;
+    int pdchInLtSpace = 0;
+    int pdchInLtSpaceType = 0;
     int pdchInLtDens = 0;
     int pdchInLtArea = 0;
     int pdchInLtPower = 0;
@@ -905,10 +904,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchS62svrClPs = 0;
     int pdchS62svrClSumPz = 0;
     int pdchS62svrClD = 0;
+    int pdchS62svrClDorg = 0;
     int pdchS62svrClVou = 0;
     int pdchS62svrClVps = 0;
     int pdchS62svrClXs = 0;
     int pdchS62svrClEv = 0;
+    int pdchS62svrClEvMthd = 0;
     int pdchS62svrClVot = 0;
     int pdchS62svrClPercOA = 0;
     int pdchS62svrClEnvironmentOfPs = 0;
@@ -919,10 +920,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchS62svrHtPs = 0;
     int pdchS62svrHtSumPz = 0;
     int pdchS62svrHtD = 0;
+    int pdchS62svrHtDorg = 0;
     int pdchS62svrHtVou = 0;
     int pdchS62svrHtVps = 0;
     int pdchS62svrHtXs = 0;
     int pdchS62svrHtEv = 0;
+    int pdchS62svrHtEvMthd = 0;
     int pdchS62svrHtVot = 0;
     int pdchS62svrHtPercOA = 0;
     int pdchS62svrHtEnvironmentOfPs = 0;
@@ -957,6 +960,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchS62zcdVsec = 0;
     int pdchS62zcdVdz = 0;
     int pdchS62zcdVpzmin = 0;
+    int pdchS62zcdVpzminSPSize = 0;
     int pdchS62zcdVozclg = 0;
     int pdchS62zcdZpz = 0;
     int pdchS62zcdEp = 0;
@@ -983,6 +987,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchS62zhdVsec = 0;
     int pdchS62zhdVdz = 0;
     int pdchS62zhdVpzmin = 0;
+    int pdchS62zhdVpzminSPSize = 0;
     int pdchS62zhdVozhtg = 0;
     int pdchS62zhdZpz = 0;
     int pdchS62zhdEp = 0;
@@ -1371,6 +1376,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdrLighting = 0;
         this->pdstInLite = 0;
         this->pdchInLtZone = 0;
+        this->pdchInLtSpace = 0;
+        this->pdchInLtSpaceType = 0;
         this->pdchInLtDens = 0;
         this->pdchInLtArea = 0;
         this->pdchInLtPower = 0;
@@ -1826,6 +1833,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchS62svrClPs = 0;
         this->pdchS62svrClSumPz = 0;
         this->pdchS62svrClD = 0;
+        this->pdchS62svrClDorg = 0;
         this->pdchS62svrClVou = 0;
         this->pdchS62svrClVps = 0;
         this->pdchS62svrClXs = 0;
@@ -1839,6 +1847,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchS62svrHtPs = 0;
         this->pdchS62svrHtSumPz = 0;
         this->pdchS62svrHtD = 0;
+        this->pdchS62svrHtDorg = 0;
         this->pdchS62svrHtVou = 0;
         this->pdchS62svrHtVps = 0;
         this->pdchS62svrHtXs = 0;
@@ -1874,6 +1883,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchS62zcdVsec = 0;
         this->pdchS62zcdVdz = 0;
         this->pdchS62zcdVpzmin = 0;
+        this->pdchS62zcdVpzminSPSize = 0;
         this->pdchS62zcdVozclg = 0;
         this->pdchS62zcdZpz = 0;
         this->pdchS62zcdEp = 0;
@@ -1898,6 +1908,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchS62zhdVsec = 0;
         this->pdchS62zhdVdz = 0;
         this->pdchS62zhdVpzmin = 0;
+        this->pdchS62zhdVpzminSPSize = 0;
         this->pdchS62zhdVozhtg = 0;
         this->pdchS62zhdZpz = 0;
         this->pdchS62zhdEp = 0;

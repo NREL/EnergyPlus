@@ -68,7 +68,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
                                                           const CoilCoolingDXCurveFitSpeedInputSpecification &input_data)
 {
     bool errorsFound(false);
-    static const std::string routineName("CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec: ");
+    static constexpr std::string_view routineName("CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
     this->name = input_data.name;
     this->active_fraction_of_face_coil_area = input_data.active_fraction_of_coil_face_area;
@@ -141,7 +141,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
     if (!errorsFound && !input_data.waste_heat_function_of_temperature_curve_name.empty()) {
         Real64 CurveVal = CurveManager::CurveValue(state, this->indexWHFT, RatedOutdoorAirTemp, RatedInletAirTemp);
         if (CurveVal > 1.10 || CurveVal < 0.90) {
-            ShowWarningError(state, routineName + this->object_name + "=\"" + this->name + "\", curve values");
+            ShowWarningError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", curve values");
             ShowContinueError(state,
                               "Waste Heat Modifier Function of Temperature Curve Name = " + input_data.waste_heat_function_of_temperature_curve_name);
             ShowContinueError(
@@ -179,7 +179,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
             CurveInput += 0.01;
         }
         if (MinCurveVal < 0.7) {
-            ShowWarningError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
+            ShowWarningError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
             ShowContinueError(state, "..." + fieldName + "=\"" + curveName + "\" has out of range values.");
             ShowContinueError(state, format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
             ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
@@ -187,7 +187,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
         }
 
         if (MaxCurveVal > 1.0) {
-            ShowWarningError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
+            ShowWarningError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
             ShowContinueError(state, "..." + fieldName + " = " + curveName + " has out of range value.");
             ShowContinueError(state, format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
             ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
@@ -196,7 +196,8 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
     }
 
     if (errorsFound) {
-        ShowFatalError(state, routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
+        ShowFatalError(
+            state, std::string{routineName} + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
 }
 
@@ -204,7 +205,7 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
                                               const std::string &curveName,
                                               int &curveIndex,
                                               std::vector<int> validDims,
-                                              const std::string &routineName,
+                                              std::string_view const routineName,
                                               const std::string &fieldName,
                                               Real64 const Var1,           // required 1st independent variable
                                               Optional<Real64 const> Var2, // 2nd independent variable
@@ -217,7 +218,7 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
     } else {
         curveIndex = CurveManager::GetCurveIndex(state, curveName);
         if (curveIndex == 0) {
-            ShowSevereError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
+            ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
             ShowContinueError(state, "...not found " + fieldName + "=\"" + curveName + "\".");
             return true;
         } else {
@@ -231,7 +232,7 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
                                                            fieldName);           // Field Name
             if (!errorFound) {
                 CurveManager::checkCurveIsNormalizedToOne(
-                    state, routineName + this->object_name, this->name, curveIndex, fieldName, curveName, Var1, Var2, Var3, Var4, Var5);
+                    state, std::string{routineName} + this->object_name, this->name, curveIndex, fieldName, curveName, Var1, Var2, Var3, Var4, Var5);
             }
             return errorFound;
         }
@@ -332,7 +333,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusDat
 void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
 {
 
-    std::string RoutineName = "sizeSpeed";
+    static constexpr std::string_view RoutineName = "sizeSpeed";
 
     this->rated_total_capacity = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal * this->parentModeRatedGrossTotalCap;
     this->evap_air_flow_rate = this->original_input_specs.evaporator_air_flow_fraction * this->parentModeRatedEvapAirFlowRate;
@@ -417,7 +418,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
 {
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("CalcSpeedOutput: ");
+    static constexpr std::string_view RoutineName("CalcSpeedOutput: ");
 
     if ((_PLR == 0.0) || (AirMassFlow == 0.0)) {
         outletNode.Temp = inletNode.Temp;
@@ -582,7 +583,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
                                                     Real64 const p)   // Outlet node pressure {Pa}
 {
 
-    static std::string const RoutineName("CalcBypassFactor: ");
+    static constexpr std::string_view RoutineName("CalcBypassFactor: ");
     Real64 const SmallDifferenceTest(0.00000001);
 
     // Bypass factors are calculated at rated conditions at sea level (make sure in.p is Standard Pressure)
@@ -597,7 +598,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
     Real64 outrh = Psychrometrics::PsyRhFnTdbWPb(state, outtdb, outw, outp);
 
     if (outrh >= 1.0) {
-        ShowWarningError(state, RoutineName + ": For object = " + this->object_name + ", name = \"" + this->name + "\"");
+        ShowWarningError(state, std::string{RoutineName} + ": For object = " + this->object_name + ", name = \"" + this->name + "\"");
         ShowContinueError(state, "Calculated outlet air relative humidity greater than 1. The combination of");
         ShowContinueError(state, "rated air volume flow rate, total cooling capacity and sensible heat ratio yields coil exiting");
         ShowContinueError(state, "air conditions above the saturation curve. Possible fixes are to reduce the rated total cooling");
@@ -625,7 +626,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
             outw = Psychrometrics::PsyWFnTdbH(state, outtdb, outh, RoutineName);
             Real64 adjustedSHR = (Psychrometrics::PsyHFnTdbW(tdb, outw) - outh) / deltaH;
             ShowWarningError(state,
-                             RoutineName + object_name + " \"" + name +
+                             std::string{RoutineName} + object_name + " \"" + name +
                                  "\", SHR adjusted to achieve valid outlet air properties and the simulation continues.");
             ShowContinueError(state, format("Initial SHR = {:.5R}", this->grossRatedSHR));
             ShowContinueError(state, format("Adjusted SHR = {:.5R}", adjustedSHR));
@@ -683,7 +684,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
             deltaADPTemp = -deltaADPTemp / 2.0;
         } else if ((error < 0.0) && (errorLast > 0.0)) {
             deltaADPTemp = -deltaADPTemp / 2.0;
-        } else if (abs(error) > abs(errorLast)) {
+        } else if (std::abs(error) > std::abs(errorLast)) {
             deltaADPTemp = -deltaADPTemp / 2.0;
         }
         errorLast = error;
@@ -696,7 +697,8 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
 
     if (iter > maxIter) {
         ShowSevereError(state,
-                        RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation did not converge after max iterations.");
+                        std::string{RoutineName} + object_name + " \"" + name +
+                            "\" -- coil bypass factor calculation did not converge after max iterations.");
         ShowContinueError(state, format("The RatedSHR of [{:.3R}], entered by the user or autosized (see *.eio file),", this->grossRatedSHR));
         ShowContinueError(state, "may be causing this. The line defined by the coil rated inlet air conditions");
         ShowContinueError(state, "(26.7C drybulb and 19.4C wetbulb) and the RatedSHR (i.e., slope of the line) must intersect");
@@ -710,13 +712,13 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
         cbfErrors = true; // Didn't converge within MaxIter iterations
     }
     if (calcCBF < 0.0) {
-        ShowSevereError(state, RoutineName + object_name + " \"" + name + "\" -- negative coil bypass factor calculated.");
+        ShowSevereError(state, std::string{RoutineName} + object_name + " \"" + name + "\" -- negative coil bypass factor calculated.");
         ShowContinueErrorTimeStamp(state, "");
         cbfErrors = true; // Negative CBF not valid
     }
     // Show fatal error for specific coil that caused a CBF error
     if (cbfErrors) {
-        ShowFatalError(state, RoutineName + object_name + " \"" + name + "\" Errors found in calculating coil bypass factors");
+        ShowFatalError(state, std::string{RoutineName} + object_name + " \"" + name + "\" Errors found in calculating coil bypass factors");
     }
     return calcCBF;
 }

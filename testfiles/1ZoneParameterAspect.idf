@@ -273,6 +273,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     Main Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -289,6 +290,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     Main Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -305,6 +307,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     Main Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -321,6 +324,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     Main Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -337,6 +341,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     Main Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -353,6 +358,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     Main Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -448,8 +454,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     Outside Air System,      !- Name
     Outside Air System Controllers,  !- Controller List Name
-    Outside Air System Equipment,  !- Outdoor Air Equipment List Name
-    Evap Cooler Availability List;  !- Availability Manager List Name
+    Outside Air System Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:Node,
     Outside Air Inlet Node;  !- Name

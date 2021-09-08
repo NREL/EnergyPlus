@@ -2,6 +2,18 @@
 # add_library( ModernJSON INTERFACE )
 # target_include_directories( ModernJSON INTERFACE "${PROJECT_SOURCE_DIR}/nlohmann" "${PROJECT_SOURCE_DIR}/doj" )
 
+add_library( ModernJSON INTERFACE )
+target_compile_definitions(
+        ModernJSON
+        INTERFACE
+        JSON_USE_IMPLICIT_CONVERSIONS=OFF
+)
+target_include_directories(
+        ModernJSON
+        INTERFACE
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/nlohmann>
+)
+
 # To avoid modifying every third_party library
 # we link the project_options in here for every library in this
 # subdirectory
@@ -74,11 +86,12 @@ set(RE2_BUILD_TESTING
     OFF
     CACHE BOOL "" FORCE)
 
-if(OPENGL_FOUND)
-  set(BUILD_PENUMBRA_TESTING
-      ${BUILD_TESTING}
-      CACHE BOOL "" FORCE)
-endif()
+# Don't force Penumbra testing just because OpenGL is found, allow the developer to set it to ON or OFF as they want
+#if(OPENGL_FOUND)
+#  set(BUILD_PENUMBRA_TESTING
+#      ${BUILD_TESTING}
+#      CACHE BOOL "" FORCE)
+#endif()
 
 # We don't want to enable the global warnings for any of the third party projects
 link_libraries(project_options)
@@ -122,8 +135,11 @@ add_subdirectory(DElight)
 set_target_properties(DElight PROPERTIES FOLDER ThirdParty/DElight)
 add_subdirectory(re2)
 set_target_properties(re2 PROPERTIES FOLDER ThirdParty/re2)
-add_subdirectory(fmt-6.1.2)
+add_subdirectory(fmt-8.0.1)
+target_compile_definitions(fmt PRIVATE FMT_USE_FULL_CACHE_DRAGONBOX=1)
 set_target_properties(fmt PROPERTIES FOLDER ThirdParty/fmt)
+add_subdirectory(cpgfunctionEP-0.6)
+set_target_properties(cpgfunctionEP PROPERTIES FOLDER ThirdParty/cpgfunctionEP-0.6)
 
 # Kiva
 include(cmake/kiva.cmake)

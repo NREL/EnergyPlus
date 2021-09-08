@@ -285,7 +285,7 @@ namespace FanCoilUnits {
     };
 
     void SimFanCoilUnit(EnergyPlusData &state,
-                        std::string const &CompName,   // name of the fan coil unit
+                        std::string_view CompName,     // name of the fan coil unit
                         int const ZoneNum,             // number of zone being served
                         int const ControlledZoneNum,   // index into ZoneEquipConfig array; may not be equal to ZoneNum
                         bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -435,6 +435,7 @@ namespace FanCoilUnits {
                                            Real64 const PLR,          // electric heating coil part load ratio
                                            Array1D<Real64> const &Par // Function parameters
     );
+
 } // namespace FanCoilUnits
 
 struct FanCoilUnitsData : BaseGlobalStruct

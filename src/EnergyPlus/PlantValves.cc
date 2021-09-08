@@ -235,8 +235,8 @@ namespace PlantValves {
                                 "Tempering Valve Flow Fraction",
                                 OutputProcessor::Unit::None,
                                 state.dataPlantValves->TemperValve(Item).FlowDivFract,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlantValves->TemperValve(Item).Name);
         }
 
@@ -503,6 +503,9 @@ namespace PlantValves {
         if (this->FlowDivFract > 1.0) this->FlowDivFract = 1.0;
     }
     void TemperValveData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
+    void TemperValveData::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
     {
     }
 

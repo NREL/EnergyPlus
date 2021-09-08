@@ -621,6 +621,7 @@
     Roof,                    !- Surface Type
     Metal Bldg Semi-Cond Roof,  !- Construction Name
     BulkStorage,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -637,6 +638,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     BulkStorage,             !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -653,6 +655,7 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     BulkStorage,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -669,6 +672,7 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     BulkStorage,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -685,6 +689,7 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     BulkStorage,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -701,6 +706,7 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     FineStorage,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -717,6 +723,7 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     FineStorage,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -733,6 +740,7 @@
     Roof,                    !- Surface Type
     Metal Bldg Semi-Cond Roof,  !- Construction Name
     FineStorage,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -749,6 +757,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     FineStorage,             !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -767,6 +776,7 @@
     Floor,                   !- Surface Type
     int-walls,               !- Construction Name
     FineStorage,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Office_Ceiling,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -783,6 +793,7 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     FineStorage,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -799,6 +810,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     FineStorage,             !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     BulkStorage,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -815,6 +827,7 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     FineStorage,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -831,6 +844,7 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     FineStorage,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -847,6 +861,7 @@
     Ceiling,                 !- Surface Type
     int-walls,               !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     FineStorage_Floor_2,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -863,6 +878,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -879,6 +895,7 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     FineStorage,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -895,6 +912,7 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     FineStorage,             !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -911,6 +929,7 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -927,6 +946,7 @@
     Wall,                    !- Surface Type
     Metal Bldg Semi-Cond Ext Wall,  !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1376,19 +1396,22 @@
     BulkStorage Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     BulkStorage,             !- Zone or ZoneList Name
-    6409.6813;               !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    6409.6813;               !- Extended Field
 
   InternalMass,
     FineStorage Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     FineStorage,             !- Zone or ZoneList Name
-    2786.8199;               !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    2786.8199;               !- Extended Field
 
   InternalMass,
     Office Internal Mass,    !- Name
     InteriorFurnishings,     !- Construction Name
     Office,                  !- Zone or ZoneList Name
-    473.7584;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    473.7584;                !- Extended Field
 
 ! ***INTERNAL GAINS SCHEDULES***
 
@@ -2356,14 +2379,12 @@
   AirLoopHVAC:OutdoorAirSystem,
     FURNACE_PACU_CAV_1:1_OA, !- Name
     FURNACE_PACU_CAV_1:1_OA_Controllers,  !- Controller List Name
-    FURNACE_PACU_CAV_1:1_OA_Equipment,  !- Outdoor Air Equipment List Name
-    FURNACE_PACU_CAV_1:1 Availability Manager List;  !- Availability Manager List Name
+    FURNACE_PACU_CAV_1:1_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:OutdoorAirSystem,
     FURNACE_PACU_CAV_2:2_OA, !- Name
     FURNACE_PACU_CAV_2:2_OA_Controllers,  !- Controller List Name
-    FURNACE_PACU_CAV_2:2_OA_Equipment,  !- Outdoor Air Equipment List Name
-    FURNACE_PACU_CAV_2:2 Availability Manager List;  !- Availability Manager List Name
+    FURNACE_PACU_CAV_2:2_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     FURNACE_PACU_CAV_1:1_OANode List;  !- Node or NodeList Name 1

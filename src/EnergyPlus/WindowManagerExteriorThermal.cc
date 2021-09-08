@@ -50,6 +50,7 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/General.hh>
@@ -64,10 +65,6 @@
 #include <EnergyPlus/WindowManagerExteriorThermal.hh>
 
 namespace EnergyPlus {
-
-using namespace Tarcog;
-using namespace Gases;
-using namespace FenestrationCommon;
 
 using namespace DataEnvironment;
 using namespace DataSurfaces;
@@ -132,7 +129,7 @@ namespace WindowManager {
         auto i = 1;
         for (const auto &aLayer : aLayers) {
             Real64 aTemp = 0;
-            for (auto aSide : EnumSide()) {
+            for (auto aSide : FenestrationCommon::EnumSide()) {
                 aTemp = aLayer->getTemperature(aSide);
                 state.dataWindowManager->thetas(i) = aTemp;
                 if (i == 1) {
@@ -164,7 +161,7 @@ namespace WindowManager {
             }
         }
 
-        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = aSystem->getHc(Environment::Indoor);
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = aSystem->getHc(Tarcog::ISO15099::Environment::Indoor);
         if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum)) || aFactory.isInteriorShade()) {
             // It is not clear why EnergyPlus keeps this interior calculations separately for interior shade. This does create different
             // solution from heat transfer from tarcog itself. Need to confirm with LBNL team about this approach. Note that heat flow
@@ -176,17 +173,17 @@ namespace WindowManager {
             auto aShadeLayer = aLayers[totLayers - 1];
             auto aGlassLayer = aLayers[totLayers - 2];
             auto ShadeArea = state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum);
-            auto frontSurface = aShadeLayer->getSurface(Side::Front);
-            auto backSurface = aShadeLayer->getSurface(Side::Back);
+            auto frontSurface = aShadeLayer->getSurface(FenestrationCommon::Side::Front);
+            auto backSurface = aShadeLayer->getSurface(FenestrationCommon::Side::Back);
             auto EpsShIR1 = frontSurface->getEmissivity();
             auto EpsShIR2 = backSurface->getEmissivity();
             auto TauShIR = frontSurface->getTransmittance();
             auto RhoShIR1 = max(0.0, 1.0 - TauShIR - EpsShIR1);
             auto RhoShIR2 = max(0.0, 1.0 - TauShIR - EpsShIR2);
-            auto glassEmiss = aGlassLayer->getSurface(Side::Back)->getEmissivity();
+            auto glassEmiss = aGlassLayer->getSurface(FenestrationCommon::Side::Back)->getEmissivity();
             auto RhoGlIR2 = 1.0 - glassEmiss;
             auto ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
-            auto rmir = surface.getInsideIR(state, SurfNum);
+            auto rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum);
             auto NetIRHeatGainShade =
                 ShadeArea * EpsShIR2 *
                     (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep), 4) - rmir) +
@@ -212,7 +209,7 @@ namespace WindowManager {
             auto EffGlEmiss = glassEmiss * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2);
             state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss = EffGlEmiss;
 
-            auto glassTemperature = aGlassLayer->getSurface(Side::Back)->getTemperature();
+            auto glassTemperature = aGlassLayer->getSurface(FenestrationCommon::Side::Back)->getTemperature();
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
                 (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (glassTemperature - DataGlobalConstants::KelvinConv)) / (EffShBlEmiss + EffGlEmiss);
 
@@ -223,18 +220,20 @@ namespace WindowManager {
             //
             auto totLayers = aLayers.size();
             auto aGlassLayer = aLayers[totLayers - 1];
-            auto backSurface = aGlassLayer->getSurface(Side::Back);
+            auto backSurface = aGlassLayer->getSurface(FenestrationCommon::Side::Back);
 
-            auto h_cin = aSystem->getHc(Environment::Indoor);
+            auto h_cin = aSystem->getHc(Tarcog::ISO15099::Environment::Indoor);
             auto ConvHeatGainFrZoneSideOfGlass =
-                surface.Area * h_cin * (backSurface->getTemperature() - aSystem->getAirTemperature(Environment::Indoor));
+                surface.Area * h_cin * (backSurface->getTemperature() - aSystem->getAirTemperature(Tarcog::ISO15099::Environment::Indoor));
 
-            auto rmir = surface.getInsideIR(state, SurfNum);
+            auto rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum);
             auto NetIRHeatGainGlass =
                 surface.Area * backSurface->getEmissivity() * (state.dataWindowManager->sigma * pow(backSurface->getTemperature(), 4) - rmir);
 
-            state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = aLayers[totLayers - 1]->getTemperature(Side::Back) - state.dataWindowManager->TKelvin;
-            state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss = aLayers[totLayers - 1]->getSurface(Side::Back)->getEmissivity();
+            state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
+                aLayers[totLayers - 1]->getTemperature(FenestrationCommon::Side::Back) - state.dataWindowManager->TKelvin;
+            state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss =
+                aLayers[totLayers - 1]->getSurface(FenestrationCommon::Side::Back)->getEmissivity();
 
             state.dataSurface->SurfWinHeatGain(SurfNum) =
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
@@ -293,7 +292,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSingleSystem> CWCEHeatTransferFactory::getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff)
+    std::shared_ptr<Tarcog::ISO15099::CSingleSystem> CWCEHeatTransferFactory::getTarcogSystem(EnergyPlusData &state, Real64 const t_HextConvCoeff)
     {
         auto Indoor = getIndoor(state);
         auto Outdoor = getOutdoor(state, t_HextConvCoeff);
@@ -307,16 +306,16 @@ namespace WindowManager {
             // and it will be created here
             if (m_ShadePosition == ShadePosition::Interior && i == m_TotLay - 1) {
                 auto aAirLayer = getShadeToGlassLayer(state, i + 1);
-                aIGU->addLayer(aAirLayer);
+                aIGU.addLayer(aAirLayer);
             }
-            aIGU->addLayer(aLayer);
+            aIGU.addLayer(aLayer);
             if (m_ShadePosition == ShadePosition::Exterior && i == 0) {
                 auto aAirLayer = getShadeToGlassLayer(state, i + 1);
-                aIGU->addLayer(aAirLayer);
+                aIGU.addLayer(aAirLayer);
             }
         }
 
-        auto aSystem = std::make_shared<CSingleSystem>(aIGU, Indoor, Outdoor);
+        auto aSystem = std::make_shared<Tarcog::ISO15099::CSingleSystem>(aIGU, Indoor, Outdoor);
 
         return aSystem;
     }
@@ -336,9 +335,9 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getIGULayer(EnergyPlusData &state, int const t_Index)
+    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getIGULayer(EnergyPlusData &state, int const t_Index)
     {
-        std::shared_ptr<CBaseIGULayer> aLayer = nullptr;
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = nullptr;
 
         auto material = getLayerMaterial(state, t_Index);
 
@@ -366,7 +365,7 @@ namespace WindowManager {
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getSolidLayer(
+    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getSolidLayer(
         EnergyPlusData &state, SurfaceData const &surface, Material::MaterialProperties const &material, int const t_Index, int const t_SurfNum)
     {
         // SUBROUTINE INFORMATION:
@@ -472,14 +471,14 @@ namespace WindowManager {
             m_InteriorBSDFShade = ((2 * t_Index - 1) == m_TotLay);
         }
 
-        std::shared_ptr<ISurface> frontSurface = std::make_shared<CSurface>(emissFront, transThermalFront);
-        std::shared_ptr<ISurface> backSurface = std::make_shared<CSurface>(emissBack, transThermalBack);
-        auto aSolidLayer = std::make_shared<CIGUSolidLayer>(thickness, conductivity, frontSurface, backSurface);
+        std::shared_ptr<Tarcog::ISO15099::ISurface> frontSurface = std::make_shared<Tarcog::ISO15099::CSurface>(emissFront, transThermalFront);
+        std::shared_ptr<Tarcog::ISO15099::ISurface> backSurface = std::make_shared<Tarcog::ISO15099::CSurface>(emissBack, transThermalBack);
+        auto aSolidLayer = std::make_shared<Tarcog::ISO15099::CIGUSolidLayer>(thickness, conductivity, frontSurface, backSurface);
         if (createOpenness) {
-            auto aOpenings = std::make_shared<CShadeOpenings>(Atop, Abot, Aleft, Aright, Afront);
-            aSolidLayer = std::make_shared<CIGUShadeLayer>(aSolidLayer, aOpenings);
+            auto aOpenings = std::make_shared<Tarcog::ISO15099::CShadeOpenings>(Atop, Abot, Aleft, Aright, Afront, Afront);
+            aSolidLayer = std::make_shared<Tarcog::ISO15099::CIGUShadeLayer>(aSolidLayer, aOpenings);
         }
-        auto swRadiation = surface.getSWIncident(state, t_SurfNum);
+        const auto swRadiation = surface.getSWIncident(state, t_SurfNum);
         if (swRadiation > 0) {
 
             auto absCoeff = state.dataHeatBal->SurfWinQRadSWwinAbs(t_SurfNum, t_Index) / swRadiation;
@@ -487,13 +486,13 @@ namespace WindowManager {
                 absCoeff += state.dataHeatBal->SurfQRadThermInAbs(t_SurfNum) / swRadiation;
             }
 
-            aSolidLayer->setSolarAbsorptance(absCoeff);
+            aSolidLayer->setSolarAbsorptance(absCoeff, swRadiation);
         }
         return aSolidLayer;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getGapLayer(Material::MaterialProperties const &material) const
+    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getGapLayer(Material::MaterialProperties const &material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -506,12 +505,12 @@ namespace WindowManager {
         auto const pres = 1e5; // Old code uses this constant pressure
         auto thickness = material.Thickness;
         auto aGas = getGas(material);
-        std::shared_ptr<CBaseIGULayer> aLayer = std::make_shared<CIGUGapLayer>(thickness, pres, aGas);
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);
         return aLayer;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getShadeToGlassLayer(EnergyPlusData &state, int const t_Index) const
+    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getShadeToGlassLayer(EnergyPlusData &state, int const t_Index) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -532,16 +531,16 @@ namespace WindowManager {
         if (state.dataSurface->SurfWinShadingFlag(m_SurfNum) == WinShadingType::IntShade ||
             state.dataSurface->SurfWinShadingFlag(m_SurfNum) == WinShadingType::ExtShade ||
             state.dataSurface->SurfWinShadingFlag(m_SurfNum) == WinShadingType::ExtScreen) {
-            auto material = getLayerMaterial(state, t_Index);
+            const auto material = getLayerMaterial(state, t_Index);
             thickness = material->WinShadeToGlassDist;
         }
-        std::shared_ptr<CBaseIGULayer> aLayer = std::make_shared<CIGUGapLayer>(thickness, pres, aGas);
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);
         return aLayer;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CBaseIGULayer> CWCEHeatTransferFactory::getComplexGapLayer(EnergyPlusData &state,
-                                                                               Material::MaterialProperties const &material) const
+    std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> CWCEHeatTransferFactory::getComplexGapLayer(EnergyPlusData &state,
+                                                                                                 Material::MaterialProperties const &material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -556,25 +555,26 @@ namespace WindowManager {
         auto gasPointer = material.GasPointer;
         auto &gasMaterial(state.dataMaterial->Material(gasPointer));
         auto aGas = getGas(gasMaterial);
-        std::shared_ptr<CBaseIGULayer> aLayer = std::make_shared<CIGUGapLayer>(thickness, pres, aGas);
+        std::shared_ptr<Tarcog::ISO15099::CBaseIGULayer> aLayer = std::make_shared<Tarcog::ISO15099::CIGUGapLayer>(thickness, pres, aGas);
         return aLayer;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CGas> CWCEHeatTransferFactory::getGas(Material::MaterialProperties const &material) const
+    Gases::CGas CWCEHeatTransferFactory::getGas(Material::MaterialProperties const &material) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   July 2016
         //       MODIFIED       na
-        //       RE-ENGINEERED  na
+        //       RE-ENGINEERED
+        //          April 2021: April 2021: Return of CGas instead of pointer to it
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates gap layer object from material properties in EnergyPlus
-        auto numGases = material.NumberOfGasesInMixture;
+        const auto numGases = material.NumberOfGasesInMixture;
         auto const vacuumCoeff = 1.4; // Load vacuum coefficient once it is implemented (Simon).
-        auto gasName = material.Name;
-        auto aGas = std::make_shared<CGas>();
+        const auto gasName = material.Name;
+        Gases::CGas aGas;
         for (auto i = 1; i <= numGases; ++i) {
             auto wght = material.GasWght(i);
             auto fract = material.GasFract(i);
@@ -586,33 +586,32 @@ namespace WindowManager {
                 gvis.push_back(material.GasVis(j, i));
                 gcp.push_back(material.GasCp(j, i));
             }
-            auto aCon = CIntCoeff(gcon[0], gcon[1], gcon[2]);
-            auto aCp = CIntCoeff(gcp[0], gcp[1], gcp[2]);
-            auto aVis = CIntCoeff(gvis[0], gvis[1], gvis[2]);
-            auto aData = CGasData(gasName, wght, vacuumCoeff, aCp, aCon, aVis);
-            auto aGasItem = CGasItem(fract, aData);
-            aGas->addGasItem(aGasItem);
+            auto aCon = Gases::CIntCoeff(gcon[0], gcon[1], gcon[2]);
+            auto aCp = Gases::CIntCoeff(gcp[0], gcp[1], gcp[2]);
+            auto aVis = Gases::CIntCoeff(gvis[0], gvis[1], gvis[2]);
+            auto aData = Gases::CGasData(gasName, wght, vacuumCoeff, aCp, aCon, aVis);
+            aGas.addGasItem(fract, aData);
         }
         return aGas;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CGas> CWCEHeatTransferFactory::getAir() const
+    Gases::CGas CWCEHeatTransferFactory::getAir()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   August 2016
         //       MODIFIED       na
-        //       RE-ENGINEERED  na
+        //       RE-ENGINEERED
+        //          April 2021: CGas return from the function instead of pointer to it
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates air gas layer for tarcog routines
-        auto aGas = std::make_shared<CGas>();
-        return aGas;
+        return {};
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CEnvironment> CWCEHeatTransferFactory::getIndoor(EnergyPlusData &state) const
+    std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getIndoor(EnergyPlusData &state) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -625,16 +624,17 @@ namespace WindowManager {
         auto tin = m_Surface.getInsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv;
         auto hcin = state.dataHeatBalSurf->SurfHConvInt(m_SurfNum);
 
-        auto IR = m_Surface.getInsideIR(state, m_SurfNum);
+        auto IR = state.dataSurface->SurfWinIRfromParentZone(m_SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(m_SurfNum);
 
-        std::shared_ptr<CEnvironment> Indoor = std::make_shared<CIndoorEnvironment>(tin, state.dataEnvrn->OutBaroPress);
-        Indoor->setHCoeffModel(BoundaryConditionsCoeffModel::CalculateH, hcin);
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> Indoor =
+            std::make_shared<Tarcog::ISO15099::CIndoorEnvironment>(tin, state.dataEnvrn->OutBaroPress);
+        Indoor->setHCoeffModel(Tarcog::ISO15099::BoundaryConditionsCoeffModel::CalculateH, hcin);
         Indoor->setEnvironmentIR(IR);
         return Indoor;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CEnvironment> CWCEHeatTransferFactory::getOutdoor(EnergyPlusData &state, const Real64 t_Hext) const
+    std::shared_ptr<Tarcog::ISO15099::CEnvironment> CWCEHeatTransferFactory::getOutdoor(EnergyPlusData &state, const Real64 t_Hext) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -646,7 +646,7 @@ namespace WindowManager {
         // Creates outdoor environment object from surface properties in EnergyPlus
         double tout = m_Surface.getOutsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv;
         double IR = m_Surface.getOutsideIR(state, m_SurfNum);
-        // double dirSolRad = QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
+        // double dirSolRad = SurfQRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
         double swRadiation = m_Surface.getSWIncident(state, m_SurfNum);
         double tSky = state.dataEnvrn->SkyTempKelvin;
         double airSpeed = 0.0;
@@ -654,28 +654,28 @@ namespace WindowManager {
             airSpeed = state.dataSurface->SurfOutWindSpeed(m_SurfNum);
         }
         double fclr = 1 - state.dataEnvrn->CloudFraction;
-        AirHorizontalDirection airDirection = AirHorizontalDirection::Windward;
-        std::shared_ptr<CEnvironment> Outdoor = std::make_shared<COutdoorEnvironment>(
-            tout, state.dataEnvrn->OutBaroPress, airSpeed, swRadiation, airDirection, tSky, SkyModel::AllSpecified, fclr);
-        Outdoor->setHCoeffModel(BoundaryConditionsCoeffModel::HcPrescribed, t_Hext);
+        Tarcog::ISO15099::AirHorizontalDirection airDirection = Tarcog::ISO15099::AirHorizontalDirection::Windward;
+        std::shared_ptr<Tarcog::ISO15099::CEnvironment> Outdoor = std::make_shared<Tarcog::ISO15099::COutdoorEnvironment>(
+            tout, airSpeed, swRadiation, airDirection, tSky, Tarcog::ISO15099::SkyModel::AllSpecified, state.dataEnvrn->OutBaroPress, fclr);
+        Outdoor->setHCoeffModel(Tarcog::ISO15099::BoundaryConditionsCoeffModel::HcPrescribed, t_Hext);
         Outdoor->setEnvironmentIR(IR);
         return Outdoor;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CIGU> CWCEHeatTransferFactory::getIGU()
+    Tarcog::ISO15099::CIGU CWCEHeatTransferFactory::getIGU() const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   July 2016
         //       MODIFIED       na
-        //       RE-ENGINEERED  na
+        //       RE-ENGINEERED
+        //          April 2021: Return CIGU object rather than pointer to it
 
         // PURPOSE OF THIS SUBROUTINE:
         // Creates IGU object from surface properties in EnergyPlus
 
-        std::shared_ptr<CIGU> aIGU = std::make_shared<CIGU>(m_Surface.Width, m_Surface.Height, m_Surface.Tilt);
-        return aIGU;
+        return {m_Surface.Width, m_Surface.Height, m_Surface.Tilt};
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////

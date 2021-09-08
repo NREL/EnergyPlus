@@ -187,13 +187,13 @@ This field is used to select how the program will determine the minimum flow rat
 
 The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal.~ This field is used if the previous field is set to Constant.~ If the previous field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. If this field and the following field have values, the greater of the two is used for sizing.
 
-This field is autosizable and defaulted to autosize. The autosized flow fraction is calculated using the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the \hyperref[sizingzone]{Sizing:Zone} input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 are used.
+This field is autosizable and defaulted to autosize. The autosized flow fraction is calculated using the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the \hyperref[sizingzone]{Sizing:Zone} input fields ``Cooling Minimum Air Flow per Zone Floor Area'', ``Cooling Minimum Air Flow'', and ``Cooling Minimum Air Flow Fraction''. If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 are used. The autosized flow fraction is calculated according to the ASHRAE Standard 62.1 Simplified Procedure if the Sizing:System's ``System Outdoor Air Method'' associated with this terminal is set to Standard62.1SimplifiedProcedure, see the \hyperref[field-system-outdoor-air-method]{System Outdoor Air Method} of the Sizing:System object.
 
 \paragraph{Field: Fixed Minimum Air Flow Rate}\label{field-fixed-minimum-air-flow-rate}
 
 The minimum flow rate to the zone while the system is operating, specified as a fixed minimum air flow rate in meters cubed per second. The minimum air flow rate is normally specified to meet the minimum ventilation requirement for the occupants. The reheat coil operates only when the damper is at this minimum flow rate when Damper Heating Action is set to Normal (the default).~ This field is used if the Zone Minimum Air Flow Method field is set to FixedFlowRate. If the Zone Minimum Air Flow Method field is set to Scheduled (and the field Maximum Hot Water or Steam Flow Rate is set to autosize), then this field is optional and can be used to separately control the air flow rate used for sizing normal-action reheat coils. Only one of these two minimum air flow fields (i.e., this field and the previous field) should be used at any time. If this field and the previous field have values, the greater of the two is used for sizing.
 
-This field is autosizable and defaulted to autosize. The autosized flow rate is the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the \hyperref[sizingzone]{Sizing:Zone} input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 flow fraction are used.
+This field is autosizable and defaulted to autosize. The autosized flow rate is the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the \hyperref[sizingzone]{Sizing:Zone} input fields ``Cooling Minimum Air Flow per Zone Floor Area'', ``Cooling Minimum Air Flow'', and ``Cooling Minimum Air Flow Fraction''. If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 flow fraction are used. The autosized flow rate is calculated according to the ASHRAE Standard 62.1 Simplified Procedure if the Sizing:System's ``System Outdoor Air Method'' associated with this terminal is set to Standard62.1SimplifiedProcedure, see the \hyperref[field-system-outdoor-air-method]{System Outdoor Air Method} of the Sizing:System object.
 
 \paragraph{Field: Minimum Air Flow Fraction Schedule Name}\label{field-minimum-air-flow-fraction-schedule-name}
 
@@ -709,13 +709,13 @@ This field is used to select how the program will determine the minimum flow rat
 
 The minimum flow rate to the zone while the system is operating, specified as a fraction of the maximum air flow rate. The minimum zone fraction is normally specified to meet the minimum ventilation requirement for the occupants. This field is only used if the Zone Minimum Air Flow Method field is set to Constant.
 
-This field is autosizable and defaulted to autosize. The autosized flow fraction is calculated using the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the \hyperref[sizingzone]{Sizing:Zone} input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 are used.
+This field is autosizable and defaulted to autosize. If a Sizing:System \emph{System Outdoor Air Method} other than Standard62.1SimplifiedProcedure is specified, the autosized flow fraction is calculated using the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the \hyperref[sizingzone]{Sizing:Zone} input fields ``Cooling Minimum Air Flow per Zone Floor Area'', ``Cooling Minimum Air Flow'', and ``Cooling Minimum Air Flow Fraction''. If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 are used. The autosized flow fraction is calculated according to the ASHRAE Standard 62.1 Simplified Procedure if the Sizing:System's ``System Outdoor Air Method'' associated with this terminal is set to Standard62.1SimplifiedProcedure.
 
 \paragraph{Field: Fixed Minimum Air Flow Rate}\label{field-fixed-minimum-air-flow-rate-1}
 
 The minimum flow rate to the zone while the system is operating, specified as a fixed minimum air flow rate in meters cubed per second. The minimum air flow rate is normally specified to meet the minimum ventilation requirement for the occupants. This field is only used if the Zone Minimum Air Flow Method field is set to FixedFlowRate.
 
-This field is autosizable and defaulted to autosize. The autosized flow rate is the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the \hyperref[sizingzone]{Sizing:Zone} input fields "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and "Cooling Minimum Air Flow Fraction". If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 flow fraction are used.
+This field is autosizable and defaulted to autosize. The autosized flow rate is the maximum flow rate derived from the design outdoor air flow (including VRP adjustments) and the \hyperref[sizingzone]{Sizing:Zone} input fields ``Cooling Minimum Air Flow per Zone Floor Area'', ``Cooling Minimum Air Flow'', and ``Cooling Minimum Air Flow Fraction''. If there is no sizing calculation the defaults of 0.000762 cubic meters per second per square meter of zone floor area (0.15 cfm/ft2) and 0.2 flow fraction are used. The autosized flow rate is calculated according to the ASHRAE Standard 62.1 Simplified Procedure if the Sizing:System's ``System Outdoor Air Method'' associated with this terminal is set to Standard62.1SimplifiedProcedure.
 
 \paragraph{Field: Minimum Air Flow Fraction Schedule Name}\label{field-minimum-air-flow-fraction-schedule-name-1}
 
@@ -902,7 +902,7 @@ The maximum volumetric air flow rate of primary air through the unit in cubic me
 
 \paragraph{Field: Minimum Primary Air Flow Fraction}\label{field-minimum-primary-air-flow-fraction}
 
-The minimum volumetric air flow rate of primary air through the unit expressed as a fraction of the maximum volumetric air flow rate of primary air. This input can be 0.0.
+The minimum volumetric air flow rate of primary air through the unit expressed as a fraction of the maximum volumetric air flow rate of primary air. This input can be 0.0. When set to autosize and the Sizing:System's \emph{System Outdoor Air Method} associated with this terminal is set to Standard62.1SimplifiedProcedure, the autosized air flow fraction is calculated according to the ASHRAE Standard 62.1 Simplified Procedure.
 
 \paragraph{Field: Supply Air Inlet Node Name}\label{field-supply-air-inlet-node-name}
 
@@ -1065,7 +1065,7 @@ The maximum volumetric air flow rate of secondary air through the unit in cubic 
 
 \paragraph{Field: Minimum Primary Air Flow Fraction}\label{field-minimum-primary-air-flow-fraction-1}
 
-The minimum volumetric air flow rate of primary air through the unit expressed as a fraction of the maximum volumetric air flow rate of primary air. This input can be 0.0.
+The minimum volumetric air flow rate of primary air through the unit expressed as a fraction of the maximum volumetric air flow rate of primary air. This input can be 0.0. When set to autosize and the Sizing:System's \emph{System Outdoor Air Method} associated with this terminal is set to Standard62.1SimplifiedProcedure, the autosized air flow fraction is calculated according to the ASHRAE Standard 62.1 Simplified Procedure.
 
 \paragraph{Field: Fan On Flow Fraction}\label{field-fan-on-flow-fraction}
 
@@ -1827,7 +1827,7 @@ The primary air (treated outdoor air) inlet node name of the mixer. This will be
 
 \paragraph{Field: Mixer Secondary Air Inlet Node Name}\label{field-mixer-secondary-air-inlet-node-name}
 
-The secondary air (recirculating air) inlet node name of the mixer. This will be the outlet air node name of the ZoneHVAC equipment if the connection type in the input field \textit{Mixer Connection Type} below is \textbf{SupplySide}, or else this will be an exhaust air node name of the conditioned zone if the connection type in the input field \textit{Mixer Connection Type} below is \textbf{InletSide}.
+The secondary air (recirculating air) inlet node name of the mixer. This will be the outlet air node name of the ZoneHVAC equipment if the connection type in the input field \textit{Mixer Connection Type} below is \textbf{SupplySide}, or else this will be either an exhaust air node name of the conditioned zone (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} to draw air from a zone directly or an induced air outlet node (Ref. \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}) to draw air from a return plenum when the zone return node is connected to a return plenum.  The induced air outlet node will be the outlet air node name when the mixer connection type is SupplySide. If the mixer connection type is InletSide, then the induced air outlet node will be the mixer secondary air inlet node.
 
 \paragraph{Field: Mixer Connection Type}\label{field-mixer-connection-type}
 

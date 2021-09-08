@@ -807,7 +807,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
     OperatingMode Result_WetFullOperatingMode = EvaporativeCoolers::IndirectResearchSpecialEvapCoolerOperatingMode(
         *state, EvapCoolNum, thisEvapCooler.SecInletTemp, thisEvapCooler.SecInletWetBulbTemp, TdbOutSysWetMin, TdbOutSysDryMin);
     // check operating mode
-    EXPECT_EQ(Result_WetFullOperatingMode, EvaporativeCoolers::OperatingMode::WetFull);
+    EXPECT_TRUE(compare_enums(Result_WetFullOperatingMode, EvaporativeCoolers::OperatingMode::WetFull));
     // get outlet temperature in full wet operating mode
     EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp(*state,
                                                             EvapCoolNum,
@@ -929,8 +929,20 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
 
     // Simulate air loop component calls SimEvapCooler
     // SimEvapCooler calls InitEvapCooler(EvapCoolNum) and CalcDirectEvapCooler
-    SimAirServingZones::SimAirLoopComponent(
-        *state, EvapCond(EvapCoolNum).EvapCoolerName, SimAirServingZones::CompType::EvapCooler, false, AirLoopNum, EvapCoolNum, 0);
+    // temporary arguments
+    int airLoopNum = 0;
+    int branchNum = 0;
+    int compNum = 0;
+    SimAirServingZones::SimAirLoopComponent(*state,
+                                            EvapCond(EvapCoolNum).EvapCoolerName,
+                                            SimAirServingZones::CompType::EvapCooler,
+                                            false,
+                                            AirLoopNum,
+                                            EvapCoolNum,
+                                            0,
+                                            airLoopNum,
+                                            branchNum,
+                                            compNum);
 
     // air loop FanPLR successfully passed for pump power calculation
     EXPECT_EQ(EvapCond(EvapCoolNum).EvapCoolerPower, 60 * 0.8);

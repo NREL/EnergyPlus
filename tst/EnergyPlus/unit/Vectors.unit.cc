@@ -61,7 +61,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::Vectors;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, VectorsTest_AreaPolygon)
 {
