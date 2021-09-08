@@ -1001,11 +1001,12 @@ bool getDesuperHtrInput(EnergyPlusData &state)
             } else {
                 DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
                     state.dataCoilCooingDX->coilCoolingDXs[DesupHtr.ReclaimHeatingSourceIndexNum].reclaimHeat;
-                if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
-                    HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataWaterThermalTanks->numWaterHeaterDesuperheater);
-                    for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
+                if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
+                    HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(state.dataWaterThermalTanks->numWaterHeaterDesuperheater);
+                    for (auto &num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)
                         num = 0.0;
                 }
+                DesupHtr.ValidSourceType = true;
                 HeatReclaim.ReclaimEfficiencyTotal += DesupHtr.HeatReclaimRecoveryEff;
                 if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
                     ShowSevereError(state,
@@ -8652,7 +8653,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
                         Real64 NewTankTemp = this->TankTemp;
 
                         if (NewTankTemp > desupHtrSetPointTemp) {
-                            //           Only revert to floating mode if the tank temperature is higher than the cut out temperature
+                            //           Only revert to floating mode if the tank temperature is higher than the cut-out temperature
                             if (NewTankTemp > DesupHtr.SetPointTemp) {
                                 DesupHtr.Mode = state.dataWaterThermalTanks->floatMode;
                             }
