@@ -7516,12 +7516,6 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
 
     state->dataHeatBal->NominalU.allocate(1);
     state->dataHeatBal->NominalU(1) = 0.2;
-    state->dataHeatBal->NominalUBeforeAdjusted.allocate(1);
-    state->dataHeatBal->NominalUBeforeAdjusted(1) = 0.2;
-    state->dataHeatBal->CoeffAdjRatioIn.allocate(1);
-    state->dataHeatBal->CoeffAdjRatioOut.allocate(1);
-    state->dataHeatBal->CoeffAdjRatioIn(1) = 1.0;
-    state->dataHeatBal->CoeffAdjRatioOut(1) = 1.0;
     // Create one wall and one window with each azimuth from expectedAzimuthToCards
     // Azimuth & Cardinal entries happen in two separate blocks,
     // so test both to increase coverage and make sure both are correct

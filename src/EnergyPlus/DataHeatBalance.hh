@@ -2226,8 +2226,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
     Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
     Array1D<Real64> NominalUBeforeAdjusted;         // Nominal U value for glazing system only
-    Array1D<Real64> CoeffAdjRatioIn;                // Conductive and radiative coefficient adjustment ratio
-    Array1D<Real64> CoeffAdjRatioOut;               // Conductive and radiative coefficient adjustment ratio
+    Array1D<Real64> CoeffAdjRatio;                  // Conductive coefficient adjustment ratio
 
     Array1D<Real64>
         EnclSolQSWRad; // Zone short-wave flux density; used to calculate short-wave  radiation absorbed on inside surfaces of zone or enclosure
@@ -2526,8 +2525,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->NominalRforNominalUCalculation.deallocate();
         this->NominalU.deallocate();
         this->NominalUBeforeAdjusted.deallocate();
-        this->CoeffAdjRatioIn.deallocate();
-        this->CoeffAdjRatioOut.deallocate();
+        this->CoeffAdjRatio.deallocate();
         this->EnclSolQSWRad.deallocate();
         this->EnclSolQSWRadLights.deallocate();
         this->EnclSolDB.deallocate();

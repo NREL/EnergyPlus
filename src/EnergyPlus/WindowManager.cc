@@ -147,8 +147,7 @@ namespace WindowManager {
         CheckAndReadCustomSprectrumData(state);
 
         // allocate surface level adj ratio data member
-        state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn.dimension(state.dataSurface->TotSurfaces, 1.0);
-        state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut.dimension(state.dataSurface->TotSurfaces, 1.0);
+        state.dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(state.dataSurface->TotSurfaces, 1.0);
 
         if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
             InitWCE_SimplifiedOpticalData(state);
@@ -7023,8 +7022,7 @@ namespace WindowManager {
                     }
                     MaxIter -= 1;
                 }
-                state.dataHeatBal->CoeffAdjRatioIn(ConstrNum) = wettedAreaAdjRatio;
-                state.dataHeatBal->CoeffAdjRatioOut(ConstrNum) = wettedAreaAdjRatio;
+                state.dataHeatBal->CoeffAdjRatio(ConstrNum) = wettedAreaAdjRatio;
             }
         }
 
@@ -7037,8 +7035,7 @@ namespace WindowManager {
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
                     int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                    state.dataHeatBalSurf->SurfWinCoeffAdjRatioIn(SurfNum) = state.dataHeatBal->CoeffAdjRatioIn(ConstrNum);
-                    state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) = state.dataHeatBal->CoeffAdjRatioOut(ConstrNum);
+                    state.dataHeatBalSurf->SurfWinCoeffAdjRatio(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
                 }
             }
         }
@@ -7417,7 +7414,7 @@ namespace WindowManager {
             print(state.files.eio,
                   "{}\n",
                   "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},Conductance (Before Adjusted) {W/m2-K},"
-                  "Convection Coefficient Adjustment Ratio In,Convection Coefficient Adjustment Ratio Out,SHGC,"
+                  "Convection Coefficient Adjustment Ratio,SHGC,"
                   "Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
             if ((state.dataHeatBal->TotSimpleWindow > 0) || (state.dataHeatBal->W5GlsMat > 0) || (state.dataHeatBal->W5GlsMatAlt > 0))
                 print(state.files.eio,
@@ -7586,8 +7583,7 @@ namespace WindowManager {
                               Roughness(static_cast<int>(state.dataConstruction->Construct(ThisNum).OutsideRoughness)),
                               NominalConductanceWinter,
                               state.dataHeatBal->NominalUBeforeAdjusted(ThisNum),
-                              state.dataHeatBal->CoeffAdjRatioIn(ThisNum),
-                              state.dataHeatBal->CoeffAdjRatioOut(ThisNum),
+                              state.dataHeatBal->CoeffAdjRatio(ThisNum),
                               SHGCSummer,
                               TransSolNorm,
                               TransVisNorm);

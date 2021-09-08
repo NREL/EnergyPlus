@@ -352,9 +352,6 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchFenDividerAreaOf1 = 0;
     int pdchFenArea = 0;
     int pdchFenUfact = 0;
-    int pdchFenUfactBeforeAdjusted = 0;
-    int pdchFenCoeffAdjRatioIn = 0;
-    int pdchFenCoeffAdjRatioOut = 0;
     int pdchFenSHGC = 0;
     int pdchFenVisTr = 0;
     int pdchFenFrameConductance = 0;
@@ -1330,7 +1327,6 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchFenDividerAreaOf1 = 0;
         this->pdchFenArea = 0;
         this->pdchFenUfact = 0;
-        this->pdchFenUfactBeforeAdjusted = 0;
         this->pdchFenSHGC = 0;
         this->pdchFenVisTr = 0;
         this->pdchFenFrameConductance = 0;

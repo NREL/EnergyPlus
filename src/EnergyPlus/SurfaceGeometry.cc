@@ -13313,8 +13313,7 @@ namespace SurfaceGeometry {
             state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) = 0.0;
             state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalU(state.dataHeatBal->TotConstructs) = 0.0;
-            state.dataHeatBal->CoeffAdjRatioIn.redimension(state.dataHeatBal->TotConstructs) = 1.0;
-            state.dataHeatBal->CoeffAdjRatioOut.redimension(state.dataHeatBal->TotConstructs) = 1.0;
+            state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs) = 1.0;
 
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).setArraysBasedOnMaxSolidWinLayers(state);
 
@@ -13567,8 +13566,7 @@ namespace SurfaceGeometry {
             state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
-            state.dataHeatBal->CoeffAdjRatioIn.redimension(state.dataHeatBal->TotConstructs) = 1.0;
-            state.dataHeatBal->CoeffAdjRatioOut.redimension(state.dataHeatBal->TotConstructs) = 1.0;
+            state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs) = 1.0;
 
             // these Construct arrays dimensioned based on MaxSolidWinLayers
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).setArraysBasedOnMaxSolidWinLayers(state);
