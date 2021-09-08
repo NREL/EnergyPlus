@@ -2373,16 +2373,14 @@ void ReportInfiltrations(EnergyPlusData &state)
 
         if (state.dataHeatBalFanSys->MAT(NZ) > Zone(NZ).OutDryBulbTemp) {
 
-            Infiltration(j).InfilHeatLoss = Infiltration(j).MCpI_temp *
-                                                     (state.dataHeatBalFanSys->MAT(NZ) - Zone(NZ).OutDryBulbTemp) * TimeStepSys *
-                                                     DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+            Infiltration(j).InfilHeatLoss = Infiltration(j).MCpI_temp * (state.dataHeatBalFanSys->MAT(NZ) - Zone(NZ).OutDryBulbTemp) * TimeStepSys *
+                                            DataGlobalConstants::SecInHour * ADSCorrectionFactor;
             Infiltration(j).InfilHeatGain = 0.0;
 
         } else if (state.dataHeatBalFanSys->MAT(NZ) <= Zone(NZ).OutDryBulbTemp) {
 
-            Infiltration(j).InfilHeatGain = Infiltration(j).MCpI_temp *
-                                                     (Zone(NZ).OutDryBulbTemp - state.dataHeatBalFanSys->MAT(NZ)) * TimeStepSys *
-                                                     DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+            Infiltration(j).InfilHeatGain = Infiltration(j).MCpI_temp * (Zone(NZ).OutDryBulbTemp - state.dataHeatBalFanSys->MAT(NZ)) * TimeStepSys *
+                                            DataGlobalConstants::SecInHour * ADSCorrectionFactor;
             Infiltration(j).InfilHeatLoss = 0.0;
         }
 
@@ -2390,21 +2388,18 @@ void ReportInfiltrations(EnergyPlusData &state)
         H2OHtOfVap = PsyHgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(NZ), state.dataHeatBalFanSys->MAT(NZ));
         if (state.dataHeatBalFanSys->ZoneAirHumRat(NZ) > state.dataEnvrn->OutHumRat) {
 
-            Infiltration(j).InfilLatentLoss = Infiltration(j).InfilMdot *
-                                                       (state.dataHeatBalFanSys->ZoneAirHumRat(NZ) - state.dataEnvrn->OutHumRat) * H2OHtOfVap *
-                                                       TimeStepSys * DataGlobalConstants::SecInHour;
+            Infiltration(j).InfilLatentLoss = Infiltration(j).InfilMdot * (state.dataHeatBalFanSys->ZoneAirHumRat(NZ) - state.dataEnvrn->OutHumRat) *
+                                              H2OHtOfVap * TimeStepSys * DataGlobalConstants::SecInHour;
             Infiltration(j).InfilLatentGain = 0.0;
 
         } else if (state.dataHeatBalFanSys->ZoneAirHumRat(NZ) <= state.dataEnvrn->OutHumRat) {
 
-            Infiltration(j).InfilLatentGain = Infiltration(j).InfilMdot *
-                                                       (state.dataEnvrn->OutHumRat - state.dataHeatBalFanSys->ZoneAirHumRat(NZ)) * H2OHtOfVap *
-                                                       TimeStepSys * DataGlobalConstants::SecInHour;
+            Infiltration(j).InfilLatentGain = Infiltration(j).InfilMdot * (state.dataEnvrn->OutHumRat - state.dataHeatBalFanSys->ZoneAirHumRat(NZ)) *
+                                              H2OHtOfVap * TimeStepSys * DataGlobalConstants::SecInHour;
             Infiltration(j).InfilLatentLoss = 0.0;
         }
         // Total infiltration losses and gains
-        TotalLoad = Infiltration(j).InfilHeatGain + Infiltration(j).InfilLatentGain - Infiltration(j).InfilHeatLoss -
-                    Infiltration(j).InfilLatentLoss;
+        TotalLoad = Infiltration(j).InfilHeatGain + Infiltration(j).InfilLatentGain - Infiltration(j).InfilHeatLoss - Infiltration(j).InfilLatentLoss;
         if (TotalLoad > 0) {
             Infiltration(j).InfilTotalGain = TotalLoad;
             Infiltration(j).InfilTotalLoss = 0.0;
@@ -2638,12 +2633,12 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                 // Break the ventilation load into heat gain and loss components
                 if (state.dataHeatBalFanSys->MAT(ZoneLoop) > Ventilation(VentNum).AirTemp) {
                     ZnAirRpt(ZoneLoop).VentilHeatLoss += state.dataZoneEquip->VentMCP(VentNum) *
-                                                         (state.dataHeatBalFanSys->MAT(ZoneLoop) - Ventilation(VentNum).AirTemp) *
-                                                         TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                                                         (state.dataHeatBalFanSys->MAT(ZoneLoop) - Ventilation(VentNum).AirTemp) * TimeStepSys *
+                                                         DataGlobalConstants::SecInHour * ADSCorrectionFactor;
                 } else if (state.dataHeatBalFanSys->MAT(ZoneLoop) <= Ventilation(VentNum).AirTemp) {
                     ZnAirRpt(ZoneLoop).VentilHeatGain += state.dataZoneEquip->VentMCP(VentNum) *
-                                                         (Ventilation(VentNum).AirTemp - state.dataHeatBalFanSys->MAT(ZoneLoop)) *
-                                                         TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                                                         (Ventilation(VentNum).AirTemp - state.dataHeatBalFanSys->MAT(ZoneLoop)) * TimeStepSys *
+                                                         DataGlobalConstants::SecInHour * ADSCorrectionFactor;
                 }
 
                 ++VentZoneNum;
