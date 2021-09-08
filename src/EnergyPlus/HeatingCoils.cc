@@ -1622,6 +1622,22 @@ namespace HeatingCoils {
                     }
                     break;
                 }
+            } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COIL_COOLING_DX_NEW) {
+                DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
+                    state.dataCoilCooingDX->coilCoolingDXs[HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum].reclaimHeat;
+                if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
+                    HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
+                    for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
+                        num = 0.0;
+                    HeatReclaim.ReclaimEfficiencyTotal += HeatingCoil(CoilNum).Efficiency;
+                    if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
+                        ShowSevereError(state,
+                                        cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
+                                            "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
+                                            HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                    }
+                }
+                state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
             }
             if ((state.dataHeatingCoils->ValidSourceTypeCounter > state.dataHeatingCoils->NumDesuperheaterCoil * 2) &&
                 state.dataHeatingCoils->ShowSingleWarning(CoilNum) && !state.dataHeatingCoils->ValidSourceType(CoilNum)) {
@@ -2793,8 +2809,12 @@ namespace HeatingCoils {
                 break;
             case HeatObjTypes::COIL_COOLING_DX_NEW:
                 // get RTF and NominalCapacity from Coil:CoolingDX
-                HeatingCoil(CoilNum).RTF = 0.0;
-                HeatingCoil(CoilNum).NominalCapacity = 0.0;
+                {
+                    auto &thisCoolingCoil = state.dataCoilCooingDX->coilCoolingDXs[SourceID];
+                    HeatingCoil(CoilNum).RTF = thisCoolingCoil.runTimeFraction;
+                    HeatingCoil(CoilNum).NominalCapacity =
+                        thisCoolingCoil.reclaimHeat.AvailCapacity * Effic - thisCoolingCoil.reclaimHeat.WaterHeatingDesuperheaterReclaimedHeatTotal;
+                }
                 break;
             case HeatObjTypes::Unassigned:
                 ShowFatalError(state, "Developer error: Heating coil ReclaimHeatingSource was not assigned properly");

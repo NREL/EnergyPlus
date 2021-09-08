@@ -2696,7 +2696,7 @@
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Main Heating Coil 1,     !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
-    Coil:Cooling:DX,  !- Cooling Coil Object Type
+    Coil:Cooling:DX,         !- Cooling Coil Object Type
     Main Cooling Coil 1,     !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
@@ -2800,9 +2800,9 @@
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Main Cooling Coil 1 Operating Mode,  !- Name
-    36991.44,                !- Rated Gross Total Cooling Capacity
-    3.776,                   !- Rated Evaporator Air Flow Rate
-    10.62,                   !- Rated Condenser Air Flow Rate
+    AutoSize, ! 36991.44,                !- Rated Gross Total Cooling Capacity
+    AutoSize, ! 3.776,                   !- Rated Evaporator Air Flow Rate
+    AutoSize, ! 10.62,                   !- Rated Condenser Air Flow Rate
     ,                        !- Maximum Cycling Rate
     0.0,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
     0.0,                     !- Latent Capacity Time Constant

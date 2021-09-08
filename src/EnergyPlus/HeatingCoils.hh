@@ -149,7 +149,7 @@ namespace HeatingCoils {
 
     void SimulateHeatingCoilComponents(EnergyPlusData &state,
                                        std::string_view CompName,
-                                       bool const FirstHVACIteration,
+                                       bool FirstHVACIteration,
                                        Optional<Real64 const> QCoilReq = _, // coil load to be met
                                        Optional_int CompIndex = _,
                                        Optional<Real64> QCoilActual = _,         // coil load actually delivered returned to calling component
