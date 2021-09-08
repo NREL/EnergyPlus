@@ -579,50 +579,53 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                 // Write the bare-window four sky daylight factors at noon time to the eio file; this is done only
                 // for first time that daylight factors are calculated and so is insensitive to possible variation
                 // due to change in ground reflectance from month to month, or change in storm window status.
-                // TODO MJW: Post-release change to enclosure name
+                // TODO MJW: Post-release change to enclosure name and remove zone loop (which is here to preserve order for now)
                 static constexpr std::string_view Format_700(
                     "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor\n");
                 print(state.files.eio, Format_700);
-                for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
-                    auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
-                    int enclNum = thisDaylightControl.enclIndex;
-                    auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
+                for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+                    for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
+                        auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
+                        if (thisDaylightControl.zoneIndex != zoneNum) continue;
+                        int enclNum = thisDaylightControl.enclIndex;
+                        auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
 
-                    if (thisEnclDaylight.NumOfDayltgExtWins == 0 || !thisEnclDaylight.hasSplitFluxDaylighting) continue;
-                    for (int windowCounter = 1; windowCounter <= thisEnclDaylight.NumOfDayltgExtWins; ++windowCounter) {
-                        int windowSurfNum = thisEnclDaylight.DayltgExtWinSurfNums(windowCounter);
-                        // For this report, do not include ext wins in zone adjacent to ZoneNum since the inter-reflected
-                        // component will not be calculated for these windows until the time-step loop.
-                        if (state.dataSurface->Surface(windowSurfNum).SolarEnclIndex == enclNum) {
-                            // Output for each reference point, for each sky. Group by sky type first
-                            for (const DataDaylighting::SkyType &skyType : {DataDaylighting::SkyType::Clear,
-                                                                            DataDaylighting::SkyType::ClearTurbid,
-                                                                            DataDaylighting::SkyType::Intermediate,
-                                                                            DataDaylighting::SkyType::Overcast}) {
-                                std::string skyTypeString;
-                                if (skyType == DataDaylighting::SkyType::Clear) {
-                                    skyTypeString = "Clear Sky";
-                                } else if (skyType == DataDaylighting::SkyType::ClearTurbid) {
-                                    skyTypeString = "Clear Turbid Sky";
-                                } else if (skyType == DataDaylighting::SkyType::Intermediate) {
-                                    skyTypeString = "Intermediate Sky";
-                                } else if (skyType == DataDaylighting::SkyType::Overcast) {
-                                    skyTypeString = "Overcast Sky";
-                                    //} else {
-                                    //    // Should never happen
-                                    //    skyTypeString = "ERROR_SKY_TYPE_NOT_HANDLED";
-                                }
+                        if (thisEnclDaylight.NumOfDayltgExtWins == 0 || !thisEnclDaylight.hasSplitFluxDaylighting) continue;
+                        for (int windowCounter = 1; windowCounter <= thisEnclDaylight.NumOfDayltgExtWins; ++windowCounter) {
+                            int windowSurfNum = thisEnclDaylight.DayltgExtWinSurfNums(windowCounter);
+                            // For this report, do not include ext wins in zone adjacent to ZoneNum since the inter-reflected
+                            // component will not be calculated for these windows until the time-step loop.
+                            if (state.dataSurface->Surface(windowSurfNum).SolarEnclIndex == enclNum) {
+                                // Output for each reference point, for each sky. Group by sky type first
+                                for (const DataDaylighting::SkyType &skyType : {DataDaylighting::SkyType::Clear,
+                                                                                DataDaylighting::SkyType::ClearTurbid,
+                                                                                DataDaylighting::SkyType::Intermediate,
+                                                                                DataDaylighting::SkyType::Overcast}) {
+                                    std::string skyTypeString;
+                                    if (skyType == DataDaylighting::SkyType::Clear) {
+                                        skyTypeString = "Clear Sky";
+                                    } else if (skyType == DataDaylighting::SkyType::ClearTurbid) {
+                                        skyTypeString = "Clear Turbid Sky";
+                                    } else if (skyType == DataDaylighting::SkyType::Intermediate) {
+                                        skyTypeString = "Intermediate Sky";
+                                    } else if (skyType == DataDaylighting::SkyType::Overcast) {
+                                        skyTypeString = "Overcast Sky";
+                                        //} else {
+                                        //    // Should never happen
+                                        //    skyTypeString = "ERROR_SKY_TYPE_NOT_HANDLED";
+                                    }
 
-                                for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
-                                    DaylFac = thisDaylightControl.DaylIllFacSky(12, 1, static_cast<int>(skyType), refPtNum, windowCounter);
-                                    print(state.files.eio,
-                                          " Sky Daylight Factors,{},{},{},{},{},{:.4R}\n",
-                                          skyTypeString,
-                                          state.dataEnvrn->CurMnDy,
-                                          state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
-                                          state.dataSurface->Surface(windowSurfNum).Name,
-                                          state.dataDaylightingData->DaylRefPt(thisDaylightControl.DaylRefPtNum(refPtNum)).Name,
-                                          DaylFac);
+                                    for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
+                                        DaylFac = thisDaylightControl.DaylIllFacSky(12, 1, static_cast<int>(skyType), refPtNum, windowCounter);
+                                        print(state.files.eio,
+                                              " Sky Daylight Factors,{},{},{},{},{},{:.4R}\n",
+                                              skyTypeString,
+                                              state.dataEnvrn->CurMnDy,
+                                              state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
+                                              state.dataSurface->Surface(windowSurfNum).Name,
+                                              state.dataDaylightingData->DaylRefPt(thisDaylightControl.DaylRefPtNum(refPtNum)).Name,
+                                              DaylFac);
+                                    }
                                 }
                             }
                         }
