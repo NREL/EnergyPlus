@@ -4178,7 +4178,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
-    
+
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(state->dataSurface->TotSurfaces, 1.0);
     state->dataHeatBalSurf->SurfHConvInt.dimension(state->dataSurface->TotSurfaces, 0.5);
     state->dataMstBal->HConvInFD.allocate(state->dataSurface->TotSurfaces);

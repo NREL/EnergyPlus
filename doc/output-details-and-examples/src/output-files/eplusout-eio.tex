@@ -2302,7 +2302,7 @@ This field ``time'' refers to the history term to which the coefficients are app
 
 A separate report is available for windows (note that both nominal conductance and Solar Heat Gain Coefficient are calculated for windows). Like the opaque construction, the window construction report has multiple parts -- in this case, 2.
 
-\textbf{Line 1:} ! \textless{}WindowConstruction\textgreater{},Construction Name,\#Layers,Roughness,Conductance \{W/m2-K\},Conductance (Glazing Only) \{W/m2-K\},SHGC,SolarTransmittanceNormalIncid,VisibleTransmittanceNormalIncid
+\textbf{Line 1:} ! \textless{}WindowConstruction\textgreater{},Construction Name,\#Layers,Roughness,Conductance \{W/m2-K\},SHGC,SolarTransmittanceNormalIncid,VisibleTransmittanceNormalIncid
 
 \textbf{Line 2:} ! \textless{}WindowMaterial:Glazing\textgreater{}, Material Name, Optical Data Type, Spectral Data Set Name, Thickness \{m\}, Solar Transmittance,Front Solar Reflectance, Back Solar Reflectance, Visible Transmittance, Front Visible Reflectance,Back Visible Reflectance,Infrared Transmittance, Front Thermal Emissivity, Back Thermal Emissivity,Conductivity \{W/m-K\},Dirt Factor,Solar Diffusing
 
@@ -2314,7 +2314,7 @@ A separate report is available for windows (note that both nominal conductance a
 
 \textbf{Line 6:} ! \textless{}WindowMaterial:Blind\textgreater{},Material Name,SlatWidth \{m\},SlatSeparation \{m\},SlatThickness \{m\},SlatAngle \{deg\},SlatBeamSolarTransmittance,SlatBeamSolarFrontReflectance,BlindToGlassDistance \{m\}
 
-WindowConstruction,DOUBLE PANE WITH SCREEN,~~ 4,MediumRough,~~ 2.514,~~ 2.514,~~ 0.555,~~ 0.511,~~ 0.589
+WindowConstruction,DOUBLE PANE WITH SCREEN,~~ 4,MediumRough,~~ 2.514,~~ 0.555,~~ 0.511,~~ 0.589
 
 ~WindowMaterial:Screen,BRIGHT ALUMINUM SCREEN 1, 0.00025,~ 2.210E+02,~ 0.272,~ 0.697,~ 0.166,~ 0.166,~ 0.195,~ 0.195,~ 0.165,~ 0.025
 
@@ -2324,7 +2324,7 @@ WindowConstruction,DOUBLE PANE WITH SCREEN,~~ 4,MediumRough,~~ 2.514,~~ 2.514,~~
 
 ~WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,SpectralAverage,,~ 0.00300,~ 0.83700,~ 0.07500,~ 0.07500,~ 0.89800,~ 0.08100,~ 0.08100,~ 0.00000,~ 0.84000,~ 0.84000,~ 0.90000,~ 1.00000,No
 
-WindowConstruction,DOUBLE PANE WITH SHADE,~~ 4,VerySmooth,~~ 2.716,~~ 2.716,~~ 0.482,~~ 0.039,~~ 0.050
+WindowConstruction,DOUBLE PANE WITH SHADE,~~ 4,VerySmooth,~~ 2.716,~~ 0.482,~~ 0.039,~~ 0.050
 
 ~WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,SpectralAverage,,~ 0.00300,~ 0.83700,~ 0.07500,~ 0.07500,~ 0.89800,~ 0.08100,~ 0.08100,~ 0.00000,~ 0.84000,~ 0.84000,~ 0.90000,~ 1.00000,No
 
@@ -2334,7 +2334,7 @@ WindowConstruction,DOUBLE PANE WITH SHADE,~~ 4,VerySmooth,~~ 2.716,~~ 2.716,~~ 0
 
 ~WindowMaterial:Shade,SHADE ROLL - LIGHT OPAQUE,~ 0.003,~ 1.000E-01,~ 0.900,~ 0.050,~ 0.050,~ 0.500
 
-WindowConstruction,DOUBLE PANE WITH BLIND,~~ 4,VerySmooth,~~ 2.761,~~ 2.761,~~ 0.714,~~ 0.395,~~ 0.456
+WindowConstruction,DOUBLE PANE WITH BLIND,~~ 4,VerySmooth,~~ 2.761,~~ 0.714,~~ 0.395,~~ 0.456
 
 ~WindowMaterial:Glazing,GLASS - CLEAR SHEET 1 / 8 IN,~ 0.003,~ 0.900,~ 0.837,~ 0.898,~ 0.840,~ 0.840,~ 0.075,~ 0.075,~ 0.081,~ 0.081,~ 1.000,NO
 
@@ -2346,7 +2346,7 @@ WindowConstruction,DOUBLE PANE WITH BLIND,~~ 4,VerySmooth,~~ 2.761,~~ 2.761,~~ 0
 
 \subsubsection{Fields in Part 1 -- Window Construction Report}\label{fields-in-part-1-window-construction-report}
 
-\textbf{Line 1:} ! \textless{}WindowConstruction\textgreater{},Construction Name,\#Layers,Roughness,Conductance \{W/m2-K\},Conductance (Glazing Only) \{W/m2-K\},SHGC,SolarTransmittanceNormalIncid,VisibleTransmittanceNormalIncid
+\textbf{Line 1:} ! \textless{}WindowConstruction\textgreater{},Construction Name,\#Layers,Roughness,Conductance \{W/m2-K\},SHGC,SolarTransmittanceNormalIncid,VisibleTransmittanceNormalIncid
 
 \subsubsection{Field: \textless{}WindowConstruction\textgreater{}}\label{field-windowconstruction}
 
@@ -2598,7 +2598,7 @@ Distance from the mid-plane of the screen to the adjacent glass (m).
 
 Windows with Thermochromic constructions are reported similarly to other window constructions. First, you see the window as entered in the IDF:
 
-WindowConstruction,TCWINDOW,~~ 5,VerySmooth,~~ 1.666,~~ 1.666,~~ 0.429,~~ 0.242,~~ 0.520
+WindowConstruction,TCWINDOW,~~ 5,VerySmooth,~~ 1.666,~~ 0.429,~~ 0.242,~~ 0.520
 
 ~WindowMaterial:Glazing,CLEAR3PPG,Spectral,CLEAR3PPGSP,~ 0.00328,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.84000,~ 0.84000,~ 1.00000,~ 1.00000,No
 
@@ -2612,7 +2612,7 @@ WindowConstruction,TCWINDOW,~~ 5,VerySmooth,~~ 1.666,~~ 1.666,~~ 0.429,~~ 0.242,
 
 Then, there will be a list of window constructions reported with each one corresponding to a particular temperature of the thermochromic glazing layer. For example, the following excerpt shows a list of window constructions for the thermochromic window TCWINDOW at different temperature of the thermochromic layer - TCWINDOW\_TC\_25 at 25°C, TCWINDOW\_TC\_27 at 27°C, and TCWINDOW\_TC\_29 at 29°C. Detailed properties of the thermochromic glazing layer are also listed for each temperature - WO18RT25 \textbf{at} 25°C, WO18RT27 \textbf{at} 27°C, and WO18RT29 \textbf{at} 29°C.
 
-WindowConstruction,TCWINDOW\_TC\_25,~~ 5,VerySmooth,~~ 1.666,~~ 1.666,~~ 0.429,~~ 0.242,~~ 0.520
+WindowConstruction,TCWINDOW\_TC\_25,~~ 5,VerySmooth,~~ 1.666,~~ 0.429,~~ 0.242,~~ 0.520
 
 ~WindowMaterial:Glazing,CLEAR3PPG,Spectral,CLEAR3PPGSP,~ 0.00328,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.84000,~ 0.84000,~ 1.00000,~ 1.00000,No
 
@@ -2624,7 +2624,7 @@ WindowConstruction,TCWINDOW\_TC\_25,~~ 5,VerySmooth,~~ 1.666,~~ 1.666,~~ 0.429,~
 
 ~WindowMaterial:Glazing,SB60CLEAR3PPG,Spectral,SB60CLEAR3PPGSP,~ 0.00328,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.03500,~ 0.84000,~ 1.00000,~ 1.00000,No
 
-~WindowConstruction,TCWINDOW\_TC\_27,~~ 5,VerySmooth,~~ 1.666,~~ 1.666,~~ 0.424,~~ 0.236,~~ 0.504
+~WindowConstruction,TCWINDOW\_TC\_27,~~ 5,VerySmooth,~~ 1.666,~~ 0.424,~~ 0.236,~~ 0.504
 
 ~WindowMaterial:Glazing,CLEAR3PPG,Spectral,CLEAR3PPGSP,~ 0.00328,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.84000,~ 0.84000,~ 1.00000,~ 1.00000,No
 
@@ -2636,7 +2636,7 @@ WindowConstruction,TCWINDOW\_TC\_25,~~ 5,VerySmooth,~~ 1.666,~~ 1.666,~~ 0.429,~
 
 ~WindowMaterial:Glazing,SB60CLEAR3PPG,Spectral,SB60CLEAR3PPGSP,~ 0.00328,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.03500,~ 0.84000,~ 1.00000,~ 1.00000,No
 
-~WindowConstruction,TCWINDOW\_TC\_29,~~ 5,VerySmooth,~~ 1.666,~~ 1.666,~~ 0.419,~~ 0.230,~~ 0.490
+~WindowConstruction,TCWINDOW\_TC\_29,~~ 5,VerySmooth,~~ 1.666,~~ 0.419,~~ 0.230,~~ 0.490
 
 ~WindowMaterial:Glazing,CLEAR3PPG,Spectral,CLEAR3PPGSP,~ 0.00328,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.00000,~ 0.84000,~ 0.84000,~ 1.00000,~ 1.00000,No
 
