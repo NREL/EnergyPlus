@@ -1380,7 +1380,7 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = PlantComponentTemperatureSources::WaterSourceSpecs::factory(state, CompNames(CompNum));
                     } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:HorizontalTrench")) {
                         this_comp.Type = PlantEquipmentType::GrndHtExchgHorizTrench;
-                        this_comp.CurOpSchemeType = static_cast<int>(PlantEquipmentType::GrndHtExchgHorizTrench);
+                        this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                         this_comp.compPtr =
                             PlantPipingSystemsManager::Circuit::factory(state, PlantEquipmentType::GrndHtExchgHorizTrench, CompNames(CompNum));
                     } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {
