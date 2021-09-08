@@ -3,10 +3,10 @@
 //
 
 #include <algorithm>
-#include <cpgfunction/coordinates.h>
 #include <stdexcept>
 #include <string>
 #include <tuple>
+#include <cpgfunction/coordinates.h>
 
 using namespace std;
 
@@ -44,27 +44,6 @@ namespace gt::coordinates {
 
         return coordinates;
     }  // configuration();
-
-//    vector<tuple<double, double>> configuration(const string& shape,
-//                                                const string& input_path){
-//        // define acceptable inputs
-//        std::vector<std::string> acceptable_arguments{"custom"};
-//        // check if the input string is acceptable
-//        bool acceptable = (std::find(acceptable_arguments.begin(),
-//                                     acceptable_arguments.end(), shape) !=
-//                                             acceptable_arguments.end());
-//
-//        if (!acceptable) {
-//            throw invalid_argument("The shape described (" +
-//            shape + ") is not an available input for "
-//                    "gt::coordinates::configuration().");
-//        }
-//
-//        vector<tuple<double, double>> custom =
-//                import_coordinates_from_file(input_path);
-//
-//        return custom;
-//    }  // configuration();
 
     vector<tuple<double, double>> rectangle(int Nx, int Ny, double Bx,
                                             double By) {
@@ -148,46 +127,4 @@ namespace gt::coordinates {
         return L;
     }  // L_shape();
 
-//    vector<tuple<double, double>> import_coordinates_from_file(
-//            const string& input_path){
-//        vector<tuple<double, double>> custom;  // custom-shape from .json file
-//
-//        // nlohmann json input
-//        std::ifstream in(input_path);
-//        nlohmann::json js;
-//        in >> js;
-//
-//        std::vector<double> x = js["x"];
-//        std::vector<double> y = js["y"];
-//
-//        custom.reserve(x.size());
-//        for (int i = 0; i < x.size(); i++){
-//            custom.emplace_back(x[i], y[i]);
-//        }
-//
-//        return custom;
-//    }  // import_coordinates_from_file();
-//
-//    void export_coordinates_to_file(
-//            const vector<tuple<double, double>> &coordinates,
-//            const std::string& output_path){
-//        // Use nlohmann json to export the coordinates to a path
-//
-//        std::vector<double> x_values(coordinates.size());
-//        std::vector<double> y_values(coordinates.size());
-//
-//        for (int i=0; i<x_values.size(); i++) {
-//            x_values[i] = std::get<0>(coordinates[i]);
-//            y_values[i] = std::get<1>(coordinates[i]);
-//        }
-//
-//        std::ofstream o(output_path);
-//
-//        nlohmann::json j;
-//
-//        j["x"] = x_values;
-//        j["y"] = y_values;
-//
-//        o << std::setw(4) << j << std::endl;
-//    }  // export_coordinates_to_file();
 }  // namespace gt::coordinates

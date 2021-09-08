@@ -22,10 +22,10 @@ namespace gt::segments {
             case 1 :
                 if (i <= j) {
                     get_index_value(index, i, j);
-                    h = h_ij[index][k];
+                    h = h_ij[k][index];
                 } else {
                     get_index_value(index, j, i);
-                    h = boreSegments[j].H/boreSegments[i].H * h_ij[index][k];
+                    h = boreSegments[j].H/boreSegments[i].H * h_ij[k][index];
                 }
                 break;
             default:

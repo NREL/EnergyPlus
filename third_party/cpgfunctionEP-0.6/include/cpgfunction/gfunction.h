@@ -50,7 +50,6 @@ namespace gt::gfunction {
                                      std::vector<double>& dt, int p);
     void _temporal_superposition(std::vector<double>& Tb_0,
                                  gt::segments::SegmentResponse &SegRes,
-                                 std::vector<double> &h_ij,
                                  std::vector<double> &q_reconstructed, int p,
                                  int &nSources, int numThreads);
     void _solve_eqn(std::vector<double>& x, std::vector<std::vector<double>>& A,
