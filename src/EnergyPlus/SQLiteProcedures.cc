@@ -206,10 +206,10 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             state.dataSQLiteProcedures->sqlite->addNominalBaseboardData(bBHeatNum, state.dataHeatBal->ZoneBBHeat(bBHeatNum));
         }
         for (int infilNum = 1; infilNum <= state.dataHeatBal->TotInfiltration; ++infilNum) {
-            state.dataSQLiteProcedures->sqlite->addInfiltrationData(infilNum, state.dataHeatBal->InfiltrationModelType(infilNum));
+            state.dataSQLiteProcedures->sqlite->addInfiltrationData(infilNum, state.dataHeatBal->Infiltration(infilNum));
         }
         for (int ventNum = 1; ventNum <= state.dataHeatBal->TotVentilation; ++ventNum) {
-            state.dataSQLiteProcedures->sqlite->addVentilationData(ventNum, state.dataHeatBal->VentilationModelType(ventNum));
+            state.dataSQLiteProcedures->sqlite->addVentilationData(ventNum, state.dataHeatBal->Ventilation(ventNum));
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             state.dataSQLiteProcedures->sqlite->addRoomAirModelData(zoneNum, state.dataRoomAirMod->AirModel(zoneNum));
@@ -2168,11 +2168,11 @@ void SQLite::addNominalBaseboardData(int const number, DataHeatBalance::BBHeatDa
 }
 void SQLite::addInfiltrationData(int const number, DataHeatBalance::InfiltrationData const &infiltrationData)
 {
-    infiltrations.push_back(std::make_unique<InfiltrationModelType>(m_errorStream, m_db, number, infiltrationData));
+    infiltrations.push_back(std::make_unique<Infiltration>(m_errorStream, m_db, number, infiltrationData));
 }
 void SQLite::addVentilationData(int const number, DataHeatBalance::VentilationData const &ventilationData)
 {
-    ventilations.push_back(std::make_unique<VentilationModelType>(m_errorStream, m_db, number, ventilationData));
+    ventilations.push_back(std::make_unique<Ventilation>(m_errorStream, m_db, number, ventilationData));
 }
 void SQLite::addRoomAirModelData(int const number, DataRoomAirModel::AirModelData const &roomAirModelData)
 {
@@ -2414,7 +2414,7 @@ bool SQLite::NominalBaseboardHeat::insertIntoSQLite(sqlite3_stmt *insertStmt)
     sqliteResetCommand(insertStmt);
     return validInsert;
 }
-bool SQLite::InfiltrationModelType::insertIntoSQLite(sqlite3_stmt *insertStmt)
+bool SQLite::Infiltration::insertIntoSQLite(sqlite3_stmt *insertStmt)
 {
     sqliteBindInteger(insertStmt, 1, number);
     sqliteBindText(insertStmt, 2, name);
@@ -2427,7 +2427,7 @@ bool SQLite::InfiltrationModelType::insertIntoSQLite(sqlite3_stmt *insertStmt)
     sqliteResetCommand(insertStmt);
     return validInsert;
 }
-bool SQLite::VentilationModelType::insertIntoSQLite(sqlite3_stmt *insertStmt)
+bool SQLite::Ventilation::insertIntoSQLite(sqlite3_stmt *insertStmt)
 {
     sqliteBindInteger(insertStmt, 1, number);
     sqliteBindText(insertStmt, 2, name);

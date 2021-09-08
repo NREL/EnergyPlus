@@ -2460,8 +2460,8 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::ZoneEquipData> ZoneSteamEq;
     EPVector<DataHeatBalance::ITEquipData> ZoneITEq;
     EPVector<DataHeatBalance::BBHeatData> ZoneBBHeat;
-    EPVector<DataHeatBalance::InfiltrationData> InfiltrationModelType;
-    EPVector<DataHeatBalance::VentilationData> VentilationModelType;
+    EPVector<DataHeatBalance::InfiltrationData> Infiltration;
+    EPVector<DataHeatBalance::VentilationData> Ventilation;
     EPVector<DataHeatBalance::ZoneAirBalanceData> ZoneAirBalance;
     EPVector<DataHeatBalance::MixingData> Mixing;
     EPVector<DataHeatBalance::MixingData> CrossMixing;
@@ -2740,8 +2740,8 @@ struct HeatBalanceData : BaseGlobalStruct
         this->ZoneSteamEq.deallocate();
         this->ZoneITEq.deallocate();
         this->ZoneBBHeat.deallocate();
-        this->InfiltrationModelType.deallocate();
-        this->VentilationModelType.deallocate();
+        this->Infiltration.deallocate();
+        this->Ventilation.deallocate();
         this->ZoneAirBalance.deallocate();
         this->Mixing.deallocate();
         this->CrossMixing.deallocate();

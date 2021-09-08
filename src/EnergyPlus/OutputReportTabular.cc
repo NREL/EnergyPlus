@@ -14275,7 +14275,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                     } else {
                         timeCoolMax = 0;
                     }
-                } else if (FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::VentilationModelType) {
+                } else if (FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::Ventilation) {
                     coolDesSelected = SysSizPeakDDNum(iAirLoop).CoolFlowPeakDD;
                     if (coolDesSelected != 0) {
                         timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtCoolFlowPk(coolDesSelected);
