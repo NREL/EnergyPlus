@@ -1539,18 +1539,6 @@ namespace UnitarySystems {
         if (int(state.dataUnitarySystems->unitarySys.size()) == state.dataUnitarySystems->numUnitarySystems &&
             state.dataZoneEquip->ZoneEquipInputsFilled)
             setupAllOutputVars(state, state.dataUnitarySystems->numUnitarySystems);
-        for (std::size_t coilNUM = 1; coilNUM < state.dataUnitarySystems->unitarySys.size(); ++coilNUM) {
-            if (state.dataUnitarySystems->unitarySys[coilNUM].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
-                state.dataUnitarySystems->unitarySys[coilNUM].m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
-                SetupEMSActuator(state,
-                                 "Coil Speed Control",
-                                 state.dataUnitarySystems->unitarySys[coilNUM].Name,
-                                 "Unitary System DX Coil Speed Level",
-                                 "[]",
-                                 state.dataUnitarySystems->unitarySys[coilNUM].m_EMSOverrideCoilSpeedNumOn,
-                                 state.dataUnitarySystems->unitarySys[coilNUM].m_EMSOverrideCoilSpeedNumValue);
-            }
-        }
         if (errorsFound) {
             ShowFatalError(state, "getUnitarySystemInputData: previous errors cause termination. Check inputs");
         }
@@ -8352,7 +8340,6 @@ namespace UnitarySystems {
         this->FanPartLoadRatio = 1.0;
         CompressorONFlag = CompOn;
 
-        // TODO - EMS do not override full load results?
         if (state.dataUnitarySystems->HeatingLoad) {
             CoolPLR = 0.0;
             HeatPLR = 1.0;
@@ -8420,6 +8407,7 @@ namespace UnitarySystems {
                 if (this->m_NumOfSpeedCooling > 0) this->m_CoolingSpeedRatio = 1.0;
             }
         } else {
+            // Todo - what if no load but has EMS override speed > 0
             // will return here when no cooling or heating load and MoistureLoad > LatOutputOff (i.e., PLR=0)
             return;
         }
@@ -9462,9 +9450,8 @@ namespace UnitarySystems {
                 HXUnitOn = true; // HX is needed to meet moisture load
                 if (this->m_NumOfSpeedCooling > 0) {
                     if (this->m_EMSOverrideCoilSpeedNumOn) {
-                        CoolPLR = 1.0;
                         this->m_CoolingSpeedNum = this->m_EMSOverrideCoilSpeedNumValue;
-                        this->m_CoolingPartLoadFrac = CoolPLR;
+                        this->m_CoolingPartLoadFrac = 1.0;
                         this->m_CoolingSpeedRatio = 1.0;
                         this->m_CoolingCycRatio = 1.0;
                         this->calcUnitarySystemToLoad(state,
@@ -12299,6 +12286,7 @@ namespace UnitarySystems {
                         doIt = true;
                     }
                 }
+                if (this->m_EMSOverrideCoilSpeedNumOn) doIt = false;
 
                 if (doIt) {
                     if (unitSys && state.dataLoopNodes->Node(OutletNode).Temp > DesOutTemp - tempAcc) {
@@ -17632,6 +17620,16 @@ namespace UnitarySystems {
                                          "[W]",
                                          state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideMoistZoneLoadRequest,
                                          state.dataUnitarySystems->unitarySys[sysNum].m_EMSMoistureZoneLoadValue);
+                        if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                            state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                            SetupEMSActuator(state,
+                                             "Coil Speed Control",
+                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                             "Unitary System DX Coil Speed Level",
+                                             "[]",
+                                             state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideCoilSpeedNumOn,
+                                             state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideCoilSpeedNumValue);
+                        }
                     }
                     bool anyEMSRan;
                     EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
