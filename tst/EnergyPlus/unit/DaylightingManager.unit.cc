@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
@@ -144,8 +145,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->ZoneDaylight(1).Name);
     EXPECT_EQ("WEST ZONE", state->dataDaylightingData->ZoneDaylight(1).ZoneName);
-    EXPECT_EQ(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->ZoneDaylight(1).DaylightMethod);
-    EXPECT_EQ(DataDaylighting::iLtgCtrlType::Continuous, state->dataDaylightingData->ZoneDaylight(1).LightControlType);
+    EXPECT_TRUE(compare_enums(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->ZoneDaylight(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(DataDaylighting::iLtgCtrlType::Continuous, state->dataDaylightingData->ZoneDaylight(1).LightControlType));
 
     EXPECT_EQ(0.3, state->dataDaylightingData->ZoneDaylight(1).MinPowerFraction);
     EXPECT_EQ(0.2, state->dataDaylightingData->ZoneDaylight(1).MinLightFraction);
@@ -246,8 +247,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->ZoneDaylight(1).Name);
     EXPECT_EQ("WEST ZONE", state->dataDaylightingData->ZoneDaylight(1).ZoneName);
-    EXPECT_EQ(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->ZoneDaylight(1).DaylightMethod);
-    EXPECT_EQ(DataDaylighting::iLtgCtrlType::Continuous, state->dataDaylightingData->ZoneDaylight(1).LightControlType);
+    EXPECT_TRUE(compare_enums(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->ZoneDaylight(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(DataDaylighting::iLtgCtrlType::Continuous, state->dataDaylightingData->ZoneDaylight(1).LightControlType));
 
     EXPECT_EQ(0.3, state->dataDaylightingData->ZoneDaylight(1).MinPowerFraction);
     EXPECT_EQ(0.2, state->dataDaylightingData->ZoneDaylight(1).MinLightFraction);
@@ -474,6 +475,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -490,6 +492,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -507,6 +510,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -523,6 +527,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -539,6 +544,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Floor,                   !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    NoSun,                   !- Sun Exposure                                                                      ",
@@ -555,6 +561,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Roof,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -646,6 +653,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -662,6 +670,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -679,6 +688,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -695,6 +705,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -711,6 +722,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Floor,                   !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    NoSun,                   !- Sun Exposure                                                                      ",
@@ -727,6 +739,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
         "    Roof,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1118,6 +1131,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1134,6 +1148,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1151,6 +1166,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1167,6 +1183,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1183,6 +1200,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         "    Floor,                   !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    NoSun,                   !- Sun Exposure                                                                      ",
@@ -1199,6 +1217,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
         "    Roof,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1567,8 +1586,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->ZoneDaylight(1).Name);
     EXPECT_EQ("WEST ZONE", state->dataDaylightingData->ZoneDaylight(1).ZoneName);
-    EXPECT_EQ(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->ZoneDaylight(1).DaylightMethod);
-    EXPECT_EQ(DataDaylighting::iLtgCtrlType::Continuous, state->dataDaylightingData->ZoneDaylight(1).LightControlType);
+    EXPECT_TRUE(compare_enums(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->ZoneDaylight(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(DataDaylighting::iLtgCtrlType::Continuous, state->dataDaylightingData->ZoneDaylight(1).LightControlType));
 
     EXPECT_EQ(0.3, state->dataDaylightingData->ZoneDaylight(1).MinPowerFraction);
     EXPECT_EQ(0.2, state->dataDaylightingData->ZoneDaylight(1).MinLightFraction);
@@ -1739,6 +1758,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1755,6 +1775,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1772,6 +1793,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1788,6 +1810,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1804,6 +1827,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Floor,                   !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    NoSun,                   !- Sun Exposure                                                                      ",
@@ -1820,6 +1844,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Roof,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    West Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1921,6 +1946,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1937,6 +1963,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1954,6 +1981,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1970,6 +1998,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Wall,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -1986,6 +2015,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Floor,                   !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    NoSun,                   !- Sun Exposure                                                                      ",
@@ -2002,6 +2032,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
         "    Roof,                    !- Surface Type                                                                      ",
         "    WALL80,                  !- Construction Name                                                                 ",
         "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
         "    Outdoors,                !- Outside Boundary Condition                                                        ",
         "    ,                        !- Outside Boundary Condition Object                                                 ",
         "    SunExposed,              !- Sun Exposure                                                                      ",
@@ -2343,6 +2374,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2359,6 +2391,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2375,6 +2408,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2391,6 +2425,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2407,6 +2442,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Floor,                   !- Surface Type",
         "    FLOOR SLAB 8 IN,         !- Construction Name",
         "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Daylit Floor,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2423,6 +2459,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Roof,                    !- Surface Type",
         "    CEILING IN ZONE,         !- Construction Name",
         "    Daylit Zone,             !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Daylit Attic Floor,      !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2450,6 +2487,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2466,6 +2504,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2482,6 +2521,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2498,6 +2538,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2514,6 +2555,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Floor,                   !- Surface Type",
         "    CEILING IN ATTIC,        !- Construction Name",
         "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Daylit Ceiling,          !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2530,6 +2572,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "    Roof,                    !- Surface Type",
         "    ROOF,                    !- Construction Name",
         "    Daylit Attic Zone,       !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2886,4 +2929,44 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
         "modeled through the daylighting device.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
+{
+    int MapNum = 1;
+    state->dataDaylightingManager->ReportIllumMap_firstTime = false;
+    state->dataDaylightingData->TotIllumMaps = 1;
+
+    state->dataDaylightingManager->FirstTimeMaps.dimension(state->dataDaylightingData->TotIllumMaps, true);
+    state->dataDaylightingManager->EnvrnPrint.dimension(state->dataDaylightingData->TotIllumMaps, false);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints = 3;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord.allocate(3, state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints);
+    state->dataDaylightingManager->SavedMnDy.allocate(state->dataDaylightingData->TotIllumMaps);
+    state->dataDaylightingData->IllumMap.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->IllumMap(MapNum).Zone = 1;
+    state->dataDaylightingData->MapColSep = DataStringGlobals::CharSemicolon;
+    state->dataEnvrn->CurMnDyHr = "JAN012001";
+    state->dataDaylightingManager->SavedMnDy(1) = "JAN01";
+    state->dataGlobal->WarmupFlag = true;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1) = 1.23;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1) = 2.34;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1) = 3.45;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 2) = 4.56;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 2) = 5.67;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 2) = 6.78;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 3) = 7.89;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 3) = 8.90;
+    state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 3) = 9.01;
+    state->dataDaylightingData->IllumMap(MapNum).Name = "ThisOne";
+    state->dataDaylightingData->IllumMap(MapNum).Z = 23.23;
+
+    std::string expectedResultName = "ThisOne at 23.23m";
+    std::string expectedResultPtsHeader = " RefPt1=(1.23:2.34:3.45), RefPt2=(4.56:5.67:6.78), RefPt3=(7.89:8.90:9.01)";
+
+    DaylightingManager::ReportIllumMap(*state, MapNum);
+
+    EXPECT_EQ(expectedResultName, state->dataDaylightingData->IllumMap(1).Name);
+    EXPECT_EQ(expectedResultPtsHeader, state->dataDaylightingData->IllumMap(MapNum).pointsHeader);
 }

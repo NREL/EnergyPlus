@@ -589,6 +589,8 @@ namespace HVACVariableRefrigerantFlow {
         ) const;
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     struct TerminalUnitListData
@@ -876,7 +878,7 @@ namespace HVACVariableRefrigerantFlow {
     // Functions
 
     void SimulateVRF(EnergyPlusData &state,
-                     std::string const &CompName,
+                     std::string_view CompName,
                      bool const FirstHVACIteration,
                      int const ZoneNum,
                      int &CompIndex,
@@ -932,7 +934,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void UpdateVRFCondenser(EnergyPlusData &state, int VRFCond); // index to VRF condensing unit
 
-    void isVRFCoilPresent(EnergyPlusData &state, std::string const VRFTUName, bool &CoolCoilPresent, bool &HeatCoilPresent);
+    void isVRFCoilPresent(EnergyPlusData &state, std::string_view VRFTUName, bool &CoolCoilPresent, bool &HeatCoilPresent);
 
     Real64 PLRResidual(EnergyPlusData &state,
                        Real64 PartLoadRatio,      // compressor cycling ratio (1.0 is continuous, 0.0 is off)

@@ -54,10 +54,10 @@
 #include <string>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
@@ -104,6 +104,8 @@ struct DataGlobal : BaseGlobalStruct
     int NumOfDayInEnvrn = 0;                          // Number of days in the simulation for a particular environment
     int NumOfTimeStepInHour = 0;                      // Number of time steps in each hour of the simulation
     int NumOfZones = 0;                               // Total number of Zones for simulation
+    int numSpaces = 0;                                // Total number of Spaces for simulation
+    int numSpaceTypes = 0;                            // Number of unique space types
     int TimeStep = 0;                                 // Counter for time steps (fractional hours)
     Real64 TimeStepZone = 0.0;                        // Zone time step in fractional hours
     bool WarmupFlag = false;                          // True during the warmup portion of a simulation
@@ -167,6 +169,8 @@ struct DataGlobal : BaseGlobalStruct
     int FDsimDay = 0;
     int FDnumIterYears = 0;
     bool printConsoleOutput = true;
+    bool installRootOverride = false;
+    int numThread = 1;
 
     void clear_state() override
     {
@@ -208,6 +212,8 @@ struct DataGlobal : BaseGlobalStruct
         this->NumOfDayInEnvrn = 0;
         this->NumOfTimeStepInHour = 0;
         this->NumOfZones = 0;
+        this->numSpaces = 0;
+        this->numSpaceTypes = 0;
         this->TimeStep = 0;
         this->TimeStepZone = 0.0;
         this->WarmupFlag = false;
@@ -271,6 +277,8 @@ struct DataGlobal : BaseGlobalStruct
         this->FDsimDay = 0;
         this->FDnumIterYears = 0;
         this->printConsoleOutput = true;
+        this->installRootOverride = false;
+        this->numThread = 1;
     }
 };
 

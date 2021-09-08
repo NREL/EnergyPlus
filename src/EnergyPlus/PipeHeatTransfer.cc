@@ -749,15 +749,15 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                             "Pipe Fluid Heat Transfer Rate",
                             OutputProcessor::Unit::W,
                             state.dataPipeHT->PipeHT(Item).FluidHeatLossRate,
-                            "Plant",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Plant,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
         SetupOutputVariable(state,
                             "Pipe Fluid Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             state.dataPipeHT->PipeHT(Item).FluidHeatLossEnergy,
-                            "Plant",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::Plant,
+                            OutputProcessor::SOVStoreType::Summed,
                             state.dataPipeHT->PipeHT(Item).Name);
 
         if (state.dataPipeHT->PipeHT(Item).EnvironmentPtr == iEnvrnPtr::ZoneEnv) {
@@ -765,15 +765,15 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                 "Pipe Ambient Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPipeHT->PipeHT(Item).EnvironmentHeatLossRate,
-                                "Plant",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPipeHT->PipeHT(Item).Name);
             SetupOutputVariable(state,
                                 "Pipe Ambient Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPipeHT->PipeHT(Item).EnvHeatLossEnergy,
-                                "Plant",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Plant,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPipeHT->PipeHT(Item).Name);
 
             SetupZoneInternalGain(state,
@@ -788,29 +788,29 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                             "Pipe Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             state.dataPipeHT->PipeHT(Item).MassFlowRate,
-                            "Plant",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Plant,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
         SetupOutputVariable(state,
                             "Pipe Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataPipeHT->PipeHT(Item).VolumeFlowRate,
-                            "Plant",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Plant,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
         SetupOutputVariable(state,
                             "Pipe Inlet Temperature",
                             OutputProcessor::Unit::C,
                             state.dataPipeHT->PipeHT(Item).FluidInletTemp,
-                            "Plant",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Plant,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
         SetupOutputVariable(state,
                             "Pipe Outlet Temperature",
                             OutputProcessor::Unit::C,
                             state.dataPipeHT->PipeHT(Item).FluidOutletTemp,
-                            "Plant",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::Plant,
+                            OutputProcessor::SOVStoreType::Average,
                             state.dataPipeHT->PipeHT(Item).Name);
     }
 }
@@ -818,7 +818,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
                                           std::string const &PipeType,         // module object of pipe (error messages)
                                           std::string const &ConstructionName, // construction name of pipe (error messages)
-                                          std::string const &FieldName,        // fieldname of pipe (error messages)
+                                          std::string_view FieldName,          // fieldname of pipe (error messages)
                                           int const ConstructionNum,           // pointer into construction data
                                           bool &ErrorsFound                    // set to true if errors found here
 )
@@ -910,7 +910,7 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
     }
 }
 
-void PipeHTData::oneTimeInit(EnergyPlusData &state)
+void PipeHTData::oneTimeInit_new(EnergyPlusData &state)
 {
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(
@@ -945,7 +945,7 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
     using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("InitPipesHeatTransfer");
+    static constexpr std::string_view RoutineName("InitPipesHeatTransfer");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -967,12 +967,6 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
     state.dataPipeHT->nsvOutletNodeNum = this->OutletNodeNum;
     state.dataPipeHT->nsvMassFlowRate = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRate;
     state.dataPipeHT->nsvInletTemp = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Temp;
-
-    // get some data only once
-    if (this->OneTimeInit) {
-        this->oneTimeInit(state);
-        this->OneTimeInit = false;
-    }
 
     // initialize temperatures by inlet node temp
     if ((state.dataGlobal->BeginSimFlag && this->BeginSimInit) || (state.dataGlobal->BeginEnvrnFlag && this->BeginSimEnvrn)) {
@@ -1717,7 +1711,7 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("PipeHeatTransfer::CalcPipeHeatTransCoef: ");
+    static constexpr std::string_view RoutineName("PipeHeatTransfer::CalcPipeHeatTransCoef: ");
     Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
     int const NumOfPropDivisions(13);  // intervals in property correlation
     static Array1D<Real64> const Temps(
@@ -1994,6 +1988,10 @@ Real64 PipeHTData::TBND(EnergyPlusData &state,
     TBND = this->groundTempModel->getGroundTempAtTimeInSeconds(state, z, curSimTime);
 
     return TBND;
+}
+
+void PipeHTData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 //===============================================================================

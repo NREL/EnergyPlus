@@ -179,7 +179,7 @@
   ConstructionProperty:InternalHeatSource,
     PanelSource,             !- Name
     PVSpandrlPanel,          !- Construction Name
-    1,                       !- Source Present After Layer Number
+    1,                       !- Thermal Source Present After Layer Number
     1,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.0,                     !- Tube Spacing {m}
@@ -354,6 +354,7 @@
     floor,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -370,6 +371,7 @@
     Wall,                    !- Surface Type
     PVSpandrlPanel,          !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -386,6 +388,7 @@
     Wall,                    !- Surface Type
     PVSpandrlPanel,          !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -402,6 +405,7 @@
     Wall,                    !- Surface Type
     PVSpandrlPanel,          !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -418,6 +422,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -434,6 +439,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -450,6 +456,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -466,6 +473,7 @@
     roof,                    !- Surface Type
     PVRoofPaverUnderlayment, !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     OtherSideConditionsModel,!- Outside Boundary Condition
     PVRoofPaverSystem1,      !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -482,6 +490,7 @@
     roof,                    !- Surface Type
     PVRoofPaverUnderlayment, !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     OtherSideConditionsModel,!- Outside Boundary Condition
     PVRoofPaverSystem2,      !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -498,6 +507,7 @@
     roof,                    !- Surface Type
     PVRoofPaverUnderlayment, !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     OtherSideConditionsModel,!- Outside Boundary Condition
     PVRoofPaverSystem3,      !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

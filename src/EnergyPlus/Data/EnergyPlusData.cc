@@ -140,7 +140,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataHVACCooledBeam = std::make_unique<HVACCooledBeamData>();
     this->dataHVACCtrl = std::make_unique<HVACCtrlData>();
     this->dataHVACDXHeatPumpSys = std::make_unique<HVACDXHeatPumpSystemData>();
-    this->dataHVACDXSys = std::make_unique<HVACDXSystemData>();
     this->dataHVACDuct = std::make_unique<HVACDuctData>();
     this->dataHVACFan = std::make_unique<HVACFanData>();
     this->dataHVACGlobal = std::make_unique<HVACGlobalsData>();
@@ -199,7 +198,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataOutputReports = std::make_unique<OutputReportsData>();
     this->dataOutsideEnergySrcs = std::make_unique<OutsideEnergySourcesData>();
     this->dataPTHP = std::make_unique<PackagedTerminalHeatPumpData>();
-    this->dataPVWatts = std::make_unique<PVWattsData>();
     this->dataPackagedThermalStorageCoil = std::make_unique<PackagedThermalStorageCoilData>();
     this->dataPhotovoltaic = std::make_unique<PhotovoltaicsData>();
     this->dataPhotovoltaicState = std::make_unique<PhotovoltaicStateData>();
@@ -399,7 +397,6 @@ void EnergyPlusData::clear_state()
     this->dataHVACCooledBeam->clear_state();
     this->dataHVACCtrl->clear_state();
     this->dataHVACDXHeatPumpSys->clear_state();
-    this->dataHVACDXSys->clear_state();
     this->dataHVACDuct->clear_state();
     this->dataHVACFan->clear_state();
     this->dataHVACGlobal->clear_state();
@@ -458,7 +455,6 @@ void EnergyPlusData::clear_state()
     this->dataOutputReports->clear_state();
     this->dataOutsideEnergySrcs->clear_state();
     this->dataPTHP->clear_state();
-    this->dataPVWatts->clear_state();
     this->dataPackagedThermalStorageCoil->clear_state();
     this->dataPhotovoltaic->clear_state();
     this->dataPhotovoltaicState->clear_state();

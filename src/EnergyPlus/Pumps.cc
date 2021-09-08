@@ -119,8 +119,8 @@ std::map<PumpType, std::string> cPumpTypes = {
     {PumpType::Bank_ConSpeed, cPumpBank_ConSpeed},
 };
 
-static std::string const fluidNameSteam("STEAM");
-static std::string const fluidNameWater("WATER");
+static constexpr std::string_view fluidNameSteam("STEAM");
+static constexpr std::string_view fluidNameWater("WATER");
 
 void SimPumps(EnergyPlusData &state,
               std::string const &PumpName, // Name of pump to be managed
@@ -246,8 +246,8 @@ void GetPumpInput(EnergyPlusData &state)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const StartTemp(100.0); // Standard Temperature across code to calculated Steam density
-    static std::string const RoutineName("GetPumpInput: ");
-    static std::string const RoutineNameNoColon("GetPumpInput");
+    static constexpr std::string_view RoutineName("GetPumpInput: ");
+    static constexpr std::string_view RoutineNameNoColon("GetPumpInput");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PumpNum;
@@ -349,7 +349,7 @@ void GetPumpInput(EnergyPlusData &state)
             state.dataPumps->PumpEquip(PumpNum).PumpControl = PumpControlType::Intermittent;
         } else {
             ShowWarningError(state,
-                             RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
+                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
                                  state.dataIPShortCut->cAlphaFieldNames(4));
             ShowContinueError(state,
                               "Entered Value=[" + state.dataIPShortCut->cAlphaArgs(4) + "]. " + state.dataIPShortCut->cAlphaFieldNames(4) +
@@ -362,7 +362,7 @@ void GetPumpInput(EnergyPlusData &state)
         state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
         if (!state.dataIPShortCut->lAlphaFieldBlanks(5) && !(state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
             ShowWarningError(state,
-                             RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
+                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
                                  state.dataIPShortCut->cAlphaFieldNames(5));
             ShowContinueError(state, "Schedule named =[" + state.dataIPShortCut->cAlphaArgs(5) + "]. was not found and will not be used.");
         }
@@ -389,7 +389,7 @@ void GetPumpInput(EnergyPlusData &state)
                    (state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate > state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate)) {
             // Check that the minimum isn't greater than the maximum
             ShowWarningError(state,
-                             RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid '" +
+                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid '" +
                                  state.dataIPShortCut->cNumericFieldNames(10) + "'");
             ShowContinueError(state,
                               format("Entered Value=[{:.5T}] is above the {}=[{:.5T}].",
@@ -444,14 +444,14 @@ void GetPumpInput(EnergyPlusData &state)
                 state.dataPumps->PumpEquip(PumpNum).VFD.ManualRPMSchedIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
                 if (state.dataPumps->PumpEquip(PumpNum).VFD.ManualRPMSchedIndex <= 0) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
                                         "\", At least one scheduled VFD schedule input was invalid.");
                     ShowContinueError(state, "Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
                     ErrorsFound = true;
                 } else if (!CheckScheduleValueMinMax(state, state.dataPumps->PumpEquip(PumpNum).VFD.ManualRPMSchedIndex, ">", 0.0) ||
                            !CheckScheduleValueMinMax(state, state.dataPumps->PumpEquip(PumpNum).VFD.ManualRPMSchedIndex, ">", 0.0)) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
                                         "\", A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero.");
                     ErrorsFound = true;
                 }
@@ -470,20 +470,20 @@ void GetPumpInput(EnergyPlusData &state)
                         state.dataPumps->PumpEquip(PumpNum).VFD.MinRPMSchedIndex,
                         state.dataPumps->PumpEquip(PumpNum).VFD.MaxRPMSchedIndex) <= 0) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
                                         "\", At least one scheduled VFD schedule input was invalid.");
                     ShowContinueError(state, "Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
                     ErrorsFound = true;
                 } else if (!CheckScheduleValueMinMax(state, state.dataPumps->PumpEquip(PumpNum).VFD.MinRPMSchedIndex, ">", 0.0) ||
                            !CheckScheduleValueMinMax(state, state.dataPumps->PumpEquip(PumpNum).VFD.MaxRPMSchedIndex, ">", 0.0)) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
                                         "\", A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero.");
                     ErrorsFound = true;
                 }
             } else {
                 ShowSevereError(state,
-                                RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
                                     "\", VFD Control type entered is invalid.  Use one of the key choice entries.");
                 ErrorsFound = true;
             }
@@ -512,7 +512,7 @@ void GetPumpInput(EnergyPlusData &state)
                 state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
-                                RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
                                     "\", sizing method type entered is invalid.  Use one of the key choice entries.");
                 ErrorsFound = true;
             }
@@ -621,7 +621,7 @@ void GetPumpInput(EnergyPlusData &state)
             state.dataPumps->PumpEquip(PumpNum).PumpControl = PumpControlType::Intermittent;
         } else {
             ShowWarningError(state,
-                             RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
+                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
                                  state.dataIPShortCut->cAlphaFieldNames(4));
             ShowContinueError(state,
                               "Entered Value=[" + state.dataIPShortCut->cAlphaArgs(4) + "]. " + state.dataIPShortCut->cAlphaFieldNames(4) +
@@ -634,7 +634,7 @@ void GetPumpInput(EnergyPlusData &state)
         state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
         if (!state.dataIPShortCut->lAlphaFieldBlanks(5) && !(state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
             ShowWarningError(state,
-                             RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
+                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
                                  state.dataIPShortCut->cAlphaFieldNames(5));
             ShowContinueError(state, "Schedule named =[" + state.dataIPShortCut->cAlphaArgs(5) + "]. was not found and will not be used.");
         }
@@ -693,7 +693,7 @@ void GetPumpInput(EnergyPlusData &state)
                 state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
-                                RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
                                     "\", sizing method type entered is invalid.  Use one of the key choice entries.");
                 ErrorsFound = true;
             }
@@ -774,7 +774,7 @@ void GetPumpInput(EnergyPlusData &state)
         state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
         if (!state.dataIPShortCut->lAlphaFieldBlanks(4) && !(state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
             ShowWarningError(state,
-                             RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
+                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
                                  state.dataIPShortCut->cAlphaFieldNames(4));
             ShowContinueError(state, "Schedule named =[" + state.dataIPShortCut->cAlphaArgs(4) + "]. was not found and will not be used.");
         }
@@ -834,7 +834,7 @@ void GetPumpInput(EnergyPlusData &state)
                 state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
-                                RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
                                     "\", sizing method type entered is invalid.  Use one of the key choice entries.");
                 ErrorsFound = true;
             }
@@ -916,7 +916,7 @@ void GetPumpInput(EnergyPlusData &state)
             state.dataPumps->PumpEquip(PumpNum).SequencingScheme = PumpBankControlSeq::UserDefined;
         } else {
             ShowWarningError(state,
-                             RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
+                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
                                  state.dataIPShortCut->cAlphaFieldNames(4));
             ShowContinueError(state,
                               "Entered Value=[" + state.dataIPShortCut->cAlphaArgs(4) + "]. " + state.dataIPShortCut->cAlphaFieldNames(4) +
@@ -931,7 +931,7 @@ void GetPumpInput(EnergyPlusData &state)
             state.dataPumps->PumpEquip(PumpNum).PumpControl = PumpControlType::Intermittent;
         } else {
             ShowWarningError(state,
-                             RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
+                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
                                  state.dataIPShortCut->cAlphaFieldNames(5));
             ShowContinueError(state,
                               "Entered Value=[" + state.dataIPShortCut->cAlphaArgs(5) + "]. " + state.dataIPShortCut->cAlphaFieldNames(5) +
@@ -944,7 +944,7 @@ void GetPumpInput(EnergyPlusData &state)
         state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
         if (!state.dataIPShortCut->lAlphaFieldBlanks(6) && !(state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
             ShowWarningError(state,
-                             RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
+                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
                                  state.dataIPShortCut->cAlphaFieldNames(6));
             ShowContinueError(state, "Schedule named =[" + state.dataIPShortCut->cAlphaArgs(6) + "]. was not found and will not be used.");
         }
@@ -992,7 +992,7 @@ void GetPumpInput(EnergyPlusData &state)
                 state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
-                                RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
                                     "\", sizing method type entered is invalid.  Use one of the key choice entries.");
                 ErrorsFound = true;
             }
@@ -1074,7 +1074,7 @@ void GetPumpInput(EnergyPlusData &state)
             state.dataPumps->PumpEquip(PumpNum).SequencingScheme = PumpBankControlSeq::SequentialScheme;
         } else {
             ShowWarningError(state,
-                             RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
+                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
                                  state.dataIPShortCut->cAlphaFieldNames(4));
             ShowContinueError(state,
                               "Entered Value=[" + state.dataIPShortCut->cAlphaArgs(4) + "]. " + state.dataIPShortCut->cAlphaFieldNames(4) +
@@ -1088,7 +1088,7 @@ void GetPumpInput(EnergyPlusData &state)
             state.dataPumps->PumpEquip(PumpNum).PumpControl = PumpControlType::Intermittent;
         } else {
             ShowWarningError(state,
-                             RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
+                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
                                  state.dataIPShortCut->cAlphaFieldNames(5));
             ShowContinueError(state,
                               "Entered Value=[" + state.dataIPShortCut->cAlphaArgs(5) + "]. " + state.dataIPShortCut->cAlphaFieldNames(5) +
@@ -1101,7 +1101,7 @@ void GetPumpInput(EnergyPlusData &state)
         state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
         if (!state.dataIPShortCut->lAlphaFieldBlanks(6) && !(state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex > 0)) {
             ShowWarningError(state,
-                             RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
+                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name + "\", Invalid " +
                                  state.dataIPShortCut->cAlphaFieldNames(6));
             ShowContinueError(state, "Schedule named =[" + state.dataIPShortCut->cAlphaArgs(6) + "]. was not found and will not be used.");
         }
@@ -1145,7 +1145,7 @@ void GetPumpInput(EnergyPlusData &state)
                 state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
-                                RoutineName + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
                                     "\", sizing method type entered is invalid.  Use one of the key choice entries.");
                 ErrorsFound = true;
             }
@@ -1184,8 +1184,8 @@ void GetPumpInput(EnergyPlusData &state)
                                 "Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPumps->PumpEquip(PumpNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPumps->PumpEquip(PumpNum).Name,
                                 _,
                                 "Electricity",
@@ -1196,43 +1196,43 @@ void GetPumpInput(EnergyPlusData &state)
                                 "Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPumps->PumpEquip(PumpNum).Power,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Shaft Power",
                                 OutputProcessor::Unit::W,
                                 state.dataPumps->PumpEquipReport(PumpNum).ShaftPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Fluid Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluid,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Fluid Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluidEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataPumps->PumpEquipReport(PumpNum).OutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataPumps->PumpEquipReport(PumpNum).PumpMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
         } break;
 
@@ -1243,8 +1243,8 @@ void GetPumpInput(EnergyPlusData &state)
                                 "Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPumps->PumpEquip(PumpNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPumps->PumpEquip(PumpNum).Name,
                                 _,
                                 "Electricity",
@@ -1255,50 +1255,50 @@ void GetPumpInput(EnergyPlusData &state)
                                 "Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPumps->PumpEquip(PumpNum).Power,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Shaft Power",
                                 OutputProcessor::Unit::W,
                                 state.dataPumps->PumpEquipReport(PumpNum).ShaftPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Fluid Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluid,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Fluid Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluidEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataPumps->PumpEquipReport(PumpNum).OutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataPumps->PumpEquipReport(PumpNum).PumpMassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Operating Pumps Count",
                                 OutputProcessor::Unit::None,
                                 state.dataPumps->PumpEquipReport(PumpNum).NumPumpsOperating,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
         } break;
         default: {
@@ -1334,29 +1334,29 @@ void GetPumpInput(EnergyPlusData &state)
                                 "Pump Zone Total Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Zone Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPumps->PumpEquipReport(PumpNum).ZoneTotalGainEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Zone Convective Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
             SetupOutputVariable(state,
                                 "Pump Zone Radiative Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPumps->PumpEquipReport(PumpNum).ZoneRadGainRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPumps->PumpEquip(PumpNum).Name);
 
             // setup internal gains
@@ -1443,7 +1443,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const StartTemp(100.0); // Standard Temperature across code to calculated Steam density
     Real64 const ZeroPowerTol(0.0000001);
-    static std::string const RoutineName("PlantPumps::InitializePumps ");
+    static constexpr std::string_view RoutineName("PlantPumps::InitializePumps ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InletNode;  // pump inlet node number
@@ -1722,9 +1722,6 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
     using PlantUtilities::BoundValueToWithinTwoValues;
     using ScheduleManager::GetCurrentScheduleValue;
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("PlantPumps:SetupPumpMinMaxFlows: ");
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InletNode;  // pump inlet node number
     int OutletNode; // pump outlet node number
@@ -1909,7 +1906,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("PlantPumps:CalcPumps: ");
+    static constexpr std::string_view RoutineName("PlantPumps:CalcPumps: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InletNode;
@@ -2089,7 +2086,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     if (state.dataPumps->Power < 0.0) {
         if (state.dataPumps->PumpEquip(PumpNum).PowerErrIndex1 == 0) {
             ShowWarningMessage(state,
-                               RoutineName + " Calculated Pump Power < 0, Type=" + cPumpTypes[pumpType] + ", Name=\"" +
+                               std::string{RoutineName} + " Calculated Pump Power < 0, Type=" + cPumpTypes[pumpType] + ", Name=\"" +
                                    state.dataPumps->PumpEquip(PumpNum).Name + "\".");
             ShowContinueErrorTimeStamp(state, "");
             ShowContinueError(state, format("...PartLoadRatio=[{:.4R}], Fraction Full Load Power={:.4R}]", PartLoadRatio, FracFullLoadPower));
@@ -2098,7 +2095,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
         }
         state.dataPumps->Power = 0.0;
         ShowRecurringWarningErrorAtEnd(state,
-                                       RoutineName + " Calculated Pump Power < 0, " + cPumpTypes[pumpType] + ", Name=\"" +
+                                       std::string{RoutineName} + " Calculated Pump Power < 0, " + cPumpTypes[pumpType] + ", Name=\"" +
                                            state.dataPumps->PumpEquip(PumpNum).Name + "\", PLR=",
                                        state.dataPumps->PumpEquip(PumpNum).PowerErrIndex1,
                                        PartLoadRatio,
@@ -2118,9 +2115,9 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
             TotalEffic = state.dataPumps->PumpEquip(PumpNum).PumpEffic * state.dataPumps->PumpEquip(PumpNum).MotorEffic;
             // Efficiency errors are caught previously, but it doesn't hurt to add another catch before dividing by zero!!!
             if (TotalEffic == 0.0) {
-                ShowSevereError(
-                    state,
-                    RoutineName + " Plant pressure simulation encountered a pump with zero efficiency: " + state.dataPumps->PumpEquip(PumpNum).Name);
+                ShowSevereError(state,
+                                std::string{RoutineName} + " Plant pressure simulation encountered a pump with zero efficiency: " +
+                                    state.dataPumps->PumpEquip(PumpNum).Name);
                 ShowContinueError(state, "Check efficiency inputs for this pump component.");
                 ShowFatalError(state, "Errors in plant calculation would result in divide-by-zero cause program termination.");
             }
@@ -2133,8 +2130,9 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
         TotalEffic = state.dataPumps->PumpEquip(PumpNum).PumpEffic * state.dataPumps->PumpEquip(PumpNum).MotorEffic;
         // Efficiency errors are caught previously, but it doesn't hurt to add another catch before dividing by zero!!!
         if (TotalEffic == 0.0) {
-            ShowSevereError(
-                state, RoutineName + " Plant pump simulation encountered a pump with zero efficiency: " + state.dataPumps->PumpEquip(PumpNum).Name);
+            ShowSevereError(state,
+                            std::string{RoutineName} +
+                                " Plant pump simulation encountered a pump with zero efficiency: " + state.dataPumps->PumpEquip(PumpNum).Name);
             ShowContinueError(state, "Check efficiency inputs for this pump component.");
             ShowFatalError(state, "Errors in plant calculation would result in divide-by-zero cause program termination.");
         }
@@ -2184,8 +2182,8 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const StartTemp(100.0); // Standard Temperature across code to calculated Steam density
-    static std::string const RoutineName("PlantPumps::InitSimVars ");
-    static std::string const RoutineNameSizePumps("SizePumps");
+    static constexpr std::string_view RoutineName("PlantPumps::InitSimVars ");
+    static constexpr std::string_view RoutineNameSizePumps("SizePumps");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PlantSizNum; // index of Plant Sizing array

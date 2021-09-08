@@ -249,9 +249,9 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     state->dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(1);
     state->dataSurface->SurfMaterialMovInsulInt.allocate(1);
     // testing variables
-    static std::string const Alpha1("FirstString");
-    static std::string const Alpha2("SecondString");
-    static std::string const AlphaField2("cSecondString");
+    static constexpr std::string_view Alpha1("FirstString");
+    static constexpr std::string_view Alpha2("SecondString");
+    static constexpr std::string_view AlphaField2("cSecondString");
     bool ErrFnd = false;
 
     auto &poolReference = state->dataSwimmingPools->Pool(1);

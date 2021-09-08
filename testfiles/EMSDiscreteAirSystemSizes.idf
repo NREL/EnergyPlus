@@ -1142,6 +1142,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1158,6 +1159,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1174,6 +1176,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1190,6 +1193,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1236,6 +1240,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore1_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1252,6 +1257,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1357,7 +1363,8 @@
     LGstore1_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     LGstore1,                !- Zone or ZoneList Name
-    696.7728;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    696.7728;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     LGstore1_Infiltration,   !- Name
@@ -1603,6 +1610,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1619,6 +1627,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1680,6 +1689,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LGstore1_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1696,6 +1706,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1712,6 +1723,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1743,6 +1755,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore2_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1758,7 +1771,8 @@
     SMstore1_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore1,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     SMstore1_Infiltration,   !- Name
@@ -2004,6 +2018,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2020,6 +2035,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2081,6 +2097,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore1_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2097,6 +2114,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2113,6 +2131,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2144,6 +2163,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore3_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2159,7 +2179,8 @@
     SMstore2_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore2,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     SMstore2_Infiltration,   !- Name
@@ -2405,6 +2426,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2421,6 +2443,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2482,6 +2505,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore2_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2498,6 +2522,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2514,6 +2539,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2545,6 +2571,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore4_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2560,7 +2587,8 @@
     SMstore3_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore3,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     SMstore3_Infiltration,   !- Name
@@ -2806,6 +2834,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2822,6 +2851,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2883,6 +2913,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore3_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2899,6 +2930,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2915,6 +2947,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2946,6 +2979,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LGstore2_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2961,7 +2995,8 @@
     SMstore4_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore4,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     SMstore4_Infiltration,   !- Name
@@ -3207,6 +3242,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3223,6 +3259,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore4_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3239,6 +3276,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3255,6 +3293,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3301,6 +3340,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore5_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3317,6 +3357,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3422,7 +3463,8 @@
     LGstore2_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     LGstore2,                !- Zone or ZoneList Name
-    696.7728;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    696.7728;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     LGstore2_Infiltration,   !- Name
@@ -3668,6 +3710,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3684,6 +3727,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3745,6 +3789,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LGstore2_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3761,6 +3806,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3777,6 +3823,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3808,6 +3855,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore6_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3823,7 +3871,8 @@
     SMstore5_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore5,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     SMstore5_Infiltration,   !- Name
@@ -4069,6 +4118,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4085,6 +4135,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4146,6 +4197,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore5_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4162,6 +4214,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4178,6 +4231,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4209,6 +4263,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore7_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4224,7 +4279,8 @@
     SMstore6_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore6,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     SMstore6_Infiltration,   !- Name
@@ -4470,6 +4526,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4486,6 +4543,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4547,6 +4605,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore6_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4563,6 +4622,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4579,6 +4639,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4610,6 +4671,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore8_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4625,7 +4687,8 @@
     SMstore7_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore7,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     SMstore7_Infiltration,   !- Name
@@ -4871,6 +4934,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4887,6 +4951,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4948,6 +5013,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore7_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4964,6 +5030,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4980,6 +5047,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5011,6 +5079,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5026,7 +5095,8 @@
     SMstore8_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore8,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     SMstore8_Infiltration,   !- Name
@@ -5348,8 +5418,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_1:1_OA,           !- Name
     PSZ-AC_1:1_OA_Controllers,  !- Controller List Name
-    PSZ-AC_1:1_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_1:1 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_1:1_OA_Equipment; !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC_1:1_OANode List;  !- Node or NodeList Name 1
@@ -5633,8 +5702,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_2:2_OA,           !- Name
     PSZ-AC_2:2_OA_Controllers,  !- Controller List Name
-    PSZ-AC_2:2_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_2:2 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_2:2_OA_Equipment; !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC_2:2_OANode List;  !- Node or NodeList Name 1
@@ -5918,8 +5986,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_3:3_OA,           !- Name
     PSZ-AC_3:3_OA_Controllers,  !- Controller List Name
-    PSZ-AC_3:3_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_3:3 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_3:3_OA_Equipment; !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC_3:3_OANode List;  !- Node or NodeList Name 1
@@ -6203,8 +6270,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_4:4_OA,           !- Name
     PSZ-AC_4:4_OA_Controllers,  !- Controller List Name
-    PSZ-AC_4:4_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_4:4 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_4:4_OA_Equipment; !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC_4:4_OANode List;  !- Node or NodeList Name 1
@@ -6488,8 +6554,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_5:5_OA,           !- Name
     PSZ-AC_5:5_OA_Controllers,  !- Controller List Name
-    PSZ-AC_5:5_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_5:5 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_5:5_OA_Equipment; !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC_5:5_OANode List;  !- Node or NodeList Name 1
@@ -6773,8 +6838,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_6:6_OA,           !- Name
     PSZ-AC_6:6_OA_Controllers,  !- Controller List Name
-    PSZ-AC_6:6_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_6:6 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_6:6_OA_Equipment; !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC_6:6_OANode List;  !- Node or NodeList Name 1
@@ -7058,8 +7122,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_7:7_OA,           !- Name
     PSZ-AC_7:7_OA_Controllers,  !- Controller List Name
-    PSZ-AC_7:7_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_7:7 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_7:7_OA_Equipment; !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC_7:7_OANode List;  !- Node or NodeList Name 1
@@ -7343,8 +7406,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_8:8_OA,           !- Name
     PSZ-AC_8:8_OA_Controllers,  !- Controller List Name
-    PSZ-AC_8:8_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_8:8 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_8:8_OA_Equipment; !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC_8:8_OANode List;  !- Node or NodeList Name 1
@@ -7628,8 +7690,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_9:9_OA,           !- Name
     PSZ-AC_9:9_OA_Controllers,  !- Controller List Name
-    PSZ-AC_9:9_OA_Equipment, !- Outdoor Air Equipment List Name
-    PSZ-AC_9:9 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_9:9_OA_Equipment; !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC_9:9_OANode List;  !- Node or NodeList Name 1
@@ -7913,8 +7974,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_10:10_OA,         !- Name
     PSZ-AC_10:10_OA_Controllers,  !- Controller List Name
-    PSZ-AC_10:10_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PSZ-AC_10:10 Availability Manager List;  !- Availability Manager List Name
+    PSZ-AC_10:10_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PSZ-AC_10:10_OANode List;!- Node or NodeList Name 1

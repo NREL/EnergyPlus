@@ -62,7 +62,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::FluidCoolers;
 using namespace EnergyPlus::DataSizing;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test1)
 {
@@ -269,7 +268,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test4)
         "     46.0,                    !- Design Entering Water Temperature {C}",
         "     35.0,                    !- Design Entering Air Temperature {C}",
         "     25.5,                    !- Design Entering Air Wetbulb Temperature {C}",
-        "     5.05-03,                 !- Design Water Flow Rate {m3/s}",
+        "     5.05e-03,                 !- Design Water Flow Rate {m3/s}",
         "     autosize,                !- Design Air Flow Rate {m3/s}",
         "     autosize;                !- Design Air Flow Rate Fan Power {W}",
     });
@@ -324,7 +323,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test5)
     // test input error check, if the nominal capacity specified and UA value is not zero, then it does not fatal out
     bool testResult = thisFluidCooler.validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
-    EXPECT_EQ(thisFluidCooler.PerformanceInputMethod_Num, PerfInputMethod::NOMINAL_CAPACITY);
+    EXPECT_TRUE(compare_enums(thisFluidCooler.PerformanceInputMethod_Num, PerfInputMethod::NOMINAL_CAPACITY));
     // UA value is reset to zero if nominal capacity is specified and input method is "NOMINAL_CAPACITY"
     EXPECT_EQ(thisFluidCooler.HighSpeedFluidCoolerUA, 0.0);
 }

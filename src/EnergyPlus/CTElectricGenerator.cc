@@ -361,15 +361,20 @@ namespace CTElectricGenerator {
 
     void CTGeneratorData::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable(
-            state, "Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Produced AC Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            this->ElecPowerGenerated,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->ElecEnergyGenerated,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             _,
                             "ElectricityProduced",
@@ -377,15 +382,20 @@ namespace CTElectricGenerator {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
-            state, "Generator " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator " + this->FuelType + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->FuelEnergyUseRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator " + this->FuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             _,
                             this->FuelType,
@@ -394,27 +404,53 @@ namespace CTElectricGenerator {
                             "Plant");
 
         //    general fuel use report (to match other generators)
-        SetupOutputVariable(
-            state, "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Fuel HHV Basis Rate",
+                            OutputProcessor::Unit::W,
+                            this->FuelEnergyUseRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(state, "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, this->FuelEnergy, "System", "Sum", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Fuel HHV Basis Energy",
+                            OutputProcessor::Unit::J,
+                            this->FuelEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Generator " + this->FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, this->FuelMdot, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator " + this->FuelType + " Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->FuelMdot,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Generator Exhaust Air Temperature", OutputProcessor::Unit::C, this->ExhaustStackTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Exhaust Air Temperature",
+                            OutputProcessor::Unit::C,
+                            this->ExhaustStackTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         if (this->HeatRecActive) {
-            SetupOutputVariable(
-                state, "Generator Exhaust Heat Recovery Rate", OutputProcessor::Unit::W, this->QExhaustRecovered, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Generator Exhaust Heat Recovery Rate",
+                                OutputProcessor::Unit::W,
+                                this->QExhaustRecovered,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Exhaust Heat Recovery Energy",
                                 OutputProcessor::Unit::J,
                                 this->ExhaustEnergyRec,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -422,15 +458,20 @@ namespace CTElectricGenerator {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
-                state, "Generator Lube Heat Recovery Rate", OutputProcessor::Unit::W, this->QLubeOilRecovered, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Generator Lube Heat Recovery Rate",
+                                OutputProcessor::Unit::W,
+                                this->QLubeOilRecovered,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Lube Heat Recovery Energy",
                                 OutputProcessor::Unit::J,
                                 this->LubeOilEnergyRec,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -438,30 +479,45 @@ namespace CTElectricGenerator {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
-                state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->QTotalHeatRecovered, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Generator Produced Thermal Rate",
+                                OutputProcessor::Unit::W,
+                                this->QTotalHeatRecovered,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Produced Thermal Energy", OutputProcessor::Unit::J, this->TotalHeatEnergyRec, "System", "Sum", this->Name);
+            SetupOutputVariable(state,
+                                "Generator Produced Thermal Energy",
+                                OutputProcessor::Unit::J,
+                                this->TotalHeatEnergyRec,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Heat Recovery Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 this->HeatRecInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Heat Recovery Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 this->HeatRecOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdot, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Generator Heat Recovery Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->HeatRecMdot,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
         }
     }
 
@@ -485,7 +541,7 @@ namespace CTElectricGenerator {
 
         Real64 const exhaustCp(1.047); // Exhaust Gas Specific Heat (J/kg-K)
         Real64 const KJtoJ(1000.0);    // convert Kjoules to joules
-        static std::string const RoutineName("CalcCTGeneratorModel");
+        static constexpr std::string_view RoutineName("CalcCTGeneratorModel");
 
         // min allowed operating frac full load
         Real64 minPartLoadRat = this->MinPartLoadRat;

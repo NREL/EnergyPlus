@@ -219,6 +219,7 @@
     Wall,                    !- Surface Type
     Gable FATM,              !- Construction Name
     Attic Thermal Zone,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -235,6 +236,7 @@
     Wall,                    !- Surface Type
     Gable FATM,              !- Construction Name
     Attic Thermal Zone,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -250,6 +252,7 @@
     Wall,                    !- Surface Type
     Gable FATM,              !- Construction Name
     Attic Thermal Zone,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -266,6 +269,7 @@
     Wall,                    !- Surface Type
     Gable FATM,              !- Construction Name
     Attic Thermal Zone,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -281,6 +285,7 @@
     Floor,                   !- Surface Type
     Ceiling FATM,            !- Construction Name
     Attic Thermal Zone,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zone Ceiling,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -297,6 +302,7 @@
     Roof,                    !- Surface Type
     Roof FATM,               !- Construction Name
     Attic Thermal Zone,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -313,6 +319,7 @@
     Roof,                    !- Surface Type
     Roof FATM,               !- Construction Name
     Attic Thermal Zone,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -329,6 +336,7 @@
     Floor,                   !- Surface Type
     FLOOR:LIVING,            !- Construction Name
     Occupied Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -345,6 +353,7 @@
     Wall,                    !- Surface Type
     EXTWALL:LIVING,          !- Construction Name
     Occupied Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -361,6 +370,7 @@
     Wall,                    !- Surface Type
     EXTWALL:LIVING,          !- Construction Name
     Occupied Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -377,6 +387,7 @@
     Wall,                    !- Surface Type
     EXTWALL:LIVING,          !- Construction Name
     Occupied Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -393,6 +404,7 @@
     Wall,                    !- Surface Type
     EXTWALL:LIVING,          !- Construction Name
     Occupied Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -409,6 +421,7 @@
     Ceiling,                 !- Surface Type
     Ceiling FATM,            !- Construction Name
     Occupied Thermal Zone,   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Attic Ceiling,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -753,7 +766,8 @@
     TRUSSES,                 !- Name
     Trusses,                 !- Construction Name
     Attic Thermal Zone,      !- Zone or ZoneList Name
-    3.9;                     !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    3.9;                     !- Extended Field
 
   Schedule:Compact,
     Heating/Cooling Setpoints,  !- Name
