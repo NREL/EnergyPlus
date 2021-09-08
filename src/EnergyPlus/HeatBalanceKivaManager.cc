@@ -652,7 +652,7 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 {
     Kiva::setMessageCallback(kivaErrorCallback, nullptr);
     bool ErrorsFound = false;
-    
+
     if (state.dataZoneCtrls->GetZoneAirStatsInputFlag) {
         ZoneTempPredictorCorrector::GetZoneAirSetPoints(state);
         state.dataZoneCtrls->GetZoneAirStatsInputFlag = false;
