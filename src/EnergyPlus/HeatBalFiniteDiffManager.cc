@@ -179,10 +179,9 @@ namespace HeatBalFiniteDiffManager {
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(1)) {
                 {
-                    int SchemeTypeNum = getEnumerationValue(CondFDSchemeTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1));
-                    if (SchemeTypeNum >= 0) {
-                        state.dataHeatBalFiniteDiffMgr->CondFDSchemeType = static_cast<CondFDScheme>(SchemeTypeNum);
-                    } else {
+                    state.dataHeatBalFiniteDiffMgr->CondFDSchemeType =
+                        static_cast<CondFDScheme>(getEnumerationValue(CondFDSchemeTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::Unassigned) {
                         ShowSevereError(state,
                                         cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                             " entered=" + state.dataIPShortCut->cAlphaArgs(1) +

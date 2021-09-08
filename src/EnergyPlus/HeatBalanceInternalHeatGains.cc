@@ -95,7 +95,7 @@ void SetupZoneInternalGain(EnergyPlusData &state,
 }
 void SetupSpaceInternalGain(EnergyPlusData &state,
                             int const spaceNum,
-                            Real64 spaceGainFraction,            // Fraction of gain value assigned to this space
+                            Real64 spaceGainFraction,                 // Fraction of gain value assigned to this space
                             std::string_view const &cComponentObject, // object class name for device contributing internal gain
                             std::string_view const &cComponentName,   // user unique name for device
                             DataHeatBalance::IntGainType const IntGainCompType,
