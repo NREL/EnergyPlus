@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
 
     EXPECT_EQ(1u, state->dataWaterData->WaterStorage.size());
     int TankNum = 1;
-    EXPECT_EQ(DataWater::ControlSupplyType::WellFloatMainsBackup, state->dataWaterData->WaterStorage(TankNum).ControlSupply);
+    EXPECT_TRUE(compare_enums(DataWater::ControlSupplyType::WellFloatMainsBackup, state->dataWaterData->WaterStorage(TankNum).ControlSupply));
     EXPECT_EQ(0u, state->dataWaterData->WaterStorage(TankNum).NumWaterDemands);
     EXPECT_EQ(0.003, state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate);
     EXPECT_EQ(0.20, state->dataWaterData->WaterStorage(TankNum).ValveOnCapacity);

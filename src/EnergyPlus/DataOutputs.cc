@@ -145,8 +145,8 @@ OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::s
         break;
     }
     if (is_simple_string) return;
-    pattern = new RE2(KeyValue);
-    case_insensitive_pattern = new RE2("(?i)" + KeyValue);
+    pattern = std::make_shared<RE2>(KeyValue);
+    case_insensitive_pattern = std::make_shared<RE2>("(?i)" + KeyValue);
     if (!pattern->ok()) {
         ShowSevereError(state, "Regular expression \"" + KeyValue + "\" for variable name \"" + VariableName + "\" in input file is incorrect");
         ShowContinueError(state, pattern->error());

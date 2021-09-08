@@ -301,6 +301,7 @@
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -317,6 +318,7 @@
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -333,6 +335,7 @@
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -349,6 +352,7 @@
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -365,6 +369,7 @@
     Roof,                    !- Surface Type
     Roof Construction,       !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -381,6 +386,7 @@
     Floor,                   !- Surface Type
     Floor Construction,      !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     OtherSideConditionsModel,!- Outside Boundary Condition
     GroundCoupledOSCM,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure

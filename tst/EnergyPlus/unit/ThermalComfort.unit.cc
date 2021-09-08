@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -81,7 +82,6 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalSurface;
 // using namespace EnergyPlus::ScheduleManager;
 using namespace SimulationManager;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 {
@@ -507,6 +507,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -523,6 +524,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -539,6 +541,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -555,6 +558,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -571,6 +575,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -587,6 +592,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -603,6 +609,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -619,6 +626,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -635,6 +643,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -651,6 +660,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -667,6 +677,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -683,6 +694,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -753,13 +765,11 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     int SurfNum(1);
     Real64 RadTemp;
 
-    state->dataHeatBalSurf->TH.deallocate();
-    state->dataSurface->Surface.deallocate();
-    state->dataHeatBal->Zone.deallocate();
     state->dataThermalComforts->AngleFactorList.allocate(1);
     state->dataSurface->TotSurfaces = 3;
     state->dataGlobal->NumOfZones = 1;
-    state->dataHeatBalSurf->TH.allocate(2, 2, state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfInsideTempHist.allocate(1);
+    state->dataHeatBalSurf->SurfInsideTempHist(1).allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->Zone.allocate(1);
@@ -781,9 +791,9 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     state->dataSurface->Surface(3).Zone = 1;
     state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).HTSurfaceLast = 3;
-    state->dataHeatBalSurf->TH(2, 1, 1) = 20.0;
-    state->dataHeatBalSurf->TH(2, 1, 2) = 15.0;
-    state->dataHeatBalSurf->TH(2, 1, 3) = 10.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(1) = 20.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(2) = 15.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(3) = 10.0;
 
     SurfNum = 1;
     state->dataThermalComforts->clear_state();
@@ -818,17 +828,17 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT)
     state->dataThermalComforts->AngleFactorList(1).AngleFactor(2) = 0.3;
     state->dataThermalComforts->AngleFactorList(1).AngleFactor(3) = 0.2;
 
-    state->dataHeatBalSurf->TH.deallocate();
     state->dataSurface->TotSurfaces = state->dataThermalComforts->AngleFactorList(1).TotAngleFacSurfaces;
-    state->dataHeatBalSurf->TH.allocate(2, 2, state->dataSurface->TotSurfaces);
+    state->dataHeatBalSurf->SurfInsideTempHist.allocate(1);
+    state->dataHeatBalSurf->SurfInsideTempHist(1).allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->Surface.deallocate();
     state->dataConstruction->Construct.deallocate();
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataSurface->TotSurfaces);
 
-    state->dataHeatBalSurf->TH(2, 1, 1) = 20.0;
-    state->dataHeatBalSurf->TH(2, 1, 2) = 15.0;
-    state->dataHeatBalSurf->TH(2, 1, 3) = 10.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(1) = 20.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(2) = 15.0;
+    state->dataHeatBalSurf->SurfInsideTempHist(1)(3) = 10.0;
     state->dataSurface->Surface(1).Construction = 1;
     state->dataSurface->Surface(2).Construction = 2;
     state->dataSurface->Surface(3).Construction = 3;
@@ -955,11 +965,12 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBalFanSys->ZoneAirHumRatAvgComf.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneDV.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneUI.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QHTRadSysToPerson.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QCoolingPanelToPerson.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QHWBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QSteamBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBalFanSys->QElecBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQdotRadHVACToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQHTRadSysToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQCoolingPanelToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQHWBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQSteamBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneQElecBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
 
     state->dataHeatBal->People(1).ZonePtr = 1;
     state->dataHeatBal->People(1).NumberOfPeoplePtr = -1;
@@ -978,11 +989,11 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->People(1).ClothingType = 1;
 
     state->dataRoomAirMod->IsZoneDV(1) = state->dataRoomAirMod->IsZoneUI(1) = false;
-    state->dataHeatBalFanSys->QHTRadSysToPerson(1) = 0.0;
-    state->dataHeatBalFanSys->QCoolingPanelToPerson(1) = 0.0;
-    state->dataHeatBalFanSys->QHWBaseboardToPerson(1) = 0.0;
-    state->dataHeatBalFanSys->QSteamBaseboardToPerson(1) = 0.0;
-    state->dataHeatBalFanSys->QElecBaseboardToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQHTRadSysToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQCoolingPanelToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQHWBaseboardToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQSteamBaseboardToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneQElecBaseboardToPerson(1) = 0.0;
     Real64 BodySurfaceArea = 1.8258;
     state->dataEnvrn->OutBaroPress = 101325.;
     Real64 WorkEff = 0.0;
@@ -1367,6 +1378,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -1383,6 +1395,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1399,6 +1412,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1415,6 +1429,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1431,6 +1446,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1447,6 +1463,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1463,6 +1480,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -1479,6 +1497,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1495,6 +1514,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1511,6 +1531,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1527,6 +1548,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1543,6 +1565,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Spacex10,                 !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1575,6 +1598,38 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -5.5896341565108720, 0.001);
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 100.0, 0.001);
+}
+
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveCEN15251)
+{
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/ThermalComfortCEN15251Test.epw";
+
+    // test the initialisation
+    state->dataEnvrn->DayOfYear = 1;
+    state->dataEnvrn->CurrentYearIsLeapYear = false;
+    CalcThermalComfortAdaptiveCEN15251(*state, true, true, 0.0);
+    EXPECT_NEAR(state->dataThermalComforts->runningAverageCEN, -1.3671408, 0.01);
+
+    // skip the first day
+    Array1D<Real64> HourlyDryBulbTemp = {
+        -4.8, -5.4, -5.7, -5.9, -6.1, -6.2, -7.2, -6.7, -6.7, -5.6, -5., -4.4, -5., -3.9, -5., -5., -6.7, -7.8, -9.4, -9.4, -9.4, -9.4, -7.8, -7.2,
+    };
+    state->dataGlobal->BeginDayFlag = true;
+    state->dataGlobal->BeginHourFlag = true;
+    for (int i = 1; i <= 24; i++) {
+        state->dataEnvrn->OutDryBulbTemp = HourlyDryBulbTemp(i);
+        CalcThermalComfortAdaptiveCEN15251(*state, false);
+        if (i == 1) {
+            state->dataGlobal->BeginDayFlag = false;
+        }
+    }
+
+    // test the second day
+    state->dataEnvrn->DayOfYear += 1;
+    state->dataGlobal->BeginDayFlag = true;
+    CalcThermalComfortAdaptiveCEN15251(*state, false);
+    EXPECT_NEAR(state->dataThermalComforts->runningAverageCEN, -2.3912126, 0.01);
+    state->dataGlobal->BeginDayFlag = false;
 }
 
 TEST_F(EnergyPlusFixture, ThermalComfort_GetAngleFactorListTest)

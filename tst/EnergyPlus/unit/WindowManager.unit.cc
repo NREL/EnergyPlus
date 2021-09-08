@@ -151,6 +151,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
                           "  Wall,                    !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
                           "  Zone,                    !- Zone Name",
+                          "    ,                        !- Space Name",
                           "  Outdoors,                !- Outside Boundary Condition",
                           "  ,                        !- Outside Boundary Condition Object",
                           "  SunExposed,              !- Sun Exposure",
@@ -166,6 +167,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
                           "  Floor,                   !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
                           "  Zone,                    !- Zone Name",
+                          "    ,                        !- Space Name",
                           "  Outdoors,                !- Outside Boundary Condition",
                           "  ,                        !- Outside Boundary Condition Object",
                           "  NoSun,                   !- Sun Exposure",
@@ -188,8 +190,6 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
                           "  autocalculate;           !- Volume {m3}"});
 
     ASSERT_TRUE(process_idf(idf_objects));
-
-    state->dataHeatBal->ZoneIntGain.allocate(1);
 
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
@@ -426,6 +426,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
                           "  Wall,                    !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
                           "  Zone,                    !- Zone Name",
+                          "    ,                        !- Space Name",
                           "  Outdoors,                !- Outside Boundary Condition",
                           "  ,                        !- Outside Boundary Condition Object",
                           "  SunExposed,              !- Sun Exposure",
@@ -441,6 +442,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
                           "  Floor,                   !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
                           "  Zone,                    !- Zone Name",
+                          "    ,                        !- Space Name",
                           "  Outdoors,                !- Outside Boundary Condition",
                           "  ,                        !- Outside Boundary Condition Object",
                           "  NoSun,                   !- Sun Exposure",
@@ -546,10 +548,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 25.0;
-    state->dataHeatBalFanSys->QHTRadSysSurf.allocate(3);
-    state->dataHeatBalFanSys->QHWBaseboardSurf.allocate(3);
-    state->dataHeatBalFanSys->QSteamBaseboardSurf.allocate(3);
-    state->dataHeatBalFanSys->QElecBaseboardSurf.allocate(3);
+    state->dataHeatBalSurf->SurfQdotRadHVACInPerArea.allocate(3);
     state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
     state->dataHeatBal->SurfQRadThermInAbs.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
@@ -591,10 +590,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
     state->dataHeatBal->SurfQRadThermInAbs = 0.0;
 
-    state->dataHeatBalFanSys->QHTRadSysSurf = 0.0;
-    state->dataHeatBalFanSys->QHWBaseboardSurf = 0.0;
-    state->dataHeatBalFanSys->QSteamBaseboardSurf = 0.0;
-    state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
+    state->dataHeatBalSurf->SurfQdotRadHVACInPerArea = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->EnclSolQSWRad = 0.0;
 
@@ -1845,6 +1841,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1861,6 +1858,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1877,6 +1875,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    PARTITION06,             !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn003:Wall004,           !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1893,6 +1892,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    PARTITION06,             !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn002:Wall004,           !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1909,6 +1909,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR SLAB 8 IN,         !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1925,6 +1926,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    CEILING,                 !- Surface Type",
         "    CEILING:ZONE,            !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn004:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1941,6 +1943,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    EAST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1957,6 +1960,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    EAST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1973,6 +1977,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    EAST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1989,6 +1994,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    PARTITION06,             !- Construction Name",
         "    EAST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Wall004,           !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2005,6 +2011,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    PARTITION06,             !- Construction Name",
         "    EAST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn003:Wall005,           !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2021,6 +2028,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR SLAB 8 IN,         !- Construction Name",
         "    EAST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn002:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2037,6 +2045,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    CEILING,                 !- Surface Type",
         "    CEILING:ZONE,            !- Construction Name",
         "    EAST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn004:Flr002,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2053,6 +2062,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    NORTH ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2069,6 +2079,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    NORTH ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2085,6 +2096,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    NORTH ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2101,6 +2113,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    PARTITION06,             !- Construction Name",
         "    NORTH ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Wall003,           !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2117,6 +2130,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    PARTITION06,             !- Construction Name",
         "    NORTH ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn002:Wall005,           !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2133,6 +2147,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR SLAB 8 IN,         !- Construction Name",
         "    NORTH ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn003:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2149,6 +2164,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    CEILING,                 !- Surface Type",
         "    CEILING:ZONE,            !- Construction Name",
         "    NORTH ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn004:Flr003,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2165,6 +2181,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2181,6 +2198,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2197,6 +2215,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2213,6 +2232,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2229,6 +2249,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2245,6 +2266,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2261,6 +2283,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2277,6 +2300,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2293,6 +2317,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Roof,                    !- Surface Type",
         "    ROOF34,                  !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2309,6 +2334,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Roof,                    !- Surface Type",
         "    ROOF34,                  !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2325,6 +2351,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Roof,                    !- Surface Type",
         "    ROOF34,                  !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -2341,6 +2368,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Floor,                   !- Surface Type",
         "    CEILING:ATTIC,           !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Ceil001,           !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2357,6 +2385,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Floor,                   !- Surface Type",
         "    CEILING:ATTIC,           !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn002:Ceil001,           !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2373,6 +2402,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Floor,                   !- Surface Type",
         "    CEILING:ATTIC,           !- Construction Name",
         "    ATTIC ZONE,              !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn003:Ceil001,           !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2652,6 +2682,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
                           "  Wall,                    !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
                           "  Zone,                    !- Zone Name",
+                          "    ,                        !- Space Name",
                           "  Outdoors,                !- Outside Boundary Condition",
                           "  ,                        !- Outside Boundary Condition Object",
                           "  SunExposed,              !- Sun Exposure",
@@ -2667,6 +2698,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
                           "  Floor,                   !- Surface Type",
                           "  WallConstruction,        !- Construction Name",
                           "  Zone,                    !- Zone Name",
+                          "    ,                        !- Space Name",
                           "  Outdoors,                !- Outside Boundary Condition",
                           "  ,                        !- Outside Boundary Condition Object",
                           "  NoSun,                   !- Sun Exposure",
@@ -2775,10 +2807,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 25.0;
-    state->dataHeatBalFanSys->QHTRadSysSurf.allocate(3);
-    state->dataHeatBalFanSys->QHWBaseboardSurf.allocate(3);
-    state->dataHeatBalFanSys->QSteamBaseboardSurf.allocate(3);
-    state->dataHeatBalFanSys->QElecBaseboardSurf.allocate(3);
+    state->dataHeatBalSurf->SurfQdotRadHVACInPerArea.allocate(3);
     state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
     state->dataHeatBal->SurfQRadThermInAbs.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
@@ -2819,10 +2848,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
     state->dataHeatBal->SurfQRadThermInAbs = 0.0;
 
-    state->dataHeatBalFanSys->QHTRadSysSurf = 0.0;
-    state->dataHeatBalFanSys->QHWBaseboardSurf = 0.0;
-    state->dataHeatBalFanSys->QSteamBaseboardSurf = 0.0;
-    state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
+    state->dataHeatBalSurf->SurfQdotRadHVACInPerArea = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->EnclSolQSWRad = 0.0;
 
@@ -2866,7 +2892,7 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
     HeatBalanceManager::GetMaterialData(*state, errors_found);
     EXPECT_FALSE(errors_found);
     EXPECT_EQ(state->dataHeatBal->ComplexShade(1).Name, "SHADE_14_LAYER");
-    EXPECT_EQ(state->dataHeatBal->ComplexShade(1).LayerType, TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ);
+    EXPECT_TRUE(compare_enums(state->dataHeatBal->ComplexShade(1).LayerType, TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ));
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).Thickness, 1.016000e-003, 1e-5);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).Conductivity, 1.592276e+002, 1e-5);
     EXPECT_NEAR(state->dataHeatBal->ComplexShade(1).IRTransmittance, 0, 1e-5);
