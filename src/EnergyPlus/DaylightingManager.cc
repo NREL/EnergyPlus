@@ -462,24 +462,24 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
         CalcMinIntWinSolidAngs(state);
 
         // Warning if detailed daylighting has been requested for a zone with no associated exterior windows.
-        for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
-            int enclNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex;
-            if (state.dataDaylightingData->daylightControl(daylightCtrlNum).TotalDaylRefPoints > 0) {
-                if (state.dataDaylightingData->enclDaylight(enclNum).NumOfDayltgExtWins == 0 &&
-                    state.dataDaylightingData->enclDaylight(enclNum).TotalExtWindows == 0) {
-                    ShowWarningError(state,
-                                     "Detailed daylighting will not be done for Daylighting:Controls=" +
-                                         state.dataDaylightingData->daylightControl(daylightCtrlNum).Name);
-                    ShowContinueError(state, "because it has no associated exterior windows.");
+        for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+            auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
+            if (thisEnclDaylight.NumOfDayltgExtWins == 0 && thisEnclDaylight.TotalExtWindows == 0) {
+                for (int daylightCtrlNum : thisEnclDaylight.daylightControlIndexes) {
+                    if (state.dataDaylightingData->daylightControl(daylightCtrlNum).TotalDaylRefPoints > 0) {
+                        ShowWarningError(state,
+                                         "Detailed daylighting will not be done for Daylighting:Controls=" +
+                                             state.dataDaylightingData->daylightControl(daylightCtrlNum).Name);
+                        ShowContinueError(state, "because it has no associated exterior windows.");
+                    }
                 }
+            }
 
-                // Find area and reflectance quantities used in calculating inter-reflected illuminance.
-                // TH 9/10/2009. Need to calculate for zones without daylighting controls (TotalDaylRefPoints = 0)
-                // but with adjacent zones having daylighting controls.
-                if ((state.dataDaylightingData->enclDaylight(enclNum).NumOfDayltgExtWins > 0) ||
-                    state.dataDaylightingData->enclDaylight(enclNum).adjEnclHasDayltgCtrl) {
-                    DayltgAveInteriorReflectance(state, enclNum);
-                }
+            // Find area and reflectance quantities used in calculating inter-reflected illuminance.
+            // TH 9/10/2009. Need to calculate for zones without daylighting controls (TotalDaylRefPoints = 0)
+            // but with adjacent zones having daylighting controls.
+            if ((thisEnclDaylight.NumOfDayltgExtWins > 0) || thisEnclDaylight.adjEnclHasDayltgCtrl) {
+                DayltgAveInteriorReflectance(state, enclNum);
             }
         }
     }
@@ -10113,7 +10113,7 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
                         ++NumList;
                         int enclNumAdj = state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex;
                         thisEnclDaylight.AdjIntWinEnclNums(NumList) = enclNumAdj;
-                        thisEnclDaylight.adjEnclHasDayltgCtrl = true;
+                        state.dataDaylightingData->enclDaylight(enclNumAdj).adjEnclHasDayltgCtrl = true;
                         break;
                     }
                 }
@@ -10153,7 +10153,7 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
                     // now count interior windows shared by both zones
                     int NumOfIntWindowsCount = 0;
                     for (int SurfNumAdj2 : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
-                        if ((state.dataSurface->Surface(SurfNumAdj).Class == SurfaceClass::Window) &&
+                        if ((state.dataSurface->Surface(SurfNumAdj2).Class == SurfaceClass::Window) &&
                             (state.dataSurface->Surface(SurfNumAdj2).ExtBoundCond >= 1)) {
                             // This is an interior window in ZoneNumAdj
                             if (state.dataSurface->Surface(state.dataSurface->Surface(SurfNumAdj2).ExtBoundCond).SolarEnclIndex == enclNum) {
@@ -10167,7 +10167,7 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
                     thisEnclDaylight.IntWinAdjEnclExtWin(ExtWinIndex).IntWinNum = 0;
                     int IntWinIndex = 0;
                     for (int SurfNumAdj2 : state.dataViewFactor->EnclSolInfo(adjEnclNum).SurfacePtr) {
-                        if ((state.dataSurface->Surface(SurfNumAdj).Class == SurfaceClass::Window) &&
+                        if ((state.dataSurface->Surface(SurfNumAdj2).Class == SurfaceClass::Window) &&
                             (state.dataSurface->Surface(SurfNumAdj2).ExtBoundCond >= 1)) {
                             // This is an interior window in ZoneNumAdj
                             if (state.dataSurface->Surface(state.dataSurface->Surface(SurfNumAdj2).ExtBoundCond).SolarEnclIndex == enclNum) {
@@ -10292,17 +10292,19 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
 
             thisEnclDaylight.NumOfDayltgExtWins = enclExtWin(enclNum);
             int winSize = enclExtWin(enclNum);
+
             for (int controlNum : thisEnclDaylight.daylightControlIndexes) {
                 auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
-                thisDaylightControl.DaylIllFacSky.allocate(24, MaxSlatAngs + 1, 4, thisEnclNumRefPoints, winSize);
-                thisDaylightControl.DaylSourceFacSky.allocate(24, MaxSlatAngs + 1, 4, thisEnclNumRefPoints, winSize);
-                thisDaylightControl.DaylBackFacSky.allocate(24, MaxSlatAngs + 1, 4, thisEnclNumRefPoints, winSize);
-                thisDaylightControl.DaylIllFacSun.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
-                thisDaylightControl.DaylIllFacSunDisk.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
-                thisDaylightControl.DaylSourceFacSun.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
-                thisDaylightControl.DaylSourceFacSunDisk.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
-                thisDaylightControl.DaylBackFacSun.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
-                thisDaylightControl.DaylBackFacSunDisk.allocate(24, MaxSlatAngs + 1, thisEnclNumRefPoints, winSize);
+                int refSize = thisDaylightControl.TotalDaylRefPoints;
+                thisDaylightControl.DaylIllFacSky.allocate(24, MaxSlatAngs + 1, 4, refSize, winSize);
+                thisDaylightControl.DaylSourceFacSky.allocate(24, MaxSlatAngs + 1, 4, refSize, winSize);
+                thisDaylightControl.DaylBackFacSky.allocate(24, MaxSlatAngs + 1, 4, refSize, winSize);
+                thisDaylightControl.DaylIllFacSun.allocate(24, MaxSlatAngs + 1, refSize, winSize);
+                thisDaylightControl.DaylIllFacSunDisk.allocate(24, MaxSlatAngs + 1, refSize, winSize);
+                thisDaylightControl.DaylSourceFacSun.allocate(24, MaxSlatAngs + 1, refSize, winSize);
+                thisDaylightControl.DaylSourceFacSunDisk.allocate(24, MaxSlatAngs + 1, refSize, winSize);
+                thisDaylightControl.DaylBackFacSun.allocate(24, MaxSlatAngs + 1, refSize, winSize);
+                thisDaylightControl.DaylBackFacSunDisk.allocate(24, MaxSlatAngs + 1, refSize, winSize);
             }
         } // End of check if thisEnclNumRefPoints > 0
 

@@ -96,17 +96,16 @@ namespace DataDaylighting {
         DElightDaylighting
     };
 
-    // Parameters for "Lighting Control Type"
+    // Parameters for "Lighting Control Type" - these are the values expected by DElight
     enum class LtgCtrlType
     {
-        Invalid = -1,
-        Continuous,
-        Stepped,
-        ContinuousOff,
-        NUM
+        Invalid = 0,
+        Continuous = 1,
+        Stepped = 2,
+        ContinuousOff = 3,
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(LtgCtrlType::NUM)> LtgCtrlTypeNamesUC = {"CONTINUOUS", "STEPPED", "CONTINUOUSOFF"};
+    constexpr std::array<std::string_view, 4> LtgCtrlTypeNamesUC = {"INVALID", "CONTINUOUS", "STEPPED", "CONTINUOUSOFF"};
 
     struct IntWinAdjEnclExtWinStruct // nested structure for EnclDaylightCalc
     {
@@ -148,7 +147,7 @@ namespace DataDaylighting {
         int enclIndex = 0;    // Index to enclosure where the daylighting:controls object is located
         DataDaylighting::iDaylightingMethod DaylightMethod = iDaylightingMethod::NoDaylighting; // Type of Daylighting (1=SplitFlux, 2=DElight)
         int AvailSchedNum = 0;                                                                  // pointer to availability schedule if present
-        int TotalDaylRefPoints = 0;        // Number of daylighting reference points in a zone (0,1 or 2)
+        int TotalDaylRefPoints = 0;        // Number of daylighting reference points for this control
         Array1D_int DaylRefPtNum;          // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
         Array2D<Real64> DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
         // in absolute coordinate system (m)
