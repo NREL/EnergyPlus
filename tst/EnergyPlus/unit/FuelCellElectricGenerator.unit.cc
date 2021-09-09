@@ -803,7 +803,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_EQ("GENERATOR FUEL CELL 1", generatorController->name);
     EXPECT_EQ("GENERATOR:FUELCELL", generatorController->typeOfName);
 
-    EXPECT_EQ(DataPlant::PlantEquipmentType::Generator_FCExhaust, generatorController->compPlantTypeOf);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::Generator_FCExhaust,  generatorController->compPlantTypeOf));
 
     // Note: plantInfoFound (and cogenLocation) are only set when mode is FollowThermal or FollowThermalLimitElectric
     // Here it's 'Baseload'
@@ -1750,7 +1750,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     EXPECT_EQ("GENERATOR FUEL CELL 1", generatorController->name);
     EXPECT_EQ("GENERATOR:FUELCELL", generatorController->typeOfName);
 
-    EXPECT_EQ(DataPlant::PlantEquipmentType::Generator_FCExhaust, generatorController->compPlantTypeOf);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::Generator_FCExhaust,  generatorController->compPlantTypeOf));
 
     // Note: plantInfoFound (and cogenLocation) are only set when mode is FollowThermal or FollowThermalLimitElectric
     // Here it's 'Baseload'

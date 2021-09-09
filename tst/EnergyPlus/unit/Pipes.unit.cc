@@ -74,7 +74,7 @@ TEST_F(EnergyPlusFixture, TestPipesInput)
     ASSERT_TRUE(process_idf(idf_objects));
     Pipes::GetPipeInput(*state);
     EXPECT_EQ(2u, state->dataPipes->LocalPipe.size());
-    EXPECT_EQ(DataPlant::PlantEquipmentType::Pipe, state->dataPipes->LocalPipe(1).TypeOf);
-    EXPECT_EQ(DataPlant::PlantEquipmentType::PipeSteam, state->dataPipes->LocalPipe(2).TypeOf);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::Pipe,  state->dataPipes->LocalPipe(1).TypeOf));
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::PipeSteam,  state->dataPipes->LocalPipe(2).TypeOf));
 }
 } // namespace EnergyPlus
