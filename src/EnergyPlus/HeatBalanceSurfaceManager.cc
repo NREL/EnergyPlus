@@ -853,9 +853,6 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     Real64 ufactArea(0.0);
     Real64 ufactAreaNorth(0.0);
     Real64 ufactAreaNonNorth(0.0);
-    Real64 ufactBeforeAdjustedArea(0.0);
-    Real64 ufactBeforeAdjustedAreaNorth(0.0);
-    Real64 ufactBeforeAdjustedAreaNonNorth(0.0);
     Real64 shgcArea(0.0);
     Real64 shgcAreaNorth(0.0);
     Real64 shgcAreaNonNorth(0.0);
