@@ -5221,8 +5221,11 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
     NewAspectRatio = 1.0;
 
     CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
-    for (auto &daylCntrl : state.dataDaylightingData->daylightControl) {
-        if (daylCntrl.TotalDaylRefPoints > 0) {
+    // TODO MJW: For now preserve order by zone
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
+            auto &daylCntrl = state.dataDaylightingData->daylightControl(controlNum);
+            if (daylCntrl.zoneIndex != zoneNum) continue;
             auto &zone(state.dataHeatBal->Zone(daylCntrl.zoneIndex));
 
             // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
@@ -5338,8 +5341,8 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
                     }
                 }
             } // refPtNum
-        }
-    }
+        }     // daylighting control loop
+    }         // zone loop
 }
 
 void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
