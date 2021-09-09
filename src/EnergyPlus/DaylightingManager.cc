@@ -670,84 +670,88 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
         state.dataDaylightingManager->CreateDFSReportFile = false;
     }
 
-    for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
-        auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
-        int enclNum = thisDaylightControl.enclIndex;
-        auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
-        if (thisEnclDaylight.NumOfDayltgExtWins == 0) continue;
+    // TODO MJW: For now preserve order by zone
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
+            auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
+            if (thisDaylightControl.zoneIndex != zoneNum) continue;
+            int enclNum = thisDaylightControl.enclIndex;
+            auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
+            if (thisEnclDaylight.NumOfDayltgExtWins == 0) continue;
 
-        for (int windowCounter = 1; windowCounter <= thisEnclDaylight.NumOfDayltgExtWins; ++windowCounter) {
-            int windowSurfNum = thisEnclDaylight.DayltgExtWinSurfNums(windowCounter);
+            for (int windowCounter = 1; windowCounter <= thisEnclDaylight.NumOfDayltgExtWins; ++windowCounter) {
+                int windowSurfNum = thisEnclDaylight.DayltgExtWinSurfNums(windowCounter);
 
-            // For this report, do not include ext wins in zone/enclosure adjacent to ZoneNum since the inter-reflected
-            // component will not be calculated for these windows until the time-step loop.
-            if (state.dataSurface->Surface(windowSurfNum).SolarEnclIndex == enclNum) {
+                // For this report, do not include ext wins in zone/enclosure adjacent to ZoneNum since the inter-reflected
+                // component will not be calculated for these windows until the time-step loop.
+                if (state.dataSurface->Surface(windowSurfNum).SolarEnclIndex == enclNum) {
 
-                if (state.dataSurface->SurfWinMovableSlats(windowSurfNum)) {
-                    // variable slat angle - MaxSlatangle sets
-                    ISA = MaxSlatAngs + 1;
-                } else if (state.dataSurface->Surface(windowSurfNum).HasShadeControl) {
-                    // window shade or blind with fixed slat angle
-                    ISA = 2;
-                } else {
-                    // base window
-                    ISA = 1;
-                }
-
-                // loop over each slat angle
-                for (ISlatAngle = 1; ISlatAngle <= ISA; ++ISlatAngle) {
-                    if (ISlatAngle == 1) {
-                        // base window without shades, screens, or blinds
-                        print(state.files.dfs,
-                              "{},{},{},Base Window\n",
-                              state.dataEnvrn->CurMnDy,
-                              state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
-                              state.dataSurface->Surface(windowSurfNum).Name);
-                    } else if (ISlatAngle == 2 && ISA == 2) {
+                    if (state.dataSurface->SurfWinMovableSlats(windowSurfNum)) {
+                        // variable slat angle - MaxSlatangle sets
+                        ISA = MaxSlatAngs + 1;
+                    } else if (state.dataSurface->Surface(windowSurfNum).HasShadeControl) {
                         // window shade or blind with fixed slat angle
-                        print(state.files.dfs,
-                              "{},{},{},Blind or Slat Applied\n",
-                              state.dataEnvrn->CurMnDy,
-                              state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
-                              state.dataSurface->Surface(windowSurfNum).Name);
+                        ISA = 2;
                     } else {
-                        // blind with variable slat angle
-                        SlatAngle = 180.0 / double(MaxSlatAngs - 1) * double(ISlatAngle - 2);
-                        print(state.files.dfs,
-                              "{},{},{},{:.1R}\n",
-                              state.dataEnvrn->CurMnDy,
-                              state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
-                              state.dataSurface->Surface(windowSurfNum).Name,
-                              SlatAngle);
+                        // base window
+                        ISA = 1;
                     }
 
-                    for (int IHR = 1; IHR <= 24; ++IHR) {
-                        // For each Daylight Reference Point
-                        for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
-                            DFClrSky = thisDaylightControl.DaylIllFacSky(
-                                IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Clear), refPtNum, windowCounter);
-                            DFClrTbSky = thisDaylightControl.DaylIllFacSky(
-                                IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::ClearTurbid), refPtNum, windowCounter);
-                            DFIntSky = thisDaylightControl.DaylIllFacSky(
-                                IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Intermediate), refPtNum, windowCounter);
-                            DFOcSky = thisDaylightControl.DaylIllFacSky(
-                                IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Overcast), refPtNum, windowCounter);
-
-                            // write daylight factors - 4 sky types for each daylight ref point
+                    // loop over each slat angle
+                    for (ISlatAngle = 1; ISlatAngle <= ISA; ++ISlatAngle) {
+                        if (ISlatAngle == 1) {
+                            // base window without shades, screens, or blinds
                             print(state.files.dfs,
-                                  "{},{},{:.5R},{:.5R},{:.5R},{:.5R}\n",
-                                  IHR,
-                                  state.dataDaylightingData->DaylRefPt(thisDaylightControl.DaylRefPtNum(refPtNum)).Name,
-                                  DFClrSky,
-                                  DFClrTbSky,
-                                  DFIntSky,
-                                  DFOcSky);
-                        } // Reference Point loop
-                    }     // hour loop
-                }         // slat angle loop
-            }
-        } // exterior windows in enclosure loop
-    }     // daylighting control loop
+                                  "{},{},{},Base Window\n",
+                                  state.dataEnvrn->CurMnDy,
+                                  state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
+                                  state.dataSurface->Surface(windowSurfNum).Name);
+                        } else if (ISlatAngle == 2 && ISA == 2) {
+                            // window shade or blind with fixed slat angle
+                            print(state.files.dfs,
+                                  "{},{},{},Blind or Slat Applied\n",
+                                  state.dataEnvrn->CurMnDy,
+                                  state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
+                                  state.dataSurface->Surface(windowSurfNum).Name);
+                        } else {
+                            // blind with variable slat angle
+                            SlatAngle = 180.0 / double(MaxSlatAngs - 1) * double(ISlatAngle - 2);
+                            print(state.files.dfs,
+                                  "{},{},{},{:.1R}\n",
+                                  state.dataEnvrn->CurMnDy,
+                                  state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
+                                  state.dataSurface->Surface(windowSurfNum).Name,
+                                  SlatAngle);
+                        }
+
+                        for (int IHR = 1; IHR <= 24; ++IHR) {
+                            // For each Daylight Reference Point
+                            for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
+                                DFClrSky = thisDaylightControl.DaylIllFacSky(
+                                    IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Clear), refPtNum, windowCounter);
+                                DFClrTbSky = thisDaylightControl.DaylIllFacSky(
+                                    IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::ClearTurbid), refPtNum, windowCounter);
+                                DFIntSky = thisDaylightControl.DaylIllFacSky(
+                                    IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Intermediate), refPtNum, windowCounter);
+                                DFOcSky = thisDaylightControl.DaylIllFacSky(
+                                    IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Overcast), refPtNum, windowCounter);
+
+                                // write daylight factors - 4 sky types for each daylight ref point
+                                print(state.files.dfs,
+                                      "{},{},{:.5R},{:.5R},{:.5R},{:.5R}\n",
+                                      IHR,
+                                      state.dataDaylightingData->DaylRefPt(thisDaylightControl.DaylRefPtNum(refPtNum)).Name,
+                                      DFClrSky,
+                                      DFClrTbSky,
+                                      DFIntSky,
+                                      DFOcSky);
+                            } // Reference Point loop
+                        }     // hour loop
+                    }         // slat angle loop
+                }
+            } // exterior windows in enclosure loop
+        }     // daylighting control loop
+    }         // zone loop
 }
 
 void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state, int const daylightCtrlNum)
