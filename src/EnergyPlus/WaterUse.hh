@@ -100,6 +100,10 @@ namespace WaterUse {
         Real64 TargetTemp;      // Target (mixed) water temperature (C)
         Real64 MixedTemp;       // Actual outlet (mixed) water temperature (C)
         Real64 DrainTemp;
+        int HWTempErrorCount;     // - counter if hot water temp is less than cold water temp
+        int HWTempErrIndex;       // - index to recurring error structure for hot water temp
+        int TargetTempErrorCount; // - counter for target water temp error
+        int TargetTempErrIndex;   // - index to recurring error structure for target water temp
         int Zone;                 // Index for zone object
         int SensibleFracSchedule; // Pointer to schedule object
         Real64 SensibleRate;
@@ -121,8 +125,9 @@ namespace WaterUse {
         WaterEquipmentType()
             : Connections(0), PeakVolFlowRate(0.0), FlowRateFracSchedule(0), ColdVolFlowRate(0.0), HotVolFlowRate(0.0), TotalVolFlowRate(0.0),
               ColdMassFlowRate(0.0), HotMassFlowRate(0.0), TotalMassFlowRate(0.0), DrainMassFlowRate(0.0), ColdTempSchedule(0), HotTempSchedule(0),
-              TargetTempSchedule(0), ColdTemp(0.0), HotTemp(0.0), TargetTemp(0.0), MixedTemp(0.0), DrainTemp(0.0), Zone(0), SensibleFracSchedule(0),
-              SensibleRate(0.0), SensibleEnergy(0.0), SensibleRateNoMultiplier(0.0), LatentFracSchedule(0), LatentRate(0.0), LatentEnergy(0.0),
+              TargetTempSchedule(0), ColdTemp(0.0), HotTemp(0.0), TargetTemp(0.0), MixedTemp(0.0), DrainTemp(0.0), HWTempErrorCount(0.0),
+              HWTempErrIndex(0.0), TargetTempErrorCount(0.0), TargetTempErrIndex(0.0), Zone(0), SensibleFracSchedule(0), SensibleRate(0.0),
+              SensibleEnergy(0.0), SensibleRateNoMultiplier(0.0), LatentFracSchedule(0), LatentRate(0.0), LatentEnergy(0.0),
               LatentRateNoMultiplier(0.0), MoistureRate(0.0), MoistureMass(0.0), ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0),
               Energy(0.0), setupMyOutputVars(true)
         {

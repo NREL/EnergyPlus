@@ -1885,7 +1885,7 @@ void ConstructionProps::calculateFinalCoefficients()
 void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const cCounter)
 {
 
-    static constexpr fmt::string_view Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
+    static constexpr std::string_view Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
     print(state.files.eio,
           Format_700,
           this->Name,
@@ -1905,10 +1905,10 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
         {
             auto const SELECT_CASE_var(state.dataMaterial->Material(Layer).Group);
             if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::Air) {
-                static constexpr fmt::string_view Format_702(" Material:Air,{},{:12.4N}\n");
+                static constexpr std::string_view Format_702(" Material:Air,{},{:12.4N}\n");
                 print(state.files.eio, Format_702, state.dataMaterial->Material(Layer).Name, state.dataMaterial->Material(Layer).Resistance);
             } else {
-                static constexpr fmt::string_view Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
+                static constexpr std::string_view Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
                 print(state.files.eio,
                       Format_701,
                       state.dataMaterial->Material(Layer).Name,
@@ -1923,10 +1923,10 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
 
     for (int I = this->NumCTFTerms; I >= 0; --I) {
         if (I != 0) {
-            static constexpr fmt::string_view Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
+            static constexpr std::string_view Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
             print(state.files.eio, Format_703, I, this->CTFOutside(I), this->CTFCross(I), this->CTFInside(I), this->CTFFlux(I));
         } else {
-            static constexpr fmt::string_view Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+            static constexpr std::string_view Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
             print(state.files.eio, Format_704, I, this->CTFOutside(I), this->CTFCross(I), this->CTFInside(I));
         }
     }
@@ -1934,18 +1934,18 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
     if (this->SourceSinkPresent) {
         // QTFs...
         for (int I = this->NumCTFTerms; I >= 0; --I) {
-            static constexpr fmt::string_view Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
+            static constexpr std::string_view Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
             print(state.files.eio, Format_705, I, this->CTFSourceOut(I), this->CTFSourceIn(I));
         }
         // QTFs for source/sink location temperature calculation...
         for (int I = this->NumCTFTerms; I >= 0; --I) {
-            static constexpr fmt::string_view Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+            static constexpr std::string_view Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
             print(state.files.eio, Format_706, I, this->CTFTSourceOut(I), this->CTFTSourceIn(I), this->CTFTSourceQ(I));
         }
         if (this->TempAfterLayer != 0) {
             // QTFs for user specified interior temperature calculation...
             for (int I = this->NumCTFTerms; I >= 0; --I) {
-                static constexpr fmt::string_view Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+                static constexpr std::string_view Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
                 print(state.files.eio, Format_707, I, this->CTFTUserOut(I), this->CTFTUserIn(I), this->CTFTUserSource(I));
             }
         }
@@ -1968,6 +1968,31 @@ bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
                          BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::Shade) |
                              BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::WindowBlind) |
                              BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing));
+}
+
+Real64 ConstructionProps::setThicknessPerpendicular(EnergyPlusData &state, Real64 userValue)
+{
+    // Limits set here are similar to limits used in HydronicSystemBaseData::sizeRadiantSystemTubeLength
+    // which is for autosizing tube length.  The limits are not as strictly enforced here because they are
+    // not being used for autosizing so more latitude with the values is desired.  Warnings will still alert
+    // the user if values seem outside of the ordinary range anticipated.
+    Real64 returnValue = userValue / 2.0; // Divide by two because internally the half distance will be used to calculate CTFs
+    if (returnValue <= 0.001) {           // lowest reasonable value for "half" the tube spacing in meters
+        ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a tube spacing that is less than 2 mm.  This is not allowed.");
+        ShowContinueError(
+            state, "Construction=" + this->Name + " has this problem.  The tube spacing has been reset to 0.15m (~6 inches) for this construction.");
+        ShowContinueError(state, "As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing.");
+        returnValue = 0.075;          // default "half" tube spacing in meters (roughly equivalent to 15cm or 6 inches of tube spacing)
+    } else if (returnValue < 0.005) { // below this value for "half" the tube spacing in meters throw a warning
+        ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a tube spacing that is less than 1 cm (0.4 inch).");
+        ShowContinueError(state, "Construction=" + this->Name + " has this concern.  Please check this construction to make sure it is correct.");
+        ShowContinueError(state, "As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing.");
+    } else if (returnValue > 0.5) { // above this value for "half" the tube spacing in meters throw a warning
+        ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a tube spacing that is greater than 1 meter (39.4 inches).");
+        ShowContinueError(state, "Construction=" + this->Name + " has this concern.  Please check this construction to make sure it is correct.");
+        ShowContinueError(state, "As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing.");
+    }
+    return returnValue;
 }
 
 Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue)

@@ -88,7 +88,6 @@ using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputProcessor;
 using namespace EnergyPlus::OutputReportTabular;
 using namespace SimulationManager;
-using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 

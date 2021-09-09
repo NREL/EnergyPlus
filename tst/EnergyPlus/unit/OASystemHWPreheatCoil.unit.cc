@@ -64,7 +64,6 @@
 #include <EnergyPlus/WaterCoils.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataAirLoop;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::HVACControllers;

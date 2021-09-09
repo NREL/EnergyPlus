@@ -684,7 +684,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
             deltaADPTemp = -deltaADPTemp / 2.0;
         } else if ((error < 0.0) && (errorLast > 0.0)) {
             deltaADPTemp = -deltaADPTemp / 2.0;
-        } else if (abs(error) > abs(errorLast)) {
+        } else if (std::abs(error) > std::abs(errorLast)) {
             deltaADPTemp = -deltaADPTemp / 2.0;
         }
         errorLast = error;

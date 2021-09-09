@@ -337,6 +337,7 @@ struct ScheduleManagerData : BaseGlobalStruct
     std::unordered_map<std::string, std::string> UniqueDayScheduleNames;
     std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
     std::unordered_map<std::string, std::string> UniqueScheduleNames;
+    std::map<fs::path, nlohmann::json> UniqueProcessedExternalFiles;
 
     // Integer Variables for the Module
     int NumScheduleTypes = 0;
@@ -361,6 +362,7 @@ struct ScheduleManagerData : BaseGlobalStruct
         UniqueDayScheduleNames.clear();
         UniqueWeekScheduleNames.clear();
         UniqueScheduleNames.clear();
+        UniqueProcessedExternalFiles.clear();
         DoScheduleReportingSetup = true;
 
         NumScheduleTypes = 0;

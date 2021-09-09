@@ -18,14 +18,15 @@
 #include "re2/re2.h"
 #include "re2/regexp.h"
 
-DEFINE_bool(dump_prog, false, "dump regexp program");
-DEFINE_bool(log_okay, false, "log successful runs");
-DEFINE_bool(dump_rprog, false, "dump reversed regexp program");
+DEFINE_FLAG(bool, dump_prog, false, "dump regexp program");
+DEFINE_FLAG(bool, log_okay, false, "log successful runs");
+DEFINE_FLAG(bool, dump_rprog, false, "dump reversed regexp program");
 
-DEFINE_int32(max_regexp_failures, 100,
-             "maximum number of regexp test failures (-1 = unlimited)");
+DEFINE_FLAG(int, max_regexp_failures, 100,
+            "maximum number of regexp test failures (-1 = unlimited)");
 
-DEFINE_string(regexp_engines, "", "pattern to select regexp engines to test");
+DEFINE_FLAG(std::string, regexp_engines, "",
+            "pattern to select regexp engines to test");
 
 namespace re2 {
 
@@ -62,11 +63,11 @@ static uint32_t Engines() {
   if (did_parse)
     return cached_engines;
 
-  if (FLAGS_regexp_engines.empty()) {
+  if (GetFlag(FLAGS_regexp_engines).empty()) {
     cached_engines = ~0;
   } else {
     for (Engine i = static_cast<Engine>(0); i < kEngineMax; i++)
-      if (FLAGS_regexp_engines.find(EngineName(i)) != std::string::npos)
+      if (GetFlag(FLAGS_regexp_engines).find(EngineName(i)) != std::string::npos)
         cached_engines |= 1<<i;
   }
 
@@ -85,6 +86,20 @@ static uint32_t Engines() {
 
 // The result of running a match.
 struct TestInstance::Result {
+  Result()
+      : skipped(false),
+        matched(false),
+        untrusted(false),
+        have_submatch(false),
+        have_submatch0(false) {
+    ClearSubmatch();
+  }
+
+  void ClearSubmatch() {
+    for (int i = 0; i < kMaxSubmatch; i++)
+      submatch[i] = StringPiece();
+  }
+
   bool skipped;         // test skipped: wasn't applicable
   bool matched;         // found a match
   bool untrusted;       // don't really trust the answer
@@ -102,7 +117,8 @@ static std::string FormatCapture(const StringPiece& text,
   if (s.data() == NULL)
     return "(?,?)";
   return StringPrintf("(%td,%td)",
-                      s.begin() - text.begin(), s.end() - text.begin());
+                      s.begin() - text.begin(),
+                      s.end() - text.begin());
 }
 
 // Returns whether text contains non-ASCII (>= 0x80) bytes.
@@ -198,7 +214,7 @@ TestInstance::TestInstance(const StringPiece& regexp_str, Prog::MatchKind kind,
     error_ = true;
     return;
   }
-  if (FLAGS_dump_prog) {
+  if (GetFlag(FLAGS_dump_prog)) {
     LOG(INFO) << "Prog for "
               << " regexp "
               << CEscape(regexp_str_)
@@ -216,7 +232,7 @@ TestInstance::TestInstance(const StringPiece& regexp_str, Prog::MatchKind kind,
       error_ = true;
       return;
     }
-    if (FLAGS_dump_rprog)
+    if (GetFlag(FLAGS_dump_rprog))
       LOG(INFO) << rprog_->Dump();
   }
 
@@ -290,9 +306,6 @@ void TestInstance::RunSearch(Engine type,
                              const StringPiece& orig_context,
                              Prog::Anchor anchor,
                              Result* result) {
-  // Result is not trivial, so we cannot freely clear it with memset(3),
-  // but zeroing objects like so is safe and expedient for our purposes.
-  memset(reinterpret_cast<void*>(result), 0, sizeof *result);
   if (regexp_ == NULL) {
     result->skipped = true;
     return;
@@ -476,7 +489,7 @@ void TestInstance::RunSearch(Engine type,
   }
 
   if (!result->matched)
-    memset(result->submatch, 0, sizeof result->submatch);
+    result->ClearSubmatch();
 }
 
 // Checks whether r is okay given that correct is the right answer.
@@ -528,7 +541,7 @@ bool TestInstance::RunCase(const StringPiece& text, const StringPiece& context,
     Result r;
     RunSearch(i, text, context, anchor, &r);
     if (ResultOkay(r, correct)) {
-      if (FLAGS_log_okay)
+      if (GetFlag(FLAGS_log_okay))
         LogMatch(r.skipped ? "Skipped: " : "Okay: ", i, text, context, anchor);
       continue;
     }
@@ -571,7 +584,10 @@ bool TestInstance::RunCase(const StringPiece& text, const StringPiece& context,
   }
 
   if (!all_okay) {
-    if (FLAGS_max_regexp_failures > 0 && --FLAGS_max_regexp_failures == 0)
+    // This will be initialised once (after flags have been initialised)
+    // and that is desirable because we want to enforce a global limit.
+    static int max_regexp_failures = GetFlag(FLAGS_max_regexp_failures);
+    if (max_regexp_failures > 0 && --max_regexp_failures == 0)
       LOG(QFATAL) << "Too many regexp failures.";
   }
 
@@ -640,7 +656,7 @@ static Prog::Anchor anchors[] = {
 
 bool Tester::TestInput(const StringPiece& text) {
   bool okay = TestInputInContext(text, text);
-  if (text.size() > 0) {
+  if (!text.empty()) {
     StringPiece sp;
     sp = text;
     sp.remove_prefix(1);

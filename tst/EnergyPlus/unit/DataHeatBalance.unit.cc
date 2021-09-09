@@ -81,7 +81,6 @@ using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SimulationManager;
 using namespace EnergyPlus::SurfaceGeometry;
 
-using namespace ObjexxFCL;
 // using DataVectorTypes::Vector;
 
 TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
@@ -1037,4 +1036,63 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_AssignReverseConstructionNumberTest)
     EXPECT_EQ(expectedResultRevConstrNum, functionResultRevConstrNum);
     EXPECT_TRUE(otherConstruct.IsUsed);
     EXPECT_FALSE(ErrorsFound);
+}
+
+TEST_F(EnergyPlusFixture, DataHeatBalance_setThicknessPerpendicularTest)
+{
+
+    Real64 userInputValue;
+    Real64 expectedReturnValue;
+    Real64 actualReturnValue;
+
+    state->dataConstruction->Construct.allocate(1);
+    auto &thisConstruct(state->dataConstruction->Construct(1));
+    thisConstruct.Name = "TestThisConstruction";
+
+    std::string const error_string1 =
+        delimited_string({"   ** Warning ** ConstructionProperty:InternalHeatSource has a tube spacing that is less than 2 mm.  This is not allowed.",
+                          "   **   ~~~   ** Construction=TestThisConstruction has this problem.  The tube spacing has been reset to 0.15m (~6 "
+                          "inches) for this construction.",
+                          "   **   ~~~   ** As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing."});
+    std::string const error_string2 = delimited_string(
+        {"   ** Warning ** ConstructionProperty:InternalHeatSource has a tube spacing that is less than 1 cm (0.4 inch).",
+         "   **   ~~~   ** Construction=TestThisConstruction has this concern.  Please check this construction to make sure it is correct.",
+         "   **   ~~~   ** As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing."});
+    std::string const error_string3 = delimited_string(
+        {"   ** Warning ** ConstructionProperty:InternalHeatSource has a tube spacing that is greater than 1 meter (39.4 inches).",
+         "   **   ~~~   ** Construction=TestThisConstruction has this concern.  Please check this construction to make sure it is correct.",
+         "   **   ~~~   ** As per the Input Output Reference, tube spacing is only used for 2-D solutions and autosizing."});
+
+    // Test 1: User value is less than zero--should be reset to "default" value (warning messages produced)
+    userInputValue = -0.01;
+    expectedReturnValue = 0.075;
+    actualReturnValue = thisConstruct.setThicknessPerpendicular(*state, userInputValue);
+    EXPECT_NEAR(expectedReturnValue, actualReturnValue, 0.0001);
+    EXPECT_TRUE(compare_err_stream(error_string1, true));
+
+    // Test 2: User value is greater than zero but still too small--should be reset to the "default" value (warning messages produced)
+    userInputValue = 0.0001;
+    actualReturnValue = thisConstruct.setThicknessPerpendicular(*state, userInputValue);
+    EXPECT_NEAR(expectedReturnValue, actualReturnValue, 0.0001);
+    EXPECT_TRUE(compare_err_stream(error_string1, true));
+
+    // Test 3: User value is greater than minimum allowed but smaller than "typical"--no resetting (warning messages produced)
+    userInputValue = 0.008;
+    expectedReturnValue = 0.004;
+    actualReturnValue = thisConstruct.setThicknessPerpendicular(*state, userInputValue);
+    EXPECT_NEAR(expectedReturnValue, actualReturnValue, 0.0001);
+    EXPECT_TRUE(compare_err_stream(error_string2, true));
+
+    // Test 4: User value is great than a typical range--no resetting (warning message produced)
+    userInputValue = 2.0;
+    expectedReturnValue = 1.0;
+    actualReturnValue = thisConstruct.setThicknessPerpendicular(*state, userInputValue);
+    EXPECT_NEAR(expectedReturnValue, actualReturnValue, 0.0001);
+    EXPECT_TRUE(compare_err_stream(error_string3, true));
+
+    // Test 5: User value is within the typical range--no resetting, no warning messages
+    userInputValue = 0.2;
+    expectedReturnValue = 0.1;
+    actualReturnValue = thisConstruct.setThicknessPerpendicular(*state, userInputValue);
+    EXPECT_NEAR(expectedReturnValue, actualReturnValue, 0.0001);
 }

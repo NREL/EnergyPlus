@@ -2173,6 +2173,16 @@ void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, [[maybe_u
     }
 
     if (ScheduledOn) {
+
+        mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
+        PlantUtilities::SetComponentFlowRate(state,
+                                             mdotWaterSide,
+                                             this->SupplySideLoop.inletNodeNum,
+                                             this->SupplySideLoop.outletNodeNum,
+                                             this->SupplySideLoop.loopNum,
+                                             this->SupplySideLoop.loopSideNum,
+                                             this->SupplySideLoop.branchNum,
+                                             this->SupplySideLoop.compNum);
         mdotSteamSide = this->DemandSideLoop.MassFlowRateMax;
         PlantUtilities::SetComponentFlowRate(state,
                                              mdotSteamSide,
@@ -2620,8 +2630,6 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
             state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).Temp = SteamOutletTemp;
             state.dataLoopNodes->Node(this->SupplySideLoop.outletNodeNum).Temp = WaterOutletTemp;
             this->HeatTransferRate = QHXCap;
-            state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).MassFlowRate = SteamMassFlowRate;
-            state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).MassFlowRate = SteamMassFlowRate;
 
             //************************* Loop Losses *****************************
             // Loop pressure return considerations included in steam coil since the pipes are
@@ -2764,6 +2772,7 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
                 SteamOutletTemp = SteamInletTemp - SubcoolDeltaTemp;
 
                 SteamMassFlowRate = QHXCap / (LatentHeatSteam + SubcoolDeltaTemp * CpCondensate);
+                
                 PlantUtilities::SetComponentFlowRate(state,
                                                      SteamMassFlowRate,
                                                      this->DemandSideLoop.inletNodeNum,
@@ -2795,6 +2804,7 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
                 SteamOutletTemp = SteamInletTemp - SubcoolDeltaTemp;
 
                 SteamMassFlowRate = QHXCap / (LatentHeatSteam + SubcoolDeltaTemp * CpCondensate);
+
                 PlantUtilities::SetComponentFlowRate(state,
                                                      SteamMassFlowRate,
                                                      this->DemandSideLoop.inletNodeNum,
@@ -2810,8 +2820,6 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
 
                 HeatingLoad = QHXCap;
 
-                state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).MassFlowRate = SteamMassFlowRate;
-                state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).MassFlowRate = SteamMassFlowRate;
 
                 //************************* Loop Losses *****************************
                 // Loop pressure return considerations included in HX since the pipes are
@@ -2893,7 +2901,6 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
     this->HeatTransferRate = HeatingLoad;
     this->HeatTransferEnergy = this->HeatTransferRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     this->SupplySideLoop.OutletTemp = WaterOutletTemp;
-    this->DemandSideLoop.InletMassFlowRate = SteamMassFlowRate;
     this->DemandSideLoop.OutletTemp = TempLoopOutToPump;
     this->DemandSideLoop.OutletQuality = 0.0;
 

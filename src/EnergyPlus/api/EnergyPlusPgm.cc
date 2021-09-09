@@ -284,7 +284,9 @@ int commonRun(EnergyPlus::EnergyPlusData &state)
     DisplayString(state, state.dataStrGlobals->VerStringVar);
 
     try {
-        state.dataInputProcessing->inputProcessor = InputProcessor::factory();
+        if (!state.dataInputProcessing->inputProcessor) {
+            state.dataInputProcessing->inputProcessor = InputProcessor::factory();
+        }
         state.dataInputProcessing->inputProcessor->processInput(state);
         if (state.dataGlobal->outputEpJSONConversionOnly) {
             DisplayString(state, "Converted input file format. Exiting.");

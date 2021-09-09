@@ -139,10 +139,11 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> QRadIntGainsInReport;        // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> QdotRadIntGainsInRep;        // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> QdotRadIntGainsInRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf
-    // these next three all are for Radiative HVAC sources of radiation gains on inside face
-    Array1D<Real64> QRadHVACInReport;        // Surface thermal radiation heat gain at Inside face [J]
-    Array1D<Real64> QdotRadHVACInRep;        // Surface thermal radiation heat transfer inside face surface [W]
-    Array1D<Real64> QdotRadHVACInRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf
+    // these next five all are for Radiative HVAC sources of radiation gains on inside face
+    Array1D<bool> AnyRadiantSystems;          // True if there are any radiant systems
+    Array1D<Real64> SurfQRadHVACInReport;     // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQdotRadHVACInRep;     // Surface thermal radiation heat transfer inside face surface [W]
+    Array1D<Real64> SurfQdotRadHVACInPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf
 
     Array1D<Real64> QConvOutReport;        // Surface convection heat gain at Outside face [J]
     Array1D<Real64> QdotConvOutRep;        // Surface convection heat transfer rate at Outside face surface [W]
@@ -180,7 +181,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfOpaqAvgFaceCondEnergy; // Opaque surface average heat conduction flow (J) net conduction from outside environ toward inside
                                                // zone from inside of opaque surfaces, for reporting (J)
 
-    Array1D<Real64> SurfOpaqStorageGainRep;     // Opaque surface stored heat conduction flow when Opaque surface stored heat conduction flow  >= 0
+    Array1D<Real64> SurfOpaqStorageCondGainRep; // Opaque surface stored heat conduction flow when Opaque surface stored heat conduction flow  >= 0
     Array1D<Real64> SurfOpaqStorageCondLossRep; // Opaque surface stored heat conduction flow when Opaque surface stored heat conduction flow   < 0
     Array1D<Real64> SurfOpaqStorageCond;        // Opaque surface stored heat conduction flow (W) storage of heat inside surface,
                                                 // positive is increasing in surf
@@ -289,9 +290,10 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->QRadIntGainsInReport.deallocate();
         this->QdotRadIntGainsInRep.deallocate();
         this->QdotRadIntGainsInRepPerArea.deallocate();
-        this->QRadHVACInReport.deallocate();
-        this->QdotRadHVACInRep.deallocate();
-        this->QdotRadHVACInRepPerArea.deallocate();
+        this->AnyRadiantSystems.deallocate();
+        this->SurfQRadHVACInReport.deallocate();
+        this->SurfQdotRadHVACInRep.deallocate();
+        this->SurfQdotRadHVACInPerArea.deallocate();
         this->QConvOutReport.deallocate();
         this->QdotConvOutRep.deallocate();
         this->QdotConvOutRepPerArea.deallocate();
@@ -313,7 +315,7 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfOpaqAvgFaceCond.deallocate();
         this->SurfOpaqAvgFaceCondFlux.deallocate();
         this->SurfOpaqAvgFaceCondEnergy.deallocate();
-        this->SurfOpaqStorageGainRep.deallocate();
+        this->SurfOpaqStorageCondGainRep.deallocate();
         this->SurfOpaqStorageCondLossRep.deallocate();
         this->SurfOpaqStorageCond.deallocate();
         this->SurfOpaqStorageCondFlux.deallocate();

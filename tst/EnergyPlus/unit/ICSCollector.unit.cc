@@ -62,7 +62,6 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
-using namespace ObjexxFCL;
 using namespace EnergyPlus;
 using namespace EnergyPlus::ConvectionCoefficients;
 using namespace EnergyPlus::DataSurfaces;
