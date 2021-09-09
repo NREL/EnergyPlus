@@ -4694,7 +4694,7 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
     ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
 }
 
-Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state, Real64 const PartLoadRatio, std::array<Real64, 2> const Par // parameters
+Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state, Real64 const PartLoadRatio, std::array<Real64, 2> const &Par // parameters
 )
 {
     // calculates cooling load residual by varying part load ratio

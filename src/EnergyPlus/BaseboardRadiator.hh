@@ -148,8 +148,8 @@ namespace BaseboardRadiator {
     void UpdateBaseboard(EnergyPlusData &state, int &BaseboardNum);
 
     Real64 HWBaseboardUAResidual(EnergyPlusData &state,
-                                 Real64 UA,                // UA of coil
-                                 std::array<Real64, 2> Par // par(1) = design coil load [W]
+                                 Real64 UA,                       // UA of coil
+                                 std::array<Real64, 2> const &Par // par(1) = design coil load [W]
     );
 
 } // namespace BaseboardRadiator
