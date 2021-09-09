@@ -2879,7 +2879,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
     std::string const idf_objects = delimited_string({
         "WindowMaterial:SimpleGlazingSystem,",
         "NonRes Fixed Assembly Window,  !- Name",
-        "9.0000,                  !- U-Factor {W/m2-K}",
+        "6.9000,                  !- U-Factor {W/m2-K}",
         "0.39;                    !- Solar Heat Gain Coefficient",
         "Material:NoMass,",
         "R13LAYER,                !- Name",
