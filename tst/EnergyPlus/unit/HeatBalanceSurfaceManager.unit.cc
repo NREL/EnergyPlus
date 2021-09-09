@@ -119,6 +119,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataGlobal->NumOfZones = ZoneNum;
 
     state->dataSurface->Surface.allocate(SurfNum);
+    state->dataHeatBal->Zone.allocate(ZoneNum);
+
     state->dataSurface->Surface(SurfNum).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataSurface->Surface(SurfNum).Area = 10.0;
     WindowManager::initWindowModel(*state);
@@ -148,7 +150,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
 
-    state->dataHeatBal->Zone.allocate(ZoneNum);
     state->dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(ZoneNum).HTSurfaceLast = 1;
     state->dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceFirst = 1;
