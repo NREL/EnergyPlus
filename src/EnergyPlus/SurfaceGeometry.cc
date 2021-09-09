@@ -8594,11 +8594,6 @@ namespace SurfaceGeometry {
             }
         }
 
-        // Setup Kiva instances
-        if (state.dataHeatBal->AnyKiva) {
-            if (!ErrorsFound) ErrorsFound = state.dataSurfaceGeometry->kivaManager.setupKivaInstances(state);
-        }
-
         // test for missing materials for algorithms selected
         NumEMPDMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:MoisturePenetrationDepth:Settings");
         NumPCMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:PhaseChange") +
