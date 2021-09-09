@@ -178,7 +178,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfOpaqAvgFaceCondEnergy; // Opaque surface average heat conduction flow (J) net conduction from outside environ toward inside
                                                // zone from inside of opaque surfaces, for reporting (J)
 
-    Array1D<Real64> SurfOpaqStorageGainRep;     // Opaque surface stored heat conduction flow when Opaque surface stored heat conduction flow  >= 0
+    Array1D<Real64> SurfOpaqStorageCondGainRep; // Opaque surface stored heat conduction flow when Opaque surface stored heat conduction flow  >= 0
     Array1D<Real64> SurfOpaqStorageCondLossRep; // Opaque surface stored heat conduction flow when Opaque surface stored heat conduction flow   < 0
     Array1D<Real64> SurfOpaqStorageCond;        // Opaque surface stored heat conduction flow (W) storage of heat inside surface,
                                                 // positive is increasing in surf
@@ -309,7 +309,7 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfOpaqAvgFaceCond.deallocate();
         this->SurfOpaqAvgFaceCondFlux.deallocate();
         this->SurfOpaqAvgFaceCondEnergy.deallocate();
-        this->SurfOpaqStorageGainRep.deallocate();
+        this->SurfOpaqStorageCondGainRep.deallocate();
         this->SurfOpaqStorageCondLossRep.deallocate();
         this->SurfOpaqStorageCond.deallocate();
         this->SurfOpaqStorageCondFlux.deallocate();
