@@ -11152,7 +11152,7 @@ namespace UnitarySystems {
                                                                     state.dataUnitarySystems->economizerFlag,
                                                                     _,
                                                                     this->m_DehumidificationMode,
-                                                                    this->CoilSHR);
+                                                                    0.0); // this->CoilSHR);
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted)
                     this->m_CoolCompPartLoadRatio = PartLoadRatio * double(CompOn);
 
@@ -11840,7 +11840,7 @@ namespace UnitarySystems {
                                                                         state.dataUnitarySystems->economizerFlag,
                                                                         _,
                                                                         this->m_DehumidificationMode,
-                                                                        this->CoilSHR);
+                                                                        0.0); // this->CoilSHR);
                     if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) this->m_CompPartLoadRatio = PartLoadFrac;
                 } else if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
 
@@ -12024,7 +12024,7 @@ namespace UnitarySystems {
                                                                             state.dataUnitarySystems->economizerFlag,
                                                                             _,
                                                                             this->m_DehumidificationMode,
-                                                                            this->CoilSHR);
+                                                                            0.0); // this->CoilSHR);
 
                         if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) this->m_CompPartLoadRatio = PartLoadFrac;
                         FullLoadHumRatOut = state.dataLoopNodes->Node(OutletNode).HumRat;
@@ -12296,7 +12296,7 @@ namespace UnitarySystems {
                             Par[5] = double(FanOpMode);
                             Par[6] = double(this->m_UnitarySysNum);
                             Par[7] = double(this->m_DehumidificationMode);
-                            Par[8] = this->CoilSHR;
+                            Par[8] = 0.0; // this->CoilSHR;
                             General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par);
                             if (SolFla == -1) {
 
@@ -12319,7 +12319,7 @@ namespace UnitarySystems {
                                                                                         state.dataUnitarySystems->economizerFlag,
                                                                                         _,
                                                                                         this->m_DehumidificationMode,
-                                                                                        this->CoilSHR);
+                                                                                        0.0);// this->CoilSHR);
                                     TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
                                 }
                                 TempMinPLR = TempMaxPLR;
@@ -12340,7 +12340,7 @@ namespace UnitarySystems {
                                                                                         state.dataUnitarySystems->economizerFlag,
                                                                                         _,
                                                                                         this->m_DehumidificationMode,
-                                                                                        this->CoilSHR);
+                                                                                        0.0); // this->CoilSHR);
                                     TempOutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
                                 }
                                 // Relax boundary slightly to assure a solution can be found using RegulaFalsi (i.e. one boundary may
@@ -12606,7 +12606,7 @@ namespace UnitarySystems {
                                                                         state.dataUnitarySystems->economizerFlag,
                                                                         _,
                                                                         this->m_DehumidificationMode,
-                                                                        this->CoilSHR);
+                                                                        0.0); // this->CoilSHR);
 
                     OutletTempDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
 
@@ -12802,7 +12802,7 @@ namespace UnitarySystems {
                             }
                             Par[5] = double(FanOpMode);
                             Par[6] = double(this->m_DehumidificationMode);
-                            Par[7] = this->CoilSHR;
+                            Par[7] = 0.0; // this->CoilSHR;
                             General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par);
                             if (SolFla == -1) {
 
@@ -12824,7 +12824,7 @@ namespace UnitarySystems {
                                                                                         state.dataUnitarySystems->economizerFlag,
                                                                                         _,
                                                                                         this->m_DehumidificationMode,
-                                                                                        this->CoilSHR);
+                                                                                        0.0); // this->CoilSHR);
                                     OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(this->m_CoolingCoilIndex);
                                 }
                                 TempMaxPLR = min(1.0, TempMaxPLR + 0.1);
@@ -12846,7 +12846,7 @@ namespace UnitarySystems {
                                                                                         state.dataUnitarySystems->economizerFlag,
                                                                                         _,
                                                                                         this->m_DehumidificationMode,
-                                                                                        this->CoilSHR);
+                                                                                        0.0); // this->CoilSHR);
                                     OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(this->m_CoolingCoilIndex);
                                 }
                                 TempMinPLR = max(0.0, TempMinPLR - 0.1);
