@@ -53,8 +53,8 @@
 
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
