@@ -300,10 +300,8 @@ namespace FileSystem {
     }
 
     template <FileTypes fileType, class T, typename = std::enable_if_t<enable_json_v<T, fileType>>>
-    void writeFile(fs::path const &filePath,
-                   T &data,
-                   int const indent = 4,
-                   std::ios_base::openmode mode = (std::ios_base::out | std::ios_base::trunc))
+    void
+    writeFile(fs::path const &filePath, T &data, int const indent = 4, std::ios_base::openmode mode = (std::ios_base::out | std::ios_base::trunc))
     {
         auto const json_str = getJSON<fileType>(data, indent);
         writeFile<fileType>(filePath, std::string_view(json_str), mode);
