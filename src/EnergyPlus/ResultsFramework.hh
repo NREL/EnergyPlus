@@ -76,7 +76,7 @@ namespace ResultsFramework {
     using json = nlohmann::json;
 
     // trim string
-    std::string trim(std::string str);
+    std::string trim(std::string_view const s);
 
     // base result object
     class BaseResultObject
@@ -231,7 +231,8 @@ namespace ResultsFramework {
         json getVariablesJSON();
         json getJSON() const;
 
-        void writeReport(JsonOutputStreams &jsonOutputStreams, bool outputJSON, bool outputCBOR, bool outputMsgPack);
+        void
+        writeReport(JsonOutputStreams &jsonOutputStreams, bool outputJSON, bool outputCBOR, bool outputMsgPack, bool write_to_json_streams = false);
 
     protected:
         bool IDataFrameEnabled = false;
@@ -393,7 +394,7 @@ namespace ResultsFramework {
         MeterDataFrame SMMeters = MeterDataFrame("RunPeriod");
         MeterDataFrame YRMeters = MeterDataFrame("Yearly");
 
-        void writeOutputs(EnergyPlusData &state);
+        void writeOutputs(EnergyPlusData &state, bool write_to_json_streams = false);
 
         void addReportVariable(std::string const &keyedValue,
                                std::string const &variableName,
@@ -416,11 +417,18 @@ namespace ResultsFramework {
         bool outputMsgPack = false;
         std::vector<std::string> outputVariables;
 
-        void writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams);
+        void writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams, bool write_to_json_streams = false);
 
-        void writeReport(JsonOutputStreams &jsonOutputStreams);
+        void writeReport(JsonOutputStreams &jsonOutputStreams, bool write_to_json_streams = false);
 
         void writeCSVOutput(EnergyPlusData &state);
+
+        std::unique_ptr<std::ostream>
+        OpenStreamFile(EnergyPlusData &state, const fs::path &fileName, std::ios_base::openmode mode = (std::ios_base::out | std::ios_base::trunc));
+
+        std::unique_ptr<fmt::ostream> OpenFmtStreamFile(EnergyPlusData &state, const fs::path &filePath);
+
+        void OpenOutputJsonFiles(EnergyPlusData &state, JsonOutputStreams &jsonOutputStreams);
 
     private:
         friend class EnergyPlus::EnergyPlusFixture;

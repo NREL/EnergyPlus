@@ -104,10 +104,10 @@ void EnergyPlusFixture::SetUp()
     openOutputFiles(*state);
 
     this->err_stream = new std::ostringstream;
-    // this->json_stream = new std::ostringstream;
+    this->json_stream = new std::ostringstream;
 
     state->files.err_stream = std::unique_ptr<std::ostream>(this->err_stream);
-    // state->files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
+    state->files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
 
     m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     m_redirect_cout = std::make_unique<RedirectCout>(m_cout_buffer);
@@ -166,14 +166,14 @@ std::vector<std::string> EnergyPlusFixture::read_lines_in_file(fs::path const &f
     return lines;
 }
 
-// bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, bool reset_stream)
-// {
-//     auto const stream_str = this->json_stream->str();
-//     EXPECT_EQ(expected_string, stream_str);
-//     bool are_equal = (expected_string == stream_str);
-//     if (reset_stream) this->json_stream->str(std::string());
-//     return are_equal;
-// }
+bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, bool reset_stream)
+{
+    auto const stream_str = this->json_stream->str();
+    EXPECT_EQ(expected_string, stream_str);
+    bool are_equal = (expected_string == stream_str);
+    if (reset_stream) this->json_stream->str(std::string());
+    return are_equal;
+}
 
 bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, bool reset_stream)
 {
@@ -238,12 +238,12 @@ bool EnergyPlusFixture::compare_dfs_stream(std::string const &expected_string, b
     return are_equal;
 }
 
-// bool EnergyPlusFixture::has_json_output(bool reset_stream)
-// {
-//     auto const has_output = this->json_stream->str().size() > 0;
-//     if (reset_stream) this->json_stream->str(std::string());
-//     return has_output;
-// }
+bool EnergyPlusFixture::has_json_output(bool reset_stream)
+{
+    auto const has_output = this->json_stream->str().size() > 0;
+    if (reset_stream) this->json_stream->str(std::string());
+    return has_output;
+}
 
 bool EnergyPlusFixture::has_eso_output(bool reset_stream)
 {
