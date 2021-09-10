@@ -3992,13 +3992,15 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     // RR - I have no idea what this unit test is proving
     EXPECT_TRUE(state->dataLoopNodes->Node(11).Temp < state->dataLoopNodes->Node(10).Temp);
     // mass balance 1 supply, 2 outlets
-    //EXPECT_NEAR(
-    //    state->dataLoopNodes->Node(4).MassFlowRate, state->dataLoopNodes->Node(12).MassFlowRate + state->dataLoopNodes->Node(11).MassFlowRate, 0.001);
+    // EXPECT_NEAR(
+    //    state->dataLoopNodes->Node(4).MassFlowRate, state->dataLoopNodes->Node(12).MassFlowRate + state->dataLoopNodes->Node(11).MassFlowRate,
+    //    0.001);
 
     // System 2 use AirTerminal:SingleDuct:ConstantVolume:NoReheat
     // mass balance 2 inlets, 1 outlet
-    //EXPECT_NEAR(
-    //    state->dataLoopNodes->Node(14).MassFlowRate, state->dataLoopNodes->Node(6).MassFlowRate + state->dataLoopNodes->Node(5).MassFlowRate, 0.001);
+    // EXPECT_NEAR(
+    //    state->dataLoopNodes->Node(14).MassFlowRate, state->dataLoopNodes->Node(6).MassFlowRate + state->dataLoopNodes->Node(5).MassFlowRate,
+    //    0.001);
 
     // System 3 use ATMixer with InletSide. PTAC draw from induce node
     // mass balance 1 inlets, 1 outlet
@@ -4006,8 +4008,9 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
 
     //// System 4 use ATMixer with supply side, PTAC draw air from exhaust node
     // mass balance 1 inlet, 2 outlets
-    //EXPECT_NEAR(
-    //    state->dataLoopNodes->Node(8).MassFlowRate, state->dataLoopNodes->Node(18).MassFlowRate + state->dataLoopNodes->Node(19).MassFlowRate, 0.001);
+    // EXPECT_NEAR(
+    //    state->dataLoopNodes->Node(8).MassFlowRate, state->dataLoopNodes->Node(18).MassFlowRate + state->dataLoopNodes->Node(19).MassFlowRate,
+    //    0.001);
 
     // System 5 use ATMixer with supply side, PTAC draw air from induce node
     // mass balance Return = Supply

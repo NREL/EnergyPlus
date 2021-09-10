@@ -846,8 +846,8 @@ namespace UnitarySystems {
         static void getCoilWaterSystemInputData(
             EnergyPlusData &state, std::string_view CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
-        static void
-        getPackagedTerminalUnitData(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+        static void getPackagedTerminalUnitData(
+            EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
         static void allocateUnitarySys(EnergyPlusData &state);
 

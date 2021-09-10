@@ -7193,7 +7193,7 @@ namespace UnitarySystems {
                     ip->getAlphaFieldValue(fields, objectSchemaProps, "supply_air_fan_operating_mode_schedule_name");
                 original_input_specs.minimum_supply_air_temperature =
                     ip->getRealFieldValue(fields, objectSchemaProps, "minimum_supply_air_temperature_in_cooling_mode");
-                // is this correct, unit test failure. If PTAC input is missing, set it to 80?
+                // is this correct, unit test failure. If PTAC input is missing, set it to -99?
                 // PTACDrawAirfromReturnNodeAndPlenum_Test
                 if (fields.find("minimum_supply_air_temperature_in_heating_mode") == fields.end()) { // not input
                     original_input_specs.minimum_supply_air_temperature = -99.0;
