@@ -15473,7 +15473,7 @@ namespace UnitarySystems {
                                                              _,
                                                              _,
                                                              DehumidificationMode_par,
-                                                             CoilSHR_par);
+                                                             0.0); // CoilSHR_par);
         Real64 OutletAirTemp = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(CoilIndex);
         Residuum = Par[2] - OutletAirTemp;
         return Residuum;
@@ -15524,7 +15524,7 @@ namespace UnitarySystems {
                                                              _,
                                                              state.dataUnitarySystems->economizerFlag,
                                                              DehumidificationMode_par,
-                                                             CoilSHR_par);
+                                                             0.0); // CoilSHR_par);
         Real64 OutletAirHumRat = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(CoilIndex);
         Residuum = Par[2] - OutletAirHumRat;
         return Residuum;
