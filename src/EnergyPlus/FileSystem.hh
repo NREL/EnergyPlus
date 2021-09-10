@@ -65,6 +65,8 @@ namespace fs = std::experimental::filesystem;
 #error "no filesystem support"
 #endif
 
+#include <EnergyPlus/EnergyPlus.hh>
+
 // Add a custom formatter for fmt
 namespace fmt {
 template <> struct formatter<fs::path> : formatter<std::string>
