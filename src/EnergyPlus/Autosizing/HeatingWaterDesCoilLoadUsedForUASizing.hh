@@ -48,7 +48,7 @@
 #ifndef HeatingWaterDesCoilLoadUsedForUASizing_hh_INCLUDED
 #define HeatingWaterDesCoilLoadUsedForUASizing_hh_INCLUDED
 
-#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
@@ -56,7 +56,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-struct HeatingWaterDesCoilLoadUsedForUASizer : BaseSizer
+struct HeatingWaterDesCoilLoadUsedForUASizer : BaseSizerWithScalableInputs
 {
     HeatingWaterDesCoilLoadUsedForUASizer()
     {
