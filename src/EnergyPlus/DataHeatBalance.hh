@@ -2186,7 +2186,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> ZnOpqSurfExtFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
     Array1D<Real64> ZnOpqSurfExtFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
 
-    Array1D<Real64> SurfQRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
+    Array1D<Real64> SurfQdotRadIntGainsInPerArea;       // Thermal radiation absorbed on inside surfaces
     Array1D<Real64> SurfQRadSWOutIncident;              // Exterior beam plus diffuse solar incident on surface (W/m2)
     Array1D<Real64> SurfQRadSWOutIncidentBeam;          // Exterior beam solar incident on surface (W/m2)
     Array1D<Real64> SurfBmIncInsSurfIntensRep;          // Beam sol irrad from ext wins on inside of surface (W/m2)
@@ -2486,7 +2486,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->ZnOpqSurfInsFaceCondLsRepEnrg.deallocate();
         this->ZnOpqSurfExtFaceCondGnRepEnrg.deallocate();
         this->ZnOpqSurfExtFaceCondLsRepEnrg.deallocate();
-        this->SurfQRadThermInAbs.deallocate();
+        this->SurfQdotRadIntGainsInPerArea.deallocate();
         this->SurfQRadSWOutIncident.deallocate();
         this->SurfQRadSWOutIncidentBeam.deallocate();
         this->SurfBmIncInsSurfIntensRep.deallocate();

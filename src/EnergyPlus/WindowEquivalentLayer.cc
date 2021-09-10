@@ -741,7 +741,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
             // The IR radiance of this window's "exterior" surround is the IR radiance
             // from surfaces and high-temp radiant sources in the adjacent zone
             outir = state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNumAdj) +
-                    state.dataHeatBal->SurfQRadThermInAbs(SurfNumAdj);
+                    state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNumAdj);
 
         } else { // Exterior window (ExtBoundCond = 0)
                  // Calculate LWR from surrounding surfaces if defined for an exterior window
@@ -793,7 +793,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     // Indoor mean radiant temperature.
     // IR incident on window from zone surfaces and high-temp radiant sources
     rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum) +
-           state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
+           state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum);
     TRMIN = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
 
     NL = state.dataWindowEquivLayer->CFS(EQLNum).NL;
