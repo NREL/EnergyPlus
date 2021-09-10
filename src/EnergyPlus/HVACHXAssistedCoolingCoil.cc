@@ -1118,10 +1118,11 @@ namespace HVACHXAssistedCoolingCoil {
                 // This is the unitary calc way: 
                 
                 // bool const singleMode = (this->m_SingleMode == 1);
-                bool singleMode = true;
-                if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].getNumModes() > 1) {
-                    singleMode = false;
-                }
+                int mSingleMode = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].getNumModes();
+                bool singleMode = (mSingleMode == 1);
+                //if (mSingleMode > 1) {
+                //    singleMode = false;
+                //}
 
                 Real64 CoolingSpeedNum = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex]
                                              .performance.normalMode.speeds.size(); // used the same for the original variable speed coil
@@ -1163,7 +1164,29 @@ namespace HVACHXAssistedCoolingCoil {
                     OperationMode = DataHVACGlobals::coilEnhancedMode;
                 }
 
-                Real64 CoolingSpeedRatio = 1.0; // used same setting as the original variable speed coil
+                Real64 CoolingSpeedRatio = 0.0; // used same setting as the original variable speed coil
+                Real64 CoolCompPartLoadRatio = double(CompOp);
+
+                // if (this->m_CoolingSpeedNum > 1) {
+                if (CoolingSpeedNum > 1) {
+                    //    if (this->m_SingleMode == 0) {
+                    if (mSingleMode == 0) {
+                        //        this->m_CoolCompPartLoadRatio = double(CompOn);
+                        CoolCompPartLoadRatio = double(CompOp);
+                    } else {
+                        //        this->m_CoolCompPartLoadRatio = PartLoadRatio * double(CompOn);
+                        CoolCompPartLoadRatio = PartLoadRatio * double(CompOp);
+                        //        // this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
+                        //        this->m_CoolingSpeedRatio = 1.0;
+                        CoolingSpeedRatio = 1.0;
+                    }
+                } else {
+                    //    this->m_CoolCompPartLoadRatio = this->m_CoolingCycRatio * double(CompOn);
+                    // CoolCompPartLoadRatio = CoolingCycRatio * double(CompOn);
+                    //    // this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
+                    //    this->m_CoolingSpeedRatio = 0.0;
+                    CoolingSpeedRatio = 0.0;
+                }
 
                 // state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
                 //    state, OperationMode, CoilPLR, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode, this->CoilSHR);
@@ -1177,29 +1200,6 @@ namespace HVACHXAssistedCoolingCoil {
                     FanOpMode,
                     singleMode); //,
                     // LoadSHR);
-
-                Real64 CoolCompPartLoadRatio = double(CompOp);
-
-                //if (this->m_CoolingSpeedNum > 1) {
-                if (CoolingSpeedNum > 1) {
-                //    if (this->m_SingleMode == 0) {
-                    if (singleMode == true) {
-                    //        this->m_CoolCompPartLoadRatio = double(CompOn);
-                            CoolCompPartLoadRatio = double(CompOp);
-                    } else {
-                //        this->m_CoolCompPartLoadRatio = PartLoadRatio * double(CompOn);
-                        // CoolCompPartLoadRatio = PartLoadRatio * double(CompOp);
-                        //        // this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
-                //        this->m_CoolingSpeedRatio = 1.0;
-                        CoolingSpeedRatio = 1.0;
-                    }
-                } else {
-                //    this->m_CoolCompPartLoadRatio = this->m_CoolingCycRatio * double(CompOn);
-                    // CoolCompPartLoadRatio = CoolingCycRatio * double(CompOn);
-                //    // this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
-                //    this->m_CoolingSpeedRatio = 0.0;
-                      CoolingSpeedRatio = 0.0;
-                }
 
                 //// Or consider the unitary simMultiCoil way: 
                 //Real64 SpeedRatio = 0.0;
