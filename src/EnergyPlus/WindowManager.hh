@@ -132,17 +132,17 @@ namespace WindowManager {
     //***********************************************************************************
     // Window Thermal Calculation Subroutines
     //***********************************************************************************
-//    void updateQdotRadOutRepHeatEmi(EnergyPlusData &state,
-//                                    int const SurfNum,                // Surface number
-//                                    Real64 const Tsout,               // temporary for result of outside surface temp in Kelvin
-//                                    Real64 const rad_out_per_area,    // Total radiation emission rate per area
-//                                    Real64 const rad_out_air_per_area // Radiation emission to air rate per area
-//    );
-//
-//    void updateQdotConvOutRep(EnergyPlusData &state,
-//                              int const SurfNum, // Surface number
-//                              Real64 const Tsout // temporary for result of outside surface temp in Kelvin
-//    );
+    //    void updateQdotRadOutRepHeatEmi(EnergyPlusData &state,
+    //                                    int const SurfNum,                // Surface number
+    //                                    Real64 const Tsout,               // temporary for result of outside surface temp in Kelvin
+    //                                    Real64 const rad_out_per_area,    // Total radiation emission rate per area
+    //                                    Real64 const rad_out_air_per_area // Radiation emission to air rate per area
+    //    );
+    //
+    //    void updateQdotConvOutRep(EnergyPlusData &state,
+    //                              int const SurfNum, // Surface number
+    //                              Real64 const Tsout // temporary for result of outside surface temp in Kelvin
+    //    );
 
     void CalcWindowHeatBalance(EnergyPlusData &state,
                                int const SurfNum,          // Surface number
