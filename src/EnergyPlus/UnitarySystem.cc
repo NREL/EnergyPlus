@@ -12295,7 +12295,7 @@ namespace UnitarySystems {
                             }
                             Par[5] = double(FanOpMode);
                             Par[6] = double(this->m_UnitarySysNum);
-                            Par[7] = double(this->m_DehumidificationMode);
+                            Par[7] = 0.0; // double(this->m_DehumidificationMode);
                             Par[8] = 0.0; // this->CoilSHR;
                             General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par);
                             if (SolFla == -1) {
@@ -12801,7 +12801,7 @@ namespace UnitarySystems {
                                 Par[4] = 0.0;
                             }
                             Par[5] = double(FanOpMode);
-                            Par[6] = double(this->m_DehumidificationMode);
+                            Par[6] = 0.0; // double(this->m_DehumidificationMode);
                             Par[7] = 0.0; // this->CoilSHR;
                             General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par);
                             if (SolFla == -1) {
