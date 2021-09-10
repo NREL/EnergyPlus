@@ -3188,6 +3188,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                            (SELECT_CASE_var == PkgTermHPWaterToAir_Num)) { // 'ZoneHVAC:PackagedTerminalHeatPump'
                     // 'ZoneHVAC:PackagedTerminalAirConditioner'
                     // 'ZoneHVAC:WaterToAirHeatPump'
+                    // change this to be selective of comp type
                     if (SELECT_CASE_var == PkgTermACAirToAir_Num) {
                         int AirLoopNum = 0;
                         bool HeatingActive = false;
