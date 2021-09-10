@@ -2992,7 +2992,7 @@ namespace WindowComplexManager {
 
             // Add contribution of IR from zone internal gains (lights, equipment and people). This is absorbed in zone-side layer and it
             // is assumed that nothing is transmitted through
-            asol(nlayer) += state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
+            asol(nlayer) += state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum);
 
             presure = state.dataEnvrn->OutBaroPress;
 
