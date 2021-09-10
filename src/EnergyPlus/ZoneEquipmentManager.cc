@@ -3188,14 +3188,37 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                            (SELECT_CASE_var == PkgTermHPWaterToAir_Num)) { // 'ZoneHVAC:PackagedTerminalHeatPump'
                     // 'ZoneHVAC:PackagedTerminalAirConditioner'
                     // 'ZoneHVAC:WaterToAirHeatPump'
-                    SimPackagedTerminalUnit(state,
-                                            state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
-                                            ActualZoneNum,
-                                            FirstHVACIteration,
-                                            SysOutputProvided,
-                                            LatOutputProvided,
-                                            ZoneEquipTypeNum,
-                                            state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).EquipIndex(EquipPtr));
+                    if (SELECT_CASE_var == PkgTermACAirToAir_Num) {
+                        int AirLoopNum = 0;
+                        bool HeatingActive = false;
+                        bool CoolingActive = false;
+                        int OAUnitNum = 0;
+                        Real64 OAUCoilOutTemp = 0.0;
+                        bool ZoneEquipFlag = true;
+                        state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum)
+                            .compPointer[EquipPtr]
+                            ->simulate(state,
+                                       state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
+                                       FirstHVACIteration,
+                                       AirLoopNum,
+                                       state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                                       HeatingActive,
+                                       CoolingActive,
+                                       OAUnitNum,
+                                       OAUCoilOutTemp,
+                                       ZoneEquipFlag,
+                                       SysOutputProvided,
+                                       LatOutputProvided);
+                    } else {
+                        SimPackagedTerminalUnit(state,
+                                                state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
+                                                ActualZoneNum,
+                                                FirstHVACIteration,
+                                                SysOutputProvided,
+                                                LatOutputProvided,
+                                                ZoneEquipTypeNum,
+                                                state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).EquipIndex(EquipPtr));
+                    }
 
                 } else if (SELECT_CASE_var == ZoneUnitarySys_Num) { // 'AirloopHVAC:UnitarySystem'
                     int AirLoopNum = 0;
@@ -3203,7 +3226,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                     bool CoolingActive = false;
                     int OAUnitNum = 0;
                     Real64 OAUCoilOutTemp = 0.0;
-                    bool ZoneEquipFlag = true;
+                    bool ZoneEquipFlag = true; // 'AirloopHVAC:UnitarySystem'
                     state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum)
                         .compPointer[EquipPtr]
                         ->simulate(state,

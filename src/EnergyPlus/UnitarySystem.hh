@@ -126,7 +126,15 @@ namespace UnitarySystems {
         std::string design_specification_multispeed_object_type;
         std::string design_specification_multispeed_object_name;
 
+        // inputs required by non-UnitarySystem parent objects
         std::string dx_cooling_coil_system_sensor_node_name;
+        std::string oa_mixer_type;
+        std::string oa_mixer_name;
+        std::string avail_manager_list_name;
+        std::string design_spec_zonehvac_sizing_object_name;
+        Real64 cooling_oa_flow_rate;
+        Real64 heating_oa_flow_rate;
+        Real64 no_load_oa_flow_rate;
 
         UnitarySysInputSpec();
 
@@ -200,6 +208,7 @@ namespace UnitarySystems {
             Unitary,          // AirloopHVAC:UnitarySystem
             CoilCoolingDX,    // CoilSystem:Cooling:DX
             CoilCoolingWater, // CoilSystem:Cooling:Water
+            PackagedAC,       // ZoneHVAC:PackagedTerminalAirConditioner
             Num
         };
 
@@ -837,6 +846,9 @@ namespace UnitarySystems {
         static void getCoilWaterSystemInputData(
             EnergyPlusData &state, std::string_view CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
+        static void
+        getPackagedTerminalUnitData(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+
         static void allocateUnitarySys(EnergyPlusData &state);
 
         static HVACSystemData *
@@ -910,7 +922,6 @@ namespace UnitarySystems {
     bool searchZoneInletNodesByEquipmentIndex(EnergyPlusData &state, int nodeToFind, int zoneEquipmentIndex);
     bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int ZoneEquipConfigIndex, int &InletNodeIndex);
     bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
-    // void setSystemParams(EnergyPlusData &state, UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
     bool searchTotalComponents(EnergyPlusData &state, std::string_view objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
     void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
     void isWaterCoilHeatRecoveryType(EnergyPlusData &state, int const waterCoilNodeNum, bool &nodeNotFound);

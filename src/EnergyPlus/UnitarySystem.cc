@@ -1534,6 +1534,7 @@ namespace UnitarySystems {
 
         UnitarySys::getDXCoilSystemData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
         UnitarySys::getCoilWaterSystemInputData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
+        UnitarySys::getPackagedTerminalUnitData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
         UnitarySys::getUnitarySystemInputData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
 
         // all systems should have been processed at this point? I think so, so don't need to if test this call?
@@ -2495,7 +2496,7 @@ namespace UnitarySystems {
                     this->m_MSHeatingSpeedRatio[Iter] = this->m_HeatVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
                 }
                 if (this->m_CoolCoilExists) {
-                    if (this->m_CoolVolumeFlowRate.size() > 0 && MSHPIndex > -1) {
+                    if (!this->m_CoolVolumeFlowRate.empty() && MSHPIndex > -1) {
                         this->m_MaxNoCoolHeatAirVolFlow =
                             min(this->m_MaxNoCoolHeatAirVolFlow,
                                 this->m_MaxHeatAirVolFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio);
@@ -2569,7 +2570,7 @@ namespace UnitarySystems {
             }
 
             if (this->m_CoolCoilExists && this->m_NumOfSpeedHeating > 0) {
-                if (this->m_CoolVolumeFlowRate.size() > 0 && MSHPIndex > -1) {
+                if (!this->m_CoolVolumeFlowRate.empty() && MSHPIndex > -1) {
                     this->m_MaxNoCoolHeatAirVolFlow =
                         min(this->m_MaxNoCoolHeatAirVolFlow,
                             this->m_MaxHeatAirVolFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio);
@@ -2585,7 +2586,7 @@ namespace UnitarySystems {
                         this->MaxHeatAirMassFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
                     this->m_NoLoadAirFlowRateRatio = this->m_MSHeatingSpeedRatio[this->m_NumOfSpeedHeating] *
                                                      state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
-                } else if (this->m_CoolVolumeFlowRate.size() > 0) {
+                } else if (!this->m_CoolVolumeFlowRate.empty()) {
                     this->m_MaxNoCoolHeatAirVolFlow = min(this->m_MaxNoCoolHeatAirVolFlow, this->m_MaxNoCoolHeatAirVolFlow);
                     this->MaxNoCoolHeatAirMassFlow = min(this->MaxNoCoolHeatAirMassFlow, this->MaxNoCoolHeatAirMassFlow);
                     this->m_NoLoadAirFlowRateRatio =
@@ -2624,7 +2625,7 @@ namespace UnitarySystems {
                     this->m_MSHeatingSpeedRatio[Iter] = this->m_HeatVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
                 }
                 if (this->m_CoolCoilExists) {
-                    if (this->m_CoolVolumeFlowRate.size() > 0 && MSHPIndex > 0) {
+                    if (!this->m_CoolVolumeFlowRate.empty() && MSHPIndex > 0) {
                         this->m_MaxNoCoolHeatAirVolFlow =
                             min(this->m_MaxNoCoolHeatAirVolFlow,
                                 this->m_MaxHeatAirVolFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio);
@@ -3077,7 +3078,7 @@ namespace UnitarySystems {
 
         // these are needed for call from GetOASysNumHeat(Cool)ingCoils
         std::string loc_heatingCoilType = input_data.heating_coil_object_type;
-        if (loc_heatingCoilType.size() > 0) {
+        if (!loc_heatingCoilType.empty()) {
             this->m_HeatCoilExists = true;
         }
         std::string loc_m_HeatingCoilName = input_data.heating_coil_name;
@@ -3128,7 +3129,7 @@ namespace UnitarySystems {
         }
 
         std::string loc_coolingCoilType = input_data.cooling_coil_object_type;
-        if (loc_coolingCoilType.size() > 0) { // not required field
+        if (!loc_coolingCoilType.empty()) { // not required field
             this->m_CoolCoilExists = true;
         }
         std::string loc_m_CoolingCoilName = input_data.cooling_coil_name;
@@ -3215,11 +3216,11 @@ namespace UnitarySystems {
         }
 
         std::string loc_suppHeatCoilType = input_data.supplemental_heating_coil_object_type;
-        if (input_data.supplemental_heating_coil_object_type.size() > 0) {
+        if (!input_data.supplemental_heating_coil_object_type.empty()) {
             this->m_SuppCoilExists = true;
         }
 
-        if (input_data.supply_fan_object_type.size() > 0 && input_data.supply_fan_name.size() > 0) {
+        if (!input_data.supply_fan_object_type.empty() && !input_data.supply_fan_name.empty()) {
             this->m_FanExists = true;
         }
 
@@ -3311,7 +3312,7 @@ namespace UnitarySystems {
         bool isNotOK = false;
 
         std::string loc_sysAvailSched = input_data.availability_schedule_name;
-        if (loc_sysAvailSched.size() > 0) {
+        if (!loc_sysAvailSched.empty()) {
             this->m_SysAvailSchedPtr = ScheduleManager::GetScheduleIndex(state, loc_sysAvailSched);
             if (this->m_SysAvailSchedPtr == 0) {
                 ShowWarningError(state,
@@ -3325,17 +3326,19 @@ namespace UnitarySystems {
         }
 
         std::string loc_controlZoneName = input_data.controlling_zone_or_thermostat_location;
-        if (loc_controlZoneName.size() > 0) { // not required field
+        if (!loc_controlZoneName.empty()) { // not required field
             this->ControlZoneNum = UtilityRoutines::FindItemInList(loc_controlZoneName, state.dataHeatBal->Zone);
         } else if (this->m_ControlType == ControlType::Load || this->m_ControlType == ControlType::CCMASHRAE) {
-            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-            ShowContinueError(state, "Controlling Zone or Thermostat Location cannot be blank when Control Type = Load or SingleZoneVAV");
-            errorsFound = true;
+            if (this->m_sysType != SysType::PackagedAC) {
+                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                ShowContinueError(state, "Controlling Zone or Thermostat Location cannot be blank when Control Type = Load or SingleZoneVAV");
+                errorsFound = true;
+            }
         }
 
         // check that control zone name is valid for load based control
         if (this->m_ControlType == ControlType::Load || this->m_ControlType == ControlType::CCMASHRAE) {
-            if (this->ControlZoneNum == 0) {
+            if (this->ControlZoneNum == 0 && this->m_sysType != SysType::PackagedAC) {
                 ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
                 ShowContinueError(state, "When Control Type = Load or SingleZoneVAV");
                 ShowContinueError(state, " Controlling Zone or Thermostat Location must be a valid zone name, zone name = " + loc_controlZoneName);
@@ -3409,6 +3412,7 @@ namespace UnitarySystems {
                 if (ZoneExhaustNodeFound) {
                     ZoneEquipmentFound = true;
                     // The Node was found among the exhaust nodes, now check that a matching inlet node exists
+                    // this should be zoneExhaustNode
                     this->m_ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum);
                     this->ControlZoneNum = ControlledZoneNum;
                     this->setSystemParams(state, TotalFloorAreaOnAirLoop, thisObjectName);
@@ -5399,7 +5403,7 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
 
-            if (loc_m_SystemCoolControlNodeName.size() > 0) { // used by CoilSystem:Cooling:DX
+            if (!loc_m_SystemCoolControlNodeName.empty()) { // used by CoilSystem:Cooling:DX
                 this->m_SystemCoolControlNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                        loc_m_SystemCoolControlNodeName,
                                                                                        errFlag,
@@ -5493,10 +5497,12 @@ namespace UnitarySystems {
         // if (!lNumericBlanks(iDOASDXMinTempNumericNum)) {
         this->DesignMinOutletTemp = loc_DesignMinOutletTemp;
         if (this->m_ControlType != ControlType::CCMASHRAE && this->DesignMinOutletTemp == DataSizing::AutoSize) {
-            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-            ShowContinueError(state, "Invalid entry for Minimum Supply Air Temperature = AutoSize.");
-            ShowContinueError(state, "AutoSizing not allowed when Control Type = Load or Setpoint");
-            errorsFound = true;
+            if (this->m_sysType != SysType::PackagedAC) {
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                ShowContinueError(state, "Invalid entry for Minimum Supply Air Temperature = AutoSize.");
+                ShowContinueError(state, "AutoSizing not allowed when Control Type = Load or Setpoint");
+                errorsFound = true;
+            }
         }
         if (this->m_ControlType != ControlType::CCMASHRAE && this->DesignMinOutletTemp > 7.5) {
             ShowWarningError(state, cCurrentModuleObject + " = " + thisObjectName);
@@ -7139,13 +7145,105 @@ namespace UnitarySystems {
         }
     }
 
+    void UnitarySys::getPackagedTerminalUnitData(
+        EnergyPlusData &state, std::string_view objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
+    {
+        std::string cCurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
+        auto &ip = state.dataInputProcessing->inputProcessor;
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            auto &instancesValue = instances.value();
+            auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                // only get the current data once all data has been read in and vector unitarySys has been initialized
+                // when UnitarySystems::getInputOnceFlag is true read all unitary systems, otherwise read just the curren object
+                if (!UtilityRoutines::SameString(objectName, thisObjectName) && !state.dataUnitarySystems->getInputOnceFlag) continue;
+
+                int sysNum = getUnitarySystemIndex(state, thisObjectName);
+                if (sysNum == -1) ++state.dataUnitarySystems->numUnitarySystems;
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, instance.key());
+
+                // get ZoneHVAC:PackagedTerminalAirConditioner object inputs
+                UnitarySysInputSpec original_input_specs;
+                auto const &fields = instance.value();
+                original_input_specs.name = thisObjectName;
+                original_input_specs.system_type = cCurrentModuleObject;
+                original_input_specs.availability_schedule_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "availability_schedule_name");
+                original_input_specs.air_inlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "air_inlet_node_name");
+                original_input_specs.air_outlet_node_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "air_outlet_node_name");
+
+                original_input_specs.oa_mixer_type = ip->getAlphaFieldValue(fields, objectSchemaProps, "outdoor_air_mixer_object_type");
+                original_input_specs.oa_mixer_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "outdoor_air_mixer_name");
+
+                original_input_specs.cooling_supply_air_flow_rate = ip->getRealFieldValue(fields, objectSchemaProps, "cooling_supply_air_flow_rate");
+                original_input_specs.heating_supply_air_flow_rate = ip->getRealFieldValue(fields, objectSchemaProps, "heating_supply_air_flow_rate");
+                original_input_specs.no_load_supply_air_flow_rate = ip->getRealFieldValue(fields, objectSchemaProps, "no_load_supply_air_flow_rate");
+                original_input_specs.supply_fan_object_type = ip->getAlphaFieldValue(fields, objectSchemaProps, "supply_air_fan_object_type");
+                original_input_specs.supply_fan_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "supply_air_fan_name");
+                original_input_specs.heating_coil_object_type = ip->getAlphaFieldValue(fields, objectSchemaProps, "heating_coil_object_type");
+                original_input_specs.heating_coil_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "heating_coil_name");
+                original_input_specs.cooling_coil_object_type = ip->getAlphaFieldValue(fields, objectSchemaProps, "cooling_coil_object_type");
+                original_input_specs.cooling_coil_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "cooling_coil_name");
+
+                original_input_specs.fan_placement = ip->getAlphaFieldValue(fields, objectSchemaProps, "fan_placement");
+                original_input_specs.supply_air_fan_operating_mode_schedule_name =
+                    ip->getAlphaFieldValue(fields, objectSchemaProps, "supply_air_fan_operating_mode_schedule_name");
+                original_input_specs.minimum_supply_air_temperature =
+                    ip->getRealFieldValue(fields, objectSchemaProps, "minimum_supply_air_temperature_in_cooling_mode");
+                original_input_specs.maximum_supply_air_temperature =
+                    ip->getRealFieldValue(fields, objectSchemaProps, "maximum_supply_air_temperature_in_heating_mode");
+                original_input_specs.control_type = ip->getAlphaFieldValue(fields, objectSchemaProps, "capacity_control_method");
+                if (original_input_specs.control_type.empty() || original_input_specs.control_type == "NONE") {
+                    original_input_specs.control_type = "LOAD";
+                }
+                // need to checl all defaults past field 18
+
+                // inputs required by non-UnitarySystem parent objects
+                original_input_specs.cooling_oa_flow_rate = ip->getRealFieldValue(fields, objectSchemaProps, "cooling_outdoor_air_flow_rate");
+                original_input_specs.heating_oa_flow_rate = ip->getRealFieldValue(fields, objectSchemaProps, "heating_outdoor_air_flow_rate");
+                original_input_specs.no_load_oa_flow_rate = ip->getRealFieldValue(fields, objectSchemaProps, "no_load_outdoor_air_flow_rate");
+                original_input_specs.no_load_supply_air_flow_rate = ip->getRealFieldValue(fields, objectSchemaProps, "no_load_supply_air_flow_rate");
+                original_input_specs.avail_manager_list_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "availability_manager_list_name");
+                original_input_specs.design_spec_zonehvac_sizing_object_name =
+                    ip->getAlphaFieldValue(fields, objectSchemaProps, "design_specification_zonehvac_sizing_object_name");
+
+                // set UnitarySystem specific inputs
+                original_input_specs.dehumidification_control_type = "None";
+                original_input_specs.latent_load_control = "SensibleOnlyLoadControl";
+                original_input_specs.cooling_supply_air_flow_rate_method = "SupplyAirFlowRate";
+                original_input_specs.heating_supply_air_flow_rate_method = "SupplyAirFlowRate";
+                original_input_specs.no_load_supply_air_flow_rate_method = "SupplyAirFlowRate";
+
+                // now translate to UnitarySystem
+                UnitarySys thisSys;
+                thisSys.UnitType = cCurrentModuleObject;
+                thisSys.m_sysType = SysType::PackagedAC;
+                // TODO: figure out another way to set this next variable
+                // Unitary System will not turn on unless this mode is set OR a different method is used to set air flow rate
+                thisSys.m_LastMode = state.dataUnitarySystems->HeatingMode;
+                thisSys.processInputSpec(state, original_input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
+
+                if (sysNum == -1) {
+                    int thisSysNum = state.dataUnitarySystems->numUnitarySystems - 1;
+                    state.dataUnitarySystems->unitarySys[thisSysNum] = thisSys;
+                } else {
+                    state.dataUnitarySystems->unitarySys[sysNum] = thisSys;
+                }
+            }
+        }
+    }
+
     void UnitarySys::allocateUnitarySys(EnergyPlusData &state)
     {
-        if (state.dataUnitarySystems->unitarySys.size() > 0) return;
+        if (!state.dataUnitarySystems->unitarySys.empty()) return;
         int numUnitarySystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:UnitarySystem");
         int numCoilSystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:DX");
         int numCoilSystemsWater = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:Water");
-        int numAllSystemTypes = numUnitarySystems + numCoilSystems + numCoilSystemsWater;
+        int numPackagedAC = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "ZoneHVAC:PackagedTerminalAirConditioner");
+        int numAllSystemTypes = numUnitarySystems + numCoilSystems + numCoilSystemsWater + numPackagedAC;
         for (int sysCount = 0; sysCount < numAllSystemTypes; ++sysCount) {
             UnitarySys thisSys;
             state.dataUnitarySystems->unitarySys.push_back(thisSys);
@@ -17613,6 +17711,128 @@ namespace UnitarySystems {
                                             OutputProcessor::SOVStoreType::Average,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                     }
+                } else if (state.dataUnitarySystems->unitarySys[sysNum].m_sysType == UnitarySys::SysType::PackagedAC) {
+                    // CurrentModuleObject = 'ZoneHVAC:PackagedTerminalAirConditioner'
+                    // fix these report variables that do not exist in UnitarySystem, energy, sens, lat, fan avail
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Total Heating Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotHeatEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Total Heating Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotHeatEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Total Cooling Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotCoolEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Total Cooling Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotCoolEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Sensible Heating Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotHeatEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Sensible Heating Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotHeatEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Sensible Cooling Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotCoolEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Sensible Cooling Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotCoolEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Latent Heating Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotCoolEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Latent Heating Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotHeatEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Latent Cooling Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotCoolEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Latent Cooling Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_TotCoolEnergyRate,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Electricity Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_ElecPower,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Electricity Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_ElecPowerConsumption,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Fan Part Load Ratio",
+                                        OutputProcessor::Unit::None,
+                                        state.dataUnitarySystems->unitarySys[sysNum].FanPartLoadRatio,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Compressor Part Load Ratio",
+                                        OutputProcessor::Unit::None,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_CompPartLoadRatio,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
+                    SetupOutputVariable(state,
+                                        "Zone Packaged Terminal Air Conditioner Fan Availability Status",
+                                        OutputProcessor::Unit::None,
+                                        state.dataUnitarySystems->unitarySys[sysNum].FanPartLoadRatio,
+                                        OutputProcessor::SOVTimeStepType::System,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
                 } else {
                     ShowFatalError(state,
                                    "setupAllOutputVar: Developer error. All report variables must be set up here after all systems are read in.");
