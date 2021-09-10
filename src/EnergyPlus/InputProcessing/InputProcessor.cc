@@ -273,16 +273,9 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 fs::path convertedIDF = FileSystem::makeNativePath(
                     FileSystem::replaceFileExtension(state.dataStrGlobals->outDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".epJSON"));
                 FileSystem::writeFile<FileSystem::FileTypes::EpJSON>(convertedIDF, epJSONClean);
-                auto cbor_path = FileSystem::makeNativePath(
-                    FileSystem::replaceFileExtension(state.dataStrGlobals->outDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".cbor"));
-                //auto os = std::ofstream(cbor_path, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
-                    cbor_path, epJSONClean, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                //FileSystem::writeFile<FileSystem::FileTypes::CBOR>(os, epJSONClean);
-                //auto test = FileSystem::readJSON(cbor_path, std::ios_base::in | std::ios_base::binary);
             }
         } else {
-            epJSON = FileSystem::readJSON(state.dataStrGlobals->inputFilePath, std::ios_base::in | std::ios_base::binary);
+            epJSON = FileSystem::readJSON(state.dataStrGlobals->inputFilePath);
         }
     } catch (const std::exception &e) {
         ShowSevereError(state, e.what());

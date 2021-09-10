@@ -526,185 +526,105 @@ namespace ResultsFramework {
     }
 
     void
-    DataFrame::writeReport(JsonOutputStreams &jsonOutputStreams, bool outputJSON, bool outputCBOR, bool outputMsgPack, bool write_to_json_streams)
+    DataFrame::writeReport(JsonOutputFilePaths &jsonOutputFilePaths, bool outputJSON, bool outputCBOR, bool outputMsgPack)
     {
 
         json root = getJSON();
         if (ReportFrequency == "Detailed-HVAC") {
             if (outputJSON) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_TSstream_HVAC, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.outputTSJsonFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputTSHvacJsonFilePath, root);                
             }
             if (outputCBOR) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_TSstream_HVAC, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.outputTSCborFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
+                    jsonOutputFilePaths.outputTSHvacCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
             if (outputMsgPack) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_TSstream_HVAC, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.outputTSMsgPackFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
+                    jsonOutputFilePaths.outputTSHvacMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
         } else if (ReportFrequency == "Detailed-Zone") {
             if (outputJSON) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_TSstream_Zone, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.outputTSJsonFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputTSZoneJsonFilePath, root);                
             }
             if (outputCBOR) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_TSstream_Zone, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.outputTSCborFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
+                    jsonOutputFilePaths.outputTSZoneCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
             if (outputMsgPack) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_TSstream_Zone, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.outputTSMsgPackFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
+                    jsonOutputFilePaths.outputTSZoneMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
         } else if (ReportFrequency == "TimeStep") {
             if (outputJSON) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_TSstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.outputTSJsonFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputTSJsonFilePath, root);                
             }
             if (outputCBOR) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_TSstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.outputTSCborFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
+                    jsonOutputFilePaths.outputTSCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
             if (outputMsgPack) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_TSstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.outputTSMsgPackFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
+                    jsonOutputFilePaths.outputTSMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
         } else if (ReportFrequency == "Daily") {
             if (outputJSON) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_DYstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.outputDYJsonFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputDYJsonFilePath, root);                
             }
             if (outputCBOR) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_DYstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.outputDYCborFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
+                    jsonOutputFilePaths.outputDYCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
             if (outputMsgPack) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_DYstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.outputDYMsgPackFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
+                    jsonOutputFilePaths.outputDYMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
         } else if (ReportFrequency == "Hourly") {
             if (outputJSON) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_HRstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.outputHRJsonFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputHRJsonFilePath, root);                
             }
             if (outputCBOR) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_HRstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.outputHRCborFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
+                    jsonOutputFilePaths.outputHRCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
             if (outputMsgPack) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_HRstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.outputHRMsgPackFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
+                    jsonOutputFilePaths.outputHRMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
         } else if (ReportFrequency == "Monthly") {
             if (outputJSON) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_MNstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.outputMNJsonFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputMNJsonFilePath, root);                
             }
             if (outputCBOR) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_MNstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.outputMNCborFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
+                    jsonOutputFilePaths.outputMNCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
             if (outputMsgPack) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_MNstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.outputMNMsgPackFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
+                    jsonOutputFilePaths.outputMNMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
         } else if (ReportFrequency == "RunPeriod") {
             if (outputJSON) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_SMstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.outputSMJsonFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputSMJsonFilePath, root);                
             }
             if (outputCBOR) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_SMstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.outputSMCborFilePath, root);
-                }
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
+                    jsonOutputFilePaths.outputSMCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
             }
             if (outputMsgPack) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_SMstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.outputSMMsgPackFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
+                    jsonOutputFilePaths.outputSMMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
         } else if (ReportFrequency == "Yearly") {
             if (outputJSON) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_YRstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.outputYRJsonFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputYRJsonFilePath, root);                
             }
             if (outputCBOR) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_YRstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.outputYRCborFilePath, root);
-                }                
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
+                    jsonOutputFilePaths.outputYRCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));                
             }
             if (outputMsgPack) {
-                if (write_to_json_streams) {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_YRstream, root);
-                } else {
-                    FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.outputYRMsgPackFilePath, root);
-                }
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
+                    jsonOutputFilePaths.outputYRMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
             }
         }
     }
@@ -1382,22 +1302,18 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsFramework::writeOutputs(EnergyPlusData &state, bool write_to_json_streams)
+    void ResultsFramework::writeOutputs(EnergyPlusData &state)
     {
         if (state.files.outputControl.csv) {
             writeCSVOutput(state);
         }
 
-        if (write_to_json_streams && (timeSeriesEnabled() || timeSeriesAndTabularEnabled()) && (outputJSON || outputCBOR || outputMsgPack)) {
-            OpenOutputJsonFiles(state, state.files.json);
-        }
-
         if (timeSeriesEnabled() && (outputJSON || outputCBOR || outputMsgPack)) {
-            writeTimeSeriesReports(state.files.json, write_to_json_streams);
+            writeTimeSeriesReports(state.files.json);
         }
 
         if (timeSeriesAndTabularEnabled() && (outputJSON || outputCBOR || outputMsgPack)) {
-            writeReport(state.files.json, write_to_json_streams);
+            writeReport(state.files.json);
         }
     }
 
@@ -1485,50 +1401,50 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsFramework::writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams, bool write_to_json_streams)
+    void ResultsFramework::writeTimeSeriesReports(JsonOutputFilePaths &jsonOutputFilePaths)
     {
         // Output detailed Zone time series data
         if (hasRIDetailedZoneTSData()) {
-            RIDetailedZoneTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack, write_to_json_streams);
+            RIDetailedZoneTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output detailed HVAC time series data
         if (hasRIDetailedHVACTSData()) {
-            RIDetailedHVACTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack, write_to_json_streams);
+            RIDetailedHVACTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output timestep time series data
         if (hasRITimestepTSData()) {
-            RITimestepTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack, write_to_json_streams);
+            RITimestepTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output hourly time series data
         if (hasRIHourlyTSData()) {
-            RIHourlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack, write_to_json_streams);
+            RIHourlyTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output daily time series data
         if (hasRIDailyTSData()) {
-            RIDailyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack, write_to_json_streams);
+            RIDailyTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output monthly time series data
         if (hasRIMonthlyTSData()) {
-            RIMonthlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack, write_to_json_streams);
+            RIMonthlyTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output run period time series data
         if (hasRIRunPeriodTSData()) {
-            RIRunPeriodTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack, write_to_json_streams);
+            RIRunPeriodTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output yearly time series data
         if (hasRIYearlyTSData()) {
-            RIYearlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack, write_to_json_streams);
+            RIYearlyTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
     }
 
-    void ResultsFramework::writeReport(JsonOutputStreams &jsonOutputStreams, bool write_to_json_streams)
+    void ResultsFramework::writeReport(JsonOutputFilePaths &jsonOutputFilePaths)
     {
         json root, outputVars, meterVars, meterData;
         root = {{"SimulationResults", {{"Simulation", SimulationInformation.getJSON()}}}};
@@ -1629,27 +1545,15 @@ namespace ResultsFramework {
         root["TabularReports"] = TabularReportsCollection.getJSON();
 
         if (outputJSON) {
-            if (write_to_json_streams) {
-                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_stream, root);
-            } else {
-                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.outputJsonFilePath, root);
-            }
+            FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputJsonFilePath, root);
         }
         if (outputCBOR) {
-            if (write_to_json_streams) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_stream, root);
-            } else {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
-                    jsonOutputStreams.outputCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-            }
+            FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
+                    jsonOutputFilePaths.outputCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
         }
         if (outputMsgPack) {
-            if (write_to_json_streams) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_stream, root);
-            } else {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
-                    jsonOutputStreams.outputMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-            }
+            FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
+                    jsonOutputFilePaths.outputMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
         }
     }
 
@@ -1665,167 +1569,6 @@ namespace ResultsFramework {
     ResultsFramework::addReportMeter(std::string const &meter, std::string const &units, OutputProcessor::ReportingFrequency const reportingInterval)
     {
         outputVariables.emplace_back(fmt::format("{0} [{1}]({2})", meter, units, reportingFrequency(reportingInterval)));
-    }
-    
-    std::unique_ptr<std::ostream> ResultsFramework::OpenStreamFile(EnergyPlusData &state, const fs::path &filePath, std::ios_base::openmode mode)
-    {
-        auto result = std::make_unique<std::ofstream>(filePath, mode);
-        if (!result->good()) {
-            ShowFatalError(state, "OpenOutputFiles: Could not open file " + filePath.string() + " for output (write).");
-        }
-        return result;
-    }
-
-    std::unique_ptr<fmt::ostream> ResultsFramework::OpenFmtStreamFile(EnergyPlusData &state, const fs::path &filePath)
-    {
-        std::unique_ptr<fmt::ostream> result = nullptr;
-#ifdef _WIN32
-        auto filePathStr = filePath.string();
-        auto path = filePathStr.c_str();
-#else
-        auto path = filePath.c_str();
-#endif
-        try {
-            auto f = fmt::output_file(path, fmt::buffer_size = (2 << 17));
-            result = std::make_unique<fmt::ostream>(std::move(f));
-        } catch (const std::system_error &error) {
-            ShowSevereError(state, error.what());
-            ShowFatalError(state, "OpenOutputFiles: Could not open file " + filePath.string() + " for output (write).");
-        }
-        return result;
-    }
-
-    void ResultsFramework::OpenOutputJsonFiles(EnergyPlusData &state, JsonOutputStreams &jsonOutputStreams)
-    {
-
-        //// timeSeriesAndTabularEnabled() will return true if only timeSeriesAndTabular is set, that's the only time we write to that file
-        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-            if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                jsonOutputStreams.json_stream = OpenStreamFile(state, jsonOutputStreams.outputJsonFilePath);
-            }
-            if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                jsonOutputStreams.cbor_stream =
-                    OpenStreamFile(state, jsonOutputStreams.outputCborFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-            }
-            if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                jsonOutputStreams.msgpack_stream = OpenStreamFile(
-                    state, jsonOutputStreams.outputMsgPackFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-            }
-        }
-        //// timeSeriesEnabled() will return true if timeSeries is set, so we can write meter reports
-        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
-            // Output detailed Zone time series file
-            if (state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.rDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.iDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream_Zone = OpenStreamFile(state, jsonOutputStreams.outputTSZoneJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream_Zone = OpenStreamFile(
-                        state, jsonOutputStreams.outputTSZoneCborFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream_Zone = OpenStreamFile(
-                        state, jsonOutputStreams.outputTSZoneMsgPackFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-            }
-
-            // Output detailed HVAC time series file
-            if (state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream_HVAC = OpenStreamFile(state, jsonOutputStreams.outputTSHvacJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream_HVAC = OpenStreamFile(
-                        state, jsonOutputStreams.outputTSHvacCborFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream_HVAC = OpenStreamFile(
-                        state, jsonOutputStreams.outputTSHvacMsgPackFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-            }
-
-            // Output timestep time series file
-            if (state.dataResultsFramework->resultsFramework->RITimestepTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RITimestepTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream = OpenStreamFile(state, jsonOutputStreams.outputTSJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream = OpenStreamFile(
-                        state, jsonOutputStreams.outputTSCborFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream = OpenStreamFile(
-                        state, jsonOutputStreams.outputTSMsgPackFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-            }
-
-            // Output hourly time series file
-            if (state.dataResultsFramework->resultsFramework->RIHourlyTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIHourlyTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_HRstream = OpenStreamFile(state, jsonOutputStreams.outputHRJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_HRstream = OpenStreamFile(
-                        state, jsonOutputStreams.outputHRCborFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_HRstream = OpenStreamFile(
-                        state, jsonOutputStreams.outputHRMsgPackFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-            }
-
-            // Output daily time series file
-            if (state.dataResultsFramework->resultsFramework->RIDailyTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIDailyTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_DYstream = OpenStreamFile(state, jsonOutputStreams.outputDYJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_DYstream = OpenStreamFile(
-                        state, jsonOutputStreams.outputDYCborFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_DYstream = OpenStreamFile(
-                        state, jsonOutputStreams.outputDYMsgPackFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-            }
-
-            // Output monthly time series file
-            if (state.dataResultsFramework->resultsFramework->RIMonthlyTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIMonthlyTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_MNstream = OpenStreamFile(state, jsonOutputStreams.outputMNJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_MNstream = OpenStreamFile(
-                        state, jsonOutputStreams.outputMNCborFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_MNstream = OpenStreamFile(
-                        state, jsonOutputStreams.outputMNMsgPackFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-            }
-
-            // Output run period time series file
-            if (state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_SMstream = OpenStreamFile(state, jsonOutputStreams.outputSMJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_SMstream = OpenStreamFile(
-                        state, jsonOutputStreams.outputSMCborFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_SMstream = OpenStreamFile(
-                        state, jsonOutputStreams.outputSMMsgPackFilePath, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
-                }
-            }
-        }
     }
 
 } // namespace ResultsFramework

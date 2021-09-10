@@ -333,7 +333,7 @@ bool processInput(std::string const &inputFilePath,
             epJSON = idf_parser->decode(input_file, schema, success);
             cleanEPJSON(epJSON);
         } else {
-            epJSON = EnergyPlus::FileSystem::readJSON(inputPath, std::ios_base::in | std::ios_base::binary);
+            epJSON = EnergyPlus::FileSystem::readJSON(inputPath);
         }
     } catch (const std::exception &e) {
         displayMessage(e.what());

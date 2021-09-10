@@ -1668,6 +1668,34 @@ namespace SimulationManager {
         }
     }
 
+    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const fs::path &filePath, std::ios_base::openmode mode)
+    {
+        auto result = std::make_unique<std::ofstream>(filePath, mode);
+        if (!result->good()) {
+            ShowFatalError(state, "OpenOutputFiles: Could not open file " + filePath.string() + " for output (write).");
+        }
+        return result;
+    }
+
+    std::unique_ptr<fmt::ostream> OpenFmtStreamFile(EnergyPlusData &state, const fs::path &filePath)
+    {
+        std::unique_ptr<fmt::ostream> result = nullptr;
+#ifdef _WIN32
+        auto filePathStr = filePath.string();
+        auto path = filePathStr.c_str();
+#else
+        auto path = filePath.c_str();
+#endif
+        try {
+            auto f = fmt::output_file(path, fmt::buffer_size = (2 << 17));
+            result = std::make_unique<fmt::ostream>(std::move(f));
+        } catch (const std::system_error &error) {
+            ShowSevereError(state, error.what());
+            ShowFatalError(state, "OpenOutputFiles: Could not open file " + filePath.string() + " for output (write).");
+        }
+        return result;
+    }
+
     void OpenOutputFiles(EnergyPlusData &state)
     {
 

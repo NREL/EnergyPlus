@@ -169,13 +169,6 @@ protected:
     // This function reads all the lines in the supplied filePath. It puts each line into the vector.
     std::vector<std::string> read_lines_in_file(fs::path const &filePath);
 
-    // Compare an expected string against the JSON stream. The default is to reset the JSON stream after every call.
-    // It is easier to test successive functions if the ESO stream is 'empty' before the next call.
-    // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
-    // if it makes sense for the unit test to continue after returning from function.
-    // Will return true if string matches the stream and false if it does not
-    bool compare_json_stream(std::string const &expected_string, bool reset_stream = true);
-
     // Compare an expected string against the ESO stream. The default is to reset the ESO stream after every call.
     // It is easier to test successive functions if the ESO stream is 'empty' before the next call.
     // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
@@ -232,9 +225,6 @@ protected:
     // Will return true if string matches the stream and false if it does not
     bool compare_dfs_stream(std::string const &expected_string, bool reset_stream = true);
 
-    // Check if JSON stream has any output. Useful to make sure there are or are not outputs to JSON.
-    bool has_json_output(bool reset_stream = true);
-
     // Check if ESO stream has any output. Useful to make sure there are or are not outputs to ESO.
     bool has_eso_output(bool reset_stream = true);
 
@@ -272,20 +262,6 @@ protected:
     // Will return false if no errors found and true if errors found
     bool process_idf(std::string const &idf_snippet, bool use_assertions = true);
 
-    // This is a helper function to easily compare an expected IDF data structure with the actual IDFRecords data structure
-    // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
-    // if it makes sense for the unit test to continue after returning from function.
-    // Will return true if data structures match and false if they do not.
-    // Usage (assuming "Version,8.3;" was parsed as an idf snippet):
-    //       EXPECT_TRUE( compare_idf( "VERSION", 1, 0, 1, { "8.3" }, { false }, {}, {} ) );
-    bool compare_idf(std::string const &name,
-                     int const num_alphas,
-                     int const num_numbers,
-                     std::vector<std::string> const &alphas,
-                     std::vector<bool> const &alphas_blank,
-                     std::vector<Real64> const &numbers,
-                     std::vector<bool> const &numbers_blank);
-
     // Opens output files as stringstreams
     void openOutputFiles(EnergyPlusData &state);
 
@@ -306,7 +282,6 @@ private:
     //    static bool process_idd(std::string const &idd, bool &errors_found);
 
     // Note that these are non-owning raw pointers. The `state` object owns the underlying streams.
-    std::ostringstream *json_stream;
     std::ostringstream *err_stream;
 
     std::unique_ptr<std::ostringstream> m_cout_buffer;

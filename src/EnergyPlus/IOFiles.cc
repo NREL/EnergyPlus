@@ -113,7 +113,6 @@ nlohmann::json InputFile::readJSON()
     switch (ext) {
     case FileSystem::FileTypes::EpJSON:
     case FileSystem::FileTypes::JSON:
-    case FileSystem::FileTypes::GLHE:
         return nlohmann::json::parse(*is, nullptr, true, true);
     case FileSystem::FileTypes::CBOR:
         return nlohmann::json::from_cbor(*is);
@@ -463,87 +462,6 @@ void IOFiles::flushAll()
 
     if (err_stream) {
         err_stream->flush();
-    }
-    if (json.json_stream) {
-        json.json_stream->flush();
-    }
-    if (json.json_TSstream_Zone) {
-        json.json_TSstream_Zone->flush();
-    }
-    if (json.json_TSstream_HVAC) {
-        json.json_TSstream_HVAC->flush();
-    }
-    if (json.json_TSstream) {
-        json.json_TSstream->flush();
-    }
-    if (json.json_HRstream) {
-        json.json_HRstream->flush();
-    }
-    if (json.json_MNstream) {
-        json.json_MNstream->flush();
-    }
-    if (json.json_DYstream) {
-        json.json_DYstream->flush();
-    }
-    if (json.json_SMstream) {
-        json.json_SMstream->flush();
-    }
-    if (json.json_YRstream) {
-        json.json_YRstream->flush();
-    }
-    if (json.cbor_stream) {
-        json.cbor_stream->flush();
-    }
-    if (json.cbor_TSstream_Zone) {
-        json.cbor_TSstream_Zone->flush();
-    }
-    if (json.cbor_TSstream_HVAC) {
-        json.cbor_TSstream_HVAC->flush();
-    }
-    if (json.cbor_TSstream) {
-        json.cbor_TSstream->flush();
-    }
-    if (json.cbor_HRstream) {
-        json.cbor_HRstream->flush();
-    }
-    if (json.cbor_MNstream) {
-        json.cbor_MNstream->flush();
-    }
-    if (json.cbor_DYstream) {
-        json.cbor_DYstream->flush();
-    }
-    if (json.cbor_SMstream) {
-        json.cbor_SMstream->flush();
-    }
-    if (json.cbor_YRstream) {
-        json.cbor_YRstream->flush();
-    }
-    if (json.msgpack_stream) {
-        json.msgpack_stream->flush();
-    }
-    if (json.msgpack_TSstream_Zone) {
-        json.msgpack_TSstream_Zone->flush();
-    }
-    if (json.msgpack_TSstream_HVAC) {
-        json.msgpack_TSstream_HVAC->flush();
-    }
-    if (json.msgpack_TSstream) {
-        json.msgpack_TSstream->flush();
-    }
-    if (json.msgpack_HRstream) {
-        json.msgpack_HRstream->flush();
-    }
-    if (json.msgpack_MNstream) {
-        json.msgpack_MNstream->flush();
-    }
-    if (json.msgpack_DYstream) {
-        json.msgpack_DYstream->flush();
-    }
-    if (json.msgpack_SMstream) {
-        json.msgpack_SMstream->flush();
-    }
-    if (json.msgpack_YRstream) {
-        json.msgpack_YRstream->flush();
     }
 }
 

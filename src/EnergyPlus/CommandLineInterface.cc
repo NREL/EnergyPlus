@@ -469,7 +469,7 @@ namespace CommandLineInterface {
         state.files.rdd.filePath = composePath(normalSuffix + ".rdd");
         state.dataStrGlobals->outputShdFilePath = composePath(normalSuffix + ".shd");
         state.files.dfs.filePath = composePath(normalSuffix + ".dfs");
-        state.dataStrGlobals->outputGLHEFilePath = composePath(normalSuffix + ".glhe");
+        state.dataStrGlobals->outputGLHEFilePath = composePath(normalSuffix + "_glhe.cbor");
         state.files.edd.filePath = composePath(normalSuffix + ".edd");
         state.dataStrGlobals->outputIperrFilePath = composePath(normalSuffix + ".iperr");
         state.files.sln.filePath = composePath(normalSuffix + ".sln");

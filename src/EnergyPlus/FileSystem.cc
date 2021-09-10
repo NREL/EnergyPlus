@@ -404,7 +404,6 @@ namespace FileSystem {
         switch (ext) {
         case FileTypes::EpJSON:
         case FileTypes::JSON:
-        case FileTypes::GLHE:
             return nlohmann::json::parse(f, nullptr, true, true);
         case FileTypes::CBOR:
             return nlohmann::json::from_cbor(f);
