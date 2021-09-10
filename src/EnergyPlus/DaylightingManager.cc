@@ -485,14 +485,16 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
     }
 
     // Zero daylighting factor arrays
-    if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
-        state.dataDaylightingManager->TDDTransVisBeam = 0.0;
-        state.dataDaylightingManager->TDDFluxInc = 0.0;
-        state.dataDaylightingManager->TDDFluxTrans = 0.0;
-    } else {
-        state.dataDaylightingManager->TDDTransVisBeam(state.dataGlobal->HourOfDay, {1, state.dataDaylightingDevicesData->NumOfTDDPipes}) = 0.0;
-        state.dataDaylightingManager->TDDFluxInc(state.dataGlobal->HourOfDay, {1, 4}, {1, state.dataDaylightingDevicesData->NumOfTDDPipes}) = 0.0;
-        state.dataDaylightingManager->TDDFluxTrans(state.dataGlobal->HourOfDay, {1, 4}, {1, state.dataDaylightingDevicesData->NumOfTDDPipes}) = 0.0;
+    if (state.dataDaylightingDevicesData->NumOfTDDPipes > 0){
+        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
+            state.dataDaylightingManager->TDDTransVisBeam = 0.0;
+            state.dataDaylightingManager->TDDFluxInc = 0.0;
+            state.dataDaylightingManager->TDDFluxTrans = 0.0;
+        } else {
+            state.dataDaylightingManager->TDDTransVisBeam(state.dataGlobal->HourOfDay, {1, state.dataDaylightingDevicesData->NumOfTDDPipes}) = 0.0;
+            state.dataDaylightingManager->TDDFluxInc(state.dataGlobal->HourOfDay, {1, 4}, {1, state.dataDaylightingDevicesData->NumOfTDDPipes}) = 0.0;
+            state.dataDaylightingManager->TDDFluxTrans(state.dataGlobal->HourOfDay, {1, 4}, {1, state.dataDaylightingDevicesData->NumOfTDDPipes}) = 0.0;
+        }
     }
 
     if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
