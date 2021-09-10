@@ -7840,8 +7840,12 @@ namespace WindowManager {
                 // (2) solar heat gain coefficient (SHGC), including inside and outside air films,
                 // (3) solar transmittance at normal incidence, and (4) visible transmittance at normal incidence.
 
-                CalcNominalWindowCond(state, ThisNum, 1, NominalConductanceWinter, SHGCWinter, TransSolNorm, TransVisNorm, errFlag);
+                if (ThisNum == 18){
+                    std::cout << ThisNum << std::endl;
+                }
 
+                CalcNominalWindowCond(state, ThisNum, 1, NominalConductanceWinter, SHGCWinter, TransSolNorm, TransVisNorm, errFlag);
+                std::cout << "end " << ThisNum << std::endl;
                 if (errFlag == 1 || errFlag == 2) continue;
                 state.dataHeatBal->NominalU(ThisNum) = NominalConductanceWinter;
             }
