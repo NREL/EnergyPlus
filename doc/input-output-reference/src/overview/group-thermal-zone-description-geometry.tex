@@ -13,6 +13,8 @@ named \textless{}Zone Name\textgreater{}-Remainder will be created.
 Input references to Space Names must have a matching Space object. 
 Default space names may not be referenced in the input except for \hyperref[outputvariable]{Output:Variable} keys).
 
+Space geometry is specified by attaching surfaces to a space using the ``Space Name'' field. If a Space has only floor surface(s) assigned to it, the Space is assumed to share the same enclosure with other such Spaces in the same Zone (and with any surfaces that are not explicitly assinged to a space). If a Space also has other types of surfaces (non-floor) then the Space forms its own enclosure unless it is connected to other spaces with air boundaries (see \hyperref[constructionairboundary]{Construction:AirBoundary}).
+
 \subsubsection{Inputs}\label{space-inputs-048}
 
 \paragraph{Field: Name}\label{space-object-name}

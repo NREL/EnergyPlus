@@ -1166,7 +1166,7 @@ namespace HeatBalanceIntRadExchange {
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
-            std::string const thisSpaceOrSpaceListName = fields.at("space_or_spacelist_name").get<std::string>();
+            std::string const thisSpaceOrSpaceListName = fields.at("zone_or_zonelist_or_space_or_spacelist_name").get<std::string>();
             // do not mark object as used here - let GetInputViewFactorsbyName do that
 
             // Look for matching radiant enclosure name
@@ -1194,21 +1194,27 @@ namespace HeatBalanceIntRadExchange {
             int spaceListNum =
                 UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(thisSpaceOrSpaceListName), state.dataHeatBal->spaceList);
             int zoneListNum = 0;
+            int inputZoneNum = 0;
             size_t listSize = 0;
             if (spaceListNum > 0) {
                 listSize = int(state.dataHeatBal->spaceList(spaceListNum).spaces.size());
             } else {
-                // Check ZoneList for backwards compatibility
+                // Check Zone and ZoneList for backwards compatibility
                 zoneListNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(thisSpaceOrSpaceListName), state.dataHeatBal->ZoneList);
                 if (zoneListNum > 0) {
                     for (int const zoneNum : state.dataHeatBal->ZoneList(zoneListNum).Zone) {
                         listSize += state.dataHeatBal->Zone(zoneNum).spaceIndexes.size();
                     }
+                } else {
+                    inputZoneNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(thisSpaceOrSpaceListName), state.dataHeatBal->Zone);
+                    if (inputZoneNum > 0) {
+                        listSize = state.dataHeatBal->Zone(inputZoneNum).spaceIndexes.size();
+                    }
                 }
             }
 
             if (listSize > 0) {
-                // Look for radiant enclosure with same list of spaces
+                // Look for radiant enclosure with same list of spaces (solar enclosures are the same, so this is sufficient)
                 for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
                     auto &thisEnclosure(state.dataViewFactor->EnclRadInfo(enclosureNum));
                     bool anySpaceNotFound = false;
@@ -1231,7 +1237,6 @@ namespace HeatBalanceIntRadExchange {
                         }
                     } else if (zoneListNum > 0) {
                         for (int zListZoneNum : state.dataHeatBal->ZoneList(zoneListNum).Zone) {
-                            // If ZoneList is going to work, the zones must have only one space
                             for (int spaceNum : state.dataHeatBal->Zone(zListZoneNum).spaceIndexes) {
                                 // Search for matching spaces
                                 bool thisSpaceFound = false;
@@ -1250,68 +1255,29 @@ namespace HeatBalanceIntRadExchange {
                                 break;
                             }
                         }
+                    } else if (inputZoneNum > 0) {
+                        for (int spaceNum : state.dataHeatBal->Zone(inputZoneNum).spaceIndexes) {
+                            // Search for matching spaces
+                            bool thisSpaceFound = false;
+                            for (int enclSpaceNum : thisEnclosure.spaceNums) {
+                                if (enclSpaceNum == spaceNum) {
+                                    thisSpaceFound = true;
+                                    break;
+                                }
+                            }
+                            if (!thisSpaceFound) {
+                                anySpaceNotFound = true;
+                                break;
+                            }
+                        }
                     }
                     if (anySpaceNotFound) {
                         continue; // On to the next enclosure
                     } else {
                         enclMatchFound = true;
-                        // If matching SpaceList found, set the enclosure name to match
+                        // If matching SpaceList or ZoneList or Zone found, set the enclosure name to match
                         thisEnclosure.Name = thisSpaceOrSpaceListName;
                         break; // We're done with radiant enclosures
-                    }
-                }
-                if (!enclMatchFound) {
-                    // Look for solar enclosure with same list of zones
-                    for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-                        auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclosureNum));
-                        bool anySpaceNotFound = false;
-                        // If the number of enclosure spaces is not the same as the number of spacelist space, go to the next enclosure
-                        if (listSize != thisEnclosure.spaceNums.size()) continue;
-                        if (spaceListNum > 0) {
-                            for (int sListSpaceNum : state.dataHeatBal->spaceList(spaceListNum).spaces) {
-                                // Search for matching spaces
-                                bool thisSpaceFound = false;
-                                for (int enclSpaceNum : thisEnclosure.spaceNums) {
-                                    if (enclSpaceNum == sListSpaceNum) {
-                                        thisSpaceFound = true;
-                                        break;
-                                    }
-                                }
-                                if (!thisSpaceFound) {
-                                    anySpaceNotFound = true;
-                                    break;
-                                }
-                            }
-                        } else if (zoneListNum > 0) {
-                            for (int zListZoneNum : state.dataHeatBal->ZoneList(zoneListNum).Zone) {
-                                // If ZoneList is going to work, the zones must have only one space
-                                for (int spaceNum : state.dataHeatBal->Zone(zListZoneNum).spaceIndexes) {
-                                    // Search for matching spaces
-                                    bool thisSpaceFound = false;
-                                    for (int enclSpaceNum : thisEnclosure.spaceNums) {
-                                        if (enclSpaceNum == spaceNum) {
-                                            thisSpaceFound = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!thisSpaceFound) {
-                                        anySpaceNotFound = true;
-                                        break;
-                                    }
-                                }
-                                if (anySpaceNotFound) {
-                                    break;
-                                }
-                            }
-                        }
-                        if (anySpaceNotFound) {
-                            continue; // On to the next enclosure
-                        } else {
-                            enclMatchFound = true;
-                            // If matching SpaceList found, set the enclosure name to match
-                            thisEnclosure.Name = thisSpaceOrSpaceListName;
-                            break; // We're done with radiant enclosures
-                        }
                     }
                 }
             }
