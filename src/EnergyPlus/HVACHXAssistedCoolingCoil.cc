@@ -1121,6 +1121,7 @@ namespace HVACHXAssistedCoolingCoil {
                 } else if (DehumidificationMode == 1) {
                     OperationMode = DataHVACGlobals::coilEnhancedMode;
                 }
+                OperationMode = DataHVACGlobals::coilNormalMode; // 2021-09-10 use this to override the DehumidMode for now
 
                 Real64 CoolingSpeedNum = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex]
                                              .performance.normalMode.speeds.size(); // used the same for the original variable speed coil
