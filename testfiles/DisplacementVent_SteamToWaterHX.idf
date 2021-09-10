@@ -2480,14 +2480,24 @@
     autosize,                                 !- Water Side Design Flow Rate
     5,                                    !- Degree of SubCooling
     15,                                   !- Degree of Loop SubCooling
-    TemperatureSetpointControl,           !- Coil Control Type
-    HW Supply Outlet Node,  !- Heat Exchanger Setpoint Node Name
+    LoadControl,                          !- Coil Control Type
+    HW Supply Outlet Node,                !- Heat Exchanger Setpoint Node Name
     1;                                    !- Sizing Factor
 
 
   Output:Variable,*,Zone Mean Air Temperature,timestep;
 
-  Output:Variable,*,Surface Inside Face Temperature,timestep;
+  Output:Variable,*,Zone Thermostat Heating Setpoint Temperature,timestep;
+
+  Output:Variable,*,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate,timestep;
+
+  Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
+
+  Output:Variable,*,Plant Supply Side Unmet Demand Rate,timestep;
+  
+  Output:Variable,*,Plant Supply Side Inlet Mass Flow Rate,timestep;
+  
+  !Output:Variable,*,Surface Inside Face Temperature,timestep;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 
