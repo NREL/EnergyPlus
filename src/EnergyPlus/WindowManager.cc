@@ -2213,33 +2213,6 @@ namespace WindowManager {
         }
     }
 
-    // update the following:
-    // state.dataHeatBalSurf->QdotConvOutRep(SurfNum)
-    // state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum)
-    // state.dataHeatBalSurf->QConvOutReport(SurfNum)
-    //    void updateQdotConvOutRep(EnergyPlusData &state, int const SurfNum, Real64 const Tsout)
-    //    {
-    //        auto &surface(state.dataSurface->Surface(SurfNum));
-    //        state.dataHeatBalSurf->QdotConvOutRep(SurfNum) = -surface.Area * state.dataWindowManager->hcout * (Tsout -
-    //        state.dataWindowManager->tout); state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum) = -state.dataWindowManager->hcout * (Tsout -
-    //        state.dataWindowManager->tout); state.dataHeatBalSurf->QConvOutReport(SurfNum) = state.dataHeatBalSurf->QdotConvOutRep(SurfNum) *
-    //        state.dataGlobal->TimeStepZoneSec;
-    //    }
-
-    //    void updateQdotRadOutRepHeatEmi(
-    //        EnergyPlusData &state, int const SurfNum, Real64 const Tsout, Real64 const rad_out_per_area, Real64 const rad_out_air_per_area)
-    //    {
-    //        auto const &surface = state.dataSurface->Surface(SurfNum);
-    //        state.dataHeatBalSurf->QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area;
-    //        state.dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
-    //        state.dataHeatBalSurf->QRadOutReport(SurfNum) = state.dataHeatBalSurf->QdotRadOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-    //        // Radiation emission to air rate
-    //        state.dataHeatBalSurf->QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
-    //        state.dataHeatBalSurf->QHeatEmiReport(SurfNum) =
-    //            surface.Area * state.dataWindowManager->hcout * (Tsout - state.dataWindowManager->tout) +
-    //            state.dataHeatBalSurf->QAirExtReport(SurfNum);
-    //    }
-
     void CalcWindowHeatBalanceInternalRoutines(EnergyPlusData &state,
                                                int const SurfNum,          // Surface number
                                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
