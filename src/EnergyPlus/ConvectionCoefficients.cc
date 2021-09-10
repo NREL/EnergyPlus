@@ -4559,7 +4559,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
     // now send to EIO if surface reporting selected
     ScanForReports(state, "Surfaces", DoReport, "Details");
     if (DoReport) { // echo out static geometry data related to convection models
-        static constexpr fmt::string_view Format_900(
+        static constexpr std::string_view Format_900(
             "! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside Area [m2], Outside Perimeter [m], Outside Height "
             "[m], Inside Model Assignment, Inside Height [m], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio, "
             "Window Location, Near Radiant {{Yes/No}}, Has Active HVAC {{Yes/No}}\n");
@@ -4576,7 +4576,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
             } else {
                 YesNo2 = "No";
             }
-            static constexpr fmt::string_view Format_901(
+            static constexpr std::string_view Format_901(
                 "Surface Convection Parameters,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{}\n");
             print(state.files.eio,
                   Format_901,
@@ -4601,10 +4601,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
 
         // if display advanced reports also dump meta group data used for convection geometry
         if (state.dataGlobal->DisplayAdvancedReportVariables) {
-            static constexpr fmt::string_view Format_8000(
+            static constexpr std::string_view Format_8000(
                 "! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8000); // header for north facade
-            static constexpr fmt::string_view Format_8001(
+            static constexpr std::string_view Format_8001(
                 "Building Convection Parameters:North Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8001,
@@ -4616,10 +4616,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   NorthFacade.Ymax,
                   NorthFacade.Zmin,
                   NorthFacade.Zmax);
-            static constexpr fmt::string_view Format_8100(
+            static constexpr std::string_view Format_8100(
                 "! <Building Convection Parameters:Northeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8100); // header for northeast facade
-            static constexpr fmt::string_view Format_8101(
+            static constexpr std::string_view Format_8101(
                 "Building Convection Parameters:Northeast Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8101,
@@ -4631,10 +4631,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   NorthEastFacade.Ymax,
                   NorthEastFacade.Zmin,
                   NorthEastFacade.Zmax);
-            static constexpr fmt::string_view Format_8200(
+            static constexpr std::string_view Format_8200(
                 "! <Building Convection Parameters:East Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8200); // header for east facade
-            static constexpr fmt::string_view Format_8201(
+            static constexpr std::string_view Format_8201(
                 "Building Convection Parameters:East Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8201,
@@ -4647,10 +4647,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   EastFacade.Zmin,
                   EastFacade.Zmax);
 
-            static constexpr fmt::string_view Format_8300(
+            static constexpr std::string_view Format_8300(
                 "! <Building Convection Parameters:Southeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8300); // header for southeast facade
-            static constexpr fmt::string_view Format_8301(
+            static constexpr std::string_view Format_8301(
                 "Building Convection Parameters:Southeast Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8301,
@@ -4663,10 +4663,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   SouthEastFacade.Zmin,
                   SouthEastFacade.Zmax);
 
-            static constexpr fmt::string_view Format_8400(
+            static constexpr std::string_view Format_8400(
                 "! <Building Convection Parameters:South Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8400); // header for south facade
-            static constexpr fmt::string_view Format_8401(
+            static constexpr std::string_view Format_8401(
                 "Building Convection Parameters:South Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8401,
@@ -4678,10 +4678,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   SouthFacade.Ymax,
                   SouthFacade.Zmin,
                   SouthFacade.Zmax);
-            static constexpr fmt::string_view Format_8500(
+            static constexpr std::string_view Format_8500(
                 "! <Building Convection Parameters:Southwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8500); // header for southwest facade
-            static constexpr fmt::string_view Format_8501(
+            static constexpr std::string_view Format_8501(
                 "Building Convection Parameters:Southwest Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8501,
@@ -4693,10 +4693,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   SouthWestFacade.Ymax,
                   SouthWestFacade.Zmin,
                   SouthWestFacade.Zmax);
-            static constexpr fmt::string_view Format_8600(
+            static constexpr std::string_view Format_8600(
                 "! <Building Convection Parameters:West Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8600); // header for west facade
-            static constexpr fmt::string_view Format_8601(
+            static constexpr std::string_view Format_8601(
                 "Building Convection Parameters:West Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8601,
@@ -4708,10 +4708,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   WestFacade.Ymax,
                   WestFacade.Zmin,
                   WestFacade.Zmax);
-            static constexpr fmt::string_view Format_8700(
+            static constexpr std::string_view Format_8700(
                 "! <Building Convection Parameters:Northwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8700); // header for northwest facade
-            static constexpr fmt::string_view Format_8701(
+            static constexpr std::string_view Format_8701(
                 "Building Convection Parameters:NorthwWest Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8701,
@@ -4723,12 +4723,12 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   NorthWestFacade.Ymax,
                   NorthWestFacade.Zmin,
                   NorthWestFacade.Zmax);
-            static constexpr fmt::string_view Format_8800(
+            static constexpr std::string_view Format_8800(
                 "! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], XdYdZd:X, XdYdZd:Y, XdYdZd:Z,XdYdZu:X, XdYdZu:Y, "
                 "XdYdZu:Z,XdYuZd:X, XdYuZd:Y, XdYuZd:Z,XdYuZu:X, XdYuZu:Y, XdYuZu:Z,XuYdZd:X, XuYdZd:Y, XuYdZd:Z,XuYuZd:X, XuYuZd:Y, "
                 "XuYuZd:Z,XuYdZu:X, XuYdZu:Y, XuYdZu:Z,XuYuZu:X, XuYuZu:Y, XuYuZu:Z\n");
             print(state.files.eio, Format_8800); // header for roof
-            static constexpr fmt::string_view Format_8801(
+            static constexpr std::string_view Format_8801(
                 "Building Convection Parameters:Roof,{:.2R},{:.2R},{:.2R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
             print(state.files.eio,
                   Format_8801,
@@ -4742,7 +4742,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   state.dataConvectionCoefficient->RoofGeo.XdYdZu.Vertex.y,
                   state.dataConvectionCoefficient->RoofGeo.XdYdZu.Vertex.z,
                   state.dataConvectionCoefficient->RoofGeo.XdYuZd.Vertex.x);
-            static constexpr fmt::string_view Format_88012("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
+            static constexpr std::string_view Format_88012("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
             print(state.files.eio,
                   Format_88012,
                   state.dataConvectionCoefficient->RoofGeo.XdYuZd.Vertex.y,
@@ -4755,7 +4755,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   state.dataConvectionCoefficient->RoofGeo.XuYdZd.Vertex.z,
                   state.dataConvectionCoefficient->RoofGeo.XuYuZd.Vertex.x,
                   state.dataConvectionCoefficient->RoofGeo.XuYuZd.Vertex.y);
-            static constexpr fmt::string_view Format_88013("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+            static constexpr std::string_view Format_88013("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
             print(state.files.eio,
                   Format_88013,
                   state.dataConvectionCoefficient->RoofGeo.XuYuZd.Vertex.z,
@@ -4853,9 +4853,6 @@ void ManageInsideAdaptiveConvectionAlgo(EnergyPlusData &state, int const SurfNum
     //  TODO: candidate for rework to do zone level calcs once rather than for each surface
     DynamicIntConvSurfaceClassification(state, SurfNum);
 
-    // Set report var after surface has been classified successfully
-    state.dataSurface->SurfIntConvClassificationRpt(SurfNum) = static_cast<int>(state.dataSurface->SurfIntConvClassification(SurfNum));
-
     // simple worker routine takes surface classification and fills in model to use (IntConvHcModelEq) for that surface
     MapIntConvClassificationToHcModels(state, SurfNum);
 
@@ -4882,9 +4879,6 @@ void ManageOutsideAdaptiveConvectionAlgo(EnergyPlusData &state,
     //   It calls a series of separable worker routines
 
     DynamicExtConvSurfaceClassification(state, SurfNum);
-
-    // Set report var after surface has been classified successfully
-    state.dataSurface->SurfOutConvClassificationRpt(SurfNum) = static_cast<int>(state.dataSurface->SurfOutConvClassification(SurfNum));
 
     MapExtConvClassificationToHcModels(state, SurfNum);
 
@@ -5210,7 +5204,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         break;
     case ConvectionConstants::HcInt_FohannoPolidoriVerticalWall:
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-            Real64 QdotConvection = -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum);
+            Real64 QdotConvection = -state.dataHeatBalSurf->SurfQdotConvInPerArea(SurfNum);
             Real64 WallHeight = state.dataSurface->SurfIntConvZoneWallHeight(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcFohannoPolidoriVerticalWall(Tsurf - Tamb,
@@ -5223,7 +5217,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
                                                         (Tsurface - Tzone),
                                                         state.dataSurface->SurfIntConvZoneWallHeight(SurfNum),
                                                         Tsurface,
-                                                        -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum),
+                                                        -state.dataHeatBalSurf->SurfQdotConvInPerArea(SurfNum),
                                                         SurfNum);
         }
         state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
@@ -5320,7 +5314,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
     Kiva::ConvectionAlgorithm HnFn(KIVA_CONST_CONV(0.0));
 
     auto &Surface(state.dataSurface->Surface);
-    auto &QdotConvOutRepPerArea(state.dataHeatBalSurf->QdotConvOutRepPerArea);
+    auto &QdotConvOutRepPerArea(state.dataHeatBalSurf->SurfQdotConvOutPerArea);
     Real64 SurfOutTemp = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
 
     // first call Hn models
@@ -5729,6 +5723,9 @@ void MapExtConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum
                         format("MapExtConvClassificationToHcModels: caught unknown outdoor surface classification: {}",
                                state.dataSurface->SurfOutConvClassification(SurfNum)));
     }
+
+    // Set report var after surface has been classified
+    state.dataSurface->SurfOutConvClassificationRpt(SurfNum) = static_cast<int>(state.dataSurface->SurfOutConvClassification(SurfNum));
 }
 
 void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNum) // surface number
@@ -6429,6 +6426,9 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         ShowSevereError(state,
                         "DynamicIntConvSurfaceClassification: failed to determine zone flow regime for surface named " + Surface(SurfNum).Name);
     }
+
+    // Set report var after surface has been classified
+    state.dataSurface->SurfIntConvClassificationRpt(SurfNum) = static_cast<int>(state.dataSurface->SurfIntConvClassification(SurfNum));
 }
 
 void MapIntConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum) // surface pointer index
@@ -7049,85 +7049,6 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
 }
 
 //** Begin catalog of Hc equation functions. **** !*************************************************
-
-Real64 CalcASHRAEVerticalWall(Real64 const DeltaTemp) // [C] temperature difference between surface and air
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   Aug 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculate the model equation attributed to ASHRAE for vertical walls for natural convection
-
-    // REFERENCES:
-    // 2.  ASHRAE Handbook of Fundamentals 2001, p. 3.12, Table 5.
-
-    // Return value
-    Real64 Hn; // function result
-
-    Hn = 1.31 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird);
-
-    return Hn;
-}
-
-Real64 CalcWaltonUnstableHorizontalOrTilt(Real64 const DeltaTemp, // [C] temperature difference between surface and air
-                                          Real64 const CosineTilt // Cosine of tilt angle
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   Aug 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculate the model equation attributed to Walton's TARP program for horizontal
-    // and tilted surfaces with enhanced, thermally unstable natural convection
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // 1.  Walton, G. N. 1983. Thermal Analysis Research Program (TARP) Reference Manual,
-    //     NBSSIR 83-2655, National Bureau of Standards, "Surface Inside Heat Balances", pp 79-80.
-
-    // Return value
-    Real64 Hn; // function result
-
-    Hn = 9.482 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird) / (7.238 - std::abs(CosineTilt));
-
-    return Hn;
-}
-
-Real64 CalcWaltonStableHorizontalOrTilt(Real64 const DeltaTemp, // [C] temperature difference between surface and air
-                                        Real64 const CosineTilt // Cosine of tilt angle
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   Aug 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculate the model equation attributed to Walton's TARP program for horizontal
-    // and tilted surfaces with reduced, thermally stable natural convection
-
-    // REFERENCES:
-    // 1.  Walton, G. N. 1983. Thermal Analysis Research Program (TARP) Reference Manual,
-    //     NBSSIR 83-2655, National Bureau of Standards, "Surface Inside Heat Balances", pp 79-80.
-
-    // Return value
-    Real64 Hn; // function result
-
-    Hn = 1.810 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird) / (1.382 + std::abs(CosineTilt));
-
-    return Hn;
-}
 
 Real64 CalcFisherPedersenCeilDiffuserFloor(EnergyPlusData &state,
                                            Real64 const ACH, // [1/hr] air system air change rate

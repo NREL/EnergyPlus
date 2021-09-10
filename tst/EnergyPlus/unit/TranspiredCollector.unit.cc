@@ -67,7 +67,6 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-using namespace ObjexxFCL;
 using namespace EnergyPlus;
 using namespace EnergyPlus::ConvectionCoefficients;
 using namespace EnergyPlus::DataEnvironment;

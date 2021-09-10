@@ -994,14 +994,14 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
 
     if (!state.dataCoilCooingDX->coilCoolingDXs.empty()) {
         Real64 const ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
-        static constexpr fmt::string_view Format_990(
+        static constexpr std::string_view Format_990(
             "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
             "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
         print(state.files.eio, "{}", Format_990);
         for (auto &coil : state.dataCoilCooingDX->coilCoolingDXs) {
             coil.performance.calcStandardRatings210240(state);
 
-            static constexpr fmt::string_view Format_991(
+            static constexpr std::string_view Format_991(
                 " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
             print(state.files.eio,
                   Format_991,

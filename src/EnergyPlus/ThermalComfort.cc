@@ -2263,19 +2263,17 @@ namespace ThermalComfort {
         }
 
         // If high temperature radiant heater present and on, then must account for this in MRT calculation
-        if (state.dataHeatBalFanSys->QHTRadSysToPerson(state.dataThermalComforts->ZoneNum) > 0.0 ||
-            state.dataHeatBalFanSys->QCoolingPanelToPerson(state.dataThermalComforts->ZoneNum) > 0.0 ||
-            state.dataHeatBalFanSys->QHWBaseboardToPerson(state.dataThermalComforts->ZoneNum) > 0.0 ||
-            state.dataHeatBalFanSys->QSteamBaseboardToPerson(state.dataThermalComforts->ZoneNum) > 0.0 ||
-            state.dataHeatBalFanSys->QElecBaseboardToPerson(state.dataThermalComforts->ZoneNum) > 0.0) {
+        state.dataHeatBalFanSys->ZoneQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) =
+            state.dataHeatBalFanSys->ZoneQHTRadSysToPerson(state.dataThermalComforts->ZoneNum) +
+            state.dataHeatBalFanSys->ZoneQCoolingPanelToPerson(state.dataThermalComforts->ZoneNum) +
+            state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
+            state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
+            state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson(state.dataThermalComforts->ZoneNum);
+        if (state.dataHeatBalFanSys->ZoneQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) > 0.0) {
             state.dataThermalComforts->RadTemp += DataGlobalConstants::KelvinConv; // Convert to Kelvin
-            state.dataThermalComforts->RadTemp = root_4(pow_4(state.dataThermalComforts->RadTemp) +
-                                                        ((state.dataHeatBalFanSys->QHTRadSysToPerson(state.dataThermalComforts->ZoneNum) +
-                                                          state.dataHeatBalFanSys->QCoolingPanelToPerson(state.dataThermalComforts->ZoneNum) +
-                                                          state.dataHeatBalFanSys->QHWBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
-                                                          state.dataHeatBalFanSys->QSteamBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
-                                                          state.dataHeatBalFanSys->QElecBaseboardToPerson(state.dataThermalComforts->ZoneNum)) /
-                                                         AreaEff / StefanBoltzmannConst));
+            state.dataThermalComforts->RadTemp =
+                root_4(pow_4(state.dataThermalComforts->RadTemp) +
+                       (state.dataHeatBalFanSys->ZoneQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) / AreaEff / StefanBoltzmannConst));
             state.dataThermalComforts->RadTemp -= DataGlobalConstants::KelvinConv; // Convert back to Celsius
         }
 
@@ -2990,6 +2988,7 @@ namespace ThermalComfort {
         int j;
         bool weathersimulation;
         Real64 inavgdrybulb;
+        int const numHeaderRowsInEpw = 8;
 
         if (initiate) { // not optional on initiate=true.  would otherwise check for presence
             weathersimulation = wthrsim;
@@ -3005,14 +3004,22 @@ namespace ThermalComfort {
             const bool epwFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
             readStat = 0;
             if (epwFileExists) {
+                // determine number of days in year
+                int DaysInYear;
+                if (state.dataEnvrn->CurrentYearIsLeapYear) {
+                    DaysInYear = 366;
+                } else {
+                    DaysInYear = 365;
+                }
+
                 auto epwFile = state.files.inputWeatherFilePath.open(state, "CalcThermalComfortAdaptiveCEN15251");
-                for (i = 1; i <= 9; ++i) { // Headers
+                for (i = 1; i <= numHeaderRowsInEpw; ++i) {
                     epwFile.readLine();
                 }
                 jStartDay = state.dataEnvrn->DayOfYear - 1;
                 calcStartDay = jStartDay - 7;
                 if (calcStartDay > 0) {
-                    calcStartHr = 24 * (calcStartDay - 1) + 1;
+                    calcStartHr = 24 * calcStartDay + 1;
                     for (i = 1; i <= calcStartHr - 1; ++i) {
                         epwFile.readLine();
                     }
@@ -3033,9 +3040,9 @@ namespace ThermalComfort {
                     }
                 } else { // Do special things for wrapping the epw
                     calcEndDay = jStartDay;
-                    calcStartDay += 365;
+                    calcStartDay += DaysInYear;
                     calcEndHr = 24 * calcEndDay;
-                    calcStartHr = 24 * (calcStartDay - 1) + 1;
+                    calcStartHr = 24 * calcStartDay + 1;
                     for (i = 1; i <= calcEndDay; ++i) {
                         state.dataThermalComforts->avgDryBulbCEN = 0.0;
                         for (j = 1; j <= 24; ++j) {
@@ -3082,7 +3089,7 @@ namespace ThermalComfort {
         if (state.dataGlobal->BeginDayFlag && !state.dataThermalComforts->firstDaySet) {
             // Update the running average, reset the daily avg
             state.dataThermalComforts->runningAverageCEN =
-                0.2 * state.dataThermalComforts->runningAverageCEN + 0.8 * state.dataThermalComforts->avgDryBulbCEN;
+                alpha * state.dataThermalComforts->runningAverageCEN + (1.0 - alpha) * state.dataThermalComforts->avgDryBulbCEN;
             state.dataThermalComforts->avgDryBulbCEN = 0.0;
         }
 

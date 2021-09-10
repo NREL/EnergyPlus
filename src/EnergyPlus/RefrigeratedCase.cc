@@ -13445,72 +13445,72 @@ void ReportRefrigerationComponents(EnergyPlusData &state)
     auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
     auto &AirChillerSet(state.dataRefrigCase->AirChillerSet);
 
-    static constexpr fmt::string_view Format_104(
+    static constexpr std::string_view Format_104(
         "! <Refrigeration Compressor Rack>,Compressor Rack Name, # Refrigerated Cases Connected,# WalkIn Coolers "
         "Connected, Heat Rejection Location, Condenser Type, COP");
-    static constexpr fmt::string_view Format_105(
+    static constexpr std::string_view Format_105(
         "!  <Refrigeration Case>,Refrigeration Case Number, Refrigeration Case Name,Zone Name,Zone Node #,Zone "
         "Node Name,Capacity (W/m),LHR,Temperature (C),Length (m),Fan (W/m),Installed Lighting (W/m),Anti-Sweat "
         "(W/m),Defrost (W/m)");
-    static constexpr fmt::string_view Format_108("!  <Refrigeration Compressor>,Compressor Number,Compressor Name,Nominal Capacity (W)");
-    static constexpr fmt::string_view Format_109("! <#Refrigeration Compressor Racks>,Number of Refrigeration Compressor Racks");
-    static constexpr fmt::string_view Format_117("! <#Detailed Refrigeration Systems>,Number of Detailed Refrigeration Systems");
-    static constexpr fmt::string_view Format_118(
+    static constexpr std::string_view Format_108("!  <Refrigeration Compressor>,Compressor Number,Compressor Name,Nominal Capacity (W)");
+    static constexpr std::string_view Format_109("! <#Refrigeration Compressor Racks>,Number of Refrigeration Compressor Racks");
+    static constexpr std::string_view Format_117("! <#Detailed Refrigeration Systems>,Number of Detailed Refrigeration Systems");
+    static constexpr std::string_view Format_118(
         "! <Detailed Refrigeration System>,Refrigeration System Name,Refrigerant Used, # Refrigerated Cases "
         "Connected, # WalkInCoolers Connected, #Air Chillers Connected, # Secondary Loops Served, # Cascade Condensers "
         "Served, # Mechanical Subcoolers Served, # Compressors Connected, # Compression Stages, Intercooler Type, "
         "Intercooler Effectiveness, # Subcoolers Connected, Minimum Condensing Temperature (C)");
-    static constexpr fmt::string_view Format_119(
+    static constexpr std::string_view Format_119(
         "!  <Refrigeration Walk In Cooler>, Walk In Number, Walk In Name,Capacity (W),Temperature (C),Coil Fan "
         "(W), Circulating Fan (W), Lighting (W),Heaters (W),Defrost (W), # Zones");
-    static constexpr fmt::string_view Format_120(
+    static constexpr std::string_view Format_120(
         "! <#Detailed Transcritical Refrigeration Systems>,Number of Detailed Transcritical Refrigeration Systems");
-    static constexpr fmt::string_view Format_121(
+    static constexpr std::string_view Format_121(
         "! <Detailed Transcritical Refrigeration System>,Transcritical Refrigeration System Name,Refrigerant Used, # "
         "Medium Temperature Refrigerated Cases Connected, # Low Temperature Refrigerated Cases Connected, # Medium "
         "Temperature WalkInCoolers Connected, # Low Temperature WalkInCoolers Connected, # High Pressure Compressors "
         "Connected, # Low Pressure Compressors Connected, Minimum Condensing Temperature (C)");
-    static constexpr fmt::string_view Format_123("!  <Secondary Load>, Secondary System Served Name, Secondary Number");
-    static constexpr fmt::string_view Format_126(
+    static constexpr std::string_view Format_123("!  <Secondary Load>, Secondary System Served Name, Secondary Number");
+    static constexpr std::string_view Format_126(
         "!  <Refrigeration Mechanical Subcooler>, Subcooler Number, Subcooler Name, Name of System Providing "
         "Cooling, Design Outlet Temperature (C)");
-    static constexpr fmt::string_view Format_127("!  <Refrigeration Liquid Suction Subcooler>, Subcooler Number, Subcooler Name, Design Subcooling "
+    static constexpr std::string_view Format_127("!  <Refrigeration Liquid Suction Subcooler>, Subcooler Number, Subcooler Name, Design Subcooling "
                                                  "(DeltaC),Design liquid inlet temperature (C), Design vapor inlet temperature (C)");
-    static constexpr fmt::string_view Format_128("!  <Cascade Load>, System Name Connected, Condenser Number, Condenser Name");
-    static constexpr fmt::string_view Format_129(
+    static constexpr std::string_view Format_128("!  <Cascade Load>, System Name Connected, Condenser Number, Condenser Name");
+    static constexpr std::string_view Format_129(
         "!  <Refrigeration Condenser:Air-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature "
         "(C),Rated Capacity (W), Rated Fan Power (W)");
-    static constexpr fmt::string_view Format_130(
+    static constexpr std::string_view Format_130(
         "!  <Refrigeration Condenser:Water-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature "
         "(C),Rated Capacity (W), Rated Water Inlet Temperature (C), Rated Water Flow Rate (m3/s)");
-    static constexpr fmt::string_view Format_131(
+    static constexpr std::string_view Format_131(
         "!  <Refrigeration Condenser:Evaporative-Cooled>,Condenser Number,Condenser Name,Rated Capacity (W), Rated Fan Power (W)");
-    static constexpr fmt::string_view Format_132(
+    static constexpr std::string_view Format_132(
         "!  <Refrigeration Condenser:Cascade>, Condenser Number, Condenser Name, Condensing Temperature Control "
         "Type, Rated Condensing Temperature (C), Capacity (W), Approach Temperature Difference (DeltaC)");
-    static constexpr fmt::string_view Format_133(
+    static constexpr std::string_view Format_133(
         "! <Secondary Refrigeration System: Fluid Always Liquid>, Secondary Number, Secondary Name, # Refrigerated "
         "Cases Connected, # WalkIn Coolers Connected, Fluid Name, Capacity (W),Evap Temperature in Secondary "
         "Evaporator (C), Approach Temperature Difference (DeltaC), Temperature Range (DeltaC), TotalPumpPower (W)");
-    static constexpr fmt::string_view Format_134(
+    static constexpr std::string_view Format_134(
         "!      <Walk-In Surfaces Facing Zone>, ZoneName, Wall/Ceiling Area (m2), UValue (W/m2-C), AreaStockDoors "
         "(m2), HeightStockDoors, UValueStockDoors (W/m2-C), AreaGlassDoors (m2), HeightGlassDoors (m),  "
         "UValueGlassDoors (W/m2-C)");
-    static constexpr fmt::string_view Format_141("!  <Mechanical Subcooler Load>, Subcooler Number, Subcooler Name");
-    static constexpr fmt::string_view Format_142("! <#Secondary Refrigeration Systems>,Number of Secondary Refrigeration Systems");
-    static constexpr fmt::string_view Format_146(
+    static constexpr std::string_view Format_141("!  <Mechanical Subcooler Load>, Subcooler Number, Subcooler Name");
+    static constexpr std::string_view Format_142("! <#Secondary Refrigeration Systems>,Number of Secondary Refrigeration Systems");
+    static constexpr std::string_view Format_146(
         "! <Secondary Refrigeration System: Liquid Overfeed>, Secondary Number, Secondary Name, # Refrigerated Cases "
         "Connected, # WalkIn Coolers Connected, #Air Coils Connected Fluid Name, Capacity (W),Evap Temperature in "
         "Secondary Evaporator (C), Approach Temperature Difference (DeltaC), Circulating Rate, TotalPumpPower (W)");
-    static constexpr fmt::string_view Format_148("! <#ZoneHVAC/Refrigeration Air Chiller Sets>,Number of ZoneHVAC/Refrigeration Air Chiller Sets");
-    static constexpr fmt::string_view Format_149(
+    static constexpr std::string_view Format_148("! <#ZoneHVAC/Refrigeration Air Chiller Sets>,Number of ZoneHVAC/Refrigeration Air Chiller Sets");
+    static constexpr std::string_view Format_149(
         "! <ZoneHVAC/Refrigeration Air Chiller Set>,Chiller Set Name, # Air Chillers Connected, Zone Location");
-    static constexpr fmt::string_view Format_151(
+    static constexpr std::string_view Format_151(
         "!  <Refrigeration Air Chiller>,Refrigeration Chiller Number, Refrigeration Chiller Name,Zone Name,Zone "
         "Node #,Zone Node Name,Sensible Capacity (W/C),Sensible Capacity (W),Evaporating Temperature (C),DT1 (C),Fan "
         "Power (W),Heater (W),Defrost (W), Air Flow Rate (m3/s)");
-    static constexpr fmt::string_view Format_152("!  <Air Chiller Load>, Air Chiller Name, Air Chiller Number, Zone Name,");
-    static constexpr fmt::string_view Format_160(
+    static constexpr std::string_view Format_152("!  <Air Chiller Load>, Air Chiller Name, Air Chiller Number, Zone Name,");
+    static constexpr std::string_view Format_160(
         "!  <Refrigeration GasCooler:Air-Cooled>,Gas Cooler Number, Gas Cooler Name, Rated Outlet Pressure "
         "(Pa),Rated Outlet Temperature (C), Rated Approach Temperature (C), Rated Capacity (W), Rated Fan Power (W)");
 

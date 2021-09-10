@@ -1978,7 +1978,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
         }
 
         // write to .eio file
-        static constexpr fmt::string_view Format_700(
+        static constexpr std::string_view Format_700(
             "!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
             "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
             "Name,DSZAD Name");

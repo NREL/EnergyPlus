@@ -9,18 +9,18 @@ licenses(["notice"])
 exports_files(["LICENSE"])
 
 config_setting(
-    name = "darwin",
+    name = "macos",
     values = {"cpu": "darwin"},
+)
+
+config_setting(
+    name = "wasm",
+    values = {"cpu": "wasm32"},
 )
 
 config_setting(
     name = "windows",
     values = {"cpu": "x64_windows"},
-)
-
-config_setting(
-    name = "windows_msvc",
-    values = {"cpu": "x64_windows_msvc"},
 )
 
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
@@ -38,6 +38,7 @@ cc_library(
         "re2/onepass.cc",
         "re2/parse.cc",
         "re2/perl_groups.cc",
+        "re2/pod_array.h",
         "re2/prefilter.cc",
         "re2/prefilter.h",
         "re2/prefilter_tree.cc",
@@ -49,6 +50,8 @@ cc_library(
         "re2/regexp.h",
         "re2/set.cc",
         "re2/simplify.cc",
+        "re2/sparse_array.h",
+        "re2/sparse_set.h",
         "re2/stringpiece.cc",
         "re2/tostring.cc",
         "re2/unicode_casefold.cc",
@@ -56,14 +59,10 @@ cc_library(
         "re2/unicode_groups.cc",
         "re2/unicode_groups.h",
         "re2/walker-inl.h",
-        "util/flags.h",
         "util/logging.h",
         "util/mix.h",
         "util/mutex.h",
-        "util/pod_array.h",
         "util/rune.cc",
-        "util/sparse_array.h",
-        "util/sparse_set.h",
         "util/strutil.cc",
         "util/strutil.h",
         "util/utf.h",
@@ -76,17 +75,17 @@ cc_library(
         "re2/stringpiece.h",
     ],
     copts = select({
+        ":wasm": [],
         ":windows": [],
-        ":windows_msvc": [],
         "//conditions:default": ["-pthread"],
     }),
     linkopts = select({
-        # Darwin doesn't need `-pthread' when linking and it appears that
+        # macOS doesn't need `-pthread' when linking and it appears that
         # older versions of Clang will warn about the unused command line
         # argument, so just don't pass it.
-        ":darwin": [],
+        ":macos": [],
+        ":wasm": [],
         ":windows": [],
-        ":windows_msvc": [],
         "//conditions:default": ["-pthread"],
     }),
     visibility = ["//visibility:public"],
@@ -111,6 +110,8 @@ cc_library(
         "re2/testing/string_generator.h",
         "re2/testing/tester.h",
         "util/benchmark.h",
+        "util/flags.h",
+        "util/malloc_counter.h",
         "util/pcre.h",
         "util/test.h",
     ],

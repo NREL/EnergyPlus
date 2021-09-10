@@ -749,15 +749,7 @@ namespace DataSurfaces {
             // Set Precomputed Parameters
         void set_computed_geometry();
 
-        void SetOutBulbTempAt(EnergyPlusData &state, int const SurfNum);
-
-        void SetWindDirAt(EnergyPlusData &state, int const SurfNum, Real64 const fac);
-
-        void SetWindSpeedAt(EnergyPlusData &state, int const SurfNum, Real64 const fac);
-
         Real64 getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
-
-        static Real64 getInsideIR(EnergyPlusData &state, const int t_SurfNum);
 
         Real64 getOutsideAirTemperature(EnergyPlusData &state, int t_SurfNum) const;
 

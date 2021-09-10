@@ -50,6 +50,7 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/General.hh>
@@ -182,7 +183,7 @@ namespace WindowManager {
             auto glassEmiss = aGlassLayer->getSurface(FenestrationCommon::Side::Back)->getEmissivity();
             auto RhoGlIR2 = 1.0 - glassEmiss;
             auto ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
-            auto rmir = surface.getInsideIR(state, SurfNum);
+            auto rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum);
             auto NetIRHeatGainShade =
                 ShadeArea * EpsShIR2 *
                     (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep), 4) - rmir) +
@@ -225,7 +226,7 @@ namespace WindowManager {
             auto ConvHeatGainFrZoneSideOfGlass =
                 surface.Area * h_cin * (backSurface->getTemperature() - aSystem->getAirTemperature(Tarcog::ISO15099::Environment::Indoor));
 
-            auto rmir = surface.getInsideIR(state, SurfNum);
+            auto rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum);
             auto NetIRHeatGainGlass =
                 surface.Area * backSurface->getEmissivity() * (state.dataWindowManager->sigma * pow(backSurface->getTemperature(), 4) - rmir);
 
@@ -482,7 +483,7 @@ namespace WindowManager {
 
             auto absCoeff = state.dataHeatBal->SurfWinQRadSWwinAbs(t_SurfNum, t_Index) / swRadiation;
             if ((2 * t_Index - 1) == m_TotLay) {
-                absCoeff += state.dataHeatBal->SurfQRadThermInAbs(t_SurfNum) / swRadiation;
+                absCoeff += state.dataHeatBal->SurfQdotRadIntGainsInPerArea(t_SurfNum) / swRadiation;
             }
 
             aSolidLayer->setSolarAbsorptance(absCoeff, swRadiation);
@@ -623,7 +624,7 @@ namespace WindowManager {
         auto tin = m_Surface.getInsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv;
         auto hcin = state.dataHeatBalSurf->SurfHConvInt(m_SurfNum);
 
-        auto IR = m_Surface.getInsideIR(state, m_SurfNum);
+        auto IR = state.dataSurface->SurfWinIRfromParentZone(m_SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(m_SurfNum);
 
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> Indoor =
             std::make_shared<Tarcog::ISO15099::CIndoorEnvironment>(tin, state.dataEnvrn->OutBaroPress);
@@ -645,7 +646,7 @@ namespace WindowManager {
         // Creates outdoor environment object from surface properties in EnergyPlus
         double tout = m_Surface.getOutsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv;
         double IR = m_Surface.getOutsideIR(state, m_SurfNum);
-        // double dirSolRad = QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
+        // double dirSolRad = SurfQRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
         double swRadiation = m_Surface.getSWIncident(state, m_SurfNum);
         double tSky = state.dataEnvrn->SkyTempKelvin;
         double airSpeed = 0.0;

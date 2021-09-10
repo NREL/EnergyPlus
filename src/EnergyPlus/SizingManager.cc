@@ -4472,7 +4472,7 @@ void ReportZoneSizing(EnergyPlusData &state,
     // This subroutine writes one item of zone sizing data to the "eio" file..
 
     if (state.dataSizingManager->ReportZoneSizingMyOneTimeFlag) {
-        static constexpr fmt::string_view Format_990(
+        static constexpr std::string_view Format_990(
             "! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "
             "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
             "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
@@ -4481,7 +4481,7 @@ void ReportZoneSizing(EnergyPlusData &state,
         state.dataSizingManager->ReportZoneSizingMyOneTimeFlag = false;
     }
 
-    static constexpr fmt::string_view Format_991(
+    static constexpr std::string_view Format_991(
         " Zone Sizing Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
     print(state.files.eio,
           Format_991,

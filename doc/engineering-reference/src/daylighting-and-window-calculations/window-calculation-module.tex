@@ -2799,7 +2799,7 @@ Energy absorbed in the layers and which originates from diffuse radiation from s
 
 \begin{equation}
 \begin{split}
-&\text{QRadSWwinAbs}(Surf, Lay) = \\
+&\text{SurfWinQRadSWwinAbs}(Surf, Lay) = \\
 &\sum_{i = 1}^{N_{layers}} \left(\text{WinSkyFtAbs}(Surf, Lay) \cdot \text{SkySolarInc} + \text{WinSkyGndAbs}(Surf, Lay) \cdot \text{GndSolarInc}\right)
 \end{split}
 \end{equation}
@@ -2819,7 +2819,7 @@ Direct Radiation from the Sun
 Energy absorbed in the layers and which originates from direct solar radiation is given by following equation:
 
 \begin{equation}
-\text{QRadSWwinAbs}(SurfNum, Lay) = \text{AWinSurf}(SurfNum, Lay) \cdot \text{BeamSolar}
+\text{SurfWinQRadSWwinAbs}(SurfNum, Lay) = \text{AWinSurf}(SurfNum, Lay) \cdot \text{BeamSolar}
 \end{equation}
 
 where

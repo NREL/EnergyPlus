@@ -62,7 +62,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::PlantUtilities;
-using namespace ObjexxFCL;
 using namespace DataSizing;
 
 TEST_F(EnergyPlusFixture, PlantUtilities_RegisterPlantCompDesignFlowTest1)

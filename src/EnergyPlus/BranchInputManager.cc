@@ -2568,13 +2568,13 @@ namespace BranchInputManager {
         BranchNodes.allocate(state.dataBranchInputManager->NumOfBranches);
 
         print(state.files.bnd, "{}\n", "! ===============================================================");
-        static constexpr fmt::string_view Format_700("! <#Branch Lists>,<Number of Branch Lists>");
+        static constexpr std::string_view Format_700("! <#Branch Lists>,<Number of Branch Lists>");
         print(state.files.bnd, "{}\n", Format_700);
         print(state.files.bnd, " #Branch Lists,{}\n", state.dataBranchInputManager->NumOfBranchLists);
-        static constexpr fmt::string_view Format_702(
+        static constexpr std::string_view Format_702(
             "! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>");
         print(state.files.bnd, "{}\n", Format_702);
-        static constexpr fmt::string_view Format_704(
+        static constexpr std::string_view Format_704(
             "! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>");
         print(state.files.bnd, "{}\n", Format_704);
 
@@ -2788,7 +2788,7 @@ namespace BranchInputManager {
             ++BCount;
         }
         if (BCount > 0) {
-            static constexpr fmt::string_view Format_706("! <# Orphaned Branches>,<Number of Branches not on Branch Lists>");
+            static constexpr std::string_view Format_706("! <# Orphaned Branches>,<Number of Branches not on Branch Lists>");
             print(state.files.bnd, "{}\n", Format_706);
             print(state.files.bnd, " #Orphaned Branches,{}\n", BCount);
             ShowWarningError(state, "There are orphaned Branches in input. See .bnd file for details.");
