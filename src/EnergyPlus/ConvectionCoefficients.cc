@@ -5204,7 +5204,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
         break;
     case ConvectionConstants::HcInt_FohannoPolidoriVerticalWall:
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-            Real64 QdotConvection = -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum);
+            Real64 QdotConvection = -state.dataHeatBalSurf->SurfQdotConvInPerArea(SurfNum);
             Real64 WallHeight = state.dataSurface->SurfIntConvZoneWallHeight(SurfNum);
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcFohannoPolidoriVerticalWall(Tsurf - Tamb,
@@ -5217,7 +5217,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
                                                         (Tsurface - Tzone),
                                                         state.dataSurface->SurfIntConvZoneWallHeight(SurfNum),
                                                         Tsurface,
-                                                        -state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum),
+                                                        -state.dataHeatBalSurf->SurfQdotConvInPerArea(SurfNum),
                                                         SurfNum);
         }
         state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
@@ -5314,7 +5314,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
     Kiva::ConvectionAlgorithm HnFn(KIVA_CONST_CONV(0.0));
 
     auto &Surface(state.dataSurface->Surface);
-    auto &QdotConvOutRepPerArea(state.dataHeatBalSurf->QdotConvOutRepPerArea);
+    auto &QdotConvOutRepPerArea(state.dataHeatBalSurf->SurfQdotConvOutPerArea);
     Real64 SurfOutTemp = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
 
     // first call Hn models
@@ -7049,85 +7049,6 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
 }
 
 //** Begin catalog of Hc equation functions. **** !*************************************************
-
-Real64 CalcASHRAEVerticalWall(Real64 const DeltaTemp) // [C] temperature difference between surface and air
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   Aug 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculate the model equation attributed to ASHRAE for vertical walls for natural convection
-
-    // REFERENCES:
-    // 2.  ASHRAE Handbook of Fundamentals 2001, p. 3.12, Table 5.
-
-    // Return value
-    Real64 Hn; // function result
-
-    Hn = 1.31 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird);
-
-    return Hn;
-}
-
-Real64 CalcWaltonUnstableHorizontalOrTilt(Real64 const DeltaTemp, // [C] temperature difference between surface and air
-                                          Real64 const CosineTilt // Cosine of tilt angle
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   Aug 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculate the model equation attributed to Walton's TARP program for horizontal
-    // and tilted surfaces with enhanced, thermally unstable natural convection
-
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-    // 1.  Walton, G. N. 1983. Thermal Analysis Research Program (TARP) Reference Manual,
-    //     NBSSIR 83-2655, National Bureau of Standards, "Surface Inside Heat Balances", pp 79-80.
-
-    // Return value
-    Real64 Hn; // function result
-
-    Hn = 9.482 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird) / (7.238 - std::abs(CosineTilt));
-
-    return Hn;
-}
-
-Real64 CalcWaltonStableHorizontalOrTilt(Real64 const DeltaTemp, // [C] temperature difference between surface and air
-                                        Real64 const CosineTilt // Cosine of tilt angle
-)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   Aug 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // Calculate the model equation attributed to Walton's TARP program for horizontal
-    // and tilted surfaces with reduced, thermally stable natural convection
-
-    // REFERENCES:
-    // 1.  Walton, G. N. 1983. Thermal Analysis Research Program (TARP) Reference Manual,
-    //     NBSSIR 83-2655, National Bureau of Standards, "Surface Inside Heat Balances", pp 79-80.
-
-    // Return value
-    Real64 Hn; // function result
-
-    Hn = 1.810 * std::pow(std::abs(DeltaTemp), ConvectionConstants::OneThird) / (1.382 + std::abs(CosineTilt));
-
-    return Hn;
-}
 
 Real64 CalcFisherPedersenCeilDiffuserFloor(EnergyPlusData &state,
                                            Real64 const ACH, // [1/hr] air system air change rate

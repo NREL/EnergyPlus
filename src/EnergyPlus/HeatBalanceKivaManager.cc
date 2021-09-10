@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -373,9 +374,9 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
     bcs->diffuseHorizontalFlux = state.dataEnvrn->DifSolarRad;
     bcs->skyEmissivity = pow4(state.dataEnvrn->SkyTempKelvin) / pow4(bcs->outdoorTemp);
 
-    bcs->slabAbsRadiation = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(floorSurface) +     // solar
-                            state.dataHeatBal->SurfQRadThermInAbs(floorSurface) +          // internal gains
-                            state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(floorSurface); // HVAC
+    bcs->slabAbsRadiation = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(floorSurface) +      // solar
+                            state.dataHeatBal->SurfQdotRadIntGainsInPerArea(floorSurface) + // internal gains
+                            state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(floorSurface);  // HVAC
 
     bcs->slabConvectiveTemp = state.dataHeatBal->SurfTempEffBulkAir(floorSurface) + DataGlobalConstants::KelvinConv;
     bcs->slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, floorSurface) + DataGlobalConstants::KelvinConv;
@@ -389,9 +390,9 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
     Real64 TARadTotal = 0.0;
     Real64 TAConvTotal = 0.0;
     for (auto &wl : wallSurfaces) {
-        Real64 Q = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(wl) +     // solar
-                   state.dataHeatBal->SurfQRadThermInAbs(wl) +          // internal gains
-                   state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(wl); // HVAC
+        Real64 Q = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(wl) +      // solar
+                   state.dataHeatBal->SurfQdotRadIntGainsInPerArea(wl) + // internal gains
+                   state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(wl);  // HVAC
 
         Real64 &A = state.dataSurface->Surface(wl).Area;
 
