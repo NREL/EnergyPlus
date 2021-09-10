@@ -164,7 +164,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     GetAirflowNetworkInput(*state);
 
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->dataAirflowNetwork->AirflowNetworkSimu.solver);
+    EXPECT_TRUE(compare_enums(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->dataAirflowNetwork->AirflowNetworkSimu.solver));
 
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();
@@ -262,7 +262,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     GetAirflowNetworkInput(*state);
 
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->dataAirflowNetwork->AirflowNetworkSimu.solver);
+    EXPECT_TRUE(compare_enums(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->dataAirflowNetwork->AirflowNetworkSimu.solver));
 
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();

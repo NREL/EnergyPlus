@@ -168,35 +168,35 @@ namespace DElightManagerF {
         Real64 Ytrans;
 
         // Formats
-        static constexpr fmt::string_view Format_901("Version EPlus : DElight input generated from EnergyPlus processed input {}\n");
-        static constexpr fmt::string_view Format_902(
+        static constexpr std::string_view Format_901("Version EPlus : DElight input generated from EnergyPlus processed input {}\n");
+        static constexpr std::string_view Format_902(
             "\nBuilding_Name {}\nSite_Latitude  {:12.4F}\nSite_Longitude {:12.4F}\nSite_Altitude  {:12.4F}\nBldg_Azimuth   {:12.4F}\nSite_Time_Zone "
             "{:12.4F}\nAtm_Moisture  0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07\nAtm_Turbidity 0.12 0.12 0.12 0.12 0.12 0.12 0.12 "
             "0.12 0.12 0.12 0.12 0.12\n");
-        static constexpr fmt::string_view Format_903("\nZONES\nN_Zones {:4}\n");
-        static constexpr fmt::string_view Format_904(
+        static constexpr std::string_view Format_903("\nZONES\nN_Zones {:4}\n");
+        static constexpr std::string_view Format_904(
             "\nZONE DATA\nZone {}\nBldgSystem_Zone_Origin {:12.4F}{:12.4F}{:12.4F}\nZone_Azimuth    {:12.4F}\nZone_Multiplier {:5}\nZone_Floor_Area "
             "{:12.4F}\nZone_Volume     {:12.4F}\nZone_Installed_Lighting {:12.4F}\nMin_Input_Power    {:12.4F}\nMin_Light_Fraction "
             "{:12.4F}\nLight_Ctrl_Steps   {:3}\nLight_Ctrl_Prob    {:12.4F}\nView_Azimuth  0.0\nMax_Grid_Node_Area {:12.4F}\n");
-        static constexpr fmt::string_view Format_905("\nZONE LIGHTING SCHEDULES\nN_Lt_Scheds 0\n");
-        static constexpr fmt::string_view Format_906("\nZONE SURFACES\nN_Surfaces {:4}\n");
-        static constexpr fmt::string_view Format_907("\nZONE SURFACE DATA\nSurface {}\nWCS_Azimuth {:12.4F}\nWCS_Tilt    {:12.4F}\nVis_Refl    "
+        static constexpr std::string_view Format_905("\nZONE LIGHTING SCHEDULES\nN_Lt_Scheds 0\n");
+        static constexpr std::string_view Format_906("\nZONE SURFACES\nN_Surfaces {:4}\n");
+        static constexpr std::string_view Format_907("\nZONE SURFACE DATA\nSurface {}\nWCS_Azimuth {:12.4F}\nWCS_Tilt    {:12.4F}\nVis_Refl    "
                                                      "{:12.4F}\nExt_Refl    {:12.4F}\nGnd_Refl     0.2\nN_WCS_Vertices {:6}\n");
-        static constexpr fmt::string_view Format_908("Vertex {:12.4F}{:12.4F}{:12.4F}\n");
-        static constexpr fmt::string_view Format_909("\nSURFACE WINDOWS\nN_Windows {:6}\n");
-        static constexpr fmt::string_view Format_910(
+        static constexpr std::string_view Format_908("Vertex {:12.4F}{:12.4F}{:12.4F}\n");
+        static constexpr std::string_view Format_909("\nSURFACE WINDOWS\nN_Windows {:6}\n");
+        static constexpr std::string_view Format_910(
             "\nSURFACE WINDOW DATA\nWindow     {}\nGlass_Type {:8}\nShade_Flag   0\nOverhang_Fin_Depth    0.0 0.0 "
             "0.0\nOverhang_Fin_Distance 0.0 0.0 0.0\nN_WCS_Vertices {:4}\n");
-        static constexpr fmt::string_view Format_911("\nSURFACE CFS\nN_CFS {:6}\n");
-        static constexpr fmt::string_view Format_915(
+        static constexpr std::string_view Format_911("\nSURFACE CFS\nN_CFS {:6}\n");
+        static constexpr std::string_view Format_915(
             "\nCOMPLEX FENESTRATION DATA\nCFS_Name   {}\nCFS_Type   {}\nFenestration_Rotation {:12.4F}\nN_WCS_Vertices {:4}\n");
-        static constexpr fmt::string_view Format_912("\nZONE REFERENCE POINTS\nN_Ref_Pts {:4}\n");
-        static constexpr fmt::string_view Format_913(
+        static constexpr std::string_view Format_912("\nZONE REFERENCE POINTS\nN_Ref_Pts {:4}\n");
+        static constexpr std::string_view Format_913(
             "\nZONE REFERENCE POINT DATA\nReference_Point {}\nRefPt_WCS_Coords {:12.4F}{:12.4F}{:12.4F}\nZone_Fraction "
             "{:12.4F}\nLight_Set_Pt {:12.4F}\nLight_Ctrl_Type {:4}\n");
-        static constexpr fmt::string_view Format_914("\nBUILDING SHADES\nN_BShades 0\n");
-        static constexpr fmt::string_view Format_920("\nLIBRARY DATA\nGLASS TYPES\nN_Glass_Types {:4}\n");
-        static constexpr fmt::string_view Format_921(
+        static constexpr std::string_view Format_914("\nBUILDING SHADES\nN_BShades 0\n");
+        static constexpr std::string_view Format_920("\nLIBRARY DATA\nGLASS TYPES\nN_Glass_Types {:4}\n");
+        static constexpr std::string_view Format_921(
             "\nGLASS TYPE DATA\nName {:6}\nEPlusDiffuse_Transmittance   {:12.4F}\nEPlusDiffuse_Int_Reflectance "
             "{:12.4F}\nEPlus_Vis_Trans_Coeff_1 {:17.9F}\nEPlus_Vis_Trans_Coeff_2 {:17.9F}\nEPlus_Vis_Trans_Coeff_3 "
             "{:17.9F}\nEPlus_Vis_Trans_Coeff_4 {:17.9F}\nEPlus_Vis_Trans_Coeff_5 {:17.9F}\nEPlus_Vis_Trans_Coeff_6 {:17.9F}\n");

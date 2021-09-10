@@ -74,7 +74,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCurWorkMode)
 
     EXPECT_ANY_THROW(GetCurWorkMode(*state, 0););
 
-    EXPECT_EQ(IHPOperationMode::DWHMode, GetCurWorkMode(*state, 1));
+    EXPECT_TRUE(compare_enums(IHPOperationMode::DWHMode, GetCurWorkMode(*state, 1)));
 }
 
 TEST_F(EnergyPlusFixture, ASIHP_GetCoilIndexIHP)

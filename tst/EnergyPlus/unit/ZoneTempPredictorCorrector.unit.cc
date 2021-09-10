@@ -1026,7 +1026,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataHeatBalFanSys->MCPTC(ZoneNum) = 0.0;
     state->dataHeatBalFanSys->MDotCPOA(ZoneNum) = 0.0;
 
-    state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 0;
     state->dataHeatBalFanSys->SumConvHTRadSys(1) = 0.0;
     state->dataHeatBalFanSys->SumConvPool(1) = 0.0;
 

@@ -78,8 +78,6 @@ using namespace Psychrometrics;
 using namespace DataHeatBalFanSys;
 using namespace DataHeatBalance;
 
-using namespace ObjexxFCL;
-
 TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing)
 {
     // locals

@@ -63,7 +63,6 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
 {
@@ -87,6 +86,7 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
                                                       " WALL,                     !- Surface Type",
                                                       " INT-WALL-1,               !- Construction Name",
                                                       " Space1,                    !- Zone Name",
+                                                      "    ,                        !- Space Name",
                                                       " Outdoors,                 !- Outside Boundary Condition",
                                                       " ,                         !- Outside Boundary Condition Object",
                                                       " SunExposed,               !- Sun Exposure",

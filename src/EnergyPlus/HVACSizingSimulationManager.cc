@@ -222,7 +222,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
     auto &hvacSizingSimulationManager = state.dataHVACSizingSimMgr->hvacSizingSimulationManager;
 
-    hvacSizingSimulationManager = std::unique_ptr<HVACSizingSimulationManager>(new HVACSizingSimulationManager());
+    hvacSizingSimulationManager = std::make_unique<HVACSizingSimulationManager>();
 
     bool Available; // an environment is available to process
     int HVACSizingIterCount;
@@ -319,7 +319,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                     DisplayString(
                         state,
                         fmt::format("Starting HVAC Sizing Simulation at {} for {}", state.dataEnvrn->CurMnDy, state.dataEnvrn->EnvironmentName));
-                    static constexpr fmt::string_view Format_700("Environment:WarmupDays,{:3}\n");
+                    static constexpr std::string_view Format_700("Environment:WarmupDays,{:3}\n");
                     print(state.files.eio, Format_700, state.dataReportFlag->NumOfWarmupDays);
                 } else if (state.dataReportFlag->DisplayPerfSimulationFlag) {
                     DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);

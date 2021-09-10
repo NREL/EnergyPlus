@@ -236,7 +236,7 @@ namespace EcoRoofManager {
                                         HMovInsul,
                                         RoughSurf,
                                         AbsThermSurf,
-                                        state.dataHeatBalSurf->TH(1, 1, SurfNum),
+                                        state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
                                         state.dataHeatBalSurf->SurfHcExt(SurfNum),
                                         state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
                                         state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
@@ -751,7 +751,7 @@ namespace EcoRoofManager {
         } // if firstecosurface (if not we do NOT need to recalculate ecoroof energybalance as all ecoroof surfaces MUST be the same
         // this endif was moved here from the if statement regarding whether we are looking at the first ecoroof surface or not.
 
-        state.dataHeatBalSurf->TH(1, 1, SurfNum) = state.dataEcoRoofMgr->Tgold; // SoilTemperature
+        state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataEcoRoofMgr->Tgold; // SoilTemperature
         TempExt = state.dataEcoRoofMgr->Tgold;
     }
 

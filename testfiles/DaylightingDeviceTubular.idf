@@ -365,6 +365,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Daylit Zone,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -381,6 +382,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Daylit Zone,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -397,6 +399,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Daylit Zone,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -413,6 +416,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Daylit Zone,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -429,6 +433,7 @@
     Floor,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
     Daylit Zone,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Daylit Floor,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -445,6 +450,7 @@
     Roof,                    !- Surface Type
     CEILING IN ZONE,         !- Construction Name
     Daylit Zone,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Daylit Attic Floor,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -472,6 +478,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Daylit Attic Zone,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -488,6 +495,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Daylit Attic Zone,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -504,6 +512,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Daylit Attic Zone,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -520,6 +529,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Daylit Attic Zone,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -536,6 +546,7 @@
     Floor,                   !- Surface Type
     CEILING IN ATTIC,        !- Construction Name
     Daylit Attic Zone,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Daylit Ceiling,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -552,6 +563,7 @@
     Roof,                    !- Surface Type
     ROOF,                    !- Construction Name
     Daylit Attic Zone,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -579,6 +591,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Standard Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -595,6 +608,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Standard Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -611,6 +625,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Standard Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -627,6 +642,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Standard Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -643,6 +659,7 @@
     Floor,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
     Standard Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Standard Floor,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -659,6 +676,7 @@
     Roof,                    !- Surface Type
     CEILING IN ZONE,         !- Construction Name
     Standard Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Standard Attic Floor,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -686,6 +704,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Standard Attic Zone,     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -702,6 +721,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Standard Attic Zone,     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -718,6 +738,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Standard Attic Zone,     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -734,6 +755,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     Standard Attic Zone,     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -750,6 +772,7 @@
     Floor,                   !- Surface Type
     CEILING IN ATTIC,        !- Construction Name
     Standard Attic Zone,     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Standard Ceiling,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -766,6 +789,7 @@
     Roof,                    !- Surface Type
     ROOF,                    !- Construction Name
     Standard Attic Zone,     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

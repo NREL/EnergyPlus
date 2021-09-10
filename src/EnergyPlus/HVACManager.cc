@@ -168,8 +168,8 @@ void ManageHVAC(EnergyPlusData &state)
     using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr fmt::string_view EndOfHeaderString("End of Data Dictionary");                          // End of data dictionary marker
-    static constexpr fmt::string_view EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+    static constexpr std::string_view EndOfHeaderString("End of Data Dictionary");                          // End of data dictionary marker
+    static constexpr std::string_view EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 PriorTimeStep;       // magnitude of time step for previous history terms
@@ -569,8 +569,8 @@ void ManageHVAC(EnergyPlusData &state)
                       "Enthal     HumRat Fluid Type");
             }
             for (NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
-                static constexpr fmt::string_view Format_20{
-                    " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#8.0F}  {:11.2F}  {:9.5F}  {}\n"};
+                static constexpr std::string_view Format_20{
+                    " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#7.0F}  {:11.2F}  {:9.5F}  {}\n"};
 
                 print(state.files.debug,
                       Format_20,
@@ -2680,8 +2680,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         }
 
         // Report mixing sensible and latent loads
-        MixSenLoad = 0.0; // Initialize arrays to zero before starting to sum
-        MixLatLoad = 0.0;
+        MixSenLoad(ZoneLoop) = 0.0; // Initialize arrays to zero before starting to sum
+        MixLatLoad(ZoneLoop) = 0.0;
         ZnAirRpt(ZoneLoop).MixVolume = 0.0;         // zero reported volume prior to summations below
         ZnAirRpt(ZoneLoop).MixVdotCurDensity = 0.0; // zero reported volume flow rate prior to summations below
         ZnAirRpt(ZoneLoop).MixVdotStdDensity = 0.0; // zero reported volume flow rate prior to summations below

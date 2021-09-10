@@ -419,6 +419,9 @@ CHECKED_AND_OKED = {
         "heatPumpRunFrac": [
             "errFlag"
         ],
+        "isWaterCoilHeatRecoveryType": [
+            "nodeNotFound"
+        ],
         "simulate": [
             "CoolActive",
             "HeatActive"

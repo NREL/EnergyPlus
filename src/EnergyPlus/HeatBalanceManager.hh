@@ -115,6 +115,10 @@ namespace HeatBalanceManager {
 
     void GetZoneData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
+    void GetSpaceData(EnergyPlusData &state, bool &ErrorsFound);
+
+    int GetGeneralSpaceTypeNum(EnergyPlusData &state);
+
     void GetZoneLocalEnvData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void ProcessZoneData(EnergyPlusData &state,

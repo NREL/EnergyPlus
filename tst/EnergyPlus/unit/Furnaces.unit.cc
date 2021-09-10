@@ -72,7 +72,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::Furnaces;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace DataZoneEnergyDemands;
@@ -562,6 +561,7 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    EAST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -578,6 +578,7 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    EAST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -594,6 +595,7 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    EAST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -610,6 +612,7 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    EAST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -626,6 +629,7 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR SLAB 8 IN,         !- Construction Name",
         "    EAST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn002:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -642,6 +646,7 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
         "    Roof,                    !- Surface Type",
         "    ROOF34,                  !- Construction Name",
         "    EAST ZONE,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",

@@ -59,7 +59,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::DataLoopNode;
 

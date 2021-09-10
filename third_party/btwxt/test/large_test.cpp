@@ -8,6 +8,7 @@
 #include <iostream>
 
 // btwxt
+#include "fixtures.hpp"
 #include <btwxt.h>
 #include <error.h>
 #include <griddeddata.h>

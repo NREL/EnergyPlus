@@ -2081,5 +2081,8 @@ void GshpSpecs::UpdateGSHPRecords(EnergyPlusData &state)
 void GshpSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
+void GshpSpecs::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 } // namespace EnergyPlus::HeatPumpWaterToWaterSimple

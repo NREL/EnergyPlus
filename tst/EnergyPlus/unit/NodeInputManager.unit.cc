@@ -64,7 +64,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::NodeInputManager;
 using namespace EnergyPlus::DataLoopNode;
-using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 

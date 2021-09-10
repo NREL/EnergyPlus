@@ -978,7 +978,7 @@ The non-negative numeric input for this field is the fraction of a zone's recirc
 \paragraph{Field: Minimum Zone Ventilation
 Efficiency}\label{field-minimum-zone-ventilation-efficiency}
 
-This optional input sets a minimum on the ventilation efficiency for the zone. It is only used with the Ventilation Rate Procedure (VRP), single-path method. VRP should be chosen in Sizing System, System Outdoor Air Method = VentilationRateProcedure. Single-path method is indicated by leaving the previous input (Zone Secondary Recirculation Fraction) blank or setting it to 0.0. If the calculated value of ventilation efficiency for a zone is less than this value, it is raised to this minimum by raising the zone minimum air flow rate. This new value for zone minimum air flow rate then overrides other defaults and inputs in \hyperref[sizingzone]{Sizing:Zone}.
+This optional input sets a minimum on the ventilation efficiency for the zone. It is only used with the Ventilation Rate Procedure (VRP), single-path method. VRP should be chosen in Sizing System, System Outdoor Air Method = Standard62.1VentilationRateProcedure. Single-path method is indicated by leaving the previous input (Zone Secondary Recirculation Fraction) blank or setting it to 0.0. If the calculated value of ventilation efficiency for a zone is less than this value, it is raised to this minimum by raising the zone minimum air flow rate. This new value for zone minimum air flow rate then overrides other defaults and inputs in \hyperref[sizingzone]{Sizing:Zone}.
 
 An example of this in an IDF context is shown:
 
@@ -1681,7 +1681,9 @@ Enter the heating supply air volume flow rate per unit heating capacity in m3/s-
 
 \paragraph{Field: System Outdoor Air Method}\label{field-system-outdoor-air-method-000}
 
-The method used to calculate the system minimum outdoor air flow. The two choices are ZoneSum and VentilationRateProcedure (VRP). ZoneSum sums the outdoor air flows across all zones served by the system. VRP uses the multi-zone equations defined in 62.1-2007 to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. VRP may also adjust autosized air terminal maximum and minimum supply flow rates if needed to ensure adequate outdoor air flow rate to each zone.
+The method used to calculate the system minimum outdoor air flow. The three choices are ZoneSum, Standard62.1VentilationRateProcedure (VRP), and Standard62.1SimplifiedProcedure (SP). ZoneSum sums the outdoor air flows across all zones served by the system. VRP uses the multi-zone equations defined in ASHRAE Standard 62.1 to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. VRP may also adjust autosized air terminal maximum and minimum supply flow rates if needed to ensure adequate outdoor air flow rate to each zone. SP is similar to VRP and was introduced in ASHRAE Standard 62.1-2019. The main difference with VRP is that it uses a simplified approach to calculate a system's ventilation efficiency which is in turn used to calculate the system outdoor air flow. Additionally, when set to autosize, the minimum (primary) air flow (or air flow fraction) of these types of air terminals will be calculated following SP: \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} (\emph{Constant Minimum Air Flow Fraction} or \emph{Fixed Minimum Air Flow Fraction}), 
+\hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat} (\emph{Constant Minimum Air Flow Fraction} or \emph{Fixed Minimum Air Flow Fraction}), \hyperref[airterminalsingleductseriespiureheat]{AirTerminal:SingleDuct:SeriesPIU:Reheat} (\emph{Minimum Primary Air Flow Fraction}), 
+ \hyperref[airterminalsingleductparallelpiureheat]{AirTerminal:SingleDuct:ParallelPIU:Reheat}(\emph{Minimum Primary Air Flow Fraction}).
 
 \paragraph{Field: Zone Maximum Outdoor Air Fraction}\label{field-zone-maximum-outdoor-air-fraction-000}
 
@@ -1722,6 +1724,10 @@ Enter the heating capacity as a fraction of the autosized heating capacity. This
 \paragraph{Field: Central Cooling Capacity Control Method}\label{field-central-cooling-capacity-control-method}
 
 Specifies how the central cooling coil will be controlled, which affects the coil sizing calculation. There are 4 choices: VAV, Bypass, VT, and OnOff. Choose VAV if the cooling output is controlled by varying the air flow. Bypass should be chosen if the capacity is controlled by bypassing a variable fraction of the mixed air around the coil face. VT indicates that cooling coil output is controlled by varying the coil exit temperature while the flow rate is constant. And OnOff means that the cooling output is controlled by cycling the air flow.
+
+\paragraph{Field: Occupant Diversity}\label{occupant-diversity}
+
+The Occupant Diversity (D) as defined in ASHRAE Standard 62.1. The Occupant Diversity is a ratio of the expected peak population to the design zone population for all zones attached to the air system. If left blank or set to autosize, EnergyPlus will calculate it by using the people schedules and design levels included in the model.
 
 An IDF example:
 

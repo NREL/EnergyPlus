@@ -59,7 +59,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::IceThermalStorage;
-using namespace ObjexxFCL;
 using namespace CurveManager;
 using namespace EnergyPlus::General;
 

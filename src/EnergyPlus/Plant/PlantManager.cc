@@ -1838,6 +1838,26 @@ void GetPlantInput(EnergyPlusData &state)
         } // loop over branches on the loop (ventilation report data)
 
     } // loop over plant supply loops (ventilation report data)
+
+    // OneTimeInit Here
+    for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+        auto &plantLoop = state.dataPlnt->PlantLoop(LoopNum);
+        plantLoop.LoopHasConnectionComp = false;
+
+        for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
+            auto &loopSide = plantLoop.LoopSide(LoopSideNum);
+
+            for (BranchNum = 1; BranchNum <= loopSide.TotalBranches; ++BranchNum) {
+
+                for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                    //                    auto &this_comp_type(CompTypes(CompNum));
+                    auto &this_comp(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
+                    auto type = this_comp.TypeOf;
+                    this_comp.oneTimeInit(state);
+                }
+            }
+        }
+    }
 }
 
 void SetupReports(EnergyPlusData &state)
@@ -2739,7 +2759,7 @@ void UpdateNodeThermalHistory(EnergyPlusData &state)
                     // Accumulate total time loop is active
                     side.LoopSideInlet_TotalTime += state.dataHVACGlobal->TimeStepSys;
                     // Determine excessive storage - if both are moving in the same direction and McpDTdt is larger than MdotCpDeltaT
-                    if ((abs(side.LoopSideInlet_MdotCpDeltaT) > DataHVACGlobals::SmallLoad) &&
+                    if ((std::abs(side.LoopSideInlet_MdotCpDeltaT) > DataHVACGlobals::SmallLoad) &&
                         ((side.LoopSideInlet_McpDTdt / side.LoopSideInlet_MdotCpDeltaT) > 1.1)) {
                         side.LoopSideInlet_CapExcessStorageTimeReport = state.dataHVACGlobal->TimeStepSys;
                         side.LoopSideInlet_CapExcessStorageTime += state.dataHVACGlobal->TimeStepSys;
@@ -4271,6 +4291,9 @@ void CheckOngoingPlantWarnings(EnergyPlusData &state)
 }
 
 void EmptyPlantComponent::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
+void EmptyPlantComponent::oneTimeInit_new([[maybe_unused]] EnergyPlusData &state)
 {
 }
 } // namespace EnergyPlus::PlantManager

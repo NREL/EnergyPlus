@@ -204,6 +204,8 @@ namespace HeatPumpWaterToWaterSimple {
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
 } // namespace HeatPumpWaterToWaterSimple

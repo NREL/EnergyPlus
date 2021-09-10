@@ -187,6 +187,8 @@ namespace SwimmingPool {
         void update(EnergyPlusData &state);
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     void GetSwimmingPool(EnergyPlusData &state);

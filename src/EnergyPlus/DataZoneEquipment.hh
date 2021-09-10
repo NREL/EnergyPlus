@@ -474,8 +474,9 @@ namespace DataZoneEquipment {
                                       int ActualZoneNum,    // Zone index
                                       bool UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
                                       bool UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
-                                      Optional_bool_const PerPersonNotSet = _, // when calculation should not include occupants (e.g., dual duct)
-                                      Optional_bool_const MaxOAVolFlowFlag = _ // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
+                                      Optional_bool_const PerPersonNotSet = _,  // when calculation should not include occupants (e.g., dual duct)
+                                      Optional_bool_const MaxOAVolFlowFlag = _, // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
+                                      Optional_int_const spaceNum = _           // Space index (if applicable)
     );
 
     int GetZoneEquipControlledZoneNum(EnergyPlusData &state, int const ZoneEquipTypeNum, std::string const &EquipmentName);

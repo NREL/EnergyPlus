@@ -59,7 +59,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataPlant;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, DataPlant_AnyPlantLoopSidesNeedSim)
 {

@@ -72,6 +72,7 @@
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -2285,15 +2286,6 @@ namespace WindowManager {
         Real64 InsideGlassTemp; // Temperature of room side of innermost glass layer (C)
         Real64 Tleft;           // For airflow windows, temperature of the glass faces adjacent
         Real64 Tright;
-        //  to the airflow gap (C)
-        int ZoneEquipConfigNum;
-        int NodeNum;
-        Real64 SumSysMCp;  // Zone sum of air system MassFlowRate*Cp
-        Real64 SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
-        Real64 MassFlowRate;
-        Real64 NodeTemp;
-        Real64 CpAir;
-        Real64 RefAirTemp; // reference air temperatures
 
         int SrdSurfsNum;       // Surrounding surfaces list number
         int SrdSurfNum;        // Surrounding surface number DO loop counter
@@ -2422,57 +2414,8 @@ namespace WindowManager {
             state.dataWindowManager->tiltr = state.dataWindowManager->tilt * DataGlobalConstants::DegToRadians;
             SurfNumAdj = surface.ExtBoundCond;
             state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
-
-            // determine reference air temperature for this surface
-            {
-                auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
-                if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = RefAirTemp;
-                } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
-                } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
-                    // determine ZoneEquipConfigNum for this zone
-                    //            ControlledZoneAirFlag = .FALSE.
-                    ZoneEquipConfigNum = ZoneNum;
-                    //            DO ZoneEquipConfigNum = 1, NumOfControlledZones
-                    //                IF (ZoneEquipConfig(ZoneEquipConfigNum)%ActualZoneNum /= ZoneNum) CYCLE
-                    //                ControlledZoneAirFlag = .TRUE.
-                    //                EXIT
-                    //            END DO ! ZoneEquipConfigNum
-                    // check whether this zone is a controlled zone or not
-                    if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
-                        ShowFatalError(state,
-                                       "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                           state.dataHeatBal->Zone(ZoneNum).Name);
-                        return;
-                    }
-                    // determine supply air conditions
-                    SumSysMCp = 0.0;
-                    SumSysMCpT = 0.0;
-                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                        NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                        MassFlowRate =
-                            state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
-                        SumSysMCp += MassFlowRate * CpAir;
-                        SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-                    }
-                    // a weighted average of the inlet temperatures.
-                    if (SumSysMCp > 0.0) {
-                        RefAirTemp = SumSysMCpT / SumSysMCp;
-                    } else {
-                        RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                    }
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = RefAirTemp;
-
-                } else {
-                    // currently set to mean air temp but should add error warning here
-                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                    state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = RefAirTemp;
-                }
-            }
-
+            Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
+            state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = RefAirTemp;
             state.dataWindowManager->tin = RefAirTemp + state.dataWindowManager->TKelvin; // Inside air temperature
 
             // Reset hcin if necessary since too small a value sometimes causes non-convergence
@@ -2487,10 +2430,8 @@ namespace WindowManager {
             }
 
             // IR incident on window from zone surfaces and high-temp radiant sources
-            state.dataWindowManager->Rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) +
-                                            state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) +
-                                            state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
-                                            state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum);
+            state.dataWindowManager->Rmir =
+                state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum);
 
             // Short-wave radiation (from interior and exterior solar and zone lights)
             // absorbed at each face. Assumes equal split between faces of short-wave absorbed in glass layer.
@@ -2693,50 +2634,8 @@ namespace WindowManager {
             if (SurfNumAdj > 0) { // Interzone window
 
                 ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
-
-                // determine reference air temperature for this surface
-                {
-                    auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNumAdj));
-                    if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                        RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
-                        state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj) = RefAirTemp;
-                    } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                        RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj);
-                    } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
-                        // determine ZoneEquipConfigNum for this zone
-                        ZoneEquipConfigNum = ZoneNumAdj;
-                        // check whether this zone is a controlled zone or not
-                        if (!state.dataHeatBal->Zone(ZoneNumAdj).IsControlled) {
-                            ShowFatalError(state,
-                                           "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                               state.dataHeatBal->Zone(ZoneNum).Name);
-                            return;
-                        }
-                        // determine supply air conditions
-                        SumSysMCp = 0.0;
-                        SumSysMCpT = 0.0;
-                        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                            NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                            MassFlowRate =
-                                state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNumAdj));
-                            SumSysMCp += MassFlowRate * CpAir;
-                            SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-                        }
-                        if (SumSysMCp > 0.0) {
-                            // a weighted average of the inlet temperatures.
-                            RefAirTemp = SumSysMCpT / SumSysMCp;
-                        } else {
-                            RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
-                        }
-                        state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj) = RefAirTemp;
-                    } else {
-                        // currently set to mean air temp but should add error warning here
-                        RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
-                        state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj) = RefAirTemp;
-                    }
-                }
-
+                Real64 RefAirTemp = state.dataSurface->Surface(SurfNumAdj).getInsideAirTemperature(state, SurfNumAdj);
+                state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj) = RefAirTemp;
                 state.dataWindowManager->tout = RefAirTemp + state.dataWindowManager->TKelvin; // outside air temperature
 
                 // Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.
@@ -2746,9 +2645,7 @@ namespace WindowManager {
                 // from surfaces and high-temp radiant sources in the adjacent zone
 
                 state.dataWindowManager->Outir =
-                    state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNumAdj) +
-                    state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNumAdj) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNumAdj) +
-                    state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNumAdj);
+                    state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNumAdj);
 
             } else { // Exterior window (Ext BoundCond = 0)
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
@@ -7464,7 +7361,7 @@ namespace WindowManager {
                     CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::Condition::winterCondition);
                     CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::Condition::summerCondition);
 
-                    static constexpr fmt::string_view Format_800(" WindowConstruction:Complex,{},{},{},{:.3R},{:.3R}\n");
+                    static constexpr std::string_view Format_800(" WindowConstruction:Complex,{},{},{},{:.3R},{:.3R}\n");
                     print(state.files.eio,
                           Format_800,
                           state.dataConstruction->Construct(ThisNum).Name,
@@ -7486,7 +7383,7 @@ namespace WindowManager {
                         // Construct(ThisNum)%SummerSHGC = SHGCSummer
                         state.dataConstruction->Construct(ThisNum).VisTransNorm = 0.0; // TODO list
 
-                        static constexpr fmt::string_view Format_799(" Construction:WindowEquivalentLayer,{},{},{},{:.3R},{:.3R},{:.3R}\n");
+                        static constexpr std::string_view Format_799(" Construction:WindowEquivalentLayer,{},{},{},{:.3R},{:.3R},{:.3R}\n");
                         print(state.files.eio,
                               Format_799,
                               state.dataConstruction->Construct(ThisNum).Name,
@@ -7528,7 +7425,7 @@ namespace WindowManager {
                         state.dataConstruction->Construct(ThisNum).SummerSHGC = SHGCSummer;
                         state.dataConstruction->Construct(ThisNum).VisTransNorm = TransVisNorm;
 
-                        static constexpr fmt::string_view Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                        static constexpr std::string_view Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                         print(state.files.eio,
                               Format_700,
                               state.dataConstruction->Construct(ThisNum).Name,
@@ -7547,7 +7444,7 @@ namespace WindowManager {
                         {
                             auto const SELECT_CASE_var(state.dataMaterial->Material(Layer).Group);
                             if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::WindowGas) {
-                                static constexpr fmt::string_view Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
+                                static constexpr std::string_view Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
                                 print(state.files.eio,
                                       Format_702,
                                       state.dataMaterial->Material(Layer).Name,
@@ -7557,7 +7454,7 @@ namespace WindowManager {
                                 //! fw CASE(WindowGasMixture)
 
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::Shade) {
-                                static constexpr fmt::string_view Format_703(" WindowMaterial:Shade,,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                                static constexpr std::string_view Format_703(" WindowMaterial:Shade,,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                                 print(state.files.eio,
                                       Format_703,
                                       state.dataMaterial->Material(Layer).Name,
@@ -7570,7 +7467,7 @@ namespace WindowManager {
 
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::WindowBlind) {
                                 BlNum = state.dataMaterial->Material(Layer).BlindDataPtr;
-                                static constexpr fmt::string_view Format_704(
+                                static constexpr std::string_view Format_704(
                                     " WindowMaterial:Blind,{},{:.4R},{:.4R},{:.4R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                                 print(state.files.eio,
                                       Format_704,
@@ -7584,7 +7481,7 @@ namespace WindowManager {
                                       state.dataHeatBal->Blind(BlNum).BlindToGlassDist);
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::Screen) {
                                 if (state.dataMaterial->Material(Layer).ScreenDataPtr > 0) {
-                                    static constexpr fmt::string_view Format_706(
+                                    static constexpr std::string_view Format_706(
                                         " WindowMaterial:Screen,{},{:.5R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                                     print(state.files.eio,
                                           Format_706,
@@ -7618,7 +7515,7 @@ namespace WindowManager {
                                         state.dataCurveManager->PerfCurve(state.dataMaterial->Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
                                         state.dataCurveManager->PerfCurve(state.dataMaterial->Material(Layer).GlassSpecAngBRefleDataPtr).Name;
                                 }
-                                static constexpr fmt::string_view Format_707(
+                                static constexpr std::string_view Format_707(
                                     " WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{"
                                     ":.5R},{:.5R},{:.5R},{:.5R},{:.5R},{}\n");
                                 print(state.files.eio,
@@ -7643,7 +7540,7 @@ namespace WindowManager {
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) {
                                 OpticalDataType = "SpectralAverage";
                                 SpectralDataName = "";
-                                static constexpr fmt::string_view Format_708(
+                                static constexpr std::string_view Format_708(
                                     " WindowMaterial:Glazing:EquivalentLayer,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}"
                                     ",{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}\n");
                                 print(state.files.eio,
@@ -7667,7 +7564,7 @@ namespace WindowManager {
                                       state.dataMaterial->Material(Layer).EmissThermalBack);
 
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) {
-                                static constexpr fmt::string_view Format_709(
+                                static constexpr std::string_view Format_709(
                                     " WindowMaterial:Shade:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}\n");
                                 print(state.files.eio,
                                       Format_709,
@@ -7683,7 +7580,7 @@ namespace WindowManager {
                                       state.dataMaterial->Material(Layer).EmissThermalBack);
 
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) {
-                                static constexpr fmt::string_view Format_710(
+                                static constexpr std::string_view Format_710(
                                     " WindowMaterial:Drape:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},"
                                     "{:.4R},{:.4R},{:.5R},{:.5R}\n");
                                 print(state.files.eio,
@@ -7701,7 +7598,7 @@ namespace WindowManager {
                                       state.dataMaterial->Material(Layer).PleatedDrapeLength);
 
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) {
-                                static constexpr fmt::string_view Format_711(
+                                static constexpr std::string_view Format_711(
                                     " WindowMaterial:Screen:EquivalentLayer,{},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R},{:.4R}"
                                     ",{:.4R},{:.4R},{:.5R},{:.5R}\n");
                                 print(state.files.eio,
@@ -7724,7 +7621,7 @@ namespace WindowManager {
                                     SlateOrientation = "Vertical";
                                 }
                                 // Formats
-                                static constexpr fmt::string_view Format_712(
+                                static constexpr std::string_view Format_712(
                                     " WindowMaterial:Blind:EquivalentLayer,{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:."
                                     "5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}");
                                 print(state.files.eio,
@@ -7753,7 +7650,7 @@ namespace WindowManager {
                                 } else if (state.dataMaterial->Material(Layer).GapVentType == 3) {
                                     GapVentType = "VentedOutdoor";
                                 }
-                                static constexpr fmt::string_view Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
+                                static constexpr std::string_view Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
                                 print(state.files.eio,
                                       Format_713,
                                       state.dataMaterial->Material(Layer).Name,
