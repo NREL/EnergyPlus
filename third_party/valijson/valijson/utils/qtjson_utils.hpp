@@ -4,7 +4,7 @@
 
 #include <QJsonDocument>
 #include <QJsonObject>
-
+#include <QJsonArray>
 
 #include <valijson/utils/file_utils.hpp>
 

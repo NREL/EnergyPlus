@@ -75,7 +75,6 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataBSDFWindow;
 using namespace EnergyPlus::DataVectorTypes;
 using namespace EnergyPlus::DataShadowingCombinations;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 {

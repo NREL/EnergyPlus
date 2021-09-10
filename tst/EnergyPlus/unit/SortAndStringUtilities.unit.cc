@@ -62,7 +62,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SortAndStringUtilities;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, SortAndStringUtilitiesTest_Basic)
 {

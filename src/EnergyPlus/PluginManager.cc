@@ -146,9 +146,9 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
             auto const objNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(thisObjectName);
             // no need to validate name, the JSON will validate that.
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sOutputVariable, thisObjectName);
-            std::string varName = fields.at("python_plugin_variable_name");
-            std::string avgOrSum = EnergyPlus::UtilityRoutines::MakeUPPERCase(AsString(fields.at("type_of_data_in_variable")));
-            std::string updateFreq = EnergyPlus::UtilityRoutines::MakeUPPERCase(AsString(fields.at("update_frequency")));
+            std::string varName = fields.at("python_plugin_variable_name").get<std::string>();
+            std::string avgOrSum = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("type_of_data_in_variable").get<std::string>());
+            std::string updateFreq = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("update_frequency").get<std::string>());
             std::string units;
             if (fields.find("units") != fields.end()) {
                 units = fields.at("units").get<std::string>();
@@ -221,7 +221,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                                   "For metered variables, the resource type, group type, and end use category must be defined");
                     EnergyPlus::ShowFatalError(state, "Input error on PythonPlugin:OutputVariable causes program termination");
                 }
-                std::string const resourceType = EnergyPlus::UtilityRoutines::MakeUPPERCase(AsString(fields.at("resource_type")));
+                std::string const resourceType = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("resource_type").get<std::string>());
                 std::string sResourceType;
                 if (resourceType == "ELECTRICITY") {
                     sResourceType = "Electricity";
@@ -282,7 +282,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                                   "For metered variables, the resource type, group type, and end use category must be defined");
                     EnergyPlus::ShowFatalError(state, "Input error on PythonPlugin:OutputVariable causes program termination");
                 }
-                std::string const groupType = EnergyPlus::UtilityRoutines::MakeUPPERCase(AsString(fields.at("group_type")));
+                std::string const groupType = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("group_type").get<std::string>());
                 std::string sGroupType;
                 if (groupType == "BUILDING") {
                     sGroupType = "Building";
@@ -305,7 +305,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                                   "For metered variables, the resource type, group type, and end use category must be defined");
                     EnergyPlus::ShowFatalError(state, "Input error on PythonPlugin:OutputVariable causes program termination");
                 }
-                std::string const endUse = EnergyPlus::UtilityRoutines::MakeUPPERCase(AsString(fields.at("end_use_category")));
+                std::string const endUse = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("end_use_category").get<std::string>());
                 std::string sEndUse;
                 if (endUse == "HEATING") {
                     sEndUse = "Heating";
@@ -470,7 +470,8 @@ PluginManager::PluginManager(EnergyPlusData &state)
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
             std::string workingDirFlagUC = "YES";
             try {
-                workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(AsString(fields.at("add_current_working_directory_to_search_path")));
+                workingDirFlagUC =
+                    EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path").get<std::string>());
             } catch (nlohmann::json::out_of_range &e) {
                 // defaulted to YES
             }
@@ -479,7 +480,8 @@ PluginManager::PluginManager(EnergyPlusData &state)
             }
             std::string inputFileDirFlagUC = "YES";
             try {
-                inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(AsString(fields.at("add_input_file_directory_to_search_path")));
+                inputFileDirFlagUC =
+                    EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path").get<std::string>());
             } catch (nlohmann::json::out_of_range &e) {
                 // defaulted to YES
             }
@@ -491,7 +493,7 @@ PluginManager::PluginManager(EnergyPlusData &state)
                 auto const vars = fields.at("py_search_paths");
                 for (const auto &var : vars) {
                     try {
-                        PluginManager::addToPythonPath(state, PluginManager::sanitizedPath(fs::path{std::string{var.at("search_path")}}), true);
+                        PluginManager::addToPythonPath(state, PluginManager::sanitizedPath(fs::path{var.at("search_path").get<std::string>()}), true);
                     } catch (nlohmann::json::out_of_range &e) {
                         // empty entry
                     }
@@ -518,9 +520,9 @@ PluginManager::PluginManager(EnergyPlusData &state)
             auto const &fields = instance.value();
             auto const &thisObjectName = instance.key();
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
-            fs::path modulePath(std::string{fields.at("python_module_name")});
-            std::string className = fields.at("plugin_class_name");
-            std::string sWarmup = EnergyPlus::UtilityRoutines::MakeUPPERCase(AsString(fields.at("run_during_warmup_days")));
+            fs::path modulePath(fields.at("python_module_name").get<std::string>());
+            std::string className = fields.at("plugin_class_name").get<std::string>();
+            std::string sWarmup = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("run_during_warmup_days").get<std::string>());
             bool warmup = false;
             if (sWarmup == "YES") {
                 warmup = true;
@@ -548,7 +550,7 @@ PluginManager::PluginManager(EnergyPlusData &state)
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
             auto const vars = fields.at("global_py_vars");
             for (const auto &var : vars) {
-                this->addGlobalVariable(state, var.at("variable_name"));
+                this->addGlobalVariable(state, var.at("variable_name").get<std::string>());
             }
         }
     }
@@ -579,9 +581,9 @@ PluginManager::PluginManager(EnergyPlusData &state)
             auto const &fields = instance.value();
             auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
-            std::string variableName = fields.at("name_of_a_python_plugin_variable");
+            std::string variableName = fields.at("name_of_a_python_plugin_variable").get<std::string>();
             int variableIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(state, variableName);
-            int numValues = fields.at("number_of_timesteps_to_be_logged");
+            int numValues = fields.at("number_of_timesteps_to_be_logged").get<int>();
             state.dataPluginManager->trends.emplace_back(state, thisObjectName, numValues, variableIndex);
             this->maxTrendVariableIndex++;
         }

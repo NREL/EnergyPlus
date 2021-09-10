@@ -111,7 +111,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Rectangle, state->dataSurface->Surface(ThisSurf).Shape);
+    EXPECT_TRUE(compare_enums(SurfaceShape::Rectangle, state->dataSurface->Surface(ThisSurf).Shape));
 
     // Surface 2 - Isosceles Trapezoid
     ThisSurf = 2;
@@ -138,7 +138,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Quadrilateral, state->dataSurface->Surface(ThisSurf).Shape);
+    EXPECT_TRUE(compare_enums(SurfaceShape::Quadrilateral, state->dataSurface->Surface(ThisSurf).Shape));
 
     // Surface 3 - Parallelogram
     ThisSurf = 3;
@@ -165,7 +165,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Quadrilateral, state->dataSurface->Surface(ThisSurf).Shape);
+    EXPECT_TRUE(compare_enums(SurfaceShape::Quadrilateral, state->dataSurface->Surface(ThisSurf).Shape));
 
     // Surface 4 - Triangle
     ThisSurf = 4;
@@ -188,7 +188,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Triangle, state->dataSurface->Surface(ThisSurf).Shape);
+    EXPECT_TRUE(compare_enums(SurfaceShape::Triangle, state->dataSurface->Surface(ThisSurf).Shape));
 
     // Surface 5 - Polygon
     ThisSurf = 5;
@@ -219,7 +219,7 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Polygonal, state->dataSurface->Surface(ThisSurf).Shape);
+    EXPECT_TRUE(compare_enums(SurfaceShape::Polygonal, state->dataSurface->Surface(ThisSurf).Shape));
 }
 
 TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
@@ -505,64 +505,67 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     //	"Surface 1 - Triangle"
     int surfNum = UtilityRoutines::FindItemInList("SURFACE 1 - TRIANGLE", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Triangle, state->dataSurface->Surface(surfNum).Shape);
+    EXPECT_TRUE(compare_enums(SurfaceShape::Triangle, state->dataSurface->Surface(surfNum).Shape));
 
     //	enum surfaceShape:Quadrilateral = 2
     //	"Surface 2 - Quadrilateral"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 2 - QUADRILATERAL", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Quadrilateral, state->dataSurface->Surface(surfNum).Shape);
+    EXPECT_TRUE(compare_enums(SurfaceShape::Quadrilateral, state->dataSurface->Surface(surfNum).Shape));
 
     //	enum surfaceShape:Rectangle = 3
     //	"Surface 3 - Rectangle"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 3 - RECTANGLE", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Rectangle, state->dataSurface->Surface(surfNum).Shape);
+    EXPECT_TRUE(compare_enums(SurfaceShape::Rectangle, state->dataSurface->Surface(surfNum).Shape));
 
     //	enum surfaceShape:RectangularDoorWindow = 4
     //	"Surface 4 - RectangularDoorWindow"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 4 - RECTANGULARDOORWINDOW", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::RectangularDoorWindow, state->dataSurface->Surface(surfNum).Shape);
+    EXPECT_TRUE(compare_enums(SurfaceShape::RectangularDoorWindow, state->dataSurface->Surface(surfNum).Shape));
 
     //	enum surfaceShape:RectangularOverhang = 5
     //	"Surface 5 - RectangularOverhang"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 5 - RECTANGULAROVERHANG", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_NE(SurfaceShape::RectangularOverhang,
-              state->dataSurface->Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
+    EXPECT_FALSE(compare_enums(SurfaceShape::RectangularOverhang,
+                               state->dataSurface->Surface(surfNum).Shape,
+                               false)); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularLeftFin = 6
     //	"Surface 6 - RectangularLeftFin"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 6 - RECTANGULARLEFTFIN Left", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_NE(SurfaceShape::RectangularLeftFin,
-              state->dataSurface->Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
+    EXPECT_FALSE(compare_enums(SurfaceShape::RectangularLeftFin,
+                               state->dataSurface->Surface(surfNum).Shape,
+                               false)); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularRightFin = 7
     //	"Surface 7 - RectangularRightFin"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 7 - RECTANGULARRIGHTFIN Right", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_NE(SurfaceShape::RectangularRightFin,
-              state->dataSurface->Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
+    EXPECT_FALSE(compare_enums(SurfaceShape::RectangularRightFin,
+                               state->dataSurface->Surface(surfNum).Shape,
+                               false)); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:TriangularWindow = 8
     //	"Surface 8 - TriangularWindow"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 8 - TRIANGULARWINDOW", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::TriangularWindow, state->dataSurface->Surface(surfNum).Shape);
+    EXPECT_TRUE(compare_enums(SurfaceShape::TriangularWindow, state->dataSurface->Surface(surfNum).Shape));
 
     //	enum surfaceShape:TriangularDoor = 9
     //	"Surface 9 - TriangularDoor"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 9 - TRIANGULARDOOR", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::TriangularDoor, state->dataSurface->Surface(surfNum).Shape);
+    EXPECT_TRUE(compare_enums(SurfaceShape::TriangularDoor, state->dataSurface->Surface(surfNum).Shape));
 
     //	enum surfaceShape:Polygonal = 10
     //	"Surface 10 - Polygonal"
     surfNum = UtilityRoutines::FindItemInList("SURFACE 10 - POLYGONAL", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Polygonal, state->dataSurface->Surface(surfNum).Shape);
+    EXPECT_TRUE(compare_enums(SurfaceShape::Polygonal, state->dataSurface->Surface(surfNum).Shape));
 }
 
 TEST_F(EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm)
@@ -3910,19 +3913,19 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     EXPECT_FALSE(ErrorsFound);           // expect no errors
 
     int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", state->dataSurface->Surface);
-    EXPECT_EQ(DataSurfaces::iHeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(compare_enums(DataSurfaces::iHeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm));
     EXPECT_TRUE(state->dataHeatBal->AnyCondFD);
 
     surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_10000", state->dataSurface->Surface);
-    EXPECT_EQ(DataSurfaces::iHeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(compare_enums(DataSurfaces::iHeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm));
     EXPECT_TRUE(state->dataHeatBal->AnyEMPD); // input as EMPD but then later overriden to CondFD - see error message below
 
     surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_20000", state->dataSurface->Surface);
-    EXPECT_EQ(DataSurfaces::iHeatTransferModel::HAMT, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(compare_enums(DataSurfaces::iHeatTransferModel::HAMT, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm));
     EXPECT_TRUE(state->dataHeatBal->AnyHAMT);
 
     surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_30000", state->dataSurface->Surface);
-    EXPECT_EQ(DataSurfaces::iHeatTransferModel::CTF, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(compare_enums(DataSurfaces::iHeatTransferModel::CTF, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm));
     EXPECT_TRUE(state->dataHeatBal->AnyCTF);
 
     std::string const error_string = delimited_string({

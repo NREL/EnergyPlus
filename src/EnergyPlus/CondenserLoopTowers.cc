@@ -196,7 +196,7 @@ namespace CondenserLoopTowers {
         // Uses "Get" routines to read in the data.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr fmt::string_view OutputFormat("{:5.2F}");
+        static constexpr std::string_view OutputFormat("{:5.2F}");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TowerNum;                      // Tower number, reference counter for towers data array

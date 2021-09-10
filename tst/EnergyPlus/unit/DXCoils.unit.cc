@@ -1308,7 +1308,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     GetDXCoils(*state);
 
     EXPECT_EQ("Electricity", state->dataDXCoils->DXCoil(1).FuelType); // it also covers a test for fuel type input
-    EXPECT_EQ(DataGlobalConstants::ResourceType::Electricity, state->dataDXCoils->DXCoil(1).FuelTypeNum);
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Electricity, state->dataDXCoils->DXCoil(1).FuelTypeNum));
     EXPECT_EQ(0, state->dataDXCoils->DXCoil(1).MSWasteHeat(2));
 
     // Test calculations of the waste heat function #5162
@@ -1790,8 +1790,8 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
     GetDXCoils(*state);
 
     ASSERT_EQ(1, state->dataDXCoils->NumDXCoils);
-    ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostStrategy, StandardRatings::DefrostStrat::ReverseCycle);
-    ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostControl, StandardRatings::HPdefrostControl::Timed);
+    ASSERT_TRUE(compare_enums(state->dataDXCoils->DXCoil(1).DefrostStrategy, StandardRatings::DefrostStrat::ReverseCycle));
+    ASSERT_TRUE(compare_enums(state->dataDXCoils->DXCoil(1).DefrostControl, StandardRatings::HPdefrostControl::Timed));
     ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostEIRFT, 1);
     ASSERT_EQ(state->dataDXCoils->DXCoil(1).MaxOATDefrost, 5.0);
     ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostTime, 0.058333);
