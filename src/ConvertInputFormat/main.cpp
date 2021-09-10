@@ -371,19 +371,23 @@ bool processInput(std::string const &inputFilePath,
     } else if (outputType == OutputTypes::CBOR) {
         fs::path convertedCBOR =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".cbor"));
-        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::CBOR>(convertedCBOR, epJSON);
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::CBOR>(
+            convertedCBOR, epJSON, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
     } else if (outputType == OutputTypes::MsgPack) {
         fs::path convertedMsgPack =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".msgpack"));
-        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::MsgPack>(convertedMsgPack, epJSON);
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::MsgPack>(
+            convertedMsgPack, epJSON, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
     } else if (outputType == OutputTypes::UBJSON) {
         fs::path convertedUBJSON =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".ubjson"));
-        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::UBJSON>(convertedUBJSON, epJSON);
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::UBJSON>(
+            convertedUBJSON, epJSON, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
     } else if (outputType == OutputTypes::BSON) {
         fs::path convertedBSON =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".bson"));
-        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::BSON>(convertedBSON, epJSON);
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::BSON>(
+            convertedBSON, epJSON, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
     } else {
         return false;
     }
