@@ -86,19 +86,19 @@ namespace DaylightingManager {
     constexpr int NPHMAX(10);           // Number of sky/ground integration steps in altitude
     constexpr int NTHMAX(16);           // Number of sky/ground integration steps in azimuth
 
-    void DayltgAveInteriorReflectance(EnergyPlusData &state, int const ZoneNum);
+    void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum); // Enclosure number
 
     void CalcDayltgCoefficients(EnergyPlusData &state);
 
-    void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state, int const ZoneNum);
+    void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state);
 
-    void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const ZoneNum);
+    void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum);
 
     void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum);
 
     void FigureDayltgCoeffsAtPointsSetupForWindow(
         EnergyPlusData &state,
-        int const daylightCtrlNum,
+        int const daylightCtrlNum, // zero if called for map points
         int const iRefPoint,
         int const loopwin,
         DataDaylighting::iCalledFor const CalledFrom, // indicate  which type of routine called this routine
@@ -136,7 +136,6 @@ namespace DaylightingManager {
 
     void FigureDayltgCoeffsAtPointsForWindowElements(
         EnergyPlusData &state,
-        int const zoneNum,         // Zone number
         int const daylightCtrlNum, // Current daylighting control number (only used when called from RefPoint)
         int const iRefPoint,
         int const loopwin,
@@ -415,9 +414,8 @@ namespace DaylightingManager {
                                               Optional_int_const MapNum = _);
 
     void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
-                                                int const iWin,            // Window index
-                                                int const daylightCtrlNum, // Daylighting control number
-                                                int const iHour,           // Hour of day
+                                                int const iWin,  // Window index
+                                                int const iHour, // Hour of day
                                                 int const iRefPoint,
                                                 int const NumEl,                              // Total number of window elements
                                                 Real64 const AZVIEW,                          // Azimuth of view vector in absolute coord system for

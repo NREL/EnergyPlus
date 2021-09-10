@@ -556,22 +556,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
         }
     }
 
-    //           -----------
-    // ---------- Daylighting:Controls LOOP ----------
-    //           -----------
-
-    for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
-        // Skip controls that are not Daylighting:Detailed
-        if (state.dataDaylightingData->daylightControl(daylightCtrlNum).DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting)
-            continue;
-
-        // Skip controls with no exterior windows in the enclosure or in adjacent enclosure with which an interior window is shared
-        int enclNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex;
-        if (state.dataDaylightingData->enclDaylight(enclNum).NumOfDayltgExtWins == 0) continue;
-
-        CalcDayltgCoeffsRefMapPoints(state, daylightCtrlNum);
-
-    } // End of zone loop, daylightCtrlNum
+    CalcDayltgCoeffsRefMapPoints(state);
 
     if (state.dataDaylightingManager->doSkyReporting) {
         if (!state.dataGlobal->KickOffSizing && !state.dataGlobal->KickOffSimulation) {
@@ -754,7 +739,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
     }         // zone loop
 }
 
-void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state, int const daylightCtrlNum)
+void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -767,17 +752,14 @@ void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state, int const daylightCtrlN
     // This subroutine does the daylighting coefficient calculation for the
     // daylighting and illuminance map reference points.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool ErrorsFound;
 
     if (state.dataDaylightingManager->VeryFirstTime) {
         // make sure all necessary surfaces match to pipes
         ErrorsFound = false;
-        for (int TZoneNum = 1; TZoneNum <= state.dataGlobal->NumOfZones; ++TZoneNum) {
-            // TODO MJW: For now, daylighting controls require that all spaces in a zone are in the same enclosure
-            int tEnclNum = state.dataHeatBal->Zone(TZoneNum).zoneFirstSpaceSolEnclosure;
-            for (int loopwin = 1; loopwin <= state.dataDaylightingData->enclDaylight(tEnclNum).NumOfDayltgExtWins; ++loopwin) {
-                int IWin = state.dataDaylightingData->enclDaylight(tEnclNum).DayltgExtWinSurfNums(loopwin);
+        for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+            for (int loopwin = 1; loopwin <= state.dataDaylightingData->enclDaylight(enclNum).NumOfDayltgExtWins; ++loopwin) {
+                int IWin = state.dataDaylightingData->enclDaylight(enclNum).DayltgExtWinSurfNums(loopwin);
                 if (state.dataSurface->SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Diffuser) continue;
                 // Look up the TDD:DOME object
                 int PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
@@ -797,16 +779,20 @@ void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state, int const daylightCtrlN
         state.dataDaylightingManager->VeryFirstTime = false;
     }
 
-    // Calc for daylighting reference points
-    CalcDayltgCoeffsRefPoints(state, daylightCtrlNum);
+    // Calc for daylighting reference points for daylighting controls that use SplitFlux method
+    for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+        if (state.dataDaylightingData->daylightControl(daylightCtrlNum).DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting)
+            continue;
+        // Skip enclosures with no exterior windows or in adjacent enclosure(s) with which an interior window is shared
+        if (state.dataDaylightingData->enclDaylight(state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex).NumOfDayltgExtWins == 0)
+            continue;
+        CalcDayltgCoeffsRefPoints(state, daylightCtrlNum);
+    }
     if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
-        // Calc for illuminance map
+        // Calc for illuminance maps
         if (state.dataDaylightingData->TotIllumMaps > 0) {
             for (int MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
                 int mapZoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).Zone;
-                if (state.dataHeatBal->Zone(mapZoneNum).zoneFirstSpaceSolEnclosure !=
-                    state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex)
-                    continue;
                 if (state.dataGlobal->WarmupFlag) {
                     DisplayString(state, "Calculating Daylighting Coefficients (Map Points), Zone=" + state.dataHeatBal->Zone(mapZoneNum).Name);
                 } else {
@@ -1015,7 +1001,6 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
                     ++WinEl;
 
                     FigureDayltgCoeffsAtPointsForWindowElements(state,
-                                                                thisDaylightControl.zoneIndex,
                                                                 daylightCtrlNum,
                                                                 IL,
                                                                 loopwin,
@@ -1353,8 +1338,9 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
 
             for (loopwin = 1; loopwin <= thisEnclDaylight.NumOfDayltgExtWins; ++loopwin) {
 
+                // daylightingCtrlNum parameter is unused for map points
                 FigureDayltgCoeffsAtPointsSetupForWindow(state,
-                                                         ZoneNum,
+                                                         0,
                                                          IL,
                                                          loopwin,
                                                          DataDaylighting::iCalledFor::MapPoint,
@@ -1404,8 +1390,8 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
 
                         ++WinEl;
 
+                        // daylightingCtrlNum parameter is unused for map points
                         FigureDayltgCoeffsAtPointsForWindowElements(state,
-                                                                    ZoneNum,
                                                                     0,
                                                                     IL,
                                                                     loopwin,
@@ -1458,8 +1444,9 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
                         if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
                             ISunPos = 0;
                             for (IHR = 1; IHR <= 24; ++IHR) {
+                                // daylightingCtrlNum parameter is unused for map points
                                 FigureDayltgCoeffsAtPointsForSunPosition(state,
-                                                                         ZoneNum,
+                                                                         0,
                                                                          IL,
                                                                          IX,
                                                                          NWX,
@@ -1509,8 +1496,9 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
                             } else if (!state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
                                 ISunPos = -1;
                             }
+                            // daylightingCtrlNum parameter is unused for map points
                             FigureDayltgCoeffsAtPointsForSunPosition(state,
-                                                                     ZoneNum,
+                                                                     0,
                                                                      IL,
                                                                      IX,
                                                                      NWX,
@@ -1573,7 +1561,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
 
 void FigureDayltgCoeffsAtPointsSetupForWindow(
     EnergyPlusData &state,
-    int const daylightCtrlNum,
+    int const daylightCtrlNum, // zero if called for map points
     int const iRefPoint,
     int const loopwin,
     DataDaylighting::iCalledFor const CalledFrom, // indicate  which type of routine called this routine
@@ -1612,8 +1600,6 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   November 2012, refactor from legacy code by Fred Winklemann
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // collect code to setup calculations for each window for daylighting coefficients
@@ -1621,17 +1607,8 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
     // METHODOLOGY EMPLOYED:
     // switch as need to serve both reference points and map points based on calledFrom
 
-    // Using/Aliasing
-    using General::POLYF;
-    using General::SafeDivide;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ShelfNum; // Daylighting shelf object number
-
-    // counter-clockwise starting at upper left as viewed
-    // from inside of room
+    int ShelfNum;     // Daylighting shelf object number
     int IConstShaded; // Shaded construction counter
-                      // int ScNum; // Window screen number //Unused Set but never used
     Real64 WW;        // Window width (m)
     Real64 HW;        // Window height (m)
 
@@ -1648,26 +1625,22 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
     int PipeNum;              // TDD pipe object number
     Real64 SinCornerAng;      // For triangle, sine of corner angle of window element
 
-    // Complex fenestration variables
-    int NRefPts; // number of reference points
-
-    auto &Zone(state.dataHeatBal->Zone);
-
-    // Complex fenestration variables
-    NRefPts = 0;
-
-    auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-    int enclNum = thisDaylightControl.enclIndex;
-    auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
-    IWin = thisEnclDaylight.DayltgExtWinSurfNums(loopwin);
+    int zoneNum = 0; // zone number
+    int enclNum = 0; // enclosure number
 
     if (CalledFrom == DataDaylighting::iCalledFor::RefPoint) {
-        thisDaylightControl.SolidAngAtRefPt(loopwin, iRefPoint) = 0.0;
-        thisDaylightControl.SolidAngAtRefPtWtd(loopwin, iRefPoint) = 0.0;
+        state.dataDaylightingData->daylightControl(daylightCtrlNum).SolidAngAtRefPt(loopwin, iRefPoint) = 0.0;
+        state.dataDaylightingData->daylightControl(daylightCtrlNum).SolidAngAtRefPtWtd(loopwin, iRefPoint) = 0.0;
+        zoneNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).zoneIndex;
+        enclNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex;
     } else if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
         state.dataDaylightingData->IllumMapCalc(MapNum).SolidAngAtMapPt(loopwin, iRefPoint) = 0.0;
         state.dataDaylightingData->IllumMapCalc(MapNum).SolidAngAtMapPtWtd(loopwin, iRefPoint) = 0.0;
+        zoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).Zone;
+        enclNum = state.dataHeatBal->Zone(zoneNum).zoneFirstSpaceSolEnclosure;
     }
+    IWin = state.dataDaylightingData->enclDaylight(enclNum).DayltgExtWinSurfNums(loopwin);
+
     if (state.dataSurface->Surface(state.dataSurface->Surface(IWin).BaseSurf).SolarEnclIndex == enclNum) {
         ExtWinType = DataDaylighting::iExtWinType::InZoneExtWin;
     } else {
@@ -1724,15 +1697,16 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
 
     // Visible transmittance at normal incidence
     state.dataSurface->SurfWinVisTransSelected(IWin) =
-        POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
+        General::POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
     // For windows with switchable glazing, ratio of visible transmittance at normal
     // incidence for fully switched (dark) state to that of unswitched state
     state.dataSurface->SurfWinVisTransRatio(IWin) = 1.0;
     if (ICtrl > 0) {
         if (ShType == WinShadingType::SwitchableGlazing) {
             IConstShaded = state.dataSurface->Surface(IWin).activeShadedConstruction;
-            state.dataSurface->SurfWinVisTransRatio(IWin) = SafeDivide(POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef),
-                                                                       POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef));
+            state.dataSurface->SurfWinVisTransRatio(IWin) =
+                General::SafeDivide(General::POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef),
+                                    General::POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef));
         }
     }
 
@@ -1778,7 +1752,7 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
                     state,
                     format("CalcDaylightCoeffRefPoints: Daylighting calculation cannot be done for Daylighting:Controls={} because reference point "
                            "#{} is less than 0.15m (6\") from window plane {}",
-                           thisDaylightControl.Name,
+                           state.dataDaylightingData->daylightControl(daylightCtrlNum).Name,
                            iRefPoint,
                            state.dataSurface->Surface(IWin).Name));
                 ShowContinueError(state, format("Distance=[{:.5R}]. This is too close; check position of reference point.", ALF));
@@ -1787,8 +1761,10 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
         } else if (ALF < 0.1524 && ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin) {
             if (state.dataDaylightingManager->RefErrIndex(iRefPoint, IWin) == 0) { // only show error message once
                 ShowWarningError(state,
-                                 "CalcDaylightCoeffRefPoints: For Daylghting:Controls=\"" + thisDaylightControl.Name + "\" External Window=\"" +
-                                     state.dataSurface->Surface(IWin).Name + "\"in Zone=\"" + Zone(state.dataSurface->Surface(IWin).Zone).Name +
+                                 "CalcDaylightCoeffRefPoints: For Daylghting:Controls=\"" +
+                                     state.dataDaylightingData->daylightControl(daylightCtrlNum).Name + "\" External Window=\"" +
+                                     state.dataSurface->Surface(IWin).Name + "\"in Zone=\"" +
+                                     state.dataHeatBal->Zone(state.dataSurface->Surface(IWin).Zone).Name +
                                      "\" reference point is less than 0.15m (6\") from window plane ");
                 ShowContinueError(state,
                                   format("Distance=[{:.1R} m] to ref point=[{:.1R},{:.1R},{:.1R}], Inaccuracy in Daylighting Calcs may result.",
@@ -1803,8 +1779,9 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
         if (ALF < 0.1524 && ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin) {
             if (state.dataDaylightingManager->MapErrIndex(iRefPoint, IWin) == 0) { // only show error message once
                 ShowWarningError(state,
-                                 "CalcDaylightCoeffMapPoints: For Daylghting:Controls=\"" + thisDaylightControl.Name + "\" External Window=\"" +
-                                     state.dataSurface->Surface(IWin).Name + "\"in Zone=\"" + Zone(state.dataSurface->Surface(IWin).Zone).Name +
+                                 "CalcDaylightCoeffMapPoints: For Zone=\"" + state.dataHeatBal->Zone(zoneNum).Name + "\" External Window=\"" +
+                                     state.dataSurface->Surface(IWin).Name + "\"in Zone=\"" +
+                                     state.dataHeatBal->Zone(state.dataSurface->Surface(IWin).Zone).Name +
                                      "\" map point is less than 0.15m (6\") from window plane ");
                 ShowContinueError(
                     state,
@@ -1823,10 +1800,10 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
     if (ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin) {
         // Adjust number of exterior window elements to give acceptable number of rays through
         // interior windows in the zone (for accuracy of interior window daylighting calculation)
-        SolidAngExtWin = SafeDivide(
+        SolidAngExtWin = General::SafeDivide(
             ((state.dataSurface->Surface(IWin).Area + state.dataSurface->SurfWinDividerArea(IWin)) / state.dataSurface->Surface(IWin).Multiplier),
             pow_2(ALF));
-        SolidAngMinIntWin = thisEnclDaylight.MinIntWinSolidAng;
+        SolidAngMinIntWin = state.dataDaylightingData->enclDaylight(enclNum).MinIntWinSolidAng;
         SolidAngRatio = max(1.0, SolidAngExtWin / SolidAngMinIntWin);
         NDIVX *= std::sqrt(SolidAngRatio);
         NDIVY *= std::sqrt(SolidAngRatio);
@@ -1950,10 +1927,11 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
     // Initialize bsdf daylighting coefficients here.  Only one time initialization
     if (state.dataSurface->SurfWinWindowModelType(IWin) == WindowBSDFModel) {
         if (!state.dataBSDFWindow->ComplexWind(IWin).DaylightingInitialized) {
+            int NRefPts = 0;
             if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
                 NRefPts = state.dataDaylightingData->IllumMapCalc(MapNum).TotalMapRefPoints;
             } else if (CalledFrom == DataDaylighting::iCalledFor::RefPoint) {
-                NRefPts = thisDaylightControl.TotalDaylRefPoints;
+                NRefPts = state.dataDaylightingData->daylightControl(daylightCtrlNum).TotalDaylRefPoints;
             }
             InitializeCFSDaylighting(state, daylightCtrlNum, IWin, NWX, NWY, RREF, NRefPts, iRefPoint, CalledFrom, MapNum);
             // if ((WinEl == (NWX * NWY)).and.(CalledFrom == CalledForMapPoint).and.(NRefPts == iRefPoint)) then
@@ -2002,7 +1980,6 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
 
 void FigureDayltgCoeffsAtPointsForWindowElements(
     EnergyPlusData &state,
-    int const zoneNum,         // Zone number
     int const daylightCtrlNum, // Current daylighting control number (only used when called from RefPoint)
     int const iRefPoint,
     int const loopwin,
@@ -2052,8 +2029,6 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   November 2012, refactor from legacy code by Fred Winklemann
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // collect code to do calculations for each window element for daylighting coefficients
@@ -2061,16 +2036,6 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
     // REFERENCES:
     // switch as need to serve both reference points and map points based on calledFrom
 
-    // Using/Aliasing
-    using DaylightingDevices::TransTDD;
-    using General::POLYF;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // from reference point through a window element
-    //   efficiency, if appropriate)
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 DIS;    // Distance between reference point and center of window element (m)
     Real64 DAXY1;  // For triangle, area of window element at end of column
     Real64 POSFAC; // Position factor for a window element / ref point / view vector combination
@@ -2165,13 +2130,14 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
             // Look up the TDD:DOME object
             PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
             // Unshaded visible transmittance of TDD for a single ray from sky/ground element
-            TVISB = TransTDD(state, PipeNum, COSB, DataDaylightingDevices::iRadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
+            TVISB = DaylightingDevices::TransTDD(state, PipeNum, COSB, DataDaylightingDevices::iRadType::VisibleBeam) *
+                    state.dataSurface->SurfWinGlazedFrac(IWin);
 
         } else { // Regular window
             if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) {
                 // Vis trans of glass for COSB incidence angle
-                TVISB = POLYF(COSB, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin) *
-                        state.dataSurface->SurfWinLightWellEff(IWin);
+                TVISB = General::POLYF(COSB, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
+                        state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
             } else {
                 // Complex fenestration needs to use different equation for visible transmittance.  That will be calculated later
                 // in the code since it depends on different incoming directions.  For now, just put zero to differentiate from
@@ -2179,6 +2145,12 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                 TVISB = 0.0;
             }
             if (ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin) {
+                int zoneNum = 0;
+                if (CalledFrom == DataDaylighting::iCalledFor::RefPoint) {
+                    zoneNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).zoneIndex;
+                } else if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
+                    zoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).Zone;
+                }
                 // Does ray pass through an interior window in zone (ZoneNum) containing the ref point?
                 for (IntWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst; IntWin <= state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
                      ++IntWin) {
@@ -2195,7 +2167,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                                     IntWinHitNum = 0;
                                     continue;
                                 }
-                                TVISIntWin = POLYF(
+                                TVISIntWin = General::POLYF(
                                     COSBIntWin, state.dataConstruction->Construct(state.dataSurface->Surface(IntWin).Construction).TransVisBeamCoef);
                                 TVISB *= TVISIntWin;
                                 break; // Ray passes thru interior window; exit from DO loop
@@ -2235,11 +2207,10 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                     (ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin && hitIntWin)) {
                     // Increment solid angle subtended by portion of window above ref pt
                     state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPt(iRefPoint) += DOMEGA;
-                    auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-                    thisDaylightControl.SolidAngAtRefPt(loopwin, iRefPoint) += DOMEGA;
+                    state.dataDaylightingData->daylightControl(daylightCtrlNum).SolidAngAtRefPt(loopwin, iRefPoint) += DOMEGA;
                     // Increment position-factor-modified solid angle
                     state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint) += DOMEGA * POSFAC;
-                    thisDaylightControl.SolidAngAtRefPtWtd(loopwin, iRefPoint) += DOMEGA * POSFAC;
+                    state.dataDaylightingData->daylightControl(daylightCtrlNum).SolidAngAtRefPtWtd(loopwin, iRefPoint) += DOMEGA * POSFAC;
                 }
             }
         } else if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
@@ -3261,7 +3232,12 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     //  new code would be -
     // IF (LSHCAL == 1 .AND. ExtWinType /= AdjZoneExtWin) CALL DayltgInterReflectedIllum(ISunPos,IHR,ZoneNum,IWin2)
     // TODO MJW: This may be getting repeated if there is more than one daylighting control in an enclosure
-    int const enclNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex;
+    int enclNum = 0; // enclosure index
+    if (CalledFrom == DataDaylighting::iCalledFor::RefPoint) {
+        enclNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex;
+    } else if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
+        enclNum = state.dataHeatBal->Zone(state.dataDaylightingData->IllumMapCalc(MapNum).Zone).zoneFirstSpaceSolEnclosure;
+    }
     if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) {
         if (LSHCAL == 1) DayltgInterReflectedIllum(state, ISunPos, iHour, enclNum, IWin2);
     } else {
@@ -3270,8 +3246,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
         DayltgDirectIllumComplexFenestration(state, IWin, WinEl, iHour, iRefPoint, CalledFrom, MapNum);
         // Call direct sun component only once since calculation is done for entire window
         if (WinEl == (NWX * NWY)) {
-            DayltgDirectSunDiskComplexFenestration(
-                state, IWin2, enclNum, iHour, iRefPoint, WinEl, AZVIEW, CalledFrom, MapNum, MapWindowSolidAngAtRefPtWtd);
+            DayltgDirectSunDiskComplexFenestration(state, IWin2, iHour, iRefPoint, WinEl, AZVIEW, CalledFrom, MapNum, MapWindowSolidAngAtRefPtWtd);
         }
         return;
     }
@@ -8789,9 +8764,8 @@ void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
 }
 
 void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
-                                            int const iWin,                             // Window index
-                                            [[maybe_unused]] int const daylightCtrlNum, // Daylighting control number
-                                            int const iHour,                            // Hour of day
+                                            int const iWin,  // Window index
+                                            int const iHour, // Hour of day
                                             int const iRefPoint,
                                             int const NumEl,                              // Total number of window elements
                                             Real64 const AZVIEW,                          // Azimuth of view vector in absolute coord system for
