@@ -6667,8 +6667,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 if (op->EnergyMeters(WhichMeter).RptTS) {
                     ShowWarningError(state,
                                      "Output:Meter:MeterFileOnly requested for \"" + op->EnergyMeters(WhichMeter).Name +
-                                         R"(" (TimeStep), already on "Output:Meter". Will report to both )" + state.files.eso.filePath.filename().string() +
-                                         " and " + state.files.mtr.filePath.filename().string());
+                                         R"(" (TimeStep), already on "Output:Meter". Will report to both )" +
+                                         state.files.eso.filePath.filename().string() + " and " + state.files.mtr.filePath.filename().string());
                 }
             }
             if (!op->EnergyMeters(WhichMeter).RptTS) {
@@ -6693,8 +6693,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 if (op->EnergyMeters(WhichMeter).RptAccTS) {
                     ShowWarningError(state,
                                      "Output:Meter:MeterFileOnly requested for \"Cumulative " + op->EnergyMeters(WhichMeter).Name +
-                                         R"(" (TimeStep), already on "Output:Meter". Will report to both )" + state.files.eso.filePath.filename().string() +
-                                         " and " + state.files.mtr.filePath.filename().string());
+                                         R"(" (TimeStep), already on "Output:Meter". Will report to both )" +
+                                         state.files.eso.filePath.filename().string() + " and " + state.files.mtr.filePath.filename().string());
                 }
             }
             if (!op->EnergyMeters(WhichMeter).RptAccTS) {
@@ -6721,8 +6721,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 if (op->EnergyMeters(WhichMeter).RptHR) {
                     ShowWarningError(state,
                                      "Output:Meter:MeterFileOnly requested for \"" + op->EnergyMeters(WhichMeter).Name +
-                                         R"(" (Hourly), already on "Output:Meter". Will report to both )" + state.files.eso.filePath.filename().string() +
-                                         " and " + state.files.mtr.filePath.filename().string());
+                                         R"(" (Hourly), already on "Output:Meter". Will report to both )" +
+                                         state.files.eso.filePath.filename().string() + " and " + state.files.mtr.filePath.filename().string());
                 }
             }
             if (!op->EnergyMeters(WhichMeter).RptHR) {
@@ -6748,8 +6748,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 if (op->EnergyMeters(WhichMeter).RptAccHR) {
                     ShowWarningError(state,
                                      "Output:Meter:MeterFileOnly requested for \"Cumulative " + op->EnergyMeters(WhichMeter).Name +
-                                         R"(" (Hourly), already on "Output:Meter". Will report to both )" + state.files.eso.filePath.filename().string() +
-                                         " and " + state.files.mtr.filePath.filename().string());
+                                         R"(" (Hourly), already on "Output:Meter". Will report to both )" +
+                                         state.files.eso.filePath.filename().string() + " and " + state.files.mtr.filePath.filename().string());
                 }
             }
             if (!op->EnergyMeters(WhichMeter).RptAccHR) {
@@ -6777,8 +6777,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 if (op->EnergyMeters(WhichMeter).RptDY) {
                     ShowWarningError(state,
                                      "Output:Meter:MeterFileOnly requested for \"" + op->EnergyMeters(WhichMeter).Name +
-                                         R"(" (Daily), already on "Output:Meter". Will report to both )" + state.files.eso.filePath.filename().string() +
-                                         " and " + state.files.mtr.filePath.filename().string());
+                                         R"(" (Daily), already on "Output:Meter". Will report to both )" +
+                                         state.files.eso.filePath.filename().string() + " and " + state.files.mtr.filePath.filename().string());
                 }
             }
             if (!op->EnergyMeters(WhichMeter).RptDY) {
@@ -6804,8 +6804,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 if (op->EnergyMeters(WhichMeter).RptAccDY) {
                     ShowWarningError(state,
                                      "Output:Meter:MeterFileOnly requested for \"Cumulative " + op->EnergyMeters(WhichMeter).Name +
-                                         R"(" (Hourly), already on "Output:Meter". Will report to both )" + state.files.eso.filePath.filename().string() +
-                                         " and " + state.files.mtr.filePath.filename().string());
+                                         R"(" (Hourly), already on "Output:Meter". Will report to both )" +
+                                         state.files.eso.filePath.filename().string() + " and " + state.files.mtr.filePath.filename().string());
                 }
             }
             if (!op->EnergyMeters(WhichMeter).RptAccDY) {
@@ -6833,8 +6833,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 if (op->EnergyMeters(WhichMeter).RptMN) {
                     ShowWarningError(state,
                                      "Output:Meter:MeterFileOnly requested for \"" + op->EnergyMeters(WhichMeter).Name +
-                                         R"(" (Monthly), already on "Output:Meter". Will report to both )" + state.files.eso.filePath.filename().string() +
-                                         " and " + state.files.mtr.filePath.filename().string());
+                                         R"(" (Monthly), already on "Output:Meter". Will report to both )" +
+                                         state.files.eso.filePath.filename().string() + " and " + state.files.mtr.filePath.filename().string());
                 }
             }
             if (!op->EnergyMeters(WhichMeter).RptMN) {
@@ -6860,8 +6860,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 if (op->EnergyMeters(WhichMeter).RptAccMN) {
                     ShowWarningError(state,
                                      "Output:Meter:MeterFileOnly requested for \"Cumulative " + op->EnergyMeters(WhichMeter).Name +
-                                         R"(" (Monthly), already on "Output:Meter". Will report to both )" + state.files.eso.filePath.filename().string() +
-                                         " and " + state.files.mtr.filePath.filename().string());
+                                         R"(" (Monthly), already on "Output:Meter". Will report to both )" +
+                                         state.files.eso.filePath.filename().string() + " and " + state.files.mtr.filePath.filename().string());
                 }
             }
             if (!op->EnergyMeters(WhichMeter).RptAccMN) {
@@ -6889,8 +6889,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 if (op->EnergyMeters(WhichMeter).RptYR) {
                     ShowWarningError(state,
                                      "Output:Meter:MeterFileOnly requested for \"" + op->EnergyMeters(WhichMeter).Name +
-                                         R"(" (Annual), already on "Output:Meter". Will report to both )" + state.files.eso.filePath.filename().string() +
-                                         " and " + state.files.mtr.filePath.filename().string());
+                                         R"(" (Annual), already on "Output:Meter". Will report to both )" +
+                                         state.files.eso.filePath.filename().string() + " and " + state.files.mtr.filePath.filename().string());
                 }
             }
             if (!op->EnergyMeters(WhichMeter).RptYR) {
@@ -6916,8 +6916,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 if (op->EnergyMeters(WhichMeter).RptAccYR) {
                     ShowWarningError(state,
                                      "Output:Meter:MeterFileOnly requested for \"Cumulative " + op->EnergyMeters(WhichMeter).Name +
-                                         R"(" (Annual), already on "Output:Meter". Will report to both )" + state.files.eso.filePath.filename().string() +
-                                         " and " + state.files.mtr.filePath.filename().string());
+                                         R"(" (Annual), already on "Output:Meter". Will report to both )" +
+                                         state.files.eso.filePath.filename().string() + " and " + state.files.mtr.filePath.filename().string());
                 }
             }
             if (!op->EnergyMeters(WhichMeter).RptAccYR) {
@@ -6945,8 +6945,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 if (op->EnergyMeters(WhichMeter).RptSM) {
                     ShowWarningError(state,
                                      "Output:Meter:MeterFileOnly requested for \"" + op->EnergyMeters(WhichMeter).Name +
-                                         R"(" (RunPeriod), already on "Output:Meter". Will report to both )" + state.files.eso.filePath.filename().string() +
-                                         " and " + state.files.mtr.filePath.filename().string());
+                                         R"(" (RunPeriod), already on "Output:Meter". Will report to both )" +
+                                         state.files.eso.filePath.filename().string() + " and " + state.files.mtr.filePath.filename().string());
                 }
             }
             if (!op->EnergyMeters(WhichMeter).RptSM) {
@@ -6972,8 +6972,8 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
                 if (op->EnergyMeters(WhichMeter).RptAccSM) {
                     ShowWarningError(state,
                                      "Output:Meter:MeterFileOnly requested for \"Cumulative " + op->EnergyMeters(WhichMeter).Name +
-                                         R"(" (RunPeriod), already on "Output:Meter". Will report to both )" + state.files.eso.filePath.filename().string() +
-                                         " and " + state.files.mtr.filePath.filename().string());
+                                         R"(" (RunPeriod), already on "Output:Meter". Will report to both )" +
+                                         state.files.eso.filePath.filename().string() + " and " + state.files.mtr.filePath.filename().string());
                 }
             }
             if (!op->EnergyMeters(WhichMeter).RptAccSM) {
