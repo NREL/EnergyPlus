@@ -338,24 +338,25 @@ namespace DataHeatBalance {
 
     struct SpaceData
     {
-        std::string Name = "";                        // Space name
-        int zoneNum = 0;                              // Pointer to Zone wich contains this space
-        Real64 userEnteredFloorArea = 0.0;            // User input floor area for this space
-        std::string spaceType = "General";            // Space type tag
-        int spaceTypeNum = 0;                         // Points to spaceType for this space
-        EPVector<std::string> tags;                   // Optional tags for reporting
-        EPVector<int> surfaces;                       // Pointers to surfaces in this space
-        Real64 calcFloorArea = 0.0;                   // Calculated floor area used for this space
-        Real64 floorArea = 0.0;                       // Floor area used for this space
-        bool hasFloor = false;                        // Has "Floor" surface
-        Real64 extWindowArea = 0.0;                   // Exterior Window Area for Zone
-        Real64 totalSurfArea = 0.0;                   // Total surface area for Zone
-        int radiantEnclosureNum = 0;                  // Radiant exchange enclosure this space belongs to
-        int solarEnclosureNum = 0;                    // Solar distribution enclosure this space belongs to
-        Real64 totOccupants = 0.0;                    // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
-        Real64 minOccupants = 0.0;                    // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
-        Real64 maxOccupants = 0.0;                    // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
-        std::vector<std::string> otherEquipFuelTypes; // List of fuel types used by other equipment in this space
+        std::string Name = "";             // Space name
+        int zoneNum = 0;                   // Pointer to Zone wich contains this space
+        Real64 userEnteredFloorArea = 0.0; // User input floor area for this space
+        std::string spaceType = "General"; // Space type tag
+        int spaceTypeNum = 0;              // Points to spaceType for this space
+        EPVector<std::string> tags;        // Optional tags for reporting
+        EPVector<int> surfaces;            // Pointers to surfaces in this space
+        Real64 calcFloorArea = 0.0;        // Calculated floor area used for this space
+        Real64 floorArea = 0.0;            // Floor area used for this space
+        bool hasFloor = false;             // Has "Floor" surface
+        Real64 extWindowArea = 0.0;        // Exterior Window Area for Zone
+        Real64 totalSurfArea = 0.0;        // Total surface area for Zone
+        int radiantEnclosureNum = 0;       // Radiant exchange enclosure this space belongs to
+        int solarEnclosureNum = 0;         // Solar distribution enclosure this space belongs to
+        Real64 totOccupants = 0.0;         // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
+        Real64 minOccupants = 0.0;         // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
+        Real64 maxOccupants = 0.0;         // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
+        std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
+        std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this space
     };
 
     struct SpaceListData
@@ -473,16 +474,17 @@ namespace DataHeatBalance {
         bool HasLtsRetAirGain;       // TRUE means that zone lights return air heat > 0.0 calculated from plenum temperature
         bool HasAirFlowWindowReturn; // TRUE means that zone has return air flow from windows
         // from refrigeration cases for this zone
-        Real64 InternalHeatGains;                     // internal loads (W)
-        Real64 NominalInfilVent;                      // internal infiltration/ventilation
-        Real64 NominalMixing;                         // internal mixing/cross mixing
-        bool TempOutOfBoundsReported;                 // if any temp out of bounds errors, first will show zone details.
-        bool EnforcedReciprocity;                     // if zone/space required forced reciprocity -- less out of bounds temp errors allowed
-        int ZoneMinCO2SchedIndex;                     // Index for the schedule the schedule which determines minimum CO2 concentration
-        int ZoneMaxCO2SchedIndex;                     // Index for the schedule the schedule which determines maximum CO2 concentration
-        int ZoneContamControllerSchedIndex;           // Index for this schedule
-        bool FlagCustomizedZoneCap;                   // True if customized Zone Capacitance Multiplier is used
-        std::vector<std::string> otherEquipFuelTypes; // List of fuel types used by other equipment in this zone
+        Real64 InternalHeatGains;           // internal loads (W)
+        Real64 NominalInfilVent;            // internal infiltration/ventilation
+        Real64 NominalMixing;               // internal mixing/cross mixing
+        bool TempOutOfBoundsReported;       // if any temp out of bounds errors, first will show zone details.
+        bool EnforcedReciprocity;           // if zone/space required forced reciprocity -- less out of bounds temp errors allowed
+        int ZoneMinCO2SchedIndex;           // Index for the schedule the schedule which determines minimum CO2 concentration
+        int ZoneMaxCO2SchedIndex;           // Index for the schedule the schedule which determines maximum CO2 concentration
+        int ZoneContamControllerSchedIndex; // Index for this schedule
+        bool FlagCustomizedZoneCap;         // True if customized Zone Capacitance Multiplier is used
+        std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this zone
+        std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this zone
 
         // Hybrid Modeling
         Real64 ZoneMeasuredTemperature;               // Measured zone air temperature input by user

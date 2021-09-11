@@ -2404,8 +2404,29 @@ namespace InternalHeatGains {
                             ErrorsFound = true;
                         }
                         thisZoneOthEq.otherEquipFuelTypeString = FuelTypeString; // Save for output variable setup later
-                        state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypes.emplace_back(FuelTypeString);
-                        state.dataHeatBal->space(spaceNum).otherEquipFuelTypes.emplace_back(FuelTypeString);
+                        // Build list of fuel types used in each zone and space (excluding None and Water)
+                        bool found = false;
+                        for (auto fuelType : state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums) {
+                            if (thisZoneOthEq.OtherEquipFuelType == fuelType) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums.emplace_back(thisZoneOthEq.OtherEquipFuelType);
+                            state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNames.emplace_back(FuelTypeString);
+                        }
+                        found = false;
+                        for (auto fuelType : state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums) {
+                            if (thisZoneOthEq.OtherEquipFuelType == fuelType) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums.emplace_back(thisZoneOthEq.OtherEquipFuelType);
+                            state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNames.emplace_back(FuelTypeString);
+                        }
                     }
 
                     thisZoneOthEq.SchedPtr = GetScheduleIndex(state, AlphaName(4));
@@ -5895,9 +5916,10 @@ namespace InternalHeatGains {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             if (addZoneOutputs(zoneNum)) {
                 bool firstFuelType = true;
-                for (std::string fuelTypeString : state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypes) {
+                std::string firstFuel;
+                for (std::string fuelTypeString : state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNames) {
                     if (firstFuelType) {
-
+                        firstFuel = fuelTypeString;
                         SetupOutputVariable(state,
                                             "Zone Other Equipment " + fuelTypeString + " Rate",
                                             OutputProcessor::Unit::W,
@@ -5917,7 +5939,7 @@ namespace InternalHeatGains {
                         ShowWarningError(state,
                                          "setupIHGOutputs: Output variables=Zone Other Equipment " + fuelTypeString +
                                              " Rate and Energy are not available.");
-                        ShowContinueError(state, "Only the first Other Equipment fuel type used in a zone is reported.");
+                        ShowContinueError(state, "Only the first Other Equipment fuel type used in a zone is reported. (" + firstFuel + ")");
                     }
                 }
 
@@ -6000,9 +6022,10 @@ namespace InternalHeatGains {
         for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             if (addSpaceOutputs(spaceNum)) {
                 bool firstFuelType = true;
-                for (std::string fuelTypeString : state.dataHeatBal->space(spaceNum).otherEquipFuelTypes) {
+                std::string firstFuel;
+                for (std::string fuelTypeString : state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNames) {
                     if (firstFuelType) {
-
+                        firstFuel = fuelTypeString;
                         SetupOutputVariable(state,
                                             "Space Other Equipment " + fuelTypeString + " Rate",
                                             OutputProcessor::Unit::W,
@@ -6022,7 +6045,7 @@ namespace InternalHeatGains {
                         ShowWarningError(state,
                                          "setupIHGOutputs: Output variables=Space Other Equipment " + fuelTypeString +
                                              " Rate and Energy are not available.");
-                        ShowContinueError(state, "Only the first Other Equipment fuel type used in a space is reported.");
+                        ShowContinueError(state, "Only the first Other Equipment fuel type used in a zone is reported. (" + firstFuel + ")");
                     }
                 }
 
