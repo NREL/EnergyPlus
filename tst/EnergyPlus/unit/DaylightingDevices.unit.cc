@@ -56,9 +56,18 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
+#include <EnergyPlus/DaylightingManager.hh>
+#include <EnergyPlus/General.hh>
 
 using namespace EnergyPlus;
+using namespace EnergyPlus::DaylightingDevices;
+using namespace EnergyPlus::DaylightingManager;
+using namespace EnergyPlus::DataDaylighting;
+using namespace EnergyPlus::DataSurfaces;
 
 TEST_F(EnergyPlusFixture, DaylightingDevices_adjustViewFactorsWithShelfTest)
 {
@@ -71,63 +80,153 @@ TEST_F(EnergyPlusFixture, DaylightingDevices_adjustViewFactorsWithShelfTest)
     Real64 vfSkyResult;
     Real64 vfGroundResult;
     Real64 acceptableTolerance = 0.00001;
+    int WinSurf = 1;
+    int ShelfNum = 1;
 
-    // Test 1: Sky and Ground are both negative (shouldn't happen but gotta test it), Shelf <= 1.0
+    // Allocate and set up base data for surfaces and shelf
+    state->dataSurface->Surface.allocate(2);
+    state->dataDaylightingDevicesData->Shelf.allocate(1);
+    state->dataSurface->Surface(1).Vertex.allocate(4);
+    state->dataSurface->Surface(2).Vertex.allocate(4);
+    state->dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf = 2;
+    state->dataDaylightingDevicesData->Shelf(1).Name = "Skywalker";
+
+    // Test 1A: Sky and Ground are both negative (shouldn't happen but gotta test it), Shelf <= 1.0
     vfShelfSet = 0.67;
     vfSkySet = -0.1;
     vfGroundSet = -0.1;
     vfShelfResult = 0.67;
     vfSkyResult = 0.0;
     vfGroundResult = 0.0;
-    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(vfShelfSet, vfSkySet, vfGroundSet);
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(*state, vfShelfSet, vfSkySet, vfGroundSet, WinSurf, ShelfNum);
     EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
     EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
     EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
 
-    // Test 2: Sky and Ground are both negative, Shelf > 1.0 (shouldn't happen but gotta test it)
-    vfShelfSet = 1.987;
-    vfSkySet = -0.12;
-    vfGroundSet = -0.23;
+    // Test 1B: Sky and Ground are both negative (shouldn't happen but gotta test it), Shelf > 1.0
+    vfShelfSet = 1.1;
+    vfSkySet = -0.1;
+    vfGroundSet = -0.1;
     vfShelfResult = 1.0;
     vfSkyResult = 0.0;
     vfGroundResult = 0.0;
-    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(vfShelfSet, vfSkySet, vfGroundSet);
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(*state, vfShelfSet, vfSkySet, vfGroundSet, WinSurf, ShelfNum);
     EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
     EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
     EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
 
-    // Test 3: Sky and Ground are both positive, Sky + Shelf + Ground <= 1.0 (okay, nothing reset)
-    vfShelfSet = 0.67;
-    vfSkySet = 0.16;
-    vfGroundSet = 0.16;
-    vfShelfResult = 0.67;
-    vfSkyResult = 0.16;
-    vfGroundResult = 0.16;
-    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(vfShelfSet, vfSkySet, vfGroundSet);
+    // Test 2A: Sky and Ground are positive (less than 1 combined), Shelf < 0.0
+    vfShelfSet = -0.1;
+    vfSkySet = 0.4;
+    vfGroundSet = 0.4;
+    vfShelfResult = 0.0;
+    vfSkyResult = 0.4;
+    vfGroundResult = 0.4;
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(*state, vfShelfSet, vfSkySet, vfGroundSet, WinSurf, ShelfNum);
     EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
     EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
     EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
 
-    // Test 4: Sky and Ground are both positive, Sky + Shelf + Ground > 1.0 (leave Shelf alone, adjust others)
-    vfShelfSet = 0.36;
-    vfSkySet = 0.34;
-    vfGroundSet = 0.6;
-    vfShelfResult = 0.36;
-    vfSkyResult = 0.34;
-    vfGroundResult = 0.3;
-    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(vfShelfSet, vfSkySet, vfGroundSet);
+    // Test 2B: Sky and Ground are positive (greater than 1 combined), Shelf < 0.0
+    vfShelfSet = -0.1;
+    vfSkySet = 0.8;
+    vfGroundSet = 0.4;
+    vfShelfResult = 0.0;
+    vfSkyResult = 2.0 / 3.0;
+    vfGroundResult = 1.0 / 3.0;
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(*state, vfShelfSet, vfSkySet, vfGroundSet, WinSurf, ShelfNum);
     EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
     EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
     EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
 
-    // Test 5: Sky and Ground are both positive, Sky + Shelf + Ground > 1.0 (leave Shelf alone, adjust others)
-    vfShelfSet = 0.5;
-    vfSkySet = 0.55;
-    vfGroundSet = 0.45;
-    vfShelfResult = 0.5;
+    // Test 3: Sky, Ground, and Shelf are all positive (less than 1 combined)
+    vfShelfSet = 0.2;
+    vfSkySet = 0.3;
+    vfGroundSet = 0.4;
+    vfShelfResult = 0.2;
+    vfSkyResult = 0.3;
+    vfGroundResult = 0.4;
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(*state, vfShelfSet, vfSkySet, vfGroundSet, WinSurf, ShelfNum);
+    EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
+    EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
+    EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
+
+    // Test 4A: Sky, Ground, and Shelf are all positive (greater than 1 combined), shelf is below window
+    vfShelfSet = 0.4;
+    vfSkySet = 0.5;
+    vfGroundSet = 0.5;
+    vfShelfResult = 0.4;
     vfSkyResult = 0.5;
-    vfGroundResult = 0.0;
-    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(vfShelfSet, vfSkySet, vfGroundSet);
+    vfGroundResult = 0.1;
+    state->dataSurface->Surface(1).Vertex(1).z = 1.0;
+    state->dataSurface->Surface(1).Vertex(2).z = 1.0;
+    state->dataSurface->Surface(1).Vertex(3).z = 2.5;
+    state->dataSurface->Surface(1).Vertex(4).z = 2.5;
+    state->dataSurface->Surface(2).Vertex(1).z = 0.5;
+    state->dataSurface->Surface(2).Vertex(2).z = 0.5;
+    state->dataSurface->Surface(2).Vertex(3).z = 0.5;
+    state->dataSurface->Surface(2).Vertex(4).z = 0.5;
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(*state, vfShelfSet, vfSkySet, vfGroundSet, WinSurf, ShelfNum);
+    EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
+    EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
+    EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
+
+    // Test 4B: Sky, Ground, and Shelf are all positive (greater than 1 combined), shelf is above window
+    vfShelfSet = 0.4;
+    vfSkySet = 0.5;
+    vfGroundSet = 0.5;
+    vfShelfResult = 0.4;
+    vfSkyResult = 0.1;
+    vfGroundResult = 0.5;
+    state->dataSurface->Surface(1).Vertex(1).z = 1.0;
+    state->dataSurface->Surface(1).Vertex(2).z = 1.0;
+    state->dataSurface->Surface(1).Vertex(3).z = 2.5;
+    state->dataSurface->Surface(1).Vertex(4).z = 2.5;
+    state->dataSurface->Surface(2).Vertex(1).z = 3.0;
+    state->dataSurface->Surface(2).Vertex(2).z = 3.0;
+    state->dataSurface->Surface(2).Vertex(3).z = 3.0;
+    state->dataSurface->Surface(2).Vertex(4).z = 3.0;
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(*state, vfShelfSet, vfSkySet, vfGroundSet, WinSurf, ShelfNum);
+    EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
+    EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
+    EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
+
+    // Test 4C: Sky, Ground, and Shelf are all positive (greater than 1 combined), shelf is in the middle of the window somewhere
+    vfShelfSet = 0.4;
+    vfSkySet = 0.25;
+    vfGroundSet = 0.5;
+    vfShelfResult = 0.4;
+    vfSkyResult = 0.18;
+    vfGroundResult = 0.42;
+    state->dataSurface->Surface(1).Vertex(1).z = 1.0;
+    state->dataSurface->Surface(1).Vertex(2).z = 1.0;
+    state->dataSurface->Surface(1).Vertex(3).z = 2.5;
+    state->dataSurface->Surface(1).Vertex(4).z = 2.5;
+    state->dataSurface->Surface(2).Vertex(1).z = 2.2;
+    state->dataSurface->Surface(2).Vertex(2).z = 2.2;
+    state->dataSurface->Surface(2).Vertex(3).z = 2.2;
+    state->dataSurface->Surface(2).Vertex(4).z = 2.2;
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(*state, vfShelfSet, vfSkySet, vfGroundSet, WinSurf, ShelfNum);
+    EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
+    EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
+    EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
+
+    // Test 4D: Sky, Ground, and Shelf are all positive (greater than 1 combined), shelf is in the middle of the window somewhere
+    vfShelfSet = 0.4;
+    vfSkySet = 0.5;
+    vfGroundSet = 0.25;
+    vfShelfResult = 0.4;
+    vfSkyResult = 0.40;
+    vfGroundResult = 0.20;
+    state->dataSurface->Surface(1).Vertex(1).z = 1.0;
+    state->dataSurface->Surface(1).Vertex(2).z = 1.0;
+    state->dataSurface->Surface(1).Vertex(3).z = 2.5;
+    state->dataSurface->Surface(1).Vertex(4).z = 2.5;
+    state->dataSurface->Surface(2).Vertex(1).z = 2.2;
+    state->dataSurface->Surface(2).Vertex(2).z = 2.2;
+    state->dataSurface->Surface(2).Vertex(3).z = 2.2;
+    state->dataSurface->Surface(2).Vertex(4).z = 2.2;
+    EnergyPlus::DaylightingDevices::adjustViewFactorsWithShelf(*state, vfShelfSet, vfSkySet, vfGroundSet, WinSurf, ShelfNum);
     EXPECT_NEAR(vfShelfSet, vfShelfResult, acceptableTolerance);
     EXPECT_NEAR(vfSkySet, vfSkyResult, acceptableTolerance);
     EXPECT_NEAR(vfGroundSet, vfGroundResult, acceptableTolerance);
