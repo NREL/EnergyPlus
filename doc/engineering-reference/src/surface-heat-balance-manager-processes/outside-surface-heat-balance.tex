@@ -354,6 +354,11 @@ In addition to the correlation choices described below, it is also possible to o
 
 These options can also use schedules to control values over time. Specific details are given in the Input Output Reference document.
 
+For exterior simple-glazing windows modeled with the WindowMaterial:SimpleGlazingSystem
+object, \emph{h\(_{c,ext}\)} is scaled with an adjustment ratio. This enables the modeling
+of simple windows with highly conductive frames (large input U values). The calculation
+of the adjustment ratio is detailed in Section~\ref{application-issues}.
+
 \subsubsection{Simple Combined}\label{simple-combined}
 
 The simple algorithm uses surface roughness and local surface windspeed to calculate the exterior heat transfer coefficient (key:SimpleCombined).~ The basic equation used is:
