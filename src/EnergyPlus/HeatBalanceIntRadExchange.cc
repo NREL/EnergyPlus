@@ -1275,8 +1275,9 @@ namespace HeatBalanceIntRadExchange {
                         continue; // On to the next enclosure
                     } else {
                         enclMatchFound = true;
-                        // If matching SpaceList or ZoneList or Zone found, set the enclosure name to match
+                        // If matching SpaceList or ZoneList or Zone found, set the enclosure names to match
                         thisEnclosure.Name = thisSpaceOrSpaceListName;
+                        state.dataViewFactor->EnclSolInfo(enclosureNum).Name = thisSpaceOrSpaceListName;
                         break; // We're done with radiant enclosures
                     }
                 }
@@ -1342,7 +1343,7 @@ namespace HeatBalanceIntRadExchange {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         NoUserInputF = true;
         UserFZoneIndex = state.dataInputProcessing->inputProcessor->getObjectItemNum(
-            state, "ZoneProperty:UserViewFactors:BySurfaceName", "space_or_spacelist_name", EnclosureName);
+            state, "ZoneProperty:UserViewFactors:BySurfaceName", "zone_or_zonelist_or_space_or_spacelist_name", EnclosureName);
 
         if (UserFZoneIndex > 0) {
             enclosureSurfaceNames.allocate(N);
