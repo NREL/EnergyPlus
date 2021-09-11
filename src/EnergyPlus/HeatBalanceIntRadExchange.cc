@@ -1166,7 +1166,8 @@ namespace HeatBalanceIntRadExchange {
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
-            std::string const thisSpaceOrSpaceListName = fields.at("zone_or_zonelist_or_space_or_spacelist_name").get<std::string>();
+            std::string const thisSpaceOrSpaceListName =
+                UtilityRoutines::MakeUPPERCase(fields.at("zone_or_zonelist_or_space_or_spacelist_name").get<std::string>());
             // do not mark object as used here - let GetInputViewFactorsbyName do that
 
             // Look for matching radiant enclosure name
@@ -1191,8 +1192,7 @@ namespace HeatBalanceIntRadExchange {
             }
             if (enclMatchFound) continue; // We're done with this instance
             // Find matching SpaceList name
-            int spaceListNum =
-                UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(thisSpaceOrSpaceListName), state.dataHeatBal->spaceList);
+            int spaceListNum = UtilityRoutines::FindItemInList(thisSpaceOrSpaceListName, state.dataHeatBal->spaceList);
             int zoneListNum = 0;
             int inputZoneNum = 0;
             size_t listSize = 0;
@@ -1200,13 +1200,13 @@ namespace HeatBalanceIntRadExchange {
                 listSize = int(state.dataHeatBal->spaceList(spaceListNum).spaces.size());
             } else {
                 // Check Zone and ZoneList for backwards compatibility
-                zoneListNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(thisSpaceOrSpaceListName), state.dataHeatBal->ZoneList);
+                zoneListNum = UtilityRoutines::FindItemInList(thisSpaceOrSpaceListName, state.dataHeatBal->ZoneList);
                 if (zoneListNum > 0) {
                     for (int const zoneNum : state.dataHeatBal->ZoneList(zoneListNum).Zone) {
                         listSize += state.dataHeatBal->Zone(zoneNum).spaceIndexes.size();
                     }
                 } else {
-                    inputZoneNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(thisSpaceOrSpaceListName), state.dataHeatBal->Zone);
+                    inputZoneNum = UtilityRoutines::FindItemInList(thisSpaceOrSpaceListName, state.dataHeatBal->Zone);
                     if (inputZoneNum > 0) {
                         listSize = state.dataHeatBal->Zone(inputZoneNum).spaceIndexes.size();
                     }
