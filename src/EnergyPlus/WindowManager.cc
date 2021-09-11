@@ -3717,52 +3717,52 @@ namespace WindowManager {
         int iter;       // Iteration number
         Real64 errtemp; // Absolute value of sum of face temperature differences
         //   between iterations, divided by number of faces
-        Real64 VGap;                // Air velocity in gap between glass and shade/blind (m/s)
-        Real64 VAirflowGap;         // Air velocity in airflow gap between glass panes (m/s)
-        Real64 VGapPrev;            // Value of VGap from previous iteration
-        Real64 TGapNew;             // Average air temp in gap between glass and shade/blind (K)
-        Real64 TAirflowGapNew;      // Average air temp in airflow gap between glass panes (K)
-        Real64 TGapOutlet;          // Temperature of air leaving gap between glass and shade/blind (K)
-        Real64 TAirflowGapOutlet;   // Temperature of air leaving airflow gap between glass panes (K)
-        Real64 TAirflowGapOutletC;  // Temperature of air leaving airflow gap between glass panes (C)
-        Real64 hcv;                 // Convection coefficient from gap glass or shade/blind to gap air (W/m2-K)
-        Real64 hcvAirflowGap;       // Convection coefficient from airflow gap glass to airflow gap air (W/m2-K)
-        Real64 hcvPrev;             // Value of hcv from previous iteration
-        Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
-        Real64 ConvHeatFlowForced;  // Convective heat flow from forced airflow gap (W)
-        Real64 ShGlReflFacIR;       // Factor for long-wave inter-reflection between shade/blind and adjacent glass
-        Real64 RhoGlIR1;            // Long-wave reflectance of glass surface facing shade/blind; 1=exterior shade/blind,
-        Real64 RhoGlIR2;
+        Real64 VGap = 0.0;                // Air velocity in gap between glass and shade/blind (m/s)
+        Real64 VAirflowGap = 0.0;         // Air velocity in airflow gap between glass panes (m/s)
+        Real64 VGapPrev = 0.0;            // Value of VGap from previous iteration
+        Real64 TGapNew = 0.0;             // Average air temp in gap between glass and shade/blind (K)
+        Real64 TAirflowGapNew = 0.0;      // Average air temp in airflow gap between glass panes (K)
+        Real64 TGapOutlet = 0.0;          // Temperature of air leaving gap between glass and shade/blind (K)
+        Real64 TAirflowGapOutlet = 0.0;   // Temperature of air leaving airflow gap between glass panes (K)
+        Real64 TAirflowGapOutletC = 0.0;  // Temperature of air leaving airflow gap between glass panes (C)
+        Real64 hcv = 0.0;                 // Convection coefficient from gap glass or shade/blind to gap air (W/m2-K)
+        Real64 hcvAirflowGap = 0.0;       // Convection coefficient from airflow gap glass to airflow gap air (W/m2-K)
+        Real64 hcvPrev = 0.0;             // Value of hcv from previous iteration
+        Real64 ConvHeatFlowNatural = 0.0; // Convective heat flow from gap between glass and interior shade or blind (W)
+        Real64 ConvHeatFlowForced = 0.0;  // Convective heat flow from forced airflow gap (W)
+        Real64 ShGlReflFacIR = 0.0;       // Factor for long-wave inter-reflection between shade/blind and adjacent glass
+        Real64 RhoGlIR1 = 0.0;            // Long-wave reflectance of glass surface facing shade/blind; 1=exterior shade/blind,
+        Real64 RhoGlIR2 = 0.0;
         //  2=exterior shade/blind
-        Real64 EpsShIR1; // Long-wave emissivity of shade/blind surface facing glass; 1=interior shade/blind,
-        Real64 EpsShIR2;
+        Real64 EpsShIR1 = 0.0; // Long-wave emissivity of shade/blind surface facing glass; 1=interior shade/blind,
+        Real64 EpsShIR2 = 0.0;
         //  2=interior shade/blind
-        Real64 RhoShIR1; // Long-wave reflectance of shade/blind surface facing glass; 1=interior shade/blind,
-        Real64 RhoShIR2;
+        Real64 RhoShIR1 = 0.0; // Long-wave reflectance of shade/blind surface facing glass; 1=interior shade/blind,
+        Real64 RhoShIR2 = 0.0;
         //  2=exterior shade/blind
-        Real64 TauShIR; // Long-wave transmittance of isolated shade/blind
-        Real64 sconsh;  // shade/blind conductance (W/m2-K)
+        Real64 TauShIR = 0.0; // Long-wave transmittance of isolated shade/blind
+        Real64 sconsh = 0.0;  // shade/blind conductance (W/m2-K)
 
-        WinShadingType ShadeFlag; // Shading flag
+        WinShadingType ShadeFlag = WinShadingType::NoShade; // Shading flag
         //  radiation from lights and zone equipment absorbed by faces of shade/blind (W/m2)
-        Real64 ShadeArea;          // shade/blind area (m2)
-        Real64 CondHeatGainGlass;  // Conduction through inner glass layer, outside to inside (W)
-        Real64 CondHeatGainShade;  // Conduction through shade/blind, outside to inside (W)
-        Real64 NetIRHeatGainGlass; // Net IR heat gain to zone from shade/blind side of glass when interior
+        Real64 ShadeArea = 0.0;          // shade/blind area (m2)
+        Real64 CondHeatGainGlass = 0.0;  // Conduction through inner glass layer, outside to inside (W)
+        Real64 CondHeatGainShade = 0.0;  // Conduction through shade/blind, outside to inside (W)
+        Real64 NetIRHeatGainGlass = 0.0; // Net IR heat gain to zone from shade/blind side of glass when interior
         //  shade/blind is present. Zero if shade/blind has zero IR transmittance (W)
-        Real64 NetIRHeatGainShade;            // Net IR heat gain to zone from interior shade/blind (W)
-        Real64 ConvHeatGainFrZoneSideOfShade; // Convective heat gain to zone from side of interior shade facing zone (W)
-        Real64 ConvHeatGainFrZoneSideOfGlass; // Convective heat gain to zone from side of glass facing zone when
+        Real64 NetIRHeatGainShade = 0.0;            // Net IR heat gain to zone from interior shade/blind (W)
+        Real64 ConvHeatGainFrZoneSideOfShade = 0.0; // Convective heat gain to zone from side of interior shade facing zone (W)
+        Real64 ConvHeatGainFrZoneSideOfGlass = 0.0; // Convective heat gain to zone from side of glass facing zone when
         //  no interior shade/blind is present (W)
-        Real64 IncidentSolar;         // Solar incident on outside of window (W)
-        Real64 TransDiff;             // Diffuse shortwave transmittance
-        Real64 ConvHeatGainToZoneAir; // Convective heat gain to zone air from window gap airflow (W)
-        Real64 TotAirflowGap;         // Total volumetric airflow through window gap (m3/s)
-        Real64 CpAirOutlet;           // Heat capacity of air from window gap (J/kg-K)
-        Real64 CpAirZone;             // Heat capacity of zone air (J/kg-K)
-        Real64 InletAirHumRat;        // Humidity ratio of air from window gap entering fan
-        Real64 ZoneTemp;              // Zone air temperature (C)
-        int InsideFaceIndex;          // intermediate variable for index of inside face in thetas
+        Real64 IncidentSolar = 0.0;         // Solar incident on outside of window (W)
+        Real64 TransDiff = 0.0;             // Diffuse shortwave transmittance
+        Real64 ConvHeatGainToZoneAir = 0.0; // Convective heat gain to zone air from window gap airflow (W)
+        Real64 TotAirflowGap = 0.0;         // Total volumetric airflow through window gap (m3/s)
+        Real64 CpAirOutlet = 0.0;           // Heat capacity of air from window gap (J/kg-K)
+        Real64 CpAirZone = 0.0;             // Heat capacity of zone air (J/kg-K)
+        Real64 InletAirHumRat = 0.0;        // Humidity ratio of air from window gap entering fan
+        Real64 ZoneTemp = 0.0;              // Zone air temperature (C)
+        int InsideFaceIndex = 0;            // intermediate variable for index of inside face in thetas
 
         iter = 0;
         ConvHeatFlowNatural = 0.0;
