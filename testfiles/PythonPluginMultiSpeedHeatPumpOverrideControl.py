@@ -89,7 +89,7 @@ class CoilSpeedControl(EnergyPlusPlugin):
 
                 self.coil_speed_level_handle = self.api.exchange.get_actuator_handle(state,
                                                                                      "Coil Speed Control",
-                                                                                     "Unitary System DX Coil Speed Level",
+                                                                                     "Unitary System DX Coil Speed Value",
                                                                                      "TWOSPEED HEAT PUMP 1")
 
 
