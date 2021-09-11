@@ -5872,7 +5872,7 @@ namespace OutputProcessor {
         // then with a cumulative variable
         SetInitialMeterReportingAndOutputNames(*state, 1, true, ReportingFrequency::EachCall, true);
         errMsg = delimited_string({
-            "   ** Warning ** Output:Meter:MeterFileOnly requested for \"Cumulative Foo\" (TimeStep), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr"
+            "   ** Warning ** Output:Meter:MeterFileOnly requested for \"Cumulative Foo\" (TimeStep), already on \"Output:Meter\". Will report to both bar.eso and bar.mtr"
         });
         compare_err_stream(errMsg);
     }
