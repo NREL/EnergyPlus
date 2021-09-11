@@ -769,6 +769,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
     state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
 
+    // allocate surface level adj ratio data member
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(6, 1.0);
+
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
     state->dataLoopNodes->Node(3).Temp = 20.0;
@@ -1335,6 +1338,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
 
     // Set up
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(6, 1.0);
+
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
@@ -1913,6 +1918,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
 
     // Set up
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(6, 1.0);
+
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
@@ -2456,6 +2463,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
     state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
 
+    // allocate surface level adj ratio data member
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(6, 1.0);
+
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
     state->dataLoopNodes->Node(3).Temp = 20.0;
@@ -2487,6 +2497,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataScheduleMgr->Schedule(1).CurrentValue = -0.1;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 0.1;
 
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(6, 1.0);
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
@@ -4175,16 +4186,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
-    state->dataHeatBalSurf->SurfHConvInt.allocate(6);
-    state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
-    state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
-    state->dataHeatBalSurf->SurfHConvInt(3) = 0.5;
-    state->dataHeatBalSurf->SurfHConvInt(4) = 0.5;
-    state->dataHeatBalSurf->SurfHConvInt(5) = 0.5;
-    state->dataHeatBalSurf->SurfHConvInt(6) = 0.5;
-    state->dataMstBal->HConvInFD.allocate(6);
-    state->dataMstBal->RhoVaporAirIn.allocate(6);
-    state->dataMstBal->HMassConvInFD.allocate(6);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(state->dataSurface->TotSurfaces, 1.0);
+    state->dataHeatBalSurf->SurfHConvInt.dimension(state->dataSurface->TotSurfaces, 0.5);
+    state->dataMstBal->HConvInFD.allocate(state->dataSurface->TotSurfaces);
+    state->dataMstBal->RhoVaporAirIn.allocate(state->dataSurface->TotSurfaces);
+    state->dataMstBal->HMassConvInFD.allocate(state->dataSurface->TotSurfaces);
 
     SolarShading::AllocateModuleArrays(*state);
     HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
