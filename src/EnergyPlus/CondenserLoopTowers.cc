@@ -136,14 +136,17 @@ namespace CondenserLoopTowers {
                                 bool const RunFlag)
     {
         this->initialize(state);
-        if (this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_SingleSpd) {
+        switch (this->TowerType_Num) {
+        case DataPlant::PlantEquipmentType::CoolingTower_SingleSpd:
             this->calculateSingleSpeedTower(state);
-        } else if (this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_TwoSpd) {
+        case DataPlant::PlantEquipmentType::CoolingTower_TwoSpd:
             this->calculateTwoSpeedTower(state);
-        } else if (this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_VarSpdMerkel) {
+        case DataPlant::PlantEquipmentType::CoolingTower_VarSpd:
             this->calculateMerkelVariableSpeedTower(state, CurLoad);
-        } else if (this->TowerType_Num == DataPlant::PlantEquipmentType::CoolingTower_VarSpd) {
+        case DataPlant::PlantEquipmentType::CoolingTower_VarSpdMerkel:
             this->calculateVariableSpeedTower(state);
+        default:
+            ShowFatalError(state, format("Plant Equipment Type specified for {} is not a Cooling Tower.", this->Name));
         }
         this->calculateWaterUsage(state);
         this->update(state);
