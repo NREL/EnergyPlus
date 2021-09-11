@@ -232,7 +232,7 @@ namespace HVACMultiSpeedHeatPump {
         bool MyPlantScantFlag;
         bool MyStagedFlag;
         bool EMSOverrideCoilSpeedNumOn;
-        int EMSOverrideCoilSpeedNumValue;
+        Real64 EMSOverrideCoilSpeedNumValue;
 
         // Default Constructor
         MSHeatPumpData()
@@ -255,7 +255,7 @@ namespace HVACMultiSpeedHeatPump {
               HotWaterCompNum(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), StageNum(0), Staged(false), CoolCountAvail(0),
               CoolIndexAvail(0), HeatCountAvail(0), HeatIndexAvail(0), FirstPass(true), MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0),
               MyEnvrnFlag(true), MySizeFlag(true), MyCheckFlag(true), MyFlowFracFlag(true), MyPlantScantFlag(true), MyStagedFlag(true),
-              EMSOverrideCoilSpeedNumOn(false), EMSOverrideCoilSpeedNumValue(0)
+              EMSOverrideCoilSpeedNumOn(false), EMSOverrideCoilSpeedNumValue(0.0)
         {
         }
     };
@@ -352,7 +352,7 @@ namespace HVACMultiSpeedHeatPump {
                               int const CompOp,              // compressor operation; 1=on, 0=off
                               int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                               Real64 const QZnReq,           // cooling or heating output needed by zone [W]
-                              int const SpeedNum,            // Speed number
+                              Real64 const SpeedVal,         // continuous speed value
                               Real64 &SpeedRatio,            // unit speed ratio for DX coils
                               Real64 &PartLoadFrac,          // unit part load fraction
                               Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep

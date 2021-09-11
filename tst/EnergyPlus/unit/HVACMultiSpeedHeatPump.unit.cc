@@ -1403,20 +1403,22 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     state->dataGlobal->DoCoilDirectSolutions = false;
 
     state->dataHVACMultiSpdHP->MSHeatPump(2).EMSOverrideCoilSpeedNumOn = true;
-    state->dataHVACMultiSpdHP->MSHeatPump(2).EMSOverrideCoilSpeedNumValue = 2;
-    QZnReq = 50000.00;
-    SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
-    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedNum, 2);
-    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).CycRatio, 1.0);
-    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedRatio, 1.0);
-    EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 37.41738, 0.0001);
+    state->dataHVACMultiSpdHP->MSHeatPump(2).EMSOverrideCoilSpeedNumValue = 0.1530992;
 
-    state->dataHVACMultiSpdHP->MSHeatPump(2).EMSOverrideCoilSpeedNumValue = 1;
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedNum, 1);
-    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedRatio, 1.0);
-    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPump(2).CompPartLoadRatio, 1.0);
-    EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 36.73345, 0.0001);
+    EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).CycRatio, 0.1530992, 0.0001);
+    EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPump(2).CompPartLoadRatio, 0.1530992, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 26.546664, 0.0001);
+
+    QZnReq = 50000.00;
+    state->dataHVACMultiSpdHP->MSHeatPump(2).EMSOverrideCoilSpeedNumValue = 1.2;
+    SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
+    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedNum, 2);
+    EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedRatio, 0.2, 0.001);
+    EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPump(2).CompPartLoadRatio, 0.2, 0.001);
+    // SpeedNumValue = 1.2 is overheating under QZnReq = 50000.00
+    EXPECT_GT(state->dataLoopNodes->Node(22).Temp, 26.546664);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();

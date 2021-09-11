@@ -1347,10 +1347,13 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
     EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(2).Temp);
+    EXPECT_NEAR(thisSys->m_CoolingCycRatio, 0.708728, 0.001);
+    EXPECT_EQ(thisSys->m_CoolingSpeedRatio, 0);
+    EXPECT_EQ(thisSys->m_CoolingSpeedNum, 1);
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
     thisSys->m_EMSOverrideCoilSpeedNumOn = true;
-    thisSys->m_EMSOverrideCoilSpeedNumValue = 1;
+    thisSys->m_EMSOverrideCoilSpeedNumValue = 0.708728;
     thisSys->simulate(*state,
                       thisSys->Name,
                       FirstHVACIteration,
@@ -1363,15 +1366,19 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
                       ZoneEquipment,
                       sensOut,
                       latOut);
+    // EMSOverrideCoilSpeedNumValue - floor(EMSOverrideCoilSpeedNumValue);
+    EXPECT_NEAR(thisSys->m_CoolingCycRatio, 0.708728, 0.001);
+    EXPECT_EQ(thisSys->m_CoolingSpeedRatio, 0); // EMSOverrideCoilSpeedNumValue - floor(EMSOverrideCoilSpeedNumValue);
+    EXPECT_EQ(thisSys->m_CoolingSpeedNum, 1);   // ceiling of override value
 
-    // check that cooling coil air outlet node is lower than the set point
-    EXPECT_LT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint);
+    // check that cooling coil air outlet node is at set point, same cycling ratio and speed level with non-ems value
+    EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(2).Temp);
     Real64 CoolingCoilAirOutletTempAtSpeedOne = state->dataLoopNodes->Node(2).Temp;
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
-    thisSys->m_EMSOverrideCoilSpeedNumValue = 2;
+    thisSys->m_EMSOverrideCoilSpeedNumValue = 1.2;
     thisSys->simulate(*state,
                       thisSys->Name,
                       FirstHVACIteration,
@@ -1385,11 +1392,13 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
                       sensOut,
                       latOut);
 
-    EXPECT_EQ(thisSys->m_CoolingSpeedNum, thisSys->m_EMSOverrideCoilSpeedNumValue);
-    EXPECT_EQ(thisSys->m_SpeedNum, thisSys->m_EMSOverrideCoilSpeedNumValue);
+    EXPECT_EQ(thisSys->m_CoolingSpeedNum, 2);
+    EXPECT_EQ(thisSys->m_SpeedNum, 2);
+    EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 0.2, 0.001); // EMSOverrideCoilSpeedNumValue - floor(EMSOverrideCoilSpeedNumValue);
+
     // check that cooling coil air outlet node temperature is lower than the set point
     EXPECT_LT(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint);
-    // check that cooling coil air outlet node temperature at speed 2 is lower than that at speed 1
+    // check that cooling coil air outlet node temperature at speed 1.2 is lower than that at speed 0.71
     EXPECT_LT(state->dataLoopNodes->Node(2).Temp, CoolingCoilAirOutletTempAtSpeedOne);
     // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(2).Temp);
