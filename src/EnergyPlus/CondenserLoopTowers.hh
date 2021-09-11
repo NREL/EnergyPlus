@@ -114,9 +114,8 @@ namespace CondenserLoopTowers {
     struct CoolingTower : PlantComponent
     {
         // Members
-        std::string Name;      // User identifier
-        std::string TowerType; // Type of cooling tower
-        DataPlant::PlantEquipmentType TowerType_Num;
+        std::string Name; // User identifier
+        DataPlant::PlantEquipmentType TowerType;
         PIM PerformanceInputMethod_Num; // Method of entering tower performance: UA and Design Water
         //  Flow Rate, or Nominal Capacity
         std::string ModelCoeffObjectName;         // Cooling Tower:Variable Speed Model Coefficient Object name
@@ -353,7 +352,7 @@ namespace CondenserLoopTowers {
 
         // Default Constructor
         CoolingTower()
-            : TowerType_Num(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PIM::Unassigned), Available(true), ON(true),
+            : TowerType(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PIM::Unassigned), Available(true), ON(true),
               DesignWaterFlowRate(0.0), DesignWaterFlowRateWasAutoSized(false), DesignWaterFlowPerUnitNomCap(0.0), DesWaterMassFlowRate(0.0),
               DesWaterMassFlowRatePerCell(0.0), HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false), DesignAirFlowPerUnitNomCap(0.0),
               DefaultedDesignAirFlowScalingFactor(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false),
