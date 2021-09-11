@@ -75,45 +75,45 @@ namespace PlantChillers {
         Real64 OptPartLoadRat; // (GT BEST) optimal operating frac full load
         Real64 TempDesCondIn;  // C - (GT ADJTC(1)The design secondary loop fluid
         // temperature at the chiller condenser side inlet
-        Real64 TempRiseCoef;                     // (GT ADJTC(2)) correction factor for off ChillDesign oper.
-        Real64 TempDesEvapOut;                   // C - (GT ADJTC(3)The design primary loop fluid
-        DataPlant::nCondenserType CondenserType; // Type of Condenser - Air or Water Cooled
-        Real64 NomCap;                           // design nominal capacity of chiller
-        bool NomCapWasAutoSized;                 // true if NomCap was autosize on input
-        Real64 COP;                              // COP
-        DataPlant::FlowMode FlowMode;            // one of 3 modes for component flow during operation
-        bool ModulatedFlowSetToLoop;             // True if the setpoint is missing at the outlet node
-        bool ModulatedFlowErrDone;               // true if setpoint warning issued
-        bool HRSPErrDone;                        // TRUE if set point warning issued for heat recovery loop
-        int EvapInletNodeNum;                    // Node number on the inlet side of the plant
-        int EvapOutletNodeNum;                   // Node number on the outlet side of the plant
-        int CondInletNodeNum;                    // Node number on the inlet side of the condenser
-        int CondOutletNodeNum;                   // Node number on the outlet side of the condenser
-        Real64 EvapVolFlowRate;                  // m**3/s - design nominal water volumetric flow rate through the evaporator
-        bool EvapVolFlowRateWasAutoSized;        // true if autosized design evap flow rate on input
-        Real64 EvapMassFlowRateMax;              // kg/s - design water mass flow rate through evaporator
-        Real64 CondVolFlowRate;                  // m**3/s - design nominal water volumetric flow rate through the condenser
-        bool CondVolFlowRateWasAutoSized;        // true if previous was autosized
-        Real64 CondMassFlowRateMax;              // kg/s - design water mass flow rate through condenser
-        int CWLoopNum;                           // chilled water plant loop index number
-        int CWLoopSideNum;                       // chilled water plant loop side index
-        int CWBranchNum;                         // chilled water plant loop branch index
-        int CWCompNum;                           // chilled water plant loop component index
-        int CDLoopNum;                           // condenser water plant loop index number
-        int CDLoopSideNum;                       // condenser water plant loop side index
-        int CDBranchNum;                         // condenser water plant loop branch index
-        int CDCompNum;                           // condenser water plant loop component index
-        Real64 SizFac;                           // sizing factor
-        Real64 BasinHeaterPowerFTempDiff;        // Basin heater capacity per degree C below setpoint (W/C)
-        Real64 BasinHeaterSetPointTemp;          // Setpoint temperature for basin heater operation (C)
-        int BasinHeaterSchedulePtr;              // Pointer to basin heater schedule
-        int ErrCount1;                           // for recurring error messages
-        int ErrCount2;                           // for recurring error messages
-        std::string MsgBuffer1;                  // - buffer to print warning messages on following time step
-        std::string MsgBuffer2;                  // - buffer to print warning messages on following time step
-        Real64 MsgDataLast;                      // value of data when warning occurred (passed to Recurring Warn)
-        bool PrintMessage;                       // logical to determine if message is valid
-        int MsgErrorCount;                       // number of occurrences of warning
+        Real64 TempRiseCoef;                    // (GT ADJTC(2)) correction factor for off ChillDesign oper.
+        Real64 TempDesEvapOut;                  // C - (GT ADJTC(3)The design primary loop fluid
+        DataPlant::CondenserType CondenserType; // Type of Condenser - Air or Water Cooled
+        Real64 NomCap;                          // design nominal capacity of chiller
+        bool NomCapWasAutoSized;                // true if NomCap was autosize on input
+        Real64 COP;                             // COP
+        DataPlant::FlowMode FlowMode;           // one of 3 modes for component flow during operation
+        bool ModulatedFlowSetToLoop;            // True if the setpoint is missing at the outlet node
+        bool ModulatedFlowErrDone;              // true if setpoint warning issued
+        bool HRSPErrDone;                       // TRUE if set point warning issued for heat recovery loop
+        int EvapInletNodeNum;                   // Node number on the inlet side of the plant
+        int EvapOutletNodeNum;                  // Node number on the outlet side of the plant
+        int CondInletNodeNum;                   // Node number on the inlet side of the condenser
+        int CondOutletNodeNum;                  // Node number on the outlet side of the condenser
+        Real64 EvapVolFlowRate;                 // m**3/s - design nominal water volumetric flow rate through the evaporator
+        bool EvapVolFlowRateWasAutoSized;       // true if autosized design evap flow rate on input
+        Real64 EvapMassFlowRateMax;             // kg/s - design water mass flow rate through evaporator
+        Real64 CondVolFlowRate;                 // m**3/s - design nominal water volumetric flow rate through the condenser
+        bool CondVolFlowRateWasAutoSized;       // true if previous was autosized
+        Real64 CondMassFlowRateMax;             // kg/s - design water mass flow rate through condenser
+        int CWLoopNum;                          // chilled water plant loop index number
+        int CWLoopSideNum;                      // chilled water plant loop side index
+        int CWBranchNum;                        // chilled water plant loop branch index
+        int CWCompNum;                          // chilled water plant loop component index
+        int CDLoopNum;                          // condenser water plant loop index number
+        int CDLoopSideNum;                      // condenser water plant loop side index
+        int CDBranchNum;                        // condenser water plant loop branch index
+        int CDCompNum;                          // condenser water plant loop component index
+        Real64 SizFac;                          // sizing factor
+        Real64 BasinHeaterPowerFTempDiff;       // Basin heater capacity per degree C below setpoint (W/C)
+        Real64 BasinHeaterSetPointTemp;         // Setpoint temperature for basin heater operation (C)
+        int BasinHeaterSchedulePtr;             // Pointer to basin heater schedule
+        int ErrCount1;                          // for recurring error messages
+        int ErrCount2;                          // for recurring error messages
+        std::string MsgBuffer1;                 // - buffer to print warning messages on following time step
+        std::string MsgBuffer2;                 // - buffer to print warning messages on following time step
+        Real64 MsgDataLast;                     // value of data when warning occurred (passed to Recurring Warn)
+        bool PrintMessage;                      // logical to determine if message is valid
+        int MsgErrorCount;                      // number of occurrences of warning
         bool CheckEquipName;
         bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
         int CondMassFlowIndex;
@@ -150,7 +150,7 @@ namespace PlantChillers {
         // Default Constructor
         BaseChillerSpecs()
             : MinPartLoadRat(0.0), MaxPartLoadRat(1.0), OptPartLoadRat(1.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
-              CondenserType(DataPlant::nCondenserType::WaterCooled), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0),
+              CondenserType(DataPlant::CondenserType::WaterCooled), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0),
               FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false),
               EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0), EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false),

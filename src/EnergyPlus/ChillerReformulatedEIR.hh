@@ -75,35 +75,35 @@ namespace ChillerReformulatedEIR {
     struct ReformulatedEIRChillerSpecs : PlantComponent
     {
         // Members
-        std::string Name;                        // User identifier
-        int TypeNum;                             // plant loop type identifier
-        std::string CAPFTName;                   // CAPFT curve name
-        std::string EIRFTName;                   // EIRFT curve name
-        std::string EIRFPLRName;                 // EIRPLR curve name
-        DataPlant::nCondenserType CondenserType; // Type of Condenser. Water Cooled is the only available option for now
-        PLR PartLoadCurveType;                   // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift
-        Real64 RefCap;                           // Reference capacity of the chiller [W]
-        bool RefCapWasAutoSized;                 // reference capacity was autosized on input
-        Real64 RefCOP;                           // Reference coefficient of performance [W/W]
-        DataPlant::FlowMode FlowMode;            // one of 3 modes for component flow during operation
-        bool ModulatedFlowSetToLoop;             // True if the setpoint is missing at the outlet node
-        bool ModulatedFlowErrDone;               // true if setpoint warning issued
-        Real64 EvapVolFlowRate;                  // Reference water volumetric flow rate through the evaporator [m3/s]
-        bool EvapVolFlowRateWasAutoSized;        // true if previous was autosize input
-        Real64 EvapMassFlowRateMax;              // Reference water mass flow rate through evaporator [kg/s]
-        Real64 CondVolFlowRate;                  // Reference water volumetric flow rate through the condenser [m3/s]
-        bool CondVolFlowRateWasAutoSized;        // true if previous was set to autosize on input
-        Real64 CondMassFlowRateMax;              // Reference water mass flow rate through condenser [kg/s]
-        Real64 CompPowerToCondenserFrac;         // Fraction of compressor electric power rejected by condenser [0 to 1]
-        int EvapInletNodeNum;                    // Node number on the inlet side of the plant (evaporator side)
-        int EvapOutletNodeNum;                   // Node number on the outlet side of the plant (evaporator side)
-        int CondInletNodeNum;                    // Node number on the inlet side of the condenser
-        int CondOutletNodeNum;                   // Node number on the outlet side of the condenser
-        Real64 MinPartLoadRat;                   // Minimum allowed operating fraction of full load
-        Real64 MaxPartLoadRat;                   // Maximum allowed operating fraction of full load
-        Real64 OptPartLoadRat;                   // Optimal operating fraction of full load
-        Real64 MinUnloadRat;                     // Minimum unloading ratio
-        Real64 TempRefCondIn;                    // The reference secondary loop fluid temperature at the
+        std::string Name;                       // User identifier
+        int TypeNum;                            // plant loop type identifier
+        std::string CAPFTName;                  // CAPFT curve name
+        std::string EIRFTName;                  // EIRFT curve name
+        std::string EIRFPLRName;                // EIRPLR curve name
+        DataPlant::CondenserType CondenserType; // Type of Condenser. Water Cooled is the only available option for now
+        PLR PartLoadCurveType;                  // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift
+        Real64 RefCap;                          // Reference capacity of the chiller [W]
+        bool RefCapWasAutoSized;                // reference capacity was autosized on input
+        Real64 RefCOP;                          // Reference coefficient of performance [W/W]
+        DataPlant::FlowMode FlowMode;           // one of 3 modes for component flow during operation
+        bool ModulatedFlowSetToLoop;            // True if the setpoint is missing at the outlet node
+        bool ModulatedFlowErrDone;              // true if setpoint warning issued
+        Real64 EvapVolFlowRate;                 // Reference water volumetric flow rate through the evaporator [m3/s]
+        bool EvapVolFlowRateWasAutoSized;       // true if previous was autosize input
+        Real64 EvapMassFlowRateMax;             // Reference water mass flow rate through evaporator [kg/s]
+        Real64 CondVolFlowRate;                 // Reference water volumetric flow rate through the condenser [m3/s]
+        bool CondVolFlowRateWasAutoSized;       // true if previous was set to autosize on input
+        Real64 CondMassFlowRateMax;             // Reference water mass flow rate through condenser [kg/s]
+        Real64 CompPowerToCondenserFrac;        // Fraction of compressor electric power rejected by condenser [0 to 1]
+        int EvapInletNodeNum;                   // Node number on the inlet side of the plant (evaporator side)
+        int EvapOutletNodeNum;                  // Node number on the outlet side of the plant (evaporator side)
+        int CondInletNodeNum;                   // Node number on the inlet side of the condenser
+        int CondOutletNodeNum;                  // Node number on the outlet side of the condenser
+        Real64 MinPartLoadRat;                  // Minimum allowed operating fraction of full load
+        Real64 MaxPartLoadRat;                  // Maximum allowed operating fraction of full load
+        Real64 OptPartLoadRat;                  // Optimal operating fraction of full load
+        Real64 MinUnloadRat;                    // Minimum unloading ratio
+        Real64 TempRefCondIn;                   // The reference secondary loop fluid temperature at the
         // chiller condenser side inlet for the reformulated chiller [C]
         Real64 TempRefCondOut; // The reference secondary loop fluid temperature at the
         // chiller condenser side outlet for the reformulated chiller [C]
@@ -222,7 +222,7 @@ namespace ChillerReformulatedEIR {
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::nCondenserType::Unassigned), PartLoadCurveType(PLR::Unassigned), RefCap(0.0),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::Unassigned), PartLoadCurveType(PLR::Unassigned), RefCap(0.0),
               RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
               CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0), CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0),

@@ -480,7 +480,7 @@ namespace FaultsManager {
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
 
-                        if (state.dataPlantChillers->ElectricChiller(ChillerNum).CondenserType != DataPlant::nCondenserType::WaterCooled) {
+                        if (state.dataPlantChillers->ElectricChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(
                                 state,
@@ -511,7 +511,7 @@ namespace FaultsManager {
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
 
-                        if (state.dataChillerElectricEIR->ElectricEIRChiller(ChillerNum).CondenserType != DataPlant::nCondenserType::WaterCooled) {
+                        if (state.dataChillerElectricEIR->ElectricEIRChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(
                                 state,
@@ -544,7 +544,7 @@ namespace FaultsManager {
                     } else {
 
                         if (state.dataChillerReformulatedEIR->ElecReformEIRChiller(ChillerNum).CondenserType !=
-                            DataPlant::nCondenserType::WaterCooled) {
+                            DataPlant::CondenserType::WaterCooled) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(
                                 state,
@@ -575,7 +575,7 @@ namespace FaultsManager {
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
 
-                        if (state.dataPlantChillers->ConstCOPChiller(ChillerNum).CondenserType != DataPlant::nCondenserType::WaterCooled) {
+                        if (state.dataPlantChillers->ConstCOPChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(
                                 state,
@@ -606,7 +606,7 @@ namespace FaultsManager {
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
 
-                        if (state.dataPlantChillers->EngineDrivenChiller(ChillerNum).CondenserType != DataPlant::nCondenserType::WaterCooled) {
+                        if (state.dataPlantChillers->EngineDrivenChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(
                                 state,
@@ -637,7 +637,7 @@ namespace FaultsManager {
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
 
-                        if (state.dataPlantChillers->GTChiller(ChillerNum).CondenserType != DataPlant::nCondenserType::WaterCooled) {
+                        if (state.dataPlantChillers->GTChiller(ChillerNum).CondenserType != DataPlant::CondenserType::WaterCooled) {
                             // The fault model is only applicable to the chillers with water based condensers
                             ShowWarningError(
                                 state,

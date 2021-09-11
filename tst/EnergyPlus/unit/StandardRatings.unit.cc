@@ -261,7 +261,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestAirCooled)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name = "Air Cooled Chiller";
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap = 216000;           // W
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP = 2.81673861898309; // W/W
-    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::nCondenserType::AirCooled;
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::AirCooled;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat = 0.15;
 
     int CurveNum;
@@ -350,7 +350,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTestWaterCooled)
     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name = "ElectricEIRChiller McQuay WSC 471kW/5.89COP/Vanes";
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap = 471200; // W
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP = 5.89;   // W/W
-    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::nCondenserType::WaterCooled;
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::WaterCooled;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat = 0.10;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MaxPartLoadRat = 1.15;
 

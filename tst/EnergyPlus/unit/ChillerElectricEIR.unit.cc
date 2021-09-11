@@ -100,7 +100,7 @@ TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
     thisEIR.DesignHeatRecVolFlowRateWasAutoSized = true;
     thisEIR.HeatRecCapacityFraction = 0.5;
     thisEIR.HeatRecActive = true;
-    thisEIR.CondenserType = DataPlant::nCondenserType::WaterCooled;
+    thisEIR.CondenserType = DataPlant::CondenserType::WaterCooled;
     thisEIR.CWLoopNum = 1;
     thisEIR.CDLoopNum = 2;
     thisEIR.EvapVolFlowRate = 1.0;

@@ -320,11 +320,11 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                            "Chilled Water Nodes");
 
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "WaterCooled")) {
-            thisChiller.CondenserType = DataPlant::nCondenserType::WaterCooled;
+            thisChiller.CondenserType = DataPlant::CondenserType::WaterCooled;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "AirCooled")) {
-            thisChiller.CondenserType = DataPlant::nCondenserType::AirCooled;
+            thisChiller.CondenserType = DataPlant::CondenserType::AirCooled;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "EvaporativelyCooled")) {
-            thisChiller.CondenserType = DataPlant::nCondenserType::EvapCooled;
+            thisChiller.CondenserType = DataPlant::CondenserType::EvapCooled;
         } else {
             ShowSevereError(state,
                             std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
@@ -333,7 +333,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (thisChiller.CondenserType == DataPlant::nCondenserType::AirCooled || thisChiller.CondenserType == DataPlant::nCondenserType::EvapCooled) {
+        if (thisChiller.CondenserType == DataPlant::CondenserType::AirCooled || thisChiller.CondenserType == DataPlant::CondenserType::EvapCooled) {
             // Connection not required for air or evap cooled condenser
             // If the condenser inlet is blank for air cooled and evap cooled condensers then supply a generic name
             // since it is not used elsewhere for connection
@@ -382,7 +382,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                                 NodeInputManager::compFluidStream::Secondary,
                                                                                 DataLoopNode::ObjectIsNotParent);
 
-        } else if (thisChiller.CondenserType == DataPlant::nCondenserType::WaterCooled) {
+        } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
             // Condenser inlet node name is necessary for water-cooled condenser
             if (state.dataIPShortCut->lAlphaFieldBlanks(7) || state.dataIPShortCut->lAlphaFieldBlanks(8)) {
                 ShowSevereError(state,
@@ -603,7 +603,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + state.dataIPShortCut->cAlphaArgs(12));
                 ErrorsFound = true;
             }
-            if (thisChiller.CondenserType != DataPlant::nCondenserType::WaterCooled) {
+            if (thisChiller.CondenserType != DataPlant::CondenserType::WaterCooled) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\"");
@@ -942,7 +942,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         this->Name);
 
     // Condenser mass flow and outlet temp are valid for water cooled
-    if (this->CondenserType == DataPlant::nCondenserType::WaterCooled) {
+    if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         SetupOutputVariable(state,
                             "Chiller Condenser Inlet Temperature",
                             OutputProcessor::Unit::C,
@@ -1054,7 +1054,7 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 _,
                                 "Plant");
         }
-        if (this->CondenserType == DataPlant::nCondenserType::EvapCooled) {
+        if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             SetupOutputVariable(state,
                                 "Chiller Evaporative Condenser Water Volume",
                                 OutputProcessor::Unit::m3,
@@ -1129,7 +1129,7 @@ void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                             _,
                                             this->EvapInletNodeNum,
                                             _);
-    if (this->CondenserType != DataPlant::nCondenserType::AirCooled && this->CondenserType != DataPlant::nCondenserType::EvapCooled) {
+    if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
@@ -1174,7 +1174,7 @@ void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                                       true);
     }
 
-    if (this->CondenserType != DataPlant::nCondenserType::AirCooled && this->CondenserType != DataPlant::nCondenserType::EvapCooled &&
+    if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
         this->HeatRecActive) {
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->CDLoopNum,
@@ -1260,7 +1260,7 @@ void ElectricEIRChillerSpecs::initEachEnvironment(EnergyPlusData &state)
                                        this->CWBranchNum,
                                        this->CWCompNum);
 
-    if (this->CondenserType == DataPlant::nCondenserType::WaterCooled) {
+    if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
 
         rho = FluidProperties::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->CDLoopNum).FluidName,
@@ -1413,7 +1413,7 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
     PlantUtilities::SetComponentFlowRate(
         state, mdot, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWLoopNum, this->CWLoopSideNum, this->CWBranchNum, this->CWCompNum);
 
-    if (this->CondenserType == DataPlant::nCondenserType::WaterCooled) {
+    if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         PlantUtilities::SetComponentFlowRate(state,
                                              mdotCond,
                                              this->CondInletNodeNum,
@@ -1439,7 +1439,7 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
             state, mdot, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, LoopNum, LoopSideNum, BranchIndex, CompIndex);
     }
 
-    if (this->CondenserType == DataPlant::nCondenserType::EvapCooled) {
+    if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
         this->BasinHeaterPower = 0.0;
     }
 }
@@ -1470,7 +1470,7 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
     Real64 tmpEvapVolFlowRate = this->EvapVolFlowRate;
     Real64 tmpCondVolFlowRate = this->CondVolFlowRate;
 
-    if (this->CondenserType == DataPlant::nCondenserType::WaterCooled) {
+    if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         PltSizCondNum = state.dataPlnt->PlantLoop(this->CDLoopNum).PlantSizNum;
     }
 
@@ -1664,7 +1664,7 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
             }
         }
     } else {
-        if (this->CondenserType == DataPlant::nCondenserType::WaterCooled) {
+        if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
 
             if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "Autosizing of Electric EIR Chiller condenser fluid flow rate requires a condenser");
@@ -1857,13 +1857,13 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
             state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) {
             this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
         }
-        if (this->CondenserType == DataPlant::nCondenserType::WaterCooled) {
+        if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             if (state.dataPlnt->PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSideNum).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
                 DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                 this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
             }
         }
-        if (this->CondenserType == DataPlant::nCondenserType::EvapCooled) {
+        if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             CalcBasinHeaterPower(
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
         }
@@ -1874,7 +1874,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
     // initialize outlet air humidity ratio of air or evap cooled chillers
     this->CondOutletHumRat = state.dataLoopNodes->Node(this->CondInletNodeNum).HumRat;
 
-    if (this->CondenserType == DataPlant::nCondenserType::AirCooled) { // Condenser inlet temp = outdoor temp
+    if (this->CondenserType == DataPlant::CondenserType::AirCooled) { // Condenser inlet temp = outdoor temp
         state.dataLoopNodes->Node(this->CondInletNodeNum).Temp = state.dataLoopNodes->Node(this->CondInletNodeNum).OutAirDryBulb;
 
         // Warn user if entering condenser dry-bulb temperature falls below 0 C
@@ -1893,7 +1893,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
         } else {
             this->PrintMessage = false;
         }
-    } else if (this->CondenserType == DataPlant::nCondenserType::EvapCooled) { // Condenser inlet temp = (outdoor wet bulb)
+    } else if (this->CondenserType == DataPlant::CondenserType::EvapCooled) { // Condenser inlet temp = (outdoor wet bulb)
         state.dataLoopNodes->Node(this->CondInletNodeNum).Temp = state.dataLoopNodes->Node(this->CondInletNodeNum).OutAirWetBulb;
         //  line above assumes evaporation pushes condenser inlet air humidity ratio to saturation
         this->CondOutletHumRat = Psychrometrics::PsyWFnTdbTwbPb(state,
@@ -1942,7 +1942,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
     }
 
     // Set mass flow rates
-    if (this->CondenserType == DataPlant::nCondenserType::WaterCooled) {
+    if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         this->CondMassFlowRate = this->CondMassFlowRateMax;
         PlantUtilities::SetComponentFlowRate(state,
                                              this->CondMassFlowRate,
@@ -2222,7 +2222,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
 
     if (this->EvapMassFlowRate == 0.0) {
         MyLoad = 0.0;
-        if (this->CondenserType == DataPlant::nCondenserType::EvapCooled) {
+        if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             CalcBasinHeaterPower(
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
         }
@@ -2335,7 +2335,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
     if (this->ChillerFalseLoadRate < DataHVACGlobals::SmallLoad) {
         this->ChillerFalseLoadRate = 0.0;
     }
-    if (this->QEvaporator == 0.0 && this->CondenserType == DataPlant::nCondenserType::EvapCooled) {
+    if (this->QEvaporator == 0.0 && this->CondenserType == DataPlant::CondenserType::EvapCooled) {
         CalcBasinHeaterPower(
             state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
     }
@@ -2393,7 +2393,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
 
     this->QCondenser = this->Power * this->CompPowerToCondenserFrac + this->QEvaporator + this->ChillerFalseLoadRate;
 
-    if (this->CondenserType == DataPlant::nCondenserType::WaterCooled) {
+    if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         if (this->CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
             // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
             if (this->HeatRecActive) this->calcHeatRecovery(state, this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
@@ -2429,7 +2429,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
             this->CondOutletTemp = condInletTemp;
         }
 
-        if (this->CondenserType == DataPlant::nCondenserType::EvapCooled) {
+        if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             Real64 const RhoWater = Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
             // CondMassFlowRate is already multiplied by PLR, convert to water use rate
             this->EvapWaterConsumpRate =
@@ -2547,7 +2547,7 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
         // Set node conditions
         state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
         state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
-        if (this->CondenserType != DataPlant::nCondenserType::WaterCooled) {
+        if (this->CondenserType != DataPlant::CondenserType::WaterCooled) {
             state.dataLoopNodes->Node(this->CondOutletNodeNum).HumRat = state.dataLoopNodes->Node(this->CondInletNodeNum).HumRat;
             state.dataLoopNodes->Node(this->CondOutletNodeNum).Enthalpy = state.dataLoopNodes->Node(this->CondInletNodeNum).Enthalpy;
             state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate = 0.0;
@@ -2571,7 +2571,7 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
         this->ActualCOP = 0.0;
         this->CondenserFanPower = 0.0;
         this->CondenserFanEnergyConsumption = 0.0;
-        if (this->CondenserType == DataPlant::nCondenserType::EvapCooled) {
+        if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             this->EvapWaterConsump = 0.0;
         }
@@ -2593,7 +2593,7 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
             this->EvapMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
             state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
             state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = state.dataLoopNodes->Node(this->CondInletNodeNum).Temp;
-            if (this->CondenserType != DataPlant::nCondenserType::WaterCooled) {
+            if (this->CondenserType != DataPlant::CondenserType::WaterCooled) {
                 state.dataLoopNodes->Node(this->CondOutletNodeNum).HumRat = state.dataLoopNodes->Node(this->CondInletNodeNum).HumRat;
                 state.dataLoopNodes->Node(this->CondOutletNodeNum).Enthalpy = state.dataLoopNodes->Node(this->CondInletNodeNum).Enthalpy;
                 state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate = 0.0;
@@ -2602,7 +2602,7 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
         } else {
             state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
             state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
-            if (this->CondenserType != DataPlant::nCondenserType::WaterCooled) {
+            if (this->CondenserType != DataPlant::CondenserType::WaterCooled) {
                 state.dataLoopNodes->Node(this->CondOutletNodeNum).HumRat = this->CondOutletHumRat;
                 state.dataLoopNodes->Node(this->CondOutletNodeNum).Enthalpy =
                     Psychrometrics::PsyHFnTdbW(this->CondOutletTemp, this->CondOutletHumRat);
@@ -2627,7 +2627,7 @@ void ElectricEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyLoad,
         } else {
             this->ActualCOP = 0.0;
         }
-        if (this->CondenserType == DataPlant::nCondenserType::EvapCooled) {
+        if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
             this->EvapWaterConsump = this->EvapWaterConsumpRate * ReportingConstant;
         }

@@ -223,7 +223,7 @@ enum class FlowMode
     LeavingSetpointModulated,
 };
 
-enum class nCondenserType
+enum class CondenserType
 {
     Unassigned,
     AirCooled,
