@@ -1481,8 +1481,6 @@ void GLHEVert::makeThisGLHECacheStruct()
 
 void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
 {
-    // For convenience
-    using json = nlohmann::json;
 
     if (!(state.files.outputControl.glhe && FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath))) {
         // if the file doesn't exist, there are no data to read
