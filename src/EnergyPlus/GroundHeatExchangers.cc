@@ -1531,7 +1531,7 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
         // add current data
         cached_json.emplace("GHLE 1", myCacheData);
     }
-    FileSystem::writeFile<FileSystem::FileTypes::GLHE>(state.dataStrGlobals->outputGLHEFilePath, cached_json);
+    FileSystem::writeFile<FileSystem::FileTypes::GLHE>(state.dataStrGlobals->outputGLHEFilePath, cached_json, 2);
 }
 
 //******************************************************************************

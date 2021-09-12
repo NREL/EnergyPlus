@@ -233,8 +233,7 @@ namespace FileSystem {
     inline constexpr bool enable_json_v = is_all_json_type(fileType) && is_any<T, nlohmann::json>::value &&
                                           !is_any<T, std::string_view, std::string, char *>::value;
 
-    template <FileTypes fileType>
-    void writeFile(fs::path const &filePath, const std::string_view data)
+    template <FileTypes fileType> void writeFile(fs::path const &filePath, const std::string_view data)
     {
         static_assert(is_all_json_type(fileType) || is_flat_file_type(fileType), "Must be a valid file type");
 #ifdef _WIN32
