@@ -927,7 +927,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     this->EvapHeatLossRate = EvapEnergyLossPerArea * state.dataSurface->Surface(SurfNum).Area;
     // LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
     // to the air directly and added to the zone air heat balance
-    Real64 LWsum = (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum) +
+    Real64 LWsum = (state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum) +
                     state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum)); // summation of all long-wavelenth radiation going to surface
     Real64 LWtotal = this->CurCoverLWRadFac * LWsum;                           // total flux from long-wavelength radiation to surface
     Real64 SWtotal =

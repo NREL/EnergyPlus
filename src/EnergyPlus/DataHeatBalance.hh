@@ -2186,7 +2186,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> ZnOpqSurfExtFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
     Array1D<Real64> ZnOpqSurfExtFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
 
-    Array1D<Real64> SurfQRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
+    Array1D<Real64> SurfQdotRadIntGainsInPerArea;       // Thermal radiation absorbed on inside surfaces
     Array1D<Real64> SurfQRadSWOutIncident;              // Exterior beam plus diffuse solar incident on surface (W/m2)
     Array1D<Real64> SurfQRadSWOutIncidentBeam;          // Exterior beam solar incident on surface (W/m2)
     Array1D<Real64> SurfBmIncInsSurfIntensRep;          // Beam sol irrad from ext wins on inside of surface (W/m2)
@@ -2225,6 +2225,8 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
     Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
     Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
+    Array1D<Real64> NominalUBeforeAdjusted;         // Nominal U value for glazing system only
+    Array1D<Real64> CoeffAdjRatio;                  // Conductive coefficient adjustment ratio
 
     Array1D<Real64>
         EnclSolQSWRad; // Zone short-wave flux density; used to calculate short-wave  radiation absorbed on inside surfaces of zone or enclosure
@@ -2486,7 +2488,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->ZnOpqSurfInsFaceCondLsRepEnrg.deallocate();
         this->ZnOpqSurfExtFaceCondGnRepEnrg.deallocate();
         this->ZnOpqSurfExtFaceCondLsRepEnrg.deallocate();
-        this->SurfQRadThermInAbs.deallocate();
+        this->SurfQdotRadIntGainsInPerArea.deallocate();
         this->SurfQRadSWOutIncident.deallocate();
         this->SurfQRadSWOutIncidentBeam.deallocate();
         this->SurfBmIncInsSurfIntensRep.deallocate();
@@ -2522,6 +2524,8 @@ struct HeatBalanceData : BaseGlobalStruct
         this->NominalR.deallocate();
         this->NominalRforNominalUCalculation.deallocate();
         this->NominalU.deallocate();
+        this->NominalUBeforeAdjusted.deallocate();
+        this->CoeffAdjRatio.deallocate();
         this->EnclSolQSWRad.deallocate();
         this->EnclSolQSWRadLights.deallocate();
         this->EnclSolDB.deallocate();

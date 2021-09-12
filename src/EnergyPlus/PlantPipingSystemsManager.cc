@@ -4754,7 +4754,7 @@ namespace PlantPipingSystemsManager {
         Real64 RunningSummation = 0.0;
         auto const &numSurfaces = static_cast<unsigned int>(this->BasementZone.WallSurfacePointers.size());
         for (auto &surfaceIndex : this->BasementZone.WallSurfacePointers) {
-            RunningSummation += state.dataHeatBalSurf->QdotConvOutRepPerArea(surfaceIndex);
+            RunningSummation += state.dataHeatBalSurf->SurfQdotConvOutPerArea(surfaceIndex);
         }
         return -RunningSummation / numSurfaces; // heat flux is negative here
     }
@@ -4771,7 +4771,7 @@ namespace PlantPipingSystemsManager {
         Real64 RunningSummation = 0.0;
         auto const &numSurfaces = static_cast<unsigned int>(this->BasementZone.FloorSurfacePointers.size());
         for (auto &surfaceIndex : this->BasementZone.FloorSurfacePointers) {
-            RunningSummation += state.dataHeatBalSurf->QdotConvOutRepPerArea(surfaceIndex);
+            RunningSummation += state.dataHeatBalSurf->SurfQdotConvOutPerArea(surfaceIndex);
         }
         return -RunningSummation / numSurfaces; // heat flux is negative here
     }
@@ -4817,7 +4817,7 @@ namespace PlantPipingSystemsManager {
         Real64 RunningSummation = 0.0;
         auto const &NumSurfaces = this->ZoneCoupledSurfaces.size();
         for (auto &z : this->ZoneCoupledSurfaces) {
-            RunningSummation += state.dataHeatBalSurf->QdotConvOutRepPerArea(z.IndexInSurfaceArray);
+            RunningSummation += state.dataHeatBalSurf->SurfQdotConvOutPerArea(z.IndexInSurfaceArray);
         }
         return -RunningSummation / NumSurfaces; // heat flux is negative here
     }
