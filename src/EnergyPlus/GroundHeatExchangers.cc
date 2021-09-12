@@ -1533,8 +1533,7 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
         // add current data
         cached_json.emplace("GHLE 1", myCacheData);
     }
-    FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
-        state.dataStrGlobals->outputGLHEFilePath, cached_json, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+    FileSystem::writeFile<FileSystem::FileTypes::GLHE>(state.dataStrGlobals->outputGLHEFilePath, cached_json);
 }
 
 //******************************************************************************

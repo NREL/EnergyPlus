@@ -113,6 +113,7 @@ nlohmann::json InputFile::readJSON()
     switch (ext) {
     case FileSystem::FileTypes::EpJSON:
     case FileSystem::FileTypes::JSON:
+    case FileSystem::FileTypes::GLHE:
         return nlohmann::json::parse(*is, nullptr, true, true);
     case FileSystem::FileTypes::CBOR:
         return nlohmann::json::from_cbor(*is);
