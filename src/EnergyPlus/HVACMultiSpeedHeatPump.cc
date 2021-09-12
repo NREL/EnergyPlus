@@ -3043,6 +3043,11 @@ namespace HVACMultiSpeedHeatPump {
         } else if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::CoolingMode) {
             SpeedNum = MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling;
         }
+        if (ceil(SpeedVal) > SpeedNum) {
+            ShowFatalError(state,
+                           "Wrong coil speed EMS override value, for unit=" + MSHeatPump(MSHeatPumpNum).DXCoolCoilName +
+                               ". Exceeding maximum coil speed level.");
+        }
         if (SpeedNum == 1) SpeedRatio = 0.0;
         CalcMSHeatPump(state,
                        MSHeatPumpNum,

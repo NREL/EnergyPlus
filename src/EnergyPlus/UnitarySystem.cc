@@ -1539,6 +1539,7 @@ namespace UnitarySystems {
         if (int(state.dataUnitarySystems->unitarySys.size()) == state.dataUnitarySystems->numUnitarySystems &&
             state.dataZoneEquip->ZoneEquipInputsFilled)
             setupAllOutputVars(state, state.dataUnitarySystems->numUnitarySystems);
+
         if (errorsFound) {
             ShowFatalError(state, "getUnitarySystemInputData: previous errors cause termination. Check inputs");
         }
@@ -8156,15 +8157,22 @@ namespace UnitarySystems {
         this->FanPartLoadRatio = 0.0;
         this->setOnOffMassFlowRate(state, OnOffAirFlowRatio, PartLoadRatio);
 
-        if (!state.dataUnitarySystems->HeatingLoad && !state.dataUnitarySystems->CoolingLoad && state.dataUnitarySystems->MoistureLoad >= 0.0) return;
-
         // todo - document if no load, no EMS override
-        // todo - check EMS ceiling input
+        if (!state.dataUnitarySystems->HeatingLoad && !state.dataUnitarySystems->CoolingLoad && state.dataUnitarySystems->MoistureLoad >= 0.0) return;
+        int SpeedNumEMS = ceil(this->m_EMSOverrideCoilSpeedNumValue);
 
         if (state.dataUnitarySystems->HeatingLoad) {
-            this->m_HeatingSpeedNum = ceil(this->m_EMSOverrideCoilSpeedNumValue);
+            if (SpeedNumEMS > this->m_NumOfSpeedCooling) {
+                ShowFatalError(state,
+                               "Wrong coil speed EMS override value, for unit=" + this->m_CoolingCoilName + ". Exceeding maximum coil speed level.");
+            }
+            this->m_HeatingSpeedNum = SpeedNumEMS;
         } else {
-            this->m_CoolingSpeedNum = ceil(this->m_EMSOverrideCoilSpeedNumValue);
+            if (SpeedNumEMS > this->m_NumOfSpeedHeating) {
+                ShowFatalError(state,
+                               "Wrong coil speed EMS override value, for unit=" + this->m_HeatingCoilName + ". Exceeding maximum coil speed level.");
+            }
+            this->m_CoolingSpeedNum = SpeedNumEMS;
         }
 
         if (state.dataUnitarySystems->HeatingLoad) {
@@ -8294,6 +8302,11 @@ namespace UnitarySystems {
         int OutletNode = this->AirOutNode;
 
         if (ScheduleManager::GetCurrentScheduleValue(state, this->m_SysAvailSchedPtr) <= 0.0) {
+            return;
+        }
+        if (this->m_EMSOverrideCoilSpeedNumOn) {
+            this->controlUnitarySystemOutput(
+                state, AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompOn);
             return;
         }
 
@@ -8446,6 +8459,7 @@ namespace UnitarySystems {
         PartLoadRatio = 1.0; // Get full load result
         this->FanPartLoadRatio = 1.0;
         CompressorONFlag = CompOn;
+
         if (state.dataUnitarySystems->HeatingLoad) {
             CoolPLR = 0.0;
             HeatPLR = 1.0;
@@ -8492,7 +8506,6 @@ namespace UnitarySystems {
                 this->m_CoolingCycRatio = 1.0;
                 this->m_CoolingSpeedNum = this->m_NumOfSpeedCooling;
             }
-
             if (this->m_Staged && this->m_StageNum < 0) {
                 if (this->m_NumOfSpeedCooling > 0) this->m_CoolingSpeedNum = min(std::abs(this->m_StageNum), this->m_NumOfSpeedCooling);
                 this->setOnOffMassFlowRate(state, OnOffAirFlowRatio, PartLoadRatio);
@@ -11919,6 +11932,11 @@ namespace UnitarySystems {
                     if (this->m_EMSOverrideCoilSpeedNumOn) {
                         this->m_CoolingSpeedNum = ceil(this->m_EMSOverrideCoilSpeedNumValue);
                         this->m_SpeedNum = this->m_CoolingSpeedNum;
+                        if (this->m_SpeedNum > this->m_NumOfSpeedCooling) {
+                            ShowFatalError(state,
+                                           "Wrong coil speed EMS override value, for unit=" + this->m_CoolingCoilName +
+                                               ". Exceeding maximum coil speed level.");
+                        }
                         if (this->m_CoolingSpeedNum == 1) {
                             this->m_CoolingSpeedRatio = 0.0;
                             this->m_CoolingCycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
@@ -13056,7 +13074,6 @@ namespace UnitarySystems {
                         }
 
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
-                        // todo - why speed num is not presented here
 
                         DXCoils::SimDXCoilMultiSpeed(state, CompName, SpeedRatio, CycRatio, this->m_CoolingCoilIndex);
                         OutletHumRatDXCoil = state.dataDXCoils->DXCoilOutletHumRat(this->m_CoolingCoilIndex);
@@ -13438,7 +13455,6 @@ namespace UnitarySystems {
         bool LatentLoad = false;
         Real64 OutletTemp = 0.0;
 
-        // todo - OutdoorHumRat, OutdoorWetBulb, OutdoorPressure not used in this function
         if (this->m_CondenserNodeNum != 0) {
             OutdoorDryBulb = state.dataLoopNodes->Node(this->m_CondenserNodeNum).Temp;
             if (this->m_CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
@@ -13524,6 +13540,11 @@ namespace UnitarySystems {
                         if (this->m_EMSOverrideCoilSpeedNumOn) {
                             this->m_HeatingSpeedNum = ceil(this->m_EMSOverrideCoilSpeedNumValue);
                             this->m_SpeedNum = this->m_HeatingSpeedNum;
+                            if (this->m_SpeedNum > this->m_NumOfSpeedHeating) {
+                                ShowFatalError(state,
+                                               "Wrong coil speed EMS override value, for unit=" + this->m_HeatingCoilName +
+                                                   ". Exceeding maximum coil speed level.");
+                            }
                             if (this->m_HeatingSpeedNum == 1) {
                                 this->m_HeatingSpeedRatio = 0.0;
                                 CycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
