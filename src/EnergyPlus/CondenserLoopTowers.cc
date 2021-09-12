@@ -6877,7 +6877,7 @@ namespace CondenserLoopTowers {
             } else {
                 ShowRecurringWarningErrorAtEnd(
                     state,
-                    format("{} \"{}\"  Cooling tower water outlet temperature is below the specified minimum condenser loop temp error continues...",
+                    format("{} \"{}\" Cooling tower water outlet temperature is below the specified minimum condenser loop temp error continues...",
                            DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TowerType)],
                            this->Name),
                     this->OutletWaterTempErrorIndex,
