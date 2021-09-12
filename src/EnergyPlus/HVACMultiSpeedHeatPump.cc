@@ -172,15 +172,6 @@ namespace HVACMultiSpeedHeatPump {
         // First time SimMSHeatPump is called, get the input
         if (state.dataHVACMultiSpdHP->GetInputFlag) {
             GetMSHeatPumpInput(state);
-            for (int coilNUM = 1; coilNUM <= int(state.dataHVACMultiSpdHP->MSHeatPump.size()); ++coilNUM) {
-                SetupEMSActuator(state,
-                                 "Coil Speed Control",
-                                 state.dataHVACMultiSpdHP->MSHeatPump(coilNUM).Name,
-                                 "Unitary System DX Coil Speed Value",
-                                 "[]",
-                                 state.dataHVACMultiSpdHP->MSHeatPump(coilNUM).EMSOverrideCoilSpeedNumOn,
-                                 state.dataHVACMultiSpdHP->MSHeatPump(coilNUM).EMSOverrideCoilSpeedNumValue);
-            }
             state.dataHVACMultiSpdHP->GetInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
         }
 
@@ -1847,6 +1838,17 @@ namespace HVACMultiSpeedHeatPump {
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
                                     MSHeatPump(MSHPNum).Name);
+            }
+        }
+        if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+            for (int coilNUM = 1; coilNUM <= int(state.dataHVACMultiSpdHP->MSHeatPump.size()); ++coilNUM) {
+                SetupEMSActuator(state,
+                                 "Coil Speed Control",
+                                 state.dataHVACMultiSpdHP->MSHeatPump(coilNUM).Name,
+                                 "Unitary System DX Coil Speed Value",
+                                 "[]",
+                                 state.dataHVACMultiSpdHP->MSHeatPump(coilNUM).EMSOverrideCoilSpeedNumOn,
+                                 state.dataHVACMultiSpdHP->MSHeatPump(coilNUM).EMSOverrideCoilSpeedNumValue);
             }
         }
     }
