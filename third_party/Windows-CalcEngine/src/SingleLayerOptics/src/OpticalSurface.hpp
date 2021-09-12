@@ -3,50 +3,57 @@
 
 #include <map>
 
-namespace FenestrationCommon {
+namespace FenestrationCommon
+{
+    enum class Property;
+    enum class PropertySimple;
+    enum class Scattering;
+    enum class ScatteringSimple;
 
-	enum class Property;
-	enum class PropertySimple;
-	enum class Scattering;
-	enum class ScatteringSimple;
+}   // namespace FenestrationCommon
 
-}
+namespace SingleLayerOptics
+{
+    class CSurface
+    {
+    public:
+        CSurface(const double t_T, const double t_R);
+        double getProperty(const FenestrationCommon::Property t_Property);
 
-namespace SingleLayerOptics {
+    private:
+        std::map<FenestrationCommon::Property, double> m_Property;
+    };
 
-	class CSurface {
-	public:
-		CSurface( const double t_T, const double t_R );
-		double getProperty( const FenestrationCommon::Property t_Property );
+    class CScatteringSurface
+    {
+    public:
+        CScatteringSurface(const double T_dir_dir,
+                           const double R_dir_dir,
+                           double T_dir_dif,
+                           double R_dir_dif,
+                           const double T_dif_dif,
+                           const double R_dif_dif);
 
-	private:
-		std::map< FenestrationCommon::Property, double > m_Property;
+        // Simple property means only transmittance and reflectance
+        double getPropertySimple(const FenestrationCommon::PropertySimple t_Property,
+                                 const FenestrationCommon::Scattering t_Scattering) const;
 
-	};
+        void setPropertySimple(const FenestrationCommon::PropertySimple t_Property,
+                               const FenestrationCommon::Scattering t_Scattering,
+                               const double value);
 
-	class CScatteringSurface {
-	public:
-		CScatteringSurface( const double T_dir_dir, const double R_dir_dir,
-		                    double T_dir_dif, double R_dir_dif, const double T_dif_dif, const double R_dif_dif );
+        // In this case absroptance is different property from transmittance and reflectance
+        double getAbsorptance(const FenestrationCommon::ScatteringSimple t_Scattering) const;
+        double getAbsorptance() const;
 
-		// Simple property means only transmittance and reflectance
-		double getPropertySimple( const FenestrationCommon::PropertySimple t_Property,
-		                          const FenestrationCommon::Scattering t_Scattering ) const;
+    private:
+        std::map<std::pair<FenestrationCommon::PropertySimple, FenestrationCommon::Scattering>,
+                 double>
+          m_PropertySimple;
+        std::map<FenestrationCommon::ScatteringSimple, double> m_Absorptance;
+    };
 
-		void setPropertySimple( const FenestrationCommon::PropertySimple t_Property,
-		                        const FenestrationCommon::Scattering t_Scattering, const double value );
-
-		// In this case absroptance is different property from transmittance and reflectance
-		double getAbsorptance( const FenestrationCommon::ScatteringSimple t_Scattering ) const;
-		double getAbsorptance() const;
-
-	private:
-		std::map< std::pair< FenestrationCommon::PropertySimple, FenestrationCommon::Scattering >, double > m_PropertySimple;
-		std::map< FenestrationCommon::ScatteringSimple, double > m_Absorptance;
-
-	};
-
-}
+}   // namespace SingleLayerOptics
 
 
 #endif

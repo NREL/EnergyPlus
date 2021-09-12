@@ -427,7 +427,7 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("UpdatePlantLoopInterface");
+    static constexpr std::string_view RoutineName("UpdatePlantLoopInterface");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 OldTankOutletTemp;
@@ -593,7 +593,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, int const
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
-    static std::string const RoutineName("UpdateHalfLoopInletTemp");
+    static constexpr std::string_view RoutineName("UpdateHalfLoopInletTemp");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int TankOutletLoopSide;    // inlet loopsidenumber
@@ -736,7 +736,7 @@ void UpdateCommonPipe(
     // SUBROUTINE ARGUMENTS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("UpdateCommonPipe");
+    static constexpr std::string_view RoutineName("UpdateCommonPipe");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int TankOutletLoopSide;    // inlet loopsidenumber
@@ -1257,22 +1257,22 @@ void SetupCommonPipes(EnergyPlusData &state)
                                     "Plant Common Pipe Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     PlantCommonPipe(CurLoopNum).Flow,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Temperature",
                                     OutputProcessor::Unit::C,
                                     PlantCommonPipe(CurLoopNum).Temp,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Flow Direction Status",
                                     OutputProcessor::Unit::None,
                                     PlantCommonPipe(CurLoopNum).FlowDir,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
 
                 if (first_supply_component_typenum == TypeOf_PumpVariableSpeed) {
@@ -1289,29 +1289,29 @@ void SetupCommonPipes(EnergyPlusData &state)
                                     "Plant Common Pipe Primary Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     PlantCommonPipe(CurLoopNum).PriCPLegFlow,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Secondary Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     PlantCommonPipe(CurLoopNum).SecCPLegFlow,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Primary to Secondary Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     PlantCommonPipe(CurLoopNum).PriToSecFlow,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Secondary to Primary Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     PlantCommonPipe(CurLoopNum).SecToPriFlow,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
 
                 // check type of pump on supply side inlet

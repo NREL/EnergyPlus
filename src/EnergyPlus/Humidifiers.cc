@@ -106,7 +106,7 @@ namespace Humidifiers {
     using namespace ScheduleManager;
 
     void SimHumidifier(EnergyPlusData &state,
-                       std::string const &CompName,                    // name of the humidifier unit
+                       std::string_view CompName,                      // name of the humidifier unit
                        [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                        int &CompIndex                                  // Pointer to Humidifier Unit
     )
@@ -141,7 +141,7 @@ namespace Humidifiers {
         if (CompIndex == 0) {
             HumNum = UtilityRoutines::FindItemInList(CompName, Humidifier);
             if (HumNum == 0) {
-                ShowFatalError(state, "SimHumidifier: Unit not found=" + CompName);
+                ShowFatalError(state, "SimHumidifier: Unit not found=" + std::string{CompName});
             }
             CompIndex = HumNum;
         } else {
@@ -163,7 +163,7 @@ namespace Humidifiers {
             }
         }
         if (HumNum <= 0) {
-            ShowFatalError(state, "SimHumidifier: Unit not found=" + CompName);
+            ShowFatalError(state, "SimHumidifier: Unit not found=" + std::string{CompName});
         }
 
         auto &thisHum(Humidifier(HumNum));
@@ -186,7 +186,7 @@ namespace Humidifiers {
 
             } else {
                 ShowSevereError(state, format("SimHumidifier: Invalid Humidifier Type Code={}", thisHum.HumType));
-                ShowContinueError(state, "...Component Name=[" + CompName + "].");
+                ShowContinueError(state, "...Component Name=[" + std::string{CompName} + "].");
                 ShowFatalError(state, "Preceding Condition causes termination.");
             }
         }
@@ -221,7 +221,7 @@ namespace Humidifiers {
         using WaterManager::SetupTankSupplyComponent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetHumidifierInputs: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetHumidifierInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HumidifierIndex;             // loop index
@@ -300,8 +300,8 @@ namespace Humidifiers {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
             }
@@ -370,8 +370,8 @@ namespace Humidifiers {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
             }
@@ -410,7 +410,7 @@ namespace Humidifiers {
                                                             Humidifier(HumNum).Name,               // Object Name
                                                             cAlphaFields(3));                      // Field Name
             } else if (!lAlphaBlanks(3)) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\",");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\",");
                 ShowContinueError(state, "Invalid " + cAlphaFields(3) + '=' + Alphas(3));
                 ShowSevereError(state, "..." + cAlphaFields(3) + " not found.");
                 ErrorsFound = true;
@@ -453,29 +453,29 @@ namespace Humidifiers {
                                     "Humidifier Water Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     Humidifier(HumNum).WaterConsRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Water Volume",
                                     OutputProcessor::Unit::m3,
                                     Humidifier(HumNum).WaterCons,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Storage Tank Water Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     Humidifier(HumNum).TankSupplyVdot,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Storage Tank Water Volume",
                                     OutputProcessor::Unit::m3,
                                     Humidifier(HumNum).TankSupplyVol,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
                                     _,
                                     "Water",
@@ -486,15 +486,15 @@ namespace Humidifiers {
                                     "Humidifier Starved Storage Tank Water Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     Humidifier(HumNum).StarvedSupplyVdot,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Starved Storage Tank Water Volume",
                                     OutputProcessor::Unit::m3,
                                     Humidifier(HumNum).StarvedSupplyVol,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
                                     _,
                                     "Water",
@@ -505,8 +505,8 @@ namespace Humidifiers {
                                     "Humidifier Mains Water Volume",
                                     OutputProcessor::Unit::m3,
                                     Humidifier(HumNum).StarvedSupplyVol,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
                                     _,
                                     "MainsWater",
@@ -519,15 +519,15 @@ namespace Humidifiers {
                                     "Humidifier Water Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     Humidifier(HumNum).WaterConsRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Water Volume",
                                     OutputProcessor::Unit::m3,
                                     Humidifier(HumNum).WaterCons,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
                                     _,
                                     "WATER",
@@ -538,8 +538,8 @@ namespace Humidifiers {
                                     "Humidifier Mains Water Volume",
                                     OutputProcessor::Unit::m3,
                                     Humidifier(HumNum).WaterCons,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
                                     _,
                                     "MAINSWATER",
@@ -552,15 +552,15 @@ namespace Humidifiers {
                                     "Humidifier Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     Humidifier(HumNum).ElecUseRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Humidifier(HumNum).ElecUseEnergy,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
                                     _,
                                     "ELECTRICITY",
@@ -572,22 +572,22 @@ namespace Humidifiers {
                                     "Humidifier NaturalGas Use Thermal Efficiency",
                                     OutputProcessor::Unit::None,
                                     Humidifier(HumNum).ThermalEff,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier NaturalGas Rate",
                                     OutputProcessor::Unit::W,
                                     Humidifier(HumNum).GasUseRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier NaturalGas Energy",
                                     OutputProcessor::Unit::J,
                                     Humidifier(HumNum).GasUseEnergy,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
                                     _,
                                     "NATURALGAS",
@@ -598,15 +598,15 @@ namespace Humidifiers {
                                     "Humidifier Auxiliary Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     Humidifier(HumNum).AuxElecUseRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(state,
                                     "Humidifier Auxiliary Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Humidifier(HumNum).AuxElecUseEnergy,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     Humidifier(HumNum).Name,
                                     _,
                                     "ELECTRICITY",
@@ -624,7 +624,7 @@ namespace Humidifiers {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.");
         }
     }
 
@@ -651,9 +651,6 @@ namespace Humidifiers {
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const CalledFrom("Humidifier:InitHumidifier");
 
         // do sizing calculation once
         if (MySizeFlag) {
@@ -756,7 +753,7 @@ namespace Humidifiers {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const CalledFrom("Humidifier:SizeHumidifier");
+        static constexpr std::string_view CalledFrom("Humidifier:SizeHumidifier");
         Real64 const Tref(20.0);    // Reference temp of water for rated capacity calcs [C]
         Real64 const TSteam(100.0); // saturated steam temperature generated by Humidifier [C]
 
@@ -950,7 +947,7 @@ namespace Humidifiers {
                         ThermalEffRated = NominalPower / NomPower;
                     } else {
                         ShowMessage(state,
-                                    CalledFrom + ": capacity and thermal efficiency mismatch for " +
+                                    std::string{CalledFrom} + ": capacity and thermal efficiency mismatch for " +
                                         format(HumidifierType[static_cast<int>(HumType)]) + " =\"" + Name + "\".");
                         ShowContinueError(state, format("User-Specified Rated Gas Use Rate of {:.2R} [W]", NomPower));
                         ShowContinueError(state, format("User-Specified or Autosized Rated Capacity of {:.2R} [m3/s]", NomCapVol));
@@ -1019,9 +1016,10 @@ namespace Humidifiers {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(
-                state,
-                CalledFrom + ": Mismatch was found in the Rated Gas Use Rate and Thermal Efficiency for gas fired steam humidifier = " + Name + ". ");
+            ShowFatalError(state,
+                           std::string{CalledFrom} +
+                               ": Mismatch was found in the Rated Gas Use Rate and Thermal Efficiency for gas fired steam humidifier = " + Name +
+                               ". ");
         }
     }
 
@@ -1050,7 +1048,7 @@ namespace Humidifiers {
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        static std::string const RoutineName("ControlHumidifier");
+        static constexpr std::string_view RoutineName("ControlHumidifier");
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         // na
@@ -1111,7 +1109,7 @@ namespace Humidifiers {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcElecSteamHumidifier");
+        static constexpr std::string_view RoutineName("CalcElecSteamHumidifier");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1220,7 +1218,7 @@ namespace Humidifiers {
         using Psychrometrics::RhoH2O;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcGasSteamHumidifier");
+        static constexpr std::string_view RoutineName("CalcGasSteamHumidifier");
         Real64 const TSteam(100.0); // saturated steam temperature generated by Humidifier [C]
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

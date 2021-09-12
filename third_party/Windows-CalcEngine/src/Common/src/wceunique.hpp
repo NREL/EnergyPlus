@@ -6,11 +6,13 @@
 // C++ 11 does not support make_unique. Use this header file to have make_unique functionality.
 // When using later C++ standards, remove this header file
 
-namespace wce {
+namespace wce
+{
     template<typename T, typename... Args>
-    std::unique_ptr<T> make_unique(Args&&... args) {
+    std::unique_ptr<T> make_unique(Args &&... args)
+    {
         return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
     }
-}
+}   // namespace wce
 
-#endif //WINDOWS_CALCENGINE_WCEUNIQUE_H
+#endif   // WINDOWS_CALCENGINE_WCEUNIQUE_H

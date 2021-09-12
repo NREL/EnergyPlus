@@ -108,7 +108,7 @@ namespace HVACDuct {
     // Functions
 
     void SimDuct(EnergyPlusData &state,
-                 std::string const &CompName,                    // name of the duct component
+                 std::string_view CompName,                      // name of the duct component
                  [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
                  int &CompIndex                                  // index of duct component
     )
@@ -137,7 +137,7 @@ namespace HVACDuct {
         if (CompIndex == 0) {
             DuctNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACDuct->Duct);
             if (DuctNum == 0) {
-                ShowFatalError(state, "SimDuct: Component not found=" + CompName);
+                ShowFatalError(state, "SimDuct: Component not found=" + std::string{CompName});
             }
             CompIndex = DuctNum;
         } else {
@@ -191,7 +191,7 @@ namespace HVACDuct {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DuctNum; // duct index
-        static std::string const RoutineName("GetDuctInput:");
+        static constexpr std::string_view RoutineName("GetDuctInput:");
         int NumAlphas;           // Number of Alphas for each GetObjectItem call
         int NumNumbers;          // Number of Numbers for each GetObjectItem call
         int IOStatus;            // Used in GetObjectItem
@@ -247,7 +247,7 @@ namespace HVACDuct {
         // No output variables
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + " Errors found in input");
+            ShowFatalError(state, std::string{RoutineName} + " Errors found in input");
         }
     }
 

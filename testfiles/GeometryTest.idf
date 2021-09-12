@@ -924,6 +924,7 @@
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     PSI FOYER,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -940,6 +941,7 @@
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     PSI FOYER,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -956,6 +958,7 @@
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     PSI FOYER,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -972,6 +975,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     PSI FOYER,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall003,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -988,6 +992,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     PSI FOYER,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1004,6 +1009,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     PSI FOYER,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1035,6 +1041,7 @@
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1201,6 +1208,7 @@
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1367,6 +1375,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1383,6 +1392,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn005:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1399,6 +1409,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn004:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1415,6 +1426,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1431,6 +1443,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1447,6 +1460,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1463,6 +1477,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1523,6 +1538,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1538,19 +1554,22 @@
     Zn002:IntM001,           !- Name
     INTERIOR,                !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
-    408.7734;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    408.7734;                !- Extended Field
 
   InternalMass,
     Zn002:IntM002,           !- Name
     PARTITION02,             !- Construction Name
     DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
-    371.6122;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    371.6122;                !- Extended Field
 
   BuildingSurface:Detailed,
     Zn003:Wall001,           !- Name
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     LEFT FORK,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1567,6 +1586,7 @@
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     LEFT FORK,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1598,6 +1618,7 @@
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     LEFT FORK,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1749,6 +1770,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     LEFT FORK,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall006,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1765,6 +1787,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     LEFT FORK,               !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1781,6 +1804,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     LEFT FORK,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1797,6 +1821,7 @@
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     MIDDLE FORK,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1813,6 +1838,7 @@
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     MIDDLE FORK,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1844,6 +1870,7 @@
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     MIDDLE FORK,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1860,6 +1887,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     MIDDLE FORK,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1876,6 +1904,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     MIDDLE FORK,             !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1892,6 +1921,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     MIDDLE FORK,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1908,6 +1938,7 @@
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     RIGHT FORK,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2059,6 +2090,7 @@
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     RIGHT FORK,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2090,6 +2122,7 @@
     Wall,                    !- Surface Type
     EXTWALL09,               !- Construction Name
     RIGHT FORK,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2106,6 +2139,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     RIGHT FORK,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2122,6 +2156,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     RIGHT FORK,              !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2138,6 +2173,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     RIGHT FORK,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

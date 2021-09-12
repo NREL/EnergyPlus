@@ -115,8 +115,8 @@ namespace TranspiredCollector {
     using DataVectorTypes::Vector;
 
     void SimTranspiredCollector(EnergyPlusData &state,
-                                std::string const &CompName, // component name
-                                int &CompIndex               // component index (to reduce string compares during simulation)
+                                std::string_view CompName, // component name
+                                int &CompIndex             // component index (to reduce string compares during simulation)
     )
     {
 
@@ -150,7 +150,7 @@ namespace TranspiredCollector {
         if (CompIndex == 0) {
             UTSCNum = UtilityRoutines::FindItemInList(CompName, state.dataTranspiredCollector->UTSC);
             if (UTSCNum == 0) {
-                ShowFatalError(state, "Transpired Collector not found=" + CompName);
+                ShowFatalError(state, "Transpired Collector not found=" + std::string{CompName});
             }
             CompIndex = UTSCNum;
         } else {
@@ -256,7 +256,7 @@ namespace TranspiredCollector {
         Real64 AvgTilt;       // temp for error checking
         int SurfID;           // local surface "pointer"
         Real64 TiltRads;      // average tilt of collector in radians
-        Real64 tempHdeltaNPL; // temporary variable for bouyancy length scale
+        Real64 tempHdeltaNPL; // temporary variable for buoyancy length scale
         int NumUTSCSplitter(0);
         Array1D_string AlphasSplit; // Alpha items for extensible
         // Solar Collectors:Unglazed Transpired object
@@ -704,50 +704,50 @@ namespace TranspiredCollector {
                                 "Solar Collector Heat Exchanger Effectiveness",
                                 OutputProcessor::Unit::None,
                                 state.dataTranspiredCollector->UTSC(Item).HXeff,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Leaving Air Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataTranspiredCollector->UTSC(Item).TairHX,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Outside Face Suction Velocity",
                                 OutputProcessor::Unit::m_s,
                                 state.dataTranspiredCollector->UTSC(Item).Vsuction,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Surface Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataTranspiredCollector->UTSC(Item).Tcoll,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Plenum Air Temperature",
                                 OutputProcessor::Unit::C,
                                 state.dataTranspiredCollector->UTSC(Item).Tplen,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataTranspiredCollector->UTSC(Item).SensHeatingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataTranspiredCollector->UTSC(Item).SensHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataTranspiredCollector->UTSC(Item).Name,
                                 _,
                                 "SolarAir",
@@ -759,50 +759,50 @@ namespace TranspiredCollector {
                                 "Solar Collector Natural Ventilation Air Change Rate",
                                 OutputProcessor::Unit::ach,
                                 state.dataTranspiredCollector->UTSC(Item).PassiveACH,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Natural Ventilation Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataTranspiredCollector->UTSC(Item).PassiveMdotVent,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Wind Natural Ventilation Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataTranspiredCollector->UTSC(Item).PassiveMdotWind,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Buoyancy Natural Ventilation Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataTranspiredCollector->UTSC(Item).PassiveMdotTherm,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Incident Solar Radiation",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataTranspiredCollector->UTSC(Item).Isc,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector System Efficiency",
                                 OutputProcessor::Unit::None,
                                 state.dataTranspiredCollector->UTSC(Item).UTSCEfficiency,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
             SetupOutputVariable(state,
                                 "Solar Collector Surface Efficiency",
                                 OutputProcessor::Unit::None,
                                 state.dataTranspiredCollector->UTSC(Item).UTSCCollEff,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataTranspiredCollector->UTSC(Item).Name);
         }
 

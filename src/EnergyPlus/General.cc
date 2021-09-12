@@ -89,7 +89,7 @@ namespace EnergyPlus::General {
 using DataHVACGlobals::Bisection;
 
 // MODULE PARAMETER DEFINITIONS
-static std::string const BlankString;
+static constexpr std::string_view BlankString;
 
 Real64 InterpProfAng(Real64 const ProfAng,           // Profile angle (rad)
                      Array1S<Real64> const PropArray // Array of blind properties
@@ -327,8 +327,8 @@ std::string &strip_trailing_zeros(std::string &InputString)
     // PURPOSE OF THIS FUNCTION:
     // Remove trailing fractional zeros from floating point representation strings in place.
 
-    static std::string const ED("ED");
-    static std::string const zero_string("0.");
+    static constexpr std::string_view ED("ED");
+    static constexpr std::string_view zero_string("0.");
 
     assert(!has_any_of(InputString, "ed"));       // Pre Not using lowercase exponent letter
     assert(InputString == stripped(InputString)); // Pre Already stripped surrounding spaces
@@ -496,7 +496,6 @@ void DetermineDateTokens(EnergyPlusData &state,
                                             {"ST ", "ND ", "RD ", "TH ", "OF ", "IN "}); // Need trailing spaces: Want thse only at end of words
     static Array1D_string const Months(12, {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"});
     static Array1D_string const Weekdays(7, {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"});
-    static std::string const Numbers("0123456789");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string CurrentString;
@@ -1684,8 +1683,8 @@ void ScanForReports(EnergyPlusData &state,
         auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(reportName));
         if (SELECT_CASE_var == "CONSTRUCTIONS") {
             if (present(ReportKey)) {
-                if (UtilityRoutines::SameString(ReportKey, "Constructions")) DoReport = state.dataGeneral->Constructions;
-                if (UtilityRoutines::SameString(ReportKey, "Materials")) DoReport = state.dataGeneral->Materials;
+                if (UtilityRoutines::SameString(ReportKey(), "Constructions")) DoReport = state.dataGeneral->Constructions;
+                if (UtilityRoutines::SameString(ReportKey(), "Materials")) DoReport = state.dataGeneral->Materials;
             }
         } else if (SELECT_CASE_var == "VIEWFACTORINFO") {
             DoReport = state.dataGeneral->ViewFactorInfo;
@@ -1699,7 +1698,7 @@ void ScanForReports(EnergyPlusData &state,
             //      IF (PRESENT(Option1)) Option1=SchRptOption
         } else if (SELECT_CASE_var == "SURFACES") {
             {
-                auto const SELECT_CASE_var1(UtilityRoutines::MakeUPPERCase(ReportKey)); // Autodesk:OPTIONAL ReportKey used without PRESENT check
+                auto const SELECT_CASE_var1(UtilityRoutines::MakeUPPERCase(ReportKey())); // Autodesk:OPTIONAL ReportKey used without PRESENT check
                 if (SELECT_CASE_var1 == "COSTINFO") {
                     DoReport = state.dataGeneral->CostInfo;
                 } else if (SELECT_CASE_var1 == "DXF") {

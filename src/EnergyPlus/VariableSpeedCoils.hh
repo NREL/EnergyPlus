@@ -346,7 +346,7 @@ namespace VariableSpeedCoils {
     };
 
     void SimVariableSpeedCoils(EnergyPlusData &state,
-                               std::string const &CompName,   // Coil Name
+                               std::string_view CompName,     // Coil Name
                                int &CompIndex,                // Index for Component name
                                int const CyclingScheme,       // Continuous fan OR cycling compressor
                                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -532,6 +532,8 @@ namespace VariableSpeedCoils {
     void setVarSpeedHPWHFanIndex(EnergyPlusData &state, int const dXCoilNum, int const fanIndex);
 
     void setVarSpeedFanInfo(EnergyPlusData &state, int const dXCoilNum, std::string const fanName, int const fanIndex, int const fanTypeNum);
+
+    void getCoilTypeAndName(EnergyPlusData &state, int const dXCoilNum, std::string &CoilType, std::string &CoilName, bool &ErrorsFound);
 
 } // namespace VariableSpeedCoils
 

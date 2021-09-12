@@ -139,7 +139,7 @@ void PlantProfileData::simulate(EnergyPlusData &state,
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static std::string const RoutineName("SimulatePlantProfile");
+    static constexpr std::string_view RoutineName("SimulatePlantProfile");
     Real64 DeltaTemp;
 
     this->InitPlantProfile(state);
@@ -186,7 +186,7 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
     using ScheduleManager::GetScheduleMaxValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static std::string const RoutineName("InitPlantProfile");
+    static constexpr std::string_view RoutineName("InitPlantProfile");
     Real64 FluidDensityInit;
 
     // Do the one time initializations
@@ -428,24 +428,24 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 "Plant Load Profile Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).MassFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name);
 
             SetupOutputVariable(state,
                                 "Plant Load Profile Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Power,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name);
 
             SetupOutputVariable(state,
                                 "Plant Load Profile Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Energy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -457,8 +457,8 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 "Plant Load Profile Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).HeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
                                 _,
                                 "PLANTLOOPHEATINGDEMAND",
@@ -470,8 +470,8 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 "Plant Load Profile Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).CoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
                                 _,
                                 "PLANTLOOPCOOLINGDEMAND",

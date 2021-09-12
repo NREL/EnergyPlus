@@ -4,49 +4,62 @@
 #include <memory>
 #include "BaseIGULayer.hpp"
 
-namespace FenestrationCommon {
-	enum class Side;
+namespace FenestrationCommon
+{
+    enum class Side;
 }
 
-namespace Tarcog {
+namespace Tarcog
+{
+    namespace ISO15099
+    {
+        class CIGUSolidLayer : public CBaseIGULayer
+        {
+        public:
+            CIGUSolidLayer(
+              double t_Thickness,
+              double t_Conductivity,
+              const std::shared_ptr<Tarcog::ISO15099::ISurface> & t_FrontSurface = nullptr,
+              const std::shared_ptr<Tarcog::ISO15099::ISurface> & t_BackSurface = nullptr);
 
-	class ISurface;
+            CIGUSolidLayer(double t_Thickness,
+                           double t_Conductivity,
+                           double t_FrontEmissivity,
+                           double t_FrontIRTransmittance,
+                           double t_BackEmissivity,
+                           double t_BackIRTransmittance);
 
-	class CIGUSolidLayer : public CBaseIGULayer {
-	public:
-		CIGUSolidLayer( double const t_Thickness, double const t_Conductivity,
-		                std::shared_ptr< ISurface > const& t_FrontSurface = nullptr,
-		                std::shared_ptr< ISurface > const& t_BackSurface = nullptr );
+            void connectToBackSide(const std::shared_ptr<CBaseLayer> & t_Layer) override;
 
-		CIGUSolidLayer( double const t_Thickness, double const t_Conductivity,
-		                double const t_FrontEmissivity, double const t_FrontIRTransmittance,
-		                double const t_BackEmissivity, double const t_BackIRTransmittance );
+            double getConductance() const;
+            double getSolarAbsorptance() const;
 
-		CIGUSolidLayer( CIGUSolidLayer const& t_Layer );
-		CIGUSolidLayer & operator=( CIGUSolidLayer const & t_Layer );
+            void setLayerState(double t_Tf, double t_Tb, double t_Jf, double t_Jb);
+            void setSolarRadiation(double t_SolarRadiation);
+            void setSolarAbsorptance(double t_SolarAbsorptance, double t_SolarRadiation);
 
-		void connectToBackSide( std::shared_ptr< CBaseLayer > const& t_Layer ) override;
+            // Radiation flow in solid layer should be eliminated
+            double getRadiationFlow() override;
 
-		double getConductivity() const;
+            virtual bool isDeflected() const;
 
-		void setLayerState( double const t_Tf, double const t_Tb, double const t_Jf, double const t_Jb );
-		void setSolarRadiation( double const t_SolarRadiation );
-		void setSolarAbsorptance( double const t_SolarAbsorptance );
+            std::shared_ptr<CBaseLayer> clone() const override;
 
-		std::shared_ptr< CBaseLayer > clone() const override;
+        protected:
+            virtual void calculateConvectionOrConductionFlow() override;
 
-	protected:
-		void calculateConvectionOrConductionFlow() override;
+            double m_Conductivity;
 
-	private:
-		void setSurfaceState( double const t_Temperature, double const t_J,
-		                      FenestrationCommon::Side const t_Position );
+        private:
+            void setSurfaceState(double t_Temperature,
+                                 double t_J,
+                                 FenestrationCommon::Side t_Position);
 
-		double m_Conductivity;
-		double m_SolarAbsorptance;
+            double m_SolarAbsorptance;
+        };
 
-	};
+    }   // namespace ISO15099
 
-}
+}   // namespace Tarcog
 
 #endif

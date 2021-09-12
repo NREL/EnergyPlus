@@ -113,6 +113,13 @@ namespace SizingManager {
 
     void GetZoneSizingInput(EnergyPlusData &state);
 
+    void ReportTemperatureInputError(EnergyPlusData &state,
+                                     std::string cObjectName,
+                                     int const paramNum,
+                                     Real64 comparisonTemperature,
+                                     bool const shouldFlagSevere,
+                                     bool &ErrorsFound);
+
     void GetZoneAndZoneListNames(
         EnergyPlusData &state, bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
 

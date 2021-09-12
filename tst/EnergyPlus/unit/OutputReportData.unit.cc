@@ -90,8 +90,8 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -101,8 +101,8 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         _,
                         "Electricity",
@@ -112,16 +112,34 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         _,
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite1");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite2");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite3");
 
     int keyCount = 0;
     OutputProcessor::VariableType typeVar = OutputProcessor::VariableType::NotFound;

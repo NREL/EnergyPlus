@@ -95,7 +95,7 @@ namespace DataAirSystems {
         std::string Name;                          // Component name
         SimAirServingZones::CompType CompType_Num; // Numeric designator for CompType (TypeOf)
         int CompIndex;                             // Component Index in whatever is using this component
-        HVACSystemData *compPointer;               // pointer to HVAC system
+        HVACSystemData *compPointer = nullptr;     // pointer to HVAC system
         int FlowCtrl;                              // Component flow control (ACTIVE/PASSIVE)
         bool ON;                                   // When true, the designated component or operation scheme is available
         bool Parent;                               // When true, the designated component is made up of sub-components

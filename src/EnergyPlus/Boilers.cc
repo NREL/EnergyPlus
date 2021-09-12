@@ -371,13 +371,19 @@ void GetBoilerInput(EnergyPlusData &state)
 
 void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
 {
-    SetupOutputVariable(state, "Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Heating Rate",
+                        OutputProcessor::Unit::W,
+                        this->BoilerLoad,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Boiler Heating Energy",
                         OutputProcessor::Unit::J,
                         this->BoilerEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         "ENERGYTRANSFER",
@@ -388,40 +394,75 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         "Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
                         OutputProcessor::Unit::W,
                         this->FuelUsed,
-                        "System",
-                        "Average",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
                         OutputProcessor::Unit::J,
                         this->FuelConsumed,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         this->BoilerFuelTypeForOutputVariable,
                         "Heating",
                         this->EndUseSubcategory,
                         "Plant");
-    SetupOutputVariable(state, "Boiler Inlet Temperature", OutputProcessor::Unit::C, this->BoilerInletTemp, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Boiler Outlet Temperature", OutputProcessor::Unit::C, this->BoilerOutletTemp, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, this->BoilerMassFlowRate, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Boiler Ancillary Electricity Rate", OutputProcessor::Unit::W, this->ParasiticElecPower, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->BoilerInletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->BoilerOutletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->BoilerMassFlowRate,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Ancillary Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        this->ParasiticElecPower,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Boiler Ancillary Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->ParasiticElecConsumption,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         "ELECTRICITY",
                         "Heating",
                         "Boiler Parasitic",
                         "Plant");
-    SetupOutputVariable(state, "Boiler Part Load Ratio", OutputProcessor::Unit::None, this->BoilerPLR, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Boiler Efficiency", OutputProcessor::Unit::None, this->BoilerEff, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Part Load Ratio",
+                        OutputProcessor::Unit::None,
+                        this->BoilerPLR,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Boiler Efficiency",
+                        OutputProcessor::Unit::None,
+                        this->BoilerEff,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
         SetupEMSInternalVariable(state, "Boiler Nominal Capacity", this->Name, "[W]", this->NomCap);
     }

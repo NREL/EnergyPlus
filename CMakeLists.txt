@@ -265,6 +265,9 @@ target_include_directories(project_options SYSTEM INTERFACE "${kiva_SOURCE_DIR}/
 add_subdirectory(scripts/dev/generate_embeddable_epJSON_schema)
 set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES FOLDER "Internal")
 
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.5)
+target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP-0.5/include)
+
 if(OPENGL_FOUND)
   set(BUILD_PENUMBRA_TESTING
       OFF
@@ -331,6 +334,8 @@ add_subdirectory(src/ConvertInputFormat)
 
 if(BUILD_FORTRAN)
   include(CMakeAddFortranSubdirectory)
+  # Define a top-level target `fortran_project_options`
+  include(cmake/Fortran.cmake)
   cmake_add_fortran_subdirectory(
     src/ExpandObjects
     PROJECT ExpandObjects

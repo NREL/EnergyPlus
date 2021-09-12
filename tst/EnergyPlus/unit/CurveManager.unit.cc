@@ -277,15 +277,15 @@ TEST_F(EnergyPlusFixture, TableLookup)
 
 TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
 {
-    /*
-     *  Test: Normalization Method = None
-     *
-     *  The Table:Lookup object constructed in this test corresponds directly to the function:
-     *      f(x_1, x_2) = x_1 * x_2
-     *
-     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
-     *  This idf will default to Cubic interpolation and Linear extrapolation
-     */
+    //    /*
+    //     *  Test: Normalization Method = None
+    //     *
+    //     *  The Table:Lookup object constructed in this test corresponds directly to the function:
+    //     *      f(x_1, x_2) = x_1 * x_2
+    //     *
+    //     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
+    //     *  This idf will default to Cubic interpolation and Linear extrapolation
+    //     */
 
     double expected_curve_min{2.0};
     double expected_curve_max{21.0};
@@ -377,15 +377,15 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
 
 TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
 {
-    /*
-     *  Test: Normalization Method = DivisorOnly
-     *
-     *  The Table:Lookup object constructed in this test corresponds directly to the function:
-     *      f(x_1, x_2) = x_1 * x_2
-     *
-     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
-     *  This idf will default to Cubic interpolation and Linear extrapolation
-     */
+    //    /*
+    //     *  Test: Normalization Method = DivisorOnly
+    //     *
+    //     *  The Table:Lookup object constructed in this test corresponds directly to the function:
+    //     *      f(x_1, x_2) = x_1 * x_2
+    //     *
+    //     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
+    //     *  This idf will default to Cubic interpolation and Linear extrapolation
+    //     */
 
     double expected_divisor{3.0};
     double expected_curve_min{2.0 / expected_divisor};
@@ -479,16 +479,16 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
 
 TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
 {
-    /*
-     *  Test: Normalization Method = AutomaticWithDivisor
-     *      Case: Default 'Normalization Divisor' Field
-     *
-     *  The Table:Lookup object constructed in this test corresponds directly to the function:
-     *      f(x_1, x_2) = x_1 * x_2
-     *
-     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
-     *  This idf will default to Cubic interpolation and Linear extrapolation
-     */
+    //    /*
+    //     *  Test: Normalization Method = AutomaticWithDivisor
+    //     *      Case: Default 'Normalization Divisor' Field
+    //     *
+    //     *  The Table:Lookup object constructed in this test corresponds directly to the function:
+    //     *      f(x_1, x_2) = x_1 * x_2
+    //     *
+    //     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
+    //     *  This idf will default to Cubic interpolation and Linear extrapolation
+    //     */
 
     double expected_auto_divisor{6.0};
     double expected_curve_max{21.0 / expected_auto_divisor};
@@ -582,16 +582,16 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
 
 TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
 {
-    /*
-     *  Test: Normalization Method = AutomaticWithDivisor
-     *      Case: Additionally Specified Divisor in 'Normalization Divisor' Field
-     *
-     *  The Table:Lookup object constructed in this test corresponds directly to the function:
-     *      f(x_1, x_2) = x_1 * x_2
-     *
-     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
-     *  This idf will default to Cubic interpolation and Linear extrapolation
-     */
+    //    /*
+    //     *  Test: Normalization Method = AutomaticWithDivisor
+    //     *      Case: Additionally Specified Divisor in 'Normalization Divisor' Field
+    //     *
+    //     *  The Table:Lookup object constructed in this test corresponds directly to the function:
+    //     *      f(x_1, x_2) = x_1 * x_2
+    //     *
+    //     *  The curve of this data is therefore Linear, making interpolated data points easily calculated
+    //     *  This idf will default to Cubic interpolation and Linear extrapolation
+    //     */
 
     double expected_auto_divisor{6.0};
     double normalization_divisor{4.0};

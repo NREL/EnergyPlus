@@ -118,6 +118,7 @@ set(INCLUDED_IMAGES
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/ACStorageBussDiagram.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/AirLoopComponentMatrix.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/ChangeoverBypassVAV-ReturnPlenumOrMixer.png
+    ${PROJECT_SOURCE_DIR}/input-output-reference/media/CoilSystemWater_HeatRecovery.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/DCInverterBussDiagram.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/DCInverterWithACStorageBussDiagram.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/DCInverterWithDCStorageBussDiagram.png

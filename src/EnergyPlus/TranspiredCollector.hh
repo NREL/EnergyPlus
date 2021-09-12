@@ -94,7 +94,7 @@ namespace TranspiredCollector {
         Real64 AreaRatio;                             // Ratio of actual surface are to projected surface area [dimensionless]
         Real64 CollectThick;                          // Thickness of collector absorber plate material.  [m]
         Real64 Cv;                                    // volume-based effectiveness of openings for wind-driven vent when Passive
-        Real64 Cd;                                    // discharge coefficient of openings for bouyancy-driven vent when Passive
+        Real64 Cd;                                    // discharge coefficient of openings for buoyancy-driven vent when Passive
         int NumOASysAttached;                         // =1 if no splitter, other wise set by Splitter object
         int FreeHeatSetPointSchedPtr;                 // used for controlling seperately from usual setpoint managers.
         int VsucErrIndex;
@@ -111,7 +111,7 @@ namespace TranspiredCollector {
         Real64 HrPlen;     // Modeled radiation coef for OSCM [W/m2-C]
         Real64 HcPlen;     // Modeled Convection coef for OSCM [W/m2-C]
         Real64 MdotVent;   // air mass flow exchanging with ambient when passive.
-        Real64 HdeltaNPL;  // lenth scale for bouyancy-driven vent when Passive [m]
+        Real64 HdeltaNPL;  // lenth scale for buoyancy-driven vent when Passive [m]
         Real64 TairHX;     // air drybulb of air leaving collector when Active [C]
         Real64 InletMDot;  // flow rate from outdoor mixer controller
         Real64 InletTempDB;
@@ -125,7 +125,7 @@ namespace TranspiredCollector {
         Real64 PassiveACH;        // air changes per hour when passive [1/hr]
         Real64 PassiveMdotVent;   // Total Nat Vent air change rate  [kg/s]
         Real64 PassiveMdotWind;   // Nat Vent air change rate from Wind-driven [kg/s]
-        Real64 PassiveMdotTherm;  // Nat. Vent air change rate from bouyancy-driven flow [kg/s]
+        Real64 PassiveMdotTherm;  // Nat. Vent air change rate from buoyancy-driven flow [kg/s]
         Real64 PlenumVelocity;    // effective velocity inside plenum [m/s]
         Real64 SupOutTemp;        // supply air outlet temperature [C]
         Real64 SupOutHumRat;      // supply air outlet humidity ratio [kg water/kg dry air]
@@ -153,8 +153,8 @@ namespace TranspiredCollector {
     };
 
     void SimTranspiredCollector(EnergyPlusData &state,
-                                std::string const &CompName, // component name
-                                int &CompIndex               // component index (to reduce string compares during simulation)
+                                std::string_view CompName, // component name
+                                int &CompIndex             // component index (to reduce string compares during simulation)
     );
 
     void GetTranspiredCollectorInput(EnergyPlusData &state);

@@ -883,6 +883,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -899,6 +900,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -915,6 +917,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -931,6 +934,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -947,6 +951,7 @@
     ROOF,                    !- Surface Type
     ROOF-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -963,6 +968,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C1-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -979,6 +985,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C2-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -995,6 +1002,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C3-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1011,6 +1019,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C4-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1027,6 +1036,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C5-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1043,6 +1053,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1059,6 +1070,7 @@
     CEILING,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C1-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1075,6 +1087,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1091,6 +1104,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB21,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1107,6 +1121,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB41,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1123,6 +1138,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB51,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1139,6 +1155,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE2-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1155,6 +1172,7 @@
     CEILING,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE2-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C2-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1171,6 +1189,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE2-1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1187,6 +1206,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE2-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB12,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1203,6 +1223,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE2-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB32,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1219,6 +1240,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE2-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB52,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1235,6 +1257,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE3-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1251,6 +1274,7 @@
     CEILING,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE3-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C3-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1267,6 +1291,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE3-1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1283,6 +1308,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE3-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB23,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1299,6 +1325,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE3-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB43,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1315,6 +1342,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE3-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB53,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1331,6 +1359,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE4-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1347,6 +1376,7 @@
     CEILING,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE4-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C4-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1363,6 +1393,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE4-1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1379,6 +1410,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE4-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB14,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1395,6 +1427,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE4-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB34,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1411,6 +1444,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE4-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB54,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1427,6 +1461,7 @@
     CEILING,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE5-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C5-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1443,6 +1478,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE5-1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1459,6 +1495,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE5-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB15,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1475,6 +1512,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE5-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB25,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1491,6 +1529,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE5-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB35,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1507,6 +1546,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE5-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB45,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2204,47 +2244,47 @@
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER ===========
 
   ZoneHVAC:Baseboard:RadiantConvective:Water,
-    SPACE2-1 Baseboard, !- Name
-    Baseboard Design, !- Design_Object_Name
-    ReheatCoilAvailSched, !- Availability_Schedule_Name
-    SPACE2-1 Zone Coil Water In Node, !- Inlet_Node_Name
-    SPACE2-1 Zone Coil Water Out Node, !- Outlet_Node_Name
-    87.78, !- Rated_Average_Water_Temperature
-    0.063, !- Rated_Water_Mass_Flow_Rate
-    autosize, !- Heating_Design_Capacity
-    autosize, !- Maximum_Water_Flow_Rate
-    RIGHT-1, !- Surface_1_Name
-    0.4, !- Fraction_of_Radiant_Energy_to_Surface_1
-    C2-1, !- Surface_2_Name
-    0.2, !- Fraction_of_Radiant_Energy_to_Surface_2
-    SB25, !- Surface_3_Name
-    0.1; !- Fraction_of_Radiant_Energy_to_Surface_3
+    SPACE2-1 Baseboard,      !- Name
+    Baseboard Design,        !- Design Object
+    ReheatCoilAvailSched,    !- Availability Schedule Name
+    SPACE2-1 Zone Coil Water In Node,  !- Inlet Node Name
+    SPACE2-1 Zone Coil Water Out Node,  !- Outlet Node Name
+    87.78,                   !- Rated Average Water Temperature {C}
+    0.063,                   !- Rated Water Mass Flow Rate {kg/s}
+    autosize,                !- Heating Design Capacity {W}
+    autosize,                !- Maximum Water Flow Rate {m3/s}
+    RIGHT-1,                 !- Surface 1 Name
+    0.4,                     !- Fraction of Radiant Energy to Surface 1
+    C2-1,                    !- Surface 2 Name
+    0.2,                     !- Fraction of Radiant Energy to Surface 2
+    SB25,                    !- Surface 3 Name
+    0.1;                     !- Fraction of Radiant Energy to Surface 3
 
   ZoneHVAC:Baseboard:RadiantConvective:Water,
-    SPACE4-1 Baseboard, !- Name
-    Baseboard Design, !- Design_Object_Name
-    ReheatCoilAvailSched, !- Availability_Schedule_Name
-    SPACE4-1 Zone Coil Water In Node, !- Inlet_Node_Name
-    SPACE4-1 Zone Coil Water Out Node, !- Outlet_Node_Name
-    82.22, !- Rated_Average_Water_Temperature
-    0.063, !- Rated_Water_Mass_Flow_Rate
-    autosize, !- Heating_Design_Capacity
-    autosize, !- Maximum_Water_Flow_Rate
-    LEFT-1, !- Surface_1_Name
-    0.4, !- Fraction_of_Radiant_Energy_to_Surface_1
-    C4-1, !- Surface_2_Name
-    0.2, !- Fraction_of_Radiant_Energy_to_Surface_2
-    SB45, !- Surface_3_Name
-    0.1; !- Fraction_of_Radiant_Energy_to_Surface_3
+    SPACE4-1 Baseboard,      !- Name
+    Baseboard Design,        !- Design Object
+    ReheatCoilAvailSched,    !- Availability Schedule Name
+    SPACE4-1 Zone Coil Water In Node,  !- Inlet Node Name
+    SPACE4-1 Zone Coil Water Out Node,  !- Outlet Node Name
+    82.22,                   !- Rated Average Water Temperature {C}
+    0.063,                   !- Rated Water Mass Flow Rate {kg/s}
+    autosize,                !- Heating Design Capacity {W}
+    autosize,                !- Maximum Water Flow Rate {m3/s}
+    LEFT-1,                  !- Surface 1 Name
+    0.4,                     !- Fraction of Radiant Energy to Surface 1
+    C4-1,                    !- Surface 2 Name
+    0.2,                     !- Fraction of Radiant Energy to Surface 2
+    SB45,                    !- Surface 3 Name
+    0.1;                     !- Fraction of Radiant Energy to Surface 3
 
   ZoneHVAC:Baseboard:RadiantConvective:Water:Design,
-    Baseboard Design, !- Design_Object_Name
-    HeatingDesignCapacity, !- Heating_Design_Capacity_Method
-    , !- Heating_Design_Capacity_Per_Floor_Area
-    , !- Fraction_of_Autosized_Heating_Design_Capacity
-    0.001, !- Convergence_Tolerance
-    0.3, !- Fraction_Radiant
-    0.3; !- Fraction_of_Radiant_Energy_Incident_on_People
+    Baseboard Design,        !- Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    0.001,                   !- Convergence Tolerance
+    0.3,                     !- Fraction Radiant
+    0.3;                     !- Fraction of Radiant Energy Incident on People
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT ===========
 
@@ -2661,8 +2701,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    VAV Sys 1 Avail List;    !- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 

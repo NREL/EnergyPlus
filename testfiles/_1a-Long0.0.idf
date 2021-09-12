@@ -970,6 +970,7 @@
     Wall,                    !- Surface Type
     CONST 2,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE SOUTH,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -986,6 +987,7 @@
     Wall,                    !- Surface Type
     CONST 1,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1017,6 +1019,7 @@
     Wall,                    !- Surface Type
     CONST 2,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE NORTH,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1033,6 +1036,7 @@
     Wall,                    !- Surface Type
     CONST 2,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE EAST,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1049,6 +1053,7 @@
     Ceiling,                 !- Surface Type
     CONST 4-Ceiling,         !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE CEILING,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1065,6 +1070,7 @@
     Floor,                   !- Surface Type
     CONST 4-Floor,           !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE FLOOR,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1316,6 +1322,7 @@
     Roof,                    !- Surface Type
     CONST 4-Ceiling,         !- Construction Name
     ZONE TWO,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

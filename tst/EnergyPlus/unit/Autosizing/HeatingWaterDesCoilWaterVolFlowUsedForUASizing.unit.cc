@@ -56,7 +56,7 @@ namespace EnergyPlus {
 
 TEST_F(AutoSizingFixture, HeatingWaterDesCoilWaterVolFlowUsedForUASizingGauntlet)
 {
-    static std::string const routineName("HeatingWaterDesCoilWaterVolFlowUsedForUASizingSizingGauntlet");
+    static constexpr std::string_view routineName("HeatingWaterDesCoilWaterVolFlowUsedForUASizingSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     HeatingWaterDesCoilWaterVolFlowUsedForUASizer sizer;

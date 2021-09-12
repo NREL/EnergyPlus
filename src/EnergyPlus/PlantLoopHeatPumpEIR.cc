@@ -892,13 +892,13 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 EIRPlantLoopHeatPump thisPLHP;
                 thisPLHP.plantTypeOfNum = classToInput.thisTypeNum;
                 thisPLHP.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
-                std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("load_side_inlet_node_name"));
-                std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("load_side_outlet_node_name"));
-                std::string condenserType = UtilityRoutines::MakeUPPERCase(fields.at("condenser_type"));
-                std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_inlet_node_name"));
-                std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name"));
+                std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("load_side_inlet_node_name")));
+                std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("load_side_outlet_node_name")));
+                std::string condenserType = UtilityRoutines::MakeUPPERCase(AsString(fields.at("condenser_type")));
+                std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("source_side_inlet_node_name")));
+                std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("source_side_outlet_node_name")));
                 if (fields.find("companion_heat_pump_name") != fields.end()) { // optional field
-                    thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_heat_pump_name"));
+                    thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("companion_heat_pump_name")));
                 }
                 auto tmpFlowRate = fields.at("load_side_reference_flow_rate");
                 if (tmpFlowRate == "Autosize") {
@@ -956,21 +956,21 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 auto &capFtName = fields.at("capacity_modifier_function_of_temperature_curve_name");
-                thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName));
+                thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(AsString(capFtName)));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
                         state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name + "; entered curve name: " + capFtName.get<std::string>());
                     errorsFound = true;
                 }
                 auto &eirFtName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
-                thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName));
+                thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(AsString(eirFtName)));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
                         state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name + "; entered curve name: " + eirFtName.get<std::string>());
                     errorsFound = true;
                 }
                 auto &eirFplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name");
-                thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName));
+                thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(AsString(eirFplrName)));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
                         state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name + "; entered curve name: " + eirFplrName.get<std::string>());
@@ -1092,14 +1092,19 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
         bool errFlag = false;
 
         // setup output variables
-        SetupOutputVariable(
-            state, "Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W, this->loadSideHeatTransfer, "System", "Average", this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Load Side Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->loadSideHeatTransfer,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->loadSideEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             _,
                             "ENERGYTRANSFER",
@@ -1110,27 +1115,58 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                             "Heat Pump Source Side Heat Transfer Rate",
                             OutputProcessor::Unit::W,
                             this->sourceSideHeatTransfer,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->name);
-        SetupOutputVariable(
-            state, "Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J, this->sourceSideEnergy, "System", "Sum", this->name);
-        SetupOutputVariable(
-            state, "Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C, this->loadSideInletTemp, "System", "Average", this->name);
-        SetupOutputVariable(
-            state, "Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C, this->loadSideOutletTemp, "System", "Average", this->name);
-        SetupOutputVariable(
-            state, "Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C, this->sourceSideInletTemp, "System", "Average", this->name);
-        SetupOutputVariable(
-            state, "Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, this->sourceSideOutletTemp, "System", "Average", this->name);
-        SetupOutputVariable(state, "Heat Pump Electricity Rate", OutputProcessor::Unit::W, this->powerUsage, "System", "Average", this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Source Side Heat Transfer Energy",
+                            OutputProcessor::Unit::J,
+                            this->sourceSideEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Load Side Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->loadSideInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Load Side Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->loadSideOutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Source Side Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->sourceSideInletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Source Side Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->sourceSideOutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            this->powerUsage,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
         if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
             SetupOutputVariable(state,
                                 "Heat Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->powerEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->name,
                                 _,
                                 "Electricity",
@@ -1142,8 +1178,8 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                 "Heat Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->powerEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->name,
                                 _,
                                 "Electricity",
@@ -1151,14 +1187,19 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                 "Heat Pump",
                                 "Plant");
         }
-        SetupOutputVariable(
-            state, "Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->loadSideMassFlowRate, "System", "Average", this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Load Side Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->loadSideMassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             this->sourceSideMassFlowRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
                             this->name);
 
         // find this component on the plant

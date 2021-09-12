@@ -640,6 +640,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -656,6 +657,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -672,6 +674,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -688,6 +691,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -704,6 +708,7 @@
     ROOF,                    !- Surface Type
     ROOF-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -720,6 +725,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C1-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -736,6 +742,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C2-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -752,6 +759,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C3-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -768,6 +776,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C4-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -784,6 +793,7 @@
     FLOOR,                   !- Surface Type
     CLNG-1,                  !- Construction Name
     PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C5-1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -863,6 +873,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -929,6 +940,7 @@
     CEILING,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C1-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -945,6 +957,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -961,6 +974,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB21,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -977,6 +991,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB41,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -993,6 +1008,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE1-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB51,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1072,6 +1088,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE2-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1103,6 +1120,7 @@
     CEILING,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE2-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C2-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1119,6 +1137,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE2-1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1135,6 +1154,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE2-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB12,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1151,6 +1171,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE2-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB32,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1167,6 +1188,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE2-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB52,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1246,6 +1268,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE3-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1292,6 +1315,7 @@
     CEILING,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE3-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C3-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1308,6 +1332,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE3-1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1324,6 +1349,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE3-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB23,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1340,6 +1366,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE3-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB43,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1356,6 +1383,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE3-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB53,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1435,6 +1463,7 @@
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     SPACE4-1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1466,6 +1495,7 @@
     CEILING,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE4-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C4-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1482,6 +1512,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE4-1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1498,6 +1529,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE4-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB14,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1514,6 +1546,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE4-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB34,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1530,6 +1563,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE4-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB54,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1609,6 +1643,7 @@
     CEILING,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     SPACE5-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     C5-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1625,6 +1660,7 @@
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     SPACE5-1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1641,6 +1677,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE5-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB15,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1657,6 +1694,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE5-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB25,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1673,6 +1711,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE5-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB35,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1689,6 +1728,7 @@
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     SPACE5-1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB45,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2012,8 +2052,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
-    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 1 Avail List;!- Availability Manager List Name
+    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 1 Controllers,    !- Name
@@ -2272,8 +2311,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 2,                !- Name
     OA Sys 2 Controllers,    !- Controller List Name
-    OA Sys 2 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 2 Avail List;!- Availability Manager List Name
+    OA Sys 2 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 2 Controllers,    !- Name
@@ -2525,8 +2563,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 3,                !- Name
     OA Sys 3 Controllers,    !- Controller List Name
-    OA Sys 3 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 3 Avail List;!- Availability Manager List Name
+    OA Sys 3 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 3 Controllers,    !- Name
@@ -2778,8 +2815,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 4,                !- Name
     OA Sys 4 Controllers,    !- Controller List Name
-    OA Sys 4 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 4 Avail List;!- Availability Manager List Name
+    OA Sys 4 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 4 Controllers,    !- Name
@@ -3031,8 +3067,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 5,                !- Name
     OA Sys 5 Controllers,    !- Controller List Name
-    OA Sys 5 Equipment,      !- Outdoor Air Equipment List Name
-    Outdoor Air 5 Avail List;!- Availability Manager List Name
+    OA Sys 5 Equipment;      !- Outdoor Air Equipment List Name
 
   AirLoopHVAC:ControllerList,
     OA Sys 5 Controllers,    !- Name
@@ -3648,98 +3683,98 @@
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
 
- Curve:QuadLinear,
-    TotCoolCapCurve,      ! Curve Name
-    -0.68126221,             !- CoefficientC1
-    1.99529297,              !- CoefficientC2
-    -0.93611888,             !- CoefficientC3
-    0.02081177,              !- CoefficientC4
-    0.008438868,             !- CoefficientC5
-    -100,                   ! Minimum Value of w
-    100,                 ! Maximum Value of w
-    -100,                   ! Minimum Value of x
-    100,                 ! Maximum Value of x
-    0,                   ! Minimum Value of y
-    100,                 ! Maximum Value of y
-    0,                    ! Minimum Value of z
-    100,                  ! Maximum Value of z
-    0,                   ! Minimum Curve Output
-    38;                  ! Maximum Curve Output
+  Curve:QuadLinear,
+    TotCoolCapCurve,         !- Name
+    -0.68126221,             !- Coefficient1 Constant
+    1.99529297,              !- Coefficient2 w
+    -0.93611888,             !- Coefficient3 x
+    0.02081177,              !- Coefficient4 y
+    0.008438868,             !- Coefficient5 z
+    -100,                    !- Minimum Value of w
+    100,                     !- Maximum Value of w
+    -100,                    !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    100,                     !- Maximum Value of y
+    0,                       !- Minimum Value of z
+    100,                     !- Maximum Value of z
+    0,                       !- Minimum Curve Output
+    38;                      !- Maximum Curve Output
 
   Curve:QuintLinear,
-    CoolSensCapCurve,      ! Curve Name
-    2.24209455,              !- CoefficientC1
-    7.28913391,              !- CoefficientC2
-    -9.06079896,             !- CoefficientC3
-    -0.36729404,             !- CoefficientC4
-    0.218826161,             !- CoefficientC5
-    0.00901534,              !- CoefficientC6
-    -100,                   ! Minimum Value of v
-    100,                 ! Maximum Value of v
-    -100,                   ! Minimum Value of w
-    100,                 ! Maximum Value of w
-    -100,                   ! Minimum Value of x
-    100,                 ! Maximum Value of x
-    0,                   ! Minimum Value of y
-    100,                 ! Maximum Value of y
-    0,                    ! Minimum Value of z
-    100,                  ! Maximum Value of z
-    0,                   ! Minimum Curve Output
-    38;                  ! Maximum Curve Output
+    CoolSensCapCurve,        !- Name
+    2.24209455,              !- Coefficient1 Constant
+    7.28913391,              !- Coefficient2 v
+    -9.06079896,             !- Coefficient3 w
+    -0.36729404,             !- Coefficient4 x
+    0.218826161,             !- Coefficient5 y
+    0.00901534,              !- Coefficient6 z
+    -100,                    !- Minimum Value of v
+    100,                     !- Maximum Value of v
+    -100,                    !- Minimum Value of w
+    100,                     !- Maximum Value of w
+    -100,                    !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    100,                     !- Maximum Value of y
+    0,                       !- Minimum Value of z
+    100,                     !- Maximum Value of z
+    0,                       !- Minimum Curve Output
+    38;                      !- Maximum Curve Output
 
   Curve:QuadLinear,
-    CoolPowCurve,      ! Curve Name
-    -3.20456384,             !- CoefficientC1
-    0.47656454,              !- CoefficientC2
-    3.16734236,              !- CoefficientC3
-    0.10244637,              !- CoefficientC4
-    -0.038132556,            !- CoefficientC5
-    -100,                   ! Minimum Value of w
-    100,                 ! Maximum Value of w
-    -100,                   ! Minimum Value of x
-    100,                 ! Maximum Value of x
-    0,                   ! Minimum Value of y
-    100,                 ! Maximum Value of y
-    0,                    ! Minimum Value of z
-    100,                  ! Maximum Value of z
-    0,                   ! Minimum Curve Output
-    38;                  ! Maximum Curve Output
+    CoolPowCurve,            !- Name
+    -3.20456384,             !- Coefficient1 Constant
+    0.47656454,              !- Coefficient2 w
+    3.16734236,              !- Coefficient3 x
+    0.10244637,              !- Coefficient4 y
+    -0.038132556,            !- Coefficient5 z
+    -100,                    !- Minimum Value of w
+    100,                     !- Maximum Value of w
+    -100,                    !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    100,                     !- Maximum Value of y
+    0,                       !- Minimum Value of z
+    100,                     !- Maximum Value of z
+    0,                       !- Minimum Curve Output
+    38;                      !- Maximum Curve Output
 
   Curve:QuadLinear,
-    HeatCapCurve,      ! Curve Name
-    -5.50102734,             !- CoefficientC1
-    -0.96688754,             !- CoefficientC2
-    7.70755007,              !- CoefficientC3
-    0.031928881,             !- CoefficientC4
-    0.028112522,             !- CoefficientC5
-    -100,                   ! Minimum Value of w
-    100,                 ! Maximum Value of w
-    -100,                   ! Minimum Value of x
-    100,                 ! Maximum Value of x
-    0,                   ! Minimum Value of y
-    100,                 ! Maximum Value of y
-    0,                    ! Minimum Value of z
-    100,                  ! Maximum Value of z
-    0,                   ! Minimum Curve Output
-    38;                  ! Maximum Curve Output
+    HeatCapCurve,            !- Name
+    -5.50102734,             !- Coefficient1 Constant
+    -0.96688754,             !- Coefficient2 w
+    7.70755007,              !- Coefficient3 x
+    0.031928881,             !- Coefficient4 y
+    0.028112522,             !- Coefficient5 z
+    -100,                    !- Minimum Value of w
+    100,                     !- Maximum Value of w
+    -100,                    !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    100,                     !- Maximum Value of y
+    0,                       !- Minimum Value of z
+    100,                     !- Maximum Value of z
+    0,                       !- Minimum Curve Output
+    38;                      !- Maximum Curve Output
 
   Curve:QuadLinear,
-    HeatPowCurve,      ! Curve Name
-    -7.47517858,             !- CoefficientC1
-    6.40876653,              !- CoefficientC2
-    1.99711665,              !- CoefficientC3
-    -0.050682973,            !- CoefficientC4
-    0.011385145,             !- CoefficientC5
-    -100,                   ! Minimum Value of w
-    100,                 ! Maximum Value of w
-    -100,                   ! Minimum Value of x
-    100,                 ! Maximum Value of x
-    0,                   ! Minimum Value of y
-    100,                 ! Maximum Value of y
-    0,                    ! Minimum Value of z
-    100,                  ! Maximum Value of z
-    0,                   ! Minimum Curve Output
-    38;                  ! Maximum Curve Output
+    HeatPowCurve,            !- Name
+    -7.47517858,             !- Coefficient1 Constant
+    6.40876653,              !- Coefficient2 w
+    1.99711665,              !- Coefficient3 x
+    -0.050682973,            !- Coefficient4 y
+    0.011385145,             !- Coefficient5 z
+    -100,                    !- Minimum Value of w
+    100,                     !- Maximum Value of w
+    -100,                    !- Minimum Value of x
+    100,                     !- Maximum Value of x
+    0,                       !- Minimum Value of y
+    100,                     !- Maximum Value of y
+    0,                       !- Minimum Value of z
+    100,                     !- Maximum Value of z
+    0,                       !- Minimum Curve Output
+    38;                      !- Maximum Curve Output
 
   Output:Variable,*,Unitary System Requested Sensible Cooling Rate,timestep;
 

@@ -2,7 +2,7 @@ name: Documentation Windows
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master, develop, debug_windows_doc ]
 
 env:
   CMAKE_Fortran_COMPILER: "/c/msys64/mingw64/bin/x86_64-w64-mingw32-gfortran.exe"
@@ -60,21 +60,28 @@ jobs:
         # Avoid annoying warning: "xelatex: major issue: So far, you have not checked for updates as a MiKTeX user."
         mpm --find-updates
         mpm --admin --find-updates
+        # initexmf --enable-installer --update-fndb
+        # initexmf --admin --enable-installer --update-fndb
+        # initexmf --enable-installer --dump-by-name=xelatex --engine=xetex
 
-    - name: Install required packages
+    # This will install all required packages and does that in a single thread. So later in cmake we can safely run in parallel
+    - name: Install required packages by building the Test document
       shell: bash
       working-directory: ./doc/
       run: |
+        # It shaves about 1min40s to preinstall from the .lst so do it first
         mpm --verbose --admin --require=@energyplus_packages_windows.lst
-
-# For quick debugging this could be useful, but note that it does not exhibit the main memory size exceeded error
-#   - name: Build Test package - Pass Number 1
-#     shell: bash
-#     working-directory: ./doc/test/
-#     run: |
-#       xelatex dependencies.tex
-#       nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
-#       [ "$nwords" -lt "10" ] && echo "TOC isn't available for pass NO. 1" || echo "TOC IS available for pass NO. 1"
+        cd test/
+        xelatex dependencies.tex
+        nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
+        [ "$nwords" -lt "10" ] && echo "TOC isn't available for pass NO. 1 (as expected)" || echo "TOC IS available for pass NO. 1"
+        xelatex dependencies.tex
+        nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
+        if [ "$nwords" -lt "10" ]; then
+          echo "TOC isn't available for pass NO. 2"
+          exit 1
+        fi;
+        echo "TOC is available for pass NO.2"
 
     - name: Create Build Directory
       run: cmake -E make_directory ./doc/build/
@@ -94,24 +101,16 @@ jobs:
       run: |
         cmake --build . -j 2
 
-    # I made the BuildDOcumentation.cmake throw a FATAL_ERROR already on pass 2 and 3 of xelatex, so this is redundant now
-    # but if you want to just build `--target zPDF_InputOutputReference` and test it here, I'm leaving it as an example
-#    - name: Test InputOutputReference
-#      shell: bash
-#      working-directory: ./doc/build/pdf/
-#      run: |
-#        set -x
-#        pdfinfo InputOutputReference.pdf || true
-#        npages=$(pdfinfo InputOutputReference.pdf | /bin/grep "Pages:" | sed 's/[^0-9]*//')
-#        echo "Found $npages pages in the I/O Ref"
-#        nwords_in_toc=$(pdftotext -f 2 -l 2 InputOutputReference.pdf - | wc -l)
-#        set +x
-#        [ "$npages" -le "2800" ] && (echo "TOC is missing" && exit 1) || echo "Length of PDF appears ok"
-#        [ "$nwords_in_toc" -le "100" ] && (echo "TOC is empty" && exit 1) || echo "TOC appears ok"
-
     - name: Upload entire pdf folder
       if: ${{ always() }}
       uses: actions/upload-artifact@v2
       with:
         name: InputOutputReference
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/
+
+    - name: Upload log folder upon failure
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: Xelatex_Logs_after_all
+        path: C:\Users\runneradmin\AppData\Local\MiKTeX\miktex\log\

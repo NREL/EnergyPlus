@@ -73,7 +73,7 @@ namespace HVACDXHeatPumpSystem {
     // Module containing the DXHeatPumpSystem simulation routines
 
     // MODULE INFORMATION:
-    //       AUTHOR         Brent Griffith (derived from HVACDXSystem.cc by R.Liesen)
+    //       AUTHOR         Brent Griffith (derived by R.Liesen)
     //       DATE WRITTEN   May 2011
     //                      Feb 2013, Bo Shen, Oak Ridge National Lab
     //                      Add Coil:Heating:DX:VariableSpeed
@@ -98,18 +98,18 @@ namespace HVACDXHeatPumpSystem {
     using namespace ScheduleManager;
 
     void SimDXHeatPumpSystem(EnergyPlusData &state,
-                             std::string const &DXHeatPumpSystemName, // Name of DXSystem:Airloop object
-                             bool const FirstHVACIteration,           // True when first HVAC iteration
-                             int const AirLoopNum,                    // Primary air loop number
-                             int &CompIndex,                          // Index to CoilSystem:Heating:DX object
-                             Optional_int_const OAUnitNum,            // If the system is an equipment of OutdoorAirUnit
-                             Optional<Real64 const> OAUCoilOutTemp,   // the coil inlet temperature of OutdoorAirUnit
-                             Optional<Real64> QTotOut                 // the total cooling output of unit
+                             std::string_view DXHeatPumpSystemName, // Name of DXSystem:Airloop object
+                             bool const FirstHVACIteration,         // True when first HVAC iteration
+                             int const AirLoopNum,                  // Primary air loop number
+                             int &CompIndex,                        // Index to CoilSystem:Heating:DX object
+                             Optional_int_const OAUnitNum,          // If the system is an equipment of OutdoorAirUnit
+                             Optional<Real64 const> OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+                             Optional<Real64> QTotOut               // the total cooling output of unit
     )
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith (derived from HVACDXSystem.cc by R.Liesen)
+        //       AUTHOR         Brent Griffith (derived by R.Liesen)
         //       DATE WRITTEN   May 2011
         //                      Feb 2013, Bo Shen, Oak Ridge National Lab
         //                      Add Coil:Heating:DX:VariableSpeed
@@ -145,7 +145,7 @@ namespace HVACDXHeatPumpSystem {
         if (CompIndex == 0) {
             DXSystemNum = UtilityRoutines::FindItemInList(DXHeatPumpSystemName, DXHeatPumpSystem);
             if (DXSystemNum == 0) {
-                ShowFatalError(state, "SimDXHeatPumpSystem: DXUnit not found=" + DXHeatPumpSystemName);
+                ShowFatalError(state, "SimDXHeatPumpSystem: DXUnit not found=" + std::string{DXHeatPumpSystemName});
             }
             CompIndex = DXSystemNum;
         } else {
@@ -242,7 +242,7 @@ namespace HVACDXHeatPumpSystem {
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith (derived from HVACDXSystem.cc by R.Liesen)
+        //       AUTHOR         Brent Griffith (derived by R.Liesen)
         //       DATE WRITTEN   May 2011
         //                      Feb 2013, Bo Shen, Oak Ridge National Lab
         //                      Add Coil:Heating:DX:VariableSpeed
@@ -269,8 +269,8 @@ namespace HVACDXHeatPumpSystem {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        static std::string const RoutineName("GetDXHeatPumpSystemInput: "); // include trailing blank space
-        bool IsNotOK;                                                       // Flag to verify name
+        static constexpr std::string_view RoutineName("GetDXHeatPumpSystemInput: "); // include trailing blank space
+        bool IsNotOK;                                                                // Flag to verify name
         int DXHeatSysNum;
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string Alphas;           // Alpha input items for object
@@ -323,8 +323,8 @@ namespace HVACDXHeatPumpSystem {
                 DXHeatPumpSystem(DXHeatSysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (DXHeatPumpSystem(DXHeatSysNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     state.dataHVACDXHeatPumpSys->ErrorsFound = true;
                 }
             }
@@ -409,7 +409,7 @@ namespace HVACDXHeatPumpSystem {
         } // End of the DX System Loop
 
         if (state.dataHVACDXHeatPumpSys->ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Program terminates.");
         }
 
         for (DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum) {
@@ -418,8 +418,8 @@ namespace HVACDXHeatPumpSystem {
                                 "Coil System Part Load Ratio",
                                 OutputProcessor::Unit::None,
                                 DXHeatPumpSystem(DXHeatSysNum).PartLoadFrac,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 DXHeatPumpSystem(DXHeatSysNum).Name);
         }
 
@@ -446,7 +446,7 @@ namespace HVACDXHeatPumpSystem {
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith (derived from HVACDXSystem.cc by R.Liesen)
+        //       AUTHOR         Brent Griffith (derived by R.Liesen)
         //       DATE WRITTEN   May 2011
         //       RE-ENGINEERED  na
 

@@ -906,6 +906,7 @@ int AssignReverseConstructionNumber(EnergyPlusData &state,
         }
         if (Found) {
             NewConstrNum = Loop;
+            state.dataConstruction->Construct(Loop).IsUsed = true;
             break;
         }
     }

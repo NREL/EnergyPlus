@@ -1971,7 +1971,7 @@ namespace CurveManager {
 
                 // Loop through independent variables in list and add them to the grid
                 for (auto indVar : fields.at("independent_variables")) {
-                    std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name"));
+                    std::string indVarName = UtilityRoutines::MakeUPPERCase(AsString(indVar.at("independent_variable_name")));
                     std::string contextString = "Table:IndependentVariable \"" + indVarName + "\"";
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                     Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
@@ -2109,7 +2109,7 @@ namespace CurveManager {
                 state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Table:Lookup";
                 state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
 
-                std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name"));
+                std::string indVarListName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("independent_variable_list_name")));
 
                 std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveNum).Name + "\"";
                 std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
@@ -2178,9 +2178,10 @@ namespace CurveManager {
                 };
                 NormalizationMethod normalizeMethod = NM_NONE;
                 if (fields.count("normalization_method")) {
-                    if (UtilityRoutines::SameString(fields.at("normalization_method"), "DIVISORONLY")) {
+                    if (UtilityRoutines::SameString(static_cast<const std::string &>(fields.at("normalization_method")), "DIVISORONLY")) {
                         normalizeMethod = NM_DIVISOR_ONLY;
-                    } else if (UtilityRoutines::SameString(fields.at("normalization_method"), "AUTOMATICWITHDIVISOR")) {
+                    } else if (UtilityRoutines::SameString(static_cast<const std::string &>(fields.at("normalization_method")),
+                                                           "AUTOMATICWITHDIVISOR")) {
                         normalizeMethod = NM_AUTO_WITH_DIVISOR;
                     }
                 }
@@ -2432,8 +2433,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput1,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 2:
@@ -2441,8 +2442,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput2,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 3:
@@ -2450,8 +2451,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput3,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 4:
@@ -2459,8 +2460,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput4,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 5:
@@ -2468,8 +2469,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput5,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 6:
@@ -2477,8 +2478,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput6,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 default:
@@ -2491,8 +2492,8 @@ namespace CurveManager {
                                 "Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
                                 state.dataCurveManager->PerfCurve(CurveIndex).CurveOutput,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataCurveManager->PerfCurve(CurveIndex).Name);
         }
 
@@ -2501,29 +2502,29 @@ namespace CurveManager {
                                 "Performance Curve Input Variable 1 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput1,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 2 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput2,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 3 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput3,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
             SetupOutputVariable(state,
                                 "Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveOutput,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
         }
 
@@ -2803,10 +2804,10 @@ namespace CurveManager {
     bool CheckCurveDims(EnergyPlusData &state,
                         int const CurveIndex,
                         std::vector<int> validDims,
-                        std::string_view routineName,
-                        const std::string &objectType,
-                        const std::string &objectName,
-                        const std::string &curveFieldText)
+                        const std::string_view routineName,
+                        std::string_view objectType,
+                        std::string_view objectName,
+                        std::string_view curveFieldText)
     {
         // Returns true if errors found
         int curveDim = state.dataCurveManager->PerfCurve(CurveIndex).NumDims;
@@ -2816,7 +2817,7 @@ namespace CurveManager {
         } else {
             // Not compatible
             ShowSevereError(state, fmt::format("{}{}=\"{}\"", routineName, objectType, objectName));
-            ShowContinueError(state, "...Invalid curve for " + curveFieldText + ".");
+            ShowContinueError(state, "...Invalid curve for " + std::string{curveFieldText} + ".");
             std::string validString = fmt::to_string(validDims[0]);
             for (std::size_t i = 1; i < validDims.size(); i++) {
                 validString += format(" or {}", validDims[i]);

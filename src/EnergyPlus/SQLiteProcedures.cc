@@ -1366,7 +1366,7 @@ void SQLite::adjustReportingHourAndMinutes(int &hour, int &minutes)
     }
 }
 
-void SQLite::parseUnitsAndDescription(const std::string &combinedString, std::string &units, std::string &description)
+void SQLite::parseUnitsAndDescription(std::string_view combinedString, std::string &units, std::string &description)
 {
     std::size_t leftPos = combinedString.find("[");
     std::size_t rightPos = combinedString.find("]");
@@ -1388,7 +1388,7 @@ int SQLite::logicalToInteger(const bool value)
 void SQLite::createSQLiteReportDictionaryRecord(int const reportVariableReportID,
                                                 int const storeTypeIndex,
                                                 std::string const &indexGroup,
-                                                std::string const &keyedValueString,
+                                                std::string_view keyedValueString,
                                                 std::string const &variableName,
                                                 int const indexType,
                                                 std::string const &units,
@@ -1786,10 +1786,10 @@ void SQLite::addSQLiteSystemSizingRecord(std::string const &SysName,      // the
     }
 }
 
-void SQLite::addSQLiteComponentSizingRecord(std::string const &compType, // the type of the component
-                                            std::string const &compName, // the name of the component
-                                            std::string const &varDesc,  // the description of the input variable
-                                            Real64 const varValue        // the value from the sizing calculation
+void SQLite::addSQLiteComponentSizingRecord(std::string_view compType, // the type of the component
+                                            std::string_view compName, // the name of the component
+                                            std::string_view varDesc,  // the description of the input variable
+                                            Real64 const varValue      // the value from the sizing calculation
 )
 {
     if (m_writeOutputToSQLite) {
@@ -1812,13 +1812,8 @@ void SQLite::addSQLiteComponentSizingRecord(std::string const &compType, // the 
     }
 }
 
-void SQLite::createSQLiteDaylightMapTitle(int const mapNum,
-                                          std::string const &mapName,
-                                          std::string const &environmentName,
-                                          int const zone,
-                                          std::string const &refPt1,
-                                          std::string const &refPt2,
-                                          Real64 const zCoord)
+void SQLite::createSQLiteDaylightMapTitle(
+    int const mapNum, std::string const &mapName, std::string const &environmentName, int const zone, std::string const &refPts, Real64 const zCoord)
 {
     if (m_writeOutputToSQLite) {
         // for some reason it is adding extra mapNumbers that are getting UNIQUE constraint ignored.
@@ -1827,9 +1822,8 @@ void SQLite::createSQLiteDaylightMapTitle(int const mapNum,
         sqliteBindText(m_daylightMapTitleInsertStmt, 2, mapName);
         sqliteBindText(m_daylightMapTitleInsertStmt, 3, environmentName);
         sqliteBindForeignKey(m_daylightMapTitleInsertStmt, 4, zone);
-        sqliteBindText(m_daylightMapTitleInsertStmt, 5, refPt1);
-        sqliteBindText(m_daylightMapTitleInsertStmt, 6, refPt2);
-        sqliteBindDouble(m_daylightMapTitleInsertStmt, 7, zCoord);
+        sqliteBindText(m_daylightMapTitleInsertStmt, 5, refPts);
+        sqliteBindDouble(m_daylightMapTitleInsertStmt, 6, zCoord);
 
         sqliteStepCommand(m_daylightMapTitleInsertStmt);
         sqliteResetCommand(m_daylightMapTitleInsertStmt);
@@ -2672,9 +2666,9 @@ int SQLiteProcedures::sqlitePrepareStatement(sqlite3_stmt *&stmt, const std::str
     return rc;
 }
 
-int SQLiteProcedures::sqliteBindText(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, const std::string &textBuffer)
+int SQLiteProcedures::sqliteBindText(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, std::string_view textBuffer)
 {
-    int rc = sqlite3_bind_text(stmt, stmtInsertLocationIndex, textBuffer.c_str(), -1, SQLITE_TRANSIENT);
+    int rc = sqlite3_bind_text(stmt, stmtInsertLocationIndex, textBuffer.data(), textBuffer.size(), SQLITE_TRANSIENT);
     if (rc != SQLITE_OK) {
         *m_errorStream << "SQLite3 message, sqlite3_bind_text failed: " << textBuffer << std::endl;
     }

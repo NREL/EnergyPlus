@@ -1885,7 +1885,7 @@ void ConstructionProps::calculateFinalCoefficients()
 void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const cCounter)
 {
 
-    static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
+    static constexpr fmt::string_view Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
     print(state.files.eio,
           Format_700,
           this->Name,
@@ -1905,10 +1905,10 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
         {
             auto const SELECT_CASE_var(state.dataMaterial->Material(Layer).Group);
             if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::Air) {
-                static constexpr auto Format_702(" Material:Air,{},{:12.4N}\n");
+                static constexpr fmt::string_view Format_702(" Material:Air,{},{:12.4N}\n");
                 print(state.files.eio, Format_702, state.dataMaterial->Material(Layer).Name, state.dataMaterial->Material(Layer).Resistance);
             } else {
-                static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
+                static constexpr fmt::string_view Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
                 print(state.files.eio,
                       Format_701,
                       state.dataMaterial->Material(Layer).Name,
@@ -1923,10 +1923,10 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
 
     for (int I = this->NumCTFTerms; I >= 0; --I) {
         if (I != 0) {
-            static constexpr auto Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
+            static constexpr fmt::string_view Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
             print(state.files.eio, Format_703, I, this->CTFOutside(I), this->CTFCross(I), this->CTFInside(I), this->CTFFlux(I));
         } else {
-            static constexpr auto Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+            static constexpr fmt::string_view Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
             print(state.files.eio, Format_704, I, this->CTFOutside(I), this->CTFCross(I), this->CTFInside(I));
         }
     }
@@ -1934,18 +1934,18 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
     if (this->SourceSinkPresent) {
         // QTFs...
         for (int I = this->NumCTFTerms; I >= 0; --I) {
-            static constexpr auto Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
+            static constexpr fmt::string_view Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
             print(state.files.eio, Format_705, I, this->CTFSourceOut(I), this->CTFSourceIn(I));
         }
         // QTFs for source/sink location temperature calculation...
         for (int I = this->NumCTFTerms; I >= 0; --I) {
-            static constexpr auto Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+            static constexpr fmt::string_view Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
             print(state.files.eio, Format_706, I, this->CTFTSourceOut(I), this->CTFTSourceIn(I), this->CTFTSourceQ(I));
         }
         if (this->TempAfterLayer != 0) {
             // QTFs for user specified interior temperature calculation...
             for (int I = this->NumCTFTerms; I >= 0; --I) {
-                static constexpr auto Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
+                static constexpr fmt::string_view Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
                 print(state.files.eio, Format_707, I, this->CTFTUserOut(I), this->CTFTUserIn(I), this->CTFTUserSource(I));
             }
         }

@@ -1434,58 +1434,62 @@ INTEGER,PARAMETER :: buildSurfNameOff = 1
 INTEGER,PARAMETER :: buildSurfTypeOff = 2
 INTEGER,PARAMETER :: buildSurfConstructionOff = 3
 INTEGER,PARAMETER :: buildSurfZoneOff = 4
-INTEGER,PARAMETER :: buildSurfOutBndCondOff = 5
-INTEGER,PARAMETER :: buildSurfOutBndCondNameOff = 6
-INTEGER,PARAMETER :: buildSurfSunExpOff = 7
-INTEGER,PARAMETER :: buildSurfWindExpOff = 8 !last required field
-INTEGER,PARAMETER :: buildSurfViewGroundOff = 9
-INTEGER,PARAMETER :: buildSurfNumVertOff = 10
-INTEGER,PARAMETER :: buildSurfX1Off = 11
-INTEGER,PARAMETER :: buildSurfY1Off = 12
-INTEGER,PARAMETER :: buildSurfZ1Off = 13
-INTEGER,PARAMETER :: buildSurfLastZVertexOff = 370 !up to 120 vertices
+INTEGER,PARAMETER :: buildSurfSpaceOff = 5
+INTEGER,PARAMETER :: buildSurfOutBndCondOff = 6
+INTEGER,PARAMETER :: buildSurfOutBndCondNameOff = 7
+INTEGER,PARAMETER :: buildSurfSunExpOff = 8
+INTEGER,PARAMETER :: buildSurfWindExpOff = 9 !last required field
+INTEGER,PARAMETER :: buildSurfViewGroundOff = 10
+INTEGER,PARAMETER :: buildSurfNumVertOff = 11
+INTEGER,PARAMETER :: buildSurfX1Off = 12
+INTEGER,PARAMETER :: buildSurfY1Off = 13
+INTEGER,PARAMETER :: buildSurfZ1Off = 14
+INTEGER,PARAMETER :: buildSurfLastZVertexOff = 371 !up to 120 vertices
 
 INTEGER,PARAMETER :: wallDetlNameOff = 1
 INTEGER,PARAMETER :: wallDetlConstructionOff = 2
 INTEGER,PARAMETER :: wallDetlZoneOff = 3
-INTEGER,PARAMETER :: wallDetlOutBndCondOff = 4
-INTEGER,PARAMETER :: wallDetlOutBndCondNameOff = 5
-INTEGER,PARAMETER :: wallDetlSunExpOff = 6
-INTEGER,PARAMETER :: wallDetlWindExpOff = 7 !last required field
-INTEGER,PARAMETER :: wallDetlViewGroundOff = 8
-INTEGER,PARAMETER :: wallDetlNumVertOff = 9
-INTEGER,PARAMETER :: wallDetlX1Off = 10
-INTEGER,PARAMETER :: wallDetlY1Off = 11
-INTEGER,PARAMETER :: wallDetlZ1Off = 12
-INTEGER,PARAMETER :: wallDetlLastZVertexOff = 39 !up to 10 vertices
+INTEGER,PARAMETER :: wallDetlSpaceOff = 4
+INTEGER,PARAMETER :: wallDetlOutBndCondOff = 5
+INTEGER,PARAMETER :: wallDetlOutBndCondNameOff = 6
+INTEGER,PARAMETER :: wallDetlSunExpOff = 7
+INTEGER,PARAMETER :: wallDetlWindExpOff = 8 !last required field
+INTEGER,PARAMETER :: wallDetlViewGroundOff = 9
+INTEGER,PARAMETER :: wallDetlNumVertOff = 10
+INTEGER,PARAMETER :: wallDetlX1Off = 11
+INTEGER,PARAMETER :: wallDetlY1Off = 12
+INTEGER,PARAMETER :: wallDetlZ1Off = 13
+INTEGER,PARAMETER :: wallDetlLastZVertexOff = 40 !up to 10 vertices
 
 INTEGER,PARAMETER :: rfClDetlNameOff = 1
 INTEGER,PARAMETER :: rfClDetlConstructionOff = 2
 INTEGER,PARAMETER :: rfClDetlZoneOff = 3
-INTEGER,PARAMETER :: rfClDetlOutBndCondOff = 4
-INTEGER,PARAMETER :: rfClDetlOutBndCondNameOff = 5
-INTEGER,PARAMETER :: rfClDetlSunExpOff = 6
-INTEGER,PARAMETER :: rfClDetlWindExpOff = 7 !last required field
-INTEGER,PARAMETER :: rfClDetlViewGroundOff = 8
-INTEGER,PARAMETER :: rfClDetlNumVertOff = 9
-INTEGER,PARAMETER :: rfClDetlX1Off = 10
-INTEGER,PARAMETER :: rfClDetlY1Off = 11
-INTEGER,PARAMETER :: rfClDetlZ1Off = 12
-INTEGER,PARAMETER :: rfClDetlLastZVertexOff = 39 !up to 10 vertices
+INTEGER,PARAMETER :: rfClDetlSpaceOff = 4
+INTEGER,PARAMETER :: rfClDetlOutBndCondOff = 5
+INTEGER,PARAMETER :: rfClDetlOutBndCondNameOff = 6
+INTEGER,PARAMETER :: rfClDetlSunExpOff = 7
+INTEGER,PARAMETER :: rfClDetlWindExpOff = 8 !last required field
+INTEGER,PARAMETER :: rfClDetlViewGroundOff = 9
+INTEGER,PARAMETER :: rfClDetlNumVertOff = 10
+INTEGER,PARAMETER :: rfClDetlX1Off = 11
+INTEGER,PARAMETER :: rfClDetlY1Off = 12
+INTEGER,PARAMETER :: rfClDetlZ1Off = 13
+INTEGER,PARAMETER :: rfClDetlLastZVertexOff = 40 !up to 10 vertices
 
 INTEGER,PARAMETER :: flrDetlNameOff = 1
 INTEGER,PARAMETER :: flrDetlConstructionOff = 2
 INTEGER,PARAMETER :: flrDetlZoneOff = 3
-INTEGER,PARAMETER :: flrDetlOutBndCondOff = 4
-INTEGER,PARAMETER :: flrDetlOutBndCondNameOff = 5
-INTEGER,PARAMETER :: flrDetlSunExpOff = 6
-INTEGER,PARAMETER :: flrDetlWindExpOff = 7 !last required field
-INTEGER,PARAMETER :: flrDetlViewGroundOff = 8
-INTEGER,PARAMETER :: flrDetlNumVertOff = 9
-INTEGER,PARAMETER :: flrDetlX1Off = 10
-INTEGER,PARAMETER :: flrDetlY1Off = 11
-INTEGER,PARAMETER :: flrDetlZ1Off = 12
-INTEGER,PARAMETER :: flrDetlLastZVertexOff = 39 !up to 10 vertices
+INTEGER,PARAMETER :: flrDetlSpaceOff = 4
+INTEGER,PARAMETER :: flrDetlOutBndCondOff = 5
+INTEGER,PARAMETER :: flrDetlOutBndCondNameOff = 6
+INTEGER,PARAMETER :: flrDetlSunExpOff = 7
+INTEGER,PARAMETER :: flrDetlWindExpOff = 8 !last required field
+INTEGER,PARAMETER :: flrDetlViewGroundOff = 9
+INTEGER,PARAMETER :: flrDetlNumVertOff = 10
+INTEGER,PARAMETER :: flrDetlX1Off = 11
+INTEGER,PARAMETER :: flrDetlY1Off = 12
+INTEGER,PARAMETER :: flrDetlZ1Off = 13
+INTEGER,PARAMETER :: flrDetlLastZVertexOff = 40 !up to 10 vertices
 
 INTEGER,PARAMETER :: gndTempSurfJanOff = 1
 INTEGER,PARAMETER :: gndTempSurfFebOff = 2
@@ -2311,10 +2315,10 @@ CALL AddObjToProcess('CoolingTower:VariableSpeed',.FALSE.,          twrvsOutletN
 ! Ground Heat Transfer
 CALL AddObjToProcess('GroundHeatTransfer:Control',.TRUE.,           ghtCtrlNameOff,              ghtCtrlSlabOff,             3)
 IF (doGatherSurfaces) THEN !only gather these surfaces if groundheattransfer has been found.
-  CALL AddObjToProcess('BuildingSurface:Detailed',.TRUE.,             buildSurfWindExpOff,         buildSurfLastZVertexOff,  370)
-  CALL AddObjToProcess('Wall:Detailed',.TRUE.,                        wallDetlWindExpOff,          wallDetlLastZVertexOff,    39)
-  CALL AddObjToProcess('RoofCeiling:Detailed',.TRUE.,                 rfClDetlWindExpOff,          rfClDetlLastZVertexOff,    39)
-  CALL AddObjToProcess('Floor:Detailed',.TRUE.,                       flrDetlWindExpOff,           flrDetlLastZVertexOff,     39)
+  CALL AddObjToProcess('BuildingSurface:Detailed',.TRUE.,             buildSurfWindExpOff,         buildSurfLastZVertexOff,  371)
+  CALL AddObjToProcess('Wall:Detailed',.TRUE.,                        wallDetlWindExpOff,          wallDetlLastZVertexOff,    40)
+  CALL AddObjToProcess('RoofCeiling:Detailed',.TRUE.,                 rfClDetlWindExpOff,          rfClDetlLastZVertexOff,    40)
+  CALL AddObjToProcess('Floor:Detailed',.TRUE.,                       flrDetlWindExpOff,           flrDetlLastZVertexOff,     40)
 END IF
 CALL AddObjToProcess('Site:GroundTemperature:BuildingSurface',.TRUE.,gndTempSurfJanOff,          gndTempSurfDecOff,         12)
 ! Items to echo to basement or slab input files
@@ -11161,8 +11165,7 @@ DO iSys = 1, numCompactSysVAV
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + vsAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + vsAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + vsAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + vsAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !CONTROLLER LIST ~ line 545
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' OA System Controllers')
@@ -12820,8 +12823,7 @@ DO iSys = 1, numCompactSysPVAV
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + pvavsAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + pvavsAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + pvavsAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + pvavsAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !Object ==> AirLoopHVAC:ControllerList
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' OA System Controllers')
@@ -14349,8 +14351,7 @@ DO iSys = 1, numCompactSysUnit
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + usAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + usAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + usAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + usAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + usAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !CONTROLLER LIST
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + usAirHandlerNameOff,' OA System Controllers')
@@ -15279,8 +15280,7 @@ DO iSys = 1, numCompactSysUnitHP
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + usAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + uhpsAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + uhpsAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + uhpsAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + uhpsAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !Object ==> AirLoopHVAC:ControllerList
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' OA System Controllers')
@@ -17813,8 +17813,7 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + usAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + ussAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + ussAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + ussAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + ussAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !Object ==> AirLoopHVAC:ControllerList
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' OA System Controllers')
@@ -18782,7 +18781,6 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjFld('Component Inlet Node Name', base + cvzNameOff,' Reheat Coil HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + cvzNameOff,' Reheat Coil HW Outlet',.TRUE.)
     ELSEIF (reheatCoilType .EQ. ctElectric) THEN
-      CALL AddToObjStr('Hot Water or Steam Inlet Node Name', '')
       CALL AddToObjStr('Reheat Coil Object Type','Coil:Heating:Electric')
       CALL AddToObjFld('Reheat Coil Name', base + cvzNameOff,' Reheat Coil')
       CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}','')
@@ -18803,7 +18801,6 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjFld('Air Outlet Node Name', base + cvzNameOff,' Supply Inlet')
       CALL AddToObjStr('Temperature Setpoint Node Name','',.TRUE.)
     ELSEIF (reheatCoilType .EQ. ctGas) THEN
-      CALL AddToObjStr('Hot Water or Steam Inlet Node Name', '')
       CALL AddToObjStr('Reheat Coil Object Type','Coil:Heating:Fuel')
       CALL AddToObjFld('Reheat Coil Name', base + cvzNameOff,' Reheat Coil')
       CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}','')
@@ -19152,7 +19149,7 @@ DO iSys = 1, numCompactSysConstVol
   CALL AddToObjStr('100% Outdoor Air in Heating','No')
   CALL AddToObjStr('Central Cooling Design Supply Air Humidity Ratio {kg-H2O/kg-air}','0.008')
   CALL AddToObjStr('Central Heating Design Supply Air Humidity Ratio {kg-H2O/kg-air}','0.008')
-  IF (isSupplyMaxRateAutosize) THEN
+  IF (isSupplyFlowRateAutosize) THEN
     CALL AddToObjStr('Cooling Supply Air Flow Rate Method','DesignDay')
     CALL AddToObjStr('Cooling Supply Air Flow Rate {m3/s}','0')
   ELSE
@@ -19513,11 +19510,7 @@ DO iSys = 1, numCompactSysConstVol
     IF (supFanPlacement .EQ. sfpDrawThru) THEN
       CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(airloopOutlet),.TRUE.)
     ELSE
-      CALL AddToObjFld('Setpoint Node or NodeList Name', base + cvsAirHandlerNameOff,' Cooling Setpoint Nodes',.TRUE.)
-      CALL CreateNewObj('NodeList')
-      CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Cooling Setpoint Nodes')
-      CALL AddToObjStr('Node Name 1', TRIM(airloopOutlet))
-      CALL AddToObjStr('Node Name 2', TRIM(coolCoilUnitOutlet),.TRUE.)
+      CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(coolCoilUnitOutlet),.TRUE.)
     END IF
 
     IF ((coolCoilKind .NE. ccNone) .AND. (supFanPlacement .EQ. sfpDrawThru)) THEN
@@ -19535,7 +19528,11 @@ DO iSys = 1, numCompactSysConstVol
       CALL CreateNewObj('SetpointManager:MixedAir')
       CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Economizer Air Temp Manager')
       CALL AddToObjStr('Control Variable','Temperature')
-      CALL AddToObjStr('Reference Setpoint Node Name', TRIM(airloopOutlet))
+      IF  (supFanPlacement .EQ. sfpDrawThru) THEN
+        CALL AddToObjStr('Reference Setpoint Node Name', TRIM(airloopOutlet))
+      ELSE
+        CALL AddToObjStr('Reference Setpoint Node Name', TRIM(coolCoilUnitOutlet))
+      END IF
       CALL AddToObjStr('Fan Inlet Node Name', TRIM(fanInlet))
       CALL AddToObjStr('Fan Outlet Node Name', TRIM(fanOutlet))
       CALL AddToObjFld('Setpoint Node or NodeList Name', base + cvsAirHandlerNameOff,' Mixed Air Outlet',.TRUE.)
@@ -19985,8 +19982,7 @@ DO iSys = 1, numCompactSysConstVol
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + cvsAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + cvsAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + cvsAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + cvsAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !***AirLoopHVAC:ControllerList
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' OA System Controllers')
@@ -22189,8 +22185,7 @@ DO iSys = 1, numCompactSysDualDuct
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + ddsAirHandlerNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + ddsAirHandlerNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + ddsAirHandlerNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + ddsAirHandlerNameOff,' OA System Equipment',.TRUE.)
   !CONTROLLER LIST ~ line 545
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' OA System Controllers')
@@ -32593,8 +32588,7 @@ DO iSys = 1, numCompactDedOutAir
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem')
   CALL AddToObjFld('Name', base + doasNameOff,' OA System')
   CALL AddToObjFld('Controller List Name', base + doasNameOff,' OA System Controllers')
-  CALL AddToObjFld('Outdoor Air Equipment List Name', base + doasNameOff,' OA System Equipment')
-  CALL AddToObjFld('Availability Manager List Name', base + doasNameOff,' Availability Managers',.TRUE.)
+  CALL AddToObjFld('Outdoor Air Equipment List Name', base + doasNameOff,' OA System Equipment',.TRUE.)
   !***AirLoopHVAC:ControllerList
   CALL CreateNewObj('AirLoopHVAC:ControllerList')
   CALL AddToObjFld('Name', base + doasNameOff,' OA System Controllers')
@@ -33102,6 +33096,7 @@ DO iSurface = 1, numSurfBldgDetl
   CALL AddToObjFld('Surface Type', base + buildSurfTypeOff,'')
   CALL AddToObjFld('Construction Name', base + buildSurfConstructionOff,'')
   CALL AddToObjFld('Zone Name', base + buildSurfZoneOff,'')
+  CALL AddToObjFld('Space Name', base + buildSurfSpaceOff,'')
   outBndCond = FldVal(base + buildSurfOutBndCondOff)
   IF (SameString(outBndCond,'GroundSlabPreprocessorAverage')) THEN
     CALL AddToObjStr('Outside Boundary Condition', 'OtherSideCoefficients')
@@ -33164,6 +33159,7 @@ DO iSurface = 1, numSurfWallDetl
   CALL AddToObjFld('Name', base + wallDetlNameOff,'')
   CALL AddToObjFld('Construction Name', base + wallDetlConstructionOff,'')
   CALL AddToObjFld('Zone Name', base + wallDetlZoneOff,'')
+  CALL AddToObjFld('Space Name', base + wallDetlSpaceOff,'')
   outBndCond = FldVal(base + wallDetlOutBndCondOff)
   IF (SameString(outBndCond,'GroundSlabPreprocessorAverage')) THEN
     CALL AddToObjStr('Outside Boundary Condition', 'OtherSideCoefficients')
@@ -33226,6 +33222,7 @@ DO iSurface = 1, numSurfRfClDetl
   CALL AddToObjFld('Name', base + rfClDetlNameOff,'')
   CALL AddToObjFld('Construction Name', base + rfClDetlConstructionOff,'')
   CALL AddToObjFld('Zone Name', base + rfClDetlZoneOff,'')
+  CALL AddToObjFld('Space Name', base + rfClDetlSpaceOff,'')
   outBndCond = FldVal(base + rfClDetlOutBndCondOff)
   IF (SameString(outBndCond,'GroundSlabPreprocessorAverage')) THEN
     CALL AddToObjStr('Outside Boundary Condition', 'OtherSideCoefficients')
@@ -33288,6 +33285,7 @@ DO iSurface = 1, numSurfFlrDetl
   CALL AddToObjFld('Name', base + flrDetlNameOff,'')
   CALL AddToObjFld('Construction Name', base + flrDetlConstructionOff,'')
   CALL AddToObjFld('Zone Name', base + flrDetlZoneOff,'')
+  CALL AddToObjFld('Space Name', base + flrDetlSpaceOff,'')
   outBndCond = FldVal(base + flrDetlOutBndCondOff)
   IF (SameString(outBndCond,'GroundSlabPreprocessorAverage')) THEN
     CALL AddToObjStr('Outside Boundary Condition', 'OtherSideCoefficients')

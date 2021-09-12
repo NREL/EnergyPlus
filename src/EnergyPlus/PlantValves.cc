@@ -235,8 +235,8 @@ namespace PlantValves {
                                 "Tempering Valve Flow Fraction",
                                 OutputProcessor::Unit::None,
                                 state.dataPlantValves->TemperValve(Item).FlowDivFract,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataPlantValves->TemperValve(Item).Name);
         }
 

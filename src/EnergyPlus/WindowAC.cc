@@ -126,7 +126,7 @@ namespace WindowAC {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     void SimWindowAC(EnergyPlusData &state,
-                     std::string const &CompName,   // name of the window AC unit
+                     std::string_view CompName,     // name of the window AC unit
                      int const ZoneNum,             // number of zone being served
                      bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                      Real64 &PowerMet,              // Sensible power supplied by window AC (W)
@@ -158,7 +158,7 @@ namespace WindowAC {
         if (CompIndex == 0) {
             WindACNum = UtilityRoutines::FindItemInList(CompName, state.dataWindowAC->WindAC);
             if (WindACNum == 0) {
-                ShowFatalError(state, "SimWindowAC: Unit not found=" + CompName);
+                ShowFatalError(state, "SimWindowAC: Unit not found=" + std::string{CompName});
             }
             CompIndex = WindACNum;
         } else {
@@ -239,7 +239,7 @@ namespace WindowAC {
         using MixedAir::GetOAMixerNodeNumbers;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetWindowAC: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetWindowAC: "); // include trailing blank space
 
         int WindACIndex; // loop index
         int WindACNum;   // current window AC number
@@ -666,7 +666,8 @@ namespace WindowAC {
 
         if (ErrorsFound) {
             ShowFatalError(state,
-                           RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition causes termination.");
+                           std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject +
+                               " input.  Preceding condition causes termination.");
         }
 
         for (WindACNum = 1; WindACNum <= state.dataWindowAC->NumWindAC; ++WindACNum) {
@@ -675,78 +676,78 @@ namespace WindowAC {
                                 "Zone Window Air Conditioner Total Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWindowAC->WindAC(WindACNum).TotCoolEnergyRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataWindowAC->WindAC(WindACNum).Name);
             SetupOutputVariable(state,
                                 "Zone Window Air Conditioner Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWindowAC->WindAC(WindACNum).TotCoolEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataWindowAC->WindAC(WindACNum).Name);
             SetupOutputVariable(state,
                                 "Zone Window Air Conditioner Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWindowAC->WindAC(WindACNum).SensCoolEnergyRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataWindowAC->WindAC(WindACNum).Name);
             SetupOutputVariable(state,
                                 "Zone Window Air Conditioner Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWindowAC->WindAC(WindACNum).SensCoolEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataWindowAC->WindAC(WindACNum).Name);
             SetupOutputVariable(state,
                                 "Zone Window Air Conditioner Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWindowAC->WindAC(WindACNum).LatCoolEnergyRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataWindowAC->WindAC(WindACNum).Name);
             SetupOutputVariable(state,
                                 "Zone Window Air Conditioner Latent Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWindowAC->WindAC(WindACNum).LatCoolEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataWindowAC->WindAC(WindACNum).Name);
             SetupOutputVariable(state,
                                 "Zone Window Air Conditioner Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataWindowAC->WindAC(WindACNum).ElecPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataWindowAC->WindAC(WindACNum).Name);
             SetupOutputVariable(state,
                                 "Zone Window Air Conditioner Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataWindowAC->WindAC(WindACNum).ElecConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataWindowAC->WindAC(WindACNum).Name);
             SetupOutputVariable(state,
                                 "Zone Window Air Conditioner Fan Part Load Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataWindowAC->WindAC(WindACNum).FanPartLoadRatio,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataWindowAC->WindAC(WindACNum).Name);
             SetupOutputVariable(state,
                                 "Zone Window Air Conditioner Compressor Part Load Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataWindowAC->WindAC(WindACNum).CompPartLoadRatio,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataWindowAC->WindAC(WindACNum).Name);
             SetupOutputVariable(state,
                                 "Zone Window Air Conditioner Fan Availability Status",
                                 OutputProcessor::Unit::None,
                                 state.dataWindowAC->WindAC(WindACNum).AvailStatus,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataWindowAC->WindAC(WindACNum).Name);
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator(state,
@@ -970,7 +971,7 @@ namespace WindowAC {
         using DataHVACGlobals::CoolingCapacitySizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeWindowAC: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("SizeWindowAC: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MaxAirVolFlowDes;  // Autosized maximum air flow for reporting

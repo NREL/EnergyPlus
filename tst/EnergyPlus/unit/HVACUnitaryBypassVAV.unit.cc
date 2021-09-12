@@ -323,6 +323,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
         "  WALL,                    !- Surface Type",
         "  EXTWALL80,               !- Construction Name",
         "  Zone 1,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "  Outdoors,                !- Outside Boundary Condition",
         "  ,                        !- Outside Boundary Condition Object",
         "  SunExposed,              !- Sun Exposure",
@@ -339,6 +340,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
         "  WALL,                    !- Surface Type",
         "  EXTWALL80,               !- Construction Name",
         "  Zone 2,                  !- Zone Name",
+        "    ,                        !- Space Name",
         "  Outdoors,                !- Outside Boundary Condition",
         "  ,                        !- Outside Boundary Condition Object",
         "  SunExposed,              !- Sun Exposure",
@@ -646,16 +648,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     SimulationManager::GetProjectData(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput(*state);
-    HeatBalanceManager::AllocateHeatBalArrays(*state);
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
-    ASSERT_FALSE(ErrorsFound);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     ZoneTempPredictorCorrector::InitZoneAirSetPoints(*state);
     bool simZone = false;

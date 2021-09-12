@@ -61,7 +61,7 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
     state->dataSize->ZoneEqSizing.allocate(1);
-    static std::string const routineName("SystemAirFlowSizingGauntlet");
+    static constexpr std::string_view routineName("SystemAirFlowSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     SystemAirFlowSizer sizer;

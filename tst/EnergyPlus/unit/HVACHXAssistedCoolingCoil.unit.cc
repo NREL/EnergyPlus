@@ -432,8 +432,8 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 1000.0; // heating load
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = 2000.0;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = 1000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputReqToCoolSP = 2000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputReqToHeatSP = 1000.0;
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum).OutputRequiredToDehumidifyingSP = 0.0;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired.allocate(1);
@@ -482,8 +482,8 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -1000.0; // cooling load
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -1000.0;
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToHeatingSP = -2000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputReqToCoolSP = -1000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputReqToHeatSP = -2000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequired(1) =
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToCoolingSP(1) =
@@ -522,14 +522,18 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
     EXPECT_EQ(thisSys->m_DehumidControlType_Num, UnitarySystems::UnitarySys::DehumCtrlType::None);
-    // coil system delta T > 0, cooling coil inlet node = 8, outlet node = 9
-    EXPECT_LT(state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp);
-    // coil delta T > 0, cooling coil inlet node = 8, outlet node = 9
-    EXPECT_LT(state->dataLoopNodes->Node(9).Temp, state->dataLoopNodes->Node(8).Temp);
+    // coil system delta T > 0, coil system inlet node = 8, outlet node = 4
+    int coilSystemInletNode = thisSys->CoolCoilInletNodeNum;
+    int coilSystemOutletNode = thisSys->CoolCoilOutletNodeNum;
+    int coolCoilInletHXSupplyOutlet = UtilityRoutines::FindItemInList("HEAT RECOVERY SUPPLY OUTLET", state->dataLoopNodes->NodeID);
+    int coolCoilOutletHXExhaustInlet = UtilityRoutines::FindItemInList("HEAT RECOVERY EXHUAST INLET NODE", state->dataLoopNodes->NodeID);
+    EXPECT_LT(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(coilSystemInletNode).Temp);
+    // coil delta T > 0, cooling coil inlet node = 6, cooling coil outlet node = 7
+    EXPECT_LT(state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);
     // HX delta T = 0 on supply side
-    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp, state->dataLoopNodes->Node(8).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(coilSystemInletNode).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);
     // HX delta T = 0 on exhaust side
-    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(9).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp);
 
     // Test 2: HX is off, cooling load is met, dehumidification control mode = CoolReheat but no moisture load
     thisSys->m_DehumidControlType_Num = UnitarySystems::UnitarySys::DehumCtrlType::CoolReheat;
@@ -549,14 +553,14 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
     EXPECT_EQ(thisSys->m_DehumidControlType_Num, UnitarySystems::UnitarySys::DehumCtrlType::CoolReheat);
-    // coil system delta T > 0, cooling coil inlet node = 8, outlet node = 9
-    EXPECT_LT(state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp);
-    // coil delta T > 0, cooling coil inlet node = 8, outlet node = 9
-    EXPECT_LT(state->dataLoopNodes->Node(9).Temp, state->dataLoopNodes->Node(8).Temp);
+    // coil system delta T > 0, cooling coil inlet node = 8, outlet node = 4
+    EXPECT_LT(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(coilSystemInletNode).Temp);
+    // coil delta T > 0, cooling coil inlet node = 6, outlet node = 7
+    EXPECT_LT(state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);
     // HX delta T = 0 on supply side
-    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp, state->dataLoopNodes->Node(8).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(coilSystemInletNode).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);
     // HX delta T = 0 on exhaust side
-    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(9).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp);
 
     // Test 3: HX is off, cooling load is met, dehumidification control mode = Multimode but no moisture load
     thisSys->m_DehumidControlType_Num = UnitarySystems::UnitarySys::DehumCtrlType::Multimode;
@@ -576,14 +580,14 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
     EXPECT_EQ(thisSys->m_DehumidControlType_Num, UnitarySystems::UnitarySys::DehumCtrlType::Multimode);
-    // coil system delta T > 0, cooling coil inlet node = 8, outlet node = 9
-    EXPECT_LT(state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp);
-    // coil delta T > 0, cooling coil inlet node = 8, outlet node = 9
-    EXPECT_LT(state->dataLoopNodes->Node(9).Temp, state->dataLoopNodes->Node(8).Temp);
+    // coil system delta T > 0, cooling coil inlet node = 8, outlet node = 4
+    EXPECT_LT(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(coilSystemInletNode).Temp);
+    // coil delta T > 0, cooling coil inlet node = 6, outlet node = 7
+    EXPECT_LT(state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);
     // HX delta T = 0 on supply side
-    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp, state->dataLoopNodes->Node(8).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(coilSystemInletNode).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);
     // HX delta T = 0 on exhaust side
-    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(9).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp);
 
     // Test 4: HX is on, cooling load is met, dehumidification control mode = Multimode and moisture load exists
     thisSys->m_DehumidControlType_Num = UnitarySystems::UnitarySys::DehumCtrlType::Multimode;
@@ -607,14 +611,14 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
     EXPECT_EQ(thisSys->m_DehumidControlType_Num, UnitarySystems::UnitarySys::DehumCtrlType::Multimode);
-    // coil system delta T > 0, cooling coil inlet node = 8, outlet node = 9
-    EXPECT_LT(state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp);
-    // coil delta T > 0, cooling coil inlet node = 8, outlet node = 9
-    EXPECT_LT(state->dataLoopNodes->Node(9).Temp, state->dataLoopNodes->Node(8).Temp);
+    // coil system delta T > 0, cooling coil inlet node = 8, outlet node = 4
+    EXPECT_LT(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp);
+    // coil delta T > 0, cooling coil inlet node = 6, outlet node = 7
+    EXPECT_LT(state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);
     // HX delta T > 0 on supply side
-    EXPECT_GT(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp, state->dataLoopNodes->Node(8).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(coilSystemInletNode).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);
     // HX delta T > 0 on exhaust side
-    EXPECT_GT(state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(9).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp);
 
     // Test 5: HX is off, cooling load is met, dehumidification control mode = CoolReheat and moisture load exists
     // Latent output with HX off is greater than the moisture load so HX did not turn on
@@ -636,14 +640,14 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
     EXPECT_EQ(thisSys->m_DehumidControlType_Num, UnitarySystems::UnitarySys::DehumCtrlType::CoolReheat);
-    // coil system delta T > 0, cooling coil inlet node = 8, outlet node = 9
-    EXPECT_LT(state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp);
-    // coil delta T > 0, cooling coil inlet node = 8, outlet node = 9
-    EXPECT_LT(state->dataLoopNodes->Node(9).Temp, state->dataLoopNodes->Node(8).Temp);
+    // coil system delta T > 0, cooling coil inlet node = 8, outlet node = 4
+    EXPECT_LT(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp);
+    // coil delta T > 0, cooling coil inlet node = 6, outlet node = 7
+    EXPECT_LT(state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);
     // HX delta T = 0 on supply side
-    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp, state->dataLoopNodes->Node(8).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(coilSystemInletNode).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);
     // HX delta T = 0 on exhaust side
-    EXPECT_EQ(state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(9).Temp);
+    EXPECT_EQ(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp);
 
     // Test 6: HX is on, cooling load is met, dehumidification control mode = CoolReheat and moisture load exists
     // Adjust moisture load to be greater than the latent capacity to meet the sensible load
@@ -666,12 +670,12 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     EXPECT_NEAR(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired, Qsens_sys, 1.0); // Watts
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
     EXPECT_EQ(thisSys->m_DehumidControlType_Num, UnitarySystems::UnitarySys::DehumCtrlType::CoolReheat);
-    // coil system delta T > 0, cooling coil inlet node = 8, outlet node = 9
-    EXPECT_LT(state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp);
-    // coil delta T > 0, cooling coil inlet node = 8, outlet node = 9
-    EXPECT_LT(state->dataLoopNodes->Node(9).Temp, state->dataLoopNodes->Node(8).Temp);
+    // coil system delta T > 0, cooling coil inlet node = 8, outlet node = 4
+    EXPECT_LT(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp);
+    // coil delta T > 0, cooling coil inlet node = 6, outlet node = 7
+    EXPECT_LT(state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);
     // HX delta T > 0 on supply side
-    EXPECT_GT(state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).Temp, state->dataLoopNodes->Node(8).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(coilSystemInletNode).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);
     // HX delta T > 0 on exhaust side
-    EXPECT_GT(state->dataLoopNodes->Node(thisSys->CoolCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(9).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp);
 }

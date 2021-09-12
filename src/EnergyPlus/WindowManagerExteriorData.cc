@@ -76,7 +76,7 @@ namespace WindowManager {
         return (DotProd > 0);
     }
 
-    std::pair<Real64, Real64> getWCECoordinates(EnergyPlusData &state, int const t_SurfNum, Vector const &t_Ray, const BSDFHemisphere t_Direction)
+    std::pair<Real64, Real64> getWCECoordinates(EnergyPlusData &state, int const t_SurfNum, Vector const &t_Ray, const BSDFDirection t_Direction)
     {
         Real64 Theta = 0;
         Real64 Phi = 0;
@@ -87,7 +87,7 @@ namespace WindowManager {
 
         int RadType = state.dataWindowComplexManager->Front_Incident;
 
-        if (t_Direction == BSDFHemisphere::Outgoing) {
+        if (t_Direction == BSDFDirection::Outgoing) {
             RadType = state.dataWindowComplexManager->Back_Incident;
         }
 
@@ -100,7 +100,7 @@ namespace WindowManager {
         return std::make_pair(Theta, Phi);
     }
 
-    std::pair<Real64, Real64> getSunWCEAngles(EnergyPlusData &state, const int t_SurfNum, const BSDFHemisphere t_Direction)
+    std::pair<Real64, Real64> getSunWCEAngles(EnergyPlusData &state, const int t_SurfNum, const BSDFDirection t_Direction)
     {
         return getWCECoordinates(
             state, t_SurfNum, state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay), t_Direction);
@@ -109,40 +109,42 @@ namespace WindowManager {
     ///////////////////////////////////////////////////////////////////////////////
     //       CWCESpecturmProperties
     ///////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSeries> CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(EnergyPlusData &state)
+    CSeries CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   September 2016
         //       MODIFIED       na
-        //       RE-ENGINEERED  na
+        //       RE-ENGINEERED
+        //          April 2021: returning CSeries instead of pointer to CSeries
 
         // PURPOSE OF THIS SUBROUTINE:
         // Handles solar radiation spetrum from defalut location or IDF
-        std::shared_ptr<CSeries> solarRadiation = std::make_shared<CSeries>();
+        CSeries solarRadiation;
 
         for (auto i = 1; i <= state.dataWindowManager->nume; ++i) {
-            solarRadiation->addProperty(state.dataWindowManager->wle(i), state.dataWindowManager->e(i));
+            solarRadiation.addProperty(state.dataWindowManager->wle(i), state.dataWindowManager->e(i));
         }
 
         return solarRadiation;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSeries> CWCESpecturmProperties::getDefaultVisiblePhotopicResponse(EnergyPlusData &state)
+    CSeries CWCESpecturmProperties::getDefaultVisiblePhotopicResponse(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   September 2016
         //       MODIFIED       na
-        //       RE-ENGINEERED  na
+        //       RE-ENGINEERED
+        //          April 2021: Function now returns CSeries instead of pointer to CSeries
 
         // PURPOSE OF THIS SUBROUTINE:
         // Handles solar radiation spetrum from defalut location or IDF
-        std::shared_ptr<CSeries> visibleResponse = std::make_shared<CSeries>();
+        CSeries visibleResponse;
 
         for (auto i = 1; i <= state.dataWindowManager->numt3; ++i) {
-            visibleResponse->addProperty(state.dataWindowManager->wlt3(i), state.dataWindowManager->y30(i));
+            visibleResponse.addProperty(state.dataWindowManager->wlt3(i), state.dataWindowManager->y30(i));
         }
 
         return visibleResponse;
@@ -219,8 +221,7 @@ namespace WindowManager {
         m_Layers[WavelengthRange::Visible] = Layers_Map();
     }
 
-    void
-    CWindowConstructionsSimplified::pushLayer(WavelengthRange const t_Range, int const t_ConstrNum, std::shared_ptr<CScatteringLayer> const &t_Layer)
+    void CWindowConstructionsSimplified::pushLayer(WavelengthRange const t_Range, int const t_ConstrNum, const CScatteringLayer &t_Layer)
     {
         Layers_Map &aMap = m_Layers.at(t_Range);
         const auto it = aMap.find(t_ConstrNum);
@@ -243,7 +244,7 @@ namespace WindowManager {
                 aEqLayer->addLayer(iguLayers[i]);
             }
 
-            std::shared_ptr<CSeries> aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(state);
+            auto aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(state);
             aEqLayer->setSourceData(aSolarSpectrum);
             m_Equivalent[std::make_pair(t_Range, t_ConstrNum)] = aEqLayer;
         }

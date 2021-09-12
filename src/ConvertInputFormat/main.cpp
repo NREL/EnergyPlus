@@ -109,6 +109,124 @@ bool checkVersionMatch(json const &epJSON)
     return true;
 }
 
+bool checkForUnsupportedObjects(json const &epJSON, bool convertHVACTemplate)
+{
+    bool errorsFound = false;
+    constexpr std::array<std::string_view, 32> hvacTemplateObjects = {"HVACTemplate:Thermostat",
+                                                                      "HVACTemplate:Zone:IdealLoadsAirSystem",
+                                                                      "HVACTemplate:Zone:BaseboardHeat",
+                                                                      "HVACTemplate:Zone:FanCoil",
+                                                                      "HVACTemplate:Zone:PTAC",
+                                                                      "HVACTemplate:Zone:PTHP",
+                                                                      "HVACTemplate:Zone:WaterToAirHeatPump",
+                                                                      "HVACTemplate:Zone:VRF",
+                                                                      "HVACTemplate:Zone:Unitary",
+                                                                      "HVACTemplate:Zone:VAV",
+                                                                      "HVACTemplate:Zone:VAV:FanPowered",
+                                                                      "HVACTemplate:Zone:VAV:HeatAndCool",
+                                                                      "HVACTemplate:Zone:ConstantVolume",
+                                                                      "HVACTemplate:Zone:DualDuct",
+                                                                      "HVACTemplate:System:VRF",
+                                                                      "HVACTemplate:System:Unitary",
+                                                                      "HVACTemplate:System:UnitaryHeatPump:AirToAir",
+                                                                      "HVACTemplate:System:UnitarySystem",
+                                                                      "HVACTemplate:System:VAV",
+                                                                      "HVACTemplate:System:PackagedVAV",
+                                                                      "HVACTemplate:System:ConstantVolume",
+                                                                      "HVACTemplate:System:DualDuct",
+                                                                      "HVACTemplate:System:DedicatedOutdoorAir",
+                                                                      "HVACTemplate:Plant:ChilledWaterLoop",
+                                                                      "HVACTemplate:Plant:Chiller",
+                                                                      "HVACTemplate:Plant:Chiller:ObjectReference",
+                                                                      "HVACTemplate:Plant:Tower",
+                                                                      "HVACTemplate:Plant:Tower:ObjectReference",
+                                                                      "HVACTemplate:Plant:HotWaterLoop",
+                                                                      "HVACTemplate:Plant:Boiler",
+                                                                      "HVACTemplate:Plant:Boiler:ObjectReference",
+                                                                      "HVACTemplate:Plant:MixedWaterLoop"};
+
+    bool objectFound = false;
+    std::string objectType;
+
+    // For ConvertInputFormat, skip this unless -n option is present to not allow conversion of HVACTemplate objects
+    if (!convertHVACTemplate) {
+        for (size_t count = 0; count < hvacTemplateObjects.size(); ++count) {
+            objectType = hvacTemplateObjects[count];
+            auto it = epJSON.find(objectType);
+            if (it != epJSON.end()) {
+                objectFound = true;
+                break;
+            }
+        }
+        if (objectFound) {
+            displayMessage("HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.");
+            displayMessage("You must run the ExpandObjects program on this input.");
+            errorsFound = true;
+        }
+    }
+
+    constexpr std::array<std::string_view, 26> groundHTObjects = {"GroundHeatTransfer:Control",
+                                                                  "GroundHeatTransfer:Slab:Materials",
+                                                                  "GroundHeatTransfer:Slab:MatlProps",
+                                                                  "GroundHeatTransfer:Slab:BoundConds",
+                                                                  "GroundHeatTransfer:Slab:BldgProps",
+                                                                  "GroundHeatTransfer:Slab:Insulation",
+                                                                  "GroundHeatTransfer:Slab:EquivalentSlab",
+                                                                  "GroundHeatTransfer:Slab:AutoGrid",
+                                                                  "GroundHeatTransfer:Slab:ManualGrid",
+                                                                  "GroundHeatTransfer:Slab:XFACE",
+                                                                  "GroundHeatTransfer:Slab:YFACE",
+                                                                  "GroundHeatTransfer:Slab:ZFACE",
+                                                                  "GroundHeatTransfer:Basement:SimParameters",
+                                                                  "GroundHeatTransfer:Basement:MatlProps",
+                                                                  "GroundHeatTransfer:Basement:Insulation",
+                                                                  "GroundHeatTransfer:Basement:SurfaceProps",
+                                                                  "GroundHeatTransfer:Basement:BldgData",
+                                                                  "GroundHeatTransfer:Basement:Interior",
+                                                                  "GroundHeatTransfer:Basement:ComBldg",
+                                                                  "GroundHeatTransfer:Basement:EquivSlab",
+                                                                  "GroundHeatTransfer:Basement:EquivAutoGrid",
+                                                                  "GroundHeatTransfer:Basement:AutoGrid",
+                                                                  "GroundHeatTransfer:Basement:ManualGrid",
+                                                                  "GroundHeatTransfer:Basement:XFACE",
+                                                                  "GroundHeatTransfer:Basement:YFACE",
+                                                                  "GroundHeatTransfer:Basement:ZFACE"};
+
+    objectFound = false;
+    for (size_t count = 0; count < groundHTObjects.size(); ++count) {
+        objectType = groundHTObjects[count];
+        auto it = epJSON.find(objectType);
+        if (it != epJSON.end()) {
+            objectFound = true;
+            break;
+        }
+    }
+    if (objectFound) {
+        displayMessage("GroundHeatTransfer:* objects found. These objects are not supported directly by EnergyPlus.");
+        displayMessage("You must run the ExpandObjects program on this input.");
+        errorsFound = true;
+    }
+
+    constexpr std::array<std::string_view, 4> parametricObjects = {
+        "Parametric:SetValueForRun", "Parametric:Logic", "Parametric:RunControl", "Parametric:FileNameSuffix"};
+
+    objectFound = false;
+    for (size_t count = 0; count < parametricObjects.size(); ++count) {
+        objectType = parametricObjects[count];
+        auto it = epJSON.find(objectType);
+        if (it != epJSON.end()) {
+            objectFound = true;
+            break;
+        }
+    }
+    if (objectFound) {
+        displayMessage("Parametric:* objects found. These objects are not supported directly by EnergyPlus.");
+        displayMessage("You must run the ParametricPreprocesor program on this input.");
+        errorsFound = true;
+    }
+    return errorsFound;
+}
+
 bool processErrors(std::unique_ptr<IdfParser> const &idf_parser, std::unique_ptr<Validation> const &validation)
 {
     auto const idf_parser_errors = idf_parser->errors();
@@ -147,7 +265,12 @@ void cleanEPJSON(json &epjson)
     }
 }
 
-bool processInput(std::string const &inputFilePath, json const &schema, OutputTypes outputType, fs::path outputDirPath, std::string &outputTypeStr)
+bool processInput(std::string const &inputFilePath,
+                  json const &schema,
+                  OutputTypes outputType,
+                  fs::path outputDirPath,
+                  std::string &outputTypeStr,
+                  bool convertHVACTemplate)
 {
     auto validation(std::unique_ptr<Validation>(new Validation(&schema)));
     auto idf_parser(std::unique_ptr<IdfParser>(new IdfParser()));
@@ -220,18 +343,12 @@ bool processInput(std::string const &inputFilePath, json const &schema, OutputTy
         return false;
     }
 
-#ifdef _WIN32
-    std::string const NL("\r\n"); // Platform newline
-#else
-    std::string const NL("\n"); // Platform newline
-#endif
-
     try {
         if (!isEpJSON) {
             std::string input_file;
             std::string line;
             while (std::getline(input_stream, line)) {
-                input_file.append(line + NL);
+                input_file.append(line + "\n");
             }
             if (input_file.empty()) {
                 displayMessage("Failed to read input file: " + inputFilePath);
@@ -261,8 +378,9 @@ bool processInput(std::string const &inputFilePath, json const &schema, OutputTy
     bool is_valid = validation->validate(epJSON);
     bool hasErrors = processErrors(idf_parser, validation);
     bool versionMatch = checkVersionMatch(epJSON);
+    bool unsupportedFound = checkForUnsupportedObjects(epJSON, convertHVACTemplate);
 
-    if (!is_valid || hasErrors) {
+    if (!is_valid || hasErrors || unsupportedFound) {
         displayMessage("Errors occurred when validating input file. Preceding condition(s) cause termination.");
         return false;
     }
@@ -277,14 +395,14 @@ bool processInput(std::string const &inputFilePath, json const &schema, OutputTy
         auto const input_file = idf_parser->encode(epJSON, schema);
         fs::path convertedEpJSON =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".idf"));
-        std::ofstream convertedFS(convertedEpJSON, std::ofstream::out | std::ofstream::binary);
+        std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
         convertedFS << input_file << std::endl;
         outputTypeStr = "IDF";
     } else if ((outputType == OutputTypes::Default || outputType == OutputTypes::epJSON) && !isEpJSON) {
         auto const input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
         fs::path convertedIDF =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".epJSON"));
-        std::ofstream convertedFS(convertedIDF, std::ofstream::out | std::ofstream::binary);
+        std::ofstream convertedFS(convertedIDF, std::ofstream::out);
         convertedFS << input_file << std::endl;
         outputTypeStr = "EPJSON";
     } else if (outputType == OutputTypes::CBOR) {
@@ -377,6 +495,15 @@ int main(int argc, const char *argv[])
             "--format",                                                        // Flag token.
             outputTypeValidation);
 
+    opt.add("",                                     // Default.
+            0,                                      // Required?
+            0,                                      // Number of args expected.
+            0,                                      // Delimiter if expecting multiple args.
+            "Do not convert HVACTemplate objects.", // Help description.
+            "-n",                                   // Flag token.
+            "--noHVACTemplate"                      // Flag token.
+    );
+
     opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
 
     opt.add("",                            // Default.
@@ -428,6 +555,11 @@ int main(int argc, const char *argv[])
         std::string input_paths_file;
         opt.get("-i")->getString(input_paths_file);
         files = parse_input_paths(input_paths_file);
+    }
+
+    bool convertHVACTemplate = true;
+    if (opt.isSet("-n")) {
+        convertHVACTemplate = false;
     }
 
     std::string outputTypeStr;
@@ -504,11 +636,11 @@ int main(int argc, const char *argv[])
 #endif
 
 #ifdef _OPENMP
-#pragma omp parallel default(none) shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory)
+#pragma omp parallel default(none) shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory, convertHVACTemplate)
     {
 #pragma omp for
         for (int i = 0; i < number_files; ++i) {
-            bool successful = processInput(files[i], schema, outputType, output_directory, outputTypeStr);
+            bool successful = processInput(files[i], schema, outputType, output_directory, outputTypeStr, convertHVACTemplate);
 #pragma omp atomic
             ++fileCount;
             if (successful) {
@@ -520,7 +652,7 @@ int main(int argc, const char *argv[])
     }
 #else
     for (auto const &file : files) {
-        bool successful = processInput(file, schema, outputType, output_directory, outputTypeStr);
+        bool successful = processInput(file, schema, outputType, output_directory, outputTypeStr, convertHVACTemplate);
         ++fileCount;
         if (successful) {
             displayMessage("Input file converted to ", outputTypeStr, " successfully | ", fileCount, "/", number_files, " | ", file);

@@ -98,14 +98,14 @@ namespace WindowManager {
         return aFactory->getBSDFLayer(state);
     }
 
-    std::shared_ptr<CScatteringLayer>
-    getScatteringLayer(EnergyPlusData &state, const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
+    CScatteringLayer getScatteringLayer(EnergyPlusData &state, const Material::MaterialProperties &t_Material, const WavelengthRange t_Range)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
         //       DATE WRITTEN   May 2017
         //       MODIFIED       na
-        //       RE-ENGINEERED  na
+        //       RE-ENGINEERED
+        //          April 2021: returning CScatteringLayer instead of pointer to it
 
         // PURPOSE OF THIS SUBROUTINE:
         // Scattering will be created in different ways that is based on material type
@@ -315,7 +315,7 @@ namespace WindowManager {
         auto highLambda = aRange.maxLambda();
 
         if (m_Range == WavelengthRange::Visible) {
-            auto aPhotopicResponse = CWCESpecturmProperties::getDefaultVisiblePhotopicResponse(state);
+            const auto aPhotopicResponse = CWCESpecturmProperties::getDefaultVisiblePhotopicResponse(state);
             aSample->setDetectorData(aPhotopicResponse);
         }
 
@@ -530,7 +530,7 @@ namespace WindowManager {
 
     std::shared_ptr<ICellDescription> CWCEDiffuseShadeCellFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state)
     {
-        return std::make_shared<CPerfectDiffuseCellDescription>();
+        return std::make_shared<CFlatCellDescription>();
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -556,21 +556,21 @@ namespace WindowManager {
     {
         if (!m_BSDFInitialized) {
             auto res = init(state);
-            auto aBSDF = std::make_shared<CBSDFHemisphere>(BSDFBasis::Full);
+            const auto aBSDF = CBSDFHemisphere::create(BSDFBasis::Full);
 
-            auto aMaker = CBSDFLayerMaker(res.first, aBSDF, res.second);
+            const auto aMaker = CBSDFLayerMaker(res.first, aBSDF, res.second);
             m_BSDFLayer = aMaker.getLayer();
             m_BSDFInitialized = true;
         }
         return m_BSDFLayer;
     }
 
-    std::shared_ptr<CScatteringLayer> CWCELayerFactory::getLayer(EnergyPlusData &state)
+    CScatteringLayer CWCELayerFactory::getLayer(EnergyPlusData &state)
     {
         if (!m_SimpleInitialized) {
             auto res = init(state);
 
-            m_ScatteringLayer = std::make_shared<CScatteringLayer>(res.first, res.second);
+            m_ScatteringLayer = CScatteringLayer(res.first, res.second);
             m_SimpleInitialized = true;
         }
         return m_ScatteringLayer;

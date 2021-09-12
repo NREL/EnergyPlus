@@ -69,6 +69,22 @@ void SetupZoneInternalGain(EnergyPlusData &state,
                            int RetNodeNum = 0 // for return air heat gains
 );
 
+void SetupSpaceInternalGain(EnergyPlusData &state,
+                            int SpaceNum,
+                            Real64 SpaceGainFraction,            // Fraction of gain value assigned to this space
+                            std::string const &cComponentObject, // object class name for device contributing internal gain
+                            std::string const &cComponentName,   // user unique name for device
+                            int IntGainComp_TypeOfNum,
+                            Real64 *ConvectionGainRate = nullptr, // pointer target for remote convection gain value to be accessed
+                            Real64 *ReturnAirConvectionGainRate = nullptr,
+                            Real64 *ThermalRadiationGainRate = nullptr, // pointer target for remote IR radiation gain value to be accessed
+                            Real64 *LatentGainRate = nullptr,
+                            Real64 *ReturnAirLatentGainRate = nullptr,
+                            Real64 *CarbonDioxideGainRate = nullptr,
+                            Real64 *GenericContamGainRate = nullptr,
+                            int RetNodeNum = 0 // for return air heat gains
+);
+
 struct HeatBalInternalHeatGainsData : BaseGlobalStruct
 {
 

@@ -929,8 +929,20 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
 
     // Simulate air loop component calls SimEvapCooler
     // SimEvapCooler calls InitEvapCooler(EvapCoolNum) and CalcDirectEvapCooler
-    SimAirServingZones::SimAirLoopComponent(
-        *state, EvapCond(EvapCoolNum).EvapCoolerName, SimAirServingZones::CompType::EvapCooler, false, AirLoopNum, EvapCoolNum, 0);
+    // temporary arguments
+    int airLoopNum = 0;
+    int branchNum = 0;
+    int compNum = 0;
+    SimAirServingZones::SimAirLoopComponent(*state,
+                                            EvapCond(EvapCoolNum).EvapCoolerName,
+                                            SimAirServingZones::CompType::EvapCooler,
+                                            false,
+                                            AirLoopNum,
+                                            EvapCoolNum,
+                                            0,
+                                            airLoopNum,
+                                            branchNum,
+                                            compNum);
 
     // air loop FanPLR successfully passed for pump power calculation
     EXPECT_EQ(EvapCond(EvapCoolNum).EvapCoolerPower, 60 * 0.8);

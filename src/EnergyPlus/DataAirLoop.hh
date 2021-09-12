@@ -247,7 +247,7 @@ namespace DataAirLoop {
         Array1D_int OutletNodeNum;   // component outlet node number
         bool HeatExchangerFlag;      // True to have a heat exchanger in the equipment list
         int AirLoopDOASNum;          // AirLoopHVAC:DedicatedOutdoorAirSystem number
-        bool DXCoolingCoilFlag;      // True with DX cooling coil
+        bool DXCoolingCoilFlag;      // True with DX cooling coil, not used
 
         // Default Constructor
         OutsideAirSysProps()

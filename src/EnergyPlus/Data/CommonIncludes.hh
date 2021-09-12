@@ -163,7 +163,6 @@
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACFourPipeBeam.hh>

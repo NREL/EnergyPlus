@@ -412,7 +412,7 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
     //       RE-ENGINEERED  Sept 2010, Brent Griffith, plant rewrite
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("SimDistrictEnergy");
+    static constexpr std::string_view RoutineName("SimDistrictEnergy");
 
     // set inlet and outlet nodes
     int const LoopNum = this->LoopNum;
@@ -496,23 +496,50 @@ void OutsideEnergySourceSpecs::oneTimeInit(EnergyPlusData &state)
                             reportVarPrefix + hotOrChilled + "Water Energy",
                             OutputProcessor::Unit::J,
                             this->EnergyTransfer,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             _,
                             typeName,
                             heatingOrCooling,
                             _,
                             "Plant");
-        SetupOutputVariable(
-            state, reportVarPrefix + hotOrChilled + "Water Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            reportVarPrefix + hotOrChilled + "Water Rate",
+                            OutputProcessor::Unit::W,
+                            this->EnergyRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(state, reportVarPrefix + "Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
-        SetupOutputVariable(state, reportVarPrefix + "Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
-            state, reportVarPrefix + "Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
-            state, reportVarPrefix + "Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            reportVarPrefix + "Rate",
+                            OutputProcessor::Unit::W,
+                            this->EnergyRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            reportVarPrefix + "Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->InletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            reportVarPrefix + "Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->OutletTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            reportVarPrefix + "Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->MassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
     }
 }
 

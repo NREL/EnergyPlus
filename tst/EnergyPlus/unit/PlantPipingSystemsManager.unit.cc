@@ -1779,11 +1779,9 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation)
     PlantPipingSystemsManager::SimulateGroundDomains(*state, false);
 }
 
-/*
- * Asserts that all objects that defined both an inside and an outside diameters have correct input (inside < outside)
- * - PipingSystem:Underground:PipeCircuit
- * - GroundHeatExchanger:HorizontalTrench
- */
+// * Asserts that all objects that defined both an inside and an outside diameters have correct input (inside < outside)
+// * - PipingSystem:Underground:PipeCircuit
+// * - GroundHeatExchanger:HorizontalTrench
 
 TEST_F(EnergyPlusFixture, PipingSystem_Check_Correct_Pipe_Diameters)
 {

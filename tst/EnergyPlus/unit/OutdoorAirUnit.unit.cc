@@ -316,6 +316,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
     state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA = 0.5;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtCoolPeak = 26.66667;

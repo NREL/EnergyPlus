@@ -57,6 +57,7 @@ from ctypes import cdll, c_int, c_char_p, c_void_p, CFUNCTYPE
 from inspect import signature
 from typing import Union, List
 from types import FunctionType
+import os
 
 
 # CFUNCTYPE wrapped Python callbacks need to be kept in memory explicitly, otherwise GC takes it
@@ -95,6 +96,8 @@ class Runtime:
         self.api.stopSimulation.restype = c_void_p
         self.api.setConsoleOutputState.argtypes = [c_void_p, c_int]
         self.api.setConsoleOutputState.restype = c_void_p
+        self.api.setEnergyPlusRootDirectory.argtypes = [c_void_p, c_char_p]
+        self.api.setEnergyPlusRootDirectory.restype = c_void_p
         self.py_progress_callback_type = CFUNCTYPE(c_void_p, c_int)
         self.api.registerProgressCallback.argtypes = [c_void_p, self.py_progress_callback_type]
         self.api.registerProgressCallback.restype = c_void_p
@@ -142,11 +145,33 @@ class Runtime:
         self.api.registerExternalHVACManager.restype = c_void_p
 
     @staticmethod
-    def _check_callback_args(function_to_check, expected_num_args, calling_point_name):
+    def _check_callback_args(function_to_check: FunctionType, expected_num_args: int, calling_point_name: str):
         sig = signature(function_to_check)
         num_args = len(sig.parameters)
         if num_args != expected_num_args:
             raise TypeError(f"Registering function with incorrect arguments, calling point = {calling_point_name} needs {expected_num_args} arguments")
+
+    def _set_energyplus_root_directory(self, state, path: str):
+        """
+        Sets the EnergyPlus install root folder when calling EnergyPlus as a library.
+        When calling the API from Python, this can be done automagically.  Python can find the currently running
+        script, which is how this script finds the E+ DLL.  Because of this, this function is hidden in Python and the
+        client does not need to call this.  When calling directly through the C layer, the client should call the
+        underlying C function directly because C does not provide that same automagic.
+        For a developer perspective, this should be called prior to running EnergyPlus.  When EnergyPlus is run as EXE,
+        it is able to locate auxiliary tools relative to the running binary exe file.  However, when calling as an API,
+        the running binary will not be in the EnergyPlus install, and so EnergyPlus will fail to find those auxiliary
+        tools.  To call these tools when running as a library, the install root must be set using this function.
+        It should be noted that in many workflows, it would be better to just call those auxiliary tools directly from
+        an outside caller, rather than relying on EnergyPlus to do it via command line arguments.
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param path: Path to the EnergyPlus install root, for example "C:\\EnergyPlus-9-5-0".  Because this function is
+                     only called internally, a Python str is required for this argument, and it is encoded into utf-8
+                     bytes before calling the C function to set to the install root inside the running EnergyPlus.
+        :return: Nothing
+        """
+        path = path.encode('utf-8')
+        self.api.setEnergyPlusRootDirectory(state, path)
 
     def run_energyplus(self, state: c_void_p, command_line_args: List[Union[str, bytes]]) -> int:
         """
@@ -164,6 +189,13 @@ class Runtime:
                                   from the EnergyPlus executable.
         :return: An integer exit code from the simulation, zero is success, non-zero is failure
         """
+        # note that we need to set the install root when we call E+ so that E+ can find the auxiliary tools
+        # in Python, we can do this automatically with runtime introspection, the same way we find the E+ DLL itself
+        this_file = os.path.realpath(__file__)  # returns C:\EnergyPlus\pyenergyplus\runtime.py
+        this_script_dir = os.path.dirname(this_file)  # returns C:\EnergyPlus\pyenergyplus
+        eplus_root_dir = os.path.dirname(os.path.normpath(this_script_dir))  # returns C:\EnergyPlus
+        self._set_energyplus_root_directory(state, eplus_root_dir)
+        
         args_with_program_name = [b"energyplus"]  # don't require the program name argument, just add it here
         for cla in command_line_args:
             if isinstance(cla, str):

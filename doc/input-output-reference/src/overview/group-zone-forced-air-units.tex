@@ -586,7 +586,7 @@ The name of a schedule whose values (0.0 to 1.0) are used as multipliers to alte
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-009}
 
-The name of the HVAC system node from which the fan coil unit draws its indoor air. This should be one of zone exhaust nodes for the zone which the fan coil unit is serving.
+The name of the HVAC system node from which the fan coil unit draws its indoor air. This should be either one of zone exhaust nodes (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}) for the zone which the fan coil unit is serving or an induced air outlet node (Ref. \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}) to draw air from a return plenum, when the zone return node is connected to a return plenum.
 
 \paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-008}
 
@@ -1002,7 +1002,7 @@ This field can have one of two meanings depending the type of control selected i
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-1-007}
 
-This field is a node name used to identify the node that serves as the inlet (air side) to the unit ventilator. In a unit ventilator, the air inlet node name must be zone exhaust node name if there is no DOA Mixer, or if the unit ventilator is connected to DOA, then the air inlet node name must be the DOA mixer outlet node name for InletSide mixer connection. In EnergyPlus, nodes represent points between components or at various points in the loops. While a node name may be referenced more than once in an input data file, each node must have a unique name.
+This field is a node name used to identify the node that serves as the inlet (air side) to the unit ventilator. In a unit ventilator, the air inlet node name must be zone exhaust node name if there is no DOA Mixer, or if the unit ventilator is connected to DOA, then the air inlet node name must be the DOA mixer outlet node name for InletSide mixer connection. In EnergyPlus, nodes represent points between components or at various points in the loops. While a node name may be referenced more than once in an input data file, each node must have a unique name. In addition, the air inlet node name can be the name of an induced air outlet node (Ref. \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}) to draw air from a return plenum, when the zone return node is connected to a return plenum.
 
 \paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-1-006}
 
@@ -2164,7 +2164,7 @@ This alpha field defines the name of the schedule (ref: Schedule) that denotes w
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-5-001}
 
-This alpha field defines the name of the HVAC system node from which the air conditioner draws its inlet air. This node name must be the name of a zone air exhaust node (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}).
+This alpha field defines the name of the HVAC system node from which the air conditioner draws its inlet air. This node name must be either the name of a zone air exhaust node (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}) to draw air from a zone directly or the name of an induced air outlet node (Ref. \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}) to draw air from a return plenum, when the zone return node is connected to a return plenum.
 
 \paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-5-001}
 
@@ -2260,7 +2260,7 @@ This alpha field has two choices: \textbf{BlowThrough} or \textbf{DrawThrough}. 
 
 Note: the packaged terminal air conditioner's supply air fan, cooling coil and heating coil must be connected according to the configuration shown above (Figure~\ref{fig:schematic-of-a-packaged-terminal-air-001}) for the draw through fan configuration. The only other valid configuration is with a blow through fan placement, where the fan is located between the outdoor air mixer and the DX cooling coil.
 
-\paragraph{Field: Supply Air Fan Operating Mode Schedule Name}\label{field-supply-air-fan-operating-mode-schedule-name-4}
+\paragraph{Field: Supply Air Fan Operating Mode Schedule Name}\label{field-supply-air-fan-operating-mode-schedule-name-4-b}
 
 This alpha field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.
 
@@ -2509,7 +2509,7 @@ This alpha field defines the name of the schedule (ref: Schedule) that denotes w
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-6-000}
 
-This alpha field defines the name of the HVAC system node from which the heat pump draws its inlet air. This node name must be the name of a zone air exhaust node (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}).
+This alpha field defines the name of the HVAC system node from which the heat pump draws its inlet air. This node name must be either the name of a zone air exhaust node (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections}) to draw air from a zone directly or the name of an induced air outlet node (Ref. \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}) to draw air from a return plenum, when the zone return node is connected to a return plenum.
 
 \paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-6-001}
 

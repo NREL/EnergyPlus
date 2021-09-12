@@ -51,6 +51,9 @@
 // C++ Headers
 #include <memory>
 
+// Windows-CalcEngine headers
+#include <WCESingleLayerOptics.hpp>
+
 // EnergyPlus Headers
 #include <EnergyPlus/Material.hh>
 
@@ -59,32 +62,6 @@ namespace DataHeatBalance {
     struct MaterialProperties;
 }
 } // namespace EnergyPlus
-
-namespace FenestrationCommon {
-
-enum class WavelengthRange;
-enum class Property;
-enum class Side;
-
-} // namespace FenestrationCommon
-
-namespace SpectralAveraging {
-
-class CSpectralSampleData;
-class CSpectralSample;
-class CAngularSpectralSample;
-
-} // namespace SpectralAveraging
-
-namespace SingleLayerOptics {
-
-class CBSDFLayer;
-class CScatteringLayer;
-class ICellDescription;
-class CMaterial;
-class CMaterialSingleBand;
-
-} // namespace SingleLayerOptics
 
 namespace EnergyPlus {
 
@@ -103,7 +80,7 @@ namespace WindowManager {
     std::shared_ptr<SingleLayerOptics::CBSDFLayer>
     getBSDFLayer(EnergyPlusData &state, const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
-    std::shared_ptr<SingleLayerOptics::CScatteringLayer>
+    SingleLayerOptics::CScatteringLayer
     getScatteringLayer(EnergyPlusData &state, const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -261,7 +238,7 @@ namespace WindowManager {
         CWCELayerFactory(const Material::MaterialProperties &t_Material, const FenestrationCommon::WavelengthRange t_Range);
 
         std::shared_ptr<SingleLayerOptics::CBSDFLayer> getBSDFLayer(EnergyPlusData &state);
-        std::shared_ptr<SingleLayerOptics::CScatteringLayer> getLayer(EnergyPlusData &state);
+        SingleLayerOptics::CScatteringLayer getLayer(EnergyPlusData &state);
 
     protected:
         // void init();
@@ -278,7 +255,7 @@ namespace WindowManager {
         std::shared_ptr<CWCEMaterialFactory> m_MaterialFactory;
         std::shared_ptr<IWCECellDescriptionFactory> m_CellFactory;
         std::shared_ptr<SingleLayerOptics::CBSDFLayer> m_BSDFLayer;
-        std::shared_ptr<SingleLayerOptics::CScatteringLayer> m_ScatteringLayer;
+        SingleLayerOptics::CScatteringLayer m_ScatteringLayer;
     };
 
     ///////////////////////////////////////////////////////////////////////////////

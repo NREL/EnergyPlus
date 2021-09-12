@@ -131,7 +131,7 @@ namespace HighTempRadiantSystem {
     // Functions
 
     void SimHighTempRadiantSystem(EnergyPlusData &state,
-                                  std::string const &CompName,   // name of the low temperature radiant system
+                                  std::string_view CompName,     // name of the low temperature radiant system
                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   Real64 &LoadMet,               // load met by the radiant system, in Watts
                                   int &CompIndex)
@@ -169,7 +169,7 @@ namespace HighTempRadiantSystem {
         if (CompIndex == 0) {
             RadSysNum = UtilityRoutines::FindItemInList(CompName, state.dataHighTempRadSys->HighTempRadSys);
             if (RadSysNum == 0) {
-                ShowFatalError(state, "SimHighTempRadiantSystem: Unit not found=" + CompName);
+                ShowFatalError(state, "SimHighTempRadiantSystem: Unit not found=" + std::string{CompName});
             }
             CompIndex = RadSysNum;
         } else {
@@ -628,15 +628,15 @@ namespace HighTempRadiantSystem {
                                 "Zone Radiant HVAC Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataHighTempRadSys->HighTempRadSys(Item).HeatPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataHighTempRadSys->HighTempRadSys(Item).Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataHighTempRadSys->HighTempRadSys(Item).HeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataHighTempRadSys->HighTempRadSys(Item).Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -648,15 +648,15 @@ namespace HighTempRadiantSystem {
                                     "Zone Radiant HVAC NaturalGas Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).GasPower,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).Name);
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC NaturalGas Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).GasEnergy,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).Name,
                                     _,
                                     "NaturalGas",
@@ -668,15 +668,15 @@ namespace HighTempRadiantSystem {
                                     "Zone Radiant HVAC Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).ElecPower,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).Name);
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).ElecEnergy,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Summed,
                                     state.dataHighTempRadSys->HighTempRadSys(Item).Name,
                                     _,
                                     "ELECTRICITY",
