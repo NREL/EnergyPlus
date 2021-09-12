@@ -5570,17 +5570,17 @@ void checkZoneOutdoorAirFlowDesignBalanceForExhaustFan(EnergyPlusData &state)
                 state.dataSize->FinalZoneSizing(coolCtrlZoneNum).ZoneExhaustFanFlow = locZoneExhaustFanFlowRate;
                 state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneExhaustFanFlow = locZoneExhaustFanFlowRate;
 
-                // don't go quietly if making an adjustment, throw warning about taking max here
-                if (locZoneExhaustFanFlowRate > state.dataSize->FinalZoneSizing(coolCtrlZoneNum).MinOA) {
+                // throw warning if exhaust fan flow is larger than 1.1 * MinOA for the zone
+                if (locZoneExhaustFanFlowRate > 1.1 * state.dataSize->FinalZoneSizing(coolCtrlZoneNum).MinOA) {
 
                     ShowWarningError(state,
                                      RoutineName + " Zone Exhaust Fan is starved by minimum ventilation requirements.  Ventilation should "
                                                    "be increased to match that required to balance the exhaust fans in the zone. ");
                     ShowContinueError(state, "Zone name =" + state.dataHeatBal->Zone(coolCtrlZoneNum).Name);
-                    ShowContinueError(state, format("Zone exhaust fan flow for air system design = {:.6R} [m3/s] ", locZoneExhaustFanFlowRate));
-                    ShowContinueError(state,
-                                      format("Minimum ventilation requirement for zone = {:.6R} [m3/s] = ",
-                                             state.dataSize->FinalZoneSizing(coolCtrlZoneNum).MinOA));
+                    ShowContinueError(state, format("Zone exhaust fan flow for air system design = {:.6R} [m3/s]", locZoneExhaustFanFlowRate));
+                    ShowContinueError(
+                        state,
+                        format("Minimum ventilation requirement for zone = {:.6R} [m3/s]", state.dataSize->FinalZoneSizing(coolCtrlZoneNum).MinOA));
                     ShowContinueError(state,
                                       "Input for outdoor air requirements should be increased to larger flow needed for exhaust fan(s).  Check "
                                       "DesignSpecification:OutdoorAir and Fan:ZoneExhaust for this zone.  Simulation continues.");
@@ -5607,15 +5607,14 @@ void checkZoneOutdoorAirFlowDesignBalanceForExhaustFan(EnergyPlusData &state)
                     state.dataSize->FinalZoneSizing(heatCtrlZoneNum).ZoneExhaustFanFlow = locZoneExhaustFanFlowRate;
                     state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneExhaustFanFlow = locZoneExhaustFanFlowRate;
 
-                    // don't go quietly if making an adjustment, throw warning about taking max here
-                    if (locZoneExhaustFanFlowRate > state.dataSize->FinalZoneSizing(heatCtrlZoneNum).MinOA) {
+                    // throw warning if exhaust fan flow is larger than 1.1 * MinOA for the zone
+                    if (locZoneExhaustFanFlowRate > 1.1 * state.dataSize->FinalZoneSizing(heatCtrlZoneNum).MinOA) {
 
                         ShowWarningError(state,
                                          RoutineName + " Zone Exhaust Fan is starved by minimum ventilation requirements.  Ventilation should "
                                                        "be increased to match that required to balance the exhaust fans in the zone. ");
                         ShowContinueError(state, "Zone name =" + state.dataHeatBal->Zone(heatCtrlZoneNum).Name);
-                        ShowContinueError(state,
-                                          format("Zone exhaust fan flow for air system design = {:.6R} [m3/s] =  ", locZoneExhaustFanFlowRate));
+                        ShowContinueError(state, format("Zone exhaust fan flow for air system design = {:.6R} [m3/s]", locZoneExhaustFanFlowRate));
                         ShowContinueError(state,
                                           format("Minimum ventilation requirement for zone = {:.6R} [m3/s]",
                                                  state.dataSize->FinalZoneSizing(heatCtrlZoneNum).MinOA));
