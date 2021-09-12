@@ -144,10 +144,10 @@ namespace CondenserLoopTowers {
             this->calculateTwoSpeedTower(state);
             break;
         case DataPlant::PlantEquipmentType::CoolingTower_VarSpd:
-            this->calculateMerkelVariableSpeedTower(state, CurLoad);
+            this->calculateVariableSpeedTower(state);
             break;
         case DataPlant::PlantEquipmentType::CoolingTower_VarSpdMerkel:
-            this->calculateVariableSpeedTower(state);
+            this->calculateMerkelVariableSpeedTower(state, CurLoad);
             break;
         default:
             ShowFatalError(state, format("Plant Equipment Type specified for {} is not a Cooling Tower.", this->Name));
