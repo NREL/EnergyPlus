@@ -104,7 +104,7 @@ Curve:Cubic,
     -0.6246776637429885,      !- Coefficient4 x3
     0.0,                      !- Minimum Value of x
     1.0,                      !- Maximum Value of x
-    ,                         !- Minimum Curve Output
+    ;                         !- Minimum Curve Output
 
 !- Set of performance curves for ASHRAE901_2019_air_A_gte528kW_2.985COP_4.137IPLV.SI
 
@@ -146,7 +146,7 @@ Curve:Cubic,
     -0.7739499331181423,      !- Coefficient4 x3
     0.0,                      !- Minimum Value of x
     1.0,                      !- Maximum Value of x
-    ,                         !- Minimum Curve Output
+    ;                         !- Minimum Curve Output
 
 !- Set of performance curves for ASHRAE901_2019_air_A_lt150ton_10.1kWpton_13.7IPLV.IP
 
@@ -188,7 +188,7 @@ Curve:Cubic,
     -0.8439853035608315,      !- Coefficient4 x3
     0.0,                      !- Minimum Value of x
     1.0,                      !- Maximum Value of x
-    ,                         !- Minimum Curve Output
+    ;                         !- Minimum Curve Output
 
 !- Set of performance curves for ASHRAE901_2019_air_A_lt528kW_2.985COP_4.048IPLV.SI
 
@@ -230,7 +230,7 @@ Curve:Cubic,
     -0.9136557506047499,      !- Coefficient4 x3
     0.0,                      !- Minimum Value of x
     1.0,                      !- Maximum Value of x
-    ,                         !- Minimum Curve Output
+    ;                         !- Minimum Curve Output
 
 !- Set of performance curves for ASHRAE901_2019_air_B_gte150ton_9.7kWpton_16.1IPLV.IP
 
@@ -272,7 +272,7 @@ Curve:Cubic,
     -0.830217972918539,       !- Coefficient4 x3
     0.0,                      !- Minimum Value of x
     1.0,                      !- Maximum Value of x
-    ,                         !- Minimum Curve Output
+    ;                         !- Minimum Curve Output
 
 !- Set of performance curves for ASHRAE901_2019_air_B_gte528kW_2.866COP_4.758IPLV.SI
 
@@ -314,7 +314,7 @@ Curve:Cubic,
     -0.6903373176376427,      !- Coefficient4 x3
     0.0,                      !- Minimum Value of x
     1.0,                      !- Maximum Value of x
-    ,                         !- Minimum Curve Output
+    ;                         !- Minimum Curve Output
 
 !- Set of performance curves for ASHRAE901_2019_air_B_lt150ton_9.7kWpton_15.8IPLV.IP
 
@@ -356,7 +356,7 @@ Curve:Cubic,
     -0.7990510830858572,      !- Coefficient4 x3
     0.0,                      !- Minimum Value of x
     1.0,                      !- Maximum Value of x
-    ,                         !- Minimum Curve Output
+    ;                         !- Minimum Curve Output
 
 !- Set of performance curves for ASHRAE901_2019_air_B_lt528kW_2.866COP_4.669IPLV.SI
 
@@ -398,7 +398,7 @@ Curve:Cubic,
     -0.7992244286842732,      !- Coefficient4 x3
     0.0,                      !- Minimum Value of x
     1.0,                      !- Maximum Value of x
-    ,                         !- Minimum Curve Output
+    ;                         !- Minimum Curve Output
 
 !- Set of performance curves for ASHRAE901_2019_wtr_A_cent_gte1055lt1407kW_6.286COP_6.77IPLV.SI
 
