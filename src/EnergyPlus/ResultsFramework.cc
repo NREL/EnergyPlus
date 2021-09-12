@@ -534,96 +534,80 @@ namespace ResultsFramework {
                 FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputTSHvacJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
-                    jsonOutputFilePaths.outputTSHvacCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputTSHvacCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
-                    jsonOutputFilePaths.outputTSHvacMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputTSHvacMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Detailed-Zone") {
             if (outputJSON) {
                 FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputTSZoneJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
-                    jsonOutputFilePaths.outputTSZoneCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputTSZoneCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
-                    jsonOutputFilePaths.outputTSZoneMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputTSZoneMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "TimeStep") {
             if (outputJSON) {
                 FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputTSJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
-                    jsonOutputFilePaths.outputTSCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputTSCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
-                    jsonOutputFilePaths.outputTSMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputTSMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Daily") {
             if (outputJSON) {
                 FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputDYJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
-                    jsonOutputFilePaths.outputDYCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputDYCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
-                    jsonOutputFilePaths.outputDYMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputDYMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Hourly") {
             if (outputJSON) {
                 FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputHRJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
-                    jsonOutputFilePaths.outputHRCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputHRCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
-                    jsonOutputFilePaths.outputHRMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputHRMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Monthly") {
             if (outputJSON) {
                 FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputMNJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
-                    jsonOutputFilePaths.outputMNCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputMNCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
-                    jsonOutputFilePaths.outputMNMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputMNMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "RunPeriod") {
             if (outputJSON) {
                 FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputSMJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
-                    jsonOutputFilePaths.outputSMCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputSMCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
-                    jsonOutputFilePaths.outputSMMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputSMMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Yearly") {
             if (outputJSON) {
                 FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputYRJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
-                    jsonOutputFilePaths.outputYRCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputYRCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
-                    jsonOutputFilePaths.outputYRMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputYRMsgPackFilePath, root);
             }
         }
     }
@@ -1547,12 +1531,10 @@ namespace ResultsFramework {
             FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputJsonFilePath, root);
         }
         if (outputCBOR) {
-            FileSystem::writeFile<FileSystem::FileTypes::CBOR>(
-                jsonOutputFilePaths.outputCborFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+            FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputCborFilePath, root);
         }
         if (outputMsgPack) {
-            FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(
-                jsonOutputFilePaths.outputMsgPackFilePath, root, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+            FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputMsgPackFilePath, root);
         }
     }
 

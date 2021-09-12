@@ -233,9 +233,9 @@ namespace FileSystem {
                                           !is_any<T, std::string_view, std::string, char *>::value;
 
     template <FileTypes fileType>
-    void writeFile(fs::path const &filePath, const std::string_view data, std::ios_base::openmode mode = (std::ios_base::out | std::ios_base::trunc))
+    void writeFile(fs::path const &filePath, const std::string_view data)
     {
-        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        static_assert(is_all_json_type(fileType) || is_flat_file_type(fileType), "Must be a valid file type");
 #ifdef _WIN32
         auto filePathStr = filePath.string();
         auto path = filePathStr.c_str();
@@ -243,33 +243,18 @@ namespace FileSystem {
         auto path = filePath.c_str();
 #endif
 
-        bool use_output_file = false;
-        std::string_view fopen_mode;
-        if (mode == std::ios_base::out || mode == (std::ios_base::out | std::ios_base::trunc)) {
-            fopen_mode = "w";
-            use_output_file = true;
-        } else if (mode == std::ios_base::binary) {
-            fopen_mode = "b";
-        } else if (mode == (std::ios_base::out | std::ios_base::binary) ||
-                   mode == (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary)) {
-            fopen_mode = "wb";
-        } else {
-            throw FatalError(fmt::format("ERROR - readFile: Bad openmode argument. Must be std::ios_base::out with optional std::ios_base::trunc "
-                                         "and/or std::ios_base::binary"));
-        }
-
-        if (!use_output_file) {
+        if constexpr (is_json_type(fileType) || is_flat_file_type(fileType)) {
+            auto f = fmt::output_file(path, fmt::buffer_size = (2 << 17));
+            f.print("{}", data);
+        } else if constexpr (is_binary_json_type(fileType)) {
             auto close_file = [](FILE *f) { fclose(f); };
-            auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, fopen_mode.data()), close_file);
+            auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, "wb"), close_file);
             if (!holder) {
                 throw FatalError(fmt::format("Could not open file: {}", path));
             }
 
             auto f = holder.get();
             fmt::print(f, "{}", data);
-        } else {
-            auto f = fmt::output_file(path, fmt::buffer_size = (2 << 17));
-            f.print("{}", data);
         }
     }
 
@@ -300,11 +285,10 @@ namespace FileSystem {
     }
 
     template <FileTypes fileType, class T, typename = std::enable_if_t<enable_json_v<T, fileType>>>
-    void
-    writeFile(fs::path const &filePath, T &data, int const indent = 4, std::ios_base::openmode mode = (std::ios_base::out | std::ios_base::trunc))
+    void writeFile(fs::path const &filePath, T &data, int const indent = 4)
     {
         auto const json_str = getJSON<fileType>(data, indent);
-        writeFile<fileType>(filePath, std::string_view(json_str), mode);
+        writeFile<fileType>(filePath, std::string_view(json_str));
     }
 
     template <FileTypes fileType, class T, typename = std::enable_if_t<enable_json_v<T, fileType>>>

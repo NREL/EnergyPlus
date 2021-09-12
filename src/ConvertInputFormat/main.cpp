@@ -371,23 +371,19 @@ bool processInput(std::string const &inputFilePath,
     } else if (outputType == OutputTypes::CBOR) {
         fs::path convertedCBOR =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".cbor"));
-        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::CBOR>(
-            convertedCBOR, epJSON, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::CBOR>(convertedCBOR, epJSON);
     } else if (outputType == OutputTypes::MsgPack) {
         fs::path convertedMsgPack =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".msgpack"));
-        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::MsgPack>(
-            convertedMsgPack, epJSON, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::MsgPack>(convertedMsgPack, epJSON);
     } else if (outputType == OutputTypes::UBJSON) {
         fs::path convertedUBJSON =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".ubjson"));
-        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::UBJSON>(
-            convertedUBJSON, epJSON, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::UBJSON>(convertedUBJSON, epJSON);
     } else if (outputType == OutputTypes::BSON) {
         fs::path convertedBSON =
             EnergyPlus::FileSystem::makeNativePath(EnergyPlus::FileSystem::replaceFileExtension(fileNameWithoutExtension, ".bson"));
-        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::BSON>(
-            convertedBSON, epJSON, 4, (std::ios_base::out | std::ios_base::trunc | std::ios_base::binary));
+        EnergyPlus::FileSystem::writeFile<EnergyPlus::FileSystem::FileTypes::BSON>(convertedBSON, epJSON);
     } else {
         return false;
     }
