@@ -3043,11 +3043,6 @@ namespace HVACMultiSpeedHeatPump {
         } else if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::CoolingMode) {
             SpeedNum = MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling;
         }
-        if (ceil(SpeedVal) > SpeedNum) {
-            ShowFatalError(state,
-                           "Wrong coil speed EMS override value, for unit=" + MSHeatPump(MSHeatPumpNum).DXCoolCoilName +
-                               ". Exceeding maximum coil speed level.");
-        }
         if (SpeedNum == 1) SpeedRatio = 0.0;
         CalcMSHeatPump(state,
                        MSHeatPumpNum,
@@ -3063,6 +3058,19 @@ namespace HVACMultiSpeedHeatPump {
 
         // Get EMS output
         SpeedNum = ceil(SpeedVal);
+        if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::HeatingMode) {
+            if (SpeedNum > MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating) {
+                ShowFatalError(state,
+                               "Wrong coil speed EMS override value, for unit=" + MSHeatPump(MSHeatPumpNum).DXCoolCoilName +
+                                   ". Exceeding maximum coil speed level.");
+            }
+        } else if (MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::CoolingMode) {
+            if (SpeedNum > MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling) {
+                ShowFatalError(state,
+                               "Wrong coil speed EMS override value, for unit=" + MSHeatPump(MSHeatPumpNum).DXCoolCoilName +
+                                   ". Exceeding maximum coil speed level.");
+            }
+        }
         // Calculate TempOutput
         Real64 TempOutput = 0.0; // unit output when iteration limit exceeded [W]
 

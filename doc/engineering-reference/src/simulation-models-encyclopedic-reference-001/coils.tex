@@ -2604,9 +2604,9 @@ Bin Number j & Bin Temperature Range (\(^{\circ}\)C) & Representative Temperatur
 \multicolumn{4}{l}{Source: AHRI Standard 210-240, 2008; Table 16, Page 94}
 \end{longtable}
 
-\subsubsection{Energy Management System Coil Speed Level Override}\label{energy-management-system-coil-speed-level-override-1}
+\subsubsection{Energy Management System Coil Speed Override}\label{energy-management-system-coil-speed-level-override-1}
 
-The cooling coil speed level could be actuated by EMS to at run-time. When EMS is used to overwrite the “Unitary System DX Coil Speed Level” values, the speed levels are set as the EMS values rather than speed levels determined by the Non-EMS EnergyPlus control logic.
+The cooling coil speed level and cycling/speed ratio could be actuated by EMS to at run-time. When EMS is used to overwrite the “Unitary System DX Coil Speed Value” values, the speed levels are set based on EMS values rather than speed levels determined by the Non-EMS EnergyPlus control logic. The EMS override coil speed value is a continous number below maximum coil speed level allowed. With any EMS override coil speed value, the speed level is calculated as the closest integer greater than or equal to the EMS speed value, and the cycling/speed ratio is set as the floating point part of the EMS speed value. For example, if EMS override coil speed value = 1.2, the speed level number is set as 2 with a speed ratio at 0.2.
 
 \subsubsection{References}\label{references-3-001}
 
@@ -2776,7 +2776,7 @@ The results for EER, COP, and supply air mass flow rate at the part load test po
 
 \subsubsection{Energy Management System Coil Speed Level Override}\label{energy-management-system-coil-speed-level-override-2}
 
-The heating coil speed level could be actuated by EMS to at run-time. When EMS is used to overwrite the “Unitary System DX Coil Speed Level” values, the speed levels are applied to the EMS values rather than the default controlled speed levels.
+The heating coil speed level and cycling/speed ratio could be actuated by EMS to at run-time. When EMS is used to overwrite the “Unitary System DX Coil Speed Value” values, the speed levels are set based on EMS values rather than speed levels determined by the Non-EMS EnergyPlus control logic. The EMS override coil speed value is a continous number below maximum coil speed level allowed. With any EMS override coil speed value, the speed level is calculated as the closest integer greater than or equal to the EMS speed value, and the cycling/speed ratio is set as the floating point part of the EMS speed value. For example, if EMS override coil speed value = 1.2, the speed level number is set as 2 with a speed ratio at 0.2.
 
 \subsubsection{References}\label{references-4-001}
 

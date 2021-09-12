@@ -2021,13 +2021,13 @@
   EnergyManagementSystem:Program,
     CoilSpeedControl,                                                                            !- Name
     IF (ZoneAirTemperature < HeatingSetpoint),                                                   !- Program Line 1
-    SET CoilSpeedOverride = 1.9,                                                                   !- Program Line 2
+    SET CoilSpeedOverride = 1.9,                                                                 !- Program Line 2
     SET CoilSpeedLevelOverrideReport = 1,                                                        !- Program Line 3
     ELSEIF (ZoneAirTemperature < HeatingSetpoint + 0.5),                                         !- Program Line 4
     SET CoilSpeedOverride = 1,                                                                   !- Program Line 5
     SET CoilSpeedLevelOverrideReport = 1,                                                        !- Program Line 6
     ELSEIF (ZoneAirTemperature > CoolingSetpoint + 1),                                           !- Program Line 7
-    SET CoilSpeedOverride = 1.5,                                                                   !- Program Line 8
+    SET CoilSpeedOverride = 1.95,                                                                !- Program Line 8
     SET CoilSpeedLevelOverrideReport = 1,                                                        !- Program Line 9
     ELSEIF (ZoneAirTemperature > CoolingSetpoint),                                               !- Program Line 10
     SET CoilSpeedOverride = 1,                                                                   !- Program Line 11
