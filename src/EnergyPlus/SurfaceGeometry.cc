@@ -15007,7 +15007,7 @@ namespace SurfaceGeometry {
             assert(state.dataViewFactor->NumOfSolarEnclosures <= int(Enclosures.size()));
         }
 
-        // ToDo: For now, set the max and min enclosure numbers for each zone to be used in CalcInteriorRadExchange with ZoneToResimulate
+        // TODO MJW: For now, set the max and min enclosure numbers for each zone to be used in CalcInteriorRadExchange with ZoneToResimulate
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                 if (state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureFirst == -1) { // initial value
@@ -15018,7 +15018,7 @@ namespace SurfaceGeometry {
                 }
                 state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureLast =
                     max(state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureLast, state.dataHeatBal->space(spaceNum).radiantEnclosureNum);
-                // TODO: For daylighting, set the zone solar enclosure number to the first space's number
+                // TODO MJW: For daylighting, set the zone solar enclosure number to the first space's number
                 if (state.dataHeatBal->Zone(zoneNum).zoneFirstSpaceSolEnclosure == 0) {
                     state.dataHeatBal->Zone(zoneNum).zoneFirstSpaceSolEnclosure = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
                 }

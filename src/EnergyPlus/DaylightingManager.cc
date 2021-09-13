@@ -5127,18 +5127,18 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
 
         Real64 sumFracs = sum(daylightControl.FracZoneDaylit);
         if ((1.0 - sumFracs) > FractionTolerance) {
-            ShowWarningError(state, "GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is < 1.0.");
+            ShowWarningError(state, "GetDaylightingControls: Fraction of zone or space controlled by the Daylighting reference points is < 1.0.");
             ShowContinueError(state,
-                              format("..discovered in \"{}\" for Zone=\"{}\", only {:.3R} of the zone is controlled.",
+                              format("..discovered in {}=\"{}\", only {:.3R} of the zone or space is controlled.",
                                      cCurrentModuleObject,
-                                     state.dataIPShortCut->cAlphaArgs(2),
+                                     daylightControl.Name,
                                      sum(daylightControl.FracZoneDaylit)));
         } else if ((sumFracs - 1.0) > FractionTolerance) {
-            ShowSevereError(state, "GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.");
+            ShowSevereError(state, "GetDaylightingControls: Fraction of zone or space controlled by the Daylighting reference points is > 1.0.");
             ShowContinueError(state,
-                              format("..discovered in \"{}\" for Zone=\"{}\", trying to control {:.3R} of the zone.",
+                              format("..discovered in {}=\"{}\", trying to control {:.3R} of the zone or space.",
                                      cCurrentModuleObject,
-                                     state.dataIPShortCut->cAlphaArgs(2),
+                                     daylightControl.Name,
                                      sum(daylightControl.FracZoneDaylit)));
             ErrorsFound = true;
         }
@@ -9800,31 +9800,26 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
     }
 
     state.dataDaylightingData->IllumMap(MapNum).pointsHeader = "";
-    // TODO MJW: Deal with map list of ref points
-    // TODO MJW: For now, there's one daylighting control for a zone use the first one that matches
-    int found = 0;
+    int rCount = 0;
     for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
         if (state.dataDaylightingData->daylightControl(daylightCtrlNum).zoneIndex == state.dataDaylightingData->IllumMap(MapNum).Zone) {
-            found = daylightCtrlNum;
-            break;
-        }
-    }
+            auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
 
-    if (found > 0) {
-        auto &thisDaylightControl = state.dataDaylightingData->daylightControl(found);
-
-        for (R = 1; R <= thisDaylightControl.TotalDaylRefPoints; ++R) {
-            state.dataDaylightingData->IllumMap(MapNum).pointsHeader += format(" RefPt{}=({:.2R}:{:.2R}:{:.2R})",
-                                                                               R,
-                                                                               thisDaylightControl.DaylRefPtAbsCoord(1, R),
-                                                                               thisDaylightControl.DaylRefPtAbsCoord(2, R),
-                                                                               thisDaylightControl.DaylRefPtAbsCoord(3, R));
-            if (R < thisDaylightControl.TotalDaylRefPoints) {
-                state.dataDaylightingData->IllumMap(MapNum).pointsHeader += ",";
+            for (R = 1; R <= thisDaylightControl.TotalDaylRefPoints; ++R) {
+                ++rCount;
+                state.dataDaylightingData->IllumMap(MapNum).pointsHeader += format(" RefPt{}=({:.2R}:{:.2R}:{:.2R}),",
+                                                                                   rCount,
+                                                                                   thisDaylightControl.DaylRefPtAbsCoord(1, R),
+                                                                                   thisDaylightControl.DaylRefPtAbsCoord(2, R),
+                                                                                   thisDaylightControl.DaylRefPtAbsCoord(3, R));
             }
         }
     }
 
+    if (rCount > 0) {
+        // Remove trailing comma
+        state.dataDaylightingData->IllumMap(MapNum).pointsHeader.pop_back();
+    }
     if (EnvrnPrint(MapNum)) {
         WriteDaylightMapTitle(state,
                               MapNum,
@@ -10025,6 +10020,8 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
     // Count number of exterior Windows (use to allocate arrays)
     for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
+        thisEnclDaylight.TotalExtWindows = 0;
+
         // Count exterior windows in this solar enclosure
         for (int const surfNum : state.dataViewFactor->EnclSolInfo(enclNum).SurfacePtr) {
             if ((state.dataSurface->Surface(surfNum).Class == SurfaceClass::Window &&
