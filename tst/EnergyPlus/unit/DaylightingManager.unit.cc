@@ -131,13 +131,14 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
     bool foundErrors = false;
     GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
+    // Need to initialize enclosure num
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
 
     int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
     state->dataViewFactor->NumOfSolarEnclosures = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
-    state->dataHeatBal->Zone(1).zoneFirstSpaceSolEnclosure = 1;
     state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
     GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
@@ -239,10 +240,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
     bool foundErrors = false;
     GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
+    // Need to initialize enclosure num
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
     state->dataViewFactor->NumOfSolarEnclosures = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
-    state->dataHeatBal->Zone(1).zoneFirstSpaceSolEnclosure = 1;
 
     int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     GetInputDayliteRefPt(*state, foundErrors);
@@ -392,10 +394,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
     bool foundErrors = false;
     GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
+    // Need to initialize enclosure num
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
     state->dataViewFactor->NumOfSolarEnclosures = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
-    state->dataHeatBal->Zone(1).zoneFirstSpaceSolEnclosure = 1;
 
     GetInputIlluminanceMap(*state, foundErrors);
     // compare_err_stream(""); // expecting errors because zone is not really defined
@@ -403,7 +406,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
     EXPECT_EQ(1, state->dataDaylightingData->TotIllumMaps);
 
     EXPECT_EQ("MAP1", state->dataDaylightingData->IllumMap(1).Name);
-    EXPECT_EQ(1, state->dataDaylightingData->IllumMap(1).Zone);
+    EXPECT_EQ(1, state->dataDaylightingData->IllumMap(1).zoneIndex);
     EXPECT_EQ(0, state->dataDaylightingData->IllumMap(1).Z);
     EXPECT_EQ(0.1, state->dataDaylightingData->IllumMap(1).Xmin);
     EXPECT_EQ(6.0, state->dataDaylightingData->IllumMap(1).Xmax);
@@ -1030,7 +1033,6 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
     state->dataDaylightingData->enclDaylight.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->enclDaylight(zn).daylightControlIndexes.emplace_back(1);
     state->dataHeatBal->Zone.allocate(zn);
-    state->dataHeatBal->Zone(zn).zoneFirstSpaceSolEnclosure = 1;
 
     CreateShadeDeploymentOrder(*state, zn);
 
@@ -1105,7 +1107,6 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
     state->dataDaylightingData->enclDaylight.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->enclDaylight(zn).daylightControlIndexes.emplace_back(1);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->Zone(zn).zoneFirstSpaceSolEnclosure = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataGlobal->NumOfZones);
 
     CreateShadeDeploymentOrder(*state, zn);
@@ -1596,10 +1597,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     bool foundErrors = false;
     HeatBalanceManager::GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
+    // Need to initialize enclosure num
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
     state->dataViewFactor->NumOfSolarEnclosures = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
-    state->dataHeatBal->Zone(1).zoneFirstSpaceSolEnclosure = 1;
 
     int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
@@ -1712,10 +1714,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotArou
     bool foundErrors = false;
     HeatBalanceManager::GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
+    // Need to initialize enclosure num
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
     state->dataViewFactor->NumOfSolarEnclosures = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
-    state->dataHeatBal->Zone(1).zoneFirstSpaceSolEnclosure = 1;
 
     int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
@@ -1728,8 +1731,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotArou
     DaylightingManager::GetDaylightingControls(*state, foundErrors);
 
     std::string const error_string = delimited_string({
-        "   ** Severe  ** GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.",
-        "   **   ~~~   ** ..discovered in \"Daylighting:Controls\" for Zone=\"WEST ZONE\", trying to control 1.001 of the zone.",
+        "   ** Severe  ** GetDaylightingControls: Fraction of zone or space controlled by the Daylighting reference points is > 1.0.",
+        "   **   ~~~   ** ..discovered in Daylighting:Controls=\"WEST ZONE_DAYLCTRL\", trying to control 1.001 of the zone or space.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_TRUE(foundErrors);
@@ -2169,7 +2172,6 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataViewFactor->NumOfSolarEnclosures = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     state->dataDaylightingData->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);
-    state->dataHeatBal->Zone(1).zoneFirstSpaceSolEnclosure = 1;
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
@@ -2988,7 +2990,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord.allocate(3, state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints);
     state->dataDaylightingManager->SavedMnDy.allocate(state->dataDaylightingData->TotIllumMaps);
     state->dataDaylightingData->IllumMap.allocate(state->dataGlobal->NumOfZones);
-    state->dataDaylightingData->IllumMap(MapNum).Zone = 1;
+    state->dataDaylightingData->IllumMap(MapNum).zoneIndex = 1;
     state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
     state->dataDaylightingData->MapColSep = DataStringGlobals::CharSemicolon;
     state->dataEnvrn->CurMnDyHr = "JAN012001";
