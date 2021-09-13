@@ -1170,20 +1170,10 @@ namespace HeatBalanceIntRadExchange {
                 UtilityRoutines::MakeUPPERCase(fields.at("zone_or_zonelist_or_space_or_spacelist_name").get<std::string>());
             // do not mark object as used here - let GetInputViewFactorsbyName do that
 
-            // Look for matching radiant enclosure name
+            // Look for matching radiant enclosure name (solar enclosures have the same names)
             bool enclMatchFound = false;
             for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
                 auto &thisEnclosure(state.dataViewFactor->EnclRadInfo(enclosureNum));
-                if (UtilityRoutines::SameString(thisSpaceOrSpaceListName, thisEnclosure.Name)) {
-                    // View factor space name matches enclosure name
-                    enclMatchFound = true;
-                    break;
-                }
-            }
-            if (enclMatchFound) continue; // We're done with this instance
-            // Look for matching solar enclosure name
-            for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-                auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclosureNum));
                 if (UtilityRoutines::SameString(thisSpaceOrSpaceListName, thisEnclosure.Name)) {
                     // View factor space name matches enclosure name
                     enclMatchFound = true;
@@ -1275,7 +1265,7 @@ namespace HeatBalanceIntRadExchange {
                         continue; // On to the next enclosure
                     } else {
                         enclMatchFound = true;
-                        // If matching SpaceList or ZoneList or Zone found, set the enclosure names to match
+                        // If matching SpaceList or ZoneList or Zone found, set the radiant and solar enclosure names to match
                         thisEnclosure.Name = thisSpaceOrSpaceListName;
                         state.dataViewFactor->EnclSolInfo(enclosureNum).Name = thisSpaceOrSpaceListName;
                         break; // We're done with radiant enclosures
