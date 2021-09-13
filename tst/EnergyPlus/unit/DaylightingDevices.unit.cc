@@ -90,6 +90,8 @@ TEST_F(EnergyPlusFixture, DaylightingDevices_adjustViewFactorsWithShelfTest)
     state->dataSurface->Surface(2).Vertex.allocate(4);
     state->dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf = 2;
     state->dataDaylightingDevicesData->Shelf(1).Name = "Skywalker";
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(2).Sides = 4;
 
     // Test 1A: Sky and Ground are both negative (shouldn't happen but gotta test it), Shelf <= 1.0
     vfShelfSet = 0.67;

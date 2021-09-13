@@ -1654,17 +1654,17 @@ namespace DaylightingDevices {
 
         // If the flow is still here, there is something that needs to be adjusted so set the maximum shelf height and the minimum window height
         int ShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf;
-        Real64 zShelfMax = -9999.9;
-        Real64 zShelfMin = 9999.9;
-        for (int vertex = 1; vertex <= 4; ++vertex) {
+        Real64 zShelfMax = state.dataSurface->Surface(ShelfSurf).Vertex(1).z;
+        Real64 zShelfMin = zShelfMax;
+        for (int vertex = 2; vertex <= state.dataSurface->Surface(ShelfSurf).Sides; ++vertex) {
             if (state.dataSurface->Surface(ShelfSurf).Vertex(vertex).z > zShelfMax)
                 zShelfMax = state.dataSurface->Surface(ShelfSurf).Vertex(vertex).z;
             if (state.dataSurface->Surface(ShelfSurf).Vertex(vertex).z < zShelfMin)
                 zShelfMin = state.dataSurface->Surface(ShelfSurf).Vertex(vertex).z;
         }
-        Real64 zWinMax = -9999.9;
-        Real64 zWinMin = 9999.9;
-        for (int vertex = 1; vertex <= 4; ++vertex) {
+        Real64 zWinMax = state.dataSurface->Surface(WinSurf).Vertex(1).z;
+        Real64 zWinMin = zWinMax;
+        for (int vertex = 2; vertex <= state.dataSurface->Surface(WinSurf).Sides; ++vertex) {
             if (state.dataSurface->Surface(WinSurf).Vertex(vertex).z > zWinMax) zWinMax = state.dataSurface->Surface(WinSurf).Vertex(vertex).z;
             if (state.dataSurface->Surface(WinSurf).Vertex(vertex).z < zWinMin) zWinMin = state.dataSurface->Surface(WinSurf).Vertex(vertex).z;
         }
@@ -1717,7 +1717,7 @@ namespace DaylightingDevices {
                 "Since the light shelf is neither fully above or fully below the window to which it is associated, the view factor of the window");
             ShowContinueError(
                 state,
-                "to the ground and sky were both potentially reduced Check you input and/or consider turning off autosizing of the view factors.");
+                "to the ground and sky were both potentially reduced. Check you input and/or consider turning off autosizing of the view factors.");
             Real64 zShelfAvg;
             if (((zShelfMin >= zWinMin) && (zShelfMax <= zWinMax)) || // Shelf does not go above or below the window
                 ((zShelfMin < zWinMin) && (zShelfMax > zWinMax))) {   // Shelf goes both above AND below the window
@@ -1770,6 +1770,14 @@ namespace DaylightingDevices {
             viewFactorToGround = vfGroundAdjustMin + heightRatio * (vfGroundAdjustMax - vfGroundAdjustMin);
             viewFactorToSky = leftoverViewFactor - viewFactorToGround;
         }
+        ShowWarningError(state,
+                         format("DaylightingDevice:Shelf = {}:  As a result of user input (see previous messages), at least one view factor but "
+                                "possibly more than one was reduced.",
+                                state.dataDaylightingDevicesData->Shelf(ShelfNum).Name));
+        ShowContinueError(state,
+                          "These include the view factors to the ground, the sky, and the exterior light shelf.  Note that views to other exterior "
+                          "surfaces could further complicated this.");
+        ShowContinueError(state, "Please consider manually calculating or adjusting view factors to avoid this problem.");
     }
 
     void FigureTDDZoneGains(EnergyPlusData &state)
