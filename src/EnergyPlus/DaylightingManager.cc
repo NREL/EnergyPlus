@@ -3236,10 +3236,13 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     // IF (LSHCAL == 1 .AND. ExtWinType /= AdjZoneExtWin) CALL DayltgInterReflectedIllum(ISunPos,IHR,ZoneNum,IWin2)
     // TODO MJW: This may be getting repeated if there is more than one daylighting control in an enclosure
     int enclNum = 0; // enclosure index
+    int zoneNum = 0; // zone index
     if (CalledFrom == DataDaylighting::iCalledFor::RefPoint) {
+        zoneNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).zoneIndex;
         enclNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex;
     } else if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
-        enclNum = state.dataHeatBal->Zone(state.dataDaylightingData->IllumMapCalc(MapNum).Zone).zoneFirstSpaceSolEnclosure;
+        zoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).Zone;
+        enclNum = state.dataHeatBal->Zone(zoneNum).zoneFirstSpaceSolEnclosure;
     }
     if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) {
         if (LSHCAL == 1) DayltgInterReflectedIllum(state, ISunPos, iHour, enclNum, IWin2);
@@ -3464,7 +3467,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                     // adjacent to zones with exterior windows
                     // Does RAYCOS pass through interior window in zone containing RP?
                     // Loop over zone surfaces looking for interior windows between reference point and sun
-                    auto &thisZone = state.dataHeatBal->Zone(state.dataDaylightingData->daylightControl(daylightCtrlNum).zoneIndex);
+                    auto &thisZone = state.dataHeatBal->Zone(zoneNum);
                     for (int IntWinDisk = thisZone.WindowSurfaceFirst, IntWinDisk_end = thisZone.WindowSurfaceLast; IntWinDisk <= IntWinDisk_end;
                          ++IntWinDisk) {
                         if (state.dataSurface->Surface(IntWinDisk).ExtBoundCond >= 1) {
