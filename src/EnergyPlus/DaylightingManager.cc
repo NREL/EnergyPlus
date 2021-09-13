@@ -3871,7 +3871,8 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     state.dataDaylightingManager->THSUN = state.dataDaylightingManager->THSUNHR(iHour);
 
     auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-    int enclNum = thisDaylightControl.enclIndex;
+    int const enclNum = state.dataSurface->Surface(IWin).SolarEnclIndex;
+
     for (ISky = 1; ISky <= 4; ++ISky) { // Loop over sky types
 
         // Loop over shading index (1=bare window; 2=diffusing glazing, shade, screen or fixed slat-angle blind;
