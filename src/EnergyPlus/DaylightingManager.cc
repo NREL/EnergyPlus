@@ -795,13 +795,13 @@ void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
         // Calc for illuminance maps
         if (state.dataDaylightingData->TotIllumMaps > 0) {
             for (int MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
-                int mapZoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).Zone;
+                int mapZoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).zoneIndex;
                 if (state.dataGlobal->WarmupFlag) {
                     DisplayString(state, "Calculating Daylighting Coefficients (Map Points), Zone=" + state.dataHeatBal->Zone(mapZoneNum).Name);
                 } else {
                     DisplayString(state, "Updating Daylighting Coefficients (Map Points), Zone=" + state.dataHeatBal->Zone(mapZoneNum).Name);
                 }
-                CalcDayltgCoeffsMapPoints(state, mapZoneNum);
+                CalcDayltgCoeffsMapPoints(state, MapNum);
             }
         }
     }
@@ -1181,7 +1181,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
     } // End of reference point loop, IL
 }
 
-void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
+void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1237,7 +1237,6 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
     Real64 SkyObstructionMult;               // Ratio of obstructed to unobstructed sky diffuse at a ground point
     DataDaylighting::iExtWinType ExtWinType; // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
     int ILB;
-    int MapNum;            // Loop for map number
     bool hitIntObs;        // True iff interior obstruction hit
     bool hitExtObs;        // True iff ray from ref pt to ext win hits an exterior obstruction
     Real64 TVISIntWin;     // Visible transmittance of int win at COSBIntWin for light from ext win
@@ -1266,14 +1265,14 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
 
     if (state.dataDaylightingManager->mapFirstTime && state.dataDaylightingData->TotIllumMaps > 0) {
         IL = -999;
-        for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
+        for (int MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
             IL = max(IL, state.dataDaylightingData->IllumMapCalc(MapNum).TotalMapRefPoints);
         }
         state.dataDaylightingManager->MapErrIndex.dimension(IL, state.dataSurface->TotSurfaces, 0);
         state.dataDaylightingManager->mapFirstTime = false;
     }
 
-    int enclNum = state.dataHeatBal->Zone(ZoneNum).zoneFirstSpaceSolEnclosure;
+    int enclNum = state.dataDaylightingData->IllumMapCalc(mapNum).enclIndex;
     auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
 
     // Azimuth of view vector in absolute coord sys - set to zero here, because glare isn't calculated for map points
@@ -1284,221 +1283,165 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
     VIEWVC(2) = std::cos(AZVIEW);
     VIEWVC(3) = 0.0;
 
-    for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
+    numRefPts = state.dataDaylightingData->IllumMapCalc(mapNum).TotalMapRefPoints;
 
-        if (state.dataDaylightingData->IllumMapCalc(MapNum).Zone != ZoneNum) continue;
+    state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllumAtMapPt = 0.0;  // Daylight illuminance at reference points (lux)
+    state.dataDaylightingData->IllumMapCalc(mapNum).GlareIndexAtMapPt = 0.0; // Glare index at reference points
+    state.dataDaylightingData->IllumMapCalc(mapNum).SolidAngAtMapPt = 0.0;
+    state.dataDaylightingData->IllumMapCalc(mapNum).SolidAngAtMapPtWtd = 0.0;
+    state.dataDaylightingData->IllumMapCalc(mapNum).IllumFromWinAtMapPt = 0.0;
+    state.dataDaylightingData->IllumMapCalc(mapNum).BackLumFromWinAtMapPt = 0.0;
+    state.dataDaylightingData->IllumMapCalc(mapNum).SourceLumFromWinAtMapPt = 0.0;
+    if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllFacSky = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylSourceFacSky = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylBackFacSky = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllFacSun = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllFacSunDisk = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylSourceFacSun = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylSourceFacSunDisk = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylBackFacSun = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylBackFacSunDisk = 0.0;
+    } else {
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllFacSky(
+            state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylSourceFacSky(
+            state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylBackFacSky(
+            state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllFacSun(
+            state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllFacSunDisk(
+            state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylSourceFacSun(
+            state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylSourceFacSunDisk(
+            state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylBackFacSun(
+            state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
+        state.dataDaylightingData->IllumMapCalc(mapNum).DaylBackFacSunDisk(
+            state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
+    }
 
-        numRefPts = state.dataDaylightingData->IllumMapCalc(MapNum).TotalMapRefPoints;
+    for (IL = 1; IL <= numRefPts; ++IL) {
 
-        state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllumAtMapPt = 0.0;  // Daylight illuminance at reference points (lux)
-        state.dataDaylightingData->IllumMapCalc(MapNum).GlareIndexAtMapPt = 0.0; // Glare index at reference points
-        state.dataDaylightingData->IllumMapCalc(MapNum).SolidAngAtMapPt = 0.0;
-        state.dataDaylightingData->IllumMapCalc(MapNum).SolidAngAtMapPtWtd = 0.0;
-        state.dataDaylightingData->IllumMapCalc(MapNum).IllumFromWinAtMapPt = 0.0;
-        state.dataDaylightingData->IllumMapCalc(MapNum).BackLumFromWinAtMapPt = 0.0;
-        state.dataDaylightingData->IllumMapCalc(MapNum).SourceLumFromWinAtMapPt = 0.0;
-        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSky = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSky = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSun = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSunDisk = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSun = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSunDisk = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSun = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSunDisk = 0.0;
-        } else {
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(
-                state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSky(
-                state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSky(
-                state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSun(
-                state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSunDisk(
-                state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSun(
-                state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSunDisk(
-                state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSun(
-                state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSunDisk(
-                state.dataGlobal->HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, thisEnclDaylight.NumOfDayltgExtWins}) = 0.0;
-        }
+        RREF = state.dataDaylightingData->IllumMapCalc(mapNum).MapRefPtAbsCoord({1, 3}, IL); // (x, y, z)
 
-        for (IL = 1; IL <= numRefPts; ++IL) {
+        //           -------------
+        // ---------- WINDOW LOOP ----------
+        //           -------------
 
-            RREF = state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord({1, 3}, IL); // (x, y, z)
+        // MapWindowSolidAngAtRefPt = 0.0; //Inactive
+        MapWindowSolidAngAtRefPtWtd = 0.0;
 
-            //           -------------
-            // ---------- WINDOW LOOP ----------
-            //           -------------
+        for (loopwin = 1; loopwin <= thisEnclDaylight.NumOfDayltgExtWins; ++loopwin) {
 
-            // MapWindowSolidAngAtRefPt = 0.0; //Inactive
-            MapWindowSolidAngAtRefPtWtd = 0.0;
+            // daylightingCtrlNum parameter is unused for map points
+            FigureDayltgCoeffsAtPointsSetupForWindow(state,
+                                                     0,
+                                                     IL,
+                                                     loopwin,
+                                                     DataDaylighting::iCalledFor::MapPoint,
+                                                     RREF,
+                                                     VIEWVC,
+                                                     IWin,
+                                                     IWin2,
+                                                     NWX,
+                                                     NWY,
+                                                     W2,
+                                                     W3,
+                                                     W21,
+                                                     W23,
+                                                     LSHCAL,
+                                                     InShelfSurf,
+                                                     ICtrl,
+                                                     ShType,
+                                                     BlNum,
+                                                     WNORM2,
+                                                     ExtWinType,
+                                                     IConst,
+                                                     RREF2,
+                                                     DWX,
+                                                     DWY,
+                                                     DAXY,
+                                                     U2,
+                                                     U23,
+                                                     U21,
+                                                     VIEWVC2,
+                                                     is_Rectangle,
+                                                     is_Triangle,
+                                                     mapNum,
+                                                     MapWindowSolidAngAtRefPtWtd); // Inactive MapWindowSolidAngAtRefPt arg removed
+            //           ---------------------
+            // ---------- WINDOW ELEMENT LOOP ----------
+            //           ---------------------
+            WinEl = 0;
 
-            for (loopwin = 1; loopwin <= thisEnclDaylight.NumOfDayltgExtWins; ++loopwin) {
+            for (IX = 1; IX <= NWX; ++IX) {
+                if (is_Rectangle) {
+                    NWYlim = NWY;
+                } else if (is_Triangle) {
+                    NWYlim = NWY - IX + 1;
+                }
 
-                // daylightingCtrlNum parameter is unused for map points
-                FigureDayltgCoeffsAtPointsSetupForWindow(state,
-                                                         0,
-                                                         IL,
-                                                         loopwin,
-                                                         DataDaylighting::iCalledFor::MapPoint,
-                                                         RREF,
-                                                         VIEWVC,
-                                                         IWin,
-                                                         IWin2,
-                                                         NWX,
-                                                         NWY,
-                                                         W2,
-                                                         W3,
-                                                         W21,
-                                                         W23,
-                                                         LSHCAL,
-                                                         InShelfSurf,
-                                                         ICtrl,
-                                                         ShType,
-                                                         BlNum,
-                                                         WNORM2,
-                                                         ExtWinType,
-                                                         IConst,
-                                                         RREF2,
-                                                         DWX,
-                                                         DWY,
-                                                         DAXY,
-                                                         U2,
-                                                         U23,
-                                                         U21,
-                                                         VIEWVC2,
-                                                         is_Rectangle,
-                                                         is_Triangle,
-                                                         MapNum,
-                                                         MapWindowSolidAngAtRefPtWtd); // Inactive MapWindowSolidAngAtRefPt arg removed
-                //           ---------------------
-                // ---------- WINDOW ELEMENT LOOP ----------
-                //           ---------------------
-                WinEl = 0;
+                for (IY = 1; IY <= NWYlim; ++IY) {
 
-                for (IX = 1; IX <= NWX; ++IX) {
-                    if (is_Rectangle) {
-                        NWYlim = NWY;
-                    } else if (is_Triangle) {
-                        NWYlim = NWY - IX + 1;
-                    }
+                    ++WinEl;
 
-                    for (IY = 1; IY <= NWYlim; ++IY) {
+                    // daylightingCtrlNum parameter is unused for map points
+                    FigureDayltgCoeffsAtPointsForWindowElements(state,
+                                                                0,
+                                                                IL,
+                                                                loopwin,
+                                                                DataDaylighting::iCalledFor::MapPoint,
+                                                                WinEl,
+                                                                IWin,
+                                                                IWin2,
+                                                                IX,
+                                                                IY,
+                                                                SkyObstructionMult,
+                                                                W2,
+                                                                W21,
+                                                                W23,
+                                                                RREF,
+                                                                NWYlim,
+                                                                VIEWVC2,
+                                                                DWX,
+                                                                DWY,
+                                                                DAXY,
+                                                                U2,
+                                                                U23,
+                                                                U21,
+                                                                RWIN,
+                                                                RWIN2,
+                                                                Ray,
+                                                                PHRAY,
+                                                                LSHCAL,
+                                                                COSB,
+                                                                ObTrans,
+                                                                TVISB,
+                                                                DOMEGA,
+                                                                THRAY,
+                                                                hitIntObs,
+                                                                hitExtObs,
+                                                                WNORM2,
+                                                                ExtWinType,
+                                                                IConst,
+                                                                RREF2,
+                                                                is_Triangle,
+                                                                TVISIntWin,
+                                                                TVISIntWinDisk,
+                                                                mapNum,
+                                                                MapWindowSolidAngAtRefPtWtd); // Inactive MapWindowSolidAngAtRefPt arg removed
+                    //           -------------------
+                    // ---------- SUN POSITION LOOP ----------
+                    //           -------------------
 
-                        ++WinEl;
-
-                        // daylightingCtrlNum parameter is unused for map points
-                        FigureDayltgCoeffsAtPointsForWindowElements(state,
-                                                                    0,
-                                                                    IL,
-                                                                    loopwin,
-                                                                    DataDaylighting::iCalledFor::MapPoint,
-                                                                    WinEl,
-                                                                    IWin,
-                                                                    IWin2,
-                                                                    IX,
-                                                                    IY,
-                                                                    SkyObstructionMult,
-                                                                    W2,
-                                                                    W21,
-                                                                    W23,
-                                                                    RREF,
-                                                                    NWYlim,
-                                                                    VIEWVC2,
-                                                                    DWX,
-                                                                    DWY,
-                                                                    DAXY,
-                                                                    U2,
-                                                                    U23,
-                                                                    U21,
-                                                                    RWIN,
-                                                                    RWIN2,
-                                                                    Ray,
-                                                                    PHRAY,
-                                                                    LSHCAL,
-                                                                    COSB,
-                                                                    ObTrans,
-                                                                    TVISB,
-                                                                    DOMEGA,
-                                                                    THRAY,
-                                                                    hitIntObs,
-                                                                    hitExtObs,
-                                                                    WNORM2,
-                                                                    ExtWinType,
-                                                                    IConst,
-                                                                    RREF2,
-                                                                    is_Triangle,
-                                                                    TVISIntWin,
-                                                                    TVISIntWinDisk,
-                                                                    MapNum,
-                                                                    MapWindowSolidAngAtRefPtWtd); // Inactive MapWindowSolidAngAtRefPt arg removed
-                        //           -------------------
-                        // ---------- SUN POSITION LOOP ----------
-                        //           -------------------
-
-                        // Sun position counter. Used to avoid calculating various quantities
-                        // that do not depend on sun position.
-                        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
-                            ISunPos = 0;
-                            for (IHR = 1; IHR <= 24; ++IHR) {
-                                // daylightingCtrlNum parameter is unused for map points
-                                FigureDayltgCoeffsAtPointsForSunPosition(state,
-                                                                         0,
-                                                                         IL,
-                                                                         IX,
-                                                                         NWX,
-                                                                         IY,
-                                                                         NWYlim,
-                                                                         WinEl,
-                                                                         IWin,
-                                                                         IWin2,
-                                                                         IHR,
-                                                                         ISunPos,
-                                                                         SkyObstructionMult,
-                                                                         RWIN2,
-                                                                         Ray,
-                                                                         PHRAY,
-                                                                         LSHCAL,
-                                                                         InShelfSurf,
-                                                                         COSB,
-                                                                         ObTrans,
-                                                                         TVISB,
-                                                                         DOMEGA,
-                                                                         ICtrl,
-                                                                         ShType,
-                                                                         BlNum,
-                                                                         THRAY,
-                                                                         WNORM2,
-                                                                         ExtWinType,
-                                                                         IConst,
-                                                                         AZVIEW,
-                                                                         RREF2,
-                                                                         hitIntObs,
-                                                                         hitExtObs,
-                                                                         DataDaylighting::iCalledFor::MapPoint,
-                                                                         TVISIntWin,
-                                                                         TVISIntWinDisk,
-                                                                         MapNum,
-                                                                         MapWindowSolidAngAtRefPtWtd);
-                            } // End of hourly sun position loop, IHR
-                        } else {
-                            if (state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
-                                ISunPos = 0;
-                                MySunIsUpFlag = true;
-                            } else if (state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
-                                ISunPos = 1;
-                            } else if (!state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
-                                MySunIsUpFlag = false;
-                                ISunPos = -1;
-                            } else if (!state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
-                                ISunPos = -1;
-                            }
+                    // Sun position counter. Used to avoid calculating various quantities
+                    // that do not depend on sun position.
+                    if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
+                        ISunPos = 0;
+                        for (IHR = 1; IHR <= 24; ++IHR) {
                             // daylightingCtrlNum parameter is unused for map points
                             FigureDayltgCoeffsAtPointsForSunPosition(state,
                                                                      0,
@@ -1510,7 +1453,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
                                                                      WinEl,
                                                                      IWin,
                                                                      IWin2,
-                                                                     state.dataGlobal->HourOfDay,
+                                                                     IHR,
                                                                      ISunPos,
                                                                      SkyObstructionMult,
                                                                      RWIN2,
@@ -1536,30 +1479,80 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
                                                                      DataDaylighting::iCalledFor::MapPoint,
                                                                      TVISIntWin,
                                                                      TVISIntWinDisk,
-                                                                     MapNum,
+                                                                     mapNum,
                                                                      MapWindowSolidAngAtRefPtWtd);
+                        } // End of hourly sun position loop, IHR
+                    } else {
+                        if (state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
+                            ISunPos = 0;
+                            MySunIsUpFlag = true;
+                        } else if (state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
+                            ISunPos = 1;
+                        } else if (!state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
+                            MySunIsUpFlag = false;
+                            ISunPos = -1;
+                        } else if (!state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
+                            ISunPos = -1;
                         }
-                    } // End of window Y-element loop, IY
-                }     // End of window X-element loop, IX
+                        // daylightingCtrlNum parameter is unused for map points
+                        FigureDayltgCoeffsAtPointsForSunPosition(state,
+                                                                 0,
+                                                                 IL,
+                                                                 IX,
+                                                                 NWX,
+                                                                 IY,
+                                                                 NWYlim,
+                                                                 WinEl,
+                                                                 IWin,
+                                                                 IWin2,
+                                                                 state.dataGlobal->HourOfDay,
+                                                                 ISunPos,
+                                                                 SkyObstructionMult,
+                                                                 RWIN2,
+                                                                 Ray,
+                                                                 PHRAY,
+                                                                 LSHCAL,
+                                                                 InShelfSurf,
+                                                                 COSB,
+                                                                 ObTrans,
+                                                                 TVISB,
+                                                                 DOMEGA,
+                                                                 ICtrl,
+                                                                 ShType,
+                                                                 BlNum,
+                                                                 THRAY,
+                                                                 WNORM2,
+                                                                 ExtWinType,
+                                                                 IConst,
+                                                                 AZVIEW,
+                                                                 RREF2,
+                                                                 hitIntObs,
+                                                                 hitExtObs,
+                                                                 DataDaylighting::iCalledFor::MapPoint,
+                                                                 TVISIntWin,
+                                                                 TVISIntWinDisk,
+                                                                 mapNum,
+                                                                 MapWindowSolidAngAtRefPtWtd);
+                    }
+                } // End of window Y-element loop, IY
+            }     // End of window X-element loop, IX
 
-                if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
-                    // Loop again over hourly sun positions and calculate daylight factors by adding
-                    // direct and inter-reflected illum components, then dividing by exterior horiz illum.
-                    // Also calculate corresponding glare factors.
-                    ILB = IL;
-                    for (IHR = 1; IHR <= 24; ++IHR) {
-                        FigureMapPointDayltgFactorsToAddIllums(state, MapNum, ILB, IHR, IWin, loopwin, NWX, NWY, ICtrl);
-                    } // End of sun position loop, IHR
-                } else {
-                    ILB = IL;
-                    FigureMapPointDayltgFactorsToAddIllums(state, MapNum, ILB, state.dataGlobal->HourOfDay, IWin, loopwin, NWX, NWY, ICtrl);
-                }
+            if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
+                // Loop again over hourly sun positions and calculate daylight factors by adding
+                // direct and inter-reflected illum components, then dividing by exterior horiz illum.
+                // Also calculate corresponding glare factors.
+                ILB = IL;
+                for (IHR = 1; IHR <= 24; ++IHR) {
+                    FigureMapPointDayltgFactorsToAddIllums(state, mapNum, ILB, IHR, IWin, loopwin, NWX, NWY, ICtrl);
+                } // End of sun position loop, IHR
+            } else {
+                ILB = IL;
+                FigureMapPointDayltgFactorsToAddIllums(state, mapNum, ILB, state.dataGlobal->HourOfDay, IWin, loopwin, NWX, NWY, ICtrl);
+            }
 
-            } // End of window loop, loopwin - IWin
+        } // End of window loop, loopwin - IWin
 
-        } // End of reference point loop, IL
-
-    } // MapNum
+    } // End of reference point loop, IL
 }
 
 void FigureDayltgCoeffsAtPointsSetupForWindow(
@@ -1639,8 +1632,8 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
     } else if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
         state.dataDaylightingData->IllumMapCalc(MapNum).SolidAngAtMapPt(loopwin, iRefPoint) = 0.0;
         state.dataDaylightingData->IllumMapCalc(MapNum).SolidAngAtMapPtWtd(loopwin, iRefPoint) = 0.0;
-        zoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).Zone;
-        enclNum = state.dataHeatBal->Zone(zoneNum).zoneFirstSpaceSolEnclosure;
+        zoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).zoneIndex;
+        enclNum = state.dataDaylightingData->IllumMapCalc(MapNum).enclIndex;
     }
     IWin = state.dataDaylightingData->enclDaylight(enclNum).DayltgExtWinSurfNums(loopwin);
 
@@ -2152,7 +2145,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                 if (CalledFrom == DataDaylighting::iCalledFor::RefPoint) {
                     zoneNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).zoneIndex;
                 } else if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
-                    zoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).Zone;
+                    zoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).zoneIndex;
                 }
                 // Does ray pass through an interior window in zone (ZoneNum) containing the ref point?
                 for (IntWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst; IntWin <= state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
@@ -3241,8 +3234,8 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
         zoneNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).zoneIndex;
         enclNum = state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex;
     } else if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
-        zoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).Zone;
-        enclNum = state.dataHeatBal->Zone(zoneNum).zoneFirstSpaceSolEnclosure;
+        zoneNum = state.dataDaylightingData->IllumMapCalc(MapNum).zoneIndex;
+        enclNum = state.dataDaylightingData->IllumMapCalc(MapNum).enclIndex;
     }
     if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) {
         if (LSHCAL == 1) DayltgInterReflectedIllum(state, ISunPos, iHour, enclNum, IWin2);
@@ -4435,7 +4428,6 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
     using DataStringGlobals::CharSpace;
     using DataStringGlobals::CharTab;
 
-    Array1D_int ZoneMapCount;
     int MapNum;
     int IOStat;
     int NumAlpha;
@@ -4486,7 +4478,6 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
 
     state.dataDaylightingData->IllumMap.allocate(state.dataDaylightingData->TotIllumMaps);
     state.dataDaylightingData->IllumMapCalc.allocate(state.dataDaylightingData->TotIllumMaps);
-    ZoneMapCount.dimension(state.dataGlobal->NumOfZones, 0);
 
     if (state.dataDaylightingData->TotIllumMaps > 0) {
         for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
@@ -4503,19 +4494,33 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             state.dataDaylightingData->IllumMap(MapNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataDaylightingData->IllumMap(MapNum).Zone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), Zone);
+            state.dataDaylightingData->IllumMap(MapNum).zoneIndex = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), Zone);
 
-            if (state.dataDaylightingData->IllumMap(MapNum).Zone == 0) {
+            if (state.dataDaylightingData->IllumMap(MapNum).zoneIndex == 0) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
+            } else {
+                // set enclosure index for first space in zone
+                int zoneNum = state.dataDaylightingData->IllumMap(MapNum).zoneIndex;
+                int enclNum = state.dataHeatBal->space(state.dataHeatBal->Zone(zoneNum).spaceIndexes(1)).solarEnclosureNum;
+                state.dataDaylightingData->IllumMap(MapNum).enclIndex = enclNum;
+                // check that all spaces in the zone are in the same enclosure
+                for (int spaceCounter = 2; spaceCounter <= state.dataHeatBal->Zone(zoneNum).numSpaces; ++spaceCounter) {
+                    int spaceNum = state.dataHeatBal->Zone(zoneNum).spaceIndexes(spaceCounter);
+                    if (enclNum != state.dataHeatBal->space(spaceNum).solarEnclosureNum) {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                            "\" All spaces in the zone must be in the same enclosure for daylighting illuminance maps.");
+                        ErrorsFound = true;
+                        break;
+                    }
+                }
             }
 
-            state.dataDaylightingData->IllumMapCalc(MapNum).Zone = state.dataDaylightingData->IllumMap(MapNum).Zone;
-            if (state.dataDaylightingData->IllumMap(MapNum).Zone != 0) {
-                ++ZoneMapCount(state.dataDaylightingData->IllumMap(MapNum).Zone);
-            }
+            state.dataDaylightingData->IllumMapCalc(MapNum).zoneIndex = state.dataDaylightingData->IllumMap(MapNum).zoneIndex;
+            state.dataDaylightingData->IllumMapCalc(MapNum).enclIndex = state.dataDaylightingData->IllumMap(MapNum).enclIndex;
             state.dataDaylightingData->IllumMap(MapNum).Z = state.dataIPShortCut->rNumericArgs(1);
 
             state.dataDaylightingData->IllumMap(MapNum).Xmin = state.dataIPShortCut->rNumericArgs(2);
@@ -4612,25 +4617,11 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
         state.dataIPShortCut->cAlphaArgs(1) += state.dataIPShortCut->cAlphaArgs(2).substr(1);
         print(state.files.eio, "Daylighting:Illuminance Maps,{},{}\n", state.dataDaylightingData->TotIllumMaps, state.dataIPShortCut->cAlphaArgs(1));
     }
-    for (Loop1 = 1; Loop1 <= state.dataGlobal->NumOfZones; ++Loop1) {
-        state.dataDaylightingData->ZoneDaylight(Loop1).ZoneToMap.allocate(ZoneMapCount(Loop1));
-        state.dataDaylightingData->ZoneDaylight(Loop1).ZoneToMap = 0;
-        state.dataDaylightingData->ZoneDaylight(Loop1).MapCount = 0;
-    }
-
-    for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
-        if (state.dataDaylightingData->IllumMap(MapNum).Zone == 0) continue;
-        ++state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).MapCount;
-        state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone)
-            .ZoneToMap(state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).MapCount) = MapNum;
-    }
-
-    ZoneMapCount.deallocate();
 
     // Check for illuminance maps associated with this zone
     for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
-        if (state.dataDaylightingData->IllumMap(MapNum).Zone > 0) {
-            auto &zone(Zone(state.dataDaylightingData->IllumMap(MapNum).Zone));
+        if (state.dataDaylightingData->IllumMap(MapNum).zoneIndex > 0) {
+            auto &zone(Zone(state.dataDaylightingData->IllumMap(MapNum).zoneIndex));
             // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
             CosZoneRelNorth = std::cos(-zone.RelNorth * DataGlobalConstants::DegToRadians);
             SinZoneRelNorth = std::sin(-zone.RelNorth * DataGlobalConstants::DegToRadians);
@@ -4848,14 +4839,13 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
     } // MapNum
     ZoneMsgDone.dimension(state.dataGlobal->NumOfZones, false);
     for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
-        if (state.dataDaylightingData->IllumMap(MapNum).Zone == 0) continue;
-        // TODO MJW: punt with entire zone must be in same enclosure rule
-        int enclNum = state.dataHeatBal->Zone(state.dataDaylightingData->IllumMap(MapNum).Zone).zoneFirstSpaceSolEnclosure;
+        if (state.dataDaylightingData->IllumMap(MapNum).zoneIndex == 0) continue;
+        int enclNum = state.dataDaylightingData->IllumMap(MapNum).enclIndex;
         if (!state.dataDaylightingData->enclDaylight(enclNum).hasSplitFluxDaylighting &&
-            !ZoneMsgDone(state.dataDaylightingData->IllumMap(MapNum).Zone)) {
+            !ZoneMsgDone(state.dataDaylightingData->IllumMap(MapNum).zoneIndex)) {
             ShowSevereError(state,
                             "Zone Name in Output:IlluminanceMap is not used for Daylighting:Controls=" +
-                                Zone(state.dataDaylightingData->IllumMap(MapNum).Zone).Name);
+                                Zone(state.dataDaylightingData->IllumMap(MapNum).zoneIndex).Name);
             ErrorsFound = true;
         }
     }
@@ -4870,7 +4860,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
         print(state.files.eio,
               "Daylighting:Illuminance Maps:Detail,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{},{:.2R}\n",
               state.dataDaylightingData->IllumMap(MapNum).Name,
-              Zone(state.dataDaylightingData->IllumMap(MapNum).Zone).Name,
+              Zone(state.dataDaylightingData->IllumMap(MapNum).zoneIndex).Name,
               state.dataDaylightingData->IllumMap(MapNum).Xmin,
               state.dataDaylightingData->IllumMap(MapNum).Xmax,
               state.dataDaylightingData->IllumMap(MapNum).Xinc,
@@ -4937,11 +4927,13 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         daylightControl.ZoneName = state.dataIPShortCut->cAlphaArgs(2); // Field: Zone Name
         daylightControl.zoneIndex = zoneNum;
 
-        // set enclosure index
-        daylightControl.enclIndex = state.dataHeatBal->Zone(zoneNum).zoneFirstSpaceSolEnclosure;
+        // set enclosure index for first space in zone
+        int enclNum = state.dataHeatBal->space(state.dataHeatBal->Zone(zoneNum).spaceIndexes(1)).solarEnclosureNum;
+        daylightControl.enclIndex = enclNum;
         state.dataDaylightingData->enclDaylight(daylightControl.enclIndex).daylightControlIndexes.emplace_back(controlNum);
         // check that all spaces in the zone are in the same enclosure
-        for (int spaceNum = 2; spaceNum <= state.dataHeatBal->Zone(zoneNum).numSpaces; ++spaceNum) {
+        for (int spaceCounter = 2; spaceCounter <= state.dataHeatBal->Zone(zoneNum).numSpaces; ++spaceCounter) {
+            int spaceNum = state.dataHeatBal->Zone(zoneNum).spaceIndexes(spaceCounter);
             if (daylightControl.enclIndex != state.dataHeatBal->space(spaceNum).solarEnclosureNum) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
@@ -9309,7 +9301,7 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
 
     for (int mapNum = 1; mapNum <= state.dataDaylightingData->TotIllumMaps; ++mapNum) {
         auto &thisMap = state.dataDaylightingData->IllumMapCalc(mapNum);
-        int enclNum = state.dataHeatBal->Zone(thisMap.Zone).zoneFirstSpaceSolEnclosure;
+        int enclNum = thisMap.enclIndex;
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
 
         NREFPT = thisMap.TotalMapRefPoints;
@@ -9802,7 +9794,7 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
     state.dataDaylightingData->IllumMap(MapNum).pointsHeader = "";
     int rCount = 0;
     for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
-        if (state.dataDaylightingData->daylightControl(daylightCtrlNum).zoneIndex == state.dataDaylightingData->IllumMap(MapNum).Zone) {
+        if (state.dataDaylightingData->daylightControl(daylightCtrlNum).zoneIndex == state.dataDaylightingData->IllumMap(MapNum).zoneIndex) {
             auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
 
             for (R = 1; R <= thisDaylightControl.TotalDaylRefPoints; ++R) {
@@ -9826,7 +9818,7 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
                               *state.dataDaylightingData->IllumMap(MapNum).mapFile,
                               state.dataDaylightingData->IllumMap(MapNum).Name,
                               state.dataEnvrn->EnvironmentName,
-                              state.dataDaylightingData->IllumMap(MapNum).Zone,
+                              state.dataDaylightingData->IllumMap(MapNum).zoneIndex,
                               state.dataDaylightingData->IllumMap(MapNum).pointsHeader,
                               state.dataDaylightingData->IllumMap(MapNum).Z);
         EnvrnPrint(MapNum) = false;
@@ -10298,72 +10290,72 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
         }
     } // End of primary enclosure loop
 
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        for (int loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(zoneNum).MapCount; ++loop) {
-            int mapNum = state.dataDaylightingData->ZoneDaylight(zoneNum).ZoneToMap(loop);
-            // TODO MJW: Maps are still by zone
-            int numExtWin = enclExtWin(state.dataHeatBal->Zone(zoneNum).zoneFirstSpaceSolEnclosure);
-            int numMapRefPts = state.dataDaylightingData->IllumMapCalc(mapNum).TotalMapRefPoints;
+    for (int mapNum = 1; mapNum <= state.dataDaylightingData->TotIllumMaps; ++mapNum) {
+        int numExtWin = enclExtWin(state.dataDaylightingData->IllumMapCalc(mapNum).enclIndex);
+        int numMapRefPts = state.dataDaylightingData->IllumMapCalc(mapNum).TotalMapRefPoints;
 
-            if (numMapRefPts > 0) {
-                // might be able to use TotalMapRefPoints for zone in below.
-                state.dataDaylightingData->IllumMapCalc(mapNum).SolidAngAtMapPt.allocate(numExtWin, numMapRefPts);
-                state.dataDaylightingData->IllumMapCalc(mapNum).SolidAngAtMapPt = 0.0;
-                state.dataDaylightingData->IllumMapCalc(mapNum).SolidAngAtMapPtWtd.allocate(numExtWin, numMapRefPts);
-                state.dataDaylightingData->IllumMapCalc(mapNum).SolidAngAtMapPtWtd = 0.0;
-                state.dataDaylightingData->IllumMapCalc(mapNum).IllumFromWinAtMapPt.allocate(numExtWin, 2, numMapRefPts);
-                state.dataDaylightingData->IllumMapCalc(mapNum).IllumFromWinAtMapPt = 0.0;
-                state.dataDaylightingData->IllumMapCalc(mapNum).BackLumFromWinAtMapPt.allocate(numExtWin, 2, numMapRefPts);
-                state.dataDaylightingData->IllumMapCalc(mapNum).BackLumFromWinAtMapPt = 0.0;
-                state.dataDaylightingData->IllumMapCalc(mapNum).SourceLumFromWinAtMapPt.allocate(numExtWin, 2, numMapRefPts);
-                state.dataDaylightingData->IllumMapCalc(mapNum).SourceLumFromWinAtMapPt = 0.0;
+        if (numMapRefPts > 0) {
+            // might be able to use TotalMapRefPoints for zone in below.
+            state.dataDaylightingData->IllumMapCalc(mapNum).SolidAngAtMapPt.allocate(numExtWin, numMapRefPts);
+            state.dataDaylightingData->IllumMapCalc(mapNum).SolidAngAtMapPt = 0.0;
+            state.dataDaylightingData->IllumMapCalc(mapNum).SolidAngAtMapPtWtd.allocate(numExtWin, numMapRefPts);
+            state.dataDaylightingData->IllumMapCalc(mapNum).SolidAngAtMapPtWtd = 0.0;
+            state.dataDaylightingData->IllumMapCalc(mapNum).IllumFromWinAtMapPt.allocate(numExtWin, 2, numMapRefPts);
+            state.dataDaylightingData->IllumMapCalc(mapNum).IllumFromWinAtMapPt = 0.0;
+            state.dataDaylightingData->IllumMapCalc(mapNum).BackLumFromWinAtMapPt.allocate(numExtWin, 2, numMapRefPts);
+            state.dataDaylightingData->IllumMapCalc(mapNum).BackLumFromWinAtMapPt = 0.0;
+            state.dataDaylightingData->IllumMapCalc(mapNum).SourceLumFromWinAtMapPt.allocate(numExtWin, 2, numMapRefPts);
+            state.dataDaylightingData->IllumMapCalc(mapNum).SourceLumFromWinAtMapPt = 0.0;
 
-                state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllFacSky.allocate(24, MaxSlatAngs + 1, 4, numMapRefPts, numExtWin);
-                state.dataDaylightingData->IllumMapCalc(mapNum).DaylSourceFacSky.allocate(24, MaxSlatAngs + 1, 4, numMapRefPts, numExtWin);
-                state.dataDaylightingData->IllumMapCalc(mapNum).DaylBackFacSky.allocate(24, MaxSlatAngs + 1, 4, numMapRefPts, numExtWin);
-                state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllFacSun.allocate(24, MaxSlatAngs + 1, numMapRefPts, numExtWin);
-                state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllFacSunDisk.allocate(24, MaxSlatAngs + 1, numMapRefPts, numExtWin);
-                state.dataDaylightingData->IllumMapCalc(mapNum).DaylSourceFacSun.allocate(24, MaxSlatAngs + 1, numMapRefPts, numExtWin);
-                state.dataDaylightingData->IllumMapCalc(mapNum).DaylSourceFacSunDisk.allocate(24, MaxSlatAngs + 1, numMapRefPts, numExtWin);
-                state.dataDaylightingData->IllumMapCalc(mapNum).DaylBackFacSun.allocate(24, MaxSlatAngs + 1, numMapRefPts, numExtWin);
-                state.dataDaylightingData->IllumMapCalc(mapNum).DaylBackFacSunDisk.allocate(24, MaxSlatAngs + 1, numMapRefPts, numExtWin);
-            }
+            state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllFacSky.allocate(24, MaxSlatAngs + 1, 4, numMapRefPts, numExtWin);
+            state.dataDaylightingData->IllumMapCalc(mapNum).DaylSourceFacSky.allocate(24, MaxSlatAngs + 1, 4, numMapRefPts, numExtWin);
+            state.dataDaylightingData->IllumMapCalc(mapNum).DaylBackFacSky.allocate(24, MaxSlatAngs + 1, 4, numMapRefPts, numExtWin);
+            state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllFacSun.allocate(24, MaxSlatAngs + 1, numMapRefPts, numExtWin);
+            state.dataDaylightingData->IllumMapCalc(mapNum).DaylIllFacSunDisk.allocate(24, MaxSlatAngs + 1, numMapRefPts, numExtWin);
+            state.dataDaylightingData->IllumMapCalc(mapNum).DaylSourceFacSun.allocate(24, MaxSlatAngs + 1, numMapRefPts, numExtWin);
+            state.dataDaylightingData->IllumMapCalc(mapNum).DaylSourceFacSunDisk.allocate(24, MaxSlatAngs + 1, numMapRefPts, numExtWin);
+            state.dataDaylightingData->IllumMapCalc(mapNum).DaylBackFacSun.allocate(24, MaxSlatAngs + 1, numMapRefPts, numExtWin);
+            state.dataDaylightingData->IllumMapCalc(mapNum).DaylBackFacSunDisk.allocate(24, MaxSlatAngs + 1, numMapRefPts, numExtWin);
         }
-    } // End of zone loop
+    } // End of map loop
 
     // TODO MJW: These eio outputs need to change from zone to enclosure
     static constexpr std::string_view Format_700(
         "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones\n");
     print(state.files.eio, Format_700);
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        int enclNum = state.dataHeatBal->Zone(ZoneNum).zoneFirstSpaceSolEnclosure;
-        auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
-        if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
-        if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
-        if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
-        static constexpr std::string_view Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
-        print(state.files.eio,
-              Format_701,
-              state.dataHeatBal->Zone(ZoneNum).Name,
-              thisEnclDaylight.TotalExtWindows,
-              (thisEnclDaylight.NumOfDayltgExtWins - thisEnclDaylight.TotalExtWindows));
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+            int enclNum = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
+            auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
+            if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
+            if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
+            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
+            static constexpr std::string_view Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
+            print(state.files.eio,
+                  Format_701,
+                  state.dataHeatBal->Zone(ZoneNum).Name,
+                  thisEnclDaylight.TotalExtWindows,
+                  (thisEnclDaylight.NumOfDayltgExtWins - thisEnclDaylight.TotalExtWindows));
+        }
     }
     static constexpr std::string_view Format_702(
         "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent "
         "Zone Names - 1st 100 (max)\n");
     print(state.files.eio, Format_702);
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        int enclNum = state.dataHeatBal->Zone(ZoneNum).zoneFirstSpaceSolEnclosure;
-        auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
-        if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
-        if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
-        if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
-        static constexpr std::string_view Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
-        print(state.files.eio, Format_703, state.dataHeatBal->Zone(ZoneNum).Name, thisEnclDaylight.NumOfIntWinAdjEncls);
-        for (int loop = 1, loop_end = min(thisEnclDaylight.NumOfIntWinAdjEncls, 100); loop <= loop_end; ++loop) {
-            print(state.files.eio, ",{}", state.dataViewFactor->EnclSolInfo(thisEnclDaylight.AdjIntWinEnclNums(loop)).Name);
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+            int enclNum = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
+            auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
+            if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
+            if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
+            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
+            static constexpr std::string_view Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
+            print(state.files.eio, Format_703, state.dataHeatBal->Zone(ZoneNum).Name, thisEnclDaylight.NumOfIntWinAdjEncls);
+            for (int loop = 1, loop_end = min(thisEnclDaylight.NumOfIntWinAdjEncls, 100); loop <= loop_end; ++loop) {
+                print(state.files.eio, ",{}", state.dataViewFactor->EnclSolInfo(thisEnclDaylight.AdjIntWinEnclNums(loop)).Name);
+            }
+            print(state.files.eio, "\n");
         }
-        print(state.files.eio, "\n");
     }
 
     enclExtWin.deallocate();
@@ -10376,8 +10368,12 @@ void CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum)
     // first step is to create a sortable list of WindowShadingControl objects by sequence
     std::vector<std::pair<int, int>> shadeControlSequence; // sequence, WindowShadingControl
     for (int iShadeCtrl = 1; iShadeCtrl <= state.dataSurface->TotWinShadingControl; ++iShadeCtrl) {
-        if (state.dataHeatBal->Zone(state.dataSurface->WindowShadingControl(iShadeCtrl).ZoneIndex).zoneFirstSpaceSolEnclosure == enclNum) {
-            shadeControlSequence.push_back(std::make_pair(state.dataSurface->WindowShadingControl(iShadeCtrl).SequenceNumber, iShadeCtrl));
+        for (int spaceNum : state.dataHeatBal->Zone(state.dataSurface->WindowShadingControl(iShadeCtrl).ZoneIndex).spaceIndexes) {
+            int shadeCtrlEnclNum = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
+            if (shadeCtrlEnclNum == enclNum) {
+                shadeControlSequence.push_back(std::make_pair(state.dataSurface->WindowShadingControl(iShadeCtrl).SequenceNumber, iShadeCtrl));
+                break;
+            }
         }
     }
     // sort the WindowShadingControl objects based on sequence number

@@ -213,8 +213,6 @@ namespace DataDaylighting {
     {
         // Members
         Real64 ZonePowerReductionFactor = 1.0; // Electric power reduction factor for entire zone due to daylighting
-        int MapCount = 0;                      // Number of maps assigned to Zone
-        Array1D_int ZoneToMap;                 // Pointers to maps allocated to Zone
         Real64 zoneAvgIllumSum = 0.0;          // For VisualResilienceSummary reported average illuminance
         int totRefPts = 0.0;                   // For VisualResilienceSummary total number of rereference points
     };
@@ -222,35 +220,30 @@ namespace DataDaylighting {
     struct IllumMapData
     {
         // Members
-        std::string Name;             // Map name
-        int Zone;                     // Pointer to zone being mapped
-        Real64 Z;                     // Elevation or height
-        Real64 Xmin;                  // Minimum X value
-        Real64 Xmax;                  // Maximum X value
-        int Xnum;                     // Number of X reference points (going N-S)
-        Real64 Xinc;                  // Increment between X reference points
-        Real64 Ymin;                  // Minimum Y value
-        Real64 Ymax;                  // Maximum Y value
-        int Ynum;                     // Number of Y reference points (going E-W)
-        Real64 Yinc;                  // Increment between Y reference points
-        SharedFileHandle mapFile;     // Unit number for map output (later merged to final file)
-        bool HeaderXLineLengthNeeded; // X header will likely be the longest line in the file
-        int HeaderXLineLength;        // actual length of this X header line
-        std::string pointsHeader;     // part of the header that lists the reference points in the same zone
-
-        // Default Constructor
-        IllumMapData()
-            : Zone(0), Z(0.0), Xmin(0.0), Xmax(0.0), Xnum(0), Xinc(0.0), Ymin(0.0), Ymax(0.0), Ynum(0), Yinc(0.0), HeaderXLineLengthNeeded(true),
-              HeaderXLineLength(0)
-        {
-        }
+        std::string Name;                    // Map name
+        int zoneIndex;                       // Index to zone being mapped
+        int enclIndex = 0;                   // Index to enclosure for this map
+        Real64 Z = 0.0;                      // Elevation or height
+        Real64 Xmin = 0.0;                   // Minimum X value
+        Real64 Xmax = 0.0;                   // Maximum X value
+        int Xnum = 0;                        // Number of X reference points (going N-S)
+        Real64 Xinc = 0.0;                   // Increment between X reference points
+        Real64 Ymin = 0.0;                   // Minimum Y value
+        Real64 Ymax = 0.0;                   // Maximum Y value
+        int Ynum = 0;                        // Number of Y reference points (going E-W)
+        Real64 Yinc = 0.0;                   // Increment between Y reference points
+        SharedFileHandle mapFile;            // Unit number for map output (later merged to final file)
+        bool HeaderXLineLengthNeeded = true; // X header will likely be the longest line in the file
+        int HeaderXLineLength = 0;           // actual length of this X header line
+        std::string pointsHeader;            // part of the header that lists the reference points in the same zone
     };
 
     struct MapCalcData
     {
         // Members
-        int TotalMapRefPoints;            // Number of illuminance map reference points in this zone (up to 100)
-        int Zone;                         // Pointer to zone being mapped
+        int TotalMapRefPoints = 0;        // Number of illuminance map reference points in this zone (up to 100)
+        int zoneIndex = 0;                // Pointer to zone being mapped
+        int enclIndex = 0;                // Index to enclosure for this map
         Array2D<Real64> MapRefPtAbsCoord; // X,Y,Z coordinates of all illuminance map reference points
         // in absolute coordinate system (m)
         // Points 1 and 2 are the control reference points
@@ -287,11 +280,6 @@ namespace DataDaylighting {
         Array4D<Real64> DaylSourceFacSunDisk;
         Array4D<Real64> DaylBackFacSun;
         Array4D<Real64> DaylBackFacSunDisk;
-
-        // Default Constructor
-        MapCalcData() : TotalMapRefPoints(0), Zone(0)
-        {
-        }
     };
 
     struct RefPointData

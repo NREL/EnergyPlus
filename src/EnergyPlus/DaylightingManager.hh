@@ -94,7 +94,7 @@ namespace DaylightingManager {
 
     void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum);
 
-    void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum);
+    void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum);
 
     void FigureDayltgCoeffsAtPointsSetupForWindow(
         EnergyPlusData &state,

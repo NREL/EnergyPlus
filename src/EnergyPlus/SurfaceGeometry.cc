@@ -15018,10 +15018,6 @@ namespace SurfaceGeometry {
                 }
                 state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureLast =
                     max(state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureLast, state.dataHeatBal->space(spaceNum).radiantEnclosureNum);
-                // TODO MJW: For daylighting, set the zone solar enclosure number to the first space's number
-                if (state.dataHeatBal->Zone(zoneNum).zoneFirstSpaceSolEnclosure == 0) {
-                    state.dataHeatBal->Zone(zoneNum).zoneFirstSpaceSolEnclosure = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
-                }
             }
             assert(state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureFirst != -1);
             assert(state.dataHeatBal->Zone(zoneNum).zoneRadEnclosureLast != -1);

@@ -884,7 +884,7 @@ void DXFOut(EnergyPlusData &state,
         const auto curcolorno = ColorNo::DaylSensor1;
 
         for (int mapnum = 1; mapnum <= state.dataDaylightingData->TotIllumMaps; ++mapnum) {
-            if (state.dataDaylightingData->IllumMapCalc(mapnum).Zone != zones) continue;
+            if (state.dataDaylightingData->IllumMapCalc(mapnum).zoneIndex != zones) continue;
             for (int refpt = 1; refpt <= state.dataDaylightingData->IllumMapCalc(mapnum).TotalMapRefPoints; ++refpt) {
                 print(dxffile, Format_710, format("{}:MapRefPt:{}", state.dataHeatBal->Zone(zones).Name, refpt));
                 print(dxffile,
