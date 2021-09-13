@@ -3714,9 +3714,8 @@ namespace WindowManager {
         auto &hcvBG = state.dataWindowManager->hcvBG;
         auto &AbsRadShadeFace = state.dataWindowManager->AbsRadShadeFace;
 
-        int iter;       // Iteration number
-        Real64 errtemp; // Absolute value of sum of face temperature differences
-        //   between iterations, divided by number of faces
+        int iter = 0;                     // Iteration number
+        Real64 errtemp = 0.0;             // Absolute value of sum of face temperature differences between iterations, divided by number of faces
         Real64 VGap = 0.0;                // Air velocity in gap between glass and shade/blind (m/s)
         Real64 VAirflowGap = 0.0;         // Air velocity in airflow gap between glass panes (m/s)
         Real64 VGapPrev = 0.0;            // Value of VGap from previous iteration
@@ -3764,14 +3763,10 @@ namespace WindowManager {
         Real64 ZoneTemp = 0.0;              // Zone air temperature (C)
         int InsideFaceIndex = 0;            // intermediate variable for index of inside face in thetas
 
-        iter = 0;
-        ConvHeatFlowNatural = 0.0;
-        ConvHeatFlowForced = 0.0;
         state.dataWindowManager->nglfacep = state.dataWindowManager->nglface;
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
         ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
         AbsRadShadeFace = 0.0;
-        TGapNew = 0.0;
 
         if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
             state.dataWindowManager->nglfacep = state.dataWindowManager->nglface + 2;
