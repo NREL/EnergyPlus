@@ -251,8 +251,6 @@ namespace SimulationManager {
 
         PostIPProcessing(state);
 
-        InitializePsychRoutines(state);
-
         state.dataGlobal->BeginSimFlag = true;
         state.dataGlobal->BeginFullSimFlag = false;
         state.dataGlobal->DoOutputReporting = false;
@@ -265,6 +263,7 @@ namespace SimulationManager {
 
         OpenOutputFiles(state);
         GetProjectData(state);
+        InitializePsychRoutines(state);
         CheckForMisMatchedEnvironmentSpecifications(state);
         CheckForRequestedReporting(state);
         SetPredefinedTables(state);
@@ -1315,6 +1314,9 @@ namespace SimulationManager {
                                          "cubic spline interpolations in replacement of PsychTsatFnPb .");
                         // Mode06 CSpline interpolation (64 Pa bin size + 20/16 bit)
                         state.dataPsychrometrics->useInterpolationPsychTsatFnPb = true;
+#ifdef EP_cache_PsyTsatFnPb
+                        state.dataPsychCache->tsatprecision_bits = 20;
+#endif
                     }
                     if (overrideMaxZoneTempDiff) {
                         ShowWarningError(

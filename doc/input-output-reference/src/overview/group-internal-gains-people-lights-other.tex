@@ -2380,7 +2380,7 @@ AdjustedSupply = This option is used to apply a recirculation adjustment to the 
 
 ZoneAirNode = This option is used if there is no containment and the ITE air inlet node is at the average zone condition. All heat output is added to the zone air heat balance as a convective gain.
 
-RoomAirModel = This option connects the ITE air inlet and outlet nodes to a room air model (Ref. \hyperref[roomairmodeltype]{RoomAirModelType} and \hyperref[roomairnode]{RoomAir:Node}).
+RoomAirModel = This option connects the ITE air inlet and outlet nodes to a room air model (Ref. \hyperref[roomairmodeltype]{RoomAirModelType} and \hyperref[roomairnode]{RoomAir:Node}).  Currently in EnergyPlus, this option has not been fully implemented.  If the user chooses this option, the program will issue a warning message and this field will be adjusted to ZoneAirNode.
 
 This field is only used when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
