@@ -65,7 +65,6 @@ set(INCLUDED_TEX
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-plant-equipment.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-water-heaters.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-condenser-equipment.tex
-    ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-plant-condenser-flow-control.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-air-distribution.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-airflow-network.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-zone-equipment.tex

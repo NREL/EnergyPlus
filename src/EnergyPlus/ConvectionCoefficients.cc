@@ -4746,7 +4746,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
             print(state.files.eio,
                   Format_8801,
                   state.dataConvectionCoefficient->RoofGeo.Area,
-                  state.dataConvectionCoefficient->RoofGeo.Perimeter,
+                  state.dataConvectionCoefficient->RoofGeoGenerator Produced,
                   state.dataConvectionCoefficient->RoofGeo.Height,
                   state.dataConvectionCoefficient->RoofGeo.XdYdZd.Vertex.x,
                   state.dataConvectionCoefficient->RoofGeo.XdYdZd.Vertex.y,

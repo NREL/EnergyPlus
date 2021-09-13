@@ -2410,6 +2410,7 @@ Zone,Average,Surface Inside Face Temperature [C]
 Zone,Average,Surface Inside Face Interior Movable Insulation Temperature [C]
 Zone,Average,Surface Outside Face Temperature [C]
 Zone,Average,Surface Inside Face Adjacent Air Temperature [C]
+Zone,Average,Surface Outside Face Outdoor Air Wind Direction [deg]
 Zone,Average,Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]
 Zone,Average,Surface Inside Face Convection Heat Gain Rate [W]
 Zone,Average,Surface Inside Face Convection Heat Gain Rate per Area [W/m2]
@@ -2687,6 +2688,10 @@ This is the temperature of the surface's outside face, in degrees Celsius. Forme
 \subsubsection{Surface Inside Face Adjacent Air Temperature {[}C{]}}\label{surface-inside-face-adjacent-air-temperature-c}
 
 This is the effective bulk air temperature used for modeling the inside surface convection heat transfer. This is the same as the zone mean air temperature when using the mixing model for roomair. However, if more advanced roomair models are used, this variable will report the air temperature predicted by the roomair model as it was used in the surface heat balance model calculations. Former Name: Prior to version 7.1, this output was called Surface Int Adjacent Air Temperature.
+
+\subsubsection{Surface Outside Face Outdoor Air Wind Direction {[}deg{]}}\label{surface-outside-face-outdoor-air-wind-direction-def}
+
+This output reports the actual wind direction at the outside face of a surface.  This value may be different from the site wind direction when using OutdoorAir:Node with SurfaceProperty:LocalEnvironment or ZoneProperty:LocalEnvironment. It can also be modified using EMS.
 
 \subsubsection{Surface Inside Face Convection Heat Gain Rate {[}W{]}}\label{surface-inside-face-convection-heat-gain-rate-w}
 
