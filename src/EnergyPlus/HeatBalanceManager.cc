@@ -6111,11 +6111,11 @@ namespace HeatBalanceManager {
             if (state.dataHeatBalFanSys->ZTAV(ZoneNum) < state.dataHeatBalMgr->MinTempZone(ZoneNum)) {
                 state.dataHeatBalMgr->MinTempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             }
-            if (state.dataHeatBal->SNLoadHeatRate(ZoneNum) > state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum)) {
-                state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = state.dataHeatBal->SNLoadHeatRate(ZoneNum);
+            if (state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum) > state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum);
             }
-            if (state.dataHeatBal->SNLoadCoolRate(ZoneNum) > state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum)) {
-                state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = state.dataHeatBal->SNLoadCoolRate(ZoneNum);
+            if (state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum) > state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum);
             }
 
             // Record temperature and load for individual zone
@@ -6125,7 +6125,7 @@ namespace HeatBalanceManager {
             state.dataHeatBalMgr->LoadZonePrevDay(ZoneNum) = state.dataHeatBalMgr->LoadZone(ZoneNum);
             state.dataHeatBalMgr->TempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             state.dataHeatBalMgr->LoadZone(ZoneNum) =
-                max(state.dataHeatBal->SNLoadHeatRate(ZoneNum), std::abs(state.dataHeatBal->SNLoadCoolRate(ZoneNum)));
+                max(state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum), std::abs(state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum)));
 
             // Calculate differences in temperature and load for the last two warmup days
             if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DayOfSim == 1 && !state.dataGlobal->DoingSizing) {
