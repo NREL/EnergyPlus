@@ -619,7 +619,8 @@ namespace DataSurfaces {
         int RepresentativeCalcSurfNum; // Index of the surface that is used to calculate the heat balance for this surface. Equal to this surfaces
                                        // index when not using representative surface calculations.
 
-        int ConstructionStoredInputValue; // holds the original value for Construction per surface input
+        std::vector<int> ConstituentSurfaceNums; // A vector of surface numbers which reference this surface for representative calculations
+        int ConstructionStoredInputValue;        // holds the original value for Construction per surface input
         SurfaceClass Class;
 
         // Geometry related parameters

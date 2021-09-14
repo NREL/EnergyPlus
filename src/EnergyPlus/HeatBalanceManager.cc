@@ -8167,8 +8167,19 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->SurfIncSolSSG(Loop).SurfPtr = SurfNum;
-                    // Automatic Surface Multipliers: Do not use representative surfaces
-                    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
+                    if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                        int repSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
+                        if (repSurfNum != SurfNum) {
+                            // Do not use representative surfaces
+
+                            // remove surface from representative constituent list
+                            auto &vec = state.dataSurface->Surface(repSurfNum).ConstituentSurfaceNums;
+                            vec.erase(std::remove(vec.begin(), vec.end(), SurfNum), vec.end());
+
+                            // reset representative surface number
+                            state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
+                        }
+                    }
                 }
 
                 // Assign construction number
