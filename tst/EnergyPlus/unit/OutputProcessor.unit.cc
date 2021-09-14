@@ -5833,6 +5833,45 @@ namespace OutputProcessor {
 
         EXPECT_FALSE(errors_found);
     }
+
+    TEST_F(EnergyPlusFixture, OutputProcessor_FilePathInSetInitialMeterReportingAndOutputNames)
+    {
+        state->dataOutputProcessor->EnergyMeters.allocate(1);
+        state->dataOutputProcessor->EnergyMeters(1).Name = "Foo";
+        state->dataOutputProcessor->EnergyMeters(1).RptTS = true;
+        state->dataOutputProcessor->EnergyMeters(1).RptAccTS = true;
+
+        // by default, the eso fs::path instance will just be a filename, so this will definitely pass
+
+        // first call it as a non-cumulative variable
+        SetInitialMeterReportingAndOutputNames(*state, 1, true, ReportingFrequency::EachCall, false);
+        std::string errMsg = delimited_string({"   ** Warning ** Output:Meter:MeterFileOnly requested for \"Foo\" (TimeStep), already on "
+                                               "\"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr"});
+        compare_err_stream(errMsg);
+
+        // then with a cumulative variable
+        SetInitialMeterReportingAndOutputNames(*state, 1, true, ReportingFrequency::EachCall, true);
+        errMsg = delimited_string({"   ** Warning ** Output:Meter:MeterFileOnly requested for \"Cumulative Foo\" (TimeStep), already on "
+                                   "\"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr"});
+        compare_err_stream(errMsg);
+
+        // but then if you run EnergyPlus with `-d` to set an output directory, the variable will become a fully qualified path to the file
+        // to test this we need to set up a proper path for the current platform, luckily this seems to suffic
+        state->files.eso.filePath = fs::path("foo") / "bar.eso";
+        state->files.mtr.filePath = fs::path("foo") / "bar.mtr";
+
+        // first call it as a non-cumulative variable
+        SetInitialMeterReportingAndOutputNames(*state, 1, true, ReportingFrequency::EachCall, false);
+        errMsg = delimited_string({"   ** Warning ** Output:Meter:MeterFileOnly requested for \"Foo\" (TimeStep), already on \"Output:Meter\". Will "
+                                   "report to both bar.eso and bar.mtr"});
+        compare_err_stream(errMsg);
+
+        // then with a cumulative variable
+        SetInitialMeterReportingAndOutputNames(*state, 1, true, ReportingFrequency::EachCall, true);
+        errMsg = delimited_string({"   ** Warning ** Output:Meter:MeterFileOnly requested for \"Cumulative Foo\" (TimeStep), already on "
+                                   "\"Output:Meter\". Will report to both bar.eso and bar.mtr"});
+        compare_err_stream(errMsg);
+    }
 } // namespace OutputProcessor
 
 } // namespace EnergyPlus

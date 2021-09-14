@@ -107,17 +107,19 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfTempTerm;    // TempTerm for heatbalance equation
     Array1D<Real64> SurfTempDiv;     // Divisor for heatbalance equation
     // end group added to support CalcHeatBalanceInsideSurf2CTFOnly
-    Array1D<Real64> SurfTempIn;          // Temperature of the Inside Surface for each heat transfer surface
-    Array1D<Real64> SurfTempInsOld;      // SurfTempIn from previous iteration for convergence check
-    Array1D<Real64> SurfTempInTmp;       // Inside Surface Temperature Of Each Heat Transfer Surface
-    Array1D<Real64> SurfHcExt;           // Outside Convection Coefficient
-    Array1D<Real64> SurfHAirExt;         // Outside Radiation Coefficient to Air
-    Array1D<Real64> SurfHSkyExt;         // Outside Radiation Coefficient to Sky
-    Array1D<Real64> SurfHGrdExt;         // Outside Radiation Coefficient to Ground
-    Array1D<Real64> SurfHConvInt;        // INSIDE CONVECTION COEFFICIENT
-    Array1D<Real64> SurfTempSource;      // Temperature at the source location for each heat transfer surface
-    Array1D<Real64> SurfTempUserLoc;     // Temperature at the user specified location for each heat transfer surface
-    Array1D<Real64> SurfTempInMovInsRep; // Temperature of interior movable insulation on the side facing the zone
+    Array1D<Real64> SurfTempIn;           // Temperature of the Inside Surface for each heat transfer surface
+    Array1D<Real64> SurfTempInsOld;       // SurfTempIn from previous iteration for convergence check
+    Array1D<Real64> SurfTempInTmp;        // Inside Surface Temperature Of Each Heat Transfer Surface
+    Array1D<Real64> SurfHcExt;            // Outside Convection Coefficient
+    Array1D<Real64> SurfWinCoeffAdjRatio; // Convective Coefficient Adjustment Ratio assuming highly conductive frames
+                                          // Only applicable for exterior window surfaces
+    Array1D<Real64> SurfHAirExt;          // Outside Radiation Coefficient to Air
+    Array1D<Real64> SurfHSkyExt;          // Outside Radiation Coefficient to Sky
+    Array1D<Real64> SurfHGrdExt;          // Outside Radiation Coefficient to Ground
+    Array1D<Real64> SurfHConvInt;         // INSIDE CONVECTION COEFFICIENT
+    Array1D<Real64> SurfTempSource;       // Temperature at the source location for each heat transfer surface
+    Array1D<Real64> SurfTempUserLoc;      // Temperature at the user specified location for each heat transfer surface
+    Array1D<Real64> SurfTempInMovInsRep;  // Temperature of interior movable insulation on the side facing the zone
 
     Array1D<Real64> QConvInReport;         // Surface convection heat gain at inside face [J]
     Array1D<Real64> QdotConvInRep;         // Surface convection heat transfer rate at inside face surface [W] (report)
@@ -178,7 +180,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfOpaqAvgFaceCondEnergy; // Opaque surface average heat conduction flow (J) net conduction from outside environ toward inside
                                                // zone from inside of opaque surfaces, for reporting (J)
 
-    Array1D<Real64> SurfOpaqStorageGainRep;     // Opaque surface stored heat conduction flow when Opaque surface stored heat conduction flow  >= 0
+    Array1D<Real64> SurfOpaqStorageCondGainRep; // Opaque surface stored heat conduction flow when Opaque surface stored heat conduction flow  >= 0
     Array1D<Real64> SurfOpaqStorageCondLossRep; // Opaque surface stored heat conduction flow when Opaque surface stored heat conduction flow   < 0
     Array1D<Real64> SurfOpaqStorageCond;        // Opaque surface stored heat conduction flow (W) storage of heat inside surface,
                                                 // positive is increasing in surf
@@ -264,6 +266,7 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfTempInsOld.deallocate();
         this->SurfTempInTmp.deallocate();
         this->SurfHcExt.deallocate();
+        this->SurfWinCoeffAdjRatio.deallocate();
         this->SurfHAirExt.deallocate();
         this->SurfHSkyExt.deallocate();
         this->SurfHGrdExt.deallocate();
@@ -309,7 +312,7 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfOpaqAvgFaceCond.deallocate();
         this->SurfOpaqAvgFaceCondFlux.deallocate();
         this->SurfOpaqAvgFaceCondEnergy.deallocate();
-        this->SurfOpaqStorageGainRep.deallocate();
+        this->SurfOpaqStorageCondGainRep.deallocate();
         this->SurfOpaqStorageCondLossRep.deallocate();
         this->SurfOpaqStorageCond.deallocate();
         this->SurfOpaqStorageCondFlux.deallocate();
