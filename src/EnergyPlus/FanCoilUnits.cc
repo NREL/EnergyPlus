@@ -450,30 +450,30 @@ namespace FanCoilUnits {
                 if (UtilityRoutines::SameString(Alphas(11), "Coil:Cooling:Water")) {
                     FanCoil(FanCoilNum).CCoilType_Num = CCoil::Water;
                     FanCoil(FanCoilNum).CCoilPlantName = FanCoil(FanCoilNum).CCoilName;
-                    FanCoil(FanCoilNum).CCoilPlantTypeOf = DataPlant::PlantEquipmentType::CoilWaterCooling;
+                    FanCoil(FanCoilNum).CCoilPlantType = DataPlant::PlantEquipmentType::CoilWaterCooling;
                 }
                 if (UtilityRoutines::SameString(Alphas(11), "Coil:Cooling:Water:DetailedGeometry")) {
                     FanCoil(FanCoilNum).CCoilType_Num = CCoil::Detailed;
                     FanCoil(FanCoilNum).CCoilPlantName = FanCoil(FanCoilNum).CCoilName;
-                    FanCoil(FanCoilNum).CCoilPlantTypeOf = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
+                    FanCoil(FanCoilNum).CCoilPlantType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                 }
                 if (UtilityRoutines::SameString(Alphas(11), "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                     FanCoil(FanCoilNum).CCoilType_Num = CCoil::HXAssist;
+                    std::string CCoilType;
                     GetHXCoilTypeAndName(state,
                                          FanCoil(FanCoilNum).CCoilType,
                                          FanCoil(FanCoilNum).CCoilName,
                                          ErrorsFound,
-                                         FanCoil(FanCoilNum).CCoilPlantType,
+                                         CCoilType,
                                          FanCoil(FanCoilNum).CCoilPlantName);
-                    if (UtilityRoutines::SameString(FanCoil(FanCoilNum).CCoilPlantType, "Coil:Cooling:Water")) {
-                        FanCoil(FanCoilNum).CCoilPlantTypeOf = DataPlant::PlantEquipmentType::CoilWaterCooling;
-                    } else if (UtilityRoutines::SameString(FanCoil(FanCoilNum).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry")) {
-                        FanCoil(FanCoilNum).CCoilPlantTypeOf = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
+                    if (UtilityRoutines::SameString(CCoilType, "Coil:Cooling:Water")) {
+                        FanCoil(FanCoilNum).CCoilPlantType = DataPlant::PlantEquipmentType::CoilWaterCooling;
+                    } else if (UtilityRoutines::SameString(CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
+                        FanCoil(FanCoilNum).CCoilPlantType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                     } else {
                         ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
                         ShowContinueError(state, "For: " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
-                        ShowContinueError(state,
-                                          "Invalid Coil Type=" + FanCoil(FanCoilNum).CCoilPlantType + ", Name=" + FanCoil(FanCoilNum).CCoilPlantName);
+                        ShowContinueError(state, format("Invalid Coil Type={}, Name={}", CCoilType, FanCoil(FanCoilNum).CCoilPlantName));
                         ShowContinueError(state, "must be \"Coil:Cooling:Water\" or \"Coil:Cooling:Water:DetailedGeometry\"");
                         ErrorsFound = true;
                     }
@@ -1202,11 +1202,11 @@ namespace FanCoilUnits {
                 ShowFatalError(state, "InitFanCoilUnits: FanCoil=" + FanCoil(FanCoilNum).Name + ", invalid heating coil type. Program terminated.");
             }
 
-            if ((FanCoil(FanCoilNum).CCoilPlantTypeOf == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
-                (FanCoil(FanCoilNum).CCoilPlantTypeOf == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
+            if ((FanCoil(FanCoilNum).CCoilPlantType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
+                (FanCoil(FanCoilNum).CCoilPlantType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
                 ScanPlantLoopsForObject(state,
                                         FanCoil(FanCoilNum).CCoilPlantName,
-                                        FanCoil(FanCoilNum).CCoilPlantTypeOf,
+                                        FanCoil(FanCoilNum).CCoilPlantType,
                                         FanCoil(FanCoilNum).CoolCoilLoopNum,
                                         FanCoil(FanCoilNum).CoolCoilLoopSide,
                                         FanCoil(FanCoilNum).CoolCoilBranchNum,
