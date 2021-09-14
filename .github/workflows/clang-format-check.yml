@@ -1,5 +1,14 @@
 name: clang-format
-on: [push, pull_request]
+
+on:
+  push:
+    branches: [ develop ]
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - '*'
+  pull_request:
+    branches: [ develop ]
+
 jobs:
   formatting-check:
     name: Formatting Check

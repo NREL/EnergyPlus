@@ -134,6 +134,7 @@ protected:
             "    WALL,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -150,6 +151,7 @@ protected:
             "    WALL,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -166,6 +168,7 @@ protected:
             "    WALL,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -182,6 +185,7 @@ protected:
             "    WALL,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -198,6 +202,7 @@ protected:
             "    WALL,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -214,6 +219,7 @@ protected:
             "    ROOF,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -230,6 +236,7 @@ protected:
             "    ROOF,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -246,6 +253,7 @@ protected:
             "    ROOF,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -262,6 +270,7 @@ protected:
             "    ROOF,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -278,6 +287,7 @@ protected:
             "    ROOF,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -294,6 +304,7 @@ protected:
             "    FLOOR,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -310,6 +321,7 @@ protected:
             "    FLOOR,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -326,6 +338,7 @@ protected:
             "    FLOOR,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -342,6 +355,7 @@ protected:
             "    FLOOR,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -358,6 +372,7 @@ protected:
             "    FLOOR,                    !- Surface Type",
             "    WALL-1,                  !- Construction Name",
             "    Zone 1,                  !- Zone Name",
+            "    ,                        !- Space Name",
             "    Outdoors,                !- Outside Boundary Condition",
             "    ,                        !- Outside Boundary Condition Object",
             "    SunExposed,              !- Sun Exposure",
@@ -389,6 +404,440 @@ protected:
         return delimited_string(idf_lines);
     }
 };
+
+TEST_F(ConvectionCoefficientsFixture, initExtConvCoeffAdjRatio)
+{
+
+    std::string const idf_objects = delimited_string({
+        "WindowMaterial:SimpleGlazingSystem,",
+        "NonRes Fixed Assembly Window,  !- Name",
+        "6.9000,                  !- U-Factor {W/m2-K}",
+        "0.39;                    !- Solar Heat Gain Coefficient",
+        "Material:NoMass,",
+        "R13LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "2.290965,                !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+        "Material:NoMass,",
+        "R31LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "5.456,                   !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+        "Material,",
+        "C5 - 4 IN HW CONCRETE,   !- Name",
+        "MediumRough,             !- Roughness",
+        "0.1014984,               !- Thickness {m}",
+        "1.729577,                !- Conductivity {W/m-K}",
+        "2242.585,                !- Density {kg/m3}",
+        "836.8000,                !- Specific Heat {J/kg-K}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.6500000,               !- Solar Absorptance",
+        "0.6500000;               !- Visible Absorptance",
+        "Construction,",
+        "R13WALL,                 !- Name",
+        "R13LAYER;                !- Outside Layer",
+        "Construction,",
+        "FLOOR,                   !- Name",
+        "C5 - 4 IN HW CONCRETE;   !- Outside Layer",
+        "Construction,",
+        "ROOF31,                  !- Name",
+        "R31LAYER;                !- Outside Layer",
+        "Construction,",
+        "Window Non-res Fixed,    !- Name",
+        "NonRes Fixed Assembly Window;  !- Outside Layer",
+        "Zone,",
+        "ZONE ONE,                !- Name",
+        "0,                       !- Direction of Relative North {deg}",
+        "0,                       !- X Origin {m}",
+        "0,                       !- Y Origin {m}",
+        "0,                       !- Z Origin {m}",
+        "1,                       !- Type",
+        "1,                       !- Multiplier",
+        "autocalculate,           !- Ceiling Height {m}",
+        "autocalculate;           !- Volume {m3}",
+        "ScheduleTypeLimits,",
+        "Fraction,                !- Name",
+        "0.0,                     !- Lower Limit Value",
+        "1.0,                     !- Upper Limit Value",
+        "CONTINUOUS;              !- Numeric Type",
+        "GlobalGeometryRules,",
+        "UpperLeftCorner,         !- Starting Vertex Position",
+        "CounterClockWise,        !- Vertex Entry Direction",
+        "World;                   !- Coordinate System",
+        "FenestrationSurface:Detailed,",
+        "Zn001:Wall001:Win001,    !- Name",
+        "Window,                  !- Surface Type",
+        "Window Non-res Fixed,    !- Construction Name",
+        "Zn001:Wall001,           !- Building Surface Name",
+        ",                        !- Outside Boundary Condition Object",
+        "0.5000000,               !- View Factor to Ground",
+        ",                        !- Frame and Divider Name",
+        "1.0,                     !- Multiplier",
+        "4,                       !- Number of Vertices",
+        "0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall001,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall002,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "15.24000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall003,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "0,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall004,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "0,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Flr001,            !- Name",
+        "Floor,                   !- Surface Type",
+        "FLOOR,                   !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Adiabatic,               !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "NoSun,                   !- Sun Exposure",
+        "NoWind,                  !- Wind Exposure",
+        "1.000000,                !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,0.000000,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.000000,0.000000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0.000000,15.24000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,0.0;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Roof001,           !- Name",
+        "Roof,                    !- Surface Type",
+        "ROOF31,                  !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0,                       !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0.000000,15.24000,4.572,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.000000,0.000000,4.572,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+
+    Real64 HMovInsul = 1.0;
+    DataSurfaces::SurfaceRoughness RoughSurf = DataSurfaces::SurfaceRoughness::VerySmooth;
+    Real64 AbsThermSurf = 0.84;
+    Real64 TempExt = -20.0;
+    Real64 HExt;
+    Real64 HSky;
+    Real64 HGround;
+    Real64 HAir;
+
+    Real64 HExtAdj;
+    Real64 adjRatio = 2.0;
+
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(1);
+    // without adjust ratio
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio(1) = 1.0;
+    InitExteriorConvectionCoeff(*state, 1, HMovInsul, RoughSurf, AbsThermSurf, TempExt, HExt, HSky, HGround, HAir);
+    // with adjust ratio
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio(1) = adjRatio;
+    InitExteriorConvectionCoeff(*state, 1, HMovInsul, RoughSurf, AbsThermSurf, TempExt, HExtAdj, HSky, HGround, HAir);
+    // adjust ratio scales the returned exterior convection coefficient
+    EXPECT_EQ(HExtAdj, HExt * adjRatio);
+}
+
+TEST_F(ConvectionCoefficientsFixture, initIntConvCoeffAdjRatio)
+{
+    std::string const idf_objects = delimited_string({
+        "WindowMaterial:SimpleGlazingSystem,",
+        "NonRes Fixed Assembly Window,  !- Name",
+        "6.9000,                  !- U-Factor {W/m2-K}",
+        "0.39;                    !- Solar Heat Gain Coefficient",
+        "Material:NoMass,",
+        "R13LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "2.290965,                !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+        "Material:NoMass,",
+        "R31LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "5.456,                   !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+        "Material,",
+        "C5 - 4 IN HW CONCRETE,   !- Name",
+        "MediumRough,             !- Roughness",
+        "0.1014984,               !- Thickness {m}",
+        "1.729577,                !- Conductivity {W/m-K}",
+        "2242.585,                !- Density {kg/m3}",
+        "836.8000,                !- Specific Heat {J/kg-K}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.6500000,               !- Solar Absorptance",
+        "0.6500000;               !- Visible Absorptance",
+        "Construction,",
+        "R13WALL,                 !- Name",
+        "R13LAYER;                !- Outside Layer",
+        "Construction,",
+        "FLOOR,                   !- Name",
+        "C5 - 4 IN HW CONCRETE;   !- Outside Layer",
+        "Construction,",
+        "ROOF31,                  !- Name",
+        "R31LAYER;                !- Outside Layer",
+        "Construction,",
+        "Window Non-res Fixed,    !- Name",
+        "NonRes Fixed Assembly Window;  !- Outside Layer",
+        "Zone,",
+        "ZONE ONE,                !- Name",
+        "0,                       !- Direction of Relative North {deg}",
+        "0,                       !- X Origin {m}",
+        "0,                       !- Y Origin {m}",
+        "0,                       !- Z Origin {m}",
+        "1,                       !- Type",
+        "1,                       !- Multiplier",
+        "autocalculate,           !- Ceiling Height {m}",
+        "autocalculate;           !- Volume {m3}",
+        "ScheduleTypeLimits,",
+        "Fraction,                !- Name",
+        "0.0,                     !- Lower Limit Value",
+        "1.0,                     !- Upper Limit Value",
+        "CONTINUOUS;              !- Numeric Type",
+        "GlobalGeometryRules,",
+        "UpperLeftCorner,         !- Starting Vertex Position",
+        "CounterClockWise,        !- Vertex Entry Direction",
+        "World;                   !- Coordinate System",
+        "FenestrationSurface:Detailed,",
+        "Zn001:Wall001:Win001,    !- Name",
+        "Window,                  !- Surface Type",
+        "Window Non-res Fixed,    !- Construction Name",
+        "Zn001:Wall001,           !- Building Surface Name",
+        ",                        !- Outside Boundary Condition Object",
+        "0.5000000,               !- View Factor to Ground",
+        ",                        !- Frame and Divider Name",
+        "1.0,                     !- Multiplier",
+        "4,                       !- Number of Vertices",
+        "0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall001,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall002,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "15.24000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall003,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "0,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall004,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "0,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Flr001,            !- Name",
+        "Floor,                   !- Surface Type",
+        "FLOOR,                   !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Adiabatic,               !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "NoSun,                   !- Sun Exposure",
+        "NoWind,                  !- Wind Exposure",
+        "1.000000,                !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,0.000000,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.000000,0.000000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0.000000,15.24000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,0.0;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Roof001,           !- Name",
+        "Roof,                    !- Surface Type",
+        "ROOF31,                  !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0,                       !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0.000000,15.24000,4.572,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.000000,0.000000,4.572,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(7, 1.0);
+
+    state->dataHeatBalSurf->SurfTempInTmp.dimension(7, 20.0);
+    state->dataHeatBalFanSys->MAT.dimension(1, 25.0);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(1, 0.006);
+    state->dataHeatBalSurf->SurfHConvInt.allocate(7);
+    state->dataHeatBalSurf->SurfHConvInt(7) = 0.0;
+
+    InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->SurfTempInTmp);
+    // exterior window interior surface convection coefficient without adjustment
+    Real64 hcin = state->dataHeatBalSurf->SurfHConvInt(7);
+    Real64 adjRatio = 2.0;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio(7) = adjRatio;
+    InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->SurfTempInTmp);
+    // exterior window interior surface convection coefficient with adjustment
+    Real64 hcinAdj = state->dataHeatBalSurf->SurfHConvInt(7);
+    // adjustment ratio properly applied
+    EXPECT_EQ(hcinAdj, adjRatio * hcin);
+}
 
 TEST_F(ConvectionCoefficientsFixture, ConvectionCofficients)
 {
@@ -479,106 +928,106 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
 
     // Surface temps are 20C
     for (int surf = 1; surf <= state->dataSurface->TotSurfaces; ++surf) {
-        state->dataHeatBalSurf->TH(2, 1, surf) = 20.0;
+        state->dataHeatBalSurf->SurfInsideTempHist(1)(surf) = 20.0;
     }
 
     // Case 1 - Zone air warmer than surfaces
     state->dataHeatBalFanSys->MAT(1) = 30.0;
 
     DynamicIntConvSurfaceClassification(*state, 1);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(1), DataSurfaces::InConvClass_A3_VertWalls);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(1), ConvectionConstants::InConvClass::A3_VertWalls));
 
     DynamicIntConvSurfaceClassification(*state, 2);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(2), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(2), ConvectionConstants::InConvClass::A3_StableTilted));
 
     DynamicIntConvSurfaceClassification(*state, 3);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(3), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(3), ConvectionConstants::InConvClass::A3_UnstableTilted));
 
     DynamicIntConvSurfaceClassification(*state, 4);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(4), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(4), ConvectionConstants::InConvClass::A3_UnstableHoriz));
 
     DynamicIntConvSurfaceClassification(*state, 5);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(5), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(5), ConvectionConstants::InConvClass::A3_StableHoriz));
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
-    DynamicIntConvSurfaceClassification(*state, 6);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0);
+    //    DynamicIntConvSurfaceClassification(*state, 6);
+    //    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0);
 
     DynamicIntConvSurfaceClassification(*state, 7);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(7), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(7), ConvectionConstants::InConvClass::A3_StableTilted));
 
     DynamicIntConvSurfaceClassification(*state, 8);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(8), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(8), ConvectionConstants::InConvClass::A3_StableTilted));
 
     DynamicIntConvSurfaceClassification(*state, 9);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(9), DataSurfaces::InConvClass_A3_StableHoriz);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(9), ConvectionConstants::InConvClass::A3_StableHoriz));
 
     DynamicIntConvSurfaceClassification(*state, 10);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(10), DataSurfaces::InConvClass_A3_StableHoriz);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(10), ConvectionConstants::InConvClass::A3_StableHoriz));
 
     DynamicIntConvSurfaceClassification(*state, 11);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(11), DataSurfaces::InConvClass_A3_VertWalls);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(11), ConvectionConstants::InConvClass::A3_VertWalls));
 
     DynamicIntConvSurfaceClassification(*state, 12);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(12), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(12), ConvectionConstants::InConvClass::A3_UnstableTilted));
 
     DynamicIntConvSurfaceClassification(*state, 13);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(13), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(13), ConvectionConstants::InConvClass::A3_UnstableTilted));
 
     DynamicIntConvSurfaceClassification(*state, 14);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(14), DataSurfaces::InConvClass_A3_UnstableHoriz);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(14), ConvectionConstants::InConvClass::A3_UnstableHoriz));
 
     DynamicIntConvSurfaceClassification(*state, 15);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(15), DataSurfaces::InConvClass_A3_UnstableHoriz);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(15), ConvectionConstants::InConvClass::A3_UnstableHoriz));
 
     // Case 2 - Zone air colder than surfaces
     state->dataHeatBalFanSys->MAT(1) = 10.0;
 
     DynamicIntConvSurfaceClassification(*state, 1);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(1), DataSurfaces::InConvClass_A3_VertWalls);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(1), ConvectionConstants::InConvClass::A3_VertWalls));
 
     DynamicIntConvSurfaceClassification(*state, 2);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(2), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(2), ConvectionConstants::InConvClass::A3_UnstableTilted));
 
     DynamicIntConvSurfaceClassification(*state, 3);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(3), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(3), ConvectionConstants::InConvClass::A3_StableTilted));
 
     DynamicIntConvSurfaceClassification(*state, 4);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(4), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(4), ConvectionConstants::InConvClass::A3_StableHoriz));
 
     DynamicIntConvSurfaceClassification(*state, 5);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(5), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(5), ConvectionConstants::InConvClass::A3_UnstableHoriz));
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
-    DynamicIntConvSurfaceClassification(*state, 6);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0);
+    //    DynamicIntConvSurfaceClassification(*state, 6);
+    //    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0));
 
     DynamicIntConvSurfaceClassification(*state, 7);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(7), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(7), ConvectionConstants::InConvClass::A3_UnstableTilted));
 
     DynamicIntConvSurfaceClassification(*state, 8);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(8), DataSurfaces::InConvClass_A3_UnstableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(8), ConvectionConstants::InConvClass::A3_UnstableTilted));
 
     DynamicIntConvSurfaceClassification(*state, 9);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(9), DataSurfaces::InConvClass_A3_UnstableHoriz);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(9), ConvectionConstants::InConvClass::A3_UnstableHoriz));
 
     DynamicIntConvSurfaceClassification(*state, 10);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(10), DataSurfaces::InConvClass_A3_UnstableHoriz);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(10), ConvectionConstants::InConvClass::A3_UnstableHoriz));
 
     DynamicIntConvSurfaceClassification(*state, 11);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(11), DataSurfaces::InConvClass_A3_VertWalls);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(11), ConvectionConstants::InConvClass::A3_VertWalls));
 
     DynamicIntConvSurfaceClassification(*state, 12);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(12), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(12), ConvectionConstants::InConvClass::A3_StableTilted));
 
     DynamicIntConvSurfaceClassification(*state, 13);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(13), DataSurfaces::InConvClass_A3_StableTilted);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(13), ConvectionConstants::InConvClass::A3_StableTilted));
 
     DynamicIntConvSurfaceClassification(*state, 14);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(14), DataSurfaces::InConvClass_A3_StableHoriz);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(14), ConvectionConstants::InConvClass::A3_StableHoriz));
 
     DynamicIntConvSurfaceClassification(*state, 15);
-    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(15), DataSurfaces::InConvClass_A3_StableHoriz);
+    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClassification(15), ConvectionConstants::InConvClass::A3_StableHoriz));
 }
 
 TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
@@ -612,7 +1061,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
     for (int surf = 1; surf <= state->dataSurface->TotSurfaces; ++surf) {
-        state->dataHeatBalSurf->TH(2, 1, surf) = 20.0;
+        state->dataHeatBalSurf->SurfInsideTempHist(1)(surf) = 20.0;
     }
 
     state->dataHeatBalFanSys->MAT.allocate(1);
@@ -628,8 +1077,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     Hc = 0.0;
     state->dataSurface->Surface(SurfNum).CosTilt = -1;
 
-    HcExpectedValue =
-        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
+    HcExpectedValue = CalcASHRAETARPNatural(
+        state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
     EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
@@ -640,8 +1089,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     Hc = 0.0;
     state->dataSurface->Surface(SurfNum).CosTilt = 1;
 
-    HcExpectedValue =
-        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
+    HcExpectedValue = CalcASHRAETARPNatural(
+        state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
     EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
@@ -652,8 +1101,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     Hc = 0.0;
     state->dataSurface->Surface(SurfNum).CosTilt = 0;
 
-    HcExpectedValue =
-        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
+    HcExpectedValue = CalcASHRAETARPNatural(
+        state->dataHeatBalSurf->SurfInsideTempHist(1)(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
     EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);

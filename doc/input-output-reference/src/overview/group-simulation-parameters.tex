@@ -21,38 +21,38 @@ The Timestep object specifies the ``basic'' timestep for the simulation. The val
 The choice made for this field has important implications for modeling accuracy and the overall time it takes to run a simulation. Here are some considerations when choosing a value:
 
 \begin{itemize}
-\item
-  The solution technique used in EnergyPlus has been designed to be stable with zone timesteps of up to sixty minutes (Number Timesteps in Hour = 1). However, 60 minutes is considered a ``long'' timestep and it should only be used in rare occasions where there is no HVAC system, accuracy is not a concern, and short run times are critical. Such long timesteps are not recommended to use because simulation results are more accurate for shorter timesteps, of say 10 minutes or less (Number of Timesteps per Hour of 6 or more). Shorter zone timesteps improve the numerical solution of the Zone Heat Balance Model because they improve how models for surface temperature and zone air temperature are coupled together. Longer timesteps introduce more lag and lead to more a dampened dynamic response.
-\item
-  Simulation run time increases with shorter timesteps or larger values for Number of Timesteps per Hour. The effect varies with the nature of the model. The user can test out different values on their particular model to understand the implications for his or her particular case. Sometimes large models with multizone HVAC and Plant systems execute nearly as fast with 15 minute timesteps as with 60 minute timesteps because fewer iterations are required in the system modeling since the prior timestep's results are close to the final outcome of next timestep.
-\item
-  The weather data files usually have 60-minute (or hourly) data. However, it does not follow that this should be used as the basis for choosing the zone timestep because:
-\item
-  EnergyPlus carefully interpolates the weather data between data points for use at shorter timesteps. This is discussed in a later section: Weather Data Hourly Interpolation
-\item
-  Many aspects of a model have time scales that differ from the that of the weather data. A goal of the modeling is to predict how the building will respond to the weather. However, the building's response is not \emph{governed} by the time scale that the weather data are available at, but rather the time scales of the dynamic performance of the thermal envelope as well as things like schedules for internal gains, thermostats, and equipment availability.
-\item
-  If the model will include calculating the cost of electricity, then the user should be aware that many electric utility tariffs base charges on demand windows of a specified length of time. If the choice of Number of Timesteps per Hour is not consistent with the demand window, then unexpected results may be obtained. For reasonable prediction of the maximum rates for electricity use for in calculating demand charges, the length of the zone timestep needs to be consistent with the tariff's demand window. The following table lists what values are consistent with various demand windows.
+    \item
+    The solution technique used in EnergyPlus has been designed to be stable with zone timesteps of up to sixty minutes (Number Timesteps in Hour = 1). However, 60 minutes is considered a ``long'' timestep and it should only be used in rare occasions where there is no HVAC system, accuracy is not a concern, and short run times are critical. Such long timesteps are not recommended to use because simulation results are more accurate for shorter timesteps, of say 10 minutes or less (Number of Timesteps per Hour of 6 or more). Shorter zone timesteps improve the numerical solution of the Zone Heat Balance Model because they improve how models for surface temperature and zone air temperature are coupled together. Longer timesteps introduce more lag and lead to more a dampened dynamic response.
+    \item
+    Simulation run time increases with shorter timesteps or larger values for Number of Timesteps per Hour. The effect varies with the nature of the model. The user can test out different values on their particular model to understand the implications for his or her particular case. Sometimes large models with multizone HVAC and Plant systems execute nearly as fast with 15 minute timesteps as with 60 minute timesteps because fewer iterations are required in the system modeling since the prior timestep's results are close to the final outcome of next timestep.
+    \item
+    The weather data files usually have 60-minute (or hourly) data. However, it does not follow that this should be used as the basis for choosing the zone timestep because:
+    \item
+    EnergyPlus carefully interpolates the weather data between data points for use at shorter timesteps. This is discussed in a later section: Weather Data Hourly Interpolation
+    \item
+    Many aspects of a model have time scales that differ from the that of the weather data. A goal of the modeling is to predict how the building will respond to the weather. However, the building's response is not \emph{governed} by the time scale that the weather data are available at, but rather the time scales of the dynamic performance of the thermal envelope as well as things like schedules for internal gains, thermostats, and equipment availability.
+    \item
+    If the model will include calculating the cost of electricity, then the user should be aware that many electric utility tariffs base charges on demand windows of a specified length of time. If the choice of Number of Timesteps per Hour is not consistent with the demand window, then unexpected results may be obtained. For reasonable prediction of the maximum rates for electricity use for in calculating demand charges, the length of the zone timestep needs to be consistent with the tariff's demand window. The following table lists what values are consistent with various demand windows.
 \end{itemize}
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule
-Demand Window & Applicable Number of Timesteps per Hour \tabularnewline
-\midrule
-\endfirsthead
+    \toprule
+    Demand Window & Applicable Number of Timesteps per Hour \tabularnewline
+    \midrule
+    \endfirsthead
 
-\toprule
-Demand Window & Applicable Number of Timesteps per Hour \tabularnewline
-\midrule
-\endhead
+    \toprule
+    Demand Window & Applicable Number of Timesteps per Hour \tabularnewline
+    \midrule
+    \endhead
 
-QuarterHour & 4, 12, 20, or 60 \tabularnewline
-HalfHour & 2, 4, 6, 10, 12, 20, 30, or 60 \tabularnewline
-FullHour, Day, Week & Any \tabularnewline
-\bottomrule
+    QuarterHour & 4, 12, 20, or 60 \tabularnewline
+    HalfHour & 2, 4, 6, 10, 12, 20, 30, or 60 \tabularnewline
+    FullHour, Day, Week & Any \tabularnewline
+    \bottomrule
 \end{longtable}
 
-There is also second type of timestep inside EnergyPlus that is known as the System Timestep. This is a variable-length timestep that governs the driving timestep for HVAC and Plant system modeling. The user cannot directly control the system timestep (except by use of the \hyperref[convergencelimits]{ConvergenceLimits} object). When the HVAC portion of the simulation begins its solution for the current zone timestep, it uses the zone timestep as its maximum length but then can reduce the timestep, as necessary, to improve the solution.  The technical details of the approach are explained in the Engineering Documentation under ``Integrated Solution Manager''.
+There is also second type of timestep inside EnergyPlus that is known as the System Timestep. This is a variable-length timestep that governs the driving timestep for HVAC and Plant system modeling. The user cannot directly control the system timestep (except by use of the \hyperref[convergencelimits]{ConvergenceLimits} object). When the HVAC portion of the simulation begins its solution for the current zone timestep, it uses the zone timestep as its maximum length but then can reduce the timestep, as necessary, to improve the solution. The technical details of the approach are explained in the Engineering Documentation under ``Integrated Solution Manager''.
 
 Users can see the system timestep used if they select the ``detailed'' frequency option on an HVAC output variable (e.g. Zone Air Temperature). To contrast, the ``Zone'' variables will only be reported on the zone timestep (e.g. Zone Mean Air Temperature).
 
@@ -121,9 +121,9 @@ The Building North Axis is specified \textbf{relative to true North}. Buildings 
 The figure below shows how the building north axis can be rotated to correspond with one of the major axes of an actual building. The relevance of this field is described more completely under ``\hyperref[globalgeometryrules]{GlobalGeometryRules}''; in particular, the value of ``North Axis'' is \emph{ignored} if a coordinate system other than ``relative'' is used.
 
 \begin{figure}[hbtp] % fig 1
-\centering
-\includegraphics[width=0.4\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image001.png}
-\caption{Illustration of Building North Axis \protect \label{fig:illustration-of-building-north-axis}}
+    \centering
+    \includegraphics[width=0.4\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image001.png}
+    \caption{Illustration of Building North Axis \protect \label{fig:illustration-of-building-north-axis}}
 \end{figure}
 
 \paragraph{Field: Terrain}\label{field-terrain}
@@ -132,29 +132,29 @@ The site's terrain affects how the wind hits the building -- as does the buildin
 
 % table 1
 \begin{longtable}[c]{@{}ll@{}}
-\caption{Values for ``Terrain'' \label{table:values-for-terrain}} \tabularnewline
-\toprule
-Terrain Type Value & Terrain Description \tabularnewline
-\midrule
-\endfirsthead
+    \caption{Values for ``Terrain'' \label{table:values-for-terrain}} \tabularnewline
+    \toprule
+    Terrain Type Value & Terrain Description \tabularnewline
+    \midrule
+    \endfirsthead
 
-\caption[]{Values for ``Terrain''} \tabularnewline
-\toprule
-Terrain Type Value & Terrain Description \tabularnewline
-\midrule
-\endhead
+    \caption[]{Values for ``Terrain''} \tabularnewline
+    \toprule
+    Terrain Type Value & Terrain Description \tabularnewline
+    \midrule
+    \endhead
 
-Country & Flat, Open Country \tabularnewline
-Suburbs & Rough, Wooded Country, Suburbs \tabularnewline
-City & Towns, city outskirts, center of large cities \tabularnewline
-Ocean & Ocean, Bayou flat country \tabularnewline
-Urban & Urban, Industrial, Forest \tabularnewline
-\bottomrule
+    Country & Flat, Open Country \tabularnewline
+    Suburbs & Rough, Wooded Country, Suburbs \tabularnewline
+    City & Towns, city outskirts, center of large cities \tabularnewline
+    Ocean & Ocean, Bayou flat country \tabularnewline
+    Urban & Urban, Industrial, Forest \tabularnewline
+    \bottomrule
 \end{longtable}
 
 \paragraph{Warmup Convergence}\label{warmup-convergence}
 
-The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will ``converge'' at each environment (each sizing period or run period set as Yes in the \hyperref[simulationcontrol]{SimulationControl} object). At the beginning of a new enviroment the building model is reinitialized so that temperatures are initialized to 23C and zone humidity ratios are initialized to the outdoor humidity ratio  (unless this initialization is suppressed using the input field called Begin Environment Reset Mode in the \hyperref[sizingperioddesignday]{SizingPerod:DesignDay} object).  EnergyPlus repeatedly ``runs'' the first day of the environment or until it reaches ``maximum number of warmup days'' or the convergence criteria are met. Note that setting the convergence tolerance values too loose will cause the program to be satisfied too early and you may not get the results you expect from the actual simulation. However too tight of a value and the program will repeat the first day too many times leading to excessive simulation run time.
+The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will ``converge'' at each environment (each sizing period or run period set as Yes in the \hyperref[simulationcontrol]{SimulationControl} object). At the beginning of a new enviroment the building model is reinitialized so that temperatures are initialized to 23C and zone humidity ratios are initialized to the outdoor humidity ratio  (unless this initialization is suppressed using the input field called Begin Environment Reset Mode in the \hyperref[sizingperioddesignday]{SizingPerod:DesignDay} object). EnergyPlus repeatedly ``runs'' the first day of the environment or until it reaches ``maximum number of warmup days'' or the convergence criteria are met. Note that setting the convergence tolerance values too loose will cause the program to be satisfied too early and you may not get the results you expect from the actual simulation. However too tight of a value and the program will repeat the first day too many times leading to excessive simulation run time.
 
 \paragraph{Field: Loads Convergence Tolerance Value}\label{field-loads-convergence-tolerance-value}
 
@@ -193,9 +193,9 @@ If this option is used, you should be sure that the surfaces of the zone totally
 If you use \textbf{FullInteriorAndExterior} the program will also calculate how much beam radiation falling on the inside of an exterior window (from other windows in the zone) is absorbed by the window, how much is reflected back into the zone, and how much is transmitted to the outside. In this calculation the effect of a shading device, if present, is accounted for.
 
 \begin{figure}[hbtp] % fig 2
-\centering
-\includegraphics[width=0.9\textwidth, height=0.5\textheight, keepaspectratio=true]{media/image002.png}
-\caption{Illustration of Convex and Non-convex Zones \protect \label{fig:illustration-of-convex-and-non-convex-zones}}
+    \centering
+    \includegraphics[width=0.9\textwidth, height=0.5\textheight, keepaspectratio=true]{media/image002.png}
+    \caption{Illustration of Convex and Non-convex Zones \protect \label{fig:illustration-of-convex-and-non-convex-zones}}
 \end{figure}
 
 \textbf{Diffuse Radiation}
@@ -220,21 +220,21 @@ The building surfaces are assumed to be diffusely reflecting if they are opaque 
 3) \textbf{The ground surface}. Reflection from the ground is calculated even if reflections option is not used;l but then the ground plane is considered unobstructed, i.e., the shadowing of the ground by the building itself or by obstructions such as neighboring buildings is ignored. Shadowing by the building itself or neighboring buildings is taken into account when the ``with reflections'' option is used but then the ``view factor to ground'' is NOT used. This is shown in Figure~\ref{fig:shadowing-from-building-affects-beam-solar}.
 
 \begin{figure}[hbtp] % fig 3
-\centering
-\includegraphics[width=0.9\textwidth, height=0.7\textheight, keepaspectratio=true]{media/image003.png}
-\caption{  Solar reflection from shadowing surfaces. Solid arrows are beam solar radiation; dashed arrows are diffuse solar radiation. (a) Diffuse reflection of beam solar radiation from the top of an overhang. (b) Diffuse reflection of sky solar radiation from the top of an overhang. (c) Beam-to-beam (specular) reflection from the façade of an adjacent highly-glazed building represented by a vertical shadowing surface. \protect \label{fig:solar-reflection-from-shadowing-surfaces.}}
+    \centering
+    \includegraphics[width=0.9\textwidth, height=0.7\textheight, keepaspectratio=true]{media/image003.png}
+    \caption{  Solar reflection from shadowing surfaces. Solid arrows are beam solar radiation; dashed arrows are diffuse solar radiation. (a) Diffuse reflection of beam solar radiation from the top of an overhang. (b) Diffuse reflection of sky solar radiation from the top of an overhang. (c) Beam-to-beam (specular) reflection from the façade of an adjacent highly-glazed building represented by a vertical shadowing surface. \protect \label{fig:solar-reflection-from-shadowing-surfaces.}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 4
-\centering
-\includegraphics[width=0.9\textwidth, height=0.7\textheight, keepaspectratio=true]{media/image004.png}
-\caption{  Solar reflection from building surfaces onto other building surfaces. In this example beam solar reflects from a vertical section of the building onto a roof section. The reflection from the window is specular. The reflection from the wall is diffuse. \protect \label{fig:solar-reflection-from-building-surfaces-onto}}
+    \centering
+    \includegraphics[width=0.9\textwidth, height=0.7\textheight, keepaspectratio=true]{media/image004.png}
+    \caption{  Solar reflection from building surfaces onto other building surfaces. In this example beam solar reflects from a vertical section of the building onto a roof section. The reflection from the window is specular. The reflection from the wall is diffuse. \protect \label{fig:solar-reflection-from-building-surfaces-onto}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 5
-\centering
-\includegraphics[width=0.9\textwidth, height=0.7\textheight, keepaspectratio=true]{media/image005.png}
-\caption{Shadowing from building affects beam solar reflection from the ground. Beam-to-diffuse reflection from the ground onto the building occurs only for sunlit areas, A and C, not from shaded area, B. \protect \label{fig:shadowing-from-building-affects-beam-solar}}
+    \centering
+    \includegraphics[width=0.9\textwidth, height=0.7\textheight, keepaspectratio=true]{media/image005.png}
+    \caption{Shadowing from building affects beam solar reflection from the ground. Beam-to-diffuse reflection from the ground onto the building occurs only for sunlit areas, A and C, not from shaded area, B. \protect \label{fig:shadowing-from-building-affects-beam-solar}}
 \end{figure}
 
 \paragraph{Field: Maximum Number of Warmup Days}\label{field-maximum-number-of-warmup-days}
@@ -254,11 +254,11 @@ As noted in the message, there will be more information in the .eio file. (Refer
 
 You may be able to increase the Maximum Number of Warmup Days and get convergence, but some anomalous buildings may still not converge. Simulation proceeds for x warmup days until ``convergence'' is reached (see the discussion under the Temperature Convergence Tolerance Value field in this object, just above).
 
-The value in this field is an overall parameter for all types of environments in the simulation.  The maximum nmber of warmup days can also be controlled separately for individual designgdays using the input field Maximum Number Warmup Days in the \hyperref[sizingperioddesignday]{SizingPerod:DesignDay} object.
+The value in this field is an overall parameter for all types of environments in the simulation. The maximum nmber of warmup days can also be controlled separately for individual designgdays using the input field Maximum Number Warmup Days in the \hyperref[sizingperioddesignday]{SizingPerod:DesignDay} object.
 
 \paragraph{Field: Minimum Number of Warmup Days}\label{field-minimum-number-of-warmup-days}
 
-This field specifies the minimum number of ``warmup'' days before EnergyPlus will check if it has achieved convergence and can thus start simulating the particular environment (design day, annual run) in question. Although some older investigations indicated that 6 warmup days is generally enough on the minimum end of the spectrum, current thinking is that the convergence checks (controlled by convergence tolerance values above) can be relied on to determine a minimum number of warm days.  An arbitrary high minimum can lead to excessive run times for lightweight buildings that may converge quickly and not need many warmup days.  Therefore the default is reduced from 6 to just 1. A value of 6 here will replicate older behavior if field was being left blank.  Users may wish to increase the value in certain situations when, based on the output variables described in the Output Details document, it is determined that EnergyPlus has not converged. While this parameter should be less than the previous maximum parameter, a value greater than the value entered in the field ``Maximum Number of Warmup Days'' above may be used when users wish to increase warmup days more than the previous field. In this particular case, the previous field will be automatically reset to the value entered in this field and EnergyPlus will run exactly the number of warmup days specified in this field.
+This field specifies the minimum number of ``warmup'' days before EnergyPlus will check if it has achieved convergence and can thus start simulating the particular environment (design day, annual run) in question. Although some older investigations indicated that 6 warmup days is generally enough on the minimum end of the spectrum, current thinking is that the convergence checks (controlled by convergence tolerance values above) can be relied on to determine a minimum number of warm days. An arbitrary high minimum can lead to excessive run times for lightweight buildings that may converge quickly and not need many warmup days. Therefore the default is reduced from 6 to just 1. A value of 6 here will replicate older behavior if field was being left blank. Users may wish to increase the value in certain situations when, based on the output variables described in the Output Details document, it is determined that EnergyPlus has not converged. While this parameter should be less than the previous maximum parameter, a value greater than the value entered in the field ``Maximum Number of Warmup Days'' above may be used when users wish to increase warmup days more than the previous field. In this particular case, the previous field will be automatically reset to the value entered in this field and EnergyPlus will run exactly the number of warmup days specified in this field.
 
 An example from an IDF:
 
@@ -346,40 +346,40 @@ The HeatBalanceAlgorithm object provides a way to select what type of heat and m
 Four values are allowed to select which solution will be used.
 
 \begin{itemize}
-\item
-  The \textbf{ConductionTransferFunction} selection is a sensible heat only solution and does not take into account moisture storage or diffusion in the construction elements.
-\item
-  The \textbf{MoisturePenetrationDepthConductionTransferFunction} selection is a sensible heat diffusion and an inside surface moisture storage algorithm that also needs additional moisture material property information. Sometimes, this is referred to as the Effective Moisture Penetration Depth or EMPD. See the moisture material property object for additional information and description of outputs:
-  \begin{itemize}
-  \item
-    \hyperref[materialpropertymoisturepenetrationdepthsettings]{MaterialProperty:MoisturePenetrationDepth:Settings}
-  \end{itemize}
-\item
-  \textbf{Advanced/Research usage:}The \textbf{ConductionFiniteDifference} selection is a sensible heat only solution and does not take into account moisture storage or diffusion in the construction elements. This solution technique uses a 1-D finite difference solution in the construction elements. Outputs for the surfaces are described with the material property objects. The Conduction Finite Difference (aka CondFD) property objects are:
-  \begin{itemize}
-  \item
-    \hyperref[materialpropertyphasechange]{MaterialProperty:PhaseChange}
-  \item
-    \hyperref[materialpropertyvariablethermalconductivity]{MaterialProperty:VariableThermalConductivity}
-  \item
-    \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis}
-  \end{itemize}
-\item
-  \textbf{Advanced/Research usage:} The \textbf{CombinedHeatAndMoistureFiniteElement} is a coupled heat and moisture transfer and storage solution. The solution technique uses a one dimensional finite difference solution in the construction elements and requires further material properties described in the Heat and Moisture Transfer material properties objects. Outputs from the algorithm are described with these objects. The Heat and Moisture Transfer property objects are:
-  \begin{itemize}
-  \item
-    \hyperref[materialpropertyheatandmoisturetransfersettings]{MaterialProperty:HeatAndMoistureTransfer:Settings}
-  \item
-    \hyperref[materialpropertyheatandmoisturetransfersorptionisotherm]{MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm}
-  \item
-    \hyperref[materialpropertyheatandmoisturetransfersuction]{MaterialProperty:HeatAndMoistureTransfer:Suction}
-  \item
-    \hyperref[materialpropertyheatandmoisturetransferredistribution]{MaterialProperty:HeatAndMoistureTransfer:Redistribution}
-  \item
-    \hyperref[materialpropertyheatandmoisturetransferdiffusion]{MaterialProperty:HeatAndMoistureTransfer:Diffusion}
-  \item
-    \hyperref[materialpropertyheatandmoisturetransferthermalconductivity]{MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity}
-  \end{itemize}
+    \item
+    The \textbf{ConductionTransferFunction} selection is a sensible heat only solution and does not take into account moisture storage or diffusion in the construction elements.
+    \item
+    The \textbf{MoisturePenetrationDepthConductionTransferFunction} selection is a sensible heat diffusion and an inside surface moisture storage algorithm that also needs additional moisture material property information. Sometimes, this is referred to as the Effective Moisture Penetration Depth or EMPD. See the moisture material property object for additional information and description of outputs:
+    \begin{itemize}
+        \item
+        \hyperref[materialpropertymoisturepenetrationdepthsettings]{MaterialProperty:MoisturePenetrationDepth:Settings}
+    \end{itemize}
+    \item
+    \textbf{Advanced/Research usage:}The \textbf{ConductionFiniteDifference} selection is a sensible heat only solution and does not take into account moisture storage or diffusion in the construction elements. This solution technique uses a 1-D finite difference solution in the construction elements. Outputs for the surfaces are described with the material property objects. The Conduction Finite Difference (aka CondFD) property objects are:
+    \begin{itemize}
+        \item
+        \hyperref[materialpropertyphasechange]{MaterialProperty:PhaseChange}
+        \item
+        \hyperref[materialpropertyvariablethermalconductivity]{MaterialProperty:VariableThermalConductivity}
+        \item
+        \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis}
+    \end{itemize}
+    \item
+    \textbf{Advanced/Research usage:} The \textbf{CombinedHeatAndMoistureFiniteElement} is a coupled heat and moisture transfer and storage solution. The solution technique uses a one dimensional finite difference solution in the construction elements and requires further material properties described in the Heat and Moisture Transfer material properties objects. Outputs from the algorithm are described with these objects. The Heat and Moisture Transfer property objects are:
+    \begin{itemize}
+        \item
+        \hyperref[materialpropertyheatandmoisturetransfersettings]{MaterialProperty:HeatAndMoistureTransfer:Settings}
+        \item
+        \hyperref[materialpropertyheatandmoisturetransfersorptionisotherm]{MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm}
+        \item
+        \hyperref[materialpropertyheatandmoisturetransfersuction]{MaterialProperty:HeatAndMoistureTransfer:Suction}
+        \item
+        \hyperref[materialpropertyheatandmoisturetransferredistribution]{MaterialProperty:HeatAndMoistureTransfer:Redistribution}
+        \item
+        \hyperref[materialpropertyheatandmoisturetransferdiffusion]{MaterialProperty:HeatAndMoistureTransfer:Diffusion}
+        \item
+        \hyperref[materialpropertyheatandmoisturetransferthermalconductivity]{MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity}
+    \end{itemize}
 \end{itemize}
 
 \paragraph{Field: Surface Temperature Upper Limit}\label{field-surface-temperature-upper-limit}
@@ -428,7 +428,7 @@ This field determines the solution scheme used by the Conduction Finite Differen
 This field controls how the model determines spatial discretization, or the count of nodes across each material layer in the construction. The model calculates the nominal distance associated with a node, \(\Delta x\), using
 
 \begin{equation}
-\Delta x = \sqrt {C\alpha \Delta t}
+    \Delta x = \sqrt {C\alpha \Delta t}
 \end{equation}
 
 Where
@@ -593,9 +593,9 @@ This numeric field will allow you to increase the number of figures in shadow ov
 This is an advanced feature. Prior to V7, the internal polygon clipping method was a special case of the Weiler-Atherton method. Now, three options are available:
 
 \begin{description}
-  \item[SutherlandHodgman] A simpler algorithm but it works well in cases where receiving surfaces (of shadows) are non-convex.
-  \item[ConvexWeilerAtherton] Only accurate where both casting and receiving surfaces are convex. Warnings/severe errors are displayed when necessary.
-  \item[SlaterBarskyandSutherlandHodgman] Slater-Barsky only applies to rectangular surfaces. Polygon clipping for rectangular surfaces will be calculated using the Slater-Barsky algorithm, while the rest adopts the default Sutherl-Hodgman algorithm.
+    \item[SutherlandHodgman] A simpler algorithm but it works well in cases where receiving surfaces (of shadows) are non-convex.
+    \item[ConvexWeilerAtherton] Only accurate where both casting and receiving surfaces are convex. Warnings/severe errors are displayed when necessary.
+    \item[SlaterBarskyandSutherlandHodgman] Slater-Barsky only applies to rectangular surfaces. Polygon clipping for rectangular surfaces will be calculated using the Slater-Barsky algorithm, while the rest adopts the default Sutherl-Hodgman algorithm.
 \end{description}
 
 Default is SutherlandHodgman. More details on polygon clipping are contained in the Engineering Reference.
@@ -615,7 +615,7 @@ In general (and you should also read the previous field description), if shadowi
 This field applies to the shading calculation update frequency method called ``Periodic.'' When the method called ``Timestep'' is used the diffuse sky modeling always uses DetailedSkyDiffuseModeling.
 
 \paragraph{Field: Output External Shading Calculation Results}\label{field-output-external-shading-calculation results}
-This fields indicates whether or not (\textbf{Yes} or \textbf{No})to save internal shading calculation results to an external file, which can be imported back as needed. This file saves external sunlit fractions for all surfaces. If \textbf{Yes} is chosen, hourly shading fraction of all surfaces will be exported as a CSV file, naming as "output file prefix + shading" (the default name is "eplusshading.csv" if no output file prefix is defined). Each column of the CSV file lists the annually calculated shading fraction of each surface with time-step interval. It only writes data for each simulation day that shadows are calculated, e.g. once every 20 days by default. If the results are intended to be reused to be imported  back using \textbf{ImportedShading} in \textbf{Field: External Shading Calculation Method}, the Calculation Frequency should be set as one to write year-round hourly results. Design days are not included. The default choice is \textbf{No}.
+This fields indicates whether or not (\textbf{Yes} or \textbf{No})to save internal shading calculation results to an external file, which can be imported back as needed. This file saves external sunlit fractions for all surfaces. If \textbf{Yes} is chosen, hourly shading fraction of all surfaces will be exported as a CSV file, naming as "output file prefix + shading" (the default name is "eplusshading.csv" if no output file prefix is defined). Each column of the CSV file lists the annually calculated shading fraction of each surface with time-step interval. It only writes data for each simulation day that shadows are calculated, e.g. once every 20 days by default. If the results are intended to be reused to be imported back using \textbf{ImportedShading} in \textbf{Field: External Shading Calculation Method}, the Calculation Frequency should be set as one to write year-round hourly results. Design days are not included. The default choice is \textbf{No}.
 
 \paragraph{Field: Disable Self-Shading Within Shading Zone Groups}\label{fieldself--disable-shading-within-a-zone-group}
 This fields specifies during shading calculation, for all surfaces in a targeted Zone Group, whether or not (\textbf{Yes} or \textbf{No} ) the self-shading effect by exterior surfaces of all zones within the target Zone Group is disabled. If Yes, self-shading will be disabled from all exterior surfaces in a given Shading Zone Group to surfaces within the same Shading Zone Group. If both Disable Self-Shading Within Shading Zone Groups and Disable Self-Shading From Shading Zone Groups to Other Zones = Yes, then all self-shading from exterior surfaces will be disabled.If only one of these fields = Yes, then at least one Shading Zone Group must be specified, or this field will be ignored. Shading from Shading:* surfaces, overhangs, fins, and reveals will not be disabled.
@@ -624,7 +624,7 @@ This fields specifies during shading calculation, for all surfaces in a targeted
 This fields specifies during shading calculation, for all surfaces in a targeted Zone Group, whether or not (\textbf{Yes} or \textbf{No} ) the self-shading effect from all exterior surfaces in the target Zone Group to other zones is disabled. If Yes, self-shading will be disabled from all exterior surfaces in a given Shading Zone Group to all other zones in the model. If both Disable Self-Shading Within Shading Zone Groups and Disable Self-Shading From Shading Zone Groups to Other Zones = Yes, then all self-shading from exterior surfaces will be disabled. If only one of these fields = Yes, then at least one Shading Zone Group must be specified, or this field will be ignored. Shading from Shading:* surfaces, overhangs, fins, and reveals will not be disabled.
 
 \paragraph{Field: Shading Zone Group ZoneList Name}\label{field-shading-zone-group-zoneList-name}
-The shading zones group specifies group of zones which are controlled by the Disable Self-Shading fields.  This object is extensible, so additional fields of this type can be added to the end of this object.
+The shading zones group specifies group of zones which are controlled by the Disable Self-Shading fields. This object is extensible, so additional fields of this type can be added to the end of this object.
 
 Examples of this object in IDF: (note this object must be unique in an IDF)
 
@@ -780,7 +780,7 @@ This field is used to alter the effective generic contaminant capacitance of the
 The input for SimulationControl allows the user to specify what kind of calculations a given EnergyPlus simulation will perform. For instance the user may want to perform one or more of the sizing calculations but not proceed to an annual weather file simulation. Or the user might have all flow rates and equipment sizes already specified and desire an annual weather without any preceding sizing calculations. Sizing runs, even for large projects, are quickly run -- they do not add much to the overall simulation time. The SimulationControl input allows all permutations of run selection by means of 5 yes/no inputs.
 
 \begin{callout}
-Only one SimulationControl object is permitted for each EnergyPlus input file. While a SimulationControl is needed to trigger sizing calculations, it is optional for other runs (design days, run periods). The actions will still be shown in the eplusout.eio file (see Output Details and Examples Document).
+    Only one SimulationControl object is permitted for each EnergyPlus input file. While a SimulationControl is needed to trigger sizing calculations, it is optional for other runs (design days, run periods). The actions will still be shown in the eplusout.eio file (see Output Details and Examples Document).
 \end{callout}
 
 \subsubsection{Inputs}\label{inputs-15-014}
@@ -838,153 +838,160 @@ To illustrate how to use the PerformancePrecisionTradeoffs object and the \_perf
 
 
 % table X
-{\scriptsize
-\begin{longtable}[c]{p{0.2in}p{0.4in}p{0.55in}p{0.5in}p{0.52in}p{0.4in}p{0.5in}p{0.5in}p{0.5in}p{0.6in}p{0.5in}}
+        {\scriptsize
+\begin{longtable}[c]{p{0.15in}p{0.4in}p{0.55in}p{0.5in}p{0.52in}p{0.4in}p{0.5in}p{0.5in}p{0.55in}p{0.5in}p{0.55in}p{0.5in}}
 % \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.6in}p{0.5in}p{0.5in}p{0.6in}p{0.6in}p{0.65in}}
 % \begin{longtable}[c]{cccccccrr}
-\caption{PerfLog Mode Columns\label{table:perflog_mode_columns}} \tabularnewline
-\toprule
-Run & 
-Direct Coil & 
-Radiant Algorithm & 
-Override Mode & 
-Num of Timesteps {[}\#/hour{]}& 
-Min Warmup& 
-Suppress Resets & 
-System Timestep {[}minute{]} &
-MaxZone TempDiff & 
-MaxAllowed DelTemp &
-Runtime {[}second{]} \tabularnewline
-\midrule
-\endfirsthead
+    \caption{PerfLog Mode Columns\label{table:perflog_mode_columns}} \tabularnewline
+    \toprule
+    Run &
+    Direct Coil &
+    Radiant Algorithm &
+    Override Mode &
+    Num of Timesteps {[}\#/hour{]}&
+    Min Warmup&
+    Suppress Resets &
+    System Timestep {[}minute{]} &
+    PsyTsatFnPb &
+    MaxZone TempDiff &
+    MaxAllowed DelTemp &
+    Runtime {[}second{]} \tabularnewline
+    \midrule
+    \endfirsthead
 
-1  & FALSE & ScriptF    & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 185.12 \tabularnewline
-2  & FALSE & ScriptF    & MODE01 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 75.73  \tabularnewline
-3  & FALSE & ScriptF    & MODE02 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 71.37  \tabularnewline
-4  & FALSE & ScriptF    & MODE03 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 66.17  \tabularnewline
-5  & FALSE & ScriptF    & MODE04 & 1 & 1 & TRUE  & 1  & 0.30 & 0.002 & 61.31  \tabularnewline
-6  & FALSE & ScriptF    & MODE05 & 1 & 1 & TRUE  & 60 & 0.30 & 0.002 & 33.30  \tabularnewline
-7  & FALSE & ScriptF    & MODE06 & 1 & 1 & TRUE  & 60 & 1.00 & 0.002 & 32.20  \tabularnewline
-8  & FALSE & ScriptF    & MODE07 & 1 & 1 & TRUE  & 60 & 1.00 & 0.1   & 26.38  \tabularnewline
-9  & TRUE  & ScriptF    & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 178.86 \tabularnewline
-10 & FALSE & CarrollMRT & NORMAL & 6 & 1 & FALSE & 1  & 0.30 & 0.002 & 185.07 \tabularnewline
-11 & FALSE & CarrollMRT & MODE01 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 70.30  \tabularnewline
-12 & FALSE & CarrollMRT & MODE02 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 66.85  \tabularnewline
-13 & FALSE & CarrollMRT & MODE03 & 1 & 1 & FALSE & 1  & 0.30 & 0.002 & 65.76  \tabularnewline
-14 & FALSE & CarrollMRT & MODE04 & 1 & 1 & TRUE  & 1  & 0.30 & 0.002 & 54.46  \tabularnewline
-15 & FALSE & CarrollMRT & MODE05 & 1 & 1 & TRUE  & 60 & 0.30 & 0.002 & 28.09  \tabularnewline
-16 & FALSE & CarrollMRT & MODE06 & 1 & 1 & TRUE  & 60 & 1.00 & 0.002 & 27.87  \tabularnewline
-17 & FALSE & CarrollMRT & MODE07 & 1 & 1 & TRUE  & 60 & 1.00 & 0.1   & 27.39  \tabularnewline
+    1  & FALSE & ScriptF    & NORMAL & 6 & 1 & FALSE & 1 & Normal & 0.30 & 0.002 & 275.56 \tabularnewline
+    2  & FALSE & ScriptF    & MODE01 & 1 & 1 & FALSE & 1 & Normal & 0.30 & 0.002 & 104.37 \tabularnewline
+    3  & FALSE & ScriptF    & MODE02 & 1 & 1 & FALSE & 1 & Normal & 0.30 & 0.002 & 98.81  \tabularnewline
+    4  & FALSE & ScriptF    & MODE03 & 1 & 1 & FALSE & 1 & Normal & 0.30 & 0.002 & 98.63 \tabularnewline
+    5  & FALSE & ScriptF    & MODE04 & 1 & 1 & TRUE  & 1 & Normal & 0.30 & 0.002 & 97.87  \tabularnewline
+    6  & FALSE & ScriptF    & MODE05 & 1 & 1 & TRUE  & 60 & Normal & 0.30 & 0.002 & 47.22  \tabularnewline
+    7  & FALSE & ScriptF    & MODE06 & 1 & 1 & TRUE  & 60 & Interpolate & 0.30 & 0.002 & 45.48 \tabularnewline
+    8  & FALSE & ScriptF    & MODE07 & 1 & 1 & TRUE  & 60 & Interpolate & 1.00 & 0.002 & 45.14  \tabularnewline
+    9  & FALSE & ScriptF    & MODE08 & 1 & 1 & TRUE  & 60 & Interpolate & 1.00 & 0.1   & 44.18  \tabularnewline
+    10 & TRUE  & ScriptF    & NORMAL & 6 & 1 & FALSE & 1 & Normal & 0.30 & 0.002 & 273.42 \tabularnewline
+    11 & FALSE & CarrollMRT & NORMAL & 6 & 1 & FALSE & 1 & Normal & 0.30 & 0.002 & 276.68 \tabularnewline
+    12 & FALSE & CarrollMRT & MODE01 & 1 & 1 & FALSE & 1 & Normal & 0.30 & 0.002 & 102.73  \tabularnewline
+    13 & FALSE & CarrollMRT & MODE02 & 1 & 1 & FALSE & 1 & Normal & 0.30 & 0.002 & 97.28  \tabularnewline
+    14 & FALSE & CarrollMRT & MODE03 & 1 & 1 & FALSE & 1  & Normal & 0.30 & 0.002 & 96.77 \tabularnewline
+    15 & FALSE & CarrollMRT & MODE04 & 1 & 1 & TRUE  & 1  & Normal & 0.30 & 0.002 & 96.56  \tabularnewline
+    16 & FALSE & CarrollMRT & MODE05 & 1 & 1 & TRUE  & 60 & Normal & 0.30 & 0.002 & 47.31  \tabularnewline
+    17 & FALSE & CarrollMRT & MODE06 & 1 & 1 & TRUE  & 60 & Interpolate & 0.30 & 0.002 & 45.62  \tabularnewline
+    18 & FALSE & CarrollMRT & MODE07 & 1 & 1 & TRUE  & 60 & Interpolate & 1.00 & 0.002 & 45.23  \tabularnewline
+    19 & FALSE & CarrollMRT & MODE08 & 1 & 1 & TRUE  & 60 & Interpolate & 1.00 & 0.1   & 44.09  \tabularnewline
 
-\bottomrule
+    \bottomrule
 \end{longtable}
 }
 
-This example uses 17 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffs object, but fewer trials could have been made to reach a similar conclusion. The first run (Run 1, Normal mode) shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 8 are just stepping through the Override Modes (Mode01 to Mode07). Run 9 employs the ``Use Coil Direct Solution'' option, but the time gain for the simulation is not so significant. Therefore it is not used anymore in later runs. Runs 10 through 17 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. The biggest savings of the computation time are from Mode01 (Run 2) application. Compared to the Normal mode (Run 1) baseline, applying Mode01 (Run 2) immediately reduces the simulation time by nearly 60\%, to about only 40.9\% of that for the Normal baseline. Then again, by applying Mode02 (Run 3), the simulation time is reduced by 5.8\% compared to Mode02 (Run 1); Mode03 (Run 4) saves about 7.3\% compared to Mode02 (Run 3); and Mode04 (Run 5) saves about 7.3\% on top of Mode03 (Run 4). Compared to the normal baseline (Run 1), Mode04 (Run 5) only consumes about one third (33.1\%) of the computation time of Run 1 Normal baseline. 
+This example uses 19 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffs object, but fewer trials could have been made to reach a similar conclusion. The first run (Run 1, Normal mode) shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference. Runs 2 through 9 are just stepping through the Override Modes (Mode01 to Mode08). Run 10 employs the ``Use Coil Direct Solution'' option, but the time gain for the simulation is not so significant. Therefore it is not used anymore in later runs. Runs 11 through 19 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. The biggest savings of the computation time are from Mode01 (Run 2) application. Compared to the Normal mode (Run 1) baseline, applying Mode01 (Run 2) immediately reduces the simulation time by 62\%, to about only 37.9\% of that for the Normal baseline. Then again, by applying Mode02 (Run 3), the simulation time is reduced by 5.3\% compared to Mode02 (Run 1); Mode03 (Run 4) saves about 0.2\% compared to Mode02 (Run 3); and Mode04 (Run 5) saves about 0.7\% on top of Mode03 (Run 4). Compared to the normal baseline (Run 1), Mode04 (Run 5) only consumes about one third (35.5\%) of the computation time of Run 1 Normal baseline.
 
-Next, when Mode05 (Run 6) is applied, the simulation time is significantly reduced again---Mode05 reduces the simulation time by nearly a half compared to Mode04 (Run 5). The run time for Mode05 (Run 6) is only 54.3\% of that for Mode04 (Run 5); and it is only 18.0\% of the Normal baseline (Run 1). Mode06 (Run 7) cuts the simulation time by about a second, or about 3.3\% compared to Mode 05 (Run 6); the overall simulation time of Mode06 (Run 7) is about 17.4\% of the Normal baseline. The final Mode07 (Run 8) cuts the simulation time by another 18.0\% compared to Mode06 (Run 7); and the overall run time for Mode07 is only 14.25\% (or about one-seventh) of that for the Run 1 Normal baseline.
+Next, when Mode05 (Run 6) is applied, the simulation time is significantly reduced again---Mode05 reduces the simulation time by nearly a half compared to Mode04 (Run 5). The run time for Mode05 (Run 6) is only 51.8\% of that for Mode04 (Run 5); and it is only 17.0\% of the Normal baseline (Run 1). The run time for Mode06 (Run 7)was reduced by 3.7\% in comparison with Mode05 (Run6).Mode07 (Run 8) cuts the simulation time by about 0.7\% compared to Mode 06 (Run 7); the overall simulation time of Mode07 (Run 8) is about 16.4\% of the Normal baseline. The final Mode08 (Run 9) cuts the simulation time by another 2.1\% compared to Mode07 (Run 8); and the overall run time for Mode08 is only 16.0\% (or about one-seventh) of that for the Run 1 Normal baseline.
 
-In general, the higher models---Mode05 to Mode07---significantly save the simulation time with both ScriptF and CarrollMRT, taking about one-fifth to one-seventh of the original Normal simulation time. These modes seem to be good choices for faster simulations. However, we still need to look at other results in the \_perflog.csv file first before coming to that conclusion.
+In general, the higher models---Mode05 to Mode08---significantly save the simulation time with both ScriptF and CarrollMRT, taking about one-fifth to one-seventh of the original Normal simulation time. These modes seem to be good choices for faster simulations. However, we still need to look at other results in the \_perflog.csv file first before coming to that conclusion.
 
 These example simulations each takes about three minutes or less to try. If your building takes much longer than a few minutes, you might want to temporarily change the run period to just a month or even a week to tune the PerformancePrecisionTradeoffs object inputs. If temporarily shortening the run period is necessary, it is best to pick a month or week that has some cooling and some heating. Just remember to set your run period back to a full year before coming to any conclusions about the building or energy efficiency options being considered for the building.
 
 % table X
-{\scriptsize
+        {\scriptsize
 \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.55in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.6in}}
 % \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.7in}p{0.65in}}
-\caption{PerfLog Energy Columns\label{table:perflog_energy_columns}} \tabularnewline
-\toprule
-Run & 
-Direct Coil & 
-Radiant Algorithm & 
-Override Mode & 
-  Electricity {[}MJ{]} &
-  Natural Gas {[}MJ{]} &
-  Water {[}m$^3${]} &
-  Runtime {[}second{]} \tabularnewline
-\midrule
-\endfirsthead
+    \caption{PerfLog Energy Columns\label{table:perflog_energy_columns}} \tabularnewline
+    \toprule
+    Run &
+    Direct Coil &
+    Radiant Algorithm &
+    Override Mode &
+    Electricity {[}MJ{]} &
+    Natural Gas {[}MJ{]} &
+    Water {[}m$^3${]} &
+    Runtime {[}second{]} \tabularnewline
+    \midrule
+    \endfirsthead
 
-1  & FALSE & ScriptF  & NORMAL &  3,103,447 &	 755,635 &	 213,488 &	185.12 \tabularnewline
-2  & FALSE & ScriptF  & MODE01 &  3,095,147 &	 741,358 &	 212,016 &	75.73  \tabularnewline
-3  & FALSE & ScriptF  & MODE02 &  3,097,345 &	 744,583 &	 212,730 &	71.37  \tabularnewline
-4  & FALSE & ScriptF  & MODE03 &  3,097,345 &	 744,583 &	 212,730 &	66.17  \tabularnewline
-5  & FALSE & ScriptF  & MODE04 &  3,097,345 &	 744,583 &	 212,730 &	61.31  \tabularnewline
-6  & FALSE & ScriptF  & MODE05 &  3,096,331 &	 766,580 &	 211,613 &	33.30  \tabularnewline
-7  & FALSE & ScriptF  & MODE06 &  3,096,331 &	 766,580 &	 211,613 &	32.20  \tabularnewline
-8  & FALSE & ScriptF  & MODE07 &  3,097,280 &	 751,021 &	 212,386 &	26.38  \tabularnewline
-9  & TRUE  & ScriptF  & NORMAL &  3,103,447 &	 755,635 &	 213,488 &	178.86 \tabularnewline
-10 & FALSE & CarrollMRT & NORMAL & 3,256,682& 	 497,760 &	 267,097 &	185.07 \tabularnewline
-11 & FALSE & CarrollMRT & MODE01 & 3,246,880& 	 488,583 &	 265,309 &	70.30  \tabularnewline
-12 & FALSE & CarrollMRT & MODE02 & 3,244,172& 	 491,383 &	 265,347 &	66.85  \tabularnewline
-13 & FALSE & CarrollMRT & MODE03 & 3,244,172& 	 491,383 &	 265,347 &	65.76  \tabularnewline
-14 & FALSE & CarrollMRT & MODE04 & 3,244,172& 	 491,383 &	 265,347 &	56.46  \tabularnewline
-15 & FALSE & CarrollMRT & MODE05 & 3,250,818& 	 505,725 &	 265,180 &	28.09  \tabularnewline
-16 & FALSE & CarrollMRT & MODE06 & 3,250,818& 	 505,725 &	 265,180 &	27.87  \tabularnewline
-17 & FALSE & CarrollMRT & MODE07 & 3,250,420& 	 493,351 &	 265,828 &	27.39  \tabularnewline
+    1  & FALSE & ScriptF  & NORMAL & 3,351,884 & 1,524,574 & 248,815 & 275.56 \tabularnewline
+    2  & FALSE & ScriptF  & MODE01 & 3,340,493 & 1,508,410 & 247,179 & 104.37  \tabularnewline
+    3  & FALSE & ScriptF  & MODE02 & 3,342,128 & 1,511,817 & 247,759 & 98.81  \tabularnewline
+    4  & FALSE & ScriptF  & MODE03 & 3,342,128 & 1,511,817 & 247,759 & 98.63  \tabularnewline
+    5  & FALSE & ScriptF  & MODE04 & 3,342,128 & 1,511,817 & 247,759 & 97.87  \tabularnewline
+    6  & FALSE & ScriptF  & MODE05 & 3,341,145 & 1,532,697 & 246,121 & 47.22  \tabularnewline
+    7  & FALSE & ScriptF  & MODE06 & 3,341,183 & 1,532,626 & 246,122 & 45.48  \tabularnewline
+    8  & FALSE & ScriptF  & MODE07 & 3,341,183 & 1,532,626 & 246,122 & 45.14  \tabularnewline
+    9  & FALSE & ScriptF  & MODE08 & 3,342,365 & 1,516,963 & 246,906 & 44.18  \tabularnewline
+    10  & TRUE  & ScriptF  & NORMAL & 3,351,884 & 1,524,574 & 248,816 & 273.42 \tabularnewline
+    11 & FALSE & CarrollMRT & NORMAL & 3,525,611 & 1,271,563 & 304,914 & 276.68 \tabularnewline
+    12 & FALSE & CarrollMRT & MODE01 & 3,511,800 & 1,260,228 & 303,189 & 102.73  \tabularnewline
+    13 & FALSE & CarrollMRT & MODE02 & 3,510,893 & 1,263,149 & 303,383 & 97.28  \tabularnewline
+    14 & FALSE & CarrollMRT & MODE03 & 3,510,893 & 1,263,149 & 303,383 & 96.77  \tabularnewline
+    15 & FALSE & CarrollMRT & MODE04 & 3,510,893 & 1,263,149 & 303,383 & 96.56  \tabularnewline
+    16 & FALSE & CarrollMRT & MODE05 & 3,513,714 & 1,277,252 & 302,242 & 47.31  \tabularnewline
+    17 & FALSE & CarrollMRT & MODE06 & 3,513,750 & 1,277,187 & 302,246 & 45.62  \tabularnewline
+    18 & FALSE & CarrollMRT & MODE07 & 3,513,750 & 1,277,187 & 302,246 & 45.23  \tabularnewline
+    19 & FALSE & CarrollMRT & MODE08 & 3,513,797 & 1,264,779 & 303,035 & 44.09  \tabularnewline
 
-\bottomrule
+    \bottomrule
 \end{longtable}
 }
 
-The CarrollMRT options seem to have a much more significant impact on the natural gas usage; and the total water and the times are similar to the runtimes using ScriptF. So for this example, CarrollMRT does not seem to be a right choice. In these cases, the computation times are not very different from the ScriptF instances; however, the energy usage is further away from the Normal baseline. The electricity usage differences for Runs 2 through 8 are small compared to Run 1 (the Normal baseline case), and are less than 0.27\% different. The natural gas usage has more significant differences of 1.4\% to 1.9\%, and the water usage differs from 0.36\% to 0.88\%. From an energy perspective, these impacts for the ScriptF Runs 2 through 8 are probably tolerable. 
+The CarrollMRT options seem to have a much more significant impact on the natural gas usage; and the total water and the times are similar to the runtimes using ScriptF. So for this example, CarrollMRT does not seem to be a right choice. In these cases, the computation times are not very different from the ScriptF instances; however, the energy usage is further away from the Normal baseline. The electricity usage differences for Runs 2 through 8 are small compared to Run 1 (the Normal baseline case), and are less than 0.34\% different. The natural gas usage has more significant differences of 0.5\% to 1.1\%, and the water usage differs from 0.4\% to 1.1\%. From an energy perspective, these impacts for the ScriptF Runs 2 through 8 are probably tolerable.
 
 % table X
-{\scriptsize
+        {\scriptsize
 \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.55in}p{0.7in}p{0.5in}p{0.6in}p{0.7in}p{0.6in}p{0.6in}}
 % \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.7in}p{0.5in}p{0.5in}p{0.7in}p{0.6in}p{0.65in}}
-\caption{PerfLog Oscillation Columns\label{table:perflog_oscillation_columns}} \tabularnewline
-\toprule
-Run & 
-Direct Coil & 
-Radiant Algorithm & 
-Override Mode & 
-  Oscillating {[}hour{]} &
-  Oscillating Occupancy {[}hour{]} &
-  Oscillating Deadband {[}hour{]} &
-  Warnings &
-  Runtime {[}second{]} \tabularnewline
-\midrule
-\endfirsthead
+    \caption{PerfLog Oscillation Columns\label{table:perflog_oscillation_columns}} \tabularnewline
+    \toprule
+    Run &
+    Direct Coil &
+    Radiant Algorithm &
+    Override Mode &
+    Oscillating {[}hour{]} &
+    Oscillating Occupancy {[}hour{]} &
+    Oscillating Deadband {[}hour{]} &
+    Warnings &
+    Runtime {[}second{]} \tabularnewline
+    \midrule
+    \endfirsthead
 
-1  & FALSE & ScriptF    & NORMAL & 2.92	 & 2.75	 & 0.17	 & 46 &	185.12 \tabularnewline
-2  & FALSE & ScriptF    & MODE01 & 7.5	 & 2.17	 & 6.17	 & 47 &	75.73  \tabularnewline
-3  & FALSE & ScriptF    & MODE02 & 9.25	 & 4	 & 8.25	 & 48 &	71.37  \tabularnewline
-4  & FALSE & ScriptF    & MODE03 & 9.25	 & 4	 & 8.25	 & 49 & 66.17  \tabularnewline
-5  & FALSE & ScriptF    & MODE04 & 9.25	 & 4	 & 8.25	 & 50 &	61.31  \tabularnewline
-6  & FALSE & ScriptF    & MODE05 & 158	 & 87	 & 122	 & 52 &	33.30  \tabularnewline
-7  & FALSE & ScriptF    & MODE06 & 158	 & 87	 & 122	 & 53 &	32.20  \tabularnewline
-8  & FALSE & ScriptF    & MODE07 & 155	 & 91	 & 122	 & 54 &	26.38  \tabularnewline
-9  & TRUE  & ScriptF    & NORMAL & 2.92	 & 2.75	 & 0.17	 & 47 & 178.86 \tabularnewline
-10 & FALSE & CarrollMRT & NORMAL & 2.14	 & 1.97	 & 0.17	 & 47 &	185.07 \tabularnewline
-11 & FALSE & CarrollMRT & MODE01 & 7.74	 & 0.95	 & 6.08	 & 48 &	70.30  \tabularnewline
-12 & FALSE & CarrollMRT & MODE02 & 9.99	 & 3.33	 & 7.53	 & 49 &	66.85  \tabularnewline
-13 & FALSE & CarrollMRT & MODE03 & 9.99	 & 3.33	 & 7.53	 & 50 &	65.76  \tabularnewline
-14 & FALSE & CarrollMRT & MODE04 & 9.99	 & 3.33	 & 7.53	 & 51 &	56.46  \tabularnewline
-15 & FALSE & CarrollMRT & MODE05 & 150	 & 74	 & 108	 & 52 &	28.09  \tabularnewline
-16 & FALSE & CarrollMRT & MODE06 & 150	 & 74	 & 108	 & 53 &	27.87  \tabularnewline
-17 & FALSE & CarrollMRT & MODE07 & 151	 & 76	 & 113	 & 54 &	27.39  \tabularnewline
+    1  & FALSE & ScriptF    & NORMAL & 2.6     & 2.25     & 0.18     & 64 & 275.56 \tabularnewline
+    2  & FALSE & ScriptF    & MODE01 & 7.87     & 2.67     & 6.87     & 65 & 104.37  \tabularnewline
+    3  & FALSE & ScriptF    & MODE02 & 8.7     & 3.5     & 7.7     & 66 & 98.81  \tabularnewline
+    4  & FALSE & ScriptF    & MODE03 & 8.7     & 3.5   & 7.7     & 67 & 98.63  \tabularnewline
+    5  & FALSE & ScriptF    & MODE04 & 8.7     & 3.5   & 7.7     & 68 & 97.87  \tabularnewline
+    6  & FALSE & ScriptF    & MODE05 & 169     & 94     & 119     & 70 & 47.22  \tabularnewline
+    7  & FALSE & ScriptF    & MODE06 & 169     & 94     & 119     & 71 & 45.48  \tabularnewline
+    8  & FALSE & ScriptF    & MODE07 & 169     & 94     & 119     & 72 & 45.14  \tabularnewline
+    9  & FALSE & ScriptF    & MODE08 & 161     & 94     & 115     & 2379 & 44.18 \tabularnewline
+    10  & TRUE & ScriptF    & NORMAL & 2.6     & 2.25     & 0.18     & 65 & 273.42 \tabularnewline
+    11 & FALSE & CarrollMRT & NORMAL & 2.18     & 1.83     & 0.18     & 65 & 276.68 \tabularnewline
+    12 & FALSE & CarrollMRT & MODE01 & 8.57     & 1.7     & 7.57     & 66 & 102.73  \tabularnewline
+    13 & FALSE & CarrollMRT & MODE02 & 8.83     & 2.5     & 7.7     & 67 & 97.28  \tabularnewline
+    14 & FALSE & CarrollMRT & MODE03 & 8.83     & 2.5     & 7.7     & 68 & 96.77  \tabularnewline
+    15 & FALSE & CarrollMRT & MODE04 & 8.83     & 2.5     & 7.7     & 69 & 96.56  \tabularnewline
+    16 & FALSE & CarrollMRT & MODE05 & 177     & 105     & 112     & 70 & 47.31  \tabularnewline
+    17 & FALSE & CarrollMRT & MODE06 & 177     & 105     & 112     & 71 & 45.62  \tabularnewline
+    18 & FALSE & CarrollMRT & MODE07 & 177     & 105     & 112     & 72 & 45.23  \tabularnewline
+    19 & FALSE & CarrollMRT & MODE08 & 173     & 100     & 112     & 73 & 44.09  \tabularnewline
 
-\bottomrule
+    \bottomrule
 \end{longtable}
 }
 
-The number of hours any zone is oscillating for Run 1 (the Normal baseline case) using Script F is only 2.92 hours, with almost none of the hours in the dead band and nearly all during occupancy. This changes when considering the other ScriptF cases using Mode01 to Mode07 (Run 2 to Run 8). For Mode01 (Run 2), the oscillating hours increase but are still less than 8 hours per year. While more than doubling, it is still considered a small change on an absolute basis. The change is even more minor when considering the oscillating hours during occupancy, which for Mode01 (Run 2) the hours even decrease by a small amount. The oscillation hours in the dead band for Mode01 (Run 2) increase about 6 hours. For Mode02 to Mode04, there is an increase of about 2 hours for each oscillating hour categories (the total, the occupancy, and the dead band ones), though they are considered to be a relatively minor change from the Normal baselines especially when comparing further with those for the succeeding Mode05 and Mode07. For Mode05 to Mode07 (Runs 6 to 8), the oscillating hours increase significantly, by more than one order of magnitude to about 155--158 hours per year. The numbers are also reflected in similar fashions for the the oscillating hours during occupancy and for the oscillating hours during dead band. For the CarrollMRT cases, similar trends can be observed when applying Mode01 to Mode07. The most significant change starts from Mode05, which for both ScriptF and CarrollMRT raise the oscillating hours to about 155--158. This is a substantial change that does indicate a significant shift in the way the simulation program is behaving. On the other hand, the number of warnings for all the seventeen cases are not too much different from each other, all ranging from 46 to 54, showing a slow increasing trend from Normal to Mode07. No severe errors are reported for any of these simulations, so no column is shown for them. After investigating the changes, it is reasonable to conclude that the change in the count of warning messages is not considered important.
+The number of hours any zone is oscillating for Run 1 (the Normal baseline case) using Script F is only 2.6 hours, with almost none of the hours in the dead band and nearly all during occupancy. This changes when considering the other ScriptF cases using Mode01 to Mode08 (Run 2 to Run 9). For Mode01 (Run 2), the oscillating hours increase but are still less than 8 hours per year. While more than doubling, it is still considered a small change on an absolute basis. The change is even more minor when considering the oscillating hours during occupancy. The oscillation hours in the dead band for Mode01 (Run 2) increase about 6 hours. For Mode02 to Mode04, there is an increase of about 1 hours for each oscillating hour categories (the total, the occupancy, and the dead band ones), though they are considered to be a relatively minor change from the Normal baselines especially when comparing further with those for the succeeding Mode05 and Mode08. For Mode05 to Mode08 (Runs 6 to 9), the oscillating hours increase significantly, by more than one order of magnitude to about 161--169 hours per year. The numbers are also reflected in similar fashions for the the oscillating hours during occupancy and for the oscillating hours during dead band. For the CarrollMRT cases, similar trends can be observed when applying Mode01 to Mode08. The most significant change starts from Mode05, which for both ScriptF and CarrollMRT raise the oscillating hours to about 173--177. This is a substantial change that does indicate a significant shift in the way the simulation program is behaving. On the other hand, the number of warnings for all the 19 cases are not too much different from each other ranging from 64 to 73, except for Run 9 which has 2,379 warnings. No severe errors are reported for any of these simulations, so no column is shown for them.
 
-The decision on which mode to use is up to the individual modelers. These simulations runs can be clearly classified into three tiers based on the simulation speed (computation time) and the numerical stability (oscillation hours): the first tier is the normal run, which incurs the least oscillations (the best), but also takes the longest computation time; the second tier includes Mode02 to Mode04, where the simulation time can be cut to roughly one-third of that for the Normal baseline, but with a minor penalty for increased oscillation hours; and the third tier includes Mode05 to Mode07, which can achieve an superior simulation time advantage, reaching around one-fifth to one-seventh of that for the Normal baseline, but also with significant oscillation hours penalties of about one order of magnitude higher. For simulations conducted in these test modes, Runs 5 (Mode04) is recommended as a balanced option for speed and numerical stability (oscillations). It does not use direct coil solution, uses ScriptF, and Mode04. This simulation time also shows an advantages over the other lower modes cases--it saves time compared to Mode01--Mode03---and still has tamed the oscillating hours. Further, it does not add too much additional overrides compared to the higher modes (Mode05--Mode07), which should be avoided if not adding value. For extreme speed benefit, higher modes such as Mode05 to Mode07 definitely show an advantage in the computation time, as they cost only about only one-seventh to one-fifth of the normal base, and only about half of those for the lower modes (such as Mode02--Mode04). However, substantially higher oscillating hours will be incurred as a downside with these higher modes.
+The decision on which mode to use is up to the individual modelers. These simulations runs can be clearly classified into three tiers based on the simulation speed (computation time) and the numerical stability (oscillation hours): the first tier is the normal run, which incurs the least oscillations (the best), but also takes the longest computation time; the second tier includes Mode02 to Mode04, where the simulation time can be cut to roughly one-third of that for the Normal baseline, but with a minor penalty for increased oscillation hours; and the third tier includes Mode05 to Mode08, which can achieve an superior simulation time advantage, reaching around one-fifth to one-seventh of that for the Normal baseline, but also with significant oscillation hours penalties of about one order of magnitude higher. For simulations conducted in these test modes, Runs 5 (Mode04) is recommended as a balanced option for speed and numerical stability (oscillations). It does not use direct coil solution, uses ScriptF, and Mode04. This simulation time also shows an advantages over the other lower modes cases--it saves time compared to Mode01--Mode03---and still has tamed the oscillating hours. Further, it does not add too much additional overrides compared to the higher modes (Mode05--Mode08), which should be avoided if not adding value. For extreme speed benefit, higher modes such as Mode05 to Mode08 definitely show an advantage in the computation time, as they cost only about only one-seventh to one-fifth of the normal base, and only about half of those for the lower modes (such as Mode02--Mode04). However, substantially higher oscillating hours will be incurred as a downside with these higher modes.
 
 Additional guidance on how to make EnergyPlus faster appears in the ``Tips And Tricks for Using EnergyPlus'' document that is distributed with EnergyPlus within the section titled ``Platforms and Run-Time.''
 
 \paragraph{Field: Use Coil Direct Solutions}\label{use-coil-direct-solutions}
 
-If Yes, an analytical or empirical solution will be used instead of iteration based method in calculations that determine how to control the coil model.  The tradeoff is between an iterative solution algorithm, see \hyperref[hvacystemrootfindingalgorithm]{HVACSystemRootFindingAlgorithm}, or a direct solution algorithm as described below.  These calculations are at the level of how the coil component model is to be controlled by the parent system object as it tries to find a part load ratio that just meets a coil load or coil leaving temperature condition.  Once the control calculations have been completed to determine the part load ratio (or speed ratio for variable speed) the full coil model is still used for the final calculation.
+If Yes, an analytical or empirical solution will be used instead of iteration based method in calculations that determine how to control the coil model. The tradeoff is between an iterative solution algorithm, see \hyperref[hvacystemrootfindingalgorithm]{HVACSystemRootFindingAlgorithm}, or a direct solution algorithm as described below. These calculations are at the level of how the coil component model is to be controlled by the parent system object as it tries to find a part load ratio that just meets a coil load or coil leaving temperature condition. Once the control calculations have been completed to determine the part load ratio (or speed ratio for variable speed) the full coil model is still used for the final calculation.
 
 Although this input field may eventually affect all coils, the current implementation is available for only the limited number of systems and coil configurations listed in the following table. Since a linear relationship between system output and part load ratio, or speed ratio, is expected, an analytical direct solution is applied to all coils in the listed in the table when Yes is selected. More coils will be allowed when time allows. Note that this simulation parameter is global and when used every such coil model included in the entire building model will be changed to use the direct method.
 
-The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below: 
+The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below:
 
 \begin{equation}
-\textnormal{PLR} = \frac{\textnormal{SystemLoad} - \textnormal{OutputOff}}{\textnormal{OutputFull} - \textnormal{OutputOff}}
+    \textnormal{PLR} = \frac{\textnormal{SystemLoad} - \textnormal{OutputOff}}{\textnormal{OutputFull} - \textnormal{OutputOff}}
 \end{equation}
 
 where
@@ -997,10 +1004,10 @@ OutputOff = System output at PLR = 0 as coil off;
 
 OutputFull = System output at PLR = 1 as full output.
 
-The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below: 
+The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below:
 
 \begin{equation}
-\textnormal{SpeedRatio} = \frac{\textnormal{SystemLoad} - \textnormal{OutputFull}_{i-1}}{\textnormal{OutputFull}_{i} - \textnormal{OutputFull}_{i-1}}
+    \textnormal{SpeedRatio} = \frac{\textnormal{SystemLoad} - \textnormal{OutputFull}_{i-1}}{\textnormal{OutputFull}_{i} - \textnormal{OutputFull}_{i-1}}
 \end{equation}
 
 where
@@ -1020,7 +1027,7 @@ When coils of Coil:Cooling:DX:VariableSpeed, Coil:Heating:DX:SingleSpeed, and Co
 The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below:
 
 \begin{equation}
-\textnormal{PLR} = \frac{\textnormal{DesOutTemp} - \textnormal{InletTemp}}{\textnormal{OutTempFull} - \textnormal{InletTemp}}
+    \textnormal{PLR} = \frac{\textnormal{DesOutTemp} - \textnormal{InletTemp}}{\textnormal{OutTempFull} - \textnormal{InletTemp}}
 \end{equation}
 
 where
@@ -1036,7 +1043,7 @@ OutTemptFull = Outlet temperature at PLR = 1 as full output.
 The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below:
 
 \begin{equation}
-\textnormal{SpeedRatio} = \frac{\textnormal{DesOutTemp} - \textnormal{OutTempFull}_{i-1}}{\textnormal{OutTempFull}_{i} - \textnormal{OutTempFull}_{i-1}}
+    \textnormal{SpeedRatio} = \frac{\textnormal{DesOutTemp} - \textnormal{OutTempFull}_{i-1}}{\textnormal{OutTempFull}_{i} - \textnormal{OutTempFull}_{i-1}}
 \end{equation}
 
 where
@@ -1051,28 +1058,28 @@ OutTempFull$_{i-1}$ = Outlet temperature of full output at the lower speed.
 
 % table 2
 \begin{longtable}[c]{p{4in}p{2.5in}}
-\caption{A list of air systems and associated coils allowed for direct solutions\label{table:a_list_of_air_systems_and_associated_coils_allowed_for_direct solutions}} \tabularnewline
-\toprule
-System & Allowed Coil \tabularnewline
-\midrule
-\endfirsthead
+    \caption{A list of air systems and associated coils allowed for direct solutions\label{table:a_list_of_air_systems_and_associated_coils_allowed_for_direct solutions}} \tabularnewline
+    \toprule
+    System & Allowed Coil \tabularnewline
+    \midrule
+    \endfirsthead
 
-AirLoopHVAC:UnitarySystem & Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Heating:Electric, Coil:Heating:Fuel,  Coil:Heating:DX:MultiSpeed, Coil:Cooling:DX\tabularnewline
-AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed & Coil:Heating:DX:MultiSpeed, Coil:Heating:Electric:MultiStage, Coil:Heating:Gas:MultiStage, Coil:Cooling:DX:MultiSpeed\tabularnewline
-CoilSystem:Cooling:DX & Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:VariableSpeed \tabularnewline
-CoilSystem:Heating:DX & Coil:Heating:DX:SingleSpeed, Coil:Heating:DX:VariableSpeed \tabularnewline
+    AirLoopHVAC:UnitarySystem & Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Heating:Electric, Coil:Heating:Fuel,  Coil:Heating:DX:MultiSpeed, Coil:Cooling:DX\tabularnewline
+    AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed & Coil:Heating:DX:MultiSpeed, Coil:Heating:Electric:MultiStage, Coil:Heating:Gas:MultiStage, Coil:Cooling:DX:MultiSpeed\tabularnewline
+    CoilSystem:Cooling:DX & Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:VariableSpeed \tabularnewline
+    CoilSystem:Heating:DX & Coil:Heating:DX:SingleSpeed, Coil:Heating:DX:VariableSpeed \tabularnewline
 
-\bottomrule
+    \bottomrule
 \end{longtable}
 
 Note: The choice of Load in the Control Type of the AirLoopHVAC:UnitarySystem object is required for all coils listed in the above table.
 In addition, when Coil:Cooling:DX is specified under AirLoopHVAC:UnitarySystem, the following coil configurations are supported for Direct Solution:
 
-	Single speed mode at Nominal Speed Number = 1 in the Coil:Cooling:DX:CurveFit:OperatingMode
+Single speed mode at Nominal Speed Number = 1 in the Coil:Cooling:DX:CurveFit:OperatingMode
 
-	Multi speed mode at Nominal Speed Number > 1 in the Coil:Cooling:DX:CurveFit:OperatingMode
+Multi speed mode at Nominal Speed Number > 1 in the Coil:Cooling:DX:CurveFit:OperatingMode
 
-	Single speed SubcoolReheat mode. The SubcoolReheat mode requires all inputs of 3 fields in the Coil:Cooling:DX:CurveFit:Performance: Base Operating Mode, Alternative Operating Mode 1, and Alternative Operating Mode 2.
+Single speed SubcoolReheat mode. The SubcoolReheat mode requires all inputs of 3 fields in the Coil:Cooling:DX:CurveFit:Performance: Base Operating Mode, Alternative Operating Mode 1, and Alternative Operating Mode 2.
 
 \paragraph{Field: Zone Radiant Exchange Algorithm}\label{zone-radiant-exchange-algorithm}
 
@@ -1082,30 +1089,31 @@ Although, defined view factors cannot be used with CarrollMRT, the algorithm app
 
 \paragraph{Field: Override Mode}\label{override-mode}
 
-The Override Mode field provides a single field that will override other inputs located in the IDF/epJSON file as well as convergence related values that appear in the remaining fields of the PerformancePrecisionTradeoffs object. The Normal option (default) provides no overrides while the Mode options provide overrides based on the following tables. The Advanced option, allows the remaining fields of the PerformancePrecisionTradeoffs to be used. 
+The Override Mode field provides a single field that will override other inputs located in the IDF/epJSON file as well as convergence related values that appear in the remaining fields of the PerformancePrecisionTradeoffs object. The Normal option (default) provides no overrides while the Mode options provide overrides based on the following tables. The Advanced option, allows the remaining fields of the PerformancePrecisionTradeoffs to be used.
 
 % table 2
 \begin{longtable}[c]{p{1.5in}p{5.0in}}
-\caption{Override Modes\label{table:override_modes}} \tabularnewline
-\toprule
-Mode & Description \tabularnewline
-\midrule
-\endfirsthead
+    \caption{Override Modes\label{table:override_modes}} \tabularnewline
+    \toprule
+    Mode & Description \tabularnewline
+    \midrule
+    \endfirsthead
 
-Normal & No overrides\tabularnewline
-Mode01 & Zone time step (TimeStep object) will be set to one timestep per hour\tabularnewline
-Mode02 & Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler\tabularnewline
-Mode03 & Mode02 plus Minimum Number of Warmup Days will be set to 1\tabularnewline
-Mode04 & Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets\tabularnewline
-Mode05 & Mode04 plus minimum system timestep length will be 1 hour\tabularnewline
-Mode06 & Mode05 MaxZoneTempDiff will be set to 1.00\tabularnewline
-Mode07 & Mode06 MaxAllowedDelTemp will be set to 0.1\tabularnewline
-Advanced& Allow direct input of convergence field values\tabularnewline
+    Normal & No overrides\tabularnewline
+    Mode01 & Zone time step (TimeStep object) will be set to one timestep per hour\tabularnewline
+    Mode02 & Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler\tabularnewline
+    Mode03 & Mode02 plus Minimum Number of Warmup Days will be set to 1\tabularnewline
+    Mode04 & Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets\tabularnewline
+    Mode05 & Mode04 plus minimum system timestep length will be 1 hour\tabularnewline
+    Mode06 & Mode05 plus use cubic spline interpolations in replacement of the psychrometric function PsyTsatFnPb\tabularnewline
+    Mode07 & Mode06 plus MaxZoneTempDiff will be set to 1.00\tabularnewline
+    Mode08 & Mode07 plus MaxAllowedDelTemp will be set to 0.1\tabularnewline
+    Advanced& Allow direct input of convergence field values\tabularnewline
 
-\bottomrule
+    \bottomrule
 \end{longtable}
 
-The increasing mode number roughly corresponds with increased speed. Mode01 to Mode05 are overriding inputs in other parts of the IDF/epJSON file and is equivalent to changing those input directly. Mode06 and Mode07 are changing convergence parameters previously not available to be modified by the user.
+The increasing mode number roughly corresponds with increased speed. Mode01 to Mode05 are overriding inputs in other parts of the IDF/epJSON file and is equivalent to changing those input directly. Mode06 offers an alternative method to calculate saturated temperature given pressure in replacement of the psychrometric function PsyTsatFnPb. Mode07 and Mode08 are changing convergence parameters previously not available to be modified by the user.
 
 \paragraph{Field: MaxZoneTempDiff}\label{max-zone-temp-diff}
 
@@ -1115,6 +1123,36 @@ This field is only active and used when Override Mode is set to Advanced. The va
 
 This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxAllowedDelTemp variable within EnergyPlus. This variable sets the maximum surface temperature change before the HVAC timestep is shortened. Similar to the MaxZoneTempDiff parameter, larger MaxAllowedDelTemp values result in fewer iterations. To understand this input completely, please review the use of the MaxAllowedDetTemp variable in the CalcHeatBalanceInsideSurf2() routine located in the HeatBalanceSurfaceManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.002 ($^\circ$C), which is also the default value. Testing has been done with a value of 0.1 ($^\circ$C), which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 0.1 have not been tested.
 
+\paragraph{Field: Use Representative Surfaces for Calculations}\label{use-representative-surfaces-for-calculations}
+
+If Yes, EnergyPlus will automatically group heat-transfer surfaces with similar characteristics and perform relevant calculations only once for each group.
+
+Surface are grouped based on the following criteria for similarity:
+
+\begin{itemize}
+    \item construction
+    \item orientation
+    \item surface height
+    \item zone
+    \item solar/wind exposure
+    \item other side boundary condition
+    \item conduction and convection heat transfer algorithms
+    \item movable insulation
+    \item frame and divider (windows only)
+    \item storm window construction (windows only)
+    \item other minor attributes
+\end{itemize}
+
+Surfaces with the following objects defined are currently never grouped because there is a high likelihood that they will experience dissimilar conditions throughout a simulation:
+
+\begin{itemize}
+    \item ConstructionProperty:InternalHeatSource
+    \item ZoneProperty:UserViewFactors:BySurfaceName
+    \item WindowShadingControl (windows only)
+    \item WindowProperty:AirflowControl (windows only)
+\end{itemize}
+
+Currently, the only calculations performed across all surfaces with a group is the interior radiation exchange, where surfaces within a group are collected into a single area for participating in interior longwave radiation exchange. This will reduce the scale and complexity of the algorithm with minimal impact on accuracy. Additional calculations may be performed for a group of surfaces in future releases.
 
 An IDF example:
 
@@ -1124,15 +1162,14 @@ Yes,                      !- Use Coil Direct Solutions
 CarrollMRT;               !- Zone Radiant Exchange Algorithm
 Mode06,                   !- Override Mode
 0.3,                      !- MaxZoneTempDiff
-0.002;                    !- MaxAllowedDelTemp
+0.002,                    !- MaxAllowedDelTemp
+Yes;                      !- Use Representative Surfaces for Calculations
 \end{lstlisting}
-
 
 \subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}
 
 The HVACSystemRootFindingAlgorithm object provides a way to select what type of solution
 algorithm will be used to find a part load ratio or mass flow rate at given equipment/system load in HVAC system simulations. This object is an optional object. If the default algorithm is used, this object is not required in an input file.
-
 
 \subsubsection{Inputs}\label{inputs-hvacystemrootfindingalgorithm}
 
@@ -1140,7 +1177,6 @@ algorithm will be used to find a part load ratio or mass flow rate at given equi
 
 Five choices are allowed to select which solution algorithm will be used: RegulaFalsi, Bisection,  BisectionThenRegulaFalsi, RegulaFalsiThenBisection, and Alternation. The RegulaFalsi
 selection is the default selection. Bisection selection will allow the program to use the bisection method to get a solution. The BisectionThenRegulaFalsi selection requires the program to apply the bisection method first. After the number of iteration is above the value defined in the next field, the RegulaFalsi algorithm will be applied. The RegulaFalsiThenBisection selection requires the program to apply the RegulaFalsi method first. After the number of iteration is above the value defined in the next field, the bisection algorithm will be applied. The Alternation selection forces number of iteration (defined in the next field) using RegulaFalsi first. Then Bisection and RegulaFalsi algorithm will be alternated after the number of iteration is above the value defined in the next field.
-
 
 \paragraph{Field: Number of Iterations Before Algorithm Switch}\label{field-number-of-iteration-before-algorithm-switch}
 
@@ -1169,36 +1205,36 @@ This is a user defined name for the custom meter. Names for custom meters cannot
 A resource type should be specified for the meter. All assignments to this meter will be checked to assure that the same resource type is used. Additionally, this may be used in other objects (such as the Demand Limiting). Valid choices for this field are:
 
 \begin{itemize}
-\item
-  Electricity
-\item
-  NaturalGas
-\item
-  Propane
-\item
-  FuelOilNo1
-\item
-  FuelOilNo2
-\item
-  Diesel
-\item
-  Gasoline
-\item
-  Coal
-\item
-  OtherFuel1
-\item
-  OtherFuel2
-\item
-  Steam
-\item
-  DistrictHeating
-\item
-  DistrictCooling
-\item
-  Water
-\item
-  Generic
+    \item
+    Electricity
+    \item
+    NaturalGas
+    \item
+    Propane
+    \item
+    FuelOilNo1
+    \item
+    FuelOilNo2
+    \item
+    Diesel
+    \item
+    Gasoline
+    \item
+    Coal
+    \item
+    OtherFuel1
+    \item
+    OtherFuel2
+    \item
+    Steam
+    \item
+    DistrictHeating
+    \item
+    DistrictCooling
+    \item
+    Water
+    \item
+    Generic
 \end{itemize}
 
 Resource types are generally self-explanatory. Generic is included for convenience when a custom meter is defined that doesn't quite fit the ``resource'' categories. See the examples below.
@@ -1219,7 +1255,6 @@ For output variables, only summed variables are valid. For example from the rdd 
  Zone,Sum,Exterior Equipment Electricity Energy [J]
 \end{lstlisting}
 
-
 \subsection{Meter:CustomDecrement}\label{metercustomdecrement}
 
 The decrement custom meter is very similar to the custom meter specification but additionally allows a predefined meter to be used as the ``source'' meter and the remaining items subtract from that predefined meter.
@@ -1235,36 +1270,36 @@ This is a user defined name for the custom meter. Names for custom meters cannot
 A resource type should be specified for the meter. All assignments to this meter will be checked to assure that the same resource type is used. Additionally, this may be used in other objects (such as the Demand Limiting). Valid choices for this field are:
 
 \begin{itemize}
-\item
-  Electricity
-\item
-  NaturalGas
-\item
-  Propane
-\item
-  FuelOilNo1
-\item
-  FuelOilNo2
-\item
-  Diesel
-\item
-  Gasoline
-\item
-  Coal
-\item
-  OtherFuel1
-\item
-  OtherFuel2
-\item
-  Steam
-\item
-  DistrictHeating
-\item
-  DistrictCooling
-\item
-  Water
-\item
-  Generic
+    \item
+    Electricity
+    \item
+    NaturalGas
+    \item
+    Propane
+    \item
+    FuelOilNo1
+    \item
+    FuelOilNo2
+    \item
+    Diesel
+    \item
+    Gasoline
+    \item
+    Coal
+    \item
+    OtherFuel1
+    \item
+    OtherFuel2
+    \item
+    Steam
+    \item
+    DistrictHeating
+    \item
+    DistrictCooling
+    \item
+    Water
+    \item
+    Generic
 \end{itemize}
 
 \paragraph{Field: Source Meter Name}\label{field-source-meter-name}

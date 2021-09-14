@@ -197,6 +197,8 @@ public:
 
     const json &getObjectInstances(std::string const &ObjType);
 
+    bool checkForUnsupportedObjects(EnergyPlusData &state);
+
     //    void clear_state();
 private:
     friend class EnergyPlusFixture;

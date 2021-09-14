@@ -2461,6 +2461,17 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             sizerCWDesWaterInTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
             state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp = sizerCWDesWaterInTemp.size(state, TempSize, ErrorsFound);
 
+            if ((state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp > state.dataSize->DataDesOutletAirTemp) &&
+                state.dataSize->DataDesOutletAirTemp > 0.0) {
+                ShowWarningError(state, "Invalid design inlet water temperature for " + std::string{CompType} + " = " + std::string{CompName});
+                ShowContinueError(state,
+                                  format("...design inlet water temperature = {:.3R} C", state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp));
+                ShowContinueError(state, format("...design outlet air temperature = {:.3R} C", state.dataSize->DataDesOutletAirTemp));
+                ShowContinueError(state, "...design inlet water temperature should be less than the design outlet air temperature");
+                ShowContinueError(state, "...design inlet water temperature is set to the design outlet air temperature minus 5.0C");
+                state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp = state.dataSize->DataDesOutletAirTemp - 5.0;
+            }
+
             if (state.dataSize->CurZoneEqNum > 0) { // zone equipment use air inlet humrat to calculate design outlet air temperature
                 if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;      // no field for detailed water coil, should print to eio anyway
@@ -2558,7 +2569,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
             if (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate <= 0.0) {
                 state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = 0.0;
-                ShowWarningError(state, "The design air flow rate is zero for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                ShowWarningError(state, "The design air flow rate is zero for " + std::string{CompType} + " = " + std::string{CompName});
                 ShowContinueError(state, "The autosize value for max air volume flow rate is zero");
             }
 
@@ -6976,8 +6987,8 @@ void SetWaterCoilData(EnergyPlusData &state,
                       int const CoilNum,                       // Number of hot water heating Coil
                       bool &ErrorsFound,                       // Set to true if certain errors found
                       Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
-                      Optional_int DesiccantDehumIndex         // Index for the desiccant dehum system where this caoil is used
-)
+                      Optional_int DesiccantDehumIndex,        // Index for the desiccant dehum system where this caoil is used
+                      Optional_bool heatRecoveryCoil)          // true if water coil is connected to heat recovery loop
 {
 
     // FUNCTION INFORMATION:
@@ -7011,6 +7022,10 @@ void SetWaterCoilData(EnergyPlusData &state,
 
     if (present(DesiccantDehumIndex)) {
         state.dataWaterCoils->WaterCoil(CoilNum).DesiccantDehumNum = DesiccantDehumIndex;
+    }
+
+    if (present(heatRecoveryCoil)) {
+        state.dataWaterCoils->WaterCoil(CoilNum).heatRecoveryCoil = heatRecoveryCoil;
     }
 }
 

@@ -3026,6 +3026,10 @@ This numeric field contains the thermal heat capacity of the ground in J/m\(^{3}
 
 The unique name of the \hyperref[groundheatexchangerresponsefactors]{GroundHeatExchanger:ResponseFactors} object used to define the third-party response factors. If present, the GHE:Vertical:Array and GHE:Vertical:Single objects defined will be ignored.
 
+\paragraph{Field: g-Function Calculation Method}
+
+If the GHE:ResponseFactors object is not provided, this input will be relevant to the calculation method used to generate the g-function values. There are two options for this input: ``UHFcalc" or ``UBHWTcalc". The default is UHFcalc, where a g-function is computed with the uniform heat flux boundary condition. The UBHWTcalc option computes the g-function with a uniform borehole wall temperature boundary condition. The g-function computed with a uniform borehole wall temperature boundary condition is expected to be a better approximation of the borehole physics and is also expected to be faster to compute.
+
 \paragraph{Field: GHE:Vertical:Array object name}
 
 The unique name of the \hyperref[groundheatexchangerverticalarray]{GroundHeatExchanger:Vertical:Array} object used to define a rectangular borehole field. If present, the GHE:Vertical:Single objects will be ignored.
@@ -3047,7 +3051,8 @@ The following is are example inputs corresponding to the input variations allowe
     2.5,                !- Ground Thermal Conductivity {W/m-K}
     2.5E+06,            !- Ground Thermal Heat Capacity {J/m3-K}
     ,                   !- Response Factors Object Name
-    GHE-Array;
+    UBHWTcalc,          !- g-Function Calculation Method
+    GHE-Array;          !- GHE:Vertical:Array Object Name
 
   GroundHeatExchanger:Vertical:Properties,
     GHE-1 Props,        !- Name
@@ -3083,6 +3088,7 @@ The second example uses the \hyperref[groundheatexchangerverticalsingle]{GroundH
     2.5,                !- Ground Thermal Conductivity {W/m-K}
     2.5E+06,            !- Ground Thermal Heat Capacity {J/m3-K}
     ,                   !- Response Factors Object Name
+    UBHWTcalc,          !- g-Function Calculation Method
     ,                   !- GHE Array Object Name
     GHE-1,              !- GHE Borehole Definition 1
     GHE-2,              !- GHE Borehole Definition 2

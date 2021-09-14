@@ -190,7 +190,6 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
     Real64 FluidDensityInit;
 
     // Do the one time initializations
-    this->oneTimeInit(state);
 
     if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
         RegisterPlantCompDesignFlow(state, InletNode, this->PeakVolFlowRate);
@@ -295,33 +294,21 @@ void PlantProfileData::ReportPlantProfile(EnergyPlusData &state)
         this->CoolingEnergy = std::abs(this->Energy);
     }
 }
-void PlantProfileData::oneTimeInit(EnergyPlusData &state)
+void PlantProfileData::oneTimeInit_new(EnergyPlusData &state)
 {
     bool errFlag;
 
-    if (this->SetLoopIndexFlag) {
-        if (allocated(state.dataPlnt->PlantLoop)) {
-            errFlag = false;
-            ScanPlantLoopsForObject(state,
-                                    this->Name,
-                                    this->TypeNum,
-                                    this->WLoopNum,
-                                    this->WLoopSideNum,
-                                    this->WLoopBranchNum,
-                                    this->WLoopCompNum,
-                                    errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
-            if (errFlag) {
-                ShowFatalError(state, "InitPlantProfile: Program terminated for previous conditions.");
-            }
-
-            this->SetLoopIndexFlag = false;
+    if (allocated(state.dataPlnt->PlantLoop)) {
+        errFlag = false;
+        ScanPlantLoopsForObject(
+            state, this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
+        if (errFlag) {
+            ShowFatalError(state, "InitPlantProfile: Program terminated for previous conditions.");
         }
     }
+}
+void PlantProfileData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 // Functions

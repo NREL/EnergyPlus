@@ -1049,6 +1049,7 @@
     EastWall_SouthZone_1stFloor,  !- Name
     WALL-ASSEMBLY,           !- Construction Name
     SouthZone_1stFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1064,6 +1065,7 @@
     SouthWall_SouthZone_1stFloor,  !- Name
     WALL-ASSEMBLY,           !- Construction Name
     SouthZone_1stFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1079,6 +1081,7 @@
     WestWall_SouthZone_1stFloor,  !- Name
     WALL-ASSEMBLY,           !- Construction Name
     SouthZone_1stFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1094,6 +1097,7 @@
     EastWall_NorthZone_1stFloor,  !- Name
     WALL-ASSEMBLY,           !- Construction Name
     NorthZone_1stFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1109,6 +1113,7 @@
     NorthWall_NorthZone_1stFloor,  !- Name
     WALL-ASSEMBLY,           !- Construction Name
     NorthZone_1stFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1124,6 +1129,7 @@
     WestWall_NorthZone_1stFloor,  !- Name
     WALL-ASSEMBLY,           !- Construction Name
     NorthZone_1stFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1139,6 +1145,7 @@
     EastWall_SouthZone_2ndFloor,  !- Name
     WALL-ASSEMBLY,           !- Construction Name
     SouthZone_2ndFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1154,6 +1161,7 @@
     SouthWall_SouthZone_2ndFloor,  !- Name
     WALL-ASSEMBLY,           !- Construction Name
     SouthZone_2ndFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1169,6 +1177,7 @@
     WestWall_SouthZone_2ndFloor,  !- Name
     WALL-ASSEMBLY,           !- Construction Name
     SouthZone_2ndFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1184,6 +1193,7 @@
     Roof_SouthZone_2ndFloor, !- Name
     ROOF-ASSEMBLY,           !- Construction Name
     SouthZone_2ndFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1199,6 +1209,7 @@
     EastWall_NorthZone_2ndFloor,  !- Name
     WALL-ASSEMBLY,           !- Construction Name
     NorthZone_2ndFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1214,6 +1225,7 @@
     NorthWall_NorthZone_2ndFloor,  !- Name
     WALL-ASSEMBLY,           !- Construction Name
     NorthZone_2ndFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1229,6 +1241,7 @@
     WestWall_NorthZone_2ndFloor,  !- Name
     WALL-ASSEMBLY,           !- Construction Name
     NorthZone_2ndFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1244,6 +1257,7 @@
     Roof_NorthZone_2ndFloor, !- Name
     ROOF-ASSEMBLY,           !- Construction Name
     NorthZone_2ndFloor,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1259,6 +1273,7 @@
     Floor_SouthZone_1stFloor,!- Name
     FLOOR-SLAB-ASSEMBLY,     !- Construction Name
     SouthZone_1stFloor,      !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1274,6 +1289,7 @@
     Floor_NorthZone_1stFloor,!- Name
     FLOOR-SLAB-ASSEMBLY,     !- Construction Name
     NorthZone_1stFloor,      !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1289,6 +1305,7 @@
     Ceiling_SouthZone_1stFloor,  !- Name
     CEILING-FLOOR-ASSEMBLY,  !- Construction Name
     SouthZone_1stFloor,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Floor_SouthZone_2ndFloor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1304,6 +1321,7 @@
     Ceiling_NorthZone_1stFloor,  !- Name
     CEILING-FLOOR-ASSEMBLY,  !- Construction Name
     NorthZone_1stFloor,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Floor_NorthZone_2ndFloor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1319,6 +1337,7 @@
     Floor_SouthZone_2ndFloor,!- Name
     FLOOR-CEILING-ASSEMBLY,  !- Construction Name
     SouthZone_2ndFloor,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Ceiling_SouthZone_1stFloor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1334,6 +1353,7 @@
     Floor_NorthZone_2ndFloor,!- Name
     FLOOR-CEILING-ASSEMBLY,  !- Construction Name
     NorthZone_2ndFloor,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Ceiling_NorthZone_1stFloor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1349,6 +1369,7 @@
     InteriorWall_SouthZone_1stFloor,  !- Name
     INTERIOR-WALL-ASSEMBLY,  !- Construction Name
     SouthZone_1stFloor,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     InteriorWall_NorthZone_1stFloor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1364,6 +1385,7 @@
     InteriorWall_NorthZone_1stFloor,  !- Name
     INTERIOR-WALL-ASSEMBLY,  !- Construction Name
     NorthZone_1stFloor,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     InteriorWall_SouthZone_1stFloor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1379,6 +1401,7 @@
     InteriorWall_SouthZone_2ndFloor,  !- Name
     INTERIOR-WALL-ASSEMBLY,  !- Construction Name
     SouthZone_2ndFloor,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     InteriorWall_NorthZone_2ndFloor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1394,6 +1417,7 @@
     InteriorWall_NorthZone_2ndFloor,  !- Name
     INTERIOR-WALL-ASSEMBLY,  !- Construction Name
     NorthZone_2ndFloor,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     InteriorWall_SouthZone_2ndFloor,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1589,25 +1613,29 @@
     InternalMass_SouthZone_1stFloor,  !- Name
     FURNITURE,               !- Construction Name
     SouthZone_1stFloor,      !- Zone or ZoneList Name
-    77;                      !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    77;                      !- Extended Field
 
   InternalMass,
     InternalMass_NorthZone_1stFloor,  !- Name
     FURNITURE,               !- Construction Name
     NorthZone_1stFloor,      !- Zone or ZoneList Name
-    77;                      !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    77;                      !- Extended Field
 
   InternalMass,
     InternalMass_SouthZone_2ndFloor,  !- Name
     FURNITURE,               !- Construction Name
     SouthZone_2ndFloor,      !- Zone or ZoneList Name
-    77;                      !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    77;                      !- Extended Field
 
   InternalMass,
     InternalMass_NorthZone_2ndFloor,  !- Name
     FURNITURE,               !- Construction Name
     NorthZone_2ndFloor,      !- Zone or ZoneList Name
-    77;                      !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    77;                      !- Extended Field
 
   ScheduleTypeLimits,
     Any Number;              !- Name

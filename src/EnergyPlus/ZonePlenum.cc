@@ -1340,4 +1340,40 @@ int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNu
     return thisPlenum;
 }
 
+bool ValidateInducedNode(EnergyPlusData &state, int const InduceNodeNum, int const NumReturnNodes, Array1D<int> const &ReturnNode)
+{
+    // Ensure induced node is used as inlet node of zoe equipment
+    int PlenumNum;     // loop counter
+    int InNodeCtr;     // loop counter
+    int InduceNodeCtr; // loop counter
+    bool Nodefound = false;
+
+    // Obtains and Allocates ZonePlenum related parameters from input file
+    if (state.dataZonePlenum->GetInputFlag) { // First time subroutine has been entered
+        GetZonePlenumInput(state);
+        state.dataZonePlenum->GetInputFlag = false;
+    }
+
+    if (state.dataZonePlenum->NumZoneReturnPlenums > 0) {
+        for (PlenumNum = 1; PlenumNum <= state.dataZonePlenum->NumZoneReturnPlenums; ++PlenumNum) {
+            for (InduceNodeCtr = 1; InduceNodeCtr <= state.dataZonePlenum->ZoneRetPlenCond(PlenumNum).NumInducedNodes; ++InduceNodeCtr) {
+                if (InduceNodeNum == state.dataZonePlenum->ZoneRetPlenCond(PlenumNum).InducedNode(InduceNodeCtr)) {
+                    for (InNodeCtr = 1; InNodeCtr <= state.dataZonePlenum->ZoneRetPlenCond(PlenumNum).NumInletNodes; ++InNodeCtr) {
+                        for (int ReturnNodeNum = 1; ReturnNodeNum <= NumReturnNodes; ++ReturnNodeNum) {
+                            if (ReturnNode(ReturnNodeNum) != state.dataZonePlenum->ZoneRetPlenCond(PlenumNum).InletNode(InNodeCtr)) continue;
+                            Nodefound = true;
+                            break;
+                        }
+                        if (Nodefound) break;
+                    }
+                }
+                if (Nodefound) break;
+            }
+            if (Nodefound) break;
+        }
+    }
+
+    return Nodefound;
+}
+
 } // namespace EnergyPlus::ZonePlenum

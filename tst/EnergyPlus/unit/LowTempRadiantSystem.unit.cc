@@ -77,7 +77,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::LowTempRadiantSystem;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataZoneEquipment;
@@ -538,6 +537,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
         "    Floor,                   !- Surface Type",
         "    Slab Floor with Radiant, !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1151,7 +1151,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     GetLowTempRadiantSystem(*state);
     EXPECT_EQ(1, state->dataLowTempRadSys->NumOfHydrLowTempRadSys);
     EXPECT_EQ("WEST ZONE RADIANT FLOOR", state->dataLowTempRadSys->RadSysTypes(RadSysNum).Name);
-    EXPECT_EQ(LowTempRadiantSystem::SystemType::HydronicSystem, state->dataLowTempRadSys->RadSysTypes(RadSysNum).SystemType);
+    EXPECT_TRUE(compare_enums(LowTempRadiantSystem::SystemType::HydronicSystem, state->dataLowTempRadSys->RadSysTypes(RadSysNum).SystemType));
 
     ErrorsFound = false;
     PlantUtilities::ScanPlantLoopsForObject(*state,
@@ -1336,6 +1336,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
         "    Floor,                   !- Surface Type",
         "    Slab Floor with Radiant, !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1352,6 +1353,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
         "    Wall,                   !- Surface Type",
         "    Slab Floor with Radiant, !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1368,6 +1370,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
         "    Wall,                   !- Surface Type",
         "    Slab, !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1384,6 +1387,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
         "    Wall,                   !- Surface Type",
         "    Slab, !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1400,6 +1404,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
         "    Wall,                   !- Surface Type",
         "    Slab, !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1416,6 +1421,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
         "    CEILING,                   !- Surface Type",
         "    Slab, !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -2365,7 +2371,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempElecRadSurfaceGroupTest)
     EXPECT_EQ(2, state->dataLowTempRadSys->NumOfElecLowTempRadSys);
     EXPECT_EQ("WEST ZONE RADIANT FLOOR", state->dataLowTempRadSys->RadSysTypes(RadSysNum).Name);
     EXPECT_EQ("EAST ZONE RADIANT FLOOR", state->dataLowTempRadSys->RadSysTypes(RadSysNum + 1).Name);
-    EXPECT_EQ(LowTempRadiantSystem::SystemType::ElectricSystem, state->dataLowTempRadSys->RadSysTypes(RadSysNum).SystemType);
+    EXPECT_TRUE(compare_enums(LowTempRadiantSystem::SystemType::ElectricSystem, state->dataLowTempRadSys->RadSysTypes(RadSysNum).SystemType));
     EXPECT_EQ(state->dataLowTempRadSys->ElecRadSys(1).ZoneName, "WEST ZONE");
     EXPECT_EQ(state->dataLowTempRadSys->ElecRadSys(1).SurfListName, "WEST ZONE SURFACE GROUP");
     // the 2nd surface list group holds data for 1st elec rad sys (#5958)
@@ -2814,15 +2820,15 @@ TEST_F(LowTempRadiantSystemTest, processRadiantSystemControlInputTest)
     actualFunctionAnswer = LowTempRadiantControlTypes::MRTControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->HydrRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::HydronicSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MRTControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->CFloRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ConstantFlowSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MRTControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->ElecRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ElectricSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
 
     // Test 2: MRT test (done for all three types of systems)
     inputFunction = meanRadiantTemperature;
@@ -2830,15 +2836,15 @@ TEST_F(LowTempRadiantSystemTest, processRadiantSystemControlInputTest)
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->HydrRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::HydronicSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->CFloRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ConstantFlowSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->ElecRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ElectricSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
 
     // Test 3: Operative Temperature test (done for all three types of systems)
     inputFunction = operativeTemperature;
@@ -2846,15 +2852,15 @@ TEST_F(LowTempRadiantSystemTest, processRadiantSystemControlInputTest)
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->HydrRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::HydronicSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->CFloRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ConstantFlowSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->ElecRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ElectricSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
 
     // Test 4: Outside Dry-Bulb Temperature test (done for all three types of systems)
     inputFunction = outsideAirDryBulbTemperature;
@@ -2862,15 +2868,15 @@ TEST_F(LowTempRadiantSystemTest, processRadiantSystemControlInputTest)
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->HydrRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::HydronicSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->CFloRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ConstantFlowSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->ElecRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ElectricSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
 
     // Test 5: Outside Wet-Bulb Temperature test (done for all three types of systems)
     inputFunction = outsideAirWetBulbTemperature;
@@ -2878,15 +2884,15 @@ TEST_F(LowTempRadiantSystemTest, processRadiantSystemControlInputTest)
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->HydrRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::HydronicSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->CFloRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ConstantFlowSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->ElecRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ElectricSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
 
     // Test 6: Inside Face Surface Temperature test (done for all three types of systems)
     inputFunction = surfaceFaceTemperature;
@@ -2894,15 +2900,15 @@ TEST_F(LowTempRadiantSystemTest, processRadiantSystemControlInputTest)
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->HydrRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::HydronicSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->CFloRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ConstantFlowSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->ElecRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ElectricSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
 
     // Test 7: Inside Face Surface Temperature test (done for all three types of systems)
     inputFunction = surfaceInteriorTemperature;
@@ -2910,15 +2916,15 @@ TEST_F(LowTempRadiantSystemTest, processRadiantSystemControlInputTest)
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->HydrRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::HydronicSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->CFloRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ConstantFlowSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
     actualFunctionAnswer = LowTempRadiantControlTypes::MATControl; // reset
     actualFunctionAnswer = state->dataLowTempRadSys->ElecRadSys(1).processRadiantSystemControlInput(
         *state, inputFunction, textField2Pass, LowTempRadiantSystem::SystemType::ElectricSystem);
-    EXPECT_EQ(expectedResult, actualFunctionAnswer);
+    EXPECT_TRUE(compare_enums(expectedResult, actualFunctionAnswer));
 }
 
 TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
@@ -3619,21 +3625,24 @@ TEST_F(LowTempRadiantSystemTest, getFluidToSlabHeatTransferInputTest)
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ISOStandard;
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer =
         thisCFloSys.getFluidToSlabHeatTransferInput(*state, userInput);
-    EXPECT_EQ(FluidToSlabHeatTransferTypes::ConvectionOnly, state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer);
+    EXPECT_TRUE(compare_enums(FluidToSlabHeatTransferTypes::ConvectionOnly,
+                              state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer));
 
     // Test 2: Input is ISOStandard--so this field needs to get reset to ISOStandard
     userInput = "ISOStandard";
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ConvectionOnly;
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer =
         thisCFloSys.getFluidToSlabHeatTransferInput(*state, userInput);
-    EXPECT_EQ(FluidToSlabHeatTransferTypes::ISOStandard, state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer);
+    EXPECT_TRUE(compare_enums(FluidToSlabHeatTransferTypes::ISOStandard,
+                              state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer));
 
     // Test 3: Input is ISOStandard--so this field needs to get reset to ConvectionOnly (the default)
     userInput = "WeWantSomethingElse!";
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ISOStandard;
     state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer =
         thisCFloSys.getFluidToSlabHeatTransferInput(*state, userInput);
-    EXPECT_EQ(FluidToSlabHeatTransferTypes::ConvectionOnly, state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer);
+    EXPECT_TRUE(compare_enums(FluidToSlabHeatTransferTypes::ConvectionOnly,
+                              state->dataLowTempRadSys->CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer));
 }
 
 TEST_F(LowTempRadiantSystemTest, calculateUFromISOStandardTest)
@@ -3858,21 +3867,21 @@ TEST_F(LowTempRadiantSystemTest, GetLowTempRadiantSystem_MultipleTypes)
     EXPECT_EQ(1, state->dataLowTempRadSys->NumOfElecLowTempRadSys);
 
     EXPECT_EQ("WEST ZONE RADIANT FLOOR", state->dataLowTempRadSys->RadSysTypes(1).Name);
-    EXPECT_EQ(LowTempRadiantSystem::SystemType::HydronicSystem, state->dataLowTempRadSys->RadSysTypes(1).SystemType);
+    EXPECT_TRUE(compare_enums(LowTempRadiantSystem::SystemType::HydronicSystem, state->dataLowTempRadSys->RadSysTypes(1).SystemType));
     EXPECT_EQ(state->dataLowTempRadSys->HydrRadSys(1).ZoneName, "WEST ZONE");
     EXPECT_EQ(state->dataLowTempRadSys->HydrRadSys(1).SurfListName, "WEST ZONE SURFACE GROUP");
     EXPECT_EQ("WEST ZONE RADIANT FLOOR DESIGN", state->dataLowTempRadSys->HydrRadSys(1).designObjectName);
     EXPECT_EQ(1, state->dataLowTempRadSys->HydrRadSys(1).DesignObjectPtr);
 
     EXPECT_EQ("SOUTH ZONE LOWTEMPRAD", state->dataLowTempRadSys->RadSysTypes(2).Name);
-    EXPECT_EQ(LowTempRadiantSystem::SystemType::ConstantFlowSystem, state->dataLowTempRadSys->RadSysTypes(2).SystemType);
+    EXPECT_TRUE(compare_enums(LowTempRadiantSystem::SystemType::ConstantFlowSystem, state->dataLowTempRadSys->RadSysTypes(2).SystemType));
     EXPECT_EQ(state->dataLowTempRadSys->CFloRadSys(1).ZoneName, "SOUTH ZONE");
     EXPECT_EQ(state->dataLowTempRadSys->CFloRadSys(1).SurfListName, "SOUTH ZONE SURFACE GROUP");
     EXPECT_EQ("SOUTH ZONE LOWTEMPRAD DESIGN", state->dataLowTempRadSys->CFloRadSys(1).designObjectName);
     EXPECT_EQ(1, state->dataLowTempRadSys->CFloRadSys(1).DesignObjectPtr);
 
     EXPECT_EQ("EAST ZONE RADIANT FLOOR", state->dataLowTempRadSys->RadSysTypes(3).Name);
-    EXPECT_EQ(LowTempRadiantSystem::SystemType::ElectricSystem, state->dataLowTempRadSys->RadSysTypes(3).SystemType);
+    EXPECT_TRUE(compare_enums(LowTempRadiantSystem::SystemType::ElectricSystem, state->dataLowTempRadSys->RadSysTypes(3).SystemType));
     EXPECT_EQ(state->dataLowTempRadSys->ElecRadSys(1).ZoneName, "EAST ZONE");
     EXPECT_EQ(state->dataLowTempRadSys->ElecRadSys(1).SurfListName, "EAST ZONE SURFACE GROUP");
 }
@@ -3969,6 +3978,7 @@ TEST_F(LowTempRadiantSystemTest, VariableFlowCoolingOnlyInputTest)
         "    Floor,                   !- Surface Type",
         "    Slab Floor with Radiant, !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -3985,6 +3995,7 @@ TEST_F(LowTempRadiantSystemTest, VariableFlowCoolingOnlyInputTest)
         "    Wall,                   !- Surface Type",
         "    Slab Floor with Radiant, !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -4001,6 +4012,7 @@ TEST_F(LowTempRadiantSystemTest, VariableFlowCoolingOnlyInputTest)
         "    Wall,                   !- Surface Type",
         "    Slab, !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -4017,6 +4029,7 @@ TEST_F(LowTempRadiantSystemTest, VariableFlowCoolingOnlyInputTest)
         "    Wall,                   !- Surface Type",
         "    Slab, !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -4033,6 +4046,7 @@ TEST_F(LowTempRadiantSystemTest, VariableFlowCoolingOnlyInputTest)
         "    Wall,                   !- Surface Type",
         "    Slab, !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -4049,6 +4063,7 @@ TEST_F(LowTempRadiantSystemTest, VariableFlowCoolingOnlyInputTest)
         "    CEILING,                   !- Surface Type",
         "    Slab, !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Adiabatic,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",

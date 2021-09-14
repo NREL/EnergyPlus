@@ -738,6 +738,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     SPHW,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -769,6 +770,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     SPHW,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -800,6 +802,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     SPHW,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -831,6 +834,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     SPHW,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -862,6 +866,7 @@
     Floor,                   !- Surface Type
     FLOOR38,                 !- Construction Name
     SPHW,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -878,6 +883,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     SPHW,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -894,6 +900,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -925,6 +932,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -956,6 +964,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -987,6 +996,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1018,6 +1028,7 @@
     Floor,                   !- Surface Type
     FLOOR38,                 !- Construction Name
     DPW,                     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1034,6 +1045,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     DPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1050,6 +1062,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPWB,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1081,6 +1094,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPWB,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1112,6 +1126,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPWB,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1143,6 +1158,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPWB,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1174,6 +1190,7 @@
     Floor,                   !- Surface Type
     FLOOR38,                 !- Construction Name
     DPWB,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1190,6 +1207,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     DPWB,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1206,6 +1224,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPWD,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1237,6 +1256,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPWD,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1268,6 +1288,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPWD,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1299,6 +1320,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPWD,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1330,6 +1352,7 @@
     Floor,                   !- Surface Type
     FLOOR38,                 !- Construction Name
     DPWD,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn004:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1346,6 +1369,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     DPWD,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1362,6 +1386,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPWS,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1393,6 +1418,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPWS,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1424,6 +1450,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPWS,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1455,6 +1482,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPWS,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1486,6 +1514,7 @@
     Floor,                   !- Surface Type
     FLOOR38,                 !- Construction Name
     DPWS,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn005:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1502,6 +1531,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     DPWS,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1518,6 +1548,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     TPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1549,6 +1580,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     TPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1580,6 +1612,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     TPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1611,6 +1644,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     TPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1642,6 +1676,7 @@
     Floor,                   !- Surface Type
     FLOOR38,                 !- Construction Name
     TPW,                     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn006:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1658,6 +1693,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     TPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1674,6 +1710,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     QPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1705,6 +1742,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     QPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1736,6 +1774,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     QPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1767,6 +1806,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     QPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1798,6 +1838,7 @@
     Floor,                   !- Surface Type
     FLOOR38,                 !- Construction Name
     QPW,                     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn007:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1814,6 +1855,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     QPW,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1830,6 +1872,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPM,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1861,6 +1904,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPM,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1892,6 +1936,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPM,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1923,6 +1968,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     DPM,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1954,6 +2000,7 @@
     Floor,                   !- Surface Type
     FLOOR38,                 !- Construction Name
     DPM,                     !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn008:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1970,6 +2017,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     DPM,                     !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1986,6 +2034,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     SCWINDOW,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2017,6 +2066,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     SCWINDOW,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2048,6 +2098,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     SCWINDOW,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2079,6 +2130,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     SCWINDOW,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2110,6 +2162,7 @@
     Floor,                   !- Surface Type
     FLOOR38,                 !- Construction Name
     SCWINDOW,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn009:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2126,6 +2179,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     SCWINDOW,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

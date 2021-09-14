@@ -67,7 +67,6 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::DataSizing;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 {

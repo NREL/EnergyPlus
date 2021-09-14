@@ -230,8 +230,7 @@ public:
                                       std::string const &mapName,
                                       std::string const &environmentName,
                                       int const zone,
-                                      std::string const &refPt1,
-                                      std::string const &refPt2,
+                                      std::string const &refPts,
                                       Real64 const zCoord);
 
     void createSQLiteDaylightMap(int const mapNum,

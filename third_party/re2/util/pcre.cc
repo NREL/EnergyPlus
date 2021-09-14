@@ -22,9 +22,7 @@
 #include "util/strutil.h"
 
 // Silence warnings about the wacky formatting in the operator() functions.
-// Note that we test for Clang first because it defines __GNUC__ as well.
-#if defined(__clang__)
-#elif defined(__GNUC__) && __GNUC__ >= 6
+#if !defined(__clang__) && defined(__GNUC__) && __GNUC__ >= 6
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
 #endif
 
@@ -35,9 +33,10 @@
 // not exceed main thread stacks.  Note that other threads
 // often have smaller stacks, and therefore tightening
 // regexp_stack_limit may frequently be necessary.
-DEFINE_int32(regexp_stack_limit, 256<<10, "default PCRE stack limit (bytes)");
-DEFINE_int32(regexp_match_limit, 1000000,
-             "default PCRE match limit (function calls)");
+DEFINE_FLAG(int, regexp_stack_limit, 256 << 10,
+            "default PCRE stack limit (bytes)");
+DEFINE_FLAG(int, regexp_match_limit, 1000000,
+            "default PCRE match limit (function calls)");
 
 #ifndef USEPCRE
 
@@ -523,12 +522,12 @@ int PCRE::TryMatch(const StringPiece& text,
 
   int match_limit = match_limit_;
   if (match_limit <= 0) {
-    match_limit = FLAGS_regexp_match_limit;
+    match_limit = GetFlag(FLAGS_regexp_match_limit);
   }
 
   int stack_limit = stack_limit_;
   if (stack_limit <= 0) {
-    stack_limit = FLAGS_regexp_stack_limit;
+    stack_limit = GetFlag(FLAGS_regexp_stack_limit);
   }
 
   pcre_extra extra = { 0 };
@@ -977,32 +976,7 @@ static bool parse_double_float(const char* str, size_t n, bool isfloat,
   } else {
     r = strtod(buf, &end);
   }
-  if (end != buf + n) {
-#ifdef _WIN32
-    // Microsoft's strtod() doesn't handle inf and nan, so we have to
-    // handle it explicitly.  Speed is not important here because this
-    // code is only called in unit tests.
-    bool pos = true;
-    const char* i = buf;
-    if ('-' == *i) {
-      pos = false;
-      ++i;
-    } else if ('+' == *i) {
-      ++i;
-    }
-    if (0 == _stricmp(i, "inf") || 0 == _stricmp(i, "infinity")) {
-      r = std::numeric_limits<double>::infinity();
-      if (!pos)
-        r = -r;
-    } else if (0 == _stricmp(i, "nan")) {
-      r = std::numeric_limits<double>::quiet_NaN();
-    } else {
-      return false;
-    }
-#else
-    return false;   // Leftover junk
-#endif
-  }
+  if (end != buf + n) return false;   // Leftover junk
   if (errno) return false;
   if (dest == NULL) return true;
   if (isfloat) {

@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -189,7 +188,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
         }
     }
     EXPECT_EQ(1, state->dataHeatBal->TotBlindsEQL);
-    EXPECT_EQ(state->dataMaterial->Material(VBMatNum).Group, DataHeatBalance::MaterialGroup::BlindEquivalentLayer);
+    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(VBMatNum).Group, DataHeatBalance::MaterialGroup::BlindEquivalentLayer));
     EXPECT_EQ(state->dataMaterial->Material(VBMatNum).SlatAngleType, state->dataWindowEquivalentLayer->lscVBNOBM);
 
     int ConstrNum = 1;
@@ -338,6 +337,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -369,6 +369,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -385,6 +386,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -401,6 +403,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -417,6 +420,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -433,6 +437,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -693,6 +698,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -724,6 +730,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -740,6 +747,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -756,6 +764,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -772,6 +781,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -788,6 +798,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -935,7 +946,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, state->dataHeatBal->TotMaterials);
-    EXPECT_EQ(state->dataMaterial->Material(1).Group, DataHeatBalance::MaterialGroup::WindowSimpleGlazing);
+    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(1).Group, DataHeatBalance::MaterialGroup::WindowSimpleGlazing));
     // get construction returns error forund true due to invalid layer
     GetConstructData(*state, ErrorsFound);
     EXPECT_EQ(1, state->dataHeatBal->TotConstructs);
@@ -1078,6 +1089,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1094,6 +1106,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1110,6 +1123,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1126,6 +1140,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1142,6 +1157,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1158,6 +1174,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1402,6 +1419,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1418,6 +1436,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1434,6 +1453,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1450,6 +1470,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1466,6 +1487,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1482,6 +1504,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1726,6 +1749,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1742,6 +1766,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1758,6 +1783,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1774,6 +1800,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1790,6 +1817,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1806,6 +1834,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",

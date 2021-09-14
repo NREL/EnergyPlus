@@ -97,6 +97,7 @@
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterToAirHeatPump.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 namespace EnergyPlus::PackagedTerminalHeatPump {
 
@@ -1079,6 +1080,14 @@ void GetPTUnit(EnergyPlusData &state)
                    state.dataPTHP->PTUnit(PTUnitNum).ATMixerSecNode,
                    state.dataPTHP->PTUnit(PTUnitNum).ATMixerOutNode,
                    state.dataPTHP->PTUnit(PTUnitNum).AirOutNode);
+        state.dataPTHP->PTUnit(PTUnitNum).ZonePtr =
+            DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::PkgTermHPAirToAir_Num, state.dataPTHP->PTUnit(PTUnitNum).Name);
+        if (state.dataPTHP->PTUnit(PTUnitNum).ZonePtr == 0) {
+            ShowSevereError(state,
+                            std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\",");
+            ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
+            ErrorsFound = true;
+        }
         if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide ||
             state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
             state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists = true;
@@ -1093,35 +1102,43 @@ void GetPTUnit(EnergyPlusData &state)
         // check that PTUnit inlet node is a zone exhaust node.
         if (!state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists || state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
             ZoneNodeNotFound = true;
-            for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                    if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
-                        ZoneNodeNotFound = false;
-                        break;
-                    }
+            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).NumExhaustNodes; ++NodeNum) {
+                if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode ==
+                    state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).ExhaustNode(NodeNum)) {
+                    ZoneNodeNotFound = false;
+                    break;
                 }
             }
             if (ZoneNodeNotFound) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
-                ShowContinueError(state, "..Heat Pumps air inlet node name must be the same as a zone exhaust node name.");
-                ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                ShowContinueError(state,
-                                  "..Heat pumps inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
-                ErrorsFound = true;
+                bool InletNodeFound = false;
+                if (state.dataPTHP->PTUnit(PTUnitNum).ZonePtr > 0) {
+                    InletNodeFound = ZonePlenum::ValidateInducedNode(
+                        state,
+                        state.dataPTHP->PTUnit(PTUnitNum).AirInNode,
+                        state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).NumReturnNodes,
+                        state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).ReturnNode);
+                }
+                if (!InletNodeFound) {
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                    ShowContinueError(state,
+                                      "..Heat Pumps air inlet node name must be the same as either a zone exhaust node name or an induced "
+                                      "air node in ZonePlenum.");
+                    ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                    ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
+                    ShowContinueError(state,
+                                      "..Heat Pumps inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                    ErrorsFound = true;
+                }
             }
         }
         // check that PTUnit outlet node is a zone inlet node.
         if (!state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists || state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
             ZoneNodeNotFound = true;
-            for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                    if (state.dataPTHP->PTUnit(PTUnitNum).AirOutNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                        state.dataPTHP->PTUnit(PTUnitNum).ZonePtr = CtrlZone;
-                        ZoneNodeNotFound = false;
-                        break;
-                    }
+            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).NumInletNodes; ++NodeNum) {
+                if (state.dataPTHP->PTUnit(PTUnitNum).AirOutNode ==
+                    state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).InletNode(NodeNum)) {
+                    ZoneNodeNotFound = false;
+                    break;
                 }
             }
             if (ZoneNodeNotFound) {
@@ -2020,6 +2037,13 @@ void GetPTUnit(EnergyPlusData &state)
                    state.dataPTHP->PTUnit(PTUnitNum).ATMixerSecNode,
                    state.dataPTHP->PTUnit(PTUnitNum).ATMixerOutNode,
                    state.dataPTHP->PTUnit(PTUnitNum).AirOutNode);
+        state.dataPTHP->PTUnit(PTUnitNum).ZonePtr =
+            DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::PkgTermACAirToAir_Num, state.dataPTHP->PTUnit(PTUnitNum).Name);
+        if (state.dataPTHP->PTUnit(PTUnitNum).ZonePtr == 0) {
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\",");
+            ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
+            ErrorsFound = true;
+        }
         if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide ||
             state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
             state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists = true;
@@ -2034,35 +2058,43 @@ void GetPTUnit(EnergyPlusData &state)
         // check that Air-conditioners inlet node is a zone exhaust node or the OA Mixer return node.
         if (!state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists || state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
             ZoneNodeNotFound = true;
-            for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                    if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
-                        ZoneNodeNotFound = false;
-                        break;
-                    }
+            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).NumExhaustNodes; ++NodeNum) {
+                if (state.dataPTHP->PTUnit(PTUnitNum).AirInNode ==
+                    state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).ExhaustNode(NodeNum)) {
+                    ZoneNodeNotFound = false;
+                    break;
                 }
             }
             if (ZoneNodeNotFound) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
-                ShowContinueError(state, "..Air-conditioners air inlet node name must be the same as a zone exhaust node name.");
-                ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                ShowContinueError(state,
-                                  "..Air-conditioners inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
-                ErrorsFound = true;
+                bool InletNodeFound = false;
+                if (state.dataPTHP->PTUnit(PTUnitNum).ZonePtr > 0) {
+                    InletNodeFound = ZonePlenum::ValidateInducedNode(
+                        state,
+                        state.dataPTHP->PTUnit(PTUnitNum).AirInNode,
+                        state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).NumReturnNodes,
+                        state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).ReturnNode);
+                }
+                if (!InletNodeFound) {
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
+                    ShowContinueError(state,
+                                      "..Air-conditioners air inlet node name must be the same as either a zone exhaust node name or an induced "
+                                      "air node in ZonePlenum.");
+                    ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                    ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
+                    ShowContinueError(
+                        state, "..Air-conditioners inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                    ErrorsFound = true;
+                }
             }
         }
         // check that Air-conditioners outlet node is a zone inlet node.
         if (!state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists || state.dataPTHP->PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
             ZoneNodeNotFound = true;
-            for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                    if (state.dataPTHP->PTUnit(PTUnitNum).AirOutNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                        state.dataPTHP->PTUnit(PTUnitNum).ZonePtr = CtrlZone;
-                        ZoneNodeNotFound = false;
-                        break;
-                    }
+            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).NumInletNodes; ++NodeNum) {
+                if (state.dataPTHP->PTUnit(PTUnitNum).AirOutNode ==
+                    state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).InletNode(NodeNum)) {
+                    ZoneNodeNotFound = false;
+                    break;
                 }
             }
             if (ZoneNodeNotFound) {

@@ -25,9 +25,6 @@
 #include "re2/stringpiece.h"
 #include "re2/regexp.h"
 
-// Cause a link error if this file is used outside of testing.
-DECLARE_string(test_tmpdir);
-
 namespace re2 {
 
 static const char* kOpcodeNames[] = {
@@ -154,14 +151,11 @@ static void DumpRegexpAppending(Regexp* re, std::string* s) {
 }
 
 std::string Regexp::Dump() {
+  // Make sure that we are being called from a unit test.
+  // Should cause a link error if used outside of testing.
+  CHECK(!::testing::TempDir().empty());
+
   std::string s;
-
-  // Make sure being called from a unit test.
-  if (FLAGS_test_tmpdir.empty()) {
-    LOG(ERROR) << "Cannot use except for testing.";
-    return s;
-  }
-
   DumpRegexpAppending(this, &s);
   return s;
 }

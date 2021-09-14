@@ -188,6 +188,8 @@ namespace ZonePlenum {
 
     int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
 
+    bool ValidateInducedNode(EnergyPlusData &state, int const InduceNodeNum, int const NumReturnNodes, Array1D<int> const &ReturnNode);
+
 } // namespace ZonePlenum
 
 struct ZonePlenumData : BaseGlobalStruct

@@ -144,6 +144,16 @@ ENERGYPLUSLIB_API void stopSimulation(EnergyPlusState state);
 /// \param[in] outputStatus An integer describing whether the console output should be printed: nonzero integer for yes, 0 for no.
 ENERGYPLUSLIB_API void setConsoleOutputState(EnergyPlusState state, int outputStatus);
 
+/// \brief Allows setting the EnergyPlus install root folder when calling EnergyPlus as a library (call this prior to running EnergyPlus)
+/// \details When EnergyPlus is run as a standalone executable, it is able to locate auxiliary tools relative to the running binary exe file.
+///          However, when calling as an API, the running binary will not be in the EnergyPlus install, and so EnergyPlus will fail to find those
+///          auxiliary tools.  To call these tools when running as a library, the install root must be set using this function.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] path Path to the EnergyPlus install root, for example "C:\\EnergyPlus-9-5-0", or "/usr/local/EnergyPlus-9-5-0"
+/// \remark It should be noted that in many workflows, it would be better to just call those auxiliary tools directly from an outside caller, rather
+///         than relying on EnergyPlus to do it via command line arguments.
+ENERGYPLUSLIB_API void setEnergyPlusRootDirectory(EnergyPlusState state, const char *path);
+
 /// \brief Asks EnergyPlus to issue a warning message to the error file.
 /// \details During an EnergyPlus simulation, if certain conditions arise, it may be useful to alert the user using
 ///          this function, which will issue a warning note in the standard error file and continue the simulation.

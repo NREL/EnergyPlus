@@ -1434,58 +1434,62 @@ INTEGER,PARAMETER :: buildSurfNameOff = 1
 INTEGER,PARAMETER :: buildSurfTypeOff = 2
 INTEGER,PARAMETER :: buildSurfConstructionOff = 3
 INTEGER,PARAMETER :: buildSurfZoneOff = 4
-INTEGER,PARAMETER :: buildSurfOutBndCondOff = 5
-INTEGER,PARAMETER :: buildSurfOutBndCondNameOff = 6
-INTEGER,PARAMETER :: buildSurfSunExpOff = 7
-INTEGER,PARAMETER :: buildSurfWindExpOff = 8 !last required field
-INTEGER,PARAMETER :: buildSurfViewGroundOff = 9
-INTEGER,PARAMETER :: buildSurfNumVertOff = 10
-INTEGER,PARAMETER :: buildSurfX1Off = 11
-INTEGER,PARAMETER :: buildSurfY1Off = 12
-INTEGER,PARAMETER :: buildSurfZ1Off = 13
-INTEGER,PARAMETER :: buildSurfLastZVertexOff = 370 !up to 120 vertices
+INTEGER,PARAMETER :: buildSurfSpaceOff = 5
+INTEGER,PARAMETER :: buildSurfOutBndCondOff = 6
+INTEGER,PARAMETER :: buildSurfOutBndCondNameOff = 7
+INTEGER,PARAMETER :: buildSurfSunExpOff = 8
+INTEGER,PARAMETER :: buildSurfWindExpOff = 9 !last required field
+INTEGER,PARAMETER :: buildSurfViewGroundOff = 10
+INTEGER,PARAMETER :: buildSurfNumVertOff = 11
+INTEGER,PARAMETER :: buildSurfX1Off = 12
+INTEGER,PARAMETER :: buildSurfY1Off = 13
+INTEGER,PARAMETER :: buildSurfZ1Off = 14
+INTEGER,PARAMETER :: buildSurfLastZVertexOff = 371 !up to 120 vertices
 
 INTEGER,PARAMETER :: wallDetlNameOff = 1
 INTEGER,PARAMETER :: wallDetlConstructionOff = 2
 INTEGER,PARAMETER :: wallDetlZoneOff = 3
-INTEGER,PARAMETER :: wallDetlOutBndCondOff = 4
-INTEGER,PARAMETER :: wallDetlOutBndCondNameOff = 5
-INTEGER,PARAMETER :: wallDetlSunExpOff = 6
-INTEGER,PARAMETER :: wallDetlWindExpOff = 7 !last required field
-INTEGER,PARAMETER :: wallDetlViewGroundOff = 8
-INTEGER,PARAMETER :: wallDetlNumVertOff = 9
-INTEGER,PARAMETER :: wallDetlX1Off = 10
-INTEGER,PARAMETER :: wallDetlY1Off = 11
-INTEGER,PARAMETER :: wallDetlZ1Off = 12
-INTEGER,PARAMETER :: wallDetlLastZVertexOff = 39 !up to 10 vertices
+INTEGER,PARAMETER :: wallDetlSpaceOff = 4
+INTEGER,PARAMETER :: wallDetlOutBndCondOff = 5
+INTEGER,PARAMETER :: wallDetlOutBndCondNameOff = 6
+INTEGER,PARAMETER :: wallDetlSunExpOff = 7
+INTEGER,PARAMETER :: wallDetlWindExpOff = 8 !last required field
+INTEGER,PARAMETER :: wallDetlViewGroundOff = 9
+INTEGER,PARAMETER :: wallDetlNumVertOff = 10
+INTEGER,PARAMETER :: wallDetlX1Off = 11
+INTEGER,PARAMETER :: wallDetlY1Off = 12
+INTEGER,PARAMETER :: wallDetlZ1Off = 13
+INTEGER,PARAMETER :: wallDetlLastZVertexOff = 40 !up to 10 vertices
 
 INTEGER,PARAMETER :: rfClDetlNameOff = 1
 INTEGER,PARAMETER :: rfClDetlConstructionOff = 2
 INTEGER,PARAMETER :: rfClDetlZoneOff = 3
-INTEGER,PARAMETER :: rfClDetlOutBndCondOff = 4
-INTEGER,PARAMETER :: rfClDetlOutBndCondNameOff = 5
-INTEGER,PARAMETER :: rfClDetlSunExpOff = 6
-INTEGER,PARAMETER :: rfClDetlWindExpOff = 7 !last required field
-INTEGER,PARAMETER :: rfClDetlViewGroundOff = 8
-INTEGER,PARAMETER :: rfClDetlNumVertOff = 9
-INTEGER,PARAMETER :: rfClDetlX1Off = 10
-INTEGER,PARAMETER :: rfClDetlY1Off = 11
-INTEGER,PARAMETER :: rfClDetlZ1Off = 12
-INTEGER,PARAMETER :: rfClDetlLastZVertexOff = 39 !up to 10 vertices
+INTEGER,PARAMETER :: rfClDetlSpaceOff = 4
+INTEGER,PARAMETER :: rfClDetlOutBndCondOff = 5
+INTEGER,PARAMETER :: rfClDetlOutBndCondNameOff = 6
+INTEGER,PARAMETER :: rfClDetlSunExpOff = 7
+INTEGER,PARAMETER :: rfClDetlWindExpOff = 8 !last required field
+INTEGER,PARAMETER :: rfClDetlViewGroundOff = 9
+INTEGER,PARAMETER :: rfClDetlNumVertOff = 10
+INTEGER,PARAMETER :: rfClDetlX1Off = 11
+INTEGER,PARAMETER :: rfClDetlY1Off = 12
+INTEGER,PARAMETER :: rfClDetlZ1Off = 13
+INTEGER,PARAMETER :: rfClDetlLastZVertexOff = 40 !up to 10 vertices
 
 INTEGER,PARAMETER :: flrDetlNameOff = 1
 INTEGER,PARAMETER :: flrDetlConstructionOff = 2
 INTEGER,PARAMETER :: flrDetlZoneOff = 3
-INTEGER,PARAMETER :: flrDetlOutBndCondOff = 4
-INTEGER,PARAMETER :: flrDetlOutBndCondNameOff = 5
-INTEGER,PARAMETER :: flrDetlSunExpOff = 6
-INTEGER,PARAMETER :: flrDetlWindExpOff = 7 !last required field
-INTEGER,PARAMETER :: flrDetlViewGroundOff = 8
-INTEGER,PARAMETER :: flrDetlNumVertOff = 9
-INTEGER,PARAMETER :: flrDetlX1Off = 10
-INTEGER,PARAMETER :: flrDetlY1Off = 11
-INTEGER,PARAMETER :: flrDetlZ1Off = 12
-INTEGER,PARAMETER :: flrDetlLastZVertexOff = 39 !up to 10 vertices
+INTEGER,PARAMETER :: flrDetlSpaceOff = 4
+INTEGER,PARAMETER :: flrDetlOutBndCondOff = 5
+INTEGER,PARAMETER :: flrDetlOutBndCondNameOff = 6
+INTEGER,PARAMETER :: flrDetlSunExpOff = 7
+INTEGER,PARAMETER :: flrDetlWindExpOff = 8 !last required field
+INTEGER,PARAMETER :: flrDetlViewGroundOff = 9
+INTEGER,PARAMETER :: flrDetlNumVertOff = 10
+INTEGER,PARAMETER :: flrDetlX1Off = 11
+INTEGER,PARAMETER :: flrDetlY1Off = 12
+INTEGER,PARAMETER :: flrDetlZ1Off = 13
+INTEGER,PARAMETER :: flrDetlLastZVertexOff = 40 !up to 10 vertices
 
 INTEGER,PARAMETER :: gndTempSurfJanOff = 1
 INTEGER,PARAMETER :: gndTempSurfFebOff = 2
@@ -2311,10 +2315,10 @@ CALL AddObjToProcess('CoolingTower:VariableSpeed',.FALSE.,          twrvsOutletN
 ! Ground Heat Transfer
 CALL AddObjToProcess('GroundHeatTransfer:Control',.TRUE.,           ghtCtrlNameOff,              ghtCtrlSlabOff,             3)
 IF (doGatherSurfaces) THEN !only gather these surfaces if groundheattransfer has been found.
-  CALL AddObjToProcess('BuildingSurface:Detailed',.TRUE.,             buildSurfWindExpOff,         buildSurfLastZVertexOff,  370)
-  CALL AddObjToProcess('Wall:Detailed',.TRUE.,                        wallDetlWindExpOff,          wallDetlLastZVertexOff,    39)
-  CALL AddObjToProcess('RoofCeiling:Detailed',.TRUE.,                 rfClDetlWindExpOff,          rfClDetlLastZVertexOff,    39)
-  CALL AddObjToProcess('Floor:Detailed',.TRUE.,                       flrDetlWindExpOff,           flrDetlLastZVertexOff,     39)
+  CALL AddObjToProcess('BuildingSurface:Detailed',.TRUE.,             buildSurfWindExpOff,         buildSurfLastZVertexOff,  371)
+  CALL AddObjToProcess('Wall:Detailed',.TRUE.,                        wallDetlWindExpOff,          wallDetlLastZVertexOff,    40)
+  CALL AddObjToProcess('RoofCeiling:Detailed',.TRUE.,                 rfClDetlWindExpOff,          rfClDetlLastZVertexOff,    40)
+  CALL AddObjToProcess('Floor:Detailed',.TRUE.,                       flrDetlWindExpOff,           flrDetlLastZVertexOff,     40)
 END IF
 CALL AddObjToProcess('Site:GroundTemperature:BuildingSurface',.TRUE.,gndTempSurfJanOff,          gndTempSurfDecOff,         12)
 ! Items to echo to basement or slab input files
@@ -5680,7 +5684,7 @@ DO iSys = 1, prelimCount
     CALL SetIfBlank(fldValStart + vsMaxOutsideFlowOff, 'autosize')
     CALL SetIfBlank(fldValStart + vsMinOutsideFlowOff, 'autosize')
     CALL SetIfBlank(fldValStart + vsMinOutsideControlOff, 'ProportionalMinimum')
-    CALL SetIfBlank(fldValStart + vsEconomizerKindOff, 'None')
+    CALL SetIfBlank(fldValStart + vsEconomizerKindOff, 'NoEconomizer')
     CALL SetIfBlank(fldValStart + vsEconoLockoutKindOff, 'NoLockout')
     CALL SetIfBlank(fldValStart + vsSupplyFanPlaceOff, 'DrawThrough')
     CALL SetIfBlank(fldValStart + vsSupplyFanPLRCoeffOff, 'InletVaneDampers')
@@ -5750,7 +5754,7 @@ DO iSys = 1, prelimCount
     CALL SetIfBlank(fldValStart + pvavsHeatSetPtResetTypeOff, 'None')
     CALL SetIfBlank(fldValStart + pvavsDehumCtrlTypeOff, 'None')
     CALL SetIfBlank(fldValStart + pvavsDehumSetPtOff, '60.0')
-    CALL SetIfBlank(fldValStart + pvavsHumidCtrlTypeOff, ' None')
+    CALL SetIfBlank(fldValStart + pvavsHumidCtrlTypeOff, 'None')
     CALL SetIfBlank(fldValStart + pvavsHumidCapOff, '0.000001')
     CALL SetIfBlank(fldValStart + pvavsHumidRatedElecOff, 'autosize')
     CALL SetIfBlank(fldValStart + pvavsHumidSetPtOff, '30.0')
@@ -6167,7 +6171,7 @@ DO iSys = 1, prelimCount
     CALL SetIfBlank(fldValStart + cvsCoolResetODBLoOff, '15.6')
     CALL SetIfBlank(fldValStart + cvsCoolSetPtAtODBHiOff, '12.8')
     CALL SetIfBlank(fldValStart + cvsCoolResetODBHiOff, '23.3')
-    CALL SetIfBlank(fldValStart + cvsHeatCoilKindOff, 'None')
+    CALL SetIfBlank(fldValStart + cvsHeatCoilKindOff, 'HotWater')
     CALL SetIfBlank(fldValStart + cvsHeatSetPtCtrlTypeOff, 'FixedSetpoint')
     CALL SetIfBlank(fldValStart + cvsHeatSetPtDesignOff, '10')
     CALL SetIfBlank(fldValStart + cvsHeatSetPtAtODBLoOff, '15')
@@ -6183,7 +6187,7 @@ DO iSys = 1, prelimCount
     CALL SetIfBlank(fldValStart + cvsPreheatParasiticOff, '0')
     CALL SetIfBlank(fldValStart + cvsMaxOutsideFlowOff, 'autosize')
     CALL SetIfBlank(fldValStart + cvsMinOutsideFlowOff, 'autosize')
-    CALL SetIfBlank(fldValStart + cvsEconomizerKindOff, 'None')
+    CALL SetIfBlank(fldValStart + cvsEconomizerKindOff, 'NoEconomizer')
     CALL SetIfBlank(fldValStart + cvsNightCycleControlOff, 'StayOff')
     CALL SetIfBlank(fldValStart + cvsHeatRecTypeOff, 'None')
     CALL SetIfBlank(fldValStart + cvsHeatRecSenEffOff, '0.7')
@@ -9055,7 +9059,7 @@ DO iZone = 1, numCompactZoneVAV
       CALL AddToObjFld('Availability Schedule Name', base + vzBaseboardAvailSchedNameOff,'')
       CALL AddToObjFld('Inlet Node Name', base + vzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Outlet Node Name', base + vzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
+      CALL AddToObjStr('Rated Average Water Temperature {C}','82.2')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
       CALL AddToObjFld('Heating Design Capacity {W}', base + vzBaseboardCapOff,'')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize',.TRUE.)
@@ -9554,7 +9558,7 @@ DO iZone = 1, numCompactZoneFPVAV
       CALL AddToObjFld('Availability Schedule Name', base + fpvzBaseboardAvailSchedNameOff,'')
       CALL AddToObjFld('Inlet Node Name', base + fpvzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Outlet Node Name', base + fpvzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
+      CALL AddToObjStr('Rated Average Water Temperature {C}','82.2')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
       CALL AddToObjFld('Heating Design Capacity {W}', base + fpvzBaseboardCapOff,'')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize',.TRUE.)
@@ -9987,7 +9991,7 @@ DO iZone = 1, numCompactZoneHCVAV
       CALL AddToObjFld('Availability Schedule Name', base + hcvzBaseboardAvailSchedNameOff,'')
       CALL AddToObjFld('Inlet Node Name', base + hcvzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Outlet Node Name', base + hcvzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
+      CALL AddToObjStr('Rated Average Water Temperature {C}','82.2')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
       CALL AddToObjFld('Heating Design Capacity {W}', base + hcvzBaseboardCapOff,'')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize',.TRUE.)
@@ -10231,7 +10235,7 @@ DO iSys = 1, numCompactSysVAV
   ENDIF
   ! check if there is no heating coil and heating design setpoint is > preheat design setpoint
   IF (heatCoilType == ctNone) THEN
-    IF(StringToReal(FldVal(base + vsHeatSetPtDesignOff)) .GT. StringToReal(FldVal(base + vsPreheatSetPtConstantOff))) THEN
+    IF((preHeatCoilType .NE. ctNone) .AND. (StringToReal(FldVal(base + vsHeatSetPtDesignOff)) .GT. StringToReal(FldVal(base + vsPreheatSetPtConstantOff)))) THEN
       usePreheatTempforHeatDesignSuppT = .TRUE.
       CALL WriteError('Warning:  In HVACTemplate:System:VAV "'//TRIM(FldVal(base + vsAirHandlerNameOff))//'"'// &
                     ' the Heating Coil Design Setpoint is greater than the Preheat Coil Design Setpoint,'// &
@@ -11177,6 +11181,13 @@ DO iSys = 1, numCompactSysVAV
   !AIR LOOP EQUIPMENT LIST ~ line 552
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem:EquipmentList')
   CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' OA System Equipment')
+  IF (heatRecovery .EQ. htrecSens) THEN
+    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
+    CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Heat Recovery')
+  ELSEIF (heatRecovery .EQ. htrecEnth) THEN
+    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
+    CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Heat Recovery')
+  END IF
   IF (preHeatCoilType .EQ. ctHotWater) THEN
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Preheat Coil')
@@ -11186,13 +11197,6 @@ DO iSys = 1, numCompactSysVAV
   ELSEIF (preHeatCoilType .EQ. ctGas) THEN
     CALL AddToObjStr('Component Object Type','Coil:Heating:Fuel')
     CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Preheat Coil')
-  END IF
-  IF (heatRecovery .EQ. htrecSens) THEN
-    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
-    CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Heat Recovery')
-  ELSEIF (heatRecovery .EQ. htrecEnth) THEN
-    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
-    CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Heat Recovery')
   END IF
   CALL AddToObjStr('Component Object Type','OutdoorAir:Mixer')
   CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' OA Mixing Box',.TRUE.)
@@ -11624,9 +11628,9 @@ DO iSys = 1, numCompactSysPVAV
   ! Warn if fixed heating or preheat setpoint is greater than fixed cooling setpoint, and no reset option is active
   IF (isCoolStPtSchedBlank .AND. (coolSetPtReset == csprNone)) THEN
     IF ((heatCoilType .NE. ctNone) .AND. isHeatStPtSchedBlank .AND. (heatSetPtReset == hsprNone)) THEN
-      IF (FldVal(base + pvavsHeatSetPtDesignOff) .GT. FldVal(base + pvavsCoolSetPtDesignOff)) THEN
+      IF (StringToReal(FldVal(base + pvavsHeatSetPtDesignOff)) .GT. StringToReal(FldVal(base + pvavsCoolSetPtDesignOff))) THEN
        CALL WriteError('Warning:  In HVACTemplate:System:PackagedVAV "'//TRIM(FldVal(base + pvavsAirHandlerNameOff))//'"'// &
-                      ' the Heating Coil Design Setpoint is greater than the Cooling Coil Design Setpoint.'// &
+                      ' the Heating Coil Design Setpoint= is greater than the Cooling Coil Design Setpoint.'// &
                       ' This may cause the heating coil and cooling coil to operate simultaneously.'// &
                       ' Check results carefully and adjust controls if needed.',msgWarning)
       ENDIF
@@ -12431,45 +12435,47 @@ DO iSys = 1, numCompactSysPVAV
       CALL AddToObjStr('Maximum Value of x','1.0',.TRUE.)
   END SELECT
   ! Humdistat(s) if needed
-  !    Single humidistat if humidification and dehumidification are both active and control zones are the same
-  IF ((.NOT. isHumidifierNone) .AND. (.NOT. isDehumidifyNone) &
-       .AND. SameString(FldVal(base +  pvavsDehumCtrlZoneOff),FldVal(base +  pvavsHumidCtrlZoneOff))) THEN
-    !Object ==> ZoneControl:Humidistat
-    CALL CreateNewObj('ZoneControl:Humidistat')
-    CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Humidistat')
-    CALL AddToObjFld('Zone Name', base + pvavsDehumCtrlZoneOff,'')
-    CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name', &
-                     'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsHumidSetPtOff)))
-    CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', &
-                     'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsDehumSetPtOff)),.TRUE.)
-    CALL AddAlwaysSchedule(FldVal(base + pvavsHumidSetPtOff))
-    CALL AddAlwaysSchedule(FldVal(base + pvavsDehumSetPtOff))
-  ELSE
-    IF (.NOT. isDehumidifyNone) THEN
-      !   Dehumidification humidistat
+  IF (.NOT. isHumidifierNone .OR. .NOT. isDehumidifyNone) THEN
+    !    Single humidistat if humidification and dehumidification are both active and control zones are the same
+    IF ((.NOT. isHumidifierNone) .AND. (.NOT. isDehumidifyNone) &
+         .AND. SameString(FldVal(base +  pvavsDehumCtrlZoneOff),FldVal(base +  pvavsHumidCtrlZoneOff))) THEN
       !Object ==> ZoneControl:Humidistat
       CALL CreateNewObj('ZoneControl:Humidistat')
-      CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Dehumidification Humidistat')
+      CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Humidistat')
       CALL AddToObjFld('Zone Name', base + pvavsDehumCtrlZoneOff,'')
-      CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 1')
-      CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', &
-                       'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsDehumSetPtOff)),.TRUE.)
-
-      CALL AddAlwaysSchedule('1')
-      CALL AddAlwaysSchedule(FldVal(base + pvavsDehumSetPtOff))
-    ENDIF
-    IF (.NOT. isHumidifierNone) THEN
-      !    Humidification humidistat
-      !Object ==> ZoneControl:Humidistat
-      CALL CreateNewObj('ZoneControl:Humidistat')
-      CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Humidification Humidistat')
-      CALL AddToObjFld('Zone Name', base + pvavsHumidCtrlZoneOff,'')
       CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name', &
                        'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsHumidSetPtOff)))
-      CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 100',.TRUE.)
-
+      CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', &
+                       'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsDehumSetPtOff)),.TRUE.)
       CALL AddAlwaysSchedule(FldVal(base + pvavsHumidSetPtOff))
-      CALL AddAlwaysSchedule('100')
+      CALL AddAlwaysSchedule(FldVal(base + pvavsDehumSetPtOff))
+    ELSE
+      IF (.NOT. isDehumidifyNone) THEN
+        !   Dehumidification humidistat
+        !Object ==> ZoneControl:Humidistat
+        CALL CreateNewObj('ZoneControl:Humidistat')
+        CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Dehumidification Humidistat')
+        CALL AddToObjFld('Zone Name', base + pvavsDehumCtrlZoneOff,'')
+        CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 1')
+        CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', &
+                         'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsDehumSetPtOff)),.TRUE.)
+  
+        CALL AddAlwaysSchedule('1')
+        CALL AddAlwaysSchedule(FldVal(base + pvavsDehumSetPtOff))
+      ENDIF
+      IF (.NOT. isHumidifierNone) THEN
+        !    Humidification humidistat
+        !Object ==> ZoneControl:Humidistat
+        CALL CreateNewObj('ZoneControl:Humidistat')
+        CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Humidification Humidistat')
+        CALL AddToObjFld('Zone Name', base + pvavsHumidCtrlZoneOff,'')
+        CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name', &
+                         'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsHumidSetPtOff)))
+        CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 100',.TRUE.)
+  
+        CALL AddAlwaysSchedule(FldVal(base + pvavsHumidSetPtOff))
+        CALL AddAlwaysSchedule('100')
+      ENDIF
     ENDIF
   ENDIF
   !Set point manager for dehumidification
@@ -13427,7 +13433,7 @@ DO iZone = 1, numCompactZoneUnit
       CALL AddToObjFld('Availability Schedule Name', base + uzBaseboardAvailSchedNameOff,'')
       CALL AddToObjFld('Inlet Node Name', base + uzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Outlet Node Name', base + uzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
+      CALL AddToObjStr('Rated Average Water Temperature {C}','82.2')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
       CALL AddToObjFld('Heating Design Capacity {W}', base + uzBaseboardCapOff,'')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize',.TRUE.)
@@ -14387,7 +14393,7 @@ DO iSys = 1, numCompactSysUnit
   CALL CreateNewObj('SetpointManager:SingleZone:Cooling')
   CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Economizer Supply Air Temp Manager')
   CALL AddToObjStr('Control Variable','Temperature')
-  CALL AddToObjStr('minimum supply air temperature {C}','13')
+  CALL AddToObjFld('minimum supply air temperature {C}',base + usCoolDesignSupplyTempOff,'')
   CALL AddToObjStr('maximum supply air temperature {C}','45')
   CALL AddToObjFld('Control Zone Name', base + usControlZoneOff,'')
   CALL AddToObjFld('Zone Node Name', base + usControlZoneOff,' Zone Air Node')
@@ -14422,11 +14428,7 @@ DO iSys = 1, numCompactSysUnit
   ENDIF
   CALL AddToObjFld('Economizer Maximum Limit Dry-Bulb Temperature {C}', base + usEconoUpLimitOff,' ')
   CALL AddToObjFld('Economizer Maximum Limit Enthalpy {J/kg}', base + usEconoEnthLimitOff,' ')
-  IF (econoKind .EQ. etFixedDewPointAndDryBulb) THEN
-    CALL AddToObjFld('Economizer Maximum Limit Dewpoint Temperature (C)',base + usEconoUpDewLimitOff, ' ')
-  ELSE
-    CALL AddToObjStr('Economizer Maximum Limit Dewpoint Temperature (C)',' ')
-  ENDIF
+  CALL AddToObjFld('Economizer Maximum Limit Dewpoint Temperature (C)',base + usEconoUpDewLimitOff, ' ')
   IF (econoKind .EQ. etElectronicEnthalpy) THEN
     CALL AddToObjFld('Electronic Enthalpy Limit Curve Name',base + usAirHandlerNameOff,' ElectrEnthCurve')
   ELSE
@@ -14996,7 +14998,7 @@ DO iSys = 1, numCompactSysUnitHP
   CALL AddToObjFld('Availability Schedule Name', base + uhpsHeatAvailSchedNameOff,'')
   CALL AddToObjFld('Rated Total Heating Capacity {W}', base + uhpsHPHeatCoilCapOff,'')
   CALL AddToObjFld('Rated COP', base + uhpsHPHeatCoilCOPOff,'')
-  CALL AddToObjFld('Rated Air Flow Rate {m3/s}', base + uhpsSupplyHeatFlowRateOff,'')
+  CALL AddToObjStr('Rated Air Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Rated Evaporator Fan Power Per Volume Flow Rate','')
   CALL AddToObjFld('Air Inlet Node Name', base + uhpsAirHandlerNameOff,' Cooling Coil Outlet')
   CALL AddToObjFld('Air Outlet Node Name', base + uhpsAirHandlerNameOff,' Heating Coil Outlet')
@@ -15150,7 +15152,7 @@ DO iSys = 1, numCompactSysUnitHP
   CALL AddToObjFld('Gross Rated Total Cooling Capacity {W}', base + uhpsCoolCoilCapOff,' ')
   CALL AddToObjFld('Gross Rated Sensible Heat Ratio', base + uhpsCoolCoilSHROff,' ')
   CALL AddToObjFld('Rated COP', base + uhpsCoolCoilCOPOff,' ')
-  CALL AddToObjFld('Rated Air Flow Rate {m3/s}', base + uhpsSupplyCoolFlowRateOff,' ')
+  CALL AddToObjStr('Rated Air Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Rated Evaporator Fan Power per Volume Flow Rate {W/(m3/s)}','')
   CALL AddToObjFld('Air Inlet Node Name', base + uhpsAirHandlerNameOff, TRIM(coolCoilInlet))
   CALL AddToObjFld('Air Outlet Node Name', base + uhpsAirHandlerNameOff, TRIM(coolCoilOutlet))
@@ -18777,7 +18779,6 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjFld('Component Inlet Node Name', base + cvzNameOff,' Reheat Coil HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + cvzNameOff,' Reheat Coil HW Outlet',.TRUE.)
     ELSEIF (reheatCoilType .EQ. ctElectric) THEN
-      CALL AddToObjStr('Hot Water or Steam Inlet Node Name', '')
       CALL AddToObjStr('Reheat Coil Object Type','Coil:Heating:Electric')
       CALL AddToObjFld('Reheat Coil Name', base + cvzNameOff,' Reheat Coil')
       CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}','')
@@ -18798,7 +18799,6 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjFld('Air Outlet Node Name', base + cvzNameOff,' Supply Inlet')
       CALL AddToObjStr('Temperature Setpoint Node Name','',.TRUE.)
     ELSEIF (reheatCoilType .EQ. ctGas) THEN
-      CALL AddToObjStr('Hot Water or Steam Inlet Node Name', '')
       CALL AddToObjStr('Reheat Coil Object Type','Coil:Heating:Fuel')
       CALL AddToObjFld('Reheat Coil Name', base + cvzNameOff,' Reheat Coil')
       CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}','')
@@ -18844,7 +18844,7 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjFld('Availability Schedule Name', base + cvzBaseboardAvailSchedNameOff,'')
       CALL AddToObjFld('Inlet Node Name', base + cvzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Outlet Node Name', base + cvzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
+      CALL AddToObjStr('Rated Average Water Temperature {C}','82.2')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
       CALL AddToObjFld('Heating Design Capacity {W}', base + cvzBaseboardCapOff,'')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize',.TRUE.)
@@ -19147,7 +19147,7 @@ DO iSys = 1, numCompactSysConstVol
   CALL AddToObjStr('100% Outdoor Air in Heating','No')
   CALL AddToObjStr('Central Cooling Design Supply Air Humidity Ratio {kg-H2O/kg-air}','0.008')
   CALL AddToObjStr('Central Heating Design Supply Air Humidity Ratio {kg-H2O/kg-air}','0.008')
-  IF (isSupplyMaxRateAutosize) THEN
+  IF (isSupplyFlowRateAutosize) THEN
     CALL AddToObjStr('Cooling Supply Air Flow Rate Method','DesignDay')
     CALL AddToObjStr('Cooling Supply Air Flow Rate {m3/s}','0')
   ELSE
@@ -19508,11 +19508,7 @@ DO iSys = 1, numCompactSysConstVol
     IF (supFanPlacement .EQ. sfpDrawThru) THEN
       CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(airloopOutlet),.TRUE.)
     ELSE
-      CALL AddToObjFld('Setpoint Node or NodeList Name', base + cvsAirHandlerNameOff,' Cooling Setpoint Nodes',.TRUE.)
-      CALL CreateNewObj('NodeList')
-      CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Cooling Setpoint Nodes')
-      CALL AddToObjStr('Node Name 1', TRIM(airloopOutlet))
-      CALL AddToObjStr('Node Name 2', TRIM(coolCoilUnitOutlet),.TRUE.)
+      CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(coolCoilUnitOutlet),.TRUE.)
     END IF
 
     IF ((coolCoilKind .NE. ccNone) .AND. (supFanPlacement .EQ. sfpDrawThru)) THEN
@@ -19530,7 +19526,11 @@ DO iSys = 1, numCompactSysConstVol
       CALL CreateNewObj('SetpointManager:MixedAir')
       CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Economizer Air Temp Manager')
       CALL AddToObjStr('Control Variable','Temperature')
-      CALL AddToObjStr('Reference Setpoint Node Name', TRIM(airloopOutlet))
+      IF  (supFanPlacement .EQ. sfpDrawThru) THEN
+        CALL AddToObjStr('Reference Setpoint Node Name', TRIM(airloopOutlet))
+      ELSE
+        CALL AddToObjStr('Reference Setpoint Node Name', TRIM(coolCoilUnitOutlet))
+      END IF
       CALL AddToObjStr('Fan Inlet Node Name', TRIM(fanInlet))
       CALL AddToObjStr('Fan Outlet Node Name', TRIM(fanOutlet))
       CALL AddToObjFld('Setpoint Node or NodeList Name', base + cvsAirHandlerNameOff,' Mixed Air Outlet',.TRUE.)
@@ -20704,7 +20704,7 @@ DO iZone = 1, numCompactZoneDualDuct
       CALL AddToObjFld('Availability Schedule Name', base + ddzBaseboardAvailSchedNameOff,'')
       CALL AddToObjFld('Inlet Node Name', base + ddzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Outlet Node Name', base + ddzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
+      CALL AddToObjStr('Rated Average Water Temperature {C}','82.2')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
       CALL AddToObjFld('Heating Design Capacity {W}', base + ddzBaseboardCapOff,'')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize',.TRUE.)
@@ -22199,6 +22199,13 @@ DO iSys = 1, numCompactSysDualDuct
   !AIR LOOP EQUIPMENT LIST ~ line 552
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem:EquipmentList')
   CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' OA System Equipment')
+  IF (heatRecovery .EQ. htrecSens) THEN
+    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
+    CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Heat Recovery')
+  ELSEIF (heatRecovery .EQ. htrecEnth) THEN
+    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
+    CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Heat Recovery')
+  END IF
   IF (preHeatCoilType .EQ. ctHotWater) THEN
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Preheat Coil')
@@ -22208,13 +22215,6 @@ DO iSys = 1, numCompactSysDualDuct
   ELSEIF (preHeatCoilType .EQ. ctGas) THEN
     CALL AddToObjStr('Component Object Type','Coil:Heating:Fuel')
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Preheat Coil')
-  END IF
-  IF (heatRecovery .EQ. htrecSens) THEN
-    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
-    CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Heat Recovery')
-  ELSEIF (heatRecovery .EQ. htrecEnth) THEN
-    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
-    CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Heat Recovery')
   END IF
   CALL AddToObjStr('Component Object Type','OutdoorAir:Mixer')
   CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' OA Mixing Box',.TRUE.)
@@ -22975,7 +22975,7 @@ DO iZone = 1, numCompactZoneVRF
       CALL AddToObjFld('Availability Schedule Name', base + vrfzBaseboardAvailSchedNameOff,'')
       CALL AddToObjFld('Inlet Node Name', base + vrfzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Outlet Node Name', base + vrfzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
+      CALL AddToObjStr('Rated Average Water Temperature {C}','82.2')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
       CALL AddToObjFld('Heating Design Capacity {W}', base + vrfzBaseboardCapOff,'')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize',.TRUE.)
@@ -24074,7 +24074,7 @@ IF (.NOT. isBaseboardNone) THEN
       CALL AddToObjFld('Availability Schedule Name', base + fczBaseboardAvailSchedNameOff,'')
       CALL AddToObjFld('Inlet Node Name', base + fczNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Outlet Node Name', base + fczNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
+      CALL AddToObjStr('Rated Average Water Temperature {C}','82.2')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
       CALL AddToObjFld('Heating Design Capacity {W}', base + fczBaseboardCapOff,'')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize',.TRUE.)
@@ -24648,7 +24648,7 @@ ELSE
       CALL AddToObjFld('Availability Schedule Name', base + bbzBaseboardAvailSchedNameOff,'')
       CALL AddToObjFld('Inlet Node Name', base + bbzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Outlet Node Name', base + bbzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
+      CALL AddToObjStr('Rated Average Water Temperature {C}','82.2')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
       CALL AddToObjFld('Heating Design Capacity {W}', base + bbzBaseboardCapOff,'')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize',.TRUE.)
@@ -25254,7 +25254,7 @@ IF (.NOT. isBaseboardNone) THEN
       CALL AddToObjFld('Availability Schedule Name', base + ptaczBaseboardAvailSchedNameOff,'')
       CALL AddToObjFld('Inlet Node Name', base + ptaczNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Outlet Node Name', base + ptaczNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
+      CALL AddToObjStr('Rated Average Water Temperature {C}','82.2')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
       CALL AddToObjFld('Heating Design Capacity {W}', base + ptaczBaseboardCapOff,'')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize',.TRUE.)
@@ -25958,7 +25958,7 @@ DO iZone = 1, numCompactPTHP
       CALL AddToObjFld('Availability Schedule Name', base + pthpzBaseboardAvailSchedNameOff,'')
       CALL AddToObjFld('Inlet Node Name', base + pthpzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Outlet Node Name', base + pthpzNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
+      CALL AddToObjStr('Rated Average Water Temperature {C}','82.2')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
       CALL AddToObjFld('Heating Design Capacity {W}', base + pthpzBaseboardCapOff,'')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize',.TRUE.)
@@ -30278,7 +30278,7 @@ DO iZone = 1, numCompactWaterAirHP
       CALL AddToObjFld('Availability Schedule Name', base + wahpBaseboardAvailSchedNameOff,'')
       CALL AddToObjFld('Inlet Node Name', base + wahpNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Outlet Node Name', base + wahpNameOff,' Baseboard HW Outlet')
-      CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
+      CALL AddToObjStr('Rated Average Water Temperature {C}','82.2')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
       CALL AddToObjFld('Heating Design Capacity {W}', base + wahpBaseboardCapOff,'')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize',.TRUE.)
@@ -33094,6 +33094,7 @@ DO iSurface = 1, numSurfBldgDetl
   CALL AddToObjFld('Surface Type', base + buildSurfTypeOff,'')
   CALL AddToObjFld('Construction Name', base + buildSurfConstructionOff,'')
   CALL AddToObjFld('Zone Name', base + buildSurfZoneOff,'')
+  CALL AddToObjFld('Space Name', base + buildSurfSpaceOff,'')
   outBndCond = FldVal(base + buildSurfOutBndCondOff)
   IF (SameString(outBndCond,'GroundSlabPreprocessorAverage')) THEN
     CALL AddToObjStr('Outside Boundary Condition', 'OtherSideCoefficients')
@@ -33156,6 +33157,7 @@ DO iSurface = 1, numSurfWallDetl
   CALL AddToObjFld('Name', base + wallDetlNameOff,'')
   CALL AddToObjFld('Construction Name', base + wallDetlConstructionOff,'')
   CALL AddToObjFld('Zone Name', base + wallDetlZoneOff,'')
+  CALL AddToObjFld('Space Name', base + wallDetlSpaceOff,'')
   outBndCond = FldVal(base + wallDetlOutBndCondOff)
   IF (SameString(outBndCond,'GroundSlabPreprocessorAverage')) THEN
     CALL AddToObjStr('Outside Boundary Condition', 'OtherSideCoefficients')
@@ -33218,6 +33220,7 @@ DO iSurface = 1, numSurfRfClDetl
   CALL AddToObjFld('Name', base + rfClDetlNameOff,'')
   CALL AddToObjFld('Construction Name', base + rfClDetlConstructionOff,'')
   CALL AddToObjFld('Zone Name', base + rfClDetlZoneOff,'')
+  CALL AddToObjFld('Space Name', base + rfClDetlSpaceOff,'')
   outBndCond = FldVal(base + rfClDetlOutBndCondOff)
   IF (SameString(outBndCond,'GroundSlabPreprocessorAverage')) THEN
     CALL AddToObjStr('Outside Boundary Condition', 'OtherSideCoefficients')
@@ -33280,6 +33283,7 @@ DO iSurface = 1, numSurfFlrDetl
   CALL AddToObjFld('Name', base + flrDetlNameOff,'')
   CALL AddToObjFld('Construction Name', base + flrDetlConstructionOff,'')
   CALL AddToObjFld('Zone Name', base + flrDetlZoneOff,'')
+  CALL AddToObjFld('Space Name', base + flrDetlSpaceOff,'')
   outBndCond = FldVal(base + flrDetlOutBndCondOff)
   IF (SameString(outBndCond,'GroundSlabPreprocessorAverage')) THEN
     CALL AddToObjStr('Outside Boundary Condition', 'OtherSideCoefficients')

@@ -76,7 +76,7 @@
     Building,                !- Name
     0,                       !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.2,                     !- Temperature Convergence Tolerance Value {deltaC}
     MinimalShadowing,        !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -100,7 +100,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    ,                        !- Do HVAC Sizing Simulation for Sizing Periods
+    ;                        !- Maximum Number of HVAC Sizing Simulation Passes
 
   ConvergenceLimits,
     5,                       !- Minimum System Timestep {minutes}
@@ -1562,6 +1564,7 @@
     Wall,                    !- Surface Type
     ext-slab,                !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1578,6 +1581,7 @@
     Wall,                    !- Surface Type
     ext-slab,                !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1594,6 +1598,7 @@
     Wall,                    !- Surface Type
     ext-slab,                !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1610,6 +1615,7 @@
     Wall,                    !- Surface Type
     ext-slab,                !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1626,6 +1632,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1642,6 +1649,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Floor,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1658,6 +1666,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_3_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1674,6 +1683,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_2_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1690,6 +1700,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_1_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1706,6 +1717,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_4_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1721,7 +1733,8 @@
     Basement_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     Basement,                !- Zone or ZoneList Name
-    7126.2120;               !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    7126.2120;               !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Basement_Infiltration,   !- Name
@@ -1830,6 +1843,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Ceiling,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1846,6 +1860,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Floor-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1862,6 +1877,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1878,6 +1894,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1894,6 +1911,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1910,6 +1928,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_bottom,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_East-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1925,7 +1944,8 @@
     Core_bottom_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Core_bottom,             !- Zone or ZoneList Name
-    5064.6526;               !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    5064.6526;               !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Core_bottom_Infiltration,!- Name
@@ -2075,7 +2095,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Core_bottom,     !- Name
@@ -2236,6 +2261,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Ceiling,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2252,6 +2278,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Floor,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2268,6 +2295,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2284,6 +2312,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2300,6 +2329,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2316,6 +2346,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_mid,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_East-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2331,7 +2362,8 @@
     Core_mid_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     Core_mid,                !- Zone or ZoneList Name
-    5064.6526;               !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    5064.6526;               !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Core_mid_Infiltration,   !- Name
@@ -2481,7 +2513,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Core_mid,        !- Name
@@ -2642,6 +2679,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2658,6 +2696,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Floor,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2674,6 +2713,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2690,6 +2730,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2706,6 +2747,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2722,6 +2764,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Core_top,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_East-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2737,7 +2780,8 @@
     Core_top_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     Core_top,                !- Zone or ZoneList Name
-    5064.6526;               !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    5064.6526;               !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Core_top_Infiltration,   !- Name
@@ -2887,7 +2931,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Core_top,        !- Name
@@ -3048,6 +3097,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3079,6 +3129,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_3_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3095,6 +3146,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_3_Floor-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3111,6 +3163,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_3_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3127,6 +3180,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_North,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3143,6 +3197,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_2_Wall_North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3158,7 +3213,8 @@
     Perimeter_bot_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_3,      !- Zone or ZoneList Name
-    626.8258;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    626.8258;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_3_Infiltration,  !- Name
@@ -3308,7 +3364,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_bot_ZN_3,  !- Name
@@ -3414,6 +3475,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3445,6 +3507,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_2_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3461,6 +3524,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_2_Floor-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3477,6 +3541,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_2_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3493,6 +3558,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_East, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3509,6 +3575,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_1_Wall_East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3524,7 +3591,8 @@
     Perimeter_bot_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_2,      !- Zone or ZoneList Name
-    403.9504;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    403.9504;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_2_Infiltration,  !- Name
@@ -3674,7 +3742,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_bot_ZN_2,  !- Name
@@ -3780,6 +3853,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3811,6 +3885,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3827,6 +3902,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_1_Floor-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3843,6 +3919,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_1_Wall_East-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3859,6 +3936,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_South,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3875,6 +3953,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_4_Wall_South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3890,7 +3969,8 @@
     Perimeter_bot_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_1,      !- Zone or ZoneList Name
-    626.8354;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    626.8354;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_1_Infiltration,  !- Name
@@ -4040,7 +4120,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_bot_ZN_1,  !- Name
@@ -4146,6 +4231,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4177,6 +4263,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_4_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4193,6 +4280,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_4_Floor-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4209,6 +4297,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_4_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4225,6 +4314,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_bot_ZN_5_Wall_West, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4241,6 +4331,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_bot_ZN_3_Wall_West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4256,7 +4347,8 @@
     Perimeter_bot_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_bot_ZN_4,      !- Zone or ZoneList Name
-    403.9478;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    403.9478;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_bot_ZN_4_Infiltration,  !- Name
@@ -4406,7 +4498,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_bot_ZN_4,  !- Name
@@ -4512,6 +4609,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4543,6 +4641,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_3_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4559,6 +4658,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_3_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4575,6 +4675,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_3_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4591,6 +4692,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_North,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4607,6 +4709,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_2_Wall_North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4622,7 +4725,8 @@
     Perimeter_mid_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_3,      !- Zone or ZoneList Name
-    626.8258;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    626.8258;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_3_Infiltration,  !- Name
@@ -4772,7 +4876,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_mid_ZN_3,  !- Name
@@ -4878,6 +4987,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4909,6 +5019,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_2_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4925,6 +5036,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_2_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4941,6 +5053,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_2_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4957,6 +5070,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_East, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4973,6 +5087,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_1_Wall_East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4988,7 +5103,8 @@
     Perimeter_mid_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_2,      !- Zone or ZoneList Name
-    403.9504;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    403.9504;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_2_Infiltration,  !- Name
@@ -5138,7 +5254,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_mid_ZN_2,  !- Name
@@ -5244,6 +5365,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_1_Wall_East-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5260,6 +5382,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5291,6 +5414,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_1_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5307,6 +5431,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_1_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5323,6 +5448,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_South,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5339,6 +5465,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_4_Wall_South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5354,7 +5481,8 @@
     Perimeter_mid_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_1,      !- Zone or ZoneList Name
-    626.8354;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    626.8354;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_1_Infiltration,  !- Name
@@ -5504,7 +5632,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_mid_ZN_1,  !- Name
@@ -5610,6 +5743,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -5641,6 +5775,7 @@
     Ceiling,                 !- Surface Type
     INT-FLOOR-UNDERSIDE,     !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_4_Ceiling,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5657,6 +5792,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_4_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5673,6 +5809,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_4_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5689,6 +5826,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_mid_ZN_5_Wall_West, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5705,6 +5843,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_mid_ZN_3_Wall_West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -5720,7 +5859,8 @@
     Perimeter_mid_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_mid_ZN_4,      !- Zone or ZoneList Name
-    403.9478;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    403.9478;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_mid_ZN_4_Infiltration,  !- Name
@@ -5870,7 +6010,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_mid_ZN_4,  !- Name
@@ -5976,6 +6121,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6007,6 +6153,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6023,6 +6170,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_3_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6039,6 +6187,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_3_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6055,6 +6204,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_North,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6071,6 +6221,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_top_ZN_3,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_2_Wall_North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6086,7 +6237,8 @@
     Perimeter_top_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_3,      !- Zone or ZoneList Name
-    626.8258;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    626.8258;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_3_Infiltration,  !- Name
@@ -6236,7 +6388,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_top_ZN_3,  !- Name
@@ -6342,6 +6499,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6373,6 +6531,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6389,6 +6548,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_2_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6405,6 +6565,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_2_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6421,6 +6582,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_East, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6437,6 +6599,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_top_ZN_2,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Int-Per3S-NE,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6452,7 +6615,8 @@
     Perimeter_top_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_2,      !- Zone or ZoneList Name
-    403.9504;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    403.9504;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_2_Infiltration,  !- Name
@@ -6602,7 +6766,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_top_ZN_2,  !- Name
@@ -6708,6 +6877,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6739,6 +6909,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -6755,6 +6926,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_1_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6771,6 +6943,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Int-Per3S-NE-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6787,6 +6960,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_South,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6803,6 +6977,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_top_ZN_1,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_4_Wall_South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -6818,7 +6993,8 @@
     Perimeter_top_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_1,      !- Zone or ZoneList Name
-    626.8354;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    626.8354;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_1_Infiltration,  !- Name
@@ -6968,7 +7144,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_top_ZN_1,  !- Name
@@ -7074,6 +7255,7 @@
     Wall,                    !- Surface Type
     ext-walls,               !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7105,6 +7287,7 @@
     Roof,                    !- Surface Type
     roofs,                   !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -7121,6 +7304,7 @@
     Floor,                   !- Surface Type
     INT-FLOOR-TOPSIDE,       !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_4_Floor,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7137,6 +7321,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_4_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7153,6 +7338,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Core_top_ZN_5_Wall_West, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7169,6 +7355,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Perimeter_top_ZN_4,      !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Perimeter_top_ZN_3_Wall_West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -7184,7 +7371,8 @@
     Perimeter_top_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Perimeter_top_ZN_4,      !- Zone or ZoneList Name
-    403.9478;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    403.9478;                !- Extended Field
 
   ZoneInfiltration:DesignFlowRate,
     Perimeter_top_ZN_4_Infiltration,  !- Name
@@ -7334,7 +7522,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_top_ZN_4,  !- Name
@@ -9265,7 +9458,7 @@
 
   UtilityCost:Tariff,
     CA_EIAMonthlyRateGas,    !- Name
-    NaturalGas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,     !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -9358,7 +9551,7 @@
     !
 
   FuelFactors,
-    FuelOilNo1,                !- Existing Fuel Resource Name
+    FuelOilNo1,              !- Existing Fuel Resource Name
     m3,                      !- Units of Measure
     38.656E+09,              !- Energy per Unit Factor
     1.158,                   !- Source Energy Factor {J/J}

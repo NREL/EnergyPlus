@@ -68,7 +68,6 @@ using namespace EnergyPlus::ChillerAbsorption;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::SimulationManager;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 {
@@ -438,6 +437,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -469,6 +469,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -485,6 +486,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -501,6 +503,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -517,6 +520,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    Floor,                   !- Surface Type",
         "    FLOOR SLAB 8 IN,         !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -533,6 +537,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    Roof,                    !- Surface Type",
         "    ROOF34,                  !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1785,7 +1790,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     // check chiller inputs
     auto &thisChiller = state->dataChillerAbsorber->absorptionChillers(AbsChillNum);
     EXPECT_EQ(thisChiller.NomCap, 100000.0);
-    EXPECT_EQ(thisChiller.FlowMode, DataPlant::FlowMode::LeavingSetpointModulated);
+    EXPECT_TRUE(compare_enums(thisChiller.FlowMode, DataPlant::FlowMode::LeavingSetpointModulated));
     // define local var
     int EvapInletNode = thisChiller.EvapInletNodeNum;
     int EvapOutletNode = thisChiller.EvapOutletNodeNum;

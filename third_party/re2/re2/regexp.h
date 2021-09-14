@@ -86,6 +86,7 @@
 // form accessible to clients, so that client code can analyze the
 // parsed regular expressions.
 
+#include <stddef.h>
 #include <stdint.h>
 #include <map>
 #include <set>
@@ -177,6 +178,7 @@ enum RegexpStatusCode {
   kRegexpBadCharRange,       // bad character class range
   kRegexpMissingBracket,     // missing closing ]
   kRegexpMissingParen,       // missing closing )
+  kRegexpUnexpectedParen,    // unexpected closing )
   kRegexpTrailingBackslash,  // at end of regexp
   kRegexpRepeatArgument,     // repeat argument missing, e.g. "*"
   kRegexpRepeatSize,         // bad repetition argument
@@ -258,7 +260,7 @@ class CharClass {
  private:
   CharClass();  // not implemented
   ~CharClass();  // not implemented
-  static CharClass* New(int maxranges);
+  static CharClass* New(size_t maxranges);
 
   friend class CharClassBuilder;
 
@@ -439,6 +441,17 @@ class Regexp {
   // regardless of the return value.
   bool RequiredPrefix(std::string* prefix, bool* foldcase,
                       Regexp** suffix);
+
+  // Whether every match of this regexp must be unanchored and
+  // begin with a non-empty fixed string (perhaps after ASCII
+  // case-folding).  If so, returns the prefix.
+  // Callers should expect *prefix and *foldcase to be "zeroed"
+  // regardless of the return value.
+  bool RequiredPrefixForAccel(std::string* prefix, bool* foldcase);
+
+  // Controls the maximum repeat count permitted by the parser.
+  // FOR FUZZING ONLY.
+  static void FUZZING_ONLY_set_maximum_repeat_count(int i);
 
  private:
   // Constructor allocates vectors as appropriate for operator.

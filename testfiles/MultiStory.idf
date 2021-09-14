@@ -651,6 +651,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Gnd West Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -667,6 +668,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Gnd West Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -683,6 +685,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Gnd West Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -699,6 +702,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Gnd West Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gnd West E Wall,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -715,6 +719,7 @@
     FLOOR,                   !- Surface Type
     Floor Slab,              !- Construction Name
     Gnd West Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gnd West Floor,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -731,6 +736,7 @@
     CEILING,                 !- Surface Type
     Ceiling,                 !- Construction Name
     Gnd West Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gnd West Ceiling,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -941,6 +947,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Gnd Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -957,6 +964,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Gnd Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gnd Center W Wall,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -973,6 +981,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Gnd Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -989,6 +998,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Gnd Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gnd Center E Wall,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1005,6 +1015,7 @@
     FLOOR,                   !- Surface Type
     Floor Slab,              !- Construction Name
     Gnd Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gnd Center Floor,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1021,6 +1032,7 @@
     CEILING,                 !- Surface Type
     Ceiling,                 !- Construction Name
     Gnd Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gnd Center Ceiling,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1209,6 +1221,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Gnd East Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1225,6 +1238,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Gnd East Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gnd East W Wall,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1241,6 +1255,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Gnd East Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1257,6 +1272,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Gnd East Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1273,6 +1289,7 @@
     FLOOR,                   !- Surface Type
     Floor Slab,              !- Construction Name
     Gnd East Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gnd East Floor,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1289,6 +1306,7 @@
     CEILING,                 !- Surface Type
     Ceiling,                 !- Construction Name
     Gnd East Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Gnd East Ceiling,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1503,6 +1521,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Mid West Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1519,6 +1538,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Mid West Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1535,6 +1555,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Mid West Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1551,6 +1572,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Mid West Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mid West E Wall,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1567,6 +1589,7 @@
     FLOOR,                   !- Surface Type
     Floor,                   !- Construction Name
     Mid West Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mid West Floor,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1583,6 +1606,7 @@
     CEILING,                 !- Surface Type
     Ceiling,                 !- Construction Name
     Mid West Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mid West Ceiling,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1786,6 +1810,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Mid Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1802,6 +1827,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Mid Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mid Center W Wall,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1818,6 +1844,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Mid Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1834,6 +1861,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Mid Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mid Center E Wall,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1850,6 +1878,7 @@
     FLOOR,                   !- Surface Type
     Floor,                   !- Construction Name
     Mid Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mid Center Floor,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1866,6 +1895,7 @@
     CEILING,                 !- Surface Type
     Ceiling,                 !- Construction Name
     Mid Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mid Center Ceiling,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2054,6 +2084,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Mid East Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2070,6 +2101,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Mid East Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mid East W Wall,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2086,6 +2118,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Mid East Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2102,6 +2135,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Mid East Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2118,6 +2152,7 @@
     FLOOR,                   !- Surface Type
     Floor,                   !- Construction Name
     Mid East Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mid East Floor,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2134,6 +2169,7 @@
     CEILING,                 !- Surface Type
     Ceiling,                 !- Construction Name
     Mid East Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Mid East Ceiling,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2348,6 +2384,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Top West Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2364,6 +2401,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Top West Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2380,6 +2418,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Top West Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2396,6 +2435,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Top West Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Top West E Wall,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2412,6 +2452,7 @@
     FLOOR,                   !- Surface Type
     Floor,                   !- Construction Name
     Top West Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Top West Floor,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2428,6 +2469,7 @@
     ROOF,                    !- Surface Type
     Roof,                    !- Construction Name
     Top West Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2631,6 +2673,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Top Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2647,6 +2690,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Top Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Top Center W Wall,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2663,6 +2707,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Top Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2679,6 +2724,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Top Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Top Center E Wall,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2695,6 +2741,7 @@
     FLOOR,                   !- Surface Type
     Floor,                   !- Construction Name
     Top Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Top Center Floor,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2711,6 +2758,7 @@
     ROOF,                    !- Surface Type
     Roof,                    !- Construction Name
     Top Center Zone,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2899,6 +2947,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Top East Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2915,6 +2964,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Top East Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Top East W Wall,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2931,6 +2981,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Top East Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2947,6 +2998,7 @@
     WALL,                    !- Surface Type
     Ext Wall,                !- Construction Name
     Top East Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2963,6 +3015,7 @@
     FLOOR,                   !- Surface Type
     Floor,                   !- Construction Name
     Top East Zone,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Top East Floor,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2979,6 +3032,7 @@
     ROOF,                    !- Surface Type
     Roof,                    !- Construction Name
     Top East Zone,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

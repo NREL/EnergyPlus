@@ -71,7 +71,6 @@
 using namespace EnergyPlus;
 using namespace DataAirSystems;
 using namespace DataSizing;
-using namespace ObjexxFCL;
 using namespace SimAirServingZones;
 
 namespace EnergyPlus {
@@ -1725,6 +1724,7 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
         "  Floor,                                  !- Surface Type",
         "  Concrete_and_carpet_Construction,                                   !- Construction Name",
         "  Zone1,                                  !- Zone Name",
+        "    ,                        !- Space Name",
         "  Ground,                                 !- Outside Boundary Condition",
         "  ,                                       !- Outside Boundary Condition Object",
         "  NoSun,                                  !- Sun Exposure",
@@ -1741,6 +1741,7 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
         "  Wall,                                   !- Surface Type",
         "  Concrete_and_carpet_Construction,                                   !- Construction Name",
         "  Zone1,                                  !- Zone Name",
+        "    ,                        !- Space Name",
         "  Outdoors,                               !- Outside Boundary Condition",
         "  ,                                       !- Outside Boundary Condition Object",
         "  SunExposed,                             !- Sun Exposure",
@@ -1757,6 +1758,7 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
         "  Wall,                                   !- Surface Type",
         "  Concrete_and_carpet_Construction,                                   !- Construction Name",
         "  Zone1,                                  !- Zone Name",
+        "    ,                        !- Space Name",
         "  Outdoors,                               !- Outside Boundary Condition",
         "  ,                                       !- Outside Boundary Condition Object",
         "  SunExposed,                             !- Sun Exposure",
@@ -1773,6 +1775,7 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
         "  Wall,                                   !- Surface Type",
         "  Concrete_and_carpet_Construction,                                   !- Construction Name",
         "  Zone1,                                  !- Zone Name",
+        "    ,                        !- Space Name",
         "  Outdoors,                               !- Outside Boundary Condition",
         "  ,                                       !- Outside Boundary Condition Object",
         "  SunExposed,                             !- Sun Exposure",
@@ -1789,6 +1792,7 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
         "  Wall,                                   !- Surface Type",
         "  Concrete_and_carpet_Construction,                                   !- Construction Name",
         "  Zone1,                                  !- Zone Name",
+        "    ,                        !- Space Name",
         "  Outdoors,                               !- Outside Boundary Condition",
         "  ,                                       !- Outside Boundary Condition Object",
         "  SunExposed,                             !- Sun Exposure",
@@ -1805,6 +1809,7 @@ TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
         "  Roof,                                   !- Surface Type",
         "  Concrete_and_carpet_Construction,                                   !- Construction Name",
         "  Zone1,                                  !- Zone Name",
+        "    ,                        !- Space Name",
         "  Outdoors,                               !- Outside Boundary Condition",
         "  ,                                       !- Outside Boundary Condition Object",
         "  SunExposed,                             !- Sun Exposure",

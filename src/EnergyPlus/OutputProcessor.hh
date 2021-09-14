@@ -435,7 +435,7 @@ namespace OutputProcessor {
         Array1D_int OnCustomMeters; // Forward pointer to Custom Meter Numbers
 
         // Default Constructor
-        MeterArrayType() : NumOnMeters(0), RepVariable(0), OnMeters(6, 0), NumOnCustomMeters(0)
+        MeterArrayType() : NumOnMeters(0), RepVariable(0), OnMeters(10, 0), NumOnCustomMeters(0)
         {
         }
     };
@@ -463,10 +463,6 @@ namespace OutputProcessor {
         Real64 HRValue;          // Hourly Value
         bool RptHR;              // Report at End of Hour
         bool RptHRFO;            // Report at End of Hour -- meter file only
-        Real64 HRMaxVal;         // Maximum Value (Hour)
-        int HRMaxValDate;        // Date stamp of maximum
-        Real64 HRMinVal;         // Minimum Value (Hour)
-        int HRMinValDate;        // Date stamp of minimum
         int HRRptNum;            // Report Number for HR Values
         std::string HRRptNumChr; // Report Number for HR Values (character -- for printing)
 
@@ -545,16 +541,15 @@ namespace OutputProcessor {
         MeterType()
             : Units(OutputProcessor::Unit::None), RT_forIPUnits(OutputProcessor::RT_IPUnits::Unassigned), TypeOfMeter(MtrType::Normal),
               SourceMeter(0), TSValue(0.0), CurTSValue(0.0), RptTS(false), RptTSFO(false), TSRptNum(0), HRValue(0.0), RptHR(false), RptHRFO(false),
-              HRMaxVal(-99999.0), HRMaxValDate(0), HRMinVal(99999.0), HRMinValDate(0), HRRptNum(0), DYValue(0.0), RptDY(false), RptDYFO(false),
-              DYMaxVal(-99999.0), DYMaxValDate(0), DYMinVal(99999.0), DYMinValDate(0), DYRptNum(0), MNValue(0.0), RptMN(false), RptMNFO(false),
-              MNMaxVal(-99999.0), MNMaxValDate(0), MNMinVal(99999.0), MNMinValDate(0), MNRptNum(0), YRValue(0.0), RptYR(false), RptYRFO(false),
-              YRMaxVal(-99999.0), YRMaxValDate(0), YRMinVal(99999.0), YRMinValDate(0), YRRptNum(0), SMValue(0.0), RptSM(false), RptSMFO(false),
-              SMMaxVal(-99999.0), SMMaxValDate(0), SMMinVal(99999.0), SMMinValDate(0), SMRptNum(0), LastSMValue(0.0), LastSMMaxVal(-99999.0),
-              LastSMMaxValDate(0), LastSMMinVal(99999.0), LastSMMinValDate(0), FinYrSMValue(0.0), FinYrSMMaxVal(-99999.0), FinYrSMMaxValDate(0),
-              FinYrSMMinVal(99999.0), FinYrSMMinValDate(0), RptAccTS(false), RptAccTSFO(false), RptAccHR(false), RptAccHRFO(false), RptAccDY(false),
-              RptAccDYFO(false), RptAccMN(false), RptAccMNFO(false), RptAccYR(false), RptAccYRFO(false), RptAccSM(false), RptAccSMFO(false),
-              TSAccRptNum(0), HRAccRptNum(0), DYAccRptNum(0), MNAccRptNum(0), YRAccRptNum(0), SMAccRptNum(0), InstMeterCacheStart(0),
-              InstMeterCacheEnd(0)
+              HRRptNum(0), DYValue(0.0), RptDY(false), RptDYFO(false), DYMaxVal(-99999.0), DYMaxValDate(0), DYMinVal(99999.0), DYMinValDate(0),
+              DYRptNum(0), MNValue(0.0), RptMN(false), RptMNFO(false), MNMaxVal(-99999.0), MNMaxValDate(0), MNMinVal(99999.0), MNMinValDate(0),
+              MNRptNum(0), YRValue(0.0), RptYR(false), RptYRFO(false), YRMaxVal(-99999.0), YRMaxValDate(0), YRMinVal(99999.0), YRMinValDate(0),
+              YRRptNum(0), SMValue(0.0), RptSM(false), RptSMFO(false), SMMaxVal(-99999.0), SMMaxValDate(0), SMMinVal(99999.0), SMMinValDate(0),
+              SMRptNum(0), LastSMValue(0.0), LastSMMaxVal(-99999.0), LastSMMaxValDate(0), LastSMMinVal(99999.0), LastSMMinValDate(0),
+              FinYrSMValue(0.0), FinYrSMMaxVal(-99999.0), FinYrSMMaxValDate(0), FinYrSMMinVal(99999.0), FinYrSMMinValDate(0), RptAccTS(false),
+              RptAccTSFO(false), RptAccHR(false), RptAccHRFO(false), RptAccDY(false), RptAccDYFO(false), RptAccMN(false), RptAccMNFO(false),
+              RptAccYR(false), RptAccYRFO(false), RptAccSM(false), RptAccSMFO(false), TSAccRptNum(0), HRAccRptNum(0), DYAccRptNum(0), MNAccRptNum(0),
+              YRAccRptNum(0), SMAccRptNum(0), InstMeterCacheStart(0), InstMeterCacheEnd(0)
         {
         }
     };
@@ -564,13 +559,10 @@ namespace OutputProcessor {
         // Members
         std::string Name;        // End use category name
         std::string DisplayName; // Display name for output table
-        int NumSubcategories;
+        int NumSubcategories = 0;
         Array1D_string SubcategoryName; // Array of subcategory names
-
-        // Default Constructor
-        EndUseCategoryType() : NumSubcategories(0)
-        {
-        }
+        int numSpaceTypes = 0;
+        Array1D_string spaceTypeName; // Array of space type names
     };
 
     void InitializeOutput(EnergyPlusData &state);
@@ -653,15 +645,16 @@ namespace OutputProcessor {
     );
 
     void AttachMeters(EnergyPlusData &state,
-                      Unit const &MtrUnits,        // Units for this meter
-                      std::string &ResourceType,   // Electricity, Gas, etc.
-                      std::string &EndUse,         // End-use category (Lights, Heating, etc.)
-                      std::string &EndUseSub,      // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
-                      std::string &Group,          // Group key (Facility, Zone, Building, etc.)
-                      std::string const &ZoneName, // Zone key only applicable for Building group
-                      int RepVarNum,               // Number of this report variable
-                      int &MeterArrayPtr,          // Output set of Pointers to Meters
-                      bool &ErrorsFound            // True if errors in this call
+                      Unit const &MtrUnits,             // Units for this meter
+                      std::string &ResourceType,        // Electricity, Gas, etc.
+                      std::string &EndUse,              // End-use category (Lights, Heating, etc.)
+                      std::string &EndUseSub,           // End-use subcategory (user-defined, e.g., General Lights, Task Lights, etc.)
+                      std::string &Group,               // Group key (Facility, Zone, Building, etc.)
+                      std::string const &ZoneName,      // Zone key only applicable for Building group
+                      std::string const &SpaceTypeName, // Space Type key only applicable for Building group
+                      int RepVarNum,                    // Number of this report variable
+                      int &MeterArrayPtr,               // Output set of Pointers to Meters
+                      bool &ErrorsFound                 // True if errors in this call
     );
 
     void AttachCustomMeters(EnergyPlusData &state,
@@ -677,7 +670,8 @@ namespace OutputProcessor {
                                          std::string &EndUseSub,                // End Use Sub Type (General Lights, Task Lights, etc.)
                                          std::string &Group,                    // Group key (Facility, Zone, Building, etc.)
                                          bool &ErrorsFound,                     // True if errors in this call
-                                         Optional_string_const ZoneName = _     // ZoneName when Group=Building
+                                         const std::string &ZoneName,           // Zone Name when Group=Building
+                                         const std::string &SpaceType           // Space Type when Group=Building
     );
 
     void DetermineMeterIPUnits(EnergyPlusData &state,
@@ -687,31 +681,9 @@ namespace OutputProcessor {
                                bool &ErrorsFound                            // true if errors found during subroutine
     );
 
-    void UpdateMeterValues(EnergyPlusData &state,
-                           Real64 TimeStepValue,       // Value of this variable at the current time step.
-                           int NumOnMeters,            // Number of meters this variable is "on".
-                           const Array1D_int &OnMeters // Which meters this variable is on (index values)
-    );
-
-    void UpdateMeterValues(EnergyPlusData &state,
-                           Real64 TimeStepValue,             // Value of this variable at the current time step.
-                           int NumOnMeters,                  // Number of meters this variable is "on".
-                           const Array1D_int &OnMeters,      // Which meters this variable is on (index values)
-                           int NumOnCustomMeters,            // Number of custom meters this variable is "on".
-                           const Array1D_int &OnCustomMeters // Which custom meters this variable is on (index values)
-    );
-
     void UpdateMeters(EnergyPlusData &state, int TimeStamp); // Current TimeStamp (for max/min)
 
     void ResetAccumulationWhenWarmupComplete(EnergyPlusData &state);
-
-    void SetMinMax(Real64 TestValue,    // Candidate new value
-                   int TimeStamp,       // TimeStamp to be stored if applicable
-                   Real64 &CurMaxValue, // Current Maximum Value
-                   int &CurMaxValDate,  // Current Maximum Value Date Stamp
-                   Real64 &CurMinValue, // Current Minimum Value
-                   int &CurMinValDate   // Current Minimum Value Date Stamp
-    );
 
     void ReportTSMeters(EnergyPlusData &state,
                         Real64 StartMinute,      // Start Minute for TimeStep
@@ -744,8 +716,9 @@ namespace OutputProcessor {
     // End of routines for Energy Meters implementation in EnergyPlus.
     // *****************************************************************************
 
-    void
-    AddEndUseSubcategory(EnergyPlusData &state, std::string const &ResourceName, std::string const &EndUseName, std::string const &EndUseSubName);
+    void addEndUseSubcategory(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSubName);
+
+    void addEndUseSpaceType(EnergyPlusData &state, std::string const &EndUseName, std::string const &EndUseSpTypeName);
 
     void WriteTimeStampFormatData(EnergyPlusData &state,
                                   InputOutputFile &outputFile,
@@ -916,7 +889,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Optional_int_const ZoneMult = _,                  // Zone Multiplier, defaults to 1
                          Optional_int_const ZoneListMult = _,              // Zone List Multiplier, defaults to 1
                          Optional_int_const indexGroupKey = _,             // Group identifier for SQL output
-                         Optional_string_const customUnitName = _          // the custom name for the units from EMS definition of units
+                         Optional_string_const customUnitName = _,         // the custom name for the units from EMS definition of units
+                         Optional_string_const SpaceType = _               // Space type (applicable for Building group only)
 );
 
 void SetupOutputVariable(EnergyPlusData &state,
@@ -1084,6 +1058,7 @@ struct OutputProcessorData : BaseGlobalStruct
     Real64 TimeStepZoneSec = 0;              // Seconds from NumTimeStepInHour
     bool ErrorsLogged = false;
     int MaxNumSubcategories = 1;
+    int maxNumEndUseSpaceTypes = 1;
     bool isFinalYear = false;
     bool GetOutputInputFlag = true;
     OutputProcessor::ReportingFrequency minimumReportFrequency = OutputProcessor::ReportingFrequency::EachCall;
@@ -1180,6 +1155,7 @@ struct OutputProcessorData : BaseGlobalStruct
         this->TimeStepZoneSec = 0;
         this->ErrorsLogged = false;
         this->MaxNumSubcategories = 1;
+        this->maxNumEndUseSpaceTypes = 1;
         this->isFinalYear = false;
         this->GetOutputInputFlag = true;
         this->minimumReportFrequency = OutputProcessor::ReportingFrequency::EachCall;
