@@ -469,13 +469,16 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         }
     }
 
+    // Reset space power reduction factors
+    for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+        state.dataDaylightingData->spacePowerReductionFactor(spaceNum) = 1.0;
+    }
     for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
         auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
         auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(thisDaylightControl.enclIndex);
         thisDaylightControl.DaylIllumAtRefPt = 0.0;
         thisDaylightControl.GlareIndexAtRefPt = 0.0;
         thisDaylightControl.PowerReductionFactor = 1.0;
-        state.dataDaylightingData->ZoneDaylight(thisDaylightControl.zoneIndex).ZonePowerReductionFactor = 1.0;
         thisEnclDaylight.InterReflIllFrIntWins = 0.0; // inter-reflected illuminance from interior windows
         if (thisDaylightControl.TotalDaylRefPoints != 0) {
             thisDaylightControl.TimeExceedingGlareIndexSPAtRefPt = 0.0;
@@ -619,8 +622,6 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
             // Store the calculated total zone Power Reduction Factor due to DElight daylighting
             // in the ZoneDaylight structure for later use
             thisDaylightControl.PowerReductionFactor = dPowerReducFac;
-            // TODO MJW: for now set zone power to match
-            state.dataDaylightingData->ZoneDaylight(zoneNum).ZonePowerReductionFactor = dPowerReducFac;
         }
         // RJH DElight Modification End - Call to DElight electric lighting control subroutine
     }

@@ -144,6 +144,7 @@ namespace DataDaylighting {
         std::string Name;     // Name of the daylighting:controls object
         std::string ZoneName; // name of the zone where the daylighting:controls object is located
         int zoneIndex = 0;    // Index to zone where the daylighting:controls object is located
+        int spaceIndex = 0;   // Index to space where the daylighting:controls object is located (0 if specified for a zone)
         int enclIndex = 0;    // Index to enclosure where the daylighting:controls object is located
         DataDaylighting::iDaylightingMethod DaylightMethod = iDaylightingMethod::NoDaylighting; // Type of Daylighting (1=SplitFlux, 2=DElight)
         int AvailSchedNum = 0;                                                                  // pointer to availability schedule if present
@@ -154,6 +155,7 @@ namespace DataDaylighting {
         // Points 1 and 2 are the control reference points
         Array1D_bool DaylRefPtInBounds;                         // True when coordinates are in bounds of zone coordinates
         Array1D<Real64> FracZoneDaylit;                         // =0.0  ! Fraction of zone controlled by each reference point
+        Real64 sumFracLights = 0.0;                             // Sum of lighting control fractions for this daylighting control
         Array1D<Real64> IllumSetPoint;                          // =0.0  ! Illuminance setpoint at each reference point (lux)
         LtgCtrlType LightControlType = LtgCtrlType::Continuous; // Lighting control type (same for all reference points)
         // (1=continuous, 2=stepped, 3=continuous/off)
@@ -211,10 +213,8 @@ namespace DataDaylighting {
 
     struct ZoneDaylightCalc
     {
-        // Members
-        Real64 ZonePowerReductionFactor = 1.0; // Electric power reduction factor for entire zone due to daylighting
-        Real64 zoneAvgIllumSum = 0.0;          // For VisualResilienceSummary reported average illuminance
-        int totRefPts = 0.0;                   // For VisualResilienceSummary total number of rereference points
+        Real64 zoneAvgIllumSum = 0.0; // For VisualResilienceSummary reported average illuminance
+        int totRefPts = 0.0;          // For VisualResilienceSummary total number of rereference points
     };
 
     struct IllumMapData
@@ -329,6 +329,7 @@ struct DaylightingData : BaseGlobalStruct
     Array1D<DataDaylighting::MapCalcData> IllumMapCalc;
     Array1D<DataDaylighting::RefPointData> DaylRefPt;
     Array1D<DataDaylighting::DElightComplexFeneData> DElightComplexFene;
+    Array1D<Real64> spacePowerReductionFactor; // Average electric power reduction factor for space due to daylighting
 
     void clear_state() override
     {
@@ -349,6 +350,7 @@ struct DaylightingData : BaseGlobalStruct
         this->IllumMapCalc.deallocate();
         this->DaylRefPt.deallocate();
         this->DElightComplexFene.deallocate();
+        this->spacePowerReductionFactor.deallocate();
     }
 };
 

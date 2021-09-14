@@ -4896,6 +4896,8 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
     cCurrentModuleObject = "Daylighting:Controls";
     state.dataDaylightingData->totDaylightingControls = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataDaylightingData->daylightControl.allocate(state.dataDaylightingData->totDaylightingControls);
+    Array1D<bool> spaceHasDaylightingControl;
+    spaceHasDaylightingControl.dimension(state.dataGlobal->numSpaces, false);
     // Reset to zero in case this is called more than once in unit tests
     for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
         state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints = 0;
@@ -4915,34 +4917,63 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        int const zoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
-        if (zoneNum == 0) {
-            ShowSevereError(state,
-                            cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                state.dataIPShortCut->cAlphaArgs(2) + "\".");
-            ErrorsFound = true;
-            continue;
-        }
         auto &daylightControl(state.dataDaylightingData->daylightControl(controlNum));
-        daylightControl.Name = state.dataIPShortCut->cAlphaArgs(1);     // Field: Name
-        daylightControl.ZoneName = state.dataIPShortCut->cAlphaArgs(2); // Field: Zone Name
-        daylightControl.zoneIndex = zoneNum;
+        daylightControl.Name = state.dataIPShortCut->cAlphaArgs(1);
 
-        // set enclosure index for first space in zone
-        int enclNum = state.dataHeatBal->space(state.dataHeatBal->Zone(zoneNum).spaceIndexes(1)).solarEnclosureNum;
-        daylightControl.enclIndex = enclNum;
-        state.dataDaylightingData->enclDaylight(daylightControl.enclIndex).daylightControlIndexes.emplace_back(controlNum);
-        // check that all spaces in the zone are in the same enclosure
-        for (int spaceCounter = 2; spaceCounter <= state.dataHeatBal->Zone(zoneNum).numSpaces; ++spaceCounter) {
-            int spaceNum = state.dataHeatBal->Zone(zoneNum).spaceIndexes(spaceCounter);
-            if (daylightControl.enclIndex != state.dataHeatBal->space(spaceNum).solarEnclosureNum) {
+        // Is it a space or zone name?
+        int const spaceNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->space);
+        if (spaceNum > 0) {
+            daylightControl.spaceIndex = spaceNum;
+            daylightControl.zoneIndex = state.dataHeatBal->space(spaceNum).zoneNum;
+            daylightControl.enclIndex = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
+            // Check if this is a duplicate
+            if (spaceHasDaylightingControl(spaceNum)) {
+                ShowSevereError(state,
+                                cCurrentModuleObject + "=\"" + daylightControl.Name + "\" Space=" + "=\"" + state.dataHeatBal->space(spaceNum).Name +
+                                    "\" already has a " + cCurrentModuleObject + " object assigned to it. Only one per Space is allowed.");
+                ErrorsFound = true;
+                continue;
+            }
+        } else {
+            int const zoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
+            if (zoneNum == 0) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(2) + "\" All spaces in the zone must be in the same enclosure for daylighting.");
+                                    state.dataIPShortCut->cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
-                break;
+                continue;
+            } else {
+                daylightControl.zoneIndex = zoneNum;
+
+                // set enclosure index for first space in zone
+                int enclNum = state.dataHeatBal->space(state.dataHeatBal->Zone(zoneNum).spaceIndexes(1)).solarEnclosureNum;
+                daylightControl.enclIndex = enclNum;
+                // check that all spaces in the zone are in the same enclosure
+                for (int spaceCounter = 2; spaceCounter <= state.dataHeatBal->Zone(zoneNum).numSpaces; ++spaceCounter) {
+                    int zoneSpaceNum = state.dataHeatBal->Zone(zoneNum).spaceIndexes(spaceCounter);
+                    if (daylightControl.enclIndex != state.dataHeatBal->space(zoneSpaceNum).solarEnclosureNum) {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(2) +
+                                            "\" All spaces in the zone must be in the same enclosure for daylighting.");
+                        ErrorsFound = true;
+                        break;
+                    }
+                    // Check if this is a duplicate
+                    if (spaceHasDaylightingControl(zoneSpaceNum)) {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + "=\"" + daylightControl.Name + "\" Space=" + "=\"" +
+                                            state.dataHeatBal->space(zoneSpaceNum).Name + "\" already has a " + cCurrentModuleObject +
+                                            " object assigned to it. Only one per Space is allowed.");
+                        ErrorsFound = true;
+                        continue;
+                    }
+                }
             }
         }
+
+        state.dataDaylightingData->enclDaylight(daylightControl.enclIndex).daylightControlIndexes.emplace_back(controlNum);
+        daylightControl.ZoneName = state.dataHeatBal->Zone(daylightControl.zoneIndex).Name;
 
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "SPLITFLUX")) { // Field: Daylighting Method
             daylightControl.DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
@@ -5021,7 +5052,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         int curTotalDaylRefPts = NumAlpha - 6; // first six alpha fields are not part of extensible group
         daylightControl.TotalDaylRefPoints = curTotalDaylRefPts;
         state.dataViewFactor->EnclSolInfo(daylightControl.enclIndex).TotalEnclosureDaylRefPoints += curTotalDaylRefPts;
-        state.dataDaylightingData->ZoneDaylight(zoneNum).totRefPts += curTotalDaylRefPts;
+        state.dataDaylightingData->ZoneDaylight(daylightControl.zoneIndex).totRefPts += curTotalDaylRefPts;
         state.dataDaylightingData->maxRefPointsPerControl = max(state.dataDaylightingData->maxRefPointsPerControl, curTotalDaylRefPts);
         if ((NumNumber - 7) / 2 != daylightControl.TotalDaylRefPoints) {
             ShowSevereError(state,
@@ -5119,6 +5150,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         Real64 sumFracs = sum(daylightControl.FracZoneDaylit);
+        daylightControl.sumFracLights = sumFracs;
         if ((1.0 - sumFracs) > FractionTolerance) {
             ShowWarningError(state, "GetDaylightingControls: Fraction of zone or space controlled by the Daylighting reference points is < 1.0.");
             ShowContinueError(state,
@@ -7191,10 +7223,30 @@ void DayltgElecLightingControl(EnergyPlusData &state)
     Real64 XRAN;  // Random number between 0 and 1
     bool ScheduledAvailable;
 
+    if (state.dataDaylightingData->totDaylightingControls == 0) return;
+    // Reset space power reduction factors
+    for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+        state.dataDaylightingData->spacePowerReductionFactor(spaceNum) = 1.0;
+    }
+
     for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
         auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
 
-        if (thisDaylightControl.DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) continue;
+        if (thisDaylightControl.DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
+            // Set space power reduction factors
+            if (thisDaylightControl.PowerReductionFactor < 1.0) {
+                if (thisDaylightControl.spaceIndex > 0) {
+                    // This is a space-level daylighting control
+                    state.dataDaylightingData->spacePowerReductionFactor(thisDaylightControl.spaceIndex) = thisDaylightControl.PowerReductionFactor;
+                } else {
+                    // This is a zone-level daylighting control
+                    for (int spaceNum : state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).spaceIndexes) {
+                        state.dataDaylightingData->spacePowerReductionFactor(spaceNum) = thisDaylightControl.PowerReductionFactor;
+                    }
+                }
+            }
+            continue;
+        }
 
         TotReduction = 0.0;
         ZFTOT = 0.0;
@@ -7278,8 +7330,19 @@ void DayltgElecLightingControl(EnergyPlusData &state)
             TotReduction = 1.0;
         }
         thisDaylightControl.PowerReductionFactor = TotReduction;
-        // TODO MJW: Punt for now and set zone power reduction factor the same
-        state.dataDaylightingData->ZoneDaylight(thisDaylightControl.zoneIndex).ZonePowerReductionFactor = TotReduction;
+
+        // Accumulate space power reduction factors
+        if (TotReduction < 1.0) {
+            if (thisDaylightControl.spaceIndex > 0) {
+                // This is a space-level daylighting control
+                state.dataDaylightingData->spacePowerReductionFactor(thisDaylightControl.spaceIndex) = TotReduction;
+            } else {
+                // This is a zone-level daylighting control
+                for (int spaceNum : state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).spaceIndexes) {
+                    state.dataDaylightingData->spacePowerReductionFactor(spaceNum) = TotReduction;
+                }
+            }
+        }
     } // end daylighting control loop
 
     //  IF(DataDaylighting::TotIllumMaps > 0 .and. .not. DoingSizing .and. .not. WarmupFlag .and. .not. KickoffSimulation) THEN

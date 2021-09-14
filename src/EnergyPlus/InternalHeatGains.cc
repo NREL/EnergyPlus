@@ -252,6 +252,7 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
             state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
             state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
+            state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
         }
         state.dataHeatBal->ZnRpt.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->spaceRpt.allocate(state.dataGlobal->numSpaces);
@@ -7233,11 +7234,12 @@ namespace InternalHeatGains {
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotLights; ++Loop) {
             int NZ = state.dataHeatBal->Lights(Loop).ZonePtr;
+            int spaceNum = state.dataHeatBal->Lights(Loop).spaceIndex;
             Q = state.dataHeatBal->Lights(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->Lights(Loop).SchedPtr);
 
             if (state.dataDaylightingData->ZoneDaylight(NZ).totRefPts > 0) {
                 if (state.dataHeatBal->Lights(Loop).FractionReplaceable > 0.0) { // FractionReplaceable can only be 0 or 1 for these models
-                    Q *= state.dataDaylightingData->ZoneDaylight(NZ).ZonePowerReductionFactor;
+                    Q *= state.dataDaylightingData->spacePowerReductionFactor(spaceNum);
                 }
             }
 
@@ -7291,7 +7293,6 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneIntGain(NZ).QLTCRA += state.dataHeatBal->Lights(Loop).RetAirGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QLTTOT += state.dataHeatBal->Lights(Loop).TotGainRate;
 
-            int spaceNum = state.dataHeatBal->Lights(Loop).spaceIndex;
             state.dataHeatBal->spaceRpt(spaceNum).LtsPower += state.dataHeatBal->Lights(Loop).Power;
             state.dataHeatBal->spaceIntGain(spaceNum).QLTRAD += state.dataHeatBal->Lights(Loop).RadGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QLTSW += state.dataHeatBal->Lights(Loop).VisGainRate;
