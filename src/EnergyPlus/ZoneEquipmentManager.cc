@@ -673,7 +673,7 @@ void SizeZoneEquipment(EnergyPlusData &state)
                 state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).HeatTstatTemp =
                     state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum);
             }
-        } else {
+        } else if (state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).CoolLoad > 0.0) {
             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).CoolZoneRetTemp = RetTemp;
             if (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) > 0.0) {
                 state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).CoolTstatTemp =
@@ -682,6 +682,12 @@ void SizeZoneEquipment(EnergyPlusData &state)
                 state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).CoolTstatTemp =
                     state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum);
             }
+        } else {
+            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).CoolZoneRetTemp = RetTemp;
+            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).HeatTstatTemp =
+                state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum);
+            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum).CoolTstatTemp =
+                state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum);
         }
     }
 }
