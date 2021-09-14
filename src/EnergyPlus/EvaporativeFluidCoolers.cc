@@ -108,7 +108,7 @@ namespace EvaporativeFluidCoolers {
 
         // Now look for this particular object
         for (auto &thisEFC : state.dataEvapFluidCoolers->SimpleEvapFluidCooler) {
-            if ((thisEFC.TypeOf_enum == static_cast<DataPlant::PlantEquipmentType>(objectType)) && (thisEFC.Name == objectName)) {
+            if ((thisEFC.Type == objectType) && (thisEFC.Name == objectName)) {
                 return &thisEFC;
             }
         }
@@ -189,7 +189,7 @@ namespace EvaporativeFluidCoolers {
 
             thisEFC.Name = AlphArray(1);
             thisEFC.EvapFluidCoolerType = state.dataIPShortCut->cCurrentModuleObject;
-            thisEFC.TypeOf_enum = DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd;
+            thisEFC.Type = DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd;
             thisEFC.EvapFluidCoolerMassFlowRateMultiplier = 2.5;
             thisEFC.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             AlphArray(2),
@@ -495,7 +495,7 @@ namespace EvaporativeFluidCoolers {
 
             thisEFC.Name = AlphArray(1);
             thisEFC.EvapFluidCoolerType = state.dataIPShortCut->cCurrentModuleObject;
-            thisEFC.TypeOf_enum = DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd;
+            thisEFC.Type = DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd;
             thisEFC.EvapFluidCoolerMassFlowRateMultiplier = 2.5;
             thisEFC.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             AlphArray(2),
@@ -894,7 +894,7 @@ namespace EvaporativeFluidCoolers {
     {
         // Set up output variables
         // CurrentModuleObject='EvaporativeFluidCooler:SingleSpeed'
-        if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
+        if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
 
             // Added for fluid bypass
             SetupOutputVariable(state,
@@ -1131,13 +1131,13 @@ namespace EvaporativeFluidCoolers {
 
     void EvapFluidCoolerSpecs::getDesignCapacities(EnergyPlusData &state, const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
+        if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
 
             MinLoad = 0.0; // signifies non-load based model (i.e. forward)
             MaxLoad = this->HighSpeedStandardDesignCapacity * this->HeatRejectCapNomCapSizingRatio;
             OptLoad = this->HighSpeedStandardDesignCapacity;
 
-        } else if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
+        } else if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
 
             MinLoad = 0.0; // signifies non-load based model (i.e. forward heat exchanger model)
             MaxLoad = this->HighSpeedStandardDesignCapacity * this->HeatRejectCapNomCapSizingRatio;
@@ -1172,9 +1172,9 @@ namespace EvaporativeFluidCoolers {
 
         this->InitEvapFluidCooler(state);
 
-        if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
+        if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
             this->CalcSingleSpeedEvapFluidCooler(state);
-        } else if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
+        } else if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
             this->CalcTwoSpeedEvapFluidCooler(state);
         } else {
             ShowFatalError(state, "SimEvapFluidCoolers: Invalid evaporative fluid cooler Type Requested = " + EvapFluidCoolerType);
@@ -1383,7 +1383,7 @@ namespace EvaporativeFluidCoolers {
             tmpDesignWaterFlowRate = 5.382e-8 * this->HighSpeedStandardDesignCapacity;
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
-                if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
+                if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      cEvapFluidCooler_SingleSpeed,
@@ -1399,7 +1399,7 @@ namespace EvaporativeFluidCoolers {
                             "Initial Design Water Flow Rate based on evaporative fluid cooler Standard Design Capacity [m3/s]",
                             this->DesignWaterFlowRate);
                     }
-                } else if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
+                } else if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
                             state,
@@ -1461,7 +1461,7 @@ namespace EvaporativeFluidCoolers {
                 }
             }
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
+                if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
                             state, cEvapFluidCooler_SingleSpeed, this->Name, "Fan Power at Design Air Flow Rate [W]", this->HighSpeedFanPower);
@@ -1473,7 +1473,7 @@ namespace EvaporativeFluidCoolers {
                                                      "Initial Fan Power at Design Air Flow Rate [W]",
                                                      this->HighSpeedFanPower);
                     }
-                } else if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
+                } else if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
                             state, cEvapFluidCooler_TwoSpeed, this->Name, "Fan Power at High Fan Speed [W]", this->HighSpeedFanPower);
@@ -1493,7 +1493,7 @@ namespace EvaporativeFluidCoolers {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 
-                if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
+                if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
                             state, cEvapFluidCooler_SingleSpeed, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
@@ -1502,7 +1502,7 @@ namespace EvaporativeFluidCoolers {
                         BaseSizer::reportSizerOutput(
                             state, cEvapFluidCooler_SingleSpeed, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                     }
-                } else if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
+                } else if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
                             state, cEvapFluidCooler_TwoSpeed, this->Name, "Air Flow Rate at High Fan Speed [m3/s]", this->HighSpeedAirFlowRate);
@@ -1623,7 +1623,7 @@ namespace EvaporativeFluidCoolers {
                     if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->HighSpeedEvapFluidCoolerUA = 0.0;
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                    if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
+                    if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
                         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(state,
                                                          cEvapFluidCooler_SingleSpeed,
@@ -1638,7 +1638,7 @@ namespace EvaporativeFluidCoolers {
                                                          "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
                                                          this->HighSpeedEvapFluidCoolerUA);
                         }
-                    } else if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
+                    } else if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
                         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(state,
                                                          cEvapFluidCooler_TwoSpeed,
@@ -1702,7 +1702,7 @@ namespace EvaporativeFluidCoolers {
                 this->HighSpeedEvapFluidCoolerUA = 0.0;
             }
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
+                if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      cEvapFluidCooler_SingleSpeed,
@@ -1717,7 +1717,7 @@ namespace EvaporativeFluidCoolers {
                                                      "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
                                                      this->HighSpeedEvapFluidCoolerUA);
                     }
-                } else if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
+                } else if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      cEvapFluidCooler_TwoSpeed,
@@ -1814,7 +1814,7 @@ namespace EvaporativeFluidCoolers {
                 this->HighSpeedEvapFluidCoolerUA = 0.0;
             }
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
+                if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd) {
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      cEvapFluidCooler_SingleSpeed,
@@ -1829,7 +1829,7 @@ namespace EvaporativeFluidCoolers {
                                                      "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
                                                      this->HighSpeedEvapFluidCoolerUA);
                     }
-                } else if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
+                } else if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      cEvapFluidCooler_TwoSpeed,
@@ -1889,8 +1889,7 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        if (this->PerformanceInputMethod_Num == PIM::StandardDesignCapacity &&
-            this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
+        if (this->PerformanceInputMethod_Num == PIM::StandardDesignCapacity && this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
             if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->LowSpeedStandardDesignCapacity > 0.0) {
                 // Standard design capacity doesn't include compressor heat;
                 // predefined factor was 1.25 W heat rejection per W of delivered cooling, now user input with default 1.25
@@ -1950,7 +1949,7 @@ namespace EvaporativeFluidCoolers {
         }
 
         if (this->PerformanceInputMethod_Num == PIM::UserSpecifiedDesignCapacity &&
-            this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
+            this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
             if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->LowSpeedUserSpecifiedDesignCapacity > 0.0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
@@ -2757,13 +2756,13 @@ namespace EvaporativeFluidCoolers {
         if (this->OneTimeFlagForEachEvapFluidCooler) {
             // Locate the tower on the plant loops for later usage
             PlantUtilities::ScanPlantLoopsForObject(
-                state, this->Name, this->TypeOf_enum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+                state, this->Name, this->Type, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
 
             if (ErrorsFound) {
                 ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");
             }
 
-            if (this->TypeOf_enum == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
+            if (this->Type == DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd) {
                 if (this->DesignWaterFlowRate > 0.0) {
                     if (this->HighSpeedAirFlowRate <= this->LowSpeedAirFlowRate) {
                         ShowSevereError(state,
