@@ -26091,21 +26091,6 @@ DO iBoiler = 1, numCompactBoiler
                     TRIM(FldVal(base + blrTypeOff)))
   END IF
   isCapacityAutosize = SameString(FldVal(base + blrCapacityOff),'autosize')
-  isFuelTypeValid = .FALSE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'Electricity')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'NaturalGas')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'PropaneGas')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'FuelOil#1')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'FuelOil#2')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'Coal')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'Diesel')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'Gasoline')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'OtherFuel1')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'OtherFuel2')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'')) isFuelTypeValid = .TRUE.
-  IF (.NOT. isFuelTypeValid) THEN
-    CALL WriteError('Invalid choice in HVACTemplate:Plant:Boiler in the Fuel Type field')
-  END IF
   ! add Boiler Outlet Node to list of node names for HW setpoints
   IF ((compactHotLoopBase .NE. 0) .AND. &
       (SameString(FldVal(base + blrLoopTypeOff),'HotWater') .OR. SameString(FldVal(base + blrLoopTypeOff),''))) THEN
