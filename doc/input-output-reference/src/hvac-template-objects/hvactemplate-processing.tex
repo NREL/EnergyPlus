@@ -32,8 +32,6 @@
   \item
     Optional - A file with the name "<original-file-name>\_hvac\_templates.epJSON" which has all the HVACTemplate objects from the input file.
   \item
-    Optional - A file with the name "<original-file-name>\_hvac\_templates.epJSON" which has all the HVACTemplate objects from the input file.
-  \item
     Optional - A file with the name "<original-file-name>\_base.epJSON" which has all the HVACTemplate objects removed.
   \end{enumerate}
   \item
@@ -70,26 +68,38 @@ The command line interface located in the EnergyPlus root directory (energyplus.
   -x --expandobjects : Run ExpandObjects prior to simulation
 \end{itemize}
 
-\subsubsection*{epJSON Options}
+\subsubsection*{epJSON Options}\label{pyexpandobjects-cli-epjson-options}
 
 \begin{itemize}
 \item
-  -xb --output-backups : Output epJSON optional backup files
+  -nb --no\_backup : Do no create backup files
   
-  It is not possible to comment sections of code in JSON formatted files.  Therefore, the output expanded files do not have the ability to retain the HVACTemplate objects used to create the current document.  If the original file were to be overwritten, then all template data would be lost.  In an attempt to provide and additional layer of backups, the -xb option will output two files: one with HVACTemplate objects, and one with all other objects.  With these files, the original input file can be created, or specific objects can be copied and pasted.
+  It is not possible to comment sections of code in JSON formatted files.  Therefore, the output expanded files do not have the ability to retain the HVACTemplate objects used to create the current document.  If the original file were to be overwritten, then all template data would be lost.  In an attempt to provide and additional layer of backups, the -nb option is set to False by default which means two files will be created: one with HVACTemplate objects, and one with all other objects.  With these files, the original input file can be created, or specific objects can be copied and pasted.
 \item
-  -ns --no-schema : Skil all schema validation checks
+  -ns --no\_schema : Skil all schema validation checks
   
   One benefit of the JSON file format is that files can be validated before simulation.  This means that erroneous inputs can be found before simulation, which saves time debugging output files and reading through logs, unsure of the error source.  This includes syntax errors, values that are out of range, and missing required inputs.  However, situations may occur when the user wishes to skip schema validation, in which case this flag should be used.  By default, schema validation is enabled.
+  
+\item
+  -l --logger\_level : Set logging output level 
+  
+  Various levels of logging output are available for debugging, and other, purposes.  A valid level, consistent with Python logging naming structure (i.e. DEBUG, INFO, WARNING, ERROR, CRITICAL), must be provided.
 
 \end{itemize}
 
-\subsubsection{ExpanObjects}
+\subsubsection{HVACTemplate Expansion Tools}
 
 \subsubsection*{IDF - ExpandObjects}
 
 No command line options are available for this tool.
 
-\subsubsection*{IDF - ExpandObjects}
+\subsubsection*{epJSON - pyExpandObjects}
 
-The command line options noted above in section 2.1.2.1 for epJSON files are available in this tool (i.e -xb, -ns)
+The command line options noted above in section~\ref{pyexpandobjects-cli-epjson-options} for epJSON files are available in this tool (e.g. -nb, -ns).  Additionally, the following arugment can be used to specify the file.  Values passed to the program with no arguments will be assumed to be a file name.
+
+\begin{itemize}
+
+\item
+  -f --file : Specify file to expand
+  
+\end{itemize}
