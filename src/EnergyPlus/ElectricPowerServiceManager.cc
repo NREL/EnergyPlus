@@ -2106,7 +2106,7 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(EnergyPlusData &state)
             plantNotFound = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     g->compPlantName,
-                                                    g->compPlantTypeOf,
+                                                    g->compPlantType,
                                                     g->cogenLocation.loopNum,
                                                     g->cogenLocation.loopSideNum,
                                                     g->cogenLocation.branchNum,
@@ -2142,7 +2142,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                                          Real64 ratedElecPowerOutput,
                                          std::string const &availSchedName,
                                          Real64 thermalToElectRatio)
-    : compGenTypeOf_Num(GeneratorType::Unassigned), compPlantTypeOf(DataPlant::PlantEquipmentType::Invalid), generatorType(GeneratorType::Unassigned),
+    : compGenTypeOf_Num(GeneratorType::Unassigned), compPlantType(DataPlant::PlantEquipmentType::Invalid), generatorType(GeneratorType::Unassigned),
       generatorIndex(0), maxPowerOut(0.0), availSchedPtr(0), powerRequestThisTimestep(0.0), onThisTimestep(false), eMSPowerRequest(0.0),
       eMSRequestOn(false), plantInfoFound(false), cogenLocation(PlantLocation(0, 0, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0),
       dCElectProdRate(0.0), electricityProd(0.0), electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), pvwattsGenerator(nullptr),
@@ -2156,27 +2156,27 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     if (UtilityRoutines::SameString(objectType, "Generator:InternalCombustionEngine")) {
         generatorType = GeneratorType::ICEngine;
         compGenTypeOf_Num = GeneratorType::ICEngine;
-        compPlantTypeOf = DataPlant::PlantEquipmentType::Generator_ICEngine;
+        compPlantType = DataPlant::PlantEquipmentType::Generator_ICEngine;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:CombustionTurbine")) {
         generatorType = GeneratorType::CombTurbine;
         compGenTypeOf_Num = GeneratorType::CombTurbine;
-        compPlantTypeOf = DataPlant::PlantEquipmentType::Generator_CTurbine;
+        compPlantType = DataPlant::PlantEquipmentType::Generator_CTurbine;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:MicroTurbine")) {
         generatorType = GeneratorType::Microturbine;
         compGenTypeOf_Num = GeneratorType::Microturbine;
-        compPlantTypeOf = DataPlant::PlantEquipmentType::Generator_MicroTurbine;
+        compPlantType = DataPlant::PlantEquipmentType::Generator_MicroTurbine;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:Photovoltaic")) {
         generatorType = GeneratorType::PV;
         compGenTypeOf_Num = GeneratorType::PV;
-        compPlantTypeOf = DataPlant::PlantEquipmentType::PVTSolarCollectorFlatPlate;
+        compPlantType = DataPlant::PlantEquipmentType::PVTSolarCollectorFlatPlate;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:PVWatts")) {
         generatorType = GeneratorType::PVWatts;
         compGenTypeOf_Num = GeneratorType::PVWatts;
-        compPlantTypeOf = DataPlant::PlantEquipmentType::Invalid;
+        compPlantType = DataPlant::PlantEquipmentType::Invalid;
 
         int ObjNum =
             state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(objectName));
@@ -2191,19 +2191,19 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         compGenTypeOf_Num = GeneratorType::FuelCell;
         // fuel cell has two possible plant component types, stack cooler and exhaust gas HX.
         // exhaust gas HX is required and it assumed that it has more thermal capacity and is used for control
-        compPlantTypeOf = DataPlant::PlantEquipmentType::Generator_FCExhaust;
+        compPlantType = DataPlant::PlantEquipmentType::Generator_FCExhaust;
         // and the name of plant component is not the same as the generator because of child object references, so fetch that name
         auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state, name);
         compPlantName = dynamic_cast<FuelCellElectricGenerator::FCDataStruct *>(thisFC)->ExhaustHX.Name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:MicroCHP")) {
         generatorType = GeneratorType::MicroCHP;
         compGenTypeOf_Num = GeneratorType::MicroCHP;
-        compPlantTypeOf = DataPlant::PlantEquipmentType::Generator_MicroCHP;
+        compPlantType = DataPlant::PlantEquipmentType::Generator_MicroCHP;
         compPlantName = name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:WindTurbine")) {
         generatorType = GeneratorType::WindTurbine;
         compGenTypeOf_Num = GeneratorType::WindTurbine;
-        compPlantTypeOf = DataPlant::PlantEquipmentType::Invalid;
+        compPlantType = DataPlant::PlantEquipmentType::Invalid;
     } else {
         ShowSevereError(state, std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + " invalid entry.");
         ShowContinueError(state, "Invalid " + objectType + " associated with generator = " + objectName);

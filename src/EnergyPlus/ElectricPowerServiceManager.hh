@@ -551,8 +551,8 @@ public:                              // data // might make this class a friend o
     std::string name;                // user identifier
     std::string typeOfName;          // equipment type
     GeneratorType compGenTypeOf_Num; // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
-    DataPlant::PlantEquipmentType compPlantTypeOf{DataPlant::PlantEquipmentType::Invalid}; // numeric designator for plant component, in DataPlant
-    std::string compPlantName;                                                             // name of plant component if heat recovery
+    DataPlant::PlantEquipmentType compPlantType{DataPlant::PlantEquipmentType::Invalid}; // numeric designator for plant component, in DataPlant
+    std::string compPlantName;                                                           // name of plant component if heat recovery
     GeneratorType generatorType;
     int generatorIndex;              // index in generator model data struct
     Real64 maxPowerOut;              // Maximum Power Output (W)
