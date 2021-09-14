@@ -12615,6 +12615,7 @@ void WaterThermalTankData::setBackupElementCapacity(EnergyPlusData &state)
     // negative electric consumption.  Using a test for any negative numbers here instead of just -99999 for safety.
     // Only reset the backup element capacity if a problem has been occured.
     if (this->HeatPumpNum > 0) {
+        if (state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) return;
         if (state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).BackupElementCapacity < 0.0) {
             state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).BackupElementCapacity = this->MaxCapacity;
         }

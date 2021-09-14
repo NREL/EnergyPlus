@@ -5352,6 +5352,8 @@ TEST_F(EnergyPlusFixture, setBackupElementCapacityTest)
     auto &DSup = state->dataWaterThermalTanks->WaterHeaterDesuperheater(1);
     auto &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
 
+    HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterPumped;
+
     // Test 1: Heat Pump Hot Water Heater.  BackupHeaterCapacity is negative--should be reset to whatever the tank max capacity is.
     Tank.HeatPumpNum = 1;
     Tank.DesuperheaterNum = 0;
@@ -5390,6 +5392,19 @@ TEST_F(EnergyPlusFixture, setBackupElementCapacityTest)
 
     // Test 5: Not a Heat Pump Water Heater or Desuperheater.  Do not do anything.
     Tank.HeatPumpNum = 0;
+    Tank.DesuperheaterNum = 0;
+    Tank.MaxCapacity = 200.0;
+    HPWH.BackupElementCapacity = 123.0;
+    DSup.BackupElementCapacity = -456.0;
+    Tank.setBackupElementCapacity(*state);
+    expectedAnswer = 123.0;
+    EXPECT_NEAR(HPWH.BackupElementCapacity, expectedAnswer, allowedTolerance);
+    expectedAnswer = -456.0;
+    EXPECT_NEAR(DSup.BackupElementCapacity, expectedAnswer, allowedTolerance);
+
+    // Test 6: Wrapped Heat Pump Water Heater.  Do not do anything.
+    HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterWrapped;
+    Tank.HeatPumpNum = 1;
     Tank.DesuperheaterNum = 0;
     Tank.MaxCapacity = 200.0;
     HPWH.BackupElementCapacity = 123.0;
