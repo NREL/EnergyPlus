@@ -1196,7 +1196,7 @@ namespace PhotovoltaicThermalCollectors {
             Real64 Tcollector =
                 (2.0 * mdot * CpInlet * Tinlet +
                  this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
-                                  HrAir * state.dataHeatBalSurf->TH(1, 1, SurfNum) + HcExt * state.dataHeatBalSurf->TH(1, 1, SurfNum))) /
+                                  HrAir * state.dataHeatBalSurf->SurfTempOut(this->SurfNum) + HcExt * state.dataHeatBalSurf->SurfTempOut(this->SurfNum))) /
                 (2.0 * mdot * CpInlet + this->AreaCol * (HrGround + HrSky + HrAir + HcExt));
             PotentialOutletTemp = 2.0 * Tcollector - Tinlet;
             this->Report.ToutletWorkFluid = PotentialOutletTemp;
@@ -1439,7 +1439,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 tamb = state.dataEnvrn->OutDryBulbTemp;                   // ambient temperature (DegC)
         Real64 tsky = state.dataEnvrn->SkyTemp;                          // sky temperature (DegC)
         Real64 v_wind = state.dataEnvrn->WindSpeed;                      // wind speed (m/s)
-        Real64 t2 = state.dataHeatBalSurf->TH(1, 1, this->SurfNum), t2K; // temperature of bldg surface (DegC)
+        Real64 t2 = state.dataHeatBalSurf->SurfTempOut(this->SurfNum), t2K; // temperature of bldg surface (DegC)
         Real64 mdot = this->MassFlowRate;                                // fluid mass flow rate (kg/s)
         Real64 mdot_bipvt(mdot), mdot_bipvt_new(mdot);                   // mass flow rate through the bipvt duct (kg/s)
         Real64 s(0.0);                                                   // solar radiation gain at pv surface (W/m2)
