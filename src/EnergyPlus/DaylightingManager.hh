@@ -485,6 +485,7 @@ struct DaylightingManagerData : BaseGlobalStruct
 {
 
     bool CalcDayltghCoefficients_firstTime = true;
+    bool getDaylightingParametersInputFlag = true;
     bool refFirstTime = true;
     bool DayltgInteriorIllum_firstTime = true; // true first time routine is called
     bool FirstTimeDaylFacCalc = true;
@@ -718,6 +719,7 @@ struct DaylightingManagerData : BaseGlobalStruct
     void clear_state() override
     {
         this->CalcDayltghCoefficients_firstTime = true;
+        this->getDaylightingParametersInputFlag = true;
         this->refFirstTime = true;
         this->DayltgInteriorIllum_firstTime = true;
         this->FirstTimeDaylFacCalc = true;

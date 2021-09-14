@@ -1033,6 +1033,9 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
     state->dataDaylightingData->enclDaylight.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->enclDaylight(zn).daylightControlIndexes.emplace_back(1);
     state->dataHeatBal->Zone.allocate(zn);
+    state->dataHeatBal->Zone(zn).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space.allocate(zn);
+    state->dataHeatBal->space(1).solarEnclosureNum = 1;
 
     CreateShadeDeploymentOrder(*state, zn);
 
@@ -1103,10 +1106,14 @@ TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
     state->dataSurface->WindowShadingControl(3).FenestrationIndex(2) = 9;
 
     state->dataGlobal->NumOfZones = zn;
+    state->dataGlobal->numSpaces = zn;
     state->dataDaylightingData->daylightControl.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->enclDaylight.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->enclDaylight(zn).daylightControlIndexes.emplace_back(1);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(zn).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
+    state->dataHeatBal->space(zn).solarEnclosureNum = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataGlobal->NumOfZones);
 
     CreateShadeDeploymentOrder(*state, zn);
@@ -2210,9 +2217,25 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
 
+    // reset eio stream
+    EXPECT_TRUE(has_eio_output(true));
     GetDaylightingParametersInput(*state);
-    // state->dataDaylightingManager->CalcDayltghCoefficients_firstTime = false;
     compare_err_stream("");
+    // EIO/DFS output uses specifically newline `\n`, so pass that in or on Windows it'll use '\r\n`
+    std::string const delim = "\n";
+
+    std::string eiooutput = delimited_string(
+        {
+            "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones",
+            "Zone/Window Adjacency Daylighting Counts, WEST ZONE,1,0",
+            "Zone/Window Adjacency Daylighting Counts, EAST ZONE,1,0",
+            "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent Zone Names - 1st 100 (max)",
+            "Zone/Window Adjacency Daylighting Matrix, WEST ZONE,0",
+            "Zone/Window Adjacency Daylighting Matrix, EAST ZONE,0",
+        },
+        delim);
+
+    EXPECT_TRUE(compare_eio_stream(eiooutput, true)); // reset eio stream after compare
     EXPECT_EQ(4, state->dataDaylightingData->TotRefPoints);
 
     EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
@@ -2235,8 +2258,6 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_NEAR(-2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
     EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
-    // reset eio stream
-    EXPECT_TRUE(has_eio_output(true));
     EXPECT_FALSE(has_dfs_output(true));
 
     state->dataGlobal->BeginSimFlag = true;
@@ -2255,17 +2276,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     // zone 2 has 2 daylighting reference points and will crash if not dimensioned appropriately.
     DayltgInteriorIllum(*state, zoneNum);
 
-    // EIO/DFS output uses specifically newline `\n`, so pass that in or on Windows it'll use '\r\n`
-    std::string const delim = "\n";
-
-    std::string const eiooutput = delimited_string(
+    eiooutput = delimited_string(
         {
-            "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones",
-            "Zone/Window Adjacency Daylighting Counts, WEST ZONE,1,0",
-            "Zone/Window Adjacency Daylighting Counts, EAST ZONE,1,0",
-            "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent Zone Names - 1st 100 (max)",
-            "Zone/Window Adjacency Daylighting Matrix, WEST ZONE,0",
-            "Zone/Window Adjacency Daylighting Matrix, EAST ZONE,0",
             "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor",
             " Sky Daylight Factors,Clear Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
             " Sky Daylight Factors,Clear Turbid Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",

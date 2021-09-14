@@ -4128,6 +4128,9 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
     int NumNumbers;
     int IOStat;
 
+    if (!state.dataDaylightingManager->getDaylightingParametersInputFlag) return;
+    state.dataDaylightingManager->getDaylightingParametersInputFlag = false;
+
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     ErrorsFound = false;
     cCurrentModuleObject = "Daylighting:Controls";
@@ -4435,7 +4438,6 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
     int NumNumber;
     int MapStyleIn;
     int AddMapPoints;
-    int Loop1;
     int RefPt;
     int X;
     int Y;
