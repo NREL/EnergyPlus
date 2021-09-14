@@ -7333,16 +7333,14 @@ void DayltgElecLightingControl(EnergyPlusData &state)
         }
         thisDaylightControl.PowerReductionFactor = TotReduction;
 
-        // Accumulate space power reduction factors
-        if (TotReduction < 1.0) {
-            if (thisDaylightControl.spaceIndex > 0) {
-                // This is a space-level daylighting control
-                state.dataDaylightingData->spacePowerReductionFactor(thisDaylightControl.spaceIndex) = TotReduction;
-            } else {
-                // This is a zone-level daylighting control
-                for (int spaceNum : state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).spaceIndexes) {
-                    state.dataDaylightingData->spacePowerReductionFactor(spaceNum) = TotReduction;
-                }
+        // Set space power reduction factors
+        if (thisDaylightControl.spaceIndex > 0) {
+            // This is a space-level daylighting control
+            state.dataDaylightingData->spacePowerReductionFactor(thisDaylightControl.spaceIndex) = TotReduction;
+        } else {
+            // This is a zone-level daylighting control
+            for (int spaceNum : state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).spaceIndexes) {
+                state.dataDaylightingData->spacePowerReductionFactor(spaceNum) = TotReduction;
             }
         }
     } // end daylighting control loop
