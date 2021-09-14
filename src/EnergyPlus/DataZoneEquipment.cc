@@ -521,17 +521,17 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     } else if (SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER") { // Window Air Conditioner
                         thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = WindowAC_Num;
 
-                    } else if (SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALHEATPUMP") { // Packaged Terminal Heat Pump
-                        thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = PkgTermHPAirToAir_Num;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER") { // Packaged Terminal Air Conditioner
-                        thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = PkgTermACAirToAir_Num;
-                        UnitarySystems::UnitarySys thisSys;
-                        thisZoneEquipList.compPointer[ZoneEquipTypeNum] =
-                            thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
-
-                    } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") { // Unitary System
-                        thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySys_Num;
+                    } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM" || SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER" ||
+                               SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALHEATPUMP") {
+                        if (SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER") {
+                            thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = PkgTermACAirToAir_Num;
+                        } else if (SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALHEATPUMP") {
+                            thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = PkgTermHPAirToAir_Num;
+                        } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
+                            thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySys_Num;
+                        } else {
+                            ShowFatalError(state, "Developer Error in GetZoneEquipmentData");
+                        }
                         UnitarySystems::UnitarySys thisSys;
                         thisZoneEquipList.compPointer[ZoneEquipTypeNum] =
                             thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);

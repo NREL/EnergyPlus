@@ -85,42 +85,42 @@ namespace UnitarySystems {
         std::string supply_air_fan_operating_mode_schedule_name;
         std::string heating_coil_object_type;
         std::string heating_coil_name;
-        Real64 dx_heating_coil_sizing_ratio;
+        Real64 dx_heating_coil_sizing_ratio = 1.0;
         std::string cooling_coil_object_type;
         std::string cooling_coil_name;
         std::string use_doas_dx_cooling_coil;
-        Real64 minimum_supply_air_temperature;
+        Real64 minimum_supply_air_temperature = 2.0;
         std::string latent_load_control;
         std::string supplemental_heating_coil_object_type;
         std::string supplemental_heating_coil_name;
         std::string cooling_supply_air_flow_rate_method;
-        Real64 cooling_supply_air_flow_rate;
-        Real64 cooling_supply_air_flow_rate_per_floor_area;
-        Real64 cooling_fraction_of_autosized_cooling_supply_air_flow_rate;
-        Real64 cooling_supply_air_flow_rate_per_unit_of_capacity;
+        Real64 cooling_supply_air_flow_rate = -999.0;
+        Real64 cooling_supply_air_flow_rate_per_floor_area = -999.0;
+        Real64 cooling_fraction_of_autosized_cooling_supply_air_flow_rate = -999.0;
+        Real64 cooling_supply_air_flow_rate_per_unit_of_capacity = -999.0;
         std::string heating_supply_air_flow_rate_method;
-        Real64 heating_supply_air_flow_rate;
-        Real64 heating_supply_air_flow_rate_per_floor_area;
-        Real64 heating_fraction_of_autosized_heating_supply_air_flow_rate;
-        Real64 heating_supply_air_flow_rate_per_unit_of_capacity;
+        Real64 heating_supply_air_flow_rate = -999.0;
+        Real64 heating_supply_air_flow_rate_per_floor_area = -999.0;
+        Real64 heating_fraction_of_autosized_heating_supply_air_flow_rate = -999.0;
+        Real64 heating_supply_air_flow_rate_per_unit_of_capacity = -999.0;
         std::string no_load_supply_air_flow_rate_method;
-        Real64 no_load_supply_air_flow_rate;
-        Real64 no_load_supply_air_flow_rate_per_floor_area;
-        Real64 no_load_fraction_of_autosized_cooling_supply_air_flow_rate;
-        Real64 no_load_fraction_of_autosized_heating_supply_air_flow_rate;
-        Real64 no_load_supply_air_flow_rate_per_unit_of_capacity_during_cooling_operation;
-        Real64 no_load_supply_air_flow_rate_per_unit_of_capacity_during_heating_operation;
-        Real64 maximum_supply_air_temperature;
-        Real64 maximum_outdoor_dry_bulb_temperature_for_supplemental_heater_operation;
+        Real64 no_load_supply_air_flow_rate = -999.0;
+        Real64 no_load_supply_air_flow_rate_per_floor_area = -999.0;
+        Real64 no_load_fraction_of_autosized_cooling_supply_air_flow_rate = -999.0;
+        Real64 no_load_fraction_of_autosized_heating_supply_air_flow_rate = -999.0;
+        Real64 no_load_supply_air_flow_rate_per_unit_of_capacity_during_cooling_operation = -999.0;
+        Real64 no_load_supply_air_flow_rate_per_unit_of_capacity_during_heating_operation = -999.0;
+        Real64 maximum_supply_air_temperature = 80.0;
+        Real64 maximum_outdoor_dry_bulb_temperature_for_supplemental_heater_operation = 21.0;
         std::string outdoor_dry_bulb_temperature_sensor_node_name;
-        Real64 maximum_cycling_rate;
-        Real64 heat_pump_time_constant;
-        Real64 fraction_of_on_cycle_power_use;
-        Real64 heat_pump_fan_delay_time;
-        Real64 ancillary_on_cycle_electric_power;
-        Real64 ancillary_off_cycle_electric_power;
-        Real64 design_heat_recovery_water_flow_rate;
-        Real64 maximum_temperature_for_heat_recovery;
+        Real64 maximum_cycling_rate = 2.5;
+        Real64 heat_pump_time_constant = 60.0;
+        Real64 fraction_of_on_cycle_power_use = 0.01;
+        Real64 heat_pump_fan_delay_time = 60.0;
+        Real64 ancillary_on_cycle_electric_power = 0.0;
+        Real64 ancillary_off_cycle_electric_power = 0.0;
+        Real64 design_heat_recovery_water_flow_rate = 0.0;
+        Real64 maximum_temperature_for_heat_recovery = 80.0;
         std::string heat_recovery_water_inlet_node_name;
         std::string heat_recovery_water_outlet_node_name;
         std::string design_specification_multispeed_object_type;
@@ -132,40 +132,37 @@ namespace UnitarySystems {
         std::string oa_mixer_name;
         std::string avail_manager_list_name;
         std::string design_spec_zonehvac_sizing_object_name;
-        Real64 cooling_oa_flow_rate;
-        Real64 heating_oa_flow_rate;
-        Real64 no_load_oa_flow_rate;
+        Real64 cooling_oa_flow_rate = 0.0;
+        Real64 heating_oa_flow_rate = 0.0;
+        Real64 no_load_oa_flow_rate = 0.0;
+        Real64 heat_conv_tol = 0.0;
+        Real64 cool_conv_tol = 0.0;
 
-        UnitarySysInputSpec();
-
-        ~UnitarySysInputSpec()
-        {
-        }
+        UnitarySysInputSpec() = default;
+        ~UnitarySysInputSpec() = default;
     };
 
     struct DesignSpecMSHP
     {
 
     public:
-        DesignSpecMSHP(); // constructor
-        ~DesignSpecMSHP() // destructor
-        {
-        }
-
         std::string name;
         static DesignSpecMSHP *factory(EnergyPlusData &state, int object_type_of_num, std::string const objectName);
-        int numOfSpeedHeating;
-        int numOfSpeedCooling;
-        Real64 noLoadAirFlowRateRatio;
+        int numOfSpeedHeating = 0;
+        int numOfSpeedCooling = 0;
+        Real64 noLoadAirFlowRateRatio = 1.0;
         std::vector<Real64> coolingVolFlowRatio; // The ratio of flow to max for this speed
         std::vector<Real64> heatingVolFlowRatio; // The ratio of flow to max for this speed
 
         //    private:
-        int m_DesignSpecMSHPType_Num;
-        bool m_SingleModeFlag;
+        int m_DesignSpecMSHPType_Num = 0;
+        bool m_SingleModeFlag = false;
 
         static void getDesignSpecMSHP(EnergyPlusData &state);
         static void getDesignSpecMSHPdata([[maybe_unused]] EnergyPlusData &state, bool errorsFound);
+
+        DesignSpecMSHP() = default;
+        ~DesignSpecMSHP() = default;
     };
 
     struct UnitarySys : HVACSystemData
@@ -209,6 +206,7 @@ namespace UnitarySystems {
             CoilCoolingDX,    // CoilSystem:Cooling:DX
             CoilCoolingWater, // CoilSystem:Cooling:Water
             PackagedAC,       // ZoneHVAC:PackagedTerminalAirConditioner
+            PackagedHP,       // ZoneHVAC:PackagedTerminalHeatPump
             Num
         };
 
@@ -433,6 +431,15 @@ namespace UnitarySystems {
         Real64 m_minWaterLoopTempForHR; // water coil heat recovery loops
         bool m_waterSideEconomizerFlag; // user input to enable lockout with economizer
         bool m_WaterHRPlantLoopModel;   // signifies water heat recovery loop for this CoilSystem
+        std::array<int, 4> m_OAMixerNodes{0, 0, 0, 0};
+        Real64 m_CoolOutAirVolFlow;
+        Real64 m_CoolOutAirMassFlow;
+        Real64 m_HeatOutAirVolFlow;
+        Real64 m_HeatOutAirMassFlow;
+        Real64 m_NoCoolHeatOutAirVolFlow;
+        Real64 m_NoCoolHeatOutAirMassFlow;
+        Real64 m_HeatConvTol;
+        Real64 m_CoolConvTol;
 
     public:
         // SZVAV variables
@@ -481,6 +488,8 @@ namespace UnitarySystems {
         Real64 LoadSHR;                     // Load sensible heat ratio with humidity control
         Real64 CoilSHR;                     // Load sensible heat ratio with humidity control
         int temperatureOffsetControlStatus; // water side economizer status flag, also report variable
+        int OAMixerIndex;                   // index to zone equipment OA mixer
+        bool OAMixerExists;                 // true if OA mixer is connected to inlet of UnitarySystem
 
         //    private:
         // private members not initialized in constructor
@@ -913,6 +922,10 @@ namespace UnitarySystems {
         void sizeSystem(EnergyPlusData &state, bool const FirstHVACIteration, int const AirLoopNum) override;
         int getAirInNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
         int getAirOutNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
+        int getAirOutletNode() override;
+        int getMixerOANode() override;
+        int getMixerMixNode() override;
+        int getMixerRetNode() override;
     };
 
     int getDesignSpecMSHPIndex(EnergyPlusData &state, std::string_view objectName);
@@ -954,11 +967,13 @@ struct UnitarySystemsData : BaseGlobalStruct
     int const HeatingMode = 2; // last compressor operating mode was in heating
     int const NoCoolHeat = 3;  // last operating mode was no cooling or heating
 
-    bool HeatingLoad = false;     // True when zone needs heating
-    bool CoolingLoad = false;     // True when zone needs cooling
-    Real64 MoistureLoad = 0.0;    // Dehumidification Load (W)
-    Real64 CompOnMassFlow = 0.0;  // Supply air mass flow rate w/ compressor ON [kg/s]
-    Real64 CompOffMassFlow = 0.0; // Supply air mass flow rate w/ compressor OFF [kg/s]
+    bool HeatingLoad = false;       // True when zone needs heating
+    bool CoolingLoad = false;       // True when zone needs cooling
+    Real64 MoistureLoad = 0.0;      // Dehumidification Load (W)
+    Real64 CompOnMassFlow = 0.0;    // Supply air mass flow rate w/ compressor ON [kg/s]
+    Real64 CompOffMassFlow = 0.0;   // Supply air mass flow rate w/ compressor OFF [kg/s]
+    Real64 OACompOnMassFlow = 0.0;  // OA mass flow rate w/ compressor ON [kg/s]
+    Real64 OACompOffMassFlow = 0.0; // OA mass flow rate w/ compressor OFF [kg/s]
 
     Real64 CompOnFlowRatio = 0.0;       // fan flow ratio when coil on
     Real64 CompOffFlowRatio = 0.0;      // fan flow ratio when coil off
@@ -1002,6 +1017,8 @@ struct UnitarySystemsData : BaseGlobalStruct
         CompOffMassFlow = 0.0;
         CompOnFlowRatio = 0.0;
         CompOffFlowRatio = 0.0;
+        OACompOnMassFlow = 0.0;
+        OACompOffMassFlow = 0.0;
         FanSpeedRatio = 0.0;
         CoolHeatPLRRat = 1.0;
         OnOffAirFlowRatioSave = 0.0;
