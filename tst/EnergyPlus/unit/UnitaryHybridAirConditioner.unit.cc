@@ -176,7 +176,6 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 
     SizingManager::GetOARequirements(*state);
     GetOAControllerInputs(*state);
-    using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
     // Setup performance tables
     using namespace EnergyPlus::DataEnvironment;
@@ -421,7 +420,6 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     CreateEnergyReportStructure(*state);
 
     SizingManager::GetOARequirements(*state);
-    using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
     // Setup performance tables
     using namespace EnergyPlus::DataEnvironment;
@@ -1476,7 +1474,6 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_RuntimeFraction_Initi
 
     SizingManager::GetOARequirements(*state);
     GetOAControllerInputs(*state);
-    using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
     // Setup performance tables
     using namespace EnergyPlus::DataEnvironment;

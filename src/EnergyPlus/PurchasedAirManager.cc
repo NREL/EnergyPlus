@@ -2954,8 +2954,6 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         M. Witte (GARD)
     //       DATE WRITTEN   Jun 2011 (taken from HVACSingleDuctSystem.cc and adapted for Ideal Loads System)
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates the amount of outside air required based on optional user input.
@@ -2963,9 +2961,6 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
 
     // METHODOLOGY EMPLOYED:
     // User input defines method used to calculate OA.
-
-    // Using/Aliasing
-    using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
     // FUNCTION PARAMETER DEFINITIONS:
     bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
@@ -2983,8 +2978,8 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
         } else {
             UseOccSchFlag = false;
         }
-        OAVolumeFlowRate =
-            CalcDesignSpecificationOutdoorAir(state, PurchAir(PurchAirNum).OARequirementsPtr, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
+        OAVolumeFlowRate = state.dataSize->OARequirements[PurchAir(PurchAirNum).OARequirementsPtr].calcOAFlowRate(
+            state, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
         OAMassFlowRate = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
         // If DCV with CO2SetPoint then check required OA flow to meet CO2 setpoint

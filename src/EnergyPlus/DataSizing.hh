@@ -959,7 +959,7 @@ namespace DataSizing {
         // Holds complete data for a single DesignSpecification:OutdoorAir object or
         // a list of indexes from a DesignSpecification:OutdoorAir:SpaceList object
         std::string Name;                     // Name of DesignSpecification:OutdoorAir or DesignSpecification:OutdoorAir:SpaceList object
-        int numDSOA = 1;                      // Number of DesignSpecification:OutdoorAir objects for this instance
+        int numDSOA = 0;                      // Number of DesignSpecification:OutdoorAir objects for this instance
         EPVector<int> dsoaIndexes;            // Indexes to DesignSpecification:OutdoorAir objects (if this is a DSOA:SpaceList object)
         EPVector<std::string> dsoaSpaceNames; // Names of spaces if this is a (if this is a DSOA:SpaceList object)
         EPVector<int> dsoaSpaceIndexes;       // Indexes to Spaces (if this is a DSOA:SpaceList object)
@@ -976,9 +976,10 @@ namespace DataSizing {
                                                    // SOAM_ProportionalControlSchOcc
         int CO2GainErrorCount = 0;                 // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
         int CO2GainErrorIndex = 0; // Index for recurring error message when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
+        bool myEnvrnFlag = true;
 
+    public:
         Real64 calcOAFlowRate(EnergyPlusData &state,
-                              int const DSOAPtr,                  // Pointer to DesignSpecification:OutdoorAir object
                               int const ActualZoneNum,            // Zone index
                               bool const UseOccSchFlag,           // Zone occupancy schedule will be used instead of using total zone occupancy
                               bool const UseMinOASchFlag,         // Use min OA schedule in DesignSpecification:OutdoorAir object
@@ -992,6 +993,17 @@ namespace DataSizing {
 
         Real64 desFlowPerZonePerson(EnergyPlusData &state,
                                     int const actualZoneNum // Zone index
+        );
+
+    private:
+        Real64 calcDesignSpecificationOutdoorAir(
+            EnergyPlusData &state,
+            int ActualZoneNum,                        // Zone index
+            bool UseOccSchFlag,                       // Zone occupancy schedule will be used instead of using total zone occupancy
+            bool UseMinOASchFlag,                     // Use min OA schedule in DesignSpecification:OutdoorAir object
+            Optional_bool_const PerPersonNotSet = _,  // when calculation should not include occupants (e.g., dual duct)
+            Optional_bool_const MaxOAVolFlowFlag = _, // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
+            Optional_int_const spaceNum = _           // Space index (if applicable)
         );
     };
 

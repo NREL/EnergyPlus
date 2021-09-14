@@ -371,12 +371,12 @@ void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     bool UseOccSchFlag = true;
     bool UseMinOASchFlag = true;
 
-    using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
-    DesignMinVR = CalcDesignSpecificationOutdoorAir(state,
-                                                    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
-                                                    ZoneNum,
-                                                    UseOccSchFlag,
-                                                    UseMinOASchFlag); //[m3/s]
+    DesignMinVR =
+        state.dataSize->OARequirements[state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr].calcOAFlowRate(
+            state,
+            ZoneNum,
+            UseOccSchFlag,
+            UseMinOASchFlag); //[m3/s]
     Real64 DesignMinVRMassFlow = 0;
     if (state.dataEnvrn->StdRhoAir > 1) {
         DesignMinVRMassFlow = DesignMinVR * state.dataEnvrn->StdRhoAir;

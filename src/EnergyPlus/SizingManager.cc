@@ -1041,12 +1041,9 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                             bool UseOccSchFlag = false;
                             bool UseMinOASchFlag = false;
                             Real64 designOAductFlow(0.0);
-                            designOAductFlow = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
-                                state,
-                                state.dataDualDuct->dd_airterminal(dualDuctATUNum).OARequirementsPtr,
-                                state.dataDualDuct->dd_airterminal(dualDuctATUNum).ActualZoneNum,
-                                UseOccSchFlag,
-                                UseMinOASchFlag);
+                            designOAductFlow =
+                                state.dataSize->OARequirements[state.dataDualDuct->dd_airterminal(dualDuctATUNum).OARequirementsPtr].calcOAFlowRate(
+                                    state, state.dataDualDuct->dd_airterminal(dualDuctATUNum).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
                             airLoopHeatingMinimumFlowRateSum += designOAductFlow;
                             // is this a dual duct is dual path for Std 62.1 ?? not sure, assume not because Vpz = Vdz
                             // anyDualPathAirTerminals = true;
@@ -2335,7 +2332,8 @@ void GetOARequirements(EnergyPlusData &state)
     lNumericBlanks.dimension(NumNumbers, true);
 
     if (state.dataSize->NumOARequirements > 0) {
-        state.dataSize->OARequirements.allocate(state.dataSize->NumOARequirements);
+        // OARequirements are special - the [zero]th element returns zero airflow (DSOAPointer = 0 is used heavily to mean no DSOA)
+        state.dataSize->OARequirements.allocate(state.dataSize->NumOARequirements + 1);
 
         // Start Loading the System Input
         for (int OAIndex = 1; OAIndex <= numOARequirements; ++OAIndex) {
@@ -2354,7 +2352,8 @@ void GetOARequirements(EnergyPlusData &state)
                                                                      cNumericFields);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
-            state.dataSize->OARequirements(OAIndex).Name = Alphas(1);
+            state.dataSize->OARequirements[OAIndex].Name = Alphas(1);
+            state.dataSize->OARequirements[OAIndex].numDSOA = 1;
 
             ProcessInputOARequirements(state,
                                        CurrentModuleObject,
@@ -2388,7 +2387,7 @@ void GetOARequirements(EnergyPlusData &state)
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 ++oaIndex;
                 auto const &objectFields = instance.value();
-                auto &thisOAReq = state.dataSize->OARequirements(oaIndex);
+                auto &thisOAReq = state.dataSize->OARequirements[oaIndex];
                 ip->markObjectAsUsed(cCurrentModuleObject2, instance.key());
                 std::string thisOAReqName = UtilityRoutines::MakeUPPERCase(instance.key());
 
@@ -2484,28 +2483,28 @@ void ProcessInputOARequirements(EnergyPlusData &state,
 
     if (NumAlphas > 1) {
         if (UtilityRoutines::SameString(Alphas(2), "Flow/Person")) {
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlowPPer;
+            state.dataSize->OARequirements[OAIndex].OAFlowMethod = OAFlowPPer;
         } else if (UtilityRoutines::SameString(Alphas(2), "Flow/Zone")) {
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlow;
+            state.dataSize->OARequirements[OAIndex].OAFlowMethod = OAFlow;
         } else if (UtilityRoutines::SameString(Alphas(2), "Flow/Area")) {
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlowPerArea;
+            state.dataSize->OARequirements[OAIndex].OAFlowMethod = OAFlowPerArea;
         } else if (UtilityRoutines::SameString(Alphas(2), "AirChanges/Hour")) {
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlowACH;
+            state.dataSize->OARequirements[OAIndex].OAFlowMethod = OAFlowACH;
         } else if (UtilityRoutines::SameString(Alphas(2), "Sum")) {
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlowSum;
+            state.dataSize->OARequirements[OAIndex].OAFlowMethod = OAFlowSum;
         } else if (UtilityRoutines::SameString(Alphas(2), "Maximum")) {
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlowMax;
+            state.dataSize->OARequirements[OAIndex].OAFlowMethod = OAFlowMax;
         } else if (UtilityRoutines::SameString(Alphas(2),
                                                "INDOORAIRQUALITYPROCEDURE")) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = ZOAM_IAQP;
+            state.dataSize->OARequirements[OAIndex].OAFlowMethod = ZOAM_IAQP;
         } else if (UtilityRoutines::SameString(
                        Alphas(2), "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE")) { // Proportional Control based on ASHRAE Standard 62.1-2004
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = ZOAM_ProportionalControlSchOcc;
+            state.dataSize->OARequirements[OAIndex].OAFlowMethod = ZOAM_ProportionalControlSchOcc;
         } else if (UtilityRoutines::SameString(
                        Alphas(2), "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY")) { // Proportional Control based on ASHRAE Standard 62.1-2004
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod = ZOAM_ProportionalControlDesOcc;
+            state.dataSize->OARequirements[OAIndex].OAFlowMethod = ZOAM_ProportionalControlDesOcc;
         } else {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements[OAIndex].Name + "\",");
             ShowContinueError(state, "...Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\",");
             ShowContinueError(state,
                               "...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, IndoorAirQualityProcedure, "
@@ -2514,69 +2513,69 @@ void ProcessInputOARequirements(EnergyPlusData &state,
         }
     } else {
         // default value for Outdoor Air Method
-        state.dataSize->OARequirements(OAIndex).OAFlowMethod = OAFlowPPer;
+        state.dataSize->OARequirements[OAIndex].OAFlowMethod = OAFlowPPer;
     }
     if (NumNumbers > 0) {
-        state.dataSize->OARequirements(OAIndex).OAFlowPerPerson = Numbers(1);
+        state.dataSize->OARequirements[OAIndex].OAFlowPerPerson = Numbers(1);
     } else {
         // default value for Outdoor Air Flow per Person when per person flow is counted
-        state.dataSize->OARequirements(OAIndex).OAFlowPerPerson = 0.00944;
+        state.dataSize->OARequirements[OAIndex].OAFlowPerPerson = 0.00944;
     }
     // if one of the methods that should not use the flow per person field is chosen then zero out the flow per person to avoid it
     // being counted later #4378
-    if (state.dataSize->OARequirements(OAIndex).OAFlowMethod != OAFlowPPer && state.dataSize->OARequirements(OAIndex).OAFlowMethod != OAFlowSum &&
-        state.dataSize->OARequirements(OAIndex).OAFlowMethod != OAFlowMax &&
-        state.dataSize->OARequirements(OAIndex).OAFlowMethod != ZOAM_ProportionalControlSchOcc &&
-        state.dataSize->OARequirements(OAIndex).OAFlowMethod != ZOAM_ProportionalControlDesOcc &&
-        state.dataSize->OARequirements(OAIndex).OAFlowMethod != ZOAM_IAQP) {
-        state.dataSize->OARequirements(OAIndex).OAFlowPerPerson = 0.0;
+    if (state.dataSize->OARequirements[OAIndex].OAFlowMethod != OAFlowPPer && state.dataSize->OARequirements[OAIndex].OAFlowMethod != OAFlowSum &&
+        state.dataSize->OARequirements[OAIndex].OAFlowMethod != OAFlowMax &&
+        state.dataSize->OARequirements[OAIndex].OAFlowMethod != ZOAM_ProportionalControlSchOcc &&
+        state.dataSize->OARequirements[OAIndex].OAFlowMethod != ZOAM_ProportionalControlDesOcc &&
+        state.dataSize->OARequirements[OAIndex].OAFlowMethod != ZOAM_IAQP) {
+        state.dataSize->OARequirements[OAIndex].OAFlowPerPerson = 0.0;
     }
     // remaining fields default to 0
     if (NumNumbers > 1) {
-        if (state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowPerArea ||
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowSum || state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowMax) {
-            state.dataSize->OARequirements(OAIndex).OAFlowPerArea = Numbers(2);
-        } else if (state.dataSize->OARequirements(OAIndex).OAFlowMethod == ZOAM_ProportionalControlSchOcc ||
-                   state.dataSize->OARequirements(OAIndex).OAFlowMethod == ZOAM_ProportionalControlDesOcc ||
-                   state.dataSize->OARequirements(OAIndex).OAFlowMethod == ZOAM_IAQP) {
-            state.dataSize->OARequirements(OAIndex).OAFlowPerArea = Numbers(2);
+        if (state.dataSize->OARequirements[OAIndex].OAFlowMethod == OAFlowPerArea ||
+            state.dataSize->OARequirements[OAIndex].OAFlowMethod == OAFlowSum || state.dataSize->OARequirements[OAIndex].OAFlowMethod == OAFlowMax) {
+            state.dataSize->OARequirements[OAIndex].OAFlowPerArea = Numbers(2);
+        } else if (state.dataSize->OARequirements[OAIndex].OAFlowMethod == ZOAM_ProportionalControlSchOcc ||
+                   state.dataSize->OARequirements[OAIndex].OAFlowMethod == ZOAM_ProportionalControlDesOcc ||
+                   state.dataSize->OARequirements[OAIndex].OAFlowMethod == ZOAM_IAQP) {
+            state.dataSize->OARequirements[OAIndex].OAFlowPerArea = Numbers(2);
         } else {
-            state.dataSize->OARequirements(OAIndex).OAFlowPerArea = 0.0;
+            state.dataSize->OARequirements[OAIndex].OAFlowPerArea = 0.0;
         }
     }
     if (NumNumbers > 2) {
-        if (state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlow || state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowSum ||
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowMax || state.dataSize->OARequirements(OAIndex).OAFlowMethod == ZOAM_IAQP) {
-            state.dataSize->OARequirements(OAIndex).OAFlowPerZone = Numbers(3);
+        if (state.dataSize->OARequirements[OAIndex].OAFlowMethod == OAFlow || state.dataSize->OARequirements[OAIndex].OAFlowMethod == OAFlowSum ||
+            state.dataSize->OARequirements[OAIndex].OAFlowMethod == OAFlowMax || state.dataSize->OARequirements[OAIndex].OAFlowMethod == ZOAM_IAQP) {
+            state.dataSize->OARequirements[OAIndex].OAFlowPerZone = Numbers(3);
         } else {
-            state.dataSize->OARequirements(OAIndex).OAFlowPerZone = 0.0;
+            state.dataSize->OARequirements[OAIndex].OAFlowPerZone = 0.0;
         }
     }
 
     if (NumNumbers > 3) {
-        if (state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowACH || state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowSum ||
-            state.dataSize->OARequirements(OAIndex).OAFlowMethod == OAFlowMax || state.dataSize->OARequirements(OAIndex).OAFlowMethod == ZOAM_IAQP) {
-            state.dataSize->OARequirements(OAIndex).OAFlowACH = Numbers(4);
+        if (state.dataSize->OARequirements[OAIndex].OAFlowMethod == OAFlowACH || state.dataSize->OARequirements[OAIndex].OAFlowMethod == OAFlowSum ||
+            state.dataSize->OARequirements[OAIndex].OAFlowMethod == OAFlowMax || state.dataSize->OARequirements[OAIndex].OAFlowMethod == ZOAM_IAQP) {
+            state.dataSize->OARequirements[OAIndex].OAFlowACH = Numbers(4);
         } else {
-            state.dataSize->OARequirements(OAIndex).OAFlowACH = 0.0;
+            state.dataSize->OARequirements[OAIndex].OAFlowACH = 0.0;
         }
     }
 
     // Set default schedule
-    state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    state.dataSize->OARequirements[OAIndex].OAFlowFracSchPtr = DataGlobalConstants::ScheduleAlwaysOn;
     if (NumAlphas > 2) {
         if (!lAlphaBlanks(3)) {
-            state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr = GetScheduleIndex(state, Alphas(3));
-            if (state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr > 0) {
-                if (!CheckScheduleValueMinMax(state, state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr, ">=", 0.0, "<=", 1.0)) {
+            state.dataSize->OARequirements[OAIndex].OAFlowFracSchPtr = GetScheduleIndex(state, Alphas(3));
+            if (state.dataSize->OARequirements[OAIndex].OAFlowFracSchPtr > 0) {
+                if (!CheckScheduleValueMinMax(state, state.dataSize->OARequirements[OAIndex].OAFlowFracSchPtr, ">=", 0.0, "<=", 1.0)) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements[OAIndex].Name + "\",");
                     ShowContinueError(state, "Error found in " + cAlphaFields(3) + " = " + Alphas(3));
                     ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements[OAIndex].Name + "\",");
                 ShowContinueError(state, "...Not Found " + cAlphaFields(3) + "=\"" + Alphas(3) + "\".");
                 ErrorsFound = true;
             }
@@ -2585,17 +2584,17 @@ void ProcessInputOARequirements(EnergyPlusData &state,
 
     if (NumAlphas > 3) {
         if (!lAlphaBlanks(4)) {
-            state.dataSize->OARequirements(OAIndex).OAPropCtlMinRateSchPtr = GetScheduleIndex(state, Alphas(4));
-            if (state.dataSize->OARequirements(OAIndex).OAPropCtlMinRateSchPtr > 0) {
-                if (!CheckScheduleValueMinMax(state, state.dataSize->OARequirements(OAIndex).OAPropCtlMinRateSchPtr, ">=", 0.0, "<=", 1.0)) {
+            state.dataSize->OARequirements[OAIndex].OAPropCtlMinRateSchPtr = GetScheduleIndex(state, Alphas(4));
+            if (state.dataSize->OARequirements[OAIndex].OAPropCtlMinRateSchPtr > 0) {
+                if (!CheckScheduleValueMinMax(state, state.dataSize->OARequirements[OAIndex].OAPropCtlMinRateSchPtr, ">=", 0.0, "<=", 1.0)) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements[OAIndex].Name + "\",");
                     ShowContinueError(state, "Error found in " + cAlphaFields(4) + " = " + Alphas(4));
                     ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements[OAIndex].Name + "\",");
                 ShowContinueError(state, "...Not Found " + cAlphaFields(4) + "=\"" + Alphas(4) + "\".");
                 ErrorsFound = true;
             }
