@@ -1124,14 +1124,14 @@ namespace HVACHXAssistedCoolingCoil {
                 //    singleMode = false;
                 //}
 
-                Real64 CoolingSpeedNum = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex]
+                Real64 mCoolingSpeedNum = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex]
                                              .performance.normalMode.speeds.size(); // used the same for the original variable speed coil
 
                 Real64 CoilPLR = 1.0;
-                int ControlType = 2; // ControlType::Setpoint
+                int mControlType = 2; // ControlType::Setpoint
                 // if (this->m_ControlType == ControlType::Setpoint) {
-                if (ControlType == 2) {
-                        if (CoolingSpeedNum > 1) { // if (this->m_CoolingSpeedNum > 1) {
+                if (mControlType == 2) {
+                        if (mCoolingSpeedNum > 1) { // if (this->m_CoolingSpeedNum > 1) {
                         // CoilPLR = 1.0 * double(CompOn);
                         CoilPLR = 1.0 * double(CompOp);
                     } else {
@@ -1164,28 +1164,28 @@ namespace HVACHXAssistedCoolingCoil {
                     OperationMode = DataHVACGlobals::coilEnhancedMode;
                 }
 
-                Real64 CoolingSpeedRatio = 0.0; // used same setting as the original variable speed coil
-                Real64 CoolCompPartLoadRatio = double(CompOp);
+                Real64 mCoolingSpeedRatio = 0.0; // used same setting as the original variable speed coil
+                Real64 mCoolCompPartLoadRatio = double(CompOp);
 
                 // if (this->m_CoolingSpeedNum > 1) {
-                if (CoolingSpeedNum > 1) {
+                if (mCoolingSpeedNum > 1) {
                     //    if (this->m_SingleMode == 0) {
                     if (mSingleMode == 0) {
                         //        this->m_CoolCompPartLoadRatio = double(CompOn);
-                        CoolCompPartLoadRatio = double(CompOp);
+                        mCoolCompPartLoadRatio = double(CompOp);
                     } else {
                         //        this->m_CoolCompPartLoadRatio = PartLoadRatio * double(CompOn);
-                        CoolCompPartLoadRatio = PartLoadRatio * double(CompOp);
+                        mCoolCompPartLoadRatio = PartLoadRatio * double(CompOp);
                         //        // this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
                         //        this->m_CoolingSpeedRatio = 1.0;
-                        CoolingSpeedRatio = 1.0;
+                        mCoolingSpeedRatio = 1.0;
                     }
                 } else {
                     //    this->m_CoolCompPartLoadRatio = this->m_CoolingCycRatio * double(CompOn);
                     // CoolCompPartLoadRatio = CoolingCycRatio * double(CompOn);
                     //    // this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
                     //    this->m_CoolingSpeedRatio = 0.0;
-                    CoolingSpeedRatio = 0.0;
+                    mCoolingSpeedRatio = 0.0;
                 }
 
                 // state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
@@ -1195,8 +1195,8 @@ namespace HVACHXAssistedCoolingCoil {
                     state,
                     OperationMode, // partially implemented for HXAssistedCoil
                     CoilPLR, // PartLoadRatio,
-                    CoolingSpeedNum,
-                    CoolingSpeedRatio,
+                    mCoolingSpeedNum,
+                    mCoolingSpeedRatio,
                     FanOpMode,
                     singleMode); //,
                     // LoadSHR);
