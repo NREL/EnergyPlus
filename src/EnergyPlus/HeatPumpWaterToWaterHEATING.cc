@@ -187,7 +187,7 @@ void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
         }
 
         PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->LoadLoopNum, this->LoadLoopSideNum, this->SourceLoopNum, this->SourceLoopSideNum, this->WWHPPlantTypeOfNum, true);
+            state, this->LoadLoopNum, this->LoadLoopSideNum, this->SourceLoopNum, this->SourceLoopSideNum, this->WWHPPlantType, true);
         this->plantScanFlag = false;
     }
 }
@@ -241,7 +241,7 @@ void GetGshpInput(EnergyPlusData &state)
 
         state.dataHPWaterToWaterHtg->GSHP(GSHPNum).Name = AlphArray(1);
 
-        state.dataHPWaterToWaterHtg->GSHP(GSHPNum).WWHPPlantTypeOfNum = DataPlant::PlantEquipmentType::HPWaterPEHeating;
+        state.dataHPWaterToWaterHtg->GSHP(GSHPNum).WWHPPlantType = DataPlant::PlantEquipmentType::HPWaterPEHeating;
 
         state.dataHPWaterToWaterHtg->GSHP(GSHPNum).COP = NumArray(1);
         if (NumArray(1) == 0.0) {
