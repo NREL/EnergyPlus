@@ -468,15 +468,13 @@ namespace DataZoneEquipment {
                             std::string const &NodeName  // Return air node name to match (may be blank)
     );
 
-    Real64
-    CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
-                                      int DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
-                                      int ActualZoneNum,    // Zone index
-                                      bool UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
-                                      bool UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
-                                      Optional_bool_const PerPersonNotSet = _,  // when calculation should not include occupants (e.g., dual duct)
-                                      Optional_bool_const MaxOAVolFlowFlag = _, // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
-                                      Optional_int_const spaceNum = _           // Space index (if applicable)
+    Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
+                                             int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
+                                             int const ActualZoneNum,    // Zone index
+                                             bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
+                                             bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
+                                             bool const PerPersonNotSet = false, // when calculation should not include occupants (e.g., dual duct)
+                                             bool const MaxOAVolFlowFlag = false // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
     );
 
     int GetZoneEquipControlledZoneNum(EnergyPlusData &state, int const ZoneEquipTypeNum, std::string const &EquipmentName);

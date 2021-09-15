@@ -1987,7 +1987,7 @@ namespace DualDuct {
 
         if (present(MaxOAVolFlow)) {
             OAVolumeFlowRate =
-                CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, _, true);
+                CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, false, true);
             MaxOAVolFlow = OAVolumeFlowRate;
         }
     }
