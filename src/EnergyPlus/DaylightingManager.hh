@@ -708,6 +708,18 @@ struct DaylightingManagerData : BaseGlobalStruct
     bool GlareOK = false;
     bool blnCycle = false;
 
+    Array1D<Real64> DILLSW;         // Illuminance a ref point from a group of windows that can be switched together,
+    Array1D<Real64> DILLUN;         //  and from those that aren't (lux)
+    Array1D_bool previously_shaded; // array of flags to indicate that previously groups would have already shaded this window
+    Array3D<Real64> WDAYIL;         // Illuminance from window at reference point (second index)
+    //   for shade open/closed (first index), the number of shade deployment groups (third index)
+    Array3D<Real64> WBACLU; // Background illuminance from window at reference point (second index)
+    //   for shade open/closed (first index), the number of shade deployment groups (third index)
+    Array2D<Real64> RDAYIL; // Illuminance from window at reference point after closing shade
+    Array2D<Real64> RBACLU; // Background illuminance from window at reference point after closing shade
+    Array1D<Real64> TVIS1;  // Visible transmittance at normal incidence of unswitched glazing
+    Array1D<Real64> TVIS2;  // Visible transmittance at normal incidence of fully-switched glazing
+
     DaylightingManagerData()
     {
         this->cos_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // cos( Phi ) table
@@ -869,6 +881,16 @@ struct DaylightingManagerData : BaseGlobalStruct
         this->tmpMult = 0.0;
         this->GlareOK = false;
         this->blnCycle = false;
+
+        this->DILLSW.clear();
+        this->DILLUN.clear();
+        this->previously_shaded.clear();
+        this->WDAYIL.clear();
+        this->WBACLU.clear();
+        this->RDAYIL.clear();
+        this->RBACLU.clear();
+        this->TVIS1.clear();
+        this->TVIS2.clear();
     }
 };
 
