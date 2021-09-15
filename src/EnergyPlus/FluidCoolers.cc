@@ -105,7 +105,7 @@ PlantComponent *FluidCoolerspecs::factory(EnergyPlusData &state, DataPlant::Plan
     }
     // Now look for this particular fluid cooler in the list
     for (auto &fc : state.dataFluidCoolers->SimpleFluidCooler) {
-        if (fc.FluidCoolerType == static_cast<DataPlant::PlantEquipmentType>(objectType) && fc.Name == objectName) {
+        if (fc.FluidCoolerType == objectType && fc.Name == objectName) {
             return &fc;
         }
     }

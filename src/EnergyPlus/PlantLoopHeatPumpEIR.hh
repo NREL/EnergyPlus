@@ -81,7 +81,7 @@ namespace EIRPlantLoopHeatPumps {
 
         // fixed configuration parameters
         std::string name;
-        DataPlant::PlantEquipmentType plantTypeOfeNum = DataPlant::PlantEquipmentType::Invalid;
+        DataPlant::PlantEquipmentType EIRHPType = DataPlant::PlantEquipmentType::Invalid;
         std::string companionCoilName;
         EIRPlantLoopHeatPump *companionHeatPumpCoil = nullptr;
         Real64 sizingFactor = 1.0;

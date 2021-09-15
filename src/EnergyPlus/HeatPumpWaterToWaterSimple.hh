@@ -67,15 +67,15 @@ namespace HeatPumpWaterToWaterSimple {
     struct GshpSpecs : public PlantComponent
     {
         // Members
-        std::string Name;                                 // user identifier
-        bool checkEquipName;                              // name check flag
-        std::string WatertoWaterHPType;                   // Type of WatertoAirHP ie. Heating or Cooling
-        DataPlant::PlantEquipmentType WWHPPlantTypeOfNum; // equipment type num
-        bool Available;                                   // need an array of logicals--load identifiers of available equipment
-        bool ON;                                          // simulate the machine at it's operating part load ratio
-        bool IsOn;                                        // flag that the heat pump is ON during current time step
-        bool MustRun;                                     // flag that the heat pump is MUST RUN during current time step
-        Real64 SourceSideDesignMassFlow;                  // Design flow rate (kg/s)
+        std::string Name;                       // user identifier
+        bool checkEquipName;                    // name check flag
+        std::string WatertoWaterHPType;         // Type of WatertoAirHP ie. Heating or Cooling
+        DataPlant::PlantEquipmentType WWHPType; // equipment type num
+        bool Available;                         // need an array of logicals--load identifiers of available equipment
+        bool ON;                                // simulate the machine at it's operating part load ratio
+        bool IsOn;                              // flag that the heat pump is ON during current time step
+        bool MustRun;                           // flag that the heat pump is MUST RUN during current time step
+        Real64 SourceSideDesignMassFlow;        // Design flow rate (kg/s)
 
         Real64 LoadSideDesignMassFlow; // Design flow rate (kg/s)
 
@@ -150,11 +150,11 @@ namespace HeatPumpWaterToWaterSimple {
 
         // Default Constructor
         GshpSpecs()
-            : checkEquipName(true), WWHPPlantTypeOfNum(DataPlant::PlantEquipmentType::Invalid), Available(false), ON(false), IsOn(false),
-              MustRun(false), SourceSideDesignMassFlow(0.0), LoadSideDesignMassFlow(0.0), RatedLoadVolFlowCool(0.0),
-              ratedLoadVolFlowCoolWasAutoSized(false), RatedSourceVolFlowCool(0.0), ratedSourceVolFlowCoolWasAutoSized(false), RatedCapCool(0.0),
-              ratedCapCoolWasAutoSized(false), RatedPowerCool(0.0), ratedPowerCoolWasAutoSized(false), CoolCapCurveIndex(0), CoolPowCurveIndex(0),
-              CoolCapNegativeCounter(0), CoolCapNegativeIndex(0), CoolPowerNegativeCounter(0), CoolPowerNegativeIndex(0), RatedLoadVolFlowHeat(0.0),
+            : checkEquipName(true), WWHPType(DataPlant::PlantEquipmentType::Invalid), Available(false), ON(false), IsOn(false), MustRun(false),
+              SourceSideDesignMassFlow(0.0), LoadSideDesignMassFlow(0.0), RatedLoadVolFlowCool(0.0), ratedLoadVolFlowCoolWasAutoSized(false),
+              RatedSourceVolFlowCool(0.0), ratedSourceVolFlowCoolWasAutoSized(false), RatedCapCool(0.0), ratedCapCoolWasAutoSized(false),
+              RatedPowerCool(0.0), ratedPowerCoolWasAutoSized(false), CoolCapCurveIndex(0), CoolPowCurveIndex(0), CoolCapNegativeCounter(0),
+              CoolCapNegativeIndex(0), CoolPowerNegativeCounter(0), CoolPowerNegativeIndex(0), RatedLoadVolFlowHeat(0.0),
               ratedLoadVolFlowHeatWasAutoSized(false), RatedSourceVolFlowHeat(0.0), ratedSourceVolFlowHeatWasAutoSized(false), RatedCapHeat(0.0),
               ratedCapHeatWasAutoSized(false), RatedPowerHeat(0.0), ratedPowerHeatWasAutoSized(false), HeatCapCurveIndex(0), HeatPowCurveIndex(0),
               LoadSideInletNodeNum(0), LoadSideOutletNodeNum(0), SourceSideInletNodeNum(0), SourceSideOutletNodeNum(0), HeatCapNegativeCounter(0),
@@ -185,8 +185,8 @@ namespace HeatPumpWaterToWaterSimple {
         void getSizingFactor(Real64 &sizingFactor) override;
 
         void InitWatertoWaterHP(EnergyPlusData &state,
-                                int GSHPTypeNum,             // Type of GSHP
-                                std::string const &GSHPName, // User Specified Name of GSHP
+                                DataPlant::PlantEquipmentType GSHPTypeNum, // Type of GSHP
+                                std::string const &GSHPName,               // User Specified Name of GSHP
                                 bool FirstHVACIteration,
                                 Real64 MyLoad // Demand Load
         );

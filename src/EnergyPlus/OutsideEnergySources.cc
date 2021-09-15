@@ -95,7 +95,7 @@ PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, DataPla
     }
     // Now look for this particular pipe in the list
     for (auto &source : state.dataOutsideEnergySrcs->EnergySource) {
-        if (source.EnergyType == static_cast<DataPlant::PlantEquipmentType>(objectType) && source.Name == objectName) {
+        if (source.EnergyType == objectType && source.Name == objectName) {
             return &source;
         }
     }

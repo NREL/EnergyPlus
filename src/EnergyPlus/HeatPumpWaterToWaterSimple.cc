@@ -117,7 +117,7 @@ PlantComponent *GshpSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipm
     }
 
     for (auto &wwhp : state.dataHPWaterToWaterSimple->GSHP) {
-        if (wwhp.Name == eir_wwhp_name && wwhp.WWHPPlantTypeOfNum == static_cast<DataPlant::PlantEquipmentType>(wwhp_type)) {
+        if (wwhp.Name == eir_wwhp_name && wwhp.WWHPType == wwhp_type) {
             return &wwhp;
         }
     }
@@ -132,9 +132,9 @@ void GshpSpecs::simulate(EnergyPlusData &state,
                          Real64 &CurLoad,
                          [[maybe_unused]] bool const RunFlag)
 {
-    if (this->WWHPPlantTypeOfNum == DataPlant::PlantEquipmentType::HPWaterEFCooling) {
+    if (this->WWHPType == DataPlant::PlantEquipmentType::HPWaterEFCooling) {
         if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
-            this->InitWatertoWaterHP(state, static_cast<int>(this->WWHPPlantTypeOfNum), this->Name, FirstHVACIteration, CurLoad);
+            this->InitWatertoWaterHP(state, this->WWHPType, this->Name, FirstHVACIteration, CurLoad);
             this->CalcWatertoWaterHPCooling(state, CurLoad);
             this->UpdateGSHPRecords(state);
         } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
@@ -152,9 +152,9 @@ void GshpSpecs::simulate(EnergyPlusData &state,
         } else {
             ShowFatalError(state, "SimHPWatertoWaterSimple:: Invalid loop connection " + HPEqFitCooling + ", Requested Unit=" + this->Name);
         }
-    } else if (this->WWHPPlantTypeOfNum == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
+    } else if (this->WWHPType == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
         if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
-            this->InitWatertoWaterHP(state, static_cast<int>(this->WWHPPlantTypeOfNum), this->Name, FirstHVACIteration, CurLoad);
+            this->InitWatertoWaterHP(state, this->WWHPType, this->Name, FirstHVACIteration, CurLoad);
             this->CalcWatertoWaterHPHeating(state, CurLoad);
             this->UpdateGSHPRecords(state);
         } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
@@ -182,10 +182,10 @@ void GshpSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const Pl
     bool initFirstHVAC = true;
     Real64 initCurLoad = 0.0;
 
-    this->InitWatertoWaterHP(state, static_cast<int>(this->WWHPPlantTypeOfNum), this->Name, initFirstHVAC, initCurLoad);
-    if (this->WWHPPlantTypeOfNum == DataPlant::PlantEquipmentType::HPWaterEFCooling) {
+    this->InitWatertoWaterHP(state, this->WWHPType, this->Name, initFirstHVAC, initCurLoad);
+    if (this->WWHPType == DataPlant::PlantEquipmentType::HPWaterEFCooling) {
         this->sizeCoolingWaterToWaterHP(state);
-    } else if (this->WWHPPlantTypeOfNum == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
+    } else if (this->WWHPType == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
         this->sizeHeatingWaterToWaterHP(state);
     }
 }
@@ -193,11 +193,11 @@ void GshpSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const Pl
 void GshpSpecs::getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
 {
     if (calledFromLocation.loopNum == this->LoadLoopNum) {
-        if (this->WWHPPlantTypeOfNum == DataPlant::PlantEquipmentType::HPWaterEFCooling) {
+        if (this->WWHPType == DataPlant::PlantEquipmentType::HPWaterEFCooling) {
             MinLoad = 0.0;
             MaxLoad = this->RatedCapCool;
             OptLoad = this->RatedCapCool;
-        } else if (this->WWHPPlantTypeOfNum == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
+        } else if (this->WWHPType == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
             MinLoad = 0.0;
             MaxLoad = this->RatedCapHeat;
             OptLoad = this->RatedCapHeat;
@@ -276,7 +276,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks);
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHPWaterToWaterSimple->HeatPumpWaterUniqueNames, state.dataIPShortCut->cAlphaArgs(1), HPEqFitCoolingUC, ErrorsFound);
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).WWHPPlantTypeOfNum = DataPlant::PlantEquipmentType::HPWaterEFCooling;
+        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).WWHPType = DataPlant::PlantEquipmentType::HPWaterEFCooling;
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedLoadVolFlowCool = state.dataIPShortCut->rNumericArgs(1);
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedLoadVolFlowCool == DataSizing::AutoSize) {
@@ -448,7 +448,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks);
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHPWaterToWaterSimple->HeatPumpWaterUniqueNames, state.dataIPShortCut->cAlphaArgs(1), HPEqFitHeatingUC, ErrorsFound);
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).WWHPPlantTypeOfNum = DataPlant::PlantEquipmentType::HPWaterEFHeating;
+        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).WWHPType = DataPlant::PlantEquipmentType::HPWaterEFHeating;
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedLoadVolFlowHeat = state.dataIPShortCut->rNumericArgs(1);
         if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedLoadVolFlowHeat == DataSizing::AutoSize) {
@@ -693,8 +693,8 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
 }
 
 void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
-                                   int const GSHPTypeNum,                        // Type of GSHP
-                                   [[maybe_unused]] std::string const &GSHPName, // User Specified Name of GSHP
+                                   DataPlant::PlantEquipmentType const GSHPTypeNum, // Type of GSHP
+                                   [[maybe_unused]] std::string const &GSHPName,    // User Specified Name of GSHP
                                    [[maybe_unused]] bool const FirstHVACIteration,
                                    Real64 const MyLoad // Demand Load
 )
@@ -752,7 +752,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                this->WWHPPlantTypeOfNum,
+                                                this->WWHPType,
                                                 this->SourceLoopNum,
                                                 this->SourceLoopSideNum,
                                                 this->SourceBranchNum,
@@ -765,7 +765,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                                 _);
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                this->WWHPPlantTypeOfNum,
+                                                this->WWHPType,
                                                 this->LoadLoopNum,
                                                 this->LoadLoopSideNum,
                                                 this->LoadBranchNum,
@@ -779,7 +779,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
 
         if (!errFlag) {
             PlantUtilities::InterConnectTwoPlantLoopSides(
-                state, this->LoadLoopNum, this->LoadLoopSideNum, this->SourceLoopNum, this->SourceLoopSideNum, this->WWHPPlantTypeOfNum, true);
+                state, this->LoadLoopNum, this->LoadLoopSideNum, this->SourceLoopNum, this->SourceLoopSideNum, this->WWHPType, true);
         }
 
         if (errFlag) {
@@ -806,7 +806,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
         this->IsOn = false;
         this->MustRun = true;
 
-        if (this->WWHPPlantTypeOfNum == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
+        if (this->WWHPType == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
             rho = GetDensityGlycol(state,
                                    state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidName,
                                    DataGlobalConstants::HWInitConvTemp,
@@ -819,7 +819,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                    state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
                                    RoutineName);
             this->SourceSideDesignMassFlow = this->RatedSourceVolFlowHeat * rho;
-        } else if (this->WWHPPlantTypeOfNum == DataPlant::PlantEquipmentType::HPWaterEFCooling) {
+        } else if (this->WWHPType == DataPlant::PlantEquipmentType::HPWaterEFCooling) {
             rho = GetDensityGlycol(state,
                                    state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidName,
                                    DataGlobalConstants::CWInitConvTemp,
@@ -874,10 +874,10 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
     LoopNum = this->LoadLoopNum;
     LoopSideNum = this->LoadLoopSideNum;
 
-    if (MyLoad > 0.0 && static_cast<DataPlant::PlantEquipmentType>(GSHPTypeNum) == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
+    if (MyLoad > 0.0 && GSHPTypeNum == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
         this->MustRun = true;
         this->IsOn = true;
-    } else if (MyLoad < 0.0 && static_cast<DataPlant::PlantEquipmentType>(GSHPTypeNum) == DataPlant::PlantEquipmentType::HPWaterEFCooling) {
+    } else if (MyLoad < 0.0 && GSHPTypeNum == DataPlant::PlantEquipmentType::HPWaterEFCooling) {
         this->MustRun = true;
         this->IsOn = true;
     } else {
