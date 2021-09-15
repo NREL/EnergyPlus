@@ -1243,8 +1243,8 @@ void SetupCommonPipes(EnergyPlusData &state)
     for (CurLoopNum = 1; CurLoopNum <= state.dataPlnt->TotNumLoops; ++CurLoopNum) {
 
         // reference to easily lookup the first item once
-        auto &first_demand_component_typenum(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(DemandSide).Branch(1).Comp(1).Type);
-        auto &first_supply_component_typenum(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(SupplySide).Branch(1).Comp(1).Type);
+        auto &first_demand_component_type(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(DemandSide).Branch(1).Comp(1).Type);
+        auto &first_supply_component_type(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(SupplySide).Branch(1).Comp(1).Type);
 
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(CurLoopNum).CommonPipeType);
@@ -1275,7 +1275,7 @@ void SetupCommonPipes(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
 
-                if (first_supply_component_typenum == PlantEquipmentType::PumpVariableSpeed) {
+                if (first_supply_component_type == PlantEquipmentType::PumpVariableSpeed) {
                     // If/when the model supports variable-pumping primary, this can be removed.
                     ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
                     ShowContinueError(state, "Occurs on plant loop name = " + state.dataPlnt->PlantLoop(CurLoopNum).Name);
@@ -1315,9 +1315,9 @@ void SetupCommonPipes(EnergyPlusData &state)
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
 
                 // check type of pump on supply side inlet
-                if (first_supply_component_typenum == PlantEquipmentType::PumpConstantSpeed) {
+                if (first_supply_component_type == PlantEquipmentType::PumpConstantSpeed) {
                     PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Constant;
-                } else if (first_supply_component_typenum == PlantEquipmentType::PumpVariableSpeed) {
+                } else if (first_supply_component_type == PlantEquipmentType::PumpVariableSpeed) {
                     PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Variable;
                     // If/when the model supports variable-pumping primary, this can be removed.
                     ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
@@ -1326,9 +1326,9 @@ void SetupCommonPipes(EnergyPlusData &state)
                     ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
                 }
                 // check type of pump on demand side inlet
-                if (first_demand_component_typenum == PlantEquipmentType::PumpConstantSpeed) {
+                if (first_demand_component_type == PlantEquipmentType::PumpConstantSpeed) {
                     PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Constant;
-                } else if (first_demand_component_typenum == PlantEquipmentType::PumpVariableSpeed) {
+                } else if (first_demand_component_type == PlantEquipmentType::PumpVariableSpeed) {
                     PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Variable;
                 }
             }
