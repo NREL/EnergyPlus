@@ -719,6 +719,7 @@ struct DaylightingManagerData : BaseGlobalStruct
     Array2D<Real64> RBACLU; // Background illuminance from window at reference point after closing shade
     Array1D<Real64> TVIS1;  // Visible transmittance at normal incidence of unswitched glazing
     Array1D<Real64> TVIS2;  // Visible transmittance at normal incidence of fully-switched glazing
+    Array1D<Real64> ASETIL; // Illuminance ratio (lux)
 
     DaylightingManagerData()
     {
@@ -891,6 +892,7 @@ struct DaylightingManagerData : BaseGlobalStruct
         this->RBACLU.clear();
         this->TVIS1.clear();
         this->TVIS2.clear();
+        this->ASETIL.clear();
     }
 };
 
