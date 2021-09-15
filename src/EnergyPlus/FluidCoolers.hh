@@ -71,9 +71,8 @@ namespace FluidCoolers {
     struct FluidCoolerspecs : PlantComponent
     {
         // Members
-        std::string Name;            // User identifier
-        std::string FluidCoolerType; // Type of fluid cooler
-        DataPlant::PlantEquipmentType FluidCoolerType_enum;
+        std::string Name; // User identifier
+        DataPlant::PlantEquipmentType FluidCoolerType;
         PerfInputMethod PerformanceInputMethod_Num;
         bool Available;                               // need an array of logicals--load identifiers of available equipment
         bool ON;                                      // Simulate the machine at it's operating part load ratio
@@ -145,21 +144,21 @@ namespace FluidCoolers {
 
         // Default Constructor
         FluidCoolerspecs()
-            : FluidCoolerType_enum(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PerfInputMethod::NOMINAL_CAPACITY),
-              Available(true), ON(true), DesignWaterFlowRate(0.0), DesignWaterFlowRateWasAutoSized(false), DesWaterMassFlowRate(0.0),
-              HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false),
-              HighSpeedFluidCoolerUA(0.0), HighSpeedFluidCoolerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0),
-              LowSpeedAirFlowRateWasAutoSized(false), LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0),
-              LowSpeedFanPowerWasAutoSized(false), LowSpeedFanPowerSizingFactor(0.0), LowSpeedFluidCoolerUA(0.0),
-              LowSpeedFluidCoolerUAWasAutoSized(false), LowSpeedFluidCoolerUASizingFactor(0.0), DesignEnteringWaterTemp(0.0),
-              DesignLeavingWaterTemp(0.0), DesignEnteringAirTemp(0.0), DesignEnteringAirWetBulbTemp(0.0), FluidCoolerMassFlowRateMultiplier(0.0),
-              FluidCoolerNominalCapacity(0.0), FluidCoolerLowSpeedNomCap(0.0), FluidCoolerLowSpeedNomCapWasAutoSized(false),
-              FluidCoolerLowSpeedNomCapSizingFactor(0.0), WaterInletNodeNum(0), WaterOutletNodeNum(0), OutdoorAirInletNodeNum(0),
-              HighMassFlowErrorCount(0), HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0), OutletWaterTempErrorIndex(0),
-              SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0),
-              WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
-              oneTimeInitFlag(true), beginEnvrnInit(true), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0),
-              FanPower(0.0), FanEnergy(0.0), WaterTemp(0.0), AirTemp(0.0), AirHumRat(0.0), AirPress(0.0), AirWetBulb(0.0), indexInArray(0)
+            : FluidCoolerType(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PerfInputMethod::NOMINAL_CAPACITY), Available(true),
+              ON(true), DesignWaterFlowRate(0.0), DesignWaterFlowRateWasAutoSized(false), DesWaterMassFlowRate(0.0), HighSpeedAirFlowRate(0.0),
+              HighSpeedAirFlowRateWasAutoSized(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false), HighSpeedFluidCoolerUA(0.0),
+              HighSpeedFluidCoolerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0), LowSpeedAirFlowRateWasAutoSized(false),
+              LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0), LowSpeedFanPowerWasAutoSized(false), LowSpeedFanPowerSizingFactor(0.0),
+              LowSpeedFluidCoolerUA(0.0), LowSpeedFluidCoolerUAWasAutoSized(false), LowSpeedFluidCoolerUASizingFactor(0.0),
+              DesignEnteringWaterTemp(0.0), DesignLeavingWaterTemp(0.0), DesignEnteringAirTemp(0.0), DesignEnteringAirWetBulbTemp(0.0),
+              FluidCoolerMassFlowRateMultiplier(0.0), FluidCoolerNominalCapacity(0.0), FluidCoolerLowSpeedNomCap(0.0),
+              FluidCoolerLowSpeedNomCapWasAutoSized(false), FluidCoolerLowSpeedNomCapSizingFactor(0.0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
+              OutdoorAirInletNodeNum(0), HighMassFlowErrorCount(0), HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0),
+              OutletWaterTempErrorIndex(0), SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0),
+              WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), LoopNum(0), LoopSideNum(0),
+              BranchNum(0), CompNum(0), oneTimeInitFlag(true), beginEnvrnInit(true), InletWaterTemp(0.0), OutletWaterTemp(0.0),
+              WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), WaterTemp(0.0), AirTemp(0.0), AirHumRat(0.0), AirPress(0.0),
+              AirWetBulb(0.0), indexInArray(0)
         {
         }
 
