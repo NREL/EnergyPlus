@@ -92,7 +92,7 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
 
     state->dataHeatBal->Zone.allocate(1);
     // OARequirements is special, reserve zero slot for zero pointer
-    state->dataSize->OARequirements.allocate(2);
+    state->dataSize->OARequirements.resize(2);
     state->dataHeatBal->ZoneIntGain.allocate(1);
     state->dataHeatBal->People.allocate(1);
     state->dataScheduleMgr->Schedule.allocate(2);
@@ -137,19 +137,18 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
 
     // Test ZOAM_ProportionalControlDesOcc
     state->dataContaminantBalance->ZoneAirCO2(1) = 500.0;
-    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::ZOAM_ProportionalControlDesOcc;
+    state->dataSize->OARequirements[1].OAFlowMethod = DataSizing::ZOAM_ProportionalControlDesOcc;
     OAVolumeFlowRate = state->dataSize->OARequirements[1].calcOAFlowRate(*state, 1, false, false);
     EXPECT_NEAR(0.0315879, OAVolumeFlowRate, 0.00001);
 
     // Test ZOAM_IAQP
-    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::ZOAM_IAQP;
+    state->dataSize->OARequirements[1].OAFlowMethod = DataSizing::ZOAM_IAQP;
     state->dataContaminantBalance->ZoneSysContDemand(1).OutputRequiredToCO2SP = 0.2 * state->dataEnvrn->StdRhoAir;
     OAVolumeFlowRate = state->dataSize->OARequirements[1].calcOAFlowRate(*state, 1, false, false);
     EXPECT_NEAR(0.2, OAVolumeFlowRate, 0.00001);
 
     // Cleanup
     state->dataHeatBal->Zone.deallocate();
-    state->dataSize->OARequirements.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();
     state->dataScheduleMgr->Schedule.deallocate();
     state->dataHeatBal->People.deallocate();

@@ -1334,7 +1334,7 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
-    state->dataSize->OARequirements.allocate(1);
+    state->dataSize->OARequirements.resize(2);
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
@@ -1349,10 +1349,11 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 0.4;
     state->dataAirLoop->AirLoopControlInfo(1).AirLoopDCVFlag = true;
 
-    state->dataSize->OARequirements(1).Name = "CM DSOA WEST ZONE";
-    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
-    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.003149;
-    state->dataSize->OARequirements(1).OAFlowPerArea = 0.000407;
+    state->dataSize->OARequirements[1].Name = "CM DSOA WEST ZONE";
+    state->dataSize->OARequirements[1].numDSOA = 1;
+    state->dataSize->OARequirements[1].OAFlowMethod = DataSizing::OAFlowSum;
+    state->dataSize->OARequirements[1].OAFlowPerPerson = 0.003149;
+    state->dataSize->OARequirements[1].OAFlowPerArea = 0.000407;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataHeatBal->ZoneIntGain(1).NOFOCC = 0.1;
 
@@ -1366,7 +1367,6 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     state->dataAirLoop->AirLoopControlInfo.deallocate();
-    state->dataSize->OARequirements.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();
 }
 
@@ -2534,7 +2534,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataLoopNodes->Node.allocate(3);
-    state->dataSize->OARequirements.allocate(1);
+    state->dataSize->OARequirements.resize(2);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
@@ -2550,9 +2550,10 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
 
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
-    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
-    state->dataSize->OARequirements(1).OAFlowPerZone = 0.1;
-    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.1;
+    state->dataSize->OARequirements[1].numDSOA = 1;
+    state->dataSize->OARequirements[1].OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements[1].OAFlowPerZone = 0.1;
+    state->dataSize->OARequirements[1].OAFlowPerPerson = 0.1;
 
     state->dataLoopNodes->Node(2).Press = 101325.0;
     state->dataLoopNodes->Node(2).Temp = 23.0;
@@ -2579,7 +2580,6 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     state->dataLoopNodes->Node.deallocate();
-    state->dataSize->OARequirements.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();
 }
@@ -2597,7 +2597,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataLoopNodes->Node.allocate(3);
-    state->dataSize->OARequirements.allocate(1);
+    state->dataSize->OARequirements.resize(2);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
@@ -2616,11 +2616,12 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
 
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
-    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
-    state->dataSize->OARequirements(1).OAFlowPerZone = 0.5;
-    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.0;
-    state->dataSize->OARequirements(1).OAFlowPerArea = 0.0;
-    state->dataSize->OARequirements(1).OAFlowACH = 0.0;
+    state->dataSize->OARequirements[1].numDSOA = 1;
+    state->dataSize->OARequirements[1].OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements[1].OAFlowPerZone = 0.5;
+    state->dataSize->OARequirements[1].OAFlowPerPerson = 0.0;
+    state->dataSize->OARequirements[1].OAFlowPerArea = 0.0;
+    state->dataSize->OARequirements[1].OAFlowACH = 0.0;
 
     state->dataLoopNodes->Node(2).Press = 101325.0;
     state->dataLoopNodes->Node(2).Temp = 23.0;
@@ -2662,7 +2663,6 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     state->dataLoopNodes->Node.deallocate();
-    state->dataSize->OARequirements.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();
 }

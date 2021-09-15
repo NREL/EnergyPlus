@@ -677,7 +677,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             // A19, \ OA requirement pointer
             if (!lAlphaBlanks(19)) {
                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr =
-                    UtilityRoutines::FindItemInList(Alphas(19), state.dataSize->OARequirements);
+                    DataSizing::getOARequirementsIndex(state, Alphas(19));
                 if (state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
                     ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + " = " + Alphas(1) + " invalid data");
                     ShowContinueError(state, "Invalid-not found " + cAlphaFields(19) + "=\"" + Alphas(19) + "\".");

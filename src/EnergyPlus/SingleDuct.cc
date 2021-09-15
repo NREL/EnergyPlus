@@ -701,7 +701,7 @@ void GetSysInput(EnergyPlusData &state)
 
         if (!lAlphaBlanks(11)) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OARequirementsPtr =
-                UtilityRoutines::FindItemInList(Alphas(11), state.dataSize->OARequirements);
+                DataSizing::getOARequirementsIndex(state, Alphas(11));
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OARequirementsPtr == 0) {
                 ShowSevereError(state, cAlphaFields(11) + " = " + Alphas(11) + " not found.");
                 ShowContinueError(state,
@@ -1491,7 +1491,7 @@ void GetSysInput(EnergyPlusData &state)
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).NoOAFlowInputFromUser = true;
         } else {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OARequirementsPtr =
-                UtilityRoutines::FindItemInList(Alphas(5), state.dataSize->OARequirements);
+                DataSizing::getOARequirementsIndex(state, Alphas(5));
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OARequirementsPtr == 0) {
                 ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                 ShowContinueError(state, "..invalid " + cAlphaFields(5) + "=\"" + Alphas(5) + "\".");
@@ -1752,7 +1752,7 @@ void GetSysInput(EnergyPlusData &state)
         }
         if (!lAlphaBlanks(7)) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OARequirementsPtr =
-                UtilityRoutines::FindItemInList(Alphas(7), state.dataSize->OARequirements);
+                DataSizing::getOARequirementsIndex(state, Alphas(7));
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OARequirementsPtr == 0) {
                 ShowSevereError(state, cAlphaFields(7) + " = " + Alphas(7) + " not found.");
                 ShowContinueError(state,
@@ -4885,7 +4885,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     }
 
     // Active cooling with fix for issue #5592
-    if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad < QCoolFanOnMin - SmallLoad && this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0 &&
+    if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad<QCoolFanOnMin - SmallLoad &&this->sd_airterminalInlet.AirMassFlowRateMaxAvail> 0.0 &&
         !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
         // check that it can meet the load
         FanOp = 1;
@@ -6159,7 +6159,7 @@ void GetATMixers(EnergyPlusData &state)
             state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = true;
         } else {
             state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(8), state.dataSize->OARequirements);
+                DataSizing::getOARequirementsIndex(state, state.dataIPShortCut->cAlphaArgs(8));
             if (state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr == 0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");

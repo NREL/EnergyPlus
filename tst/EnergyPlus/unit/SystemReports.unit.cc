@@ -241,18 +241,19 @@ TEST_F(EnergyPlusFixture, ReportMaxVentilationLoads_ZoneEquip)
 
     // Set up OA requirements for one zone
     state->dataSize->NumOARequirements = 1;
-    state->dataSize->OARequirements.allocate(state->dataSize->NumOARequirements);
-    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
+    state->dataSize->OARequirements.resize(state->dataSize->NumOARequirements + 1);
+    state->dataSize->OARequirements[1].numDSOA = 1;
+    state->dataSize->OARequirements[1].OAFlowMethod = DataSizing::OAFlowSum;
     Real64 expectedVoz = 0.0;
-    state->dataSize->OARequirements(1).OAFlowPerZone = 20;
-    expectedVoz += state->dataSize->OARequirements(1).OAFlowPerZone;
-    state->dataSize->OARequirements(1).OAFlowPerArea = 0.5;
+    state->dataSize->OARequirements[1].OAFlowPerZone = 20;
+    expectedVoz += state->dataSize->OARequirements[1].OAFlowPerZone;
+    state->dataSize->OARequirements[1].OAFlowPerArea = 0.5;
     state->dataHeatBal->Zone(1).FloorArea = 1000.0;
-    expectedVoz += state->dataSize->OARequirements(1).OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
-    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.1;
+    expectedVoz += state->dataSize->OARequirements[1].OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->OARequirements[1].OAFlowPerPerson = 0.1;
     state->dataHeatBal->ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->ZoneIntGain(1).NOFOCC = 100.0;
-    expectedVoz += state->dataSize->OARequirements(1).OAFlowPerPerson * state->dataHeatBal->ZoneIntGain(1).NOFOCC;
+    expectedVoz += state->dataSize->OARequirements[1].OAFlowPerPerson * state->dataHeatBal->ZoneIntGain(1).NOFOCC;
     state->dataHeatBal->Zone(1).Multiplier = 2.0;
     state->dataHeatBal->Zone(1).ListMultiplier = 10.0;
     expectedVoz *= state->dataHeatBal->Zone(1).Multiplier;

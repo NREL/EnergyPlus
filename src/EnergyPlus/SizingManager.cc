@@ -2331,9 +2331,9 @@ void GetOARequirements(EnergyPlusData &state)
     lAlphaBlanks.dimension(NumAlphas, true);
     lNumericBlanks.dimension(NumNumbers, true);
 
+    // OARequirements are special - the [zero]th element returns zero airflow (DSOAPointer = 0 is used heavily to mean no DSOA)
+    state.dataSize->OARequirements.resize(state.dataSize->NumOARequirements + 1);
     if (state.dataSize->NumOARequirements > 0) {
-        // OARequirements are special - the [zero]th element returns zero airflow (DSOAPointer = 0 is used heavily to mean no DSOA)
-        state.dataSize->OARequirements.allocate(state.dataSize->NumOARequirements + 1);
 
         // Start Loading the System Input
         for (int OAIndex = 1; OAIndex <= numOARequirements; ++OAIndex) {
@@ -2391,7 +2391,7 @@ void GetOARequirements(EnergyPlusData &state)
                 ip->markObjectAsUsed(cCurrentModuleObject2, instance.key());
                 std::string thisOAReqName = UtilityRoutines::MakeUPPERCase(instance.key());
 
-                if (UtilityRoutines::FindItemInList(thisOAReqName, state.dataSize->OARequirements) > 0) {
+                if (UtilityRoutines::FindItemInList(thisOAReqName, state.dataSize->OARequirements, state.dataSize->OARequirements.size()) > 0) {
                     ShowSevereError(state,
                                     std::string(RoutineName) + cCurrentModuleObject2 + "=\"" + thisOAReqName +
                                         "\" is a duplicate DesignSpecification:OutdoorAir name.");
@@ -3164,8 +3164,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
 
                 // Getting zone OA parameters from Design Specification object
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-                    OAIndex = UtilityRoutines::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).DesignSpecOAObjName,
-                                                              state.dataSize->OARequirements);
+                    OAIndex = DataSizing::getOARequirementsIndex(state, state.dataSize->ZoneSizingInput(ZoneSizIndex).DesignSpecOAObjName);
                     if (OAIndex > 0) {
                         state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneDesignSpecOAIndex = OAIndex;
                     } else {

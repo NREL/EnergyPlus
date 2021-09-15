@@ -480,8 +480,7 @@ void GetPurchasedAir(EnergyPlusData &state)
 
             // get Design specification outdoor air object
             if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                PurchAir(PurchAirNum).OARequirementsPtr =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(12), state.dataSize->OARequirements);
+                PurchAir(PurchAirNum).OARequirementsPtr = DataSizing::getOARequirementsIndex(state, state.dataIPShortCut->cAlphaArgs(12));
                 if (PurchAir(PurchAirNum).OARequirementsPtr == 0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");

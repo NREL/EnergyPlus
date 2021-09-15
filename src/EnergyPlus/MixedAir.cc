@@ -1571,7 +1571,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                 //     Getting OA details from design specification OA object
                 if (!lAlphaBlanks((groupNum - 1) * 3 + 6)) {
                     state.dataMixedAir->DesignSpecOAObjName(groupNum) = AlphArray((groupNum - 1) * 3 + 6);
-                    ObjIndex = UtilityRoutines::FindItemInList(state.dataMixedAir->DesignSpecOAObjName(groupNum), state.dataSize->OARequirements);
+                    ObjIndex = DataSizing::getOARequirementsIndex(state, state.dataMixedAir->DesignSpecOAObjName(groupNum));
                     state.dataMixedAir->DesignSpecOAObjIndex(groupNum) = ObjIndex;
 
                     if (ObjIndex == 0) {
@@ -1775,7 +1775,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
             for (int ventMechZoneNum = 1; ventMechZoneNum <= MechVentZoneCount; ++ventMechZoneNum) {
                 int zoneOAReqObjIndex = thisVentilationMechanical.ZoneDesignSpecOAObjIndex(ventMechZoneNum);
                 if (zoneOAReqObjIndex > 0) {
-                    auto const &curOARequirements(state.dataSize->OARequirements(zoneOAReqObjIndex));
+                    auto const &curOARequirements(state.dataSize->OARequirements[zoneOAReqObjIndex]);
                     thisVentilationMechanical.ZoneOAAreaRate(ventMechZoneNum) = curOARequirements.OAFlowPerArea;
                     thisVentilationMechanical.ZoneOAPeopleRate(ventMechZoneNum) = curOARequirements.OAFlowPerPerson;
                     thisVentilationMechanical.ZoneOAFlowRate(ventMechZoneNum) = curOARequirements.OAFlowPerZone;
@@ -4123,7 +4123,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                 OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
                 if (OAIndex > 0) {
                     {
-                        auto const SELECT_CASE_var(state.dataSize->OARequirements(OAIndex).OAFlowMethod);
+                        auto const SELECT_CASE_var(state.dataSize->OARequirements[OAIndex].OAFlowMethod);
                         if (SELECT_CASE_var == OAFlowPPer) {
                             ZoneOABZ = ZoneOAPeople;
                         } else if (SELECT_CASE_var == OAFlow) {
@@ -4214,7 +4214,7 @@ void VentilationMechanicalProps::CalcMechVentController(
                     OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
                     if (OAIndex > 0) {
                         {
-                            auto const SELECT_CASE_var(state.dataSize->OARequirements(OAIndex).OAFlowMethod);
+                            auto const SELECT_CASE_var(state.dataSize->OARequirements[OAIndex].OAFlowMethod);
                             if (SELECT_CASE_var == OAFlowPPer) {
                                 ZoneOABZ = ZoneOAPeople;
                             } else if (SELECT_CASE_var == OAFlow) {

@@ -542,8 +542,7 @@ namespace DualDuct {
                     }
                 }
                 if (!lAlphaBlanks(6)) {
-                    state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr =
-                        UtilityRoutines::FindItemInList(AlphArray(6), state.dataSize->OARequirements);
+                    state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr = DataSizing::getOARequirementsIndex(state, AlphArray(6));
                     if (state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr == 0) {
                         ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
                         ShowContinueError(
@@ -758,8 +757,7 @@ namespace DualDuct {
                         }
                     }
                 }
-                state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr =
-                    UtilityRoutines::FindItemInList(AlphArray(6), state.dataSize->OARequirements);
+                state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr = DataSizing::getOARequirementsIndex(state, AlphArray(6));
                 if (state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr == 0) {
                     ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
                     ShowContinueError(state,
@@ -810,7 +808,7 @@ namespace DualDuct {
                 }
 
                 if (state.dataDualDuct->dd_airterminal(DDNum).OAPerPersonMode == PerPersonMode::ModeNotSet) {
-                    DummyOAFlow = state.dataSize->OARequirements(state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr).OAFlowPerPerson;
+                    DummyOAFlow = state.dataSize->OARequirements[state.dataDualDuct->dd_airterminal(DDNum).OARequirementsPtr].OAFlowPerPerson;
                     if ((DummyOAFlow == 0.0) && (lAlphaBlanks(7))) {       // no worries
                                                                            // do nothing, okay since no per person requirement involved
                     } else if ((DummyOAFlow > 0.0) && (lAlphaBlanks(7))) { // missing input
@@ -991,10 +989,10 @@ namespace DualDuct {
                 PeopleFlow = 0.0;
                 for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
                     if (state.dataHeatBal->People(Loop).ZonePtr != this->ActualZoneNum) continue;
-                    int damperOAFlowMethod = state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowMethod;
+                    int damperOAFlowMethod = state.dataSize->OARequirements[this->OARequirementsPtr].OAFlowMethod;
                     if (damperOAFlowMethod == OAFlowPPer || damperOAFlowMethod == OAFlowSum || damperOAFlowMethod == OAFlowMax) {
                         PeopleFlow +=
-                            state.dataHeatBal->People(Loop).NumberOfPeople * state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowPerPerson;
+                            state.dataHeatBal->People(Loop).NumberOfPeople * state.dataSize->OARequirements[this->OARequirementsPtr].OAFlowPerPerson;
                     }
                 }
                 this->OAPerPersonByDesignLevel = PeopleFlow;

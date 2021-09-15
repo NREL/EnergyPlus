@@ -1042,6 +1042,8 @@ namespace DataSizing {
                          Real64 &DesExitHumRat // returned design coil exit humidity ratio [kg/kg]
     );
 
+    int getOARequirementsIndex(EnergyPlusData &state, std::string_view name);
+
 } // namespace DataSizing
 
 struct SizingData : BaseGlobalStruct
@@ -1153,7 +1155,7 @@ struct SizingData : BaseGlobalStruct
     int DataFanIndex = -1;                           // Fan index used during sizing
     DataSizing::zoneFanPlacement DataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet; // identifies location of fan wrt coil
     int DataDXSpeedNum = 0;
-    EPVector<DataSizing::OARequirementsData> OARequirements;
+    std::vector<DataSizing::OARequirementsData> OARequirements;
     EPVector<DataSizing::ZoneAirDistributionData> ZoneAirDistribution;
     EPVector<DataSizing::ZoneSizingInputData> ZoneSizingInput;    // Input data for zone sizing
     Array2D<DataSizing::ZoneSizingData> ZoneSizing;               // Data for zone sizing (all data, all design)
@@ -1331,7 +1333,7 @@ struct SizingData : BaseGlobalStruct
         this->DataFanIndex = -1;
         this->DataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
         this->DataDXSpeedNum = 0;
-        this->OARequirements.deallocate();
+        this->OARequirements.clear();
         this->ZoneAirDistribution.deallocate();
         this->ZoneSizingInput.deallocate();
         this->ZoneSizing.deallocate();

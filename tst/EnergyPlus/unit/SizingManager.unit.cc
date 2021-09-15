@@ -77,7 +77,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     std::string CurrentModuleObject = "DesignSpecification:OutdoorAir";
     int NumOARequirements = 6;
-    state->dataSize->OARequirements.allocate(NumOARequirements);
+    state->dataSize->OARequirements.resize(NumOARequirements + 1);
 
     Array1D_string Alphas;         // Alpha input items for object
     Array1D_string cAlphaFields;   // Alpha field names
@@ -118,11 +118,11 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowPerArea, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowPerArea, state->dataSize->OARequirements[OAIndex].OAFlowMethod);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements[OAIndex].OAFlowPerPerson);
+    EXPECT_EQ(0.2, state->dataSize->OARequirements[OAIndex].OAFlowPerArea);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements[OAIndex].OAFlowPerZone);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements[OAIndex].OAFlowACH);
 
     // Flow/Person
     OAIndex = 2;
@@ -149,11 +149,11 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowPPer, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowPPer, state->dataSize->OARequirements[OAIndex].OAFlowMethod);
+    EXPECT_EQ(0.1, state->dataSize->OARequirements[OAIndex].OAFlowPerPerson);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements[OAIndex].OAFlowPerArea);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements[OAIndex].OAFlowPerZone);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements[OAIndex].OAFlowACH);
 
     // Flow/Zone
     OAIndex = 3;
@@ -180,11 +180,11 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlow, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlow, state->dataSize->OARequirements[OAIndex].OAFlowMethod);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements[OAIndex].OAFlowPerPerson);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements[OAIndex].OAFlowPerArea);
+    EXPECT_EQ(0.3, state->dataSize->OARequirements[OAIndex].OAFlowPerZone);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements[OAIndex].OAFlowACH);
 
     // Flow/Zone
     OAIndex = 4;
@@ -211,11 +211,11 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowACH, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.4, state->dataSize->OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowACH, state->dataSize->OARequirements[OAIndex].OAFlowMethod);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements[OAIndex].OAFlowPerPerson);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements[OAIndex].OAFlowPerArea);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements[OAIndex].OAFlowPerZone);
+    EXPECT_EQ(0.4, state->dataSize->OARequirements[OAIndex].OAFlowACH);
 
     // Sum
     OAIndex = 5;
@@ -242,11 +242,11 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowSum, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.4, state->dataSize->OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowSum, state->dataSize->OARequirements[OAIndex].OAFlowMethod);
+    EXPECT_EQ(0.1, state->dataSize->OARequirements[OAIndex].OAFlowPerPerson);
+    EXPECT_EQ(0.2, state->dataSize->OARequirements[OAIndex].OAFlowPerArea);
+    EXPECT_EQ(0.3, state->dataSize->OARequirements[OAIndex].OAFlowPerZone);
+    EXPECT_EQ(0.4, state->dataSize->OARequirements[OAIndex].OAFlowACH);
 
     // Maximum
     OAIndex = 6;
@@ -273,14 +273,13 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowMax, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.4, state->dataSize->OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowMax, state->dataSize->OARequirements[OAIndex].OAFlowMethod);
+    EXPECT_EQ(0.1, state->dataSize->OARequirements[OAIndex].OAFlowPerPerson);
+    EXPECT_EQ(0.2, state->dataSize->OARequirements[OAIndex].OAFlowPerArea);
+    EXPECT_EQ(0.3, state->dataSize->OARequirements[OAIndex].OAFlowPerZone);
+    EXPECT_EQ(0.4, state->dataSize->OARequirements[OAIndex].OAFlowACH);
 
     // Clean up
-    state->dataSize->OARequirements.deallocate();
     Alphas.deallocate();
     cAlphaFields.deallocate();
     cNumericFields.deallocate();
