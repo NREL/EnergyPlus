@@ -10455,7 +10455,7 @@ void CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum)
                 }
             }
         }
-        maxShadeDeployOrderExtWinsSize = max(maxShadeDeployOrderExtWinsSize, thisDaylightCtrl.ShadeDeployOrderExtWins.size());
+        maxShadeDeployOrderExtWinsSize = max(maxShadeDeployOrderExtWinsSize, int(thisDaylightCtrl.ShadeDeployOrderExtWins.size()));
     }
     state.dataDaylightingManager->DILLSW.allocate(maxShadeDeployOrderExtWinsSize);
     state.dataDaylightingManager->DILLUN.allocate(maxShadeDeployOrderExtWinsSize);
