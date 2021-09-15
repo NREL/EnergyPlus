@@ -90,7 +90,6 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
 // Simulate a generic plant heat exchanger with a variety of control options
 
 std::string const ComponentClassName("HeatExchanger:FluidToFluid");
-std::string const ComponentSteamClassName("HeatExchanger:SteamToWater");
 
 PlantComponent *HeatExchangerStruct::factory(EnergyPlusData &state, std::string const &objectName)
 {
@@ -2248,8 +2247,7 @@ void HeatExchangerStruct::controlSteamToWaterHX(EnergyPlusData &state, [[maybe_u
             }
         } else if (this->ControlMode == iCtrlType::TemperatureSetpointControl) {
             Real64 SetPointTemp = state.dataLoopNodes->Node(this->SetPointNodeNum).TempSetPoint;
-            Real64 DeltaTHeating = this->DemandSideLoop.InletTemp - this->SupplySideLoop.InletTemp;
-            if ((DeltaTHeating > this->TempControlTol) && (SetPointTemp > this->SupplySideLoop.InletTemp)) {
+            if (SetPointTemp > this->SupplySideLoop.InletTemp) {
                 mdotWaterSide = this->SupplySideLoop.MassFlowRateMax;
                 PlantUtilities::SetComponentFlowRate(state,
                                                      mdotWaterSide,
@@ -2753,8 +2751,6 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
                 HeatingLoad = QHXCap;
 
                 this->DemandSideLoop.OutletEnthalpy = this->DemandSideLoop.InletEnthalpy;
-                state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).MassFlowRate = SteamMassFlowRate;
-                state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).MassFlowRate = SteamMassFlowRate;
 
             } else if (QHXCap > QmaxHT) {
                 // Setting to Maximum Capacity
@@ -2790,8 +2786,6 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
 
                 // The HeatingLoad is the change in the enthalpy of the condensate at the outlet
                 // this->DemandSideLoop.OutletEnthalpy = this->DemandSideLoop.InletEnthalpy - HeatingLoad / SteamMassFlowRate;
-                state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).MassFlowRate = SteamMassFlowRate;
-                state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).MassFlowRate = SteamMassFlowRate;
             } else {
                 WaterOutletTemp = WaterInletTemp + QHXCap / (WaterMassFlowRate * CpWaterInlet);
 
@@ -2894,6 +2888,8 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
         }
     }
 
+ //   this->DemandSideLoop.InletMassFlowRate = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).MassFlowRate;
+ //   this->SupplySideLoop.InletMassFlowRate = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate;
     this->SupplySideLoop.InletTemp = WaterInletTemp;
     this->DemandSideLoop.InletTemp = SteamInletTemp;
 

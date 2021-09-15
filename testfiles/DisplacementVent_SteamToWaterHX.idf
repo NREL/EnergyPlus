@@ -742,14 +742,8 @@
     AirSysAvailSched,        !- Name
     AnyNumber,               !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay WinterDesignDay CustomDay1 CustomDay2, !- Field 2
-    Until: 6:00,0.00,        !- Field 3
-    Until: 21:00,1.00,       !- Field 5
-    Until: 24:00,0.00,       !- Field 7
-    For: Weekends Holidays,  !- Field 9
-    Until: 6:00,0.00,        !- Field 10
-    Until: 21:00,1.00,       !- Field 12
-    Until: 24:00,0.00;       !- Field 14
+    For: Alldays,            !- Field 2
+    Until: 24:00,1.00;       !- Field 3
 
   Schedule:Compact,
     ActSchd,                 !- Name
@@ -842,18 +836,8 @@
     HEAT1,                   !- Name
     AnyNumber,               !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdays CustomDay1 CustomDay2, !- Field 2
-    Until: 6:00,12.80,       !- Field 3
-    Until: 21:00,21.10,      !- Field 5
-    Until: 24:00,12.80,      !- Field 7
-    For: Weekends Holidays,  !- Field 9
-    Until: 6:00,12.80,       !- Field 10
-    Until: 13:00,21.10,      !- Field 12
-    Until: 24:00,12.80,      !- Field 14
-    For: SummerDesignDay,    !- Field 16
-    Until: 24:00,12.80,      !- Field 17
-    For: WinterDesignDay,    !- Field 19
-    Until: 24:00,21.10;      !- Field 20
+    For: Alldays,            !- Field 2
+    Until: 24:00,21.10;      !- Field 3
 
   Schedule:Compact,
     HW Loop Temp Schedule,   !- Name
@@ -2480,7 +2464,7 @@
     autosize,                                 !- Water Side Design Flow Rate
     5,                                    !- Degree of SubCooling
     15,                                   !- Degree of Loop SubCooling
-    LoadControl,                          !- Coil Control Type
+    TemperatureSetpointControl,                  !- Coil Control Type
     HW Supply Outlet Node,                !- Heat Exchanger Setpoint Node Name
     1;                                    !- Sizing Factor
 
@@ -2491,11 +2475,25 @@
 
   Output:Variable,*,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
+  Output:Variable,HOT WATER LOOP,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,Plant Supply Side Unmet Demand Rate,timestep;
-  
-  Output:Variable,*,Plant Supply Side Inlet Mass Flow Rate,timestep;
+  Output:Variable,HOT WATER LOOP,Plant Supply Side Unmet Demand Rate,timestep;
+
+  Output:Variable,HOT WATER LOOP,Plant Supply Side Inlet Mass Flow Rate,timestep;
+
+  Output:Variable,HOT WATER LOOP,Plant Supply Side Inlet Temperature,timestep;
+
+  Output:Variable,HOT WATER LOOP,Plant Supply Side Outlet Temperature,timestep;
+
+  Output:Variable,STEAM LOOP,Plant Supply Side Heating Demand Rate,timestep;
+
+  Output:Variable,STEAM LOOP,Plant Supply Side Unmet Demand Rate,timestep;
+
+  Output:Variable,STEAM LOOP,Plant Supply Side Inlet Mass Flow Rate,timestep;
+
+  Output:Variable,STEAM LOOP,Plant Supply Side Inlet Temperature,timestep;
+
+  Output:Variable,STEAM LOOP,Plant Supply Side Outlet Temperature,timestep;
   
   !Output:Variable,*,Surface Inside Face Temperature,timestep;
 
