@@ -1352,24 +1352,6 @@ bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, in
     return exhaustNodeError;
 }
 
-Real64 CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
-                                         int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
-                                         int const ActualZoneNum,    // Zone index
-                                         bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
-                                         bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
-                                         bool const PerPersonNotSet, // when calculation should not include occupants (e.g., dual duct)
-                                         bool const MaxOAVolFlowFlag // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
-)
-{
-    Real64 OAVolumeFlowRate = 0.0;
-    if (DSOAPtr == 0) return OAVolumeFlowRate;
-
-    OAVolumeFlowRate = state.dataSize->OARequirements(DSOAPtr).calcDesignSpecificationOutdoorAir(
-        state, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet, MaxOAVolFlowFlag);
-
-    return OAVolumeFlowRate;
-}
-
 void EquipList::getPrioritiesForInletNode(EnergyPlusData &state,
                                           int const inletNodeNum, // Zone inlet node number to match
                                           int &coolingPriority,   // Cooling priority num for matching equipment

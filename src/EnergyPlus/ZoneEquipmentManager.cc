@@ -1397,7 +1397,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex = DSOAPtr; // store for later use
         state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex =
             state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex; // store for later use
-        OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state, DSOAPtr, ZoneIndex, UseOccSchFlag, UseMinOASchFlag);
+        OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state, DSOAPtr, ZoneIndex, UseOccSchFlag, UseMinOASchFlag);
 
         // Zone(ZoneIndex)%Multiplier and Zone(ZoneIndex)%ListMultiplier applied in CalcDesignSpecificationOutdoorAir
         state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA = OAVolumeFlowRate;

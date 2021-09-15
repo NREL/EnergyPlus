@@ -503,24 +503,28 @@ Real64 ZoneAirDistributionData::calculateEz(EnergyPlusData &state, int const Zon
     return zoneEz;
 }
 
-Real64 OARequirementsData::calcDesignSpecificationOutdoorAir(
-    EnergyPlusData &state,
-    int const ActualZoneNum,    // Zone index
-    bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
-    bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
-    bool const PerPersonNotSet, // when calculation should not include occupants (e.g., dual duct)
-    bool const MaxOAVolFlowFlag // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
+Real64 calcDesignSpecificationOutdoorAir(EnergyPlusData &state,
+                                         int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
+                                         int const ActualZoneNum,    // Zone index
+                                         bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
+                                         bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
+                                         bool const PerPersonNotSet, // when calculation should not include occupants (e.g., dual duct)
+                                         bool const MaxOAVolFlowFlag // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
 )
 {
     Real64 totOAFlowRate = 0.0;
-    if (this->numDSOA == 1) {
-        return this->calcOAFlowRate(state, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet, MaxOAVolFlowFlag);
+    if (DSOAPtr == 0) return totOAFlowRate;
+
+    auto &thisDSOA = state.dataSize->OARequirements(DSOAPtr);
+
+    if (thisDSOA.numDSOA == 1) {
+        return thisDSOA.calcOAFlowRate(state, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet, MaxOAVolFlowFlag);
     } else {
-        for (int dsoaCount = 1; dsoaCount <= this->numDSOA; ++dsoaCount) {
+        for (int dsoaCount = 1; dsoaCount <= thisDSOA.numDSOA; ++dsoaCount) {
             totOAFlowRate +=
-                state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount))
+                state.dataSize->OARequirements(thisDSOA.dsoaIndexes(dsoaCount))
                     .calcOAFlowRate(
-                        state, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet, MaxOAVolFlowFlag, this->dsoaSpaceIndexes(dsoaCount));
+                        state, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet, MaxOAVolFlowFlag, thisDSOA.dsoaSpaceIndexes(dsoaCount));
         }
         return totOAFlowRate;
     }

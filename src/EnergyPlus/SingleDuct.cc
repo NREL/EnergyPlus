@@ -2713,7 +2713,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
                 if (this->OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel) UseOccSchFlag = true;
                 if (airLoopOAFrac > 0.0) {
                     Real64 vDotOAReq =
-                        DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->CtrlZoneNum, UseOccSchFlag, true);
+                        DataSizing::calcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->CtrlZoneNum, UseOccSchFlag, true);
                     mDotFromOARequirement = vDotOAReq * state.dataEnvrn->StdRhoAir / airLoopOAFrac;
                     mDotFromOARequirement = min(mDotFromOARequirement, this->AirMassFlowRateMax);
                 } else {
@@ -4328,7 +4328,6 @@ void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
     // REFERENCES:
 
     // Using/Aliasing
-    using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     // Locals
@@ -4362,7 +4361,7 @@ void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
         if (this->NoOAFlowInputFromUser) return;
         // Calculate outdoor air flow rate, zone multipliers are applied in GetInput
         if (AirLoopOAFrac > 0.0) {
-            OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state,
+            OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state,
                                                                  this->OARequirementsPtr,
                                                                  this->ActualZoneNum,
                                                                  state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
@@ -6253,7 +6252,7 @@ void GetATMixers(EnergyPlusData &state)
                                 bool UseOccSchFlag = false;
                                 bool UseMinOASchFlag = false;
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate =
-                                    DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+                                    DataSizing::calcDesignSpecificationOutdoorAir(
                                         state,
                                         state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
                                         state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
@@ -6282,7 +6281,7 @@ void GetATMixers(EnergyPlusData &state)
                                     bool UseOccSchFlag = false;
                                     bool UseMinOASchFlag = false;
                                     state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate =
-                                        DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+                                        DataSizing::calcDesignSpecificationOutdoorAir(
                                             state,
                                             state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
                                             state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
@@ -6328,7 +6327,7 @@ void GetATMixers(EnergyPlusData &state)
                                 bool UseOccSchFlag = false;
                                 bool UseMinOASchFlag = false;
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate =
-                                    DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+                                    DataSizing::calcDesignSpecificationOutdoorAir(
                                         state,
                                         state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
                                         state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
@@ -6376,7 +6375,7 @@ void GetATMixers(EnergyPlusData &state)
                             state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr =
                                 state.dataSize->ZoneSizingInput(SizingInputNum).ZoneDesignSpecOAIndex;
                             state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate =
-                                DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state,
+                                DataSizing::calcDesignSpecificationOutdoorAir(state,
                                                                                      state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr,
                                                                                      state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum,
                                                                                      false,
@@ -6460,7 +6459,7 @@ void AirTerminalMixerData::InitATMixer(EnergyPlusData &state, bool const FirstHV
         if (this->AirLoopNum > 0) {
             airLoopOAFrac = state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
             if (airLoopOAFrac > 0.0) {
-                vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ZoneNum, UseOccSchFlag, true);
+                vDotOAReq = DataSizing::calcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ZoneNum, UseOccSchFlag, true);
                 mDotFromOARequirement = vDotOAReq * state.dataEnvrn->StdRhoAir / airLoopOAFrac;
             } else {
                 mDotFromOARequirement = state.dataLoopNodes->Node(this->PriInNode).MassFlowRate;
