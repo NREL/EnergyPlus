@@ -996,14 +996,13 @@ namespace DataSizing {
         );
 
     private:
-        Real64 calcDesignSpecificationOutdoorAir(
-            EnergyPlusData &state,
-            int ActualZoneNum,                        // Zone index
-            bool UseOccSchFlag,                       // Zone occupancy schedule will be used instead of using total zone occupancy
-            bool UseMinOASchFlag,                     // Use min OA schedule in DesignSpecification:OutdoorAir object
-            Optional_bool_const PerPersonNotSet = _,  // when calculation should not include occupants (e.g., dual duct)
-            Optional_bool_const MaxOAVolFlowFlag = _, // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
-            Optional_int_const spaceNum = _           // Space index (if applicable)
+        Real64 calcDesignSpecificationOutdoorAir(EnergyPlusData &state,
+                                                 int ActualZoneNum,    // Zone index
+                                                 bool UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
+                                                 bool UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
+                                                 bool const PerPersonNotSet,  // when calculation should not include occupants (e.g., dual duct)
+                                                 bool const MaxOAVolFlowFlag, // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
+                                                 int const spaceNum = 0       // Space index (if applicable)
         );
     };
 

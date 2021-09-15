@@ -772,6 +772,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
 
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
+    state->dataSize->NumOARequirements = 1;
     state->dataSize->OARequirements.resize(2);
     state->dataSize->OARequirements[1].Name = "CM DSOA WEST ZONE";
     state->dataSize->OARequirements[1].numDSOA = 1;
@@ -5887,6 +5888,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
+    state->dataSize->NumOARequirements = 1;
     state->dataSize->OARequirements.resize(2);
     state->dataSize->OARequirements[1].Name = "CM DSOA WEST ZONE";
     state->dataSize->OARequirements[1].numDSOA = 1;
