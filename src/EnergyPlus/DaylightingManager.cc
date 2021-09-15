@@ -10409,6 +10409,28 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
         }
     } // End of map loop
 
+    state.dataDaylightingManager->EINTSK.dimension(24, state.dataSurface->actualMaxSlatAngs + 1, 4, 0.0);
+    state.dataDaylightingManager->EINTSU.dimension(24, state.dataSurface->actualMaxSlatAngs + 1, 0.0);
+    state.dataDaylightingManager->EINTSUdisk.dimension(24, state.dataSurface->actualMaxSlatAngs + 1, 0.0);
+    state.dataDaylightingManager->WLUMSK.dimension(24, state.dataSurface->actualMaxSlatAngs + 1, 4, 0.0);
+    state.dataDaylightingManager->WLUMSU.dimension(24, state.dataSurface->actualMaxSlatAngs + 1, 0.0);
+    state.dataDaylightingManager->WLUMSUdisk.dimension(24, state.dataSurface->actualMaxSlatAngs + 1, 0.0);
+    state.dataDaylightingManager->EDIRSK.dimension(24, state.dataSurface->actualMaxSlatAngs + 1, 4);
+    state.dataDaylightingManager->EDIRSU.dimension(24, state.dataSurface->actualMaxSlatAngs + 1);
+    state.dataDaylightingManager->EDIRSUdisk.dimension(24, state.dataSurface->actualMaxSlatAngs + 1);
+    state.dataDaylightingManager->AVWLSK.dimension(24, state.dataSurface->actualMaxSlatAngs + 1, 4);
+    state.dataDaylightingManager->AVWLSU.dimension(24, state.dataSurface->actualMaxSlatAngs + 1);
+    state.dataDaylightingManager->AVWLSUdisk.dimension(24, state.dataSurface->actualMaxSlatAngs + 1);
+    state.dataDaylightingManager->FLFWSU.dimension(state.dataSurface->actualMaxSlatAngs + 1);
+    state.dataDaylightingManager->FLFWSUdisk.dimension(state.dataSurface->actualMaxSlatAngs + 1);
+    state.dataDaylightingManager->FLCWSU.dimension(state.dataSurface->actualMaxSlatAngs + 1);
+    state.dataDaylightingManager->TransMult.dimension(state.dataSurface->actualMaxSlatAngs);
+    state.dataDaylightingManager->DayltgInterReflectedIllumTransBmBmMult.dimension(state.dataSurface->actualMaxSlatAngs);
+    state.dataDaylightingManager->TransBmBmMult.dimension(state.dataSurface->actualMaxSlatAngs);
+    state.dataDaylightingManager->TransBmBmMultRefl.dimension(state.dataSurface->actualMaxSlatAngs);
+    state.dataDaylightingManager->FLCWSK.dimension(state.dataSurface->actualMaxSlatAngs + 1, 4);
+    state.dataDaylightingManager->FLFWSK.dimension(state.dataSurface->actualMaxSlatAngs + 1, 4);
+
     // TODO MJW: These eio outputs need to change from zone to enclosure
     static constexpr std::string_view Format_700(
         "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones\n");
