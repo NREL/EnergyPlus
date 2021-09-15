@@ -69,7 +69,6 @@ namespace HeatPumpWaterToWaterSimple {
         // Members
         std::string Name;                       // user identifier
         bool checkEquipName;                    // name check flag
-        std::string WatertoWaterHPType;         // Type of WatertoAirHP ie. Heating or Cooling
         DataPlant::PlantEquipmentType WWHPType; // equipment type num
         bool Available;                         // need an array of logicals--load identifiers of available equipment
         bool ON;                                // simulate the machine at it's operating part load ratio
