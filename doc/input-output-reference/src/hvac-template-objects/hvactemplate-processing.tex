@@ -1,6 +1,6 @@
 \section{HVACTemplate Processing}\label{hvactemplate-processing}
 
-\textbf{Unlike other EnergyPlus objects, the HVACTemplate objects are not handled by EnergyPlus directly.} Instead, they are preprocessed by a program called ExpandObjects. If you use EP-Launch or RunEPlus.bat, this preprocessor step is performed automatically using the following sequence:
+\textbf{Unlike other EnergyPlus objects, the HVACTemplate objects are not handled by EnergyPlus directly.} Instead, they are preprocessed by a program called ExpandObjects or pyExpandObjects. If you use EP-Launch or RunEPlus.bat, this preprocessor step is performed automatically using the following sequence:
 
 \subsection{Overview}
 
@@ -23,12 +23,12 @@
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
 \item
-  The preprocessor program, pyExpandObjects, reads your IDF file, verifies it meets the current schema requirements, and converts all the HVACTemplate objects into other EnergyPlus objects.
+  The preprocessor program, pyExpandObjects, reads your epJSON file, verifies it meets the current schema requirements, and converts all the HVACTemplate objects into other EnergyPlus objects.
 \item
   The pyExpandObjects program writes one to three new files.  
   \begin{enumerate}
   \item
-    A renamed file with the naming format "<original-file-name>\_expanded.epJSON". This “expanded” file may be used as a standard EnergyPlus epJSON file if the extension is changed to epJSON; however, for safety’s sake, both filename and extension should be changed.  Note, the HVACTemplate objects will be completely removed from the expanded file, so ensure to save a copy of the original file before overwriting!
+    A renamed file with the naming format "<original-file-name>\_expanded.epJSON". This “expanded” file may be used as a standard EnergyPlus epJSON file.  Note, the HVACTemplate objects will be completely removed from the expanded file, so ensure to save a copy of the original file before deleting anything!
   \item
     Optional - A file with the name "<original-file-name>\_hvac\_templates.epJSON" which has all the HVACTemplate objects from the input file.
   \item
@@ -76,7 +76,7 @@ The command line interface located in the EnergyPlus root directory (energyplus.
   
   It is not possible to comment sections of code in JSON formatted files.  Therefore, the output expanded files do not have the ability to retain the HVACTemplate objects used to create the current document.  If the original file were to be overwritten, then all template data would be lost.  In an attempt to provide and additional layer of backups, the -nb option is set to False by default which means two files will be created: one with HVACTemplate objects, and one with all other objects.  With these files, the original input file can be created, or specific objects can be copied and pasted.
 \item
-  -ns --no\_schema : Skil all schema validation checks
+  -ns --no\_schema : Skip schema validation checks for pyExpandObjects.  Note, this does not skip other schema validation operations within EnergyPlus itself.
   
   One benefit of the JSON file format is that files can be validated before simulation.  This means that erroneous inputs can be found before simulation, which saves time debugging output files and reading through logs, unsure of the error source.  This includes syntax errors, values that are out of range, and missing required inputs.  However, situations may occur when the user wishes to skip schema validation, in which case this flag should be used.  By default, schema validation is enabled.
   
