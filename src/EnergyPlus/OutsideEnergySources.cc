@@ -86,7 +86,7 @@ namespace EnergyPlus::OutsideEnergySources {
 // PURPOSE OF THIS MODULE:
 // Module containing the routines dealing with the OutsideEnergySources
 
-PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string objectName)
+PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string_view objectName)
 {
     // Process the input data for outside energy sources if it hasn't been done already
     if (state.dataOutsideEnergySrcs->SimOutsideEnergyGetInputFlag) {
@@ -100,7 +100,7 @@ PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, DataPla
         }
     }
     // If we didn't find it, fatal
-    ShowFatalError(state, "OutsideEnergySourceSpecsFactory: Error getting inputs for source named: " + objectName); // LCOV_EXCL_LINE
+    ShowFatalError(state, format("OutsideEnergySourceSpecsFactory: Error getting inputs for source named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
     return nullptr; // LCOV_EXCL_LINE
 }
