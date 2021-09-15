@@ -1758,8 +1758,7 @@ namespace FaultsManager {
                         state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag = true;
                         state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex = jFault_FoulingCoil;
 
-                        state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoiledType =
-                            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
+                        state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoilType = state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
                         state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoilNum = CoilNum;
 
                         SetupOutputVariable(state,

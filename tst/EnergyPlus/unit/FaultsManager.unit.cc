@@ -881,7 +881,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
 
         EXPECT_EQ(CoilNum, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilNum);
         EXPECT_TRUE(
-            compare_enums(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType));
+            compare_enums(DataPlant::PlantEquipmentType::CoilWaterSimpleHeating, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilType));
 
         EXPECT_TRUE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(FaultIndex, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
@@ -909,7 +909,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::CoilWaterCooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType));
 
         EXPECT_EQ(CoilNum, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilNum);
-        EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::CoilWaterCooling, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType));
+        EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::CoilWaterCooling, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilType));
 
         EXPECT_TRUE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(FaultIndex, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
