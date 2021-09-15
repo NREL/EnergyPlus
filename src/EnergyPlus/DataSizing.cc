@@ -521,10 +521,14 @@ Real64 calcDesignSpecificationOutdoorAir(EnergyPlusData &state,
         return thisDSOA.calcOAFlowRate(state, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet, MaxOAVolFlowFlag);
     } else {
         for (int dsoaCount = 1; dsoaCount <= thisDSOA.numDSOA; ++dsoaCount) {
-            totOAFlowRate +=
-                state.dataSize->OARequirements(thisDSOA.dsoaIndexes(dsoaCount))
-                    .calcOAFlowRate(
-                        state, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet, MaxOAVolFlowFlag, thisDSOA.dsoaSpaceIndexes(dsoaCount));
+            totOAFlowRate += state.dataSize->OARequirements(thisDSOA.dsoaIndexes(dsoaCount))
+                                 .calcOAFlowRate(state,
+                                                 ActualZoneNum,
+                                                 UseOccSchFlag,
+                                                 UseMinOASchFlag,
+                                                 PerPersonNotSet,
+                                                 MaxOAVolFlowFlag,
+                                                 thisDSOA.dsoaSpaceIndexes(dsoaCount));
         }
         return totOAFlowRate;
     }
