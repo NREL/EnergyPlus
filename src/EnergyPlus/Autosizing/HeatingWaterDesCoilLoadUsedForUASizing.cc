@@ -170,6 +170,9 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
                                            (this->finalSysSizing(this->curSysNum).PreheatTemp - CoilInTemp);
                 }
             } else {
+                if (this->finalSysSizing(this->curSysNum).HeatingCapMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
+                    this->dataFracOfAutosizedHeatingCapacity = this->finalSysSizing(this->curSysNum).FractionOfAutosizedHeatingCapacity;
+                }
                 if (this->dataDesicRegCoil) {
                     this->autoSizedValue = CpAirStd * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing *
                                            (this->dataDesOutletAirTemp - this->dataDesInletAirTemp);
@@ -181,7 +184,7 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(EnergyPlusData &state, Real64
         }
     }
     // heating coil can't have negative capacity
-    this->autoSizedValue = std::max(0.0, this->autoSizedValue);
+    this->autoSizedValue = std::max(0.0, this->autoSizedValue) * this->dataHeatSizeRatio * this->dataFracOfAutosizedHeatingCapacity;
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "water_heating_design_coil_load_for_ua_sizing";
     }
