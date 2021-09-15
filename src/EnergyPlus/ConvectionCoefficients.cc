@@ -5327,7 +5327,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
     Kiva::ConvectionAlgorithm HnFn(KIVA_CONST_CONV(0.0));
 
     auto &Surface(state.dataSurface->Surface);
-    auto &QdotConvOutRepPerArea(state.dataHeatBalSurf->SurfQdotConvOutPerArea);
+    auto &SurfQdotConvOutRepPerArea(state.dataHeatBalSurf->SurfQdotConvOutPerArea);
     Real64 SurfOutTemp = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum);
 
     // first call Hn models
@@ -5378,7 +5378,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
                                                  (SurfOutTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum)),
                                                  state.dataSurface->SurfOutConvFaceHeight(SurfNum),
                                                  SurfOutTemp,
-                                                 -QdotConvOutRepPerArea(SurfNum),
+                                                 -SurfQdotConvOutRepPerArea(SurfNum),
                                                  SurfNum);
         break;
     case ConvectionConstants::HcExt_AlamdariHammondStableHorizontal:

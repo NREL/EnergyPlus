@@ -144,15 +144,15 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfQdotRadHVACInRep;     // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> SurfQdotRadHVACInPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf
 
-    Array1D<Real64> QConvOutReport;         // Surface convection heat gain at Outside face [J]
-    Array1D<Real64> QdotConvOutRep;         // Surface convection heat transfer rate at Outside face surface [W]
+    Array1D<Real64> SurfQConvOutReport;         // Surface convection heat gain at Outside face [J]
+    Array1D<Real64> SurfQdotConvOutRep;         // Surface convection heat transfer rate at Outside face surface [W]
     Array1D<Real64> SurfQdotConvOutPerArea; // Surface conv heat transfer rate per m2 at Outside face surf (report){w/m2]
 
-    Array1D<Real64> QRadOutReport;        // Surface thermal radiation heat gain at Outside face [J]
-    Array1D<Real64> QdotRadOutRep;        // Surface thermal radiation heat transfer outside face surface [W]
-    Array1D<Real64> QdotRadOutRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Outside face surf
-    Array1D<Real64> QAirExtReport;        // Surface Outside Face Thermal Radiation to Air Heat Transfer Rate [W]
-    Array1D<Real64> QHeatEmiReport;       // Surface Outside Face Heat Emission to Air Rate [W]
+    Array1D<Real64> SurfQRadOutReport;        // Surface thermal radiation heat gain at Outside face [J]
+    Array1D<Real64> SurfQdotRadOutRep;        // Surface thermal radiation heat transfer outside face surface [W]
+    Array1D<Real64> SurfQdotRadOutRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Outside face surf
+    Array1D<Real64> SurfQAirExtReport;        // Surface Outside Face Thermal Radiation to Air Heat Transfer Rate [W]
+    Array1D<Real64> SurfQHeatEmiReport;       // Surface Outside Face Heat Emission to Air Rate [W]
 
     Array1D<Real64> SurfOpaqInsFaceCondGainRep; // Opaq Surf Ins Face Cond when Opaq Surf Ins Face Cond >= 0
     Array1D<Real64> SurfOpaqInsFaceCondLossRep; // Opaq Surf Ins Face Cond when Opaq Surf Ins Face Cond  < 0
@@ -291,12 +291,12 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfQRadHVACInReport.deallocate();
         this->SurfQdotRadHVACInRep.deallocate();
         this->SurfQdotRadHVACInPerArea.deallocate();
-        this->QConvOutReport.deallocate();
-        this->QdotConvOutRep.deallocate();
+        this->SurfQConvOutReport.deallocate();
+        this->SurfQdotConvOutRep.deallocate();
         this->SurfQdotConvOutPerArea.deallocate();
-        this->QRadOutReport.deallocate();
-        this->QdotRadOutRep.deallocate();
-        this->QdotRadOutRepPerArea.deallocate();
+        this->SurfQRadOutReport.deallocate();
+        this->SurfQdotRadOutRep.deallocate();
+        this->SurfQdotRadOutRepPerArea.deallocate();
         this->SurfOpaqInsFaceCondGainRep.deallocate();
         this->SurfOpaqInsFaceCondLossRep.deallocate();
         this->SurfOpaqInsFaceCond.deallocate();
