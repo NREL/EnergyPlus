@@ -808,7 +808,7 @@ namespace FuelCellElectricGenerator {
             int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameExhaustHX);
 
             if (thisFuelCell > 0) {
-                state.dataFuelCellElectGen->FuelCell(thisFuelCell).TypeOf = DataPlant::PlantEquipmentType::Generator_FCExhaust;
+                state.dataFuelCellElectGen->FuelCell(thisFuelCell).Type = DataPlant::PlantEquipmentType::Generator_FCExhaust;
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.Name = AlphArray(1);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.WaterInNodeName = AlphArray(2);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.WaterOutNodeName = AlphArray(3);
@@ -1039,7 +1039,7 @@ namespace FuelCellElectricGenerator {
                     UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameStackCooler);
 
                 if (thisFuelCell > 0) {
-                    state.dataFuelCellElectGen->FuelCell(thisFuelCell).TypeOf = DataPlant::PlantEquipmentType::Generator_FCStackCooler;
+                    state.dataFuelCellElectGen->FuelCell(thisFuelCell).Type = DataPlant::PlantEquipmentType::Generator_FCStackCooler;
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).StackCooler.Name = AlphArray(1);
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).StackCooler.WaterInNodeName = AlphArray(2);
 
@@ -3349,7 +3349,7 @@ namespace FuelCellElectricGenerator {
                                 [[maybe_unused]] Real64 &CurLoad,
                                 [[maybe_unused]] bool RunFlag)
     {
-        if (this->TypeOf == DataPlant::PlantEquipmentType::Generator_FCStackCooler) {
+        if (this->Type == DataPlant::PlantEquipmentType::Generator_FCStackCooler) {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->CWLoopNum,
                                                             this->CWLoopSideNum,
@@ -3361,7 +3361,7 @@ namespace FuelCellElectricGenerator {
                                                             this->Report.HeatRecOutletTemp,
                                                             this->Report.HeatRecMdot,
                                                             FirstHVACIteration);
-        } else if (this->TypeOf == DataPlant::PlantEquipmentType::Generator_FCExhaust) {
+        } else if (this->Type == DataPlant::PlantEquipmentType::Generator_FCExhaust) {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->CWLoopNum,
                                                             this->CWLoopSideNum,
