@@ -4925,123 +4925,115 @@
     ZN_1_FLR_1_SEC_5:Sys Supply Equipment Outlet Node,  !- Fan Outlet Node Name
     PVT:ZN_1_FLR_1_SEC_5_Ceiling Outlet;  !- Setpoint Node or NodeList Name
 
-!  SolarCollectorPerformance:PhotovoltaicThermal:Simple,
-!    30percentPVThalfArea,    !- Name
-!    0.5,                     !- Fraction of Surface Area with Active Thermal Collector {dimensionless}
-!    Fixed,                   !- Thermal Conversion Efficiency Input Mode Type
-!   0.3,                     !- Value for Thermal Conversion Efficiency if Fixed
-!    ,                        !- Thermal Conversion Efficiency Schedule Name
-!    0.84;                    !- Front Surface Emittance
-	
   SolarCollectorPerformance:PhotovoltaicThermal:BIPVT,
-     ZN_1_FLR_1_SEC_5_Ceiling_BIPVT, !- Name
-     OSCM,  !- Boundary Conditions Model Name
-     , !- Availability Schedule Name
-     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
-     12.616, !- Effective Overall Height of Collector
-     8.795, !- Effective Overall Width of Collector
-     0.87, !- PV Module Normal Transmittance-Absorptance Product
-     0.957, !- PV Cell Normal Transmittance-Absorptance Product
-     0.9, !- Back PV Module Normal Transmittance-Absorptance Product
-     0.87, !- Backing Material Normal Transmittance-Absorptance Product
-     0.85, !- Cladding Normal Transmittance-Absorptance Product
-     0.85, !- Fraction of Collector Gross Area Covered by PV module
-     0.9, !- Fraction of PV cell area to PV module area
-     0.0044, !- PV Module Thermal Resistance - Top
-     0.0039, !- PV Module Thermal Resistance - Bottom
-     0.85, !- PV Module Longwave Emissivity
-     0.9, !- Backing Material Longwave Emissivity
-     0.002, !- Glass Thickness
-     1.526, !- Glass Refraction Index
-     4.0; !- Glass Extinction Coefficient
+    ZN_1_FLR_1_SEC_5_Ceiling_BIPVT, !- Name
+    OSCM,  !- Boundary Conditions Model Name
+    , !- Availability Schedule Name
+    0.1, !- Effective Plenum Gap Thickness Behind PV Modules
+    12.616, !- Effective Overall Height of Collector
+    8.795, !- Effective Overall Width of Collector
+    0.87, !- PV Module Normal Transmittance-Absorptance Product
+    0.957, !- PV Cell Normal Transmittance-Absorptance Product
+    0.9, !- Back PV Module Normal Transmittance-Absorptance Product
+    0.87, !- Backing Material Normal Transmittance-Absorptance Product
+    0.85, !- Cladding Normal Transmittance-Absorptance Product
+    0.85, !- Fraction of Collector Gross Area Covered by PV module
+    0.9, !- Fraction of PV cell area to PV module area
+    0.0044, !- PV Module Thermal Resistance - Top
+    0.0039, !- PV Module Thermal Resistance - Bottom
+    0.85, !- PV Module Longwave Emissivity
+    0.9, !- Backing Material Longwave Emissivity
+    0.002, !- Glass Thickness
+    1.526, !- Glass Refraction Index
+    4.0; !- Glass Extinction Coefficient
 
   SolarCollectorPerformance:PhotovoltaicThermal:BIPVT,
-     ZN_1_FLR_1_SEC_4_Ceiling_BIPVT, !- Name
-     OSCM,  !- Boundary Conditions Model Name
-     , !- Availability Schedule Name
-     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
-     4.57, !- Effective Overall Height of Collector
-     13.36, !- Effective Overall Width of Collector
-     0.87, !- PV Module Normal Transmittance-Absorptance Product
-     0.957, !- PV Cell Normal Transmittance-Absorptance Product
-     0.9, !- Back PV Module Normal Transmittance-Absorptance Product
-     0.87, !- Backing Material Normal Transmittance-Absorptance Product
-     0.85, !- Cladding Normal Transmittance-Absorptance Product
-     0.85, !- Fraction of Collector Gross Area Covered by PV module
-     0.9, !- Fraction of PV cell area to PV module area
-     0.0044, !- PV Module Thermal Resistance - Top
-     0.0039, !- PV Module Thermal Resistance - Bottom
-     0.85, !- PV Module Longwave Emissivity
-     0.9, !- Backing Material Longwave Emissivity
-     0.002, !- Glass Thickness
-     1.526, !- Glass Refraction Index
-     4.0; !- Glass Extinction Coefficient
+    ZN_1_FLR_1_SEC_4_Ceiling_BIPVT, !- Name
+    OSCM,  !- Boundary Conditions Model Name
+    , !- Availability Schedule Name
+    0.1, !- Effective Plenum Gap Thickness Behind PV Modules
+    4.57, !- Effective Overall Height of Collector
+    13.36, !- Effective Overall Width of Collector
+    0.87, !- PV Module Normal Transmittance-Absorptance Product
+    0.957, !- PV Cell Normal Transmittance-Absorptance Product
+    0.9, !- Back PV Module Normal Transmittance-Absorptance Product
+    0.87, !- Backing Material Normal Transmittance-Absorptance Product
+    0.85, !- Cladding Normal Transmittance-Absorptance Product
+    0.85, !- Fraction of Collector Gross Area Covered by PV module
+    0.9, !- Fraction of PV cell area to PV module area
+    0.0044, !- PV Module Thermal Resistance - Top
+    0.0039, !- PV Module Thermal Resistance - Bottom
+    0.85, !- PV Module Longwave Emissivity
+    0.9, !- Backing Material Longwave Emissivity
+    0.002, !- Glass Thickness
+    1.526, !- Glass Refraction Index
+    4.0; !- Glass Extinction Coefficient
  
-   SolarCollectorPerformance:PhotovoltaicThermal:BIPVT,
-     ZN_1_FLR_1_SEC_3_Ceiling_BIPVT, !- Name
-     OSCM,  !- Boundary Conditions Model Name
-     , !- Availability Schedule Name
-     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
-     17.18, !- Effective Overall Height of Collector
-     4.57, !- Effective Overall Width of Collector
-     0.87, !- PV Module Normal Transmittance-Absorptance Product
-     0.957, !- PV Cell Normal Transmittance-Absorptance Product
-     0.9, !- Back PV Module Normal Transmittance-Absorptance Product
-     0.87, !- Backing Material Normal Transmittance-Absorptance Product
-     0.85, !- Cladding Normal Transmittance-Absorptance Product
-     0.85, !- Fraction of Collector Gross Area Covered by PV module
-     0.9, !- Fraction of PV cell area to PV module area
-     0.0044, !- PV Module Thermal Resistance - Top
-     0.0039, !- PV Module Thermal Resistance - Bottom
-     0.85, !- PV Module Longwave Emissivity
-     0.9, !- Backing Material Longwave Emissivity
-     0.002, !- Glass Thickness
-     1.526, !- Glass Refraction Index
-     4.0; !- Glass Extinction Coefficient
+  SolarCollectorPerformance:PhotovoltaicThermal:BIPVT,
+    ZN_1_FLR_1_SEC_3_Ceiling_BIPVT, !- Name
+    OSCM,  !- Boundary Conditions Model Name
+    , !- Availability Schedule Name
+    0.1, !- Effective Plenum Gap Thickness Behind PV Modules
+    17.18, !- Effective Overall Height of Collector
+    4.57, !- Effective Overall Width of Collector
+    0.87, !- PV Module Normal Transmittance-Absorptance Product
+    0.957, !- PV Cell Normal Transmittance-Absorptance Product
+    0.9, !- Back PV Module Normal Transmittance-Absorptance Product
+    0.87, !- Backing Material Normal Transmittance-Absorptance Product
+    0.85, !- Cladding Normal Transmittance-Absorptance Product
+    0.85, !- Fraction of Collector Gross Area Covered by PV module
+    0.9, !- Fraction of PV cell area to PV module area
+    0.0044, !- PV Module Thermal Resistance - Top
+    0.0039, !- PV Module Thermal Resistance - Bottom
+    0.85, !- PV Module Longwave Emissivity
+    0.9, !- Backing Material Longwave Emissivity
+    0.002, !- Glass Thickness
+    1.526, !- Glass Refraction Index
+    4.0; !- Glass Extinction Coefficient
 
-   SolarCollectorPerformance:PhotovoltaicThermal:BIPVT,
-     ZN_1_FLR_1_SEC_2_Ceiling_BIPVT, !- Name
-     OSCM,  !- Boundary Conditions Model Name
-     , !- Availability Schedule Name
-     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
-     4.57, !- Effective Overall Height of Collector
-     13.36, !- Effective Overall Width of Collector
-     0.87, !- PV Module Normal Transmittance-Absorptance Product
-     0.957, !- PV Cell Normal Transmittance-Absorptance Product
-     0.9, !- Back PV Module Normal Transmittance-Absorptance Product
-     0.87, !- Backing Material Normal Transmittance-Absorptance Product
-     0.85, !- Cladding Normal Transmittance-Absorptance Product
-     0.85, !- Fraction of Collector Gross Area Covered by PV module
-     0.9, !- Fraction of PV cell area to PV module area
-     0.0044, !- PV Module Thermal Resistance - Top
-     0.0039, !- PV Module Thermal Resistance - Bottom
-     0.85, !- PV Module Longwave Emissivity
-     0.9, !- Backing Material Longwave Emissivity
-     0.002, !- Glass Thickness
-     1.526, !- Glass Refraction Index
-     4.0; !- Glass Extinction Coefficient
+  SolarCollectorPerformance:PhotovoltaicThermal:BIPVT,
+    ZN_1_FLR_1_SEC_2_Ceiling_BIPVT, !- Name
+    OSCM,  !- Boundary Conditions Model Name
+    , !- Availability Schedule Name
+    0.1, !- Effective Plenum Gap Thickness Behind PV Modules
+    4.57, !- Effective Overall Height of Collector
+    13.36, !- Effective Overall Width of Collector
+    0.87, !- PV Module Normal Transmittance-Absorptance Product
+    0.957, !- PV Cell Normal Transmittance-Absorptance Product
+    0.9, !- Back PV Module Normal Transmittance-Absorptance Product
+    0.87, !- Backing Material Normal Transmittance-Absorptance Product
+    0.85, !- Cladding Normal Transmittance-Absorptance Product
+    0.85, !- Fraction of Collector Gross Area Covered by PV module
+    0.9, !- Fraction of PV cell area to PV module area
+    0.0044, !- PV Module Thermal Resistance - Top
+    0.0039, !- PV Module Thermal Resistance - Bottom
+    0.85, !- PV Module Longwave Emissivity
+    0.9, !- Backing Material Longwave Emissivity
+    0.002, !- Glass Thickness
+    1.526, !- Glass Refraction Index
+    4.0; !- Glass Extinction Coefficient
 
-   SolarCollectorPerformance:PhotovoltaicThermal:BIPVT,
-     ZN_1_FLR_1_SEC_1_Ceiling_BIPVT, !- Name
-     OSCM,  !- Boundary Conditions Model Name
-     , !- Availability Schedule Name
-     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
-     17.18, !- Effective Overall Height of Collector
-     4.57, !- Effective Overall Width of Collector
-     0.87, !- PV Module Normal Transmittance-Absorptance Product
-     0.957, !- PV Cell Normal Transmittance-Absorptance Product
-     0.9, !- Back PV Module Normal Transmittance-Absorptance Product
-     0.87, !- Backing Material Normal Transmittance-Absorptance Product
-     0.85, !- Cladding Normal Transmittance-Absorptance Product
-     0.85, !- Fraction of Collector Gross Area Covered by PV module
-     0.9, !- Fraction of PV cell area to PV module area
-     0.0044, !- PV Module Thermal Resistance - Top
-     0.0039, !- PV Module Thermal Resistance - Bottom
-     0.85, !- PV Module Longwave Emissivity
-     0.9, !- Backing Material Longwave Emissivity
-     0.002, !- Glass Thickness
-     1.526, !- Glass Refraction Index
-     4.0; !- Glass Extinction Coefficient
+  SolarCollectorPerformance:PhotovoltaicThermal:BIPVT,
+    ZN_1_FLR_1_SEC_1_Ceiling_BIPVT, !- Name
+    OSCM,  !- Boundary Conditions Model Name
+    , !- Availability Schedule Name
+    0.1, !- Effective Plenum Gap Thickness Behind PV Modules
+    17.18, !- Effective Overall Height of Collector
+    4.57, !- Effective Overall Width of Collector
+    0.87, !- PV Module Normal Transmittance-Absorptance Product
+    0.957, !- PV Cell Normal Transmittance-Absorptance Product
+    0.9, !- Back PV Module Normal Transmittance-Absorptance Product
+    0.87, !- Backing Material Normal Transmittance-Absorptance Product
+    0.85, !- Cladding Normal Transmittance-Absorptance Product
+    0.85, !- Fraction of Collector Gross Area Covered by PV module
+    0.9, !- Fraction of PV cell area to PV module area
+    0.0044, !- PV Module Thermal Resistance - Top
+    0.0039, !- PV Module Thermal Resistance - Bottom
+    0.85, !- PV Module Longwave Emissivity
+    0.9, !- Backing Material Longwave Emissivity
+    0.002, !- Glass Thickness
+    1.526, !- Glass Refraction Index
+    4.0; !- Glass Extinction Coefficient
 
   SurfaceProperty:OtherSideConditionsModel,
     OSCM, !- Name
