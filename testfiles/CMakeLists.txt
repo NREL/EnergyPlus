@@ -514,6 +514,7 @@ add_simulation_test(IDF_FILE ShopWithPVandBattery.idf EPW_FILE USA_OK_Oklahoma.C
 add_simulation_test(IDF_FILE ShopWithPVandLiIonBattery.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 add_simulation_test(IDF_FILE ShopWithPVandStorage.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 add_simulation_test(IDF_FILE ShopWithSimplePVT.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
+add_simulation_test(IDF_FILE ShopWithBIPVT.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 add_simulation_test(IDF_FILE SingleFamilyHouse_HP_Slab.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE SingleFamilyHouse_HP_Slab_Dehumidification.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE SingleFamilyHouse_TwoSpeed_ZoneAirBalance.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
