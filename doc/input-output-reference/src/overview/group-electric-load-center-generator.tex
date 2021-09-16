@@ -843,15 +843,6 @@ output.
 
 Default: 0.96
 
-\subsubsection{Outputs Description}\label{outputs-description-electricloadcenterinverterpvwatts}
-
-\begin{itemize}
-\item
-  HVAC,Average,Inverter Produced AC Electricity Rate {[}W{]}
-\item
-  HVAC,Sum,Inverter Produced AC Electricity Energy {[}J{]}
-\end{itemize}
-
 \subsubsection{Outputs}\label{outputs-3-005}
 
 Each inverter can report the following seven output variables.
@@ -888,7 +879,7 @@ Each inverter can report the following seven output variables.
 
 This is the efficiency with which DC power is converted to AC power by the inverter.
 
-\paragraph{Inverter DC Input Elecric Power {[}W{]}}\label{inverter-dc-input-elecric-power-w}
+\paragraph{Inverter DC Input Electricity Rate {[}W{]}}\label{inverter-dc-input-electricity-rate-w}
 
 \paragraph{Inverter DC Input Electricity Energy {[}J{]}}\label{inverter-dc-input-electric-energy-j}
 
@@ -1822,9 +1813,9 @@ The output variables that are available for the IC engine generator are:
 
 \begin{itemize}
 \item
-  HVAC,Average,Generator Produced Electricity Rate {[}W{]}
+  HVAC,Average,Generator Produced AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced Electricity Energy {[}J{]}
+  HVAC,Sum,Generator Produced AC Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator Lube Heat Recovery Rate {[}W{]}
 \item
@@ -1861,9 +1852,9 @@ The output variables that are available for the IC engine generator are:
   HVAC,Average,Generator \textless{}Fuel Type\textgreater{} Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w}
+\paragraph{Generator Produced AC Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w}
 
-\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j}
+\paragraph{Generator Produced AC Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j}
 
 These outputs are the electric power output from the electric generator. Energy is metered on Cogeneration:ElectricityProduced, ElectricityProduced:Plant, and ElectricityProduced:Facility.
 
@@ -2142,9 +2133,9 @@ The output variables that are available for the combustion turbine generator are
 
 \begin{itemize}
 \item
-  HVAC,Average,Generator Produced Electricity Rate {[}W{]}
+  HVAC,Average,Generator Produced AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced Electricity Energy {[}J{]}
+  HVAC,Sum,Generator Produced AC Electricity Energy {[}J{]}
 \item
   Zone,Meter,ElectricityProduced:Facility {[}J{]}
 \item
@@ -2450,9 +2441,9 @@ The output variables that are available for the microturbine generator are:
 
 \begin{itemize}
 \item
-  HVAC,Average,Generator Produced Electricity Rate {[}W{]}
+  HVAC,Average,Generator Produced AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced Electricity Energy {[}J{]}
+  HVAC,Sum,Generator Produced AC Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator LHV Basis Electric Efficiency {[}-{]}
 \item
@@ -2511,11 +2502,11 @@ If exhaust air calculations are performed:
   HVAC,Average,Generator Exhaust Air Temperature {[}C{]}
 \end{itemize}
 
-\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-1}
+\paragraph{Generator Produced AC Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-1}
 
 This output variable is the average electric power produced by the generator in Watts for the timestep being reported. This is the net electric power produced, accounting for ancillary electric power consumed during generator operation.
 
-\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-1}
+\paragraph{Generator Produced AC Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-1}
 
 This output variable is the electric energy produced by the generator in Joules for the timestep being reported. This output is also added to a meter with Resource Type = ElectricityProduced, End Use Key = Cogeneration, Group Key = Plant (Ref. Output:Meter objects). This is the net electric energy produced, accounting for ancillary electric consumption during generator operation.
 
@@ -2557,7 +2548,7 @@ This output variable is the average ancillary electric power consumed by the gen
 
 \paragraph{Generator Ancillary Electricity Energy {[}J{]}}\label{generator-ancillary-electric-energy-j}
 
-This output variable is the ancillary electric energy consumption for the generator in Joules for the timestep being reported. This energy consumption is already deducted from the output variable Generator Produced Electricity Energy ( net electric energy produced by the generator). This output variable is only produced when the user enters a value greater than 0.0 for the input field Ancillary Power.
+This output variable is the ancillary electric energy consumption for the generator in Joules for the timestep being reported. This energy consumption is already deducted from the output variable Generator Produced AC Electricity Energy ( net electric energy produced by the generator). This output variable is only produced when the user enters a value greater than 0.0 for the input field Ancillary Power.
 
 \paragraph{Generator Produced Thermal Rate {[}W{]}}\label{generator-produced-thermal-rate-w-1}
 
@@ -2839,9 +2830,9 @@ Generator:MicroCHP:NonNormalizedParameters,
 \item
   HVAC,Sum,Generator Cool Down Mode Time {[}s{]}
 \item
-  HVAC,Average,Generator Produced Electricity Rate {[}W{]}
+  HVAC,Average,Generator Produced AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Generator Produced Electricity Energy {[}J{]}
+  HVAC,Sum,Generator Produced AC Electricity Energy {[}J{]}
 \item
   HVAC,Average,Generator Electric Efficiency {[]}
 \item
@@ -2908,11 +2899,11 @@ This report is the amount of time the generator spent in Normal Operating mode i
 
 This report is the amount of time the generator spent in Cool Down mode in seconds.
 
-\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-2}
+\paragraph{Generator Produced AC Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-2}
 
 This report is the net electrical power produced by the generator in watts.
 
-\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-2}
+\paragraph{Generator Produced AC Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-2}
 
 This report is the net electrical energy produced by the generator in joules. This output variable is also put on the meter for on-site production.
 
@@ -3076,9 +3067,13 @@ The following output variables are available for the fuel cell model.
 
 \begin{itemize}
 \item
-  Output:Variable,*,Generator Produced Electricity Rate,hourly; !- HVAC Average {[}W{]}
+  Output:Variable,*,Generator Produced AC Electricity Rate,hourly; !- HVAC Average {[}W{]}
 \item
-  Output:Variable,*,Generator Produced Electricity Energy,hourly; !- HVAC Sum {[}J{]}
+  Output:Variable,*,Generator Produced AC Electricity Energy,hourly; !- HVAC Sum {[}J{]}
+\item
+  Output:Variable,*,Generator Produced DC Electricity Rate,hourly; !- HVAC Average {[}W{]}
+\item
+  Output:Variable,*,Generator Produced DC Electricity Energy,hourly; !- HVAC Sum {[}J{]}
 \item
   Output:Variable,*,Generator Produced Thermal Rate,hourly; !- HVAC Average {[}W{]}
 \item
@@ -3101,13 +3096,21 @@ The following output variables are available for the fuel cell model.
   Output:Variable,*,FuelCell Radiation Heat Loss Rate to Zone,hourly; !- HVAC Average {[}W{]}
 \end{itemize}
 
-\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-3}
+\paragraph{Generator Produced AC Electricity Rate {[}W{]}}\label{generator-produced-ac-electric-power-w-3}
 
-This report is the net electrical power produced by the generator in watts.
+This report is the net electrical AC power produced by the generator in watts.
 
-\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-3}
+\paragraph{Generator Produced AC Electricity Energy {[}J{]}}\label{generator-produced-ac-electric-energy-j-3}
 
-This report is the net electrical energy produced by the generator in joules. This output variable is also put on the meter for on-site production.
+This report is the net electrical AC energy produced by the generator in joules. This output variable is also put on the meter for on-site production.
+
+\paragraph{Generator Produced DC Electricity Rate {[}W{]}}\label{generator-produced-dc-electric-power-w-3}
+
+This report is the net electrical DC power produced by the generator in watts.
+
+\paragraph{Generator Produced DC Electricity Energy {[}J{]}}\label{generator-produced-dc-electric-energy-j-3}
+
+This report is the net electrical DC energy produced by the generator in joules. This output variable is also put on the meter for on-site production.
 
 \paragraph{Generator Produced Thermal Rate {[}W{]}}\label{generator-produced-thermal-rate-w-3}
 
@@ -5102,8 +5105,7 @@ the array. Required if Array Geometry Type is \texttt{Surface}. Shading
 will be calculated for this surface regardless of whether the array has
 1- or 2-axis tracking.
 
-\paragraph{Field: Ground Coverage
-Ratio}\label{field-ground-coverage-ratio}
+\paragraph{Field: Ground Coverage Ratio}\label{field-ground-coverage-ratio}
 
 The ground coverage ratio (GCR) applies only to arrays with one-axis
 tracking, and is the ratio of module surface area to the area of the
@@ -5324,9 +5326,9 @@ Generator:WindTurbine,
 
 \begin{itemize}
 \item
-  HVAC,Average, Generator Produced Electricity Rate {[}W{]}
+  HVAC,Average, Generator Produced AC Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Generator Produced Electricity Energy {[}J{]}
+  HVAC,Sum, Generator Produced AC Electricity Energy {[}J{]}
 \item
   HVAC,Average, Generator Turbine Local Wind Speed {[}m/s{]}
 \item
@@ -5345,11 +5347,11 @@ Generator:WindTurbine,
   HVAC,Average, Generator Turbine Attack Angle {[}deg{]}
 \end{itemize}
 
-\paragraph{Generator Produced Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-4}
+\paragraph{Generator Produced AC Electricity Rate {[}W{]}}\label{generator-produced-electric-power-w-4}
 
 This report is the electric power that the wind turbine system produces.
 
-\paragraph{Generator Produced Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-4}
+\paragraph{Generator Produced AC Electricity Energy {[}J{]}}\label{generator-produced-electric-energy-j-4}
 
 This report is the electric energy that the wind turbine system produces.
 
