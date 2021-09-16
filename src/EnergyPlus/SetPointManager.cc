@@ -4969,7 +4969,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).Name);
                                             ErrorsFound = true;
                                         }
-                                        state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).TypeNum =
+                                        state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).Type =
                                             state.dataSetPointManager->InitSetPointManagerTypeNum;
                                         state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).CondLoopNum = LoopNum;
                                     }
@@ -7652,9 +7652,9 @@ void DefineIdealCondEntSetPointManager::calculate(EnergyPlusData &state)
         if (CurLoad > 0) {
 
             // Calculate the minimum condenser inlet temperature boundary for set point
-            if (this->TypeNum == PlantEquipmentType::Chiller_Absorption || this->TypeNum == PlantEquipmentType::Chiller_CombTurbine ||
-                this->TypeNum == PlantEquipmentType::Chiller_Electric || this->TypeNum == PlantEquipmentType::Chiller_ElectricReformEIR ||
-                this->TypeNum == PlantEquipmentType::Chiller_EngineDriven) {
+            if (this->Type == PlantEquipmentType::Chiller_Absorption || this->Type == PlantEquipmentType::Chiller_CombTurbine ||
+                this->Type == PlantEquipmentType::Chiller_Electric || this->Type == PlantEquipmentType::Chiller_ElectricReformEIR ||
+                this->Type == PlantEquipmentType::Chiller_EngineDriven) {
                 EvapOutletTemp = state.dataLoopNodes
                                      ->Node(state.dataPlnt->PlantLoop(this->LoopIndexPlantSide)
                                                 .LoopSide(SupplySide)
