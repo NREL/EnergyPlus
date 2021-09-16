@@ -2000,8 +2000,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                 }
                 // save heat peak conditions when there is no design heating load or design heating volume flow rate, i.e., when
                 // zone temperature is always greater than the zone heating thermostat temperature
-                if (state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad == 0 &&
-                    state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow == 0) {
+                if (state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad == 0) {
                     bool NoHeatLoadSizingData = false;
                     for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
                         if ((state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepIndex) <
@@ -2011,119 +2010,135 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                                 state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepIndex);
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutTempAtHeatPeak =
                                 state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatOutTempSeq(TimeStepIndex);
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtHeatPeak =
-                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneRetTempSeq(TimeStepIndex);
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneHumRatAtHeatPeak =
-                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepIndex);
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutHumRatAtHeatPeak =
-                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatOutHumRatSeq(TimeStepIndex);
+                            //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                            //                            CtrlZoneNum).ZoneRetTempAtHeatPeak =
+                            //                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                            //                                CtrlZoneNum).HeatZoneRetTempSeq(TimeStepIndex);
+                            //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                            //                            CtrlZoneNum).ZoneHumRatAtHeatPeak =
+                            //                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                            //                                CtrlZoneNum).HeatZoneHumRatSeq(TimeStepIndex);
+                            //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                            //                            CtrlZoneNum).OutHumRatAtHeatPeak =
+                            //                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                            //                                CtrlZoneNum).HeatOutHumRatSeq(TimeStepIndex);
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).TimeStepNumAtHeatMax = TimeStepIndex;
                             NoHeatLoadSizingData = true;
                         }
                     }
                     if ((state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutTempAtHeatPeak <=
                          state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutTempAtHeatPeak) &&
-                        (state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtHeatPeak != 0) &&
                         (NoHeatLoadSizingData)) {
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatDesDay =
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatDesDay;
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatZoneTempSeq =
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatOutTempSeq =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatOutTempSeq;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatZoneRetTempSeq =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneRetTempSeq;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatZoneHumRatSeq =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatOutHumRatSeq =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatOutHumRatSeq;
+                        //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatOutTempSeq =
+                        //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatOutTempSeq;
+                        //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatZoneRetTempSeq =
+                        //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                        //                            CtrlZoneNum).HeatZoneRetTempSeq;
+                        //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatZoneHumRatSeq =
+                        //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq;
+                        //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatOutHumRatSeq =
+                        //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatOutHumRatSeq;
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak =
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtHeatPeak;
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutTempAtHeatPeak =
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutTempAtHeatPeak;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneRetTempAtHeatPeak =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtHeatPeak;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneHumRatAtHeatPeak;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutHumRatAtHeatPeak =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutHumRatAtHeatPeak;
+                        //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneRetTempAtHeatPeak =
+                        //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                        //                            CtrlZoneNum).ZoneRetTempAtHeatPeak;
+                        //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak =
+                        //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                        //                            CtrlZoneNum).ZoneHumRatAtHeatPeak;
+                        //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutHumRatAtHeatPeak =
+                        //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                        //                            CtrlZoneNum).OutHumRatAtHeatPeak;
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatDDNum =
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatDDNum;
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).cHeatDDDate =
                             state.dataSize->DesDayWeath(state.dataSize->CurOverallSimDay).DateString;
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax =
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).TimeStepNumAtHeatMax;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatCoilInTemp =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesHeatCoilInTemp;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRat =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesHeatCoilInHumRat;
+                        //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatCoilInTemp =
+                        //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesHeatCoilInTemp;
+                        //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRat =
+                        //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                        //                            CtrlZoneNum).DesHeatCoilInHumRat;
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatTstatTemp =
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatTstatTemp;
                     }
                 }
-                // save cool peak conditions when there is no design cooling load or design cooling volume flow rate, i.e., when
-                // zone temperature is always less than the zone cooling thermostat temperature
-                if (state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad == 0 &&
-                    state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow == 0) {
-                    bool NoCoolLoadSizingData = false;
-                    for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                        if ((state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq(TimeStepIndex) >
-                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak) ||
-                            !NoCoolLoadSizingData) {
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak =
-                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq(TimeStepIndex);
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutTempAtCoolPeak =
-                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolOutTempSeq(TimeStepIndex);
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtCoolPeak =
-                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneRetTempSeq(TimeStepIndex);
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneHumRatAtCoolPeak =
-                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneHumRatSeq(TimeStepIndex);
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutHumRatAtCoolPeak =
-                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolOutHumRatSeq(TimeStepIndex);
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).TimeStepNumAtCoolMax = TimeStepIndex;
-                            NoCoolLoadSizingData = true;
-                        }
-                    }
-                    if ((state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutTempAtCoolPeak >
-                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutTempAtCoolPeak) &&
-                        (state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak != 0) &&
-                        (NoCoolLoadSizingData)) {
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolDesDay =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolDesDay;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolZoneTempSeq =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolOutTempSeq =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolOutTempSeq;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolZoneRetTempSeq =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneRetTempSeq;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolZoneHumRatSeq =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneHumRatSeq;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolOutHumRatSeq =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolOutHumRatSeq;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutTempAtCoolPeak =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutTempAtCoolPeak;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneRetTempAtCoolPeak =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtCoolPeak;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneHumRatAtCoolPeak;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutHumRatAtCoolPeak =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutHumRatAtCoolPeak;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolDDNum =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolDDNum;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).cCoolDDDate =
-                            state.dataSize->DesDayWeath(state.dataSize->CurOverallSimDay).DateString;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).TimeStepNumAtCoolMax;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolCoilInTemp =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesCoolCoilInTemp;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolCoilInHumRat =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesCoolCoilInHumRat;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolTstatTemp =
-                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolTstatTemp;
-                    }
-                }
+                //                // save cool peak conditions when there is no design cooling load or design cooling volume flow rate, i.e., when
+                //                // zone temperature is always less than the zone cooling thermostat temperature
+                //                if (state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad == 0 &&
+                //                    state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow == 0) {
+                //                    bool NoCoolLoadSizingData = false;
+                //                    for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
+                //                        if ((state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                //                        CtrlZoneNum).CoolZoneTempSeq(TimeStepIndex) >
+                //                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak) ||
+                //                            !NoCoolLoadSizingData) {
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak =
+                //                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                //                                CtrlZoneNum).CoolZoneTempSeq(TimeStepIndex);
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutTempAtCoolPeak =
+                //                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                //                                CtrlZoneNum).CoolOutTempSeq(TimeStepIndex);
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtCoolPeak =
+                //                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                //                                CtrlZoneNum).CoolZoneRetTempSeq(TimeStepIndex);
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneHumRatAtCoolPeak =
+                //                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                //                                CtrlZoneNum).CoolZoneHumRatSeq(TimeStepIndex);
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutHumRatAtCoolPeak =
+                //                                state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay,
+                //                                CtrlZoneNum).CoolOutHumRatSeq(TimeStepIndex);
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).TimeStepNumAtCoolMax =
+                //                            TimeStepIndex; NoCoolLoadSizingData = true;
+                //                        }
+                //                    }
+                //                    if ((state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutTempAtCoolPeak >
+                //                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutTempAtCoolPeak) &&
+                //                        (state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak != 0) &&
+                //                        (NoCoolLoadSizingData)) {
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolDesDay =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolDesDay;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolZoneTempSeq =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolOutTempSeq =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolOutTempSeq;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolZoneRetTempSeq =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneRetTempSeq;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolZoneHumRatSeq =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneHumRatSeq;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolOutHumRatSeq =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolOutHumRatSeq;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutTempAtCoolPeak =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutTempAtCoolPeak;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneRetTempAtCoolPeak =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneRetTempAtCoolPeak;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneHumRatAtCoolPeak;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutHumRatAtCoolPeak =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutHumRatAtCoolPeak;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolDDNum =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolDDNum;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).cCoolDDDate =
+                //                            state.dataSize->DesDayWeath(state.dataSize->CurOverallSimDay).DateString;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).TimeStepNumAtCoolMax;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolCoilInTemp =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesCoolCoilInTemp;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolCoilInHumRat =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesCoolCoilInHumRat;
+                //                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolTstatTemp =
+                //                            state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolTstatTemp;
+                //                    }
+                //                }
             }
         } else if (SELECT_CASE_var == DataGlobalConstants::CallIndicator::EndZoneSizingCalc) {
 
@@ -2929,77 +2944,80 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                 // IF heating flow rate is 0, this data may be used to size a HP so initialize DDNum, TimeStepatPeak, and sizing data (end of IF)
                 // check for flow rate having been set (by MinOA or other min) but no timestep at max
                 //        IF (FinalZoneSizing(CtrlZoneNum)%DesHeatMassFlow > 0.0d0 .AND. &
-                if ((state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax == 0 ||
-                     state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum == 0)) {
-                    for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
-                        state.dataSize->ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax = 1;
-                        TimeStepAtPeak = state.dataSize->ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax;
-                        for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                            if (state.dataSize->DesDayWeath(DDNum).Temp(TimeStepIndex) < state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak)) {
-                                TimeStepAtPeak = TimeStepIndex;
-                            }
-                        }
-                        state.dataSize->ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax = TimeStepAtPeak;
-                    }
-                    state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax = 1;
-                    state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum = 1;
-                    TimeStepAtPeakF = state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
-                    DDNumF = state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum;
-                    for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
-                        TimeStepAtPeak = state.dataSize->ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax;
-                        if (state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak) < state.dataSize->DesDayWeath(DDNumF).Temp(TimeStepAtPeakF)) {
-                            DDNumF = DDNum;
-                            TimeStepAtPeakF = TimeStepAtPeak;
-                        }
-                    }
-                    state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax = TimeStepAtPeakF;
-                    state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum = DDNumF;
-                    state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDesDay = state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatDesDay;
+                if (state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad == 0) {
+                    //                    for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
+                    //                        state.dataSize->ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax = 1;
+                    //                        TimeStepAtPeak = state.dataSize->ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax;
+                    //                        for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay;
+                    //                        ++TimeStepIndex) {
+                    //                            if (state.dataSize->DesDayWeath(DDNum).Temp(TimeStepIndex) <
+                    //                            state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak)) {
+                    //                                TimeStepAtPeak = TimeStepIndex;
+                    //                            }
+                    //                        }
+                    //                        state.dataSize->ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax = TimeStepAtPeak;
+                    //                    }
+                    //                    state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax = 1;
+                    //                    state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum = 1;
+                    //                    TimeStepAtPeakF = state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
+                    //                    DDNumF = state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum;
+                    //                    for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
+                    //                        TimeStepAtPeak = state.dataSize->ZoneSizing(DDNum, CtrlZoneNum).TimeStepNumAtHeatMax;
+                    //                        if (state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak) <
+                    //                        state.dataSize->DesDayWeath(DDNumF).Temp(TimeStepAtPeakF)) {
+                    //                            DDNumF = DDNum;
+                    //                            TimeStepAtPeakF = TimeStepAtPeak;
+                    //                        }
+                    //                    }
+                    state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax =
+                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
+                    state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatDDNum;
+                    state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDesDay = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatDesDay;
+                    int DDNumF = state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum;
+                    int TimeStepAtPeakF = state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
 
-                    // initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
-                    if (state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak == 0.0) {
-                        // issue 6006, heating coils sizing to 0 when no heating load in zone
-                        if (state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).DesHeatSetPtSeq.empty()) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + ":  Thermostat heating set point temperatures not initialized for Zone = " +
-                                                state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName);
-                            ShowFatalError(state,
-                                           "Please send your input file to the EnergyPlus support/development team for further investigation.");
-                        } else {
-                            state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak =
-                                *std::max_element(state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatZoneTempSeq.begin(),
-                                                  state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatZoneTempSeq.end());
-                            state.dataSize->FinalZoneSizing(CtrlZoneNum).OutTempAtHeatPeak =
-                                *std::min_element(state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatOutTempSeq.begin(),
-                                                  state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatOutTempSeq.end());
-                        }
-                        state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak =
-                            state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepAtPeakF);
-                        state.dataSize->FinalZoneSizing(CtrlZoneNum).OutHumRatAtHeatPeak =
-                            state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatOutHumRatSeq(TimeStepAtPeakF);
-                        if (state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak > 0.0) {
-                            state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak =
-                                min(state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak,
-                                    PsyWFnTdpPb(state,
-                                                state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak,
-                                                state.dataEnvrn->StdBaroPress,
-                                                RoutineName));
-                        } else {
-                            state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak =
-                                state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatDesHumRat;
-                        }
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak =
-                            state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak;
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak =
-                            state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak;
-                        state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatCoilInTemp =
-                            state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak;
-                        state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRat =
-                            state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak;
-                        state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneRetTempAtHeatPeak =
-                            state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak;
+                    //                    // initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
+                    //                    if (state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak == 0.0) {
+                    // issue 6006, heating coils sizing to 0 when no heating load in zone
+                    if (state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).DesHeatSetPtSeq.empty()) {
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + ":  Thermostat heating set point temperatures not initialized for Zone = " +
+                                            state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName);
+                        ShowFatalError(state, "Please send your input file to the EnergyPlus support/development team for further investigation.");
+                    } else {
+                        state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak =
+                            *std::max_element(state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatZoneTempSeq.begin(),
+                                              state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatZoneTempSeq.end());
+                        state.dataSize->FinalZoneSizing(CtrlZoneNum).OutTempAtHeatPeak =
+                            *std::min_element(state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatOutTempSeq.begin(),
+                                              state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatOutTempSeq.end());
                     }
+                    state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak =
+                        state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepAtPeakF);
+                    state.dataSize->FinalZoneSizing(CtrlZoneNum).OutHumRatAtHeatPeak =
+                        state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatOutHumRatSeq(TimeStepAtPeakF);
+                    if (state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak > 0.0) {
+                        state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak = min(
+                            state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak,
+                            PsyWFnTdpPb(
+                                state, state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak, state.dataEnvrn->StdBaroPress, RoutineName));
+                    } else {
+                        state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak =
+                            state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatDesHumRat;
+                    }
+                    state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak =
+                        *std::max_element(state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).DesHeatSetPtSeq.begin(),
+                                          state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).DesHeatSetPtSeq.end());
+                    state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak =
+                        state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).HeatDesHumRat;
+                    state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatCoilInTemp =
+                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak;
+                    state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRat =
+                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak;
+                    state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneRetTempAtHeatPeak =
+                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak;
                 }
+                //                }
 
                 // set the zone minimum cooling supply air flow rate. This will be used for autosizing VAV terminal unit
                 // minimum flow rates (comment seems incorrect, really used as a minimum lower limit for the maximum air flow)
