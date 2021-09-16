@@ -64,10 +64,10 @@
 !-     The curve should be used as input to the following field:
 !-     "Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name"
 
-!- Set of performance curves for ASHRAE901_2019_air_A_gte150ton_10.1kWpton_14IPLV.IP
+!- Set of performance curves for ASHRAE901_2019_air_A_gte150ton_10.1EER_14IPLV.IP
 
 Curve:Biquadratic,
-    ASHRAE901_2019_air_A_gte150ton_10.1kWpton_14IPLV.IP_cap-f-t,    !- Name
+    ASHRAE901_2019_air_A_gte150ton_10.1EER_14IPLV.IP_cap-f-t,    !- Name
     0.7869057566821718,       !- Coefficient1 Constant
     0.06561212364217481,      !- Coefficient2 x
     -0.002301768917046292,    !- Coefficient3 x2
@@ -82,7 +82,7 @@ Curve:Biquadratic,
     ;                         !- Maximum Curve Output
 
 Curve:Biquadratic,
-    ASHRAE901_2019_air_A_gte150ton_10.1kWpton_14IPLV.IP_eir-f-t,    !- Name
+    ASHRAE901_2019_air_A_gte150ton_10.1EER_14IPLV.IP_eir-f-t,    !- Name
     0.872388053480053,        !- Coefficient1 Constant
     -0.02372502054976646,     !- Coefficient2 x
     0.0011453381173352607,    !- Coefficient3 x2
@@ -97,7 +97,7 @@ Curve:Biquadratic,
     ;                         !- Maximum Curve Output
 
 Curve:Cubic,
-    ASHRAE901_2019_air_A_gte150ton_10.1kWpton_14IPLV.IP_eir-f-plr,    !- Name
+    ASHRAE901_2019_air_A_gte150ton_10.1EER_14IPLV.IP_eir-f-plr,    !- Name
     0.16266507402733643,      !- Coefficient1 Constant
     0.09082153641729536,      !- Coefficient2 x
     1.369885791798356,        !- Coefficient3 x2
@@ -148,10 +148,10 @@ Curve:Cubic,
     1.0,                      !- Maximum Value of x
     ;                         !- Minimum Curve Output
 
-!- Set of performance curves for ASHRAE901_2019_air_A_lt150ton_10.1kWpton_13.7IPLV.IP
+!- Set of performance curves for ASHRAE901_2019_air_A_lt150ton_10.1EER_13.7IPLV.IP
 
 Curve:Biquadratic,
-    ASHRAE901_2019_air_A_lt150ton_10.1kWpton_13.7IPLV.IP_cap-f-t,    !- Name
+    ASHRAE901_2019_air_A_lt150ton_10.1EER_13.7IPLV.IP_cap-f-t,    !- Name
     0.7536274941282223,       !- Coefficient1 Constant
     0.059276028733216114,     !- Coefficient2 x
     -0.002073292464305097,    !- Coefficient3 x2
@@ -166,7 +166,7 @@ Curve:Biquadratic,
     ;                         !- Maximum Curve Output
 
 Curve:Biquadratic,
-    ASHRAE901_2019_air_A_lt150ton_10.1kWpton_13.7IPLV.IP_eir-f-t,    !- Name
+    ASHRAE901_2019_air_A_lt150ton_10.1EER_13.7IPLV.IP_eir-f-t,    !- Name
     0.9908215848761304,       !- Coefficient1 Constant
     -0.02794659902518455,     !- Coefficient2 x
     0.0012289343079591177,    !- Coefficient3 x2
@@ -181,7 +181,7 @@ Curve:Biquadratic,
     ;                         !- Maximum Curve Output
 
 Curve:Cubic,
-    ASHRAE901_2019_air_A_lt150ton_10.1kWpton_13.7IPLV.IP_eir-f-plr,    !- Name
+    ASHRAE901_2019_air_A_lt150ton_10.1EER_13.7IPLV.IP_eir-f-plr,    !- Name
     0.1271245020760697,       !- Coefficient1 Constant
     0.07474000662382732,      !- Coefficient2 x
     1.6429989224609347,       !- Coefficient3 x2
@@ -232,10 +232,10 @@ Curve:Cubic,
     1.0,                      !- Maximum Value of x
     ;                         !- Minimum Curve Output
 
-!- Set of performance curves for ASHRAE901_2019_air_B_gte150ton_9.7kWpton_16.1IPLV.IP
+!- Set of performance curves for ASHRAE901_2019_air_B_gte150ton_9.7EER_16.1IPLV.IP
 
 Curve:Biquadratic,
-    ASHRAE901_2019_air_B_gte150ton_9.7kWpton_16.1IPLV.IP_cap-f-t,    !- Name
+    ASHRAE901_2019_air_B_gte150ton_9.7EER_16.1IPLV.IP_cap-f-t,    !- Name
     0.7640172447555345,       !- Coefficient1 Constant
     0.06804849058816334,      !- Coefficient2 x
     -0.0023096145622898837,    !- Coefficient3 x2
@@ -250,7 +250,7 @@ Curve:Biquadratic,
     ;                         !- Maximum Curve Output
 
 Curve:Biquadratic,
-    ASHRAE901_2019_air_B_gte150ton_9.7kWpton_16.1IPLV.IP_eir-f-t,    !- Name
+    ASHRAE901_2019_air_B_gte150ton_9.7EER_16.1IPLV.IP_eir-f-t,    !- Name
     0.8376257618251238,       !- Coefficient1 Constant
     -0.02517196794784297,     !- Coefficient2 x
     0.0012343872931018665,    !- Coefficient3 x2
@@ -265,7 +265,7 @@ Curve:Biquadratic,
     ;                         !- Maximum Curve Output
 
 Curve:Cubic,
-    ASHRAE901_2019_air_B_gte150ton_9.7kWpton_16.1IPLV.IP_eir-f-plr,    !- Name
+    ASHRAE901_2019_air_B_gte150ton_9.7EER_16.1IPLV.IP_eir-f-plr,    !- Name
     0.07524240756710364,      !- Coefficient1 Constant
     0.031402409184518115,     !- Coefficient2 x
     1.7196158727669184,       !- Coefficient3 x2
@@ -316,10 +316,10 @@ Curve:Cubic,
     1.0,                      !- Maximum Value of x
     ;                         !- Minimum Curve Output
 
-!- Set of performance curves for ASHRAE901_2019_air_B_lt150ton_9.7kWpton_15.8IPLV.IP
+!- Set of performance curves for ASHRAE901_2019_air_B_lt150ton_9.7EER_15.8IPLV.IP
 
 Curve:Biquadratic,
-    ASHRAE901_2019_air_B_lt150ton_9.7kWpton_15.8IPLV.IP_cap-f-t,    !- Name
+    ASHRAE901_2019_air_B_lt150ton_9.7EER_15.8IPLV.IP_cap-f-t,    !- Name
     0.7332916635331697,       !- Coefficient1 Constant
     0.06832466267947408,      !- Coefficient2 x
     -0.00227257048344532,     !- Coefficient3 x2
@@ -334,7 +334,7 @@ Curve:Biquadratic,
     ;                         !- Maximum Curve Output
 
 Curve:Biquadratic,
-    ASHRAE901_2019_air_B_lt150ton_9.7kWpton_15.8IPLV.IP_eir-f-t,    !- Name
+    ASHRAE901_2019_air_B_lt150ton_9.7EER_15.8IPLV.IP_eir-f-t,    !- Name
     0.8024149509361447,       !- Coefficient1 Constant
     -0.020856081428500536,    !- Coefficient2 x
     0.0011199744452278892,    !- Coefficient3 x2
@@ -349,7 +349,7 @@ Curve:Biquadratic,
     ;                         !- Maximum Curve Output
 
 Curve:Cubic,
-    ASHRAE901_2019_air_B_lt150ton_9.7kWpton_15.8IPLV.IP_eir-f-plr,    !- Name
+    ASHRAE901_2019_air_B_lt150ton_9.7EER_15.8IPLV.IP_eir-f-plr,    !- Name
     0.08666141661681519,      !- Coefficient1 Constant
     0.019140365295631154,     !- Coefficient2 x
     1.6920073253734107,       !- Coefficient3 x2
