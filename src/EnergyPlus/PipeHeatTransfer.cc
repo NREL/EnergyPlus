@@ -125,7 +125,7 @@ PlantComponent *PipeHTData::factory(EnergyPlusData &state, DataPlant::PlantEquip
     }
     // Now look for this particular pipe in the list
     for (auto &pipe : state.dataPipeHT->PipeHT) {
-        if (pipe.TypeOf == objectType && pipe.Name == objectName) {
+        if (pipe.Type == objectType && pipe.Name == objectName) {
             return &pipe;
         }
     }
@@ -259,7 +259,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                  state.dataIPShortCut->cAlphaFieldNames(1),
                                                  ErrorsFound);
         state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipeHT->PipeHT(Item).TypeOf = DataPlant::PlantEquipmentType::PipeInterior;
+        state.dataPipeHT->PipeHT(Item).Type = DataPlant::PlantEquipmentType::PipeInterior;
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
@@ -414,7 +414,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                  state.dataIPShortCut->cAlphaFieldNames(1),
                                                  ErrorsFound);
         state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipeHT->PipeHT(Item).TypeOf = DataPlant::PlantEquipmentType::PipeExterior;
+        state.dataPipeHT->PipeHT(Item).Type = DataPlant::PlantEquipmentType::PipeExterior;
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
@@ -551,7 +551,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                  state.dataIPShortCut->cAlphaFieldNames(1),
                                                  ErrorsFound);
         state.dataPipeHT->PipeHT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataPipeHT->PipeHT(Item).TypeOf = DataPlant::PlantEquipmentType::PipeUnderground;
+        state.dataPipeHT->PipeHT(Item).Type = DataPlant::PlantEquipmentType::PipeUnderground;
 
         // General user input data
         state.dataPipeHT->PipeHT(Item).Construction = state.dataIPShortCut->cAlphaArgs(2);
@@ -911,7 +911,7 @@ void PipeHTData::oneTimeInit_new(EnergyPlusData &state)
 {
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+        state, this->Name, this->Type, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "InitPipesHeatTransfer: Program terminated due to previous condition(s).");
     }
@@ -1877,7 +1877,7 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
 
     // Set environmental variables
     {
-        auto const SELECT_CASE_var(this->TypeOf);
+        auto const SELECT_CASE_var(this->Type);
 
         if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeInterior) {
 
