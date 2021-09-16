@@ -26044,7 +26044,6 @@ LOGICAL :: isBoilerHotWater
 LOGICAL :: isBoilerCondHotWater
 LOGICAL :: isHotPumpVariable
 LOGICAL :: isCapacityAutosize
-LOGICAL :: isFuelTypeValid
 LOGICAL :: isPumpBranch
 LOGICAL :: isPumpSchedNameBlank
 CHARACTER(len=MaxAlphaLength) :: blrInletNode=''
