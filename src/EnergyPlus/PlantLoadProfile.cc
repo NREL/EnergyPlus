@@ -301,7 +301,7 @@ void PlantProfileData::oneTimeInit_new(EnergyPlusData &state)
     if (allocated(state.dataPlnt->PlantLoop)) {
         errFlag = false;
         ScanPlantLoopsForObject(
-            state, this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
+            state, this->Name, this->Type, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
         if (errFlag) {
             ShowFatalError(state, "InitPlantProfile: Program terminated for previous conditions.");
         }
@@ -360,7 +360,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
             UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataPlantLoadProfile->PlantProfile(ProfileNum).TypeNum =
+            state.dataPlantLoadProfile->PlantProfile(ProfileNum).Type =
                 DataPlant::PlantEquipmentType::PlantLoadProfile; // parameter assigned in DataPlant
 
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).InletNode = GetOnlySingleNode(state,
