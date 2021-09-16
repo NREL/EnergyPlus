@@ -440,6 +440,11 @@ namespace UnitarySystems {
         Real64 m_NoCoolHeatOutAirMassFlow;
         Real64 m_HeatConvTol;
         Real64 m_CoolConvTol;
+        int m_HVACSizingIndex;
+        int m_AvailStatus;
+        bool m_IsZoneEquipment;
+        bool m_ZoneCompFlag;
+        std::string m_AvailManagerListName;
 
     public:
         // SZVAV variables
