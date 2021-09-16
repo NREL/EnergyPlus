@@ -4829,7 +4829,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                 }
                                             }
                                         }
-                                        state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).TypeNum =
+                                        state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).Type =
                                             state.dataSetPointManager->InitSetPointManagerTypeNum;
                                         state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).LoopIndexDemandSide = LoopNum;
                                         state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).ChillerIndexDemandSide = CompNum;
@@ -7443,7 +7443,7 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
     LoopIndexPlantSide = this->LoopIndexPlantSide;
     ChillerIndexPlantSide = this->ChillerIndexPlantSide;
     BranchIndexPlantSide = this->BranchIndexPlantSide;
-    TypeNum = this->TypeNum;
+    TypeNum = this->Type;
     LoopIndexDemandSide = this->LoopIndexDemandSide;
     ChillerIndexDemandSide = this->ChillerIndexDemandSide;
     BranchIndexDemandSide = this->BranchIndexDemandSide;

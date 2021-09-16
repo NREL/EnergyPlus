@@ -799,21 +799,21 @@ namespace SetPointManager {
         Real64 MaxCondEntTemp;          // maximum condenser entering water temp
         int NumCtrlNodes;               // number of nodes whose temperature is being set
         std::string CtrlNodeListName;
-        Array1D_int CtrlNodes;                 // nodes where temperature is being set
-        Real64 SetPt;                          // the temperature set point [C]
-        int ChillerIndexPlantSide;             // plant side chiller index
-        int ChillerIndexDemandSide;            // demand side chiller index
-        int BranchIndexPlantSide;              // plant side branch index
-        int BranchIndexDemandSide;             // demand side branch index
-        int LoopIndexPlantSide;                // plant side loop index
-        int LoopIndexDemandSide;               // deand side loop index
-        DataPlant::PlantEquipmentType TypeNum; // chiller type number
+        Array1D_int CtrlNodes;              // nodes where temperature is being set
+        Real64 SetPt;                       // the temperature set point [C]
+        int ChillerIndexPlantSide;          // plant side chiller index
+        int ChillerIndexDemandSide;         // demand side chiller index
+        int BranchIndexPlantSide;           // plant side branch index
+        int BranchIndexDemandSide;          // demand side branch index
+        int LoopIndexPlantSide;             // plant side loop index
+        int LoopIndexDemandSide;            // deand side loop index
+        DataPlant::PlantEquipmentType Type; // chiller type number
 
         // Default Constructor
         DefineCondEntSetPointManager()
             : CondEntTempSchedPtr(0), TowerDsnInletAirWetBulb(0.0), MinTwrWbCurve(0), MinOaWbCurve(0), OptCondEntCurve(0), MinimumLiftTD(0.0),
               MaxCondEntTemp(0.0), NumCtrlNodes(0), SetPt(0.0), ChillerIndexPlantSide(0), ChillerIndexDemandSide(0), BranchIndexPlantSide(0),
-              BranchIndexDemandSide(0), LoopIndexPlantSide(0), LoopIndexDemandSide(0), TypeNum(DataPlant::PlantEquipmentType::Invalid)
+              BranchIndexDemandSide(0), LoopIndexPlantSide(0), LoopIndexDemandSide(0), Type(DataPlant::PlantEquipmentType::Invalid)
         {
         }
 
