@@ -7430,7 +7430,7 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
     int BranchIndexDemandSide(0);
     int LoopIndexPlantSide(0);
     int LoopIndexDemandSide(0);
-    DataPlant::PlantEquipmentType TypeNum(DataPlant::PlantEquipmentType::Invalid);
+    DataPlant::PlantEquipmentType Type(DataPlant::PlantEquipmentType::Invalid);
 
     // Get from tower design values
     NormDsnCondFlow = 5.38e-8; // m3/s per watt (typically 3 gpm/ton)=(Volume of condenser fluid)/(ton of heat rejection)
@@ -7443,7 +7443,7 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
     LoopIndexPlantSide = this->LoopIndexPlantSide;
     ChillerIndexPlantSide = this->ChillerIndexPlantSide;
     BranchIndexPlantSide = this->BranchIndexPlantSide;
-    TypeNum = this->Type;
+    Type = this->Type;
     LoopIndexDemandSide = this->LoopIndexDemandSide;
     ChillerIndexDemandSide = this->ChillerIndexDemandSide;
     BranchIndexDemandSide = this->BranchIndexDemandSide;
@@ -7452,9 +7452,9 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
     CurLoad =
         std::abs(state.dataPlnt->PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).MyLoad);
     if (CurLoad > 0) {
-        if (TypeNum == PlantEquipmentType::Chiller_Absorption || TypeNum == PlantEquipmentType::Chiller_CombTurbine ||
-            TypeNum == PlantEquipmentType::Chiller_Electric || TypeNum == PlantEquipmentType::Chiller_ElectricReformEIR ||
-            TypeNum == PlantEquipmentType::Chiller_EngineDriven) {
+        if (Type == PlantEquipmentType::Chiller_Absorption || Type == PlantEquipmentType::Chiller_CombTurbine ||
+            Type == PlantEquipmentType::Chiller_Electric || Type == PlantEquipmentType::Chiller_ElectricReformEIR ||
+            Type == PlantEquipmentType::Chiller_EngineDriven) {
             TempDesCondIn = state.dataPlnt->PlantLoop(LoopIndexPlantSide)
                                 .LoopSide(SupplySide)
                                 .Branch(BranchIndexPlantSide)
@@ -7482,7 +7482,7 @@ void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
             state.dataSetPointManager->DCESPMDesignClgCapacity_Watts =
                 state.dataPlnt->PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).MaxLoad;
             state.dataSetPointManager->DCESPMCurrentLoad_Watts = state.dataPlnt->PlantLoop(LoopIndexPlantSide).CoolingDemand;
-        } else if (TypeNum == PlantEquipmentType::Chiller_Indirect_Absorption || TypeNum == PlantEquipmentType::Chiller_DFAbsorption) {
+        } else if (Type == PlantEquipmentType::Chiller_Indirect_Absorption || Type == PlantEquipmentType::Chiller_DFAbsorption) {
             TempDesCondIn = state.dataPlnt->PlantLoop(LoopIndexPlantSide)
                                 .LoopSide(SupplySide)
                                 .Branch(BranchIndexPlantSide)
