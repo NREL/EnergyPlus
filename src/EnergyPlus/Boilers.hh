@@ -80,7 +80,7 @@ namespace Boilers {
         // Members
         std::string Name;                           // user identifier
         DataGlobalConstants::ResourceType FuelType; // resource type assignment
-        DataPlant::PlantEquipmentType Type;      // plant loop type identifier
+        DataPlant::PlantEquipmentType Type;         // plant loop type identifier
         int LoopNum;                                // plant loop connection
         int LoopSideNum;                            // plant loop side connection
         int BranchNum;                              // plant loop branch connection
