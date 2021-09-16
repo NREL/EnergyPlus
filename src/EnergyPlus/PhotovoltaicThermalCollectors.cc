@@ -1073,7 +1073,7 @@ namespace PhotovoltaicThermalCollectors {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   August 2008
-        //       MODIFIED       K. Haddad, March 2020, subroutine crated from original code in subroutine
+        //       MODIFIED       K. Haddad, March 2020, subroutine created from original code in subroutine
         //                      "PVTCollectorStruct::calculate()"
         //       RE-ENGINEERED  na
 
@@ -1083,7 +1083,7 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // Current model is "simple" fixed efficiency and simple night sky balance for cooling
 
-        static std::string const RoutineName("CalcSimplePVTcollectors");
+        static constexpr std::string_view RoutineName("CalcSimplePVTcollectors");
 
         int InletNode(0);
 
@@ -1196,7 +1196,7 @@ namespace PhotovoltaicThermalCollectors {
             Real64 Tcollector =
                 (2.0 * mdot * CpInlet * Tinlet +
                  this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
-                                  HrAir * state.dataHeatBalSurf->SurfTempOut(this->SurfNum) + HcExt * state.dataHeatBalSurf->SurfTempOut(this->SurfNum))) /
+                                  HrAir * state.dataSurface->SurfOutDryBulbTemp(this->SurfNum) + HcExt * state.dataSurface->SurfOutDryBulbTemp(this->SurfNum))) /
                 (2.0 * mdot * CpInlet + this->AreaCol * (HrGround + HrSky + HrAir + HcExt));
             PotentialOutletTemp = 2.0 * Tcollector - Tinlet;
             this->Report.ToutletWorkFluid = PotentialOutletTemp;
