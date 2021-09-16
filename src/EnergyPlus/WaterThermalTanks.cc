@@ -4163,7 +4163,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                 auto &DesuperHtr = state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum);
                 for (int WtrHtrNum = 1; WtrHtrNum <= state.dataWaterThermalTanks->numWaterThermalTank; ++WtrHtrNum) {
                     auto &Tank = state.dataWaterThermalTanks->WaterThermalTank(WtrHtrNum);
-                    if (!UtilityRoutines::SameString(DesuperHtr.TankName, Tank.Name) || !UtilityRoutines::SameString(DesuperHtr.TankType, Tank.Type))
+                    if (!UtilityRoutines::SameString(DesuperHtr.TankName, Tank.Name) || !UtilityRoutines::SameString(DesuperHtr.TankType, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(Tank.TypeNum)]))
                         continue;
                     Tank.DesuperheaterNum = DesuperheaterNum;
                     DesuperHtr.WaterHeaterTankNum = WtrHtrNum;
@@ -4227,7 +4227,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                     auto &Tank = state.dataWaterThermalTanks->WaterThermalTank(CheckWaterHeaterNum);
 
-                    if (!(UtilityRoutines::SameString(HPWH.TankName, Tank.Name) && UtilityRoutines::SameString(HPWH.TankType, Tank.Type))) continue;
+                    if (!(UtilityRoutines::SameString(HPWH.TankName, Tank.Name) && UtilityRoutines::SameString(HPWH.TankType, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(Tank.TypeNum)]))) continue;
 
                     // save backup element and on/off-cycle parasitic properties for use during standard rating procedure
                     HPWH.BackupElementCapacity = Tank.MaxCapacity;
@@ -4241,11 +4241,12 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     if (((Tank.TypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) &&
                          (HPWH.TypeNum == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped)) ||
                         (Tank.TypeNum == DataPlant::PlantEquipmentType::WtrHeaterStratified)) {
-                        HPWH.TankType = Tank.Type;
+                        HPWH.TankType = DataPlant::PlantEquipTypeNamesCC[static_cast<int>(Tank.TypeNum)];
                         HPWH.TankTypeNum = Tank.TypeNum;
                     } else {
                         ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                        ShowContinueError(state, "Invalid water heater tank type = " + Tank.Type);
+                        ShowContinueError(state,
+                                          format("Invalid water heater tank type = {}", DataPlant::PlantEquipTypeNamesCC[static_cast<int>(Tank.TypeNum)]));
                         ErrorsFound = true;
                     }
 
@@ -4269,7 +4270,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     // If WaterHeaterMixed: do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
                     if ((Tank.TypeNum == DataPlant::PlantEquipmentType::WtrHeaterMixed) && (Tank.ControlType == ControlTypeEnum::Modulate)) {
                         ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                        ShowContinueError(state, "Heater Control Type for " + Tank.Type + " = " + Tank.Name + " must be CYCLE.");
+                        ShowContinueError(state,
+                                          format("Heater Control Type for {} = {} must be CYCLE.", DataPlant::PlantEquipTypeNamesCC[static_cast<int>(Tank.TypeNum)], Tank.Name));
                         ErrorsFound = true;
                     }
 
@@ -4298,7 +4300,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     // Set up the source side nodes for wrapped condensers
                     if (HPWH.TypeNum == DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped) {
                         if (Tank.SourceInletNode > 0 || Tank.SourceOutletNode > 0) {
-                            ShowSevereError(state, Tank.Type + " = " + Tank.Name + " has a source inlet or outlet node specified,");
+                            ShowSevereError(state,
+                                              format("{} = {} has a source inlet or outlet node specified,", DataPlant::PlantEquipTypeNamesCC[static_cast<int>(Tank.TypeNum)], Tank.Name));
                             ShowContinueError(
                                 state, "but it is attached to " + HPWH.Type + " = " + HPWH.Name + ", which doesn't permit source side connections.");
                             ShowContinueError(state, "Please leave the source side inlet and outlet fields blank.");
@@ -4307,7 +4310,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                             Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                        HPWH.OutletNodeName1,
                                                                                        ErrorsFound,
-                                                                                       Tank.Type,
+                                                                                       DataPlant::PlantEquipTypeNamesCC[static_cast<int>(Tank.TypeNum)],
                                                                                        Tank.Name,
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
@@ -4317,7 +4320,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                             Tank.SourceOutletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                         HPWH.InletNodeName1,
                                                                                         ErrorsFound,
-                                                                                        Tank.Type,
+                                                                                        DataPlant::PlantEquipTypeNamesCC[static_cast<int>(Tank.TypeNum)],
                                                                                         Tank.Name,
                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
@@ -4833,7 +4836,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         // do nothing, Use nodes are tested for HeatPump:WaterHeater not tank
                     } else {
                         BranchNodeConnections::TestCompSet(state,
-                                                           state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Type,
+                                                           DataPlant::PlantEquipTypeNamesCC[static_cast<int>(state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).TypeNum)],
                                                            state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name,
                                                            state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).InletNodeName1,
                                                            state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).OutletNodeName1,
@@ -4844,7 +4847,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).SourceOutletNode > 0) {
 
                     BranchNodeConnections::TestCompSet(state,
-                                                       state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Type,
+                                                       DataPlant::PlantEquipTypeNamesCC[static_cast<int>(state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).TypeNum)],
                                                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name,
                                                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).InletNodeName2,
                                                        state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).OutletNodeName2,
@@ -7317,13 +7320,13 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
                 ShowWarningError(state,
                                  format("{}: {} = '{}':  Temperature of tank < 2C indicates of possibility of freeze. Tank Temperature = {:.2R} C.",
                                         RoutineName,
-                                        this->Type,
+                                        DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)],
                                         this->Name,
                                         this->TankTemp));
                 ShowContinueErrorTimeStamp(state, "");
             }
             ShowRecurringWarningErrorAtEnd(state,
-                                           this->Type + " = '" + this->Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
+                                           DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)] + " = '" + this->Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
                                            this->FreezingErrorIndex,
                                            this->TankTemp, // Report Max
                                            this->TankTemp, // Report Min
@@ -8188,13 +8191,13 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
                 ShowWarningError(state,
                                  format("{}: {} = '{}':  Temperature of tank < 2C indicates of possibility of freeze. Tank Temperature = {:.2R} C.",
                                         RoutineName,
-                                        this->Type,
+                                        DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)],
                                         this->Name,
                                         this->TankTemp));
                 ShowContinueErrorTimeStamp(state, "");
             }
             ShowRecurringWarningErrorAtEnd(state,
-                                           this->Type + " = '" + this->Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
+                                           DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)] + " = '" + this->Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
                                            this->FreezingErrorIndex,
                                            this->TankTemp, // Report Max
                                            this->TankTemp, // Report Min
@@ -10882,11 +10885,11 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
                         }
                     }
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
+                        BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, this->Type, this->Name, "Initial Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
+                            state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                         PlantUtilities::RegisterPlantCompDesignFlow(state, this->UseInletNode, this->UseDesignVolFlowRate);
@@ -10946,11 +10949,11 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
                     }
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, this->Type, this->Name, "Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
+                            state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, this->Type, this->Name, "Initial Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
+                            state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                         PlantUtilities::RegisterPlantCompDesignFlow(state, this->SourceInletNode, this->SourceDesignVolFlowRate);
@@ -11164,19 +11167,19 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
             if (this->VolumeWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->Volume = tmpTankVolume;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Volume [m3]", this->Volume);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Tank Volume [m3]", this->Volume);
                 }
             }
             if (this->MaxCapacityWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->MaxCapacity = tmpMaxCapacity;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
             }
         } else if (SELECT_CASE_var == SizeEnum::PerPerson) {
@@ -11211,19 +11214,19 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
             if (this->VolumeWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->Volume = tmpTankVolume;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Volume [m3]", this->Volume);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Tank Volume [m3]", this->Volume);
                 }
             }
             if (this->MaxCapacityWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->MaxCapacity = tmpMaxCapacity;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
             }
         } else if (SELECT_CASE_var == SizeEnum::PerFloorArea) {
@@ -11254,19 +11257,19 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
             if (this->VolumeWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->Volume = tmpTankVolume;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Volume [m3]", this->Volume);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Tank Volume [m3]", this->Volume);
                 }
             }
             if (this->MaxCapacityWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->MaxCapacity = tmpMaxCapacity;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
             }
         } else if (SELECT_CASE_var == SizeEnum::PerUnit) {
@@ -11298,19 +11301,19 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
             if (this->VolumeWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->Volume = tmpTankVolume;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Volume [m3]", this->Volume);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Tank Volume [m3]", this->Volume);
                 }
             }
             if (this->MaxCapacityWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->MaxCapacity = tmpMaxCapacity;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
             }
         } else if (SELECT_CASE_var == SizeEnum::PerSolarColArea) {
@@ -11323,10 +11326,10 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
         if ((this->HeightWasAutoSized) && (!this->VolumeWasAutoSized)) {
             this->Height = std::pow((4.0 * this->Volume * pow_2(this->Sizing.HeightAspectRatio)) / DataGlobalConstants::Pi, 0.3333333333333333);
             if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Height [m]", this->Height);
+                BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Height [m]", this->Height);
             }
             if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Tank Height [m]", this->Height);
+                BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Tank Height [m]", this->Height);
             }
             // check if DataGlobalConstants::AutoCalculate() Use outlet and source inlet are still set to autosize by earlier
             if (this->UseOutletHeightWasAutoSized) {
@@ -11376,10 +11379,10 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
             if (this->VolumeWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->Volume = tmpTankVolume;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Volume [m3]", this->Volume);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Tank Volume [m3]", this->Volume);
                 }
             }
             if (this->MaxCapacityWasAutoSized) {
@@ -11413,10 +11416,10 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
             if (this->MaxCapacityWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->MaxCapacity = tmpMaxCapacity;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
             }
         } else if (SELECT_CASE_var == SizeEnum::PerSolarColArea) {
@@ -11431,19 +11434,19 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
             if (this->VolumeWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->Volume = tmpTankVolume;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Volume [m3]", this->Volume);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Tank Volume [m3]", this->Volume);
                 }
             }
             if (this->MaxCapacityWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 this->MaxCapacity = tmpMaxCapacity;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
             }
         }
@@ -11454,10 +11457,10 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
         if ((this->HeightWasAutoSized) && (!this->VolumeWasAutoSized)) {
             this->Height = std::pow((4.0 * this->Volume * pow_2(this->Sizing.HeightAspectRatio)) / DataGlobalConstants::Pi, 0.3333333333333333);
             if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Height [m]", this->Height);
+                BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Height [m]", this->Height);
             }
             if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Initial Tank Height [m]", this->Height);
+                BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Tank Height [m]", this->Height);
             }
         }
     }
@@ -11553,11 +11556,11 @@ void WaterThermalTankData::SizeDemandSidePlantConnections(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
+                        BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, this->Type, this->Name, "Initial Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
+                            state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                         PlantUtilities::RegisterPlantCompDesignFlow(state, this->UseInletNode, this->UseDesignVolFlowRate);
@@ -11641,11 +11644,11 @@ void WaterThermalTankData::SizeDemandSidePlantConnections(EnergyPlusData &state)
                     }
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, this->Type, this->Name, "Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
+                            state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, this->Type, this->Name, "Initial Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
+                            state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Initial Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                         PlantUtilities::RegisterPlantCompDesignFlow(state, this->SourceInletNode, this->SourceDesignVolFlowRate);
@@ -11729,7 +11732,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                     tmpTankVolume =
                         this->Sizing.TankDrawTime * DrawDesignVolFlowRate * DataGlobalConstants::SecInHour; // hours | m3/s | (3600 s/1 hour)
                     this->Volume = tmpTankVolume;
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Volume [m3]", this->Volume);
                 }
                 if (this->MaxCapacityWasAutoSized) {
                     if (this->Sizing.RecoveryTime > 0.0) {
@@ -11745,7 +11748,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                                            "\", requested sizing for max capacity but entered Recovery Time is zero.");
                     }
                     this->MaxCapacity = tmpMaxCapacity;
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
 
             } else if (SELECT_CASE_var == SizeEnum::ResidentialMin) {
@@ -11881,11 +11884,11 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                 }
                 if (this->VolumeWasAutoSized) {
                     this->Volume = tmpTankVolume;
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Volume [m3]", this->Volume);
                 }
                 if (this->MaxCapacityWasAutoSized) {
                     this->MaxCapacity = tmpMaxCapacity;
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
 
             } else if (SELECT_CASE_var == SizeEnum::PerPerson) {
@@ -11906,11 +11909,11 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
 
                 if (this->VolumeWasAutoSized) {
                     this->Volume = tmpTankVolume;
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Volume [m3]", this->Volume);
                 }
                 if (this->MaxCapacityWasAutoSized) {
                     this->MaxCapacity = tmpMaxCapacity;
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
 
             } else if (SELECT_CASE_var == SizeEnum::PerFloorArea) {
@@ -11930,11 +11933,11 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                 }
                 if (this->VolumeWasAutoSized) {
                     this->Volume = tmpTankVolume;
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Volume [m3]", this->Volume);
                 }
                 if (this->MaxCapacityWasAutoSized) {
                     this->MaxCapacity = tmpMaxCapacity;
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
             } else if (SELECT_CASE_var == SizeEnum::PerUnit) {
 
@@ -11950,11 +11953,11 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
 
                 if (this->VolumeWasAutoSized) {
                     this->Volume = tmpTankVolume;
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Volume [m3]", this->Volume);
                 }
                 if (this->MaxCapacityWasAutoSized) {
                     this->MaxCapacity = tmpMaxCapacity;
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
             } else if (SELECT_CASE_var == SizeEnum::PerSolarColArea) {
                 this->Sizing.TotalSolarCollectorArea = 0.0;
@@ -11967,11 +11970,11 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 0.0;
                 if (this->VolumeWasAutoSized) {
                     this->Volume = tmpTankVolume;
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Tank Volume [m3]", this->Volume);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Tank Volume [m3]", this->Volume);
                 }
                 if (this->MaxCapacityWasAutoSized) {
                     this->MaxCapacity = tmpMaxCapacity;
-                    BaseSizer::reportSizerOutput(state, this->Type, this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
+                    BaseSizer::reportSizerOutput(state, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, "Maximum Heater Capacity [W]", this->MaxCapacity);
                 }
             }
         }
@@ -12482,7 +12485,7 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
     std::string equipName;
     if (this->HeatPumpNum == 0) {
         equipName = this->Name;
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHType, equipName, this->Type);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHType, equipName, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)]);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHVol, equipName, this->Volume);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHHeatIn, equipName, this->MaxCapacity);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSWHThEff, equipName, this->Efficiency);
@@ -12519,7 +12522,7 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
         }
 
         static constexpr std::string_view Format_720("Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T}\n");
-        print(state.files.eio, Format_720, this->Type, this->Name, this->Volume, MaxCapacity_loc, RecoveryEfficiency, EnergyFactor);
+        print(state.files.eio, Format_720, DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, this->Volume, MaxCapacity_loc, RecoveryEfficiency, EnergyFactor);
     } else {
         static constexpr std::string_view Format_721("Heat Pump Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T},{:.0T}\n");
         print(state.files.eio,
@@ -12558,7 +12561,8 @@ void WaterThermalTankData::ReportCWTankInits(EnergyPlusData &state)
     }
 
     static constexpr std::string_view Format_728("Chilled Water Tank Information,{},{},{:.4T},{:.4T},{:.4T}\n");
-    print(state.files.eio, Format_728, this->Type, this->Name, this->Volume, this->UseDesignVolFlowRate, this->SourceDesignVolFlowRate);
+    print(state.files.eio, Format_728,
+          DataPlant::PlantEquipTypeNamesCC[static_cast<int>(this->TypeNum)], this->Name, this->Volume, this->UseDesignVolFlowRate, this->SourceDesignVolFlowRate);
 
     this->AlreadyReported = true;
 }
