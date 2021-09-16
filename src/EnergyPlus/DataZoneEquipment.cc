@@ -417,6 +417,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             thisZoneEquipList.compPointer.resize(thisZoneEquipList.NumOfEquipTypes + 1);
             thisZoneEquipList.EquipName.allocate(thisZoneEquipList.NumOfEquipTypes);
             thisZoneEquipList.EquipIndex.allocate(thisZoneEquipList.NumOfEquipTypes);
+            thisZoneEquipList.ParentIndex.allocate(thisZoneEquipList.NumOfEquipTypes);
             thisZoneEquipList.EquipData.allocate(thisZoneEquipList.NumOfEquipTypes);
             thisZoneEquipList.CoolingPriority.allocate(thisZoneEquipList.NumOfEquipTypes);
             thisZoneEquipList.HeatingPriority.allocate(thisZoneEquipList.NumOfEquipTypes);
@@ -535,6 +536,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                         UnitarySystems::UnitarySys thisSys;
                         thisZoneEquipList.compPointer[ZoneEquipTypeNum] =
                             thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
+                        thisZoneEquipList.ParentIndex(ZoneEquipTypeNum) =
+                            state.dataZoneEquip->ZoneEquipList(ControlledZoneNum).compPointer[ZoneEquipTypeNum]->getParentIndex();
 
                     } else if (SELECT_CASE_var == "ZONEHVAC:DEHUMIDIFIER:DX") { // Zone dehumidifier
                         thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = ZoneDXDehumidifier_Num;

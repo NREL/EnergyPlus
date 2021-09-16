@@ -90,6 +90,7 @@ public:
     virtual int getMixerOANode() = 0;
     virtual int getMixerMixNode() = 0;
     virtual int getMixerRetNode() = 0;
+    virtual int getParentIndex() = 0;
 };
 
 } // namespace EnergyPlus

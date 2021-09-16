@@ -158,15 +158,16 @@ namespace UnitarySystems {
           m_minAirToWaterTempOffset(0.0), m_HRcoolCoilFluidInletNode(0), m_HRcoolCoilAirInNode(0), m_minWaterLoopTempForHR(0.0),
           m_waterSideEconomizerFlag(false), m_WaterHRPlantLoopModel(false), m_CoolOutAirVolFlow(0.0), m_CoolOutAirMassFlow(0.0),
           m_HeatOutAirVolFlow(0.0), m_HeatOutAirMassFlow(0.0), m_NoCoolHeatOutAirVolFlow(0.0), m_NoCoolHeatOutAirMassFlow(0.0), m_HeatConvTol(0.0),
-          m_CoolConvTol(0.0), m_HVACSizingIndex(-1), m_AvailStatus(0), m_IsZoneEquipment(false), m_ZoneCompFlag(true), UnitarySystemType_Num(0),
-          MaxIterIndex(0), RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
-          HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
-          MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
-          MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0),
-          CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0),
-          HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0),
-          HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0),
-          m_CompPointerMSHP(nullptr), LoadSHR(0.0), CoilSHR(0.0), temperatureOffsetControlStatus(0), OAMixerIndex(-1), OAMixerExists(false)
+          m_CoolConvTol(0.0), m_HVACSizingIndex(-1), m_AvailStatus(0), m_IsZoneEquipment(false), m_ZoneCompFlag(true),
+          m_ZoneUnitaryNum(0), m_PTACNum(0), m_PTHPNum(0), m_PTWSHPNum(0), UnitarySystemType_Num(0), MaxIterIndex(0),
+          RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0),
+          ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0),
+          DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0),
+          MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0),
+          CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0),
+          HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0),
+          HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr),
+          LoadSHR(0.0), CoilSHR(0.0), temperatureOffsetControlStatus(0), OAMixerIndex(-1), OAMixerExists(false)
     {
     }
 
@@ -217,14 +218,7 @@ namespace UnitarySystems {
             // Get the unitary system input
             getUnitarySystemInput(state, Name, ZoneEquipment, ZoneOAUnitNum);
         }
-        // Sys Avail Managers is accessing AvailStatus for wrong equipment
-        // ZoneEquipmentManager.cc line 3095
-        // ZoneCompNum = state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).EquipIndex(EquipPtr);
-        // ZoneEquipmentManager.cc line 3107
-        // if (ZoneComp(ZoneEquipTypeNum).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == CycleOn/ForceOff)
-        // So adding 1 here. If diffs are found in other files then rethink what is needed
-        // Zone SystemAvailabilityManagers need a refactor
-        CompIndex = this->m_UnitarySysNum + 1;
+            CompIndex = this->m_UnitarySysNum;
 
         state.dataUnitarySystems->FanSpeedRatio = 1.0;
         if (ZoneEquipment) {
@@ -515,13 +509,17 @@ namespace UnitarySystems {
             // also need to move to better location and save thisObjectIndex and thisObjectType in struct
             // also, thisObjectIndex needs to be by parent type, not total UnitarySystems
             // e.g., PTAC = 1,2,3; PTHP = 1,2; PTWSHP = 1,2,3,4; UnitarySystems = 9 total
-            int thisObjectIndex = this->m_UnitarySysNum + 1;
+            int thisObjectIndex = 0;
             int thisObjectType = 0;
             switch (this->m_sysType) {
             case SysType::PackagedAC:
+                thisObjectIndex = this->m_PTACNum;
                 thisObjectType = DataZoneEquipment::PkgTermACAirToAir_Num;
+                break;
             case SysType::PackagedHP:
+                thisObjectIndex = this->m_PTHPNum;
                 thisObjectType = DataZoneEquipment::PkgTermHPAirToAir_Num;
+                break;
             }
             if (this->m_ZoneCompFlag) {
                 state.dataHVACGlobal->ZoneComp(thisObjectType).ZoneCompAvailMgrs(thisObjectIndex).AvailManagerListName = this->m_AvailManagerListName;
@@ -3056,6 +3054,7 @@ namespace UnitarySystems {
             switch (this->m_sysType) {
             case SysType::PackagedHP:
                 EqSizing.HeatingCapacity = false; // ensure PTHP supplemental heating coil sizes to load
+                break;
             }
             SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
 
@@ -3474,34 +3473,6 @@ namespace UnitarySystems {
             this->m_NoCoolHeatOutAirVolFlow = input_data.no_load_oa_flow_rate;
         }
 
-        this->m_AvailManagerListName = input_data.avail_manager_list_name;
-        if (allocated(state.dataHVACGlobal->ZoneComp)) {
-            int thisObjectIndex = this->m_UnitarySysNum;
-            int thisObjectType = 0;
-            switch (this->m_sysType) {
-            case SysType::PackagedAC:
-                thisObjectType = DataZoneEquipment::PkgTermACAirToAir_Num;
-            case SysType::PackagedHP:
-                thisObjectType = DataZoneEquipment::PkgTermHPAirToAir_Num;
-            }
-            state.dataHVACGlobal->ZoneComp(thisObjectType).ZoneCompAvailMgrs(thisObjectIndex).AvailManagerListName =
-                input_data.avail_manager_list_name;
-            state.dataHVACGlobal->ZoneComp(thisObjectType).ZoneCompAvailMgrs(thisObjectIndex).ZoneNum = this->ControlZoneNum;
-            this->m_AvailStatus = state.dataHVACGlobal->ZoneComp(thisObjectType).ZoneCompAvailMgrs(thisObjectIndex).AvailStatus;
-        }
-
-        if (!input_data.design_spec_zonehvac_sizing_object_name.empty()) {
-            this->m_HVACSizingIndex =
-                UtilityRoutines::FindItemInList(input_data.design_spec_zonehvac_sizing_object_name, state.dataSize->ZoneHVACSizing);
-            if (this->m_HVACSizingIndex == 0) {
-                ShowSevereError(state,
-                                "Design Specification ZoneHVAC Sizing Object Name = " + input_data.design_spec_zonehvac_sizing_object_name +
-                                    " not found.");
-                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + this->Name);
-                errorsFound = true;
-            }
-        }
-
         if (ZoneEquipment) {
             this->UnitarySystemType_Num = DataZoneEquipment::ZoneUnitarySys_Num;
             this->m_OKToPrintSizing = true;
@@ -3822,7 +3793,8 @@ namespace UnitarySystems {
                 }
             }
 
-            if (AirLoopFound && !ZoneExhaustNodeFound && !InducedNodeFound) {
+            // how can ZoneEquipmentFound be true? this is inside !ZoneEquipmentFound
+            if (ZoneEquipmentFound && !ZoneExhaustNodeFound && !InducedNodeFound) {
                 // Exhaust Node was not found
                 ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
                 ShowContinueError(state,
@@ -3877,6 +3849,47 @@ namespace UnitarySystems {
             } else if (OASysFound) {
                 this->m_OKToPrintSizing = true;
                 this->m_ThisSysInputShouldBeGotten = false;
+            }
+        }
+
+        this->m_AvailManagerListName = input_data.avail_manager_list_name;
+        if (this->m_IsZoneEquipment && !state.dataHVACGlobal->ZoneComp.empty()) {
+            int thisObjectIndex = this->m_UnitarySysNum + 1;
+            int thisObjectType = 0;
+            switch (this->m_sysType) {
+            case SysType::Unitary:
+                thisObjectIndex = 0; //this->m_ZoneUnitaryNum; this object does not accept sys avail managers yet
+                thisObjectType = DataZoneEquipment::ZoneUnitarySys_Num;
+                break;
+            case SysType::PackagedAC:
+                thisObjectIndex = this->m_PTACNum;
+                thisObjectType = DataZoneEquipment::PkgTermACAirToAir_Num;
+                break;
+            case SysType::PackagedHP:
+                thisObjectIndex = this->m_PTHPNum;
+                thisObjectType = DataZoneEquipment::PkgTermHPAirToAir_Num;
+                break;
+            }
+            if (thisObjectIndex > 0) {
+                if (thisObjectIndex > state.dataHVACGlobal->ZoneComp(thisObjectType).ZoneCompAvailMgrs.size()) {
+                    ShowFatalError(state, "Developer error in SysAvailManager index for " + cCurrentModuleObject + " = " + thisObjectName);
+                }
+                state.dataHVACGlobal->ZoneComp(thisObjectType).ZoneCompAvailMgrs(thisObjectIndex).AvailManagerListName =
+                    input_data.avail_manager_list_name;
+                state.dataHVACGlobal->ZoneComp(thisObjectType).ZoneCompAvailMgrs(thisObjectIndex).ZoneNum = this->ControlZoneNum;
+                this->m_AvailStatus = state.dataHVACGlobal->ZoneComp(thisObjectType).ZoneCompAvailMgrs(thisObjectIndex).AvailStatus;
+            }
+        }
+
+        if (!input_data.design_spec_zonehvac_sizing_object_name.empty()) {
+            this->m_HVACSizingIndex =
+                UtilityRoutines::FindItemInList(input_data.design_spec_zonehvac_sizing_object_name, state.dataSize->ZoneHVACSizing);
+            if (this->m_HVACSizingIndex == 0) {
+                ShowSevereError(state,
+                                "Design Specification ZoneHVAC Sizing Object Name = " + input_data.design_spec_zonehvac_sizing_object_name +
+                                    " not found.");
+                ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + this->Name);
+                errorsFound = true;
             }
         }
 
@@ -7446,6 +7459,9 @@ namespace UnitarySystems {
     {
         std::string cCurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
         SysType sysTypeNum = SysType::PackagedAC;
+        int numPTAC = 0;
+        int numPTHP = 0;
+        int numPTWSHP = 0;
         auto &ip = state.dataInputProcessing->inputProcessor;
         for (int getPTUnitType = 1; getPTUnitType <= 2; ++getPTUnitType) {
             if (getPTUnitType == 2) {
@@ -7566,6 +7582,9 @@ namespace UnitarySystems {
 
                     // now translate to UnitarySystem
                     UnitarySys thisSys;
+                    if (sysNum != -1) {
+                        thisSys = state.dataUnitarySystems->unitarySys[sysNum];
+                    }
                     thisSys.UnitType = cCurrentModuleObject;
                     thisSys.m_sysType = sysTypeNum;
                     if (mixerIndex > 0) {
@@ -7593,6 +7612,18 @@ namespace UnitarySystems {
                     thisSys.processInputSpec(state, original_input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
 
                     if (sysNum == -1) {
+                        if (getPTUnitType == 1) {
+                            ++numPTAC;
+                            thisSys.m_PTACNum = numPTAC;
+                        } else if (getPTUnitType == 2) {
+                            ++numPTHP;
+                            thisSys.m_PTHPNum = numPTHP;
+                        } else if (getPTUnitType == 3) {
+                            ++numPTWSHP;
+                            thisSys.m_PTWSHPNum = numPTWSHP;
+                        } else {
+                            assert(true);
+                        }
                         int thisSysNum = state.dataUnitarySystems->numUnitarySystems - 1;
                         state.dataUnitarySystems->unitarySys[thisSysNum] = thisSys;
                     } else {
@@ -7763,6 +7794,7 @@ namespace UnitarySystems {
 
         std::string cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
         static std::string const getUnitarySystemInput("getUnitarySystemInputData");
+        int numZoneUnitary = 0;
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances == state.dataInputProcessing->inputProcessor->epJSON.end() && state.dataUnitarySystems->numUnitarySystems == 0) {
@@ -8007,6 +8039,7 @@ namespace UnitarySystems {
                 thisSys.processInputSpec(state, input_spec, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
 
                 if (sysNum == -1) {
+                    ++thisSys.m_UnitarySysNum;
                     int thisSysNum = state.dataUnitarySystems->numUnitarySystems - 1;
                     state.dataUnitarySystems->unitarySys[thisSysNum] = thisSys;
                 } else {
@@ -17604,6 +17637,20 @@ namespace UnitarySystems {
     int UnitarySys::getMixerRetNode()
     {
         return this->m_OAMixerNodes[2];
+    }
+
+    int UnitarySys::getParentIndex()
+    {
+        switch (this->m_sysType) {
+        case UnitarySys::SysType::PackagedAC:
+            return this->m_PTACNum;
+        case UnitarySys::SysType::PackagedHP:
+            return this->m_PTHPNum;
+        case UnitarySys::SysType::Unitary:
+            return this->m_ZoneUnitaryNum;
+        default:
+            return 0;
+        }
     }
 
     bool searchZoneInletNodes(EnergyPlusData &state, int nodeToFind, int &ZoneEquipConfigIndex, int &InletNodeIndex)

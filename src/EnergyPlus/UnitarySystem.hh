@@ -445,6 +445,10 @@ namespace UnitarySystems {
         bool m_IsZoneEquipment;
         bool m_ZoneCompFlag;
         std::string m_AvailManagerListName;
+        int m_ZoneUnitaryNum;  // 1-based index of this parent type for zone equipment processing
+        int m_PTACNum;         // 1-based index of this parent type for zone equipment processing
+        int m_PTHPNum;         // 1-based index of this parent type for zone equipment processing
+        int m_PTWSHPNum;       // 1-based index of this parent type for zone equipment processing
 
     public:
         // SZVAV variables
@@ -931,6 +935,7 @@ namespace UnitarySystems {
         int getMixerOANode() override;
         int getMixerMixNode() override;
         int getMixerRetNode() override;
+        int getParentIndex() override;
     };
 
     int getDesignSpecMSHPIndex(EnergyPlusData &state, std::string_view objectName);

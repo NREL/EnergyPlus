@@ -3092,7 +3092,12 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
             ZoneEquipTypeNum = state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipType_Num;
 
-            ZoneCompNum = state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).EquipIndex(EquipPtr);
+            // TODO: need a way to set ParentIndex for other than UnitarySystem so ZoneCompNum is correct when using ParentIndex
+            if (ZoneEquipTypeNum == PkgTermACAirToAir_Num || ZoneEquipTypeNum == PkgTermHPAirToAir_Num) {
+                ZoneCompNum = state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).ParentIndex(EquipPtr);
+            } else {
+                ZoneCompNum = state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).EquipIndex(EquipPtr);
+            }
 
             bool ValidSAMComp = false;
 
