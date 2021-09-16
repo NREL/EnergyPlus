@@ -437,7 +437,7 @@ namespace DataPlant {
         int BranchInletNode;
         int ComponentInletNode;
         int ComponentOutletNode;
-        DataPlant::PlantEquipmentType ComponentTypeOfNum;
+        DataPlant::PlantEquipmentType ComponentType;
         Real64 MassFlowRateFound;
         Real64 MassFlow;
         bool PlantIsRigid;
@@ -467,7 +467,7 @@ namespace DataPlant {
             ComponentInletNode = this_comp.NodeNumIn;
             ComponentOutletNode = this_comp.NodeNumOut;
             MassFlowRateFound = state.dataLoopNodes->Node(ComponentOutletNode).MassFlowRate;
-            ComponentTypeOfNum = this_comp.Type;
+            ComponentType = this_comp.Type;
 
             //~ Push the values through
             state.dataLoopNodes->Node(ComponentOutletNode).MassFlowRate = MassFlow;
@@ -489,7 +489,7 @@ namespace DataPlant {
             //~  For air connections, trip the LoopSide air flag
             //~  Similar for zone, none zone, and electric load center
             {
-                auto const SELECT_CASE_var(ComponentTypeOfNum);
+                auto const SELECT_CASE_var(ComponentType);
 
                 // possibly air-connected components
                 if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
