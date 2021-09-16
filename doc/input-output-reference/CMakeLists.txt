@@ -79,6 +79,7 @@ set(INCLUDED_TEX
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-non-zone-equipment.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-solar-collectors.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-pumps.tex
+    ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-plant-condenser-flow-control.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-heating-and-cooling-coils.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-fans.tex
     ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-humidifiers-and-dehumidifiers.tex
