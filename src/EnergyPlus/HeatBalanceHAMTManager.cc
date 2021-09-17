@@ -1181,8 +1181,8 @@ namespace HeatBalanceHAMTManager {
         cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).htc = state.dataMstBal->HConvInFD(sid);
 
         cells(Intcell(sid)).Qadds = state.dataSurface->Surface(sid).Area *
-                                    (state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(sid) + state.dataHeatBalSurf->SurfNetLWRadToSurf(sid) +
-                                     state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(sid) + state.dataHeatBal->SurfQRadThermInAbs(sid) +
+                                    (state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(sid) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(sid) +
+                                     state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(sid) + state.dataHeatBal->SurfQdotRadIntGainsInPerArea(sid) +
                                      state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(sid));
 
         cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).rh =
