@@ -2,10 +2,10 @@
 
 WIP
 
-**Xuechen (Jerry) Lei, Jian Zhang, PNNL**
+**Xuechen (Jerry) Lei, Jeremy Lerond, and Jian Zhang. PNNL**
 
 - Original Date: 06/09/2021
-- Revision Date
+- Revision Date: 09/17/2021
 
 ## Justification for New Feature
 
@@ -21,13 +21,15 @@ Everyone who tries to adopt Appendix C in their model should be able to implemen
 
 ## E-mail and Conference Call Conclusions
 
-None
+The current ASHRAE 90.1 narrative does not descibe sufficiently on the detail about 1) whether the luminance requirement for shading control in Appendix C is regarding a photosensor, and if it is, where should that photosensor location be; 2) what exactly should be considered as "rest of the day" in this context. The PNNL team reached out to ASHRAE 90.1 ESC (Envelope Subcommittee) and confirmed that 1) the luminance value for this control is to be based on the photosensor location defined in the daylighting reference point; 2) once the shade is lowered, it will remain down until the end of the day, i.e. midnight.
 
-## Overview
+Further feedback and comments will be collected during development of this feature.
+
+## Overview and approach
 
 A new `Shading Control Type` option in the `WindowShadingControl` object needs to be implemented. Based on the naming convention of other options, and existing setpoints arrangements for shading control, this option is tentatively named as `OnIfHighLuminOrHighSolarTillMidnight`.
 
-There are two existing setpoints fields in `WindowShadingControl` object:
+Two setpoints need to be specificd for this shading control option in the idf file. There are two existing setpoints fields in `WindowShadingControl` object:
 
 - Setpoint: units depend on the type of trigger:
   - W/m2 for solar-based controls
@@ -40,96 +42,24 @@ There are two existing setpoints fields in `WindowShadingControl` object:
   - `OnIfHighZoneAirTempAndHighSolarOnWindow`
   - `OnIfHighZoneAirTempAndHighHorizontalSolar`
 
----
+Based on the current setpoints setup, for the new control option, direct solar transmitted energy can be directly specified in `Setpoint2`, while the specification of luminance setpoint may be implemented thorugh one the the following the similar approach as another existing window shading control option: `MeetDaylightIlluminanceSetpoint`. In this existing control option, it is only for `ShadingType = SwitchableGlazing`, and the illuminance setpoint used by this control is specified in the `Daylighting:Control` object for the Zone (daylight illuminance set point at the first daylighting reference point), not `WindowShadingControl` `Setpoint`.
 
-**Potential errors / misunderstanding in current code/doc**
+To add a setpoint for luminance based control in the option to be implemented, we will be using `Daylighting:Control` object for the Zone luminance setpoint. This requires adding one more field for luminance setpoint in the `Daylighting:Control` object and expanding the application of `Daylighting:Control` object as it was dedicated for illuminance based control in its current version.
 
-- the last two zone air temperature options are not listed in hsading control type field section
-- Setpoint 2 annotation comment in idf object is 'Setpoint 2 {W/m2 or deg C}', not sure when deg C will be effective
+## Design document - Adding a new window shading control method "OnIfHighLuminOrHighSolarTillMidnight"
 
----
+For **Initializing Simulation**
 
-Based on the current setpoints setup, for the new control option, the second setpoint (for direct solar transmitted energy can be directly specified in `Setpoint2`), while we need to make a decision on two options of specifying the first setpoint (luminance threshold) for this control.
+1. Around `EnergyPlus\src\EnergyPlus\DaylightingManager.cc(4326)`, check if the zone using this new control method has daylighting reference points.
+2. Around `EnergyPlus\src\EnergyPlus\SolarShading.cc(9704)`, add a case for the new control method.
+3. Around `\EnergyPlus\src\EnergyPlus\HeatBalanceSurfaceManager.cc(1031)`, add the new method in `WindowShadingControlTypeStr` vector.
 
-1. Use `Setpoint`
-2. Use `Daylighting:Control` object for the Zone
+For **Daylighting Factors calculation**
 
-There are a couple of considerations for making this decision.
-
-1. In its current implementation, `Setpoint` in `WindowShadingControl` does not deal with illuminance level related setpoint
-2. One of the existing shading control options is `MeetDaylightIlluminanceSetpoint`. Note this is only for 'ShadingType = SwitchableGlazing'. The illuminance setpoint used by this control is specified in the `Daylighting:Control` object for the Zone (daylight illuminance set point at the first daylighting reference point), not `WindowShadingControl` `Setpoint`. From the code in the next section. It looks like the shade is actually off in this option. **Also may need to dig more in the code to figure out which option is better**
-
-## Approach (Needs to be verified by running test cases)
-
-### input (IDD)
-
-Add a new `WindowShadingControl` option: `OnIfHighLuminOrHighSolarTillMidnight`
-
-### shading control logic code
-
-The shading control logic of different control options are implemented in `src/EnergyPlus/SolarShading.cc` LOC 9589 onwards. Some existing options' logic are implemented as below. The new option will be implemented in similar fashion within this code block referencing the coding patterns of other options.
-
-```cpp
-// ...
-switch (state.dataSurface->WindowShadingControl(IShadingCtrl).ShadingControlType) {
-case WindowShadingControlType::AlwaysOn: // 'ALWAYSON'
-    shadingOn = true;
-    break;
-// ...
-case WindowShadingControlType::OnHiOutTemp_HiSolarWindow: // 'OnIfHighOutdoorAirTempAndHighSolarOnWindow'  ! Outside air temp and solar on
-                                                          // window
-    if (state.dataEnvrn->SunIsUp) {
-        if (state.dataSurface->SurfOutDryBulbTemp(ISurf) > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
-            shadingOn = true;
-        } else if (GlareControlIsActive) {
-            shadingOffButGlareControlOn = true;
-        }
-    }
-    break;
-
-case WindowShadingControlType::OnHiOutTemp_HiHorzSolar: // 'OnIfHighOutdoorAirTempAndHighHorizontalSolar'  ! Outside air temp and
-                                                        // horizontal solar
-    if (state.dataEnvrn->SunIsUp) {
-        if (state.dataSurface->SurfOutDryBulbTemp(ISurf) > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
-            shadingOn = true;
-        } else if (GlareControlIsActive) {
-            shadingOffButGlareControlOn = true;
-        }
-    }
-    break;
-// ...
-case WindowShadingControlType::MeetDaylIlumSetp:
-    // 'MEETDAYLIGHTILLUMINANCESETPOINT')  !  Daylight illuminance test is done in DayltgInteriorIllum
-    // Only switchable glazing does daylight illuminance control
-    if (state.dataEnvrn->SunIsUp && SchedAllowsControl) {
-        shadingOffButGlareControlOn = true;
-    }
-    break;
-// ...
-if (IS_SHADED(ShType)) {
-    if (shadingOn) {
-        state.dataSurface->SurfWinShadingFlag(ISurf) = ShType;
-    } else if (shadingOffButGlareControlOn) {
-        if (ShType == WinShadingType::SwitchableGlazing)
-            state.dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::GlassConditionallyLightened;
-        else if (ShType == WinShadingType::IntShade)
-            state.dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::IntShadeConditionallyOff;
-        else if (ShType == WinShadingType::ExtShade)
-            state.dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::ExtShadeConditionallyOff;
-        else if (ShType == WinShadingType::IntBlind)
-            state.dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::IntBlindConditionallyOff;
-        else if (ShType == WinShadingType::ExtBlind)
-            state.dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::ExtBlindConditionallyOff;
-        else if (ShType == WinShadingType::BGShade)
-            state.dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::BGShadeConditionallyOff;
-        else if (ShType == WinShadingType::BGBlind)
-            state.dataSurface->SurfWinShadingFlag(ISurf) = WinShadingType::BGBlindConditionallyOff;
-    }
-}
-// ...
-```
-
-**May also need to change the Python API? need more digging**
+1. Add luminance based shading control logic code in `energyplusapi.dll!EnergyPlus::DaylightingManager::DayltgInteriorIllum(EnergyPlus::EnergyPlusData & state, int & ZoneNum)` (or add a new method dedicated for luminance based control and call it from `\EnergyPlus\src\EnergyPlus\HeatBalanceSurfaceManager.cc` ) at `EnergyPlus\src\EnergyPlus\DaylightingManager.cc`, following the same coding pattern as the `WindowShadingControlType::MeetDaylIlumSetp`
+2. Luminance value to be used in checking the requirement will be `LumWinFromRefPtRep`. (This value is reported as an output variable and its illuminance counterpart is used in the illuminance based shading control (Reference in `DaylightingManager.cc`))
+3. Solar based control for this logic will be added following code patterns for "HiSolar" related window shading options in `EnergyPlus\src\EnergyPlus\SolarShading.cc`.
+4. The logic of keeping the shade done until end of day (midnight) is to be implemented either in Item 1 or 2 above, together with related logic.
 
 ## Testing/Validation/Data Sources
 
@@ -141,7 +71,8 @@ To be added according to overview.
 
 ## Input Description
 
-To be added according to overview.
+- Add a new `WindowShadingControl` option: `OnIfHighLuminOrHighSolarTillMidnight`
+- Add a field for `Daylighting:Control` object to specify the luminance set point for shading control
 
 ## Outputs Description
 
@@ -153,7 +84,7 @@ To be added according to overview.
 
 ## Example File and Transition Changes
 
-An example file using this shading control option shall be added, or this shading control option can be implemented in an existing example file. **Need to make a decision**
+Instance of this new shading control method will be added to the existing window testing idf `WindowTests.idf`. No transition change is expected.
 
 ## References
 
