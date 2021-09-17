@@ -1668,9 +1668,9 @@ namespace SimulationManager {
         }
     }
 
-    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const fs::path &filePath)
+    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const fs::path &filePath, std::ios_base::openmode mode)
     {
-        auto result = std::make_unique<std::ofstream>(filePath);
+        auto result = std::make_unique<std::ofstream>(filePath, mode);
         if (!result->good()) {
             ShowFatalError(state, "OpenOutputFiles: Could not open file " + filePath.string() + " for output (write).");
         }
@@ -1694,123 +1694,6 @@ namespace SimulationManager {
             ShowFatalError(state, "OpenOutputFiles: Could not open file " + filePath.string() + " for output (write).");
         }
         return result;
-    }
-
-    void OpenOutputJsonFiles(EnergyPlusData &state, JsonOutputStreams &jsonOutputStreams)
-    {
-
-        //// timeSeriesAndTabularEnabled() will return true if only timeSeriesAndTabular is set, that's the only time we write to that file
-        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-            if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                jsonOutputStreams.json_stream = OpenFmtStreamFile(state, jsonOutputStreams.outputJsonFilePath);
-            }
-            if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                jsonOutputStreams.cbor_stream = OpenFmtStreamFile(state, jsonOutputStreams.outputCborFilePath);
-            }
-            if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                jsonOutputStreams.msgpack_stream = OpenFmtStreamFile(state, jsonOutputStreams.outputMsgPackFilePath);
-            }
-        }
-        //// timeSeriesEnabled() will return true if timeSeries is set, so we can write meter reports
-        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
-            // Output detailed Zone time series file
-            if (state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.rDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.iDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream_Zone = OpenFmtStreamFile(state, jsonOutputStreams.outputTSZoneJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream_Zone = OpenFmtStreamFile(state, jsonOutputStreams.outputTSZoneCborFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream_Zone = OpenFmtStreamFile(state, jsonOutputStreams.outputTSZoneMsgPackFilePath);
-                }
-            }
-
-            // Output detailed HVAC time series file
-            if (state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream_HVAC = OpenFmtStreamFile(state, jsonOutputStreams.outputTSHvacJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream_HVAC = OpenFmtStreamFile(state, jsonOutputStreams.outputTSHvacCborFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream_HVAC = OpenFmtStreamFile(state, jsonOutputStreams.outputTSHvacMsgPackFilePath);
-                }
-            }
-
-            // Output timestep time series file
-            if (state.dataResultsFramework->resultsFramework->RITimestepTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RITimestepTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream = OpenFmtStreamFile(state, jsonOutputStreams.outputTSJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream = OpenFmtStreamFile(state, jsonOutputStreams.outputTSCborFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream = OpenFmtStreamFile(state, jsonOutputStreams.outputTSMsgPackFilePath);
-                }
-            }
-
-            // Output hourly time series file
-            if (state.dataResultsFramework->resultsFramework->RIHourlyTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIHourlyTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_HRstream = OpenFmtStreamFile(state, jsonOutputStreams.outputHRJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_HRstream = OpenFmtStreamFile(state, jsonOutputStreams.outputHRCborFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_HRstream = OpenFmtStreamFile(state, jsonOutputStreams.outputHRMsgPackFilePath);
-                }
-            }
-
-            // Output daily time series file
-            if (state.dataResultsFramework->resultsFramework->RIDailyTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIDailyTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_DYstream = OpenFmtStreamFile(state, jsonOutputStreams.outputDYJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_DYstream = OpenFmtStreamFile(state, jsonOutputStreams.outputDYCborFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_DYstream = OpenFmtStreamFile(state, jsonOutputStreams.outputDYMsgPackFilePath);
-                }
-            }
-
-            // Output monthly time series file
-            if (state.dataResultsFramework->resultsFramework->RIMonthlyTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIMonthlyTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_MNstream = OpenFmtStreamFile(state, jsonOutputStreams.outputMNJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_MNstream = OpenFmtStreamFile(state, jsonOutputStreams.outputMNCborFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_MNstream = OpenFmtStreamFile(state, jsonOutputStreams.outputMNMsgPackFilePath);
-                }
-            }
-
-            // Output run period time series file
-            if (state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_SMstream = OpenFmtStreamFile(state, jsonOutputStreams.outputSMJsonFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_SMstream = OpenFmtStreamFile(state, jsonOutputStreams.outputSMCborFilePath);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_SMstream = OpenFmtStreamFile(state, jsonOutputStreams.outputSMMsgPackFilePath);
-                }
-            }
-        }
     }
 
     void OpenOutputFiles(EnergyPlusData &state)
