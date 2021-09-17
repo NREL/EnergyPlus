@@ -25,7 +25,7 @@ A & $m^2$ & Contact Surface area \tabularnewline
 C & J/kgC & Specific heat capacity of dry material \tabularnewline
 $C_i^h$ & J/C & Heat Capacitance of cell i \tabularnewline
 $C_i^w$ & kg & Moisture Capacitance of cell i \tabularnewline
-$c_{w}$ & J/KgC & Specific heat capacity of water (= 4,180~J/kg$^{o}$C@ 20$^{o}$C) \tabularnewline
+$c^{w}$ & J/KgC & Specific heat capacity of water (= 4,180~J/kg$^{\circ}$C@ 20$^{\circ}$C) \tabularnewline
 ${D^w}$ & $m^2/s$ & Liquid Transport Coefficient \tabularnewline
 ${h_v}$ & J/kg & Evaporation enthalpy of water (= 2,489,000~J/kg) \tabularnewline
 $\partial{H}/\partial{T}$ & $J/m^3C$ & Moisture dependent heat storage capacity \tabularnewline
@@ -34,24 +34,24 @@ ${k^w}$ & W/mC & Moisture dependent thermal conductivity \tabularnewline
 p & Pa & Vapor pressure \tabularnewline
 $p_{\text{ambient}}$ & Pa & Ambient air pressure \tabularnewline
 p(as a superscript) & s & Present Time Step \tabularnewline
-P & m3/m3 & Material Porosity \tabularnewline
-$^{q_i^{adds}}$ & W & Heat from additional Sources \tabularnewline
-$^{q_i^v}$ & W & Heat due to Vaporisation \tabularnewline
+P & $m^3/m^3$ & Material Porosity \tabularnewline
+${q_i^{adds}}$ & W & Heat from additional Sources \tabularnewline
+${q_i^v}$ & W & Heat due to Vaporisation \tabularnewline
 RH & \% & Relative humidity \tabularnewline
 $R_{ij}^h$ & C/W & Heat Resistance between cells i and j \tabularnewline
 $R_{ij}^v$ & sPa/kg & Vapor Resistance between cells i and j \tabularnewline
-$^{R_{ij}^w}$ & s/kg & Liquid Moisture Resistance between cells i and j \tabularnewline
+$R_{ij}^w$ & s/kg & Liquid Moisture Resistance between cells i and j \tabularnewline
 $t$ & s & Time \tabularnewline
-T & °C & Temperature \tabularnewline
+T & $^\circ$C & Temperature \tabularnewline
 x & m & Distance between cell centers \tabularnewline
-W & $kg/m^3$ & Moisture Content \tabularnewline
+w & $kg/m^3$ & Moisture Content \tabularnewline
 $\partial{w}/\partial{\phi}$ & $kg/m^3$ & Moisture dependent moisture storage capacity \tabularnewline
 $\delta$ & kg/msPa & Vapor diffusion coefficient in air \tabularnewline
 $\Delta \tau$ & s & Time step between calculations \tabularnewline
 $\Delta {V_i}$ & $m^3$ & Cell Volume \tabularnewline
 $\mu$ & --- & Moisture dependent vapor diffusion resistance factor \tabularnewline
 $\rho$ & $kg/m^3$ & Material Density \tabularnewline
-${\rho ^w}$ & $kg/m^3$ & Density of water (= 1,000$kg/m^3$) \tabularnewline
+${\rho}^w$ & $kg/m^3$ & Density of water (= 1,000$kg/m^3$) \tabularnewline
 $\phi$ & fraction & Relative humidity \tabularnewline
 \bottomrule
 \end{longtable}
@@ -61,21 +61,21 @@ $\phi$ & fraction & Relative humidity \tabularnewline
 Equations~\ref{eq:HAMTHeatBalanceEquation} and~\ref{eq:HAMTMoistureBalanceEquation} are derived from heat and moisture balance equations and are taken from {[}Künzel, H.M. (1995){]}. They describe a theoretical model for the transfer of heat and moisture through a material.
 
 \begin{equation}
-\frac{{\partial H}}{{\partial T}}\frac{{\partial T}}{{\partial \tau }} = \frac{\partial }{{\partial x}}\left( {{k^w}\frac{{\partial T}}{{\partial x}}} \right) + {h_v}\frac{\partial }{{\partial x}}\left( {\frac{\delta }{\mu }\frac{{\partial T}}{{\partial x}}} \right)
+\frac{{\partial H}}{{\partial T}}\frac{{\partial T}}{{\partial \tau }} = \frac{\partial }{{\partial x}}\left( {{k^w}\frac{{\partial T}}{{\partial x}}} \right) + {h_v}\frac{\partial }{{\partial x}}\left( {\frac{\delta }{\mu }\frac{{\partial P}}{{\partial x}}} \right)
 \label{eq:HAMTHeatBalanceEquation}
 \end{equation}
 
 The three terms in Equation~\ref{eq:HAMTHeatBalanceEquation} describe the storage, transport and generation of heat respectively.
 
 \begin{equation}
-\frac{{\partial w}}{{\partial \phi }}\frac{{\partial \phi }}{{\partial \tau }} = \frac{\partial }{{\partial x}}\left( {{D^w}\frac{{\partial w}}{{\partial \phi }}\frac{{\partial \phi }}{{\partial x}}} \right) + \frac{\partial }{{\partial x}}\left( {\frac{\delta }{\mu }\frac{{\partial T}}{{\partial x}}} \right)
+\frac{{\partial w}}{{\partial \phi }}\frac{{\partial \phi }}{{\partial \tau }} = \frac{\partial }{{\partial x}}\left( {{D^w}\frac{{\partial w}}{{\partial \phi }}\frac{{\partial \phi }}{{\partial x}}} \right) + \frac{\partial }{{\partial x}}\left( {\frac{\delta }{\mu }\frac{{\partial P}}{{\partial x}}} \right)
 \label{eq:HAMTMoistureBalanceEquation}
 \end{equation}
 
-The three terms in equation describe the storage of moisture, the transport of liquid moisture and the transport of vapor respectively. The equation to calculate the vapor diffusion coefficient in air (\(\delta\)) used in the third term of both equations, is also taken from Künzel,
+The three terms in Equation~\ref{eq:HAMTMoistureBalanceEquation} describe the storage of moisture, the transport of liquid moisture and the transport of vapor respectively. The equation to calculate the vapor diffusion coefficient in air (\(\delta\)) used in the third term of both equations, is also taken from Künzel,
 
 \begin{equation}
-\delta  = \frac{{\left( {2 \times {{10}^{ - 7}} \times {{\left( {T + 273.15} \right)}^{0.81}}} \right)}}{{{P_{ambient}}}}
+\delta  = \frac{{\left( {2 \times {{10}^{ - 7}} \times {{\left( {T + 273.15} \right)}^{0.81}}} \right)}}{{{p_{ambient}}}}
 \end{equation}
 
 The heat storage capacity (\(\frac{\partial H}{\partial T}\)) depends on the moisture content w of the material by the following equation.
@@ -100,7 +100,7 @@ Equation~\ref{eq:HAMTHeatBalanceEquation} can be re-written and used to describe
 \left( {{c_i}{\rho_i} + {c^w}{w_i}} \right)\Delta {V_i}\frac{{T_i^{p + 1} - T_i^p}}{{\Delta \tau }} = \sum\limits_j {k_{ij}^w{A_{ij}}\frac{{T_j^{p + 1} - T_i^{p + 1}}}{{{x_{ij}}}}}  + \sum\limits_j {{h_v}\frac{{{\delta_{ij}}}}{{{\mu_{ij}}}}{A_{ij}}\frac{{p_j^{p + 1} - p_i^{p + 1}}}{{{x_{ij}}}}}
 \end{equation}
 
-In the one dimensional case there are only two adjacent cells each labelled j. The heat generated due to vaporization \(q_i^v\) can be calculated separately.
+In the one dimensional case there are only two adjacent cells each labeled j. The heat generated due to vaporization \(q_i^v\) can be calculated separately.
 
 \begin{equation}
 q_i^v = \sum\limits_j {{h_v}\frac{{{\delta_{ij}}}}{{{\mu_{ij}}}}{A_{ij}}\frac{{p_j^{p + 1} - p_i^{p + 1}}}{{{x_{ij}}}}}
