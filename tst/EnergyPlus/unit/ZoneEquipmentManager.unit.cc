@@ -4609,6 +4609,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataEnvrn->StdBaroPress = 101325.;
     state->dataSize->CalcFinalZoneSizing(1).MinOA = 0.1;
+    state->dataSize->CalcFinalZoneSizing(1).OutTempAtHeatPeak = 28;
     state->dataEnvrn->OutDryBulbTemp = 28.;
     state->dataEnvrn->OutHumRat = 0.017;
     state->dataLoopNodes->Node(4).Temp = 23;
