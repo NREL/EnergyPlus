@@ -2720,6 +2720,13 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                 }
                 // IF cooling flow rate is 0, this data may be used to size a HP so initialize DDNum, TimeStepatPeak, and sizing data (end of IF)
                 if (state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad == 0) {
+                    // Check CoolDDNum and TimeStepNumAtCoolMax value and default to 1 if not set, carried over from previous code
+                    if (state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolDDNum == 0) {
+                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolDDNum = 1;
+                    }
+                    if (state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax == 0) {
+                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax = 1;
+                    }
                     state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax =
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax;
                     state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDDNum = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolDDNum;
@@ -2887,6 +2894,13 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                 }
                 // IF heating flow rate is 0, this data may be used to size a HP so initialize DDNum, TimeStepatPeak, and sizing data
                 if (state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad == 0) {
+                    // Check HDDNum and TimeStepNumAtHeatMax value and default to 1 if not set, carried over from previous code
+                    if (state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatDDNum == 0) {
+                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatDDNum = 1;
+                    }
+                    if (state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax == 0) {
+                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax = 1;
+                    }
                     state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax =
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
                     state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatDDNum;

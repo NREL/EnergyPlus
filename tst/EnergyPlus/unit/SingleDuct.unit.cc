@@ -2494,7 +2494,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
     // DesZoneHeatLoad = 0 from simulating design days and forcing heating load = 0
     // this can still provide a negative coil load if CoilInTemp > ZoneDesTemp
     // CoilInTemp = Sizing:System, 16.0000, !- Central Heating Design Supply Air Temperature{ C }
-    // ZoneDesTemp = min zone temperature from simulating design days = 23.9 C
+    // ZoneDesTemp = min zone temperature from simulating design days = 17.0 C
     // "Schedule:Compact,",
     //	" HTGSETP_SCH,              !- Name",
     //	" Any Number,               !- Schedule Type Limits Name",
@@ -2515,9 +2515,9 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
 
     EXPECT_EQ(CoilInTemp, 16.0);
     EXPECT_EQ(DesZoneHeatLoad, 0.0);
-    EXPECT_GT(ZoneDesTemp, 24.0);
-    EXPECT_NEAR(ZoneDesHumRat, 0.008, 0.001);
-    EXPECT_NEAR(DesCoilLoad, 996.2, 0.1);
+    EXPECT_EQ(ZoneDesTemp, 17.0);
+    EXPECT_EQ(ZoneDesHumRat, 0.008);
+    EXPECT_NEAR(DesCoilLoad, 120.5, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
