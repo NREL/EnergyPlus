@@ -2459,6 +2459,7 @@ Output variables applicable to all exterior heat transfer surfaces:
 Zone,Average,Surface Outside Face Outdoor Air Drybulb Temperature [C]
 Zone,Average,Surface Outside Face Outdoor Air Wetbulb Temperature [C]
 Zone,Average,Surface Outside Face Outdoor Air Wind Speed [m/s]
+Zone,Average,Surface Outside Face Outdoor Air Wind Direction [deg]
 Zone,Average,Surface Outside Face Sunlit Area [m2]
 Zone,Average,Surface Outside Face Sunlit Fraction \protect\hyperlinksection-1
 Zone,Average,Surface Outside Face Incident Solar Radiation Rate per Area[W/m2]
@@ -2822,7 +2823,11 @@ The outdoor air wet-bulb temperature calculated at the height above ground of th
 
 \subsubsection{Surface Outside Face Outdoor Air Wind Speed {[}m/s{]}}\label{surface-outside-face-outdoor-air-wind-speed-ms}
 
-The outdoor wind speed calculated at the height above ground of the surface centroid. Former Name: Prior to version 7.1, this output was called ``Surface Ext Wind Speed.''
+The outdoor wind speed calculated at the height above ground of the surface centroid. This value may differ from site wind speed depending on the height of the surface (ref. \hyperref[siteheightvariation]{Site:HeightVariation}). In addition, the value may be different from the site wind speed when using \hyperref[outdoorairnode]{OutdoorAir:Node} with  \hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment} or \hyperref[ZonePropertylocalEnvironment]{ZoneProperty:LocalEnvironment}. It can also be modified using EMS. Former Name: Prior to version 7.1, this output was called ``Surface Ext Wind Speed.''
+
+\subsubsection{Surface Outside Face Outdoor Air Wind Direction {[}deg{]}}\label{surface-outside-face-outdoor-air-wind-direction-def}
+
+This output reports the actual wind direction at the outside face of a surface.  As with the wind speed variable above, this value may be different from the site wind direction when using \hyperref[outdoorairnode]{OutdoorAir:Node} with \hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment} or \hyperref[ZonePropertylocalEnvironment]{ZoneProperty:LocalEnvironment}. It can also be modified using EMS.
 
 \subsubsection{Surface Outside Face Sunlit Area {[}m2{]}}\label{surface-outside-face-sunlit-area-m2}
 
