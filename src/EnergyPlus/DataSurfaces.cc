@@ -574,7 +574,7 @@ void SurfaceData::set_representative_surface(EnergyPlusData &state, const int Su
     // Assign the representative surface number based on the first instance of the identical key
     state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum =
         state.dataSurface->RepresentativeSurfaceMap.insert({state.dataSurface->Surface(SurfNum).calcHashKey, SurfNum}).first->second;
-    
+
     state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum).ConstituentSurfaceNums.push_back(SurfNum);
 }
 
