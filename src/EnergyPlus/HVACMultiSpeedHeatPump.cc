@@ -3076,7 +3076,11 @@ namespace HVACMultiSpeedHeatPump {
 
         if (SpeedNum == 1) {
             SpeedRatio = 0.0;
-            PartLoadFrac = SpeedVal - floor(SpeedVal);
+            if (floor(SpeedVal) == SpeedVal) {
+                PartLoadFrac = 1;
+            } else {
+                PartLoadFrac = SpeedVal - floor(SpeedVal);
+            }
             CalcMSHeatPump(state,
                            MSHeatPumpNum,
                            FirstHVACIteration,
@@ -3089,7 +3093,11 @@ namespace HVACMultiSpeedHeatPump {
                            OnOffAirFlowRatio,
                            SupHeaterLoad);
         } else {
-            SpeedRatio = SpeedVal - floor(SpeedVal);
+            if (floor(SpeedVal) == SpeedVal) {
+                SpeedRatio = 1;
+            } else {
+                SpeedRatio = SpeedVal - floor(SpeedVal);
+            }
             CalcMSHeatPump(state,
                            MSHeatPumpNum,
                            FirstHVACIteration,

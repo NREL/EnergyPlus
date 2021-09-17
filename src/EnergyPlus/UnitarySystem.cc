@@ -8183,9 +8183,15 @@ namespace UnitarySystems {
             if (this->m_HeatingSpeedNum == 1) {
                 this->m_HeatingSpeedRatio = 0.0;
                 this->m_HeatingCycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
+                if (this->m_HeatingCycRatio == 0) {
+                    this->m_HeatingCycRatio = 1;
+                }
             } else {
                 this->m_HeatingCycRatio = 1.0;
                 this->m_HeatingSpeedRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
+                if (this->m_HeatingSpeedRatio == 0) {
+                    this->m_HeatingSpeedRatio = 1;
+                }
             }
             this->m_WSHPRuntimeFrac = HeatPLR;
         } else { // Cooling or moisture load
@@ -8201,9 +8207,15 @@ namespace UnitarySystems {
             if (this->m_CoolingSpeedNum == 1) {
                 this->m_CoolingSpeedRatio = 0.0;
                 this->m_CoolingCycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
+                if (this->m_CoolingCycRatio == 0) {
+                    this->m_CoolingCycRatio = 1;
+                }
             } else {
                 this->m_CoolingCycRatio = 1.0;
                 this->m_CoolingSpeedRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
+                if (this->m_CoolingSpeedRatio == 0) {
+                    this->m_CoolingSpeedRatio = 1;
+                }
             }
             this->m_WSHPRuntimeFrac = CoolPLR;
         }
@@ -8305,7 +8317,7 @@ namespace UnitarySystems {
             return;
         }
         if (this->m_EMSOverrideCoilSpeedNumOn) {
-            this->controlUnitarySystemOutput(
+            this->controlUnitarySystemOutputEMS(
                 state, AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompOn);
             return;
         }
@@ -11940,9 +11952,15 @@ namespace UnitarySystems {
                         if (this->m_CoolingSpeedNum == 1) {
                             this->m_CoolingSpeedRatio = 0.0;
                             this->m_CoolingCycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
+                            if (this->m_CoolingCycRatio == 0) {
+                                this->m_CoolingCycRatio = 1;
+                            }
                         } else {
                             this->m_CoolingCycRatio = 1.0;
                             this->m_CoolingSpeedRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
+                            if (this->m_CoolingSpeedRatio == 0) {
+                                this->m_CoolingSpeedRatio = 1;
+                            }
                         }
                     }
                     this->simMultiSpeedCoils(state,
@@ -12148,11 +12166,19 @@ namespace UnitarySystems {
                             if (this->m_CoolingSpeedNum == 1) {
                                 this->m_CoolingSpeedRatio = SpeedRatio = 0.0;
                                 CycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
-                                this->m_CoolingCycRatio = CycRatio;
+                                if (CycRatio == 0) {
+                                    this->m_CoolingCycRatio = 1;
+                                } else {
+                                    this->m_CoolingCycRatio = CycRatio;
+                                }
                             } else {
                                 this->m_CoolingCycRatio = CycRatio = 1.0;
                                 SpeedRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
-                                this->m_CoolingSpeedRatio = SpeedRatio;
+                                if (SpeedRatio == 0) {
+                                    this->m_CoolingSpeedRatio = 1;
+                                } else {
+                                    this->m_CoolingSpeedRatio = SpeedRatio;
+                                }
                             }
                             this->simMultiSpeedCoils(state,
                                                      AirLoopNum,
@@ -13549,10 +13575,20 @@ namespace UnitarySystems {
                                 this->m_HeatingSpeedRatio = 0.0;
                                 CycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
                                 this->m_HeatingCycRatio = CycRatio;
+                                if (CycRatio == 0) {
+                                    this->m_HeatingCycRatio = 1;
+                                } else {
+                                    this->m_HeatingCycRatio = CycRatio;
+                                }
                             } else {
                                 this->m_HeatingCycRatio = 1.0;
                                 SpeedRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
                                 this->m_HeatingSpeedRatio = SpeedRatio;
+                                if (SpeedRatio == 0) {
+                                    this->m_HeatingSpeedRatio = 1;
+                                } else {
+                                    this->m_HeatingSpeedRatio = SpeedRatio;
+                                }
                             }
                         }
                         this->simMultiSpeedCoils(state,
@@ -13685,10 +13721,20 @@ namespace UnitarySystems {
                                     this->m_HeatingSpeedRatio = SpeedRatio = 0.0;
                                     CycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
                                     this->m_HeatingCycRatio = CycRatio;
+                                    if (CycRatio == 0) {
+                                        this->m_HeatingCycRatio = 1;
+                                    } else {
+                                        this->m_HeatingCycRatio = CycRatio;
+                                    }
                                 } else {
                                     this->m_HeatingCycRatio = CycRatio = 1.0;
                                     SpeedRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
                                     this->m_HeatingSpeedRatio = SpeedRatio;
+                                    if (SpeedRatio == 0) {
+                                        this->m_HeatingSpeedRatio = 1;
+                                    } else {
+                                        this->m_HeatingSpeedRatio = SpeedRatio;
+                                    }
                                 }
                                 this->simMultiSpeedCoils(state,
                                                          AirLoopNum,
