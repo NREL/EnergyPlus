@@ -4588,10 +4588,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 22.;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.;
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 24.;
-    state->dataSize->CurOverallSimDay = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataSize->CalcZoneSizing(1, 1).ActualZoneNum = 1;
-    state->dataSize->CalcZoneSizing(1, 1).AccountForDOAS = true;
     state->dataSize->CurOverallSimDay = 1;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -3600;
@@ -4609,24 +4607,12 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
     state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASHighSetpoint = 14.4;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASLowSetpoint = 12.2;
     state->dataEnvrn->StdBaroPress = 101325.;
     state->dataSize->CalcFinalZoneSizing(1).MinOA = 0.1;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASControlStrategy = 3;
     state->dataEnvrn->OutDryBulbTemp = 28.;
     state->dataEnvrn->OutHumRat = 0.017;
     state->dataLoopNodes->Node(4).Temp = 23;
     state->dataLoopNodes->Node(4).HumRat = 0.008;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).ZnCoolDgnSAMethod = 1;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).ZnHeatDgnSAMethod = 1;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).CoolDesTemp = 12.5;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).CoolDesTempDiff = 11.11;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).CoolDesHumRat = 0.008;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).HeatDesHumRat = 0.008;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).HeatDesTemp = 50.0;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).HeatDesTempDiff = 30.0;
-    state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).SupplyAirAdjustFactor = 1.0;
     state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
     state->dataHeatBalFanSys->ZoneMassBalanceFlag(1) = false;
 
@@ -4663,9 +4649,16 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     EXPECT_DOUBLE_EQ(0.0, state->dataSize->CalcZoneSizing(1, 1).HeatLoad);
     EXPECT_DOUBLE_EQ(0.0, state->dataSize->CalcZoneSizing(1, 1).CoolLoad);
 
-    // check for correct TstatTemps and ZoneTempsAt*Peaks for output
+    // check for correct TstatTemps
     EXPECT_DOUBLE_EQ(22.0, state->dataSize->CalcZoneSizing(1, 1).HeatTstatTemp);
     EXPECT_DOUBLE_EQ(24.0, state->dataSize->CalcZoneSizing(1, 1).CoolTstatTemp);
-    EXPECT_DOUBLE_EQ(23.0, state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak);
-    EXPECT_DOUBLE_EQ(23.0, state->dataSize->FinalZoneSizing(1).ZoneTempAtCoolPeak);
+
+    // New calculated design values that get reported in the Zone Sensible Heating/Cooling table
+    // When no load, equal to the minimal temperature difference between zone temp and thermostat temp
+    EXPECT_DOUBLE_EQ(23.0, state->dataSize->CalcFinalZoneSizing(1).ZoneTempAtHeatPeak);
+    EXPECT_DOUBLE_EQ(23.0, state->dataSize->CalcFinalZoneSizing(1).ZoneTempAtCoolPeak);
+
+    // Final design values that get passed to the equipment, same as before
+    EXPECT_DOUBLE_EQ(22.0, state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak);
+    EXPECT_DOUBLE_EQ(24.0, state->dataSize->FinalZoneSizing(1).ZoneTempAtCoolPeak);
 }

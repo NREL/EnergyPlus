@@ -2016,8 +2016,10 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                             FirstIteration = false;
                         }
                     }
-                    if ((state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutTempAtHeatPeak <=
-                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutTempAtHeatPeak)) {
+                    FirstIteration = true;
+                    if ((state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutTempAtHeatPeak <
+                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutTempAtHeatPeak) ||
+                        (FirstIteration)) {
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatDesDay =
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatDesDay;
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatZoneTempSeq =
@@ -2052,6 +2054,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesHeatCoilInHumRat;
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatTstatTemp =
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatTstatTemp;
+                        FirstIteration = false;
                     }
                 }
                 // save cool peak conditions when there is no design cooling load or design cooling volume flow rate, i.e., when
@@ -2076,8 +2079,10 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                             FirstIteration = false;
                         }
                     }
-                    if (state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutTempAtCoolPeak >=
-                        state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutTempAtCoolPeak) {
+                    FirstIteration = true;
+                    if ((state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).OutTempAtCoolPeak >
+                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).OutTempAtCoolPeak) ||
+                        (FirstIteration)) {
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolDesDay =
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolDesDay;
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolZoneTempSeq =
@@ -2112,6 +2117,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DesCoolCoilInHumRat;
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolTstatTemp =
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolTstatTemp;
+                        FirstIteration = false;
                     }
                 }
             }
@@ -2723,8 +2729,8 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax;
                     state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDDNum = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolDDNum;
                     state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDesDay = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolDesDay;
-                    int DDNumF = state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDDNum;
-                    int TimeStepAtPeakF = state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax;
+                    DDNumF = state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDDNum;
+                    TimeStepAtPeakF = state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax;
 
                     // initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
                     // issue 6006, heating coils sizing to 0 when no heating load in zone
@@ -2890,8 +2896,8 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                         state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
                     state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatDDNum;
                     state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDesDay = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatDesDay;
-                    int DDNumF = state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum;
-                    int TimeStepAtPeakF = state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
+                    DDNumF = state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum;
+                    TimeStepAtPeakF = state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
 
                     // initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
                     // issue 6006, heating coils sizing to 0 when no heating load in zone
