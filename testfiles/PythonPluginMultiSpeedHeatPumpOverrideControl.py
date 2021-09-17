@@ -101,11 +101,14 @@ class CoilSpeedControl(EnergyPlusPlugin):
             zone_air_temp = self.api.exchange.get_variable_value(state, self.zone_air_temp_handle)
             heating_setpoint = self.api.exchange.get_variable_value(state, self.heating_setpoint_handle)
             cooling_setpoint = self.api.exchange.get_variable_value(state, self.cooling_setpoint_handle)
-            if zone_air_temp < heating_setpoint - 2:
-                self.api.exchange.set_actuator_value(state, self.coil_speed_level_handle, 2.0)
+            if zone_air_temp < heating_setpoint:
+                self.api.exchange.set_actuator_value(state, self.coil_speed_level_handle, 1.9)
                 self.api.exchange.set_global_value(state, self.coil_speed_override_report_handle, 1.0)
-            elif zone_air_temp < heating_setpoint:
+            elif zone_air_temp < heating_setpoint + 0.5:
                 self.api.exchange.set_actuator_value(state, self.coil_speed_level_handle, 1.0)
+                self.api.exchange.set_global_value(state, self.coil_speed_override_report_handle, 1.0)
+            elif zone_air_temp > cooling_setpoint + 1:
+                self.api.exchange.set_actuator_value(state, self.coil_speed_level_handle, 1.95)
                 self.api.exchange.set_global_value(state, self.coil_speed_override_report_handle, 1.0)
             elif zone_air_temp > cooling_setpoint:
                 self.api.exchange.set_actuator_value(state, self.coil_speed_level_handle, 1.0)

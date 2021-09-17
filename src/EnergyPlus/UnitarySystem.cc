@@ -8157,7 +8157,6 @@ namespace UnitarySystems {
         this->FanPartLoadRatio = 0.0;
         this->setOnOffMassFlowRate(state, OnOffAirFlowRatio, PartLoadRatio);
 
-        // todo - document if no load, no EMS override
         if (!state.dataUnitarySystems->HeatingLoad && !state.dataUnitarySystems->CoolingLoad && state.dataUnitarySystems->MoistureLoad >= 0.0) return;
         int SpeedNumEMS = ceil(this->m_EMSOverrideCoilSpeedNumValue);
 

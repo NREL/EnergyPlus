@@ -1926,21 +1926,21 @@
     Air Loop Inlet Node,     !- Air Inlet Node Name
     Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Output:Variable,*,Zone Thermostat Heating Setpoint Temperature,Detailed,ReportSch;
+  Output:Variable,*,Zone Thermostat Heating Setpoint Temperature,Detailed;
 
-  Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,Detailed,ReportSch;
+  Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,Detailed;
 
-  Output:Variable,*,Zone Air Temperature,Detailed,ReportSch;
+  Output:Variable,*,Zone Air Temperature,Detailed;
 
-  Output:Variable,*,Unitary System DX Coil Speed Level,Detailed,ReportSch;
+  Output:Variable,*,Unitary System DX Coil Speed Level,Detailed;
 
-  Output:Variable,*,Unitary System DX Coil Cycling Ratio,Detailed,ReportSch;
+  Output:Variable,*,Unitary System DX Coil Cycling Ratio,Detailed;
 
-  Output:Variable,*,Unitary System DX Coil Speed Ratio,Detailed,ReportSch;
+  Output:Variable,*,Unitary System DX Coil Speed Ratio,Detailed;
 
-  Output:Variable,*,Cooling Coil Total Cooling Energy,Detailed,ReportSch;
+  Output:Variable,*,Cooling Coil Total Cooling Energy,Detailed;
 
-  Output:Variable,*,Heating Coil Heating Energy,Detailed,ReportSch;
+  Output:Variable,*,Heating Coil Heating Energy,Detailed;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 

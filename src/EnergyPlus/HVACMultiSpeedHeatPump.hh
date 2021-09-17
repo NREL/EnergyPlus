@@ -339,9 +339,9 @@ namespace HVACMultiSpeedHeatPump {
                               Real64 const QZnReq,           // cooling or heating output needed by zone [W]
                               int const FullOutput,          // unit full output when compressor is operating [W]vvvv
                               int const SpeedNum,            // Speed number
-                              Real64 &SpeedRatio,            // unit speed ratio for DX coils
-                              Real64 &PartLoadFrac,          // unit part load fraction
-                              Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                              Real64 SpeedRatio,            // unit speed ratio for DX coils
+                              Real64 PartLoadFrac,          // unit part load fraction
+                              Real64 OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
                               Real64 &SupHeaterLoad          // Supplemental heater load [W]
 
     );
