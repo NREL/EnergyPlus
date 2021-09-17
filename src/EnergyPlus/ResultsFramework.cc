@@ -80,11 +80,18 @@ namespace ResultsFramework {
     using OutputProcessor::RealVariableType;
 
     // trim string
-    std::string trim(std::string str)
+    std::string trim(std::string_view const s)
     {
-        str.erase(str.begin(), find_if(str.begin(), str.end(), [](char &ch) -> bool { return !isspace(ch); }));
-        str.erase(find_if(str.rbegin(), str.rend(), [](char &ch) -> bool { return !isspace(ch); }).base(), str.end());
-        return str;
+        if (s.empty()) {
+            return std::string{};
+        }
+        auto const first = s.find_first_not_of(' ');
+        auto const last = s.find_last_not_of(' ');
+        if ((first == std::string::npos) || (last == std::string::npos)) {
+            return std::string{};
+        } else {
+            return std::string{s.substr(first, last - first + 1)};
+        }
     }
 
     // Class SimInfo
@@ -518,89 +525,89 @@ namespace ResultsFramework {
         return root;
     }
 
-    void DataFrame::writeReport(JsonOutputStreams &jsonOutputStreams, bool outputJSON, bool outputCBOR, bool outputMsgPack)
+    void DataFrame::writeReport(JsonOutputFilePaths &jsonOutputFilePaths, bool outputJSON, bool outputCBOR, bool outputMsgPack)
     {
 
         json root = getJSON();
         if (ReportFrequency == "Detailed-HVAC") {
             if (outputJSON) {
-                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_TSstream_HVAC, root);
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputTSHvacJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_TSstream_HVAC, root);
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputTSHvacCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_TSstream_HVAC, root);
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputTSHvacMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Detailed-Zone") {
             if (outputJSON) {
-                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_TSstream_Zone, root);
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputTSZoneJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_TSstream_Zone, root);
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputTSZoneCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_TSstream_Zone, root);
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputTSZoneMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "TimeStep") {
             if (outputJSON) {
-                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_TSstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputTSJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_TSstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputTSCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_TSstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputTSMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Daily") {
             if (outputJSON) {
-                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_DYstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputDYJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_DYstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputDYCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_DYstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputDYMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Hourly") {
             if (outputJSON) {
-                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_HRstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputHRJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_HRstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputHRCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_HRstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputHRMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Monthly") {
             if (outputJSON) {
-                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_MNstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputMNJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_MNstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputMNCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_MNstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputMNMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "RunPeriod") {
             if (outputJSON) {
-                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_SMstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputSMJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_SMstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputSMCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_SMstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputSMMsgPackFilePath, root);
             }
         } else if (ReportFrequency == "Yearly") {
             if (outputJSON) {
-                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_YRstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputYRJsonFilePath, root);
             }
             if (outputCBOR) {
-                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_YRstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputYRCborFilePath, root);
             }
             if (outputMsgPack) {
-                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_YRstream, root);
+                FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputYRMsgPackFilePath, root);
             }
         }
     }
@@ -1377,50 +1384,50 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsFramework::writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams)
+    void ResultsFramework::writeTimeSeriesReports(JsonOutputFilePaths &jsonOutputFilePaths)
     {
         // Output detailed Zone time series data
         if (hasRIDetailedZoneTSData()) {
-            RIDetailedZoneTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIDetailedZoneTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output detailed HVAC time series data
         if (hasRIDetailedHVACTSData()) {
-            RIDetailedHVACTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIDetailedHVACTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output timestep time series data
         if (hasRITimestepTSData()) {
-            RITimestepTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RITimestepTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output hourly time series data
         if (hasRIHourlyTSData()) {
-            RIHourlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIHourlyTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output daily time series data
         if (hasRIDailyTSData()) {
-            RIDailyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIDailyTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output monthly time series data
         if (hasRIMonthlyTSData()) {
-            RIMonthlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIMonthlyTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output run period time series data
         if (hasRIRunPeriodTSData()) {
-            RIRunPeriodTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIRunPeriodTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output yearly time series data
         if (hasRIYearlyTSData()) {
-            RIYearlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
+            RIYearlyTSData.writeReport(jsonOutputFilePaths, outputJSON, outputCBOR, outputMsgPack);
         }
     }
 
-    void ResultsFramework::writeReport(JsonOutputStreams &jsonOutputStreams)
+    void ResultsFramework::writeReport(JsonOutputFilePaths &jsonOutputFilePaths)
     {
         json root, outputVars, meterVars, meterData;
         root = {{"SimulationResults", {{"Simulation", SimulationInformation.getJSON()}}}};
@@ -1521,13 +1528,13 @@ namespace ResultsFramework {
         root["TabularReports"] = TabularReportsCollection.getJSON();
 
         if (outputJSON) {
-            FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputStreams.json_stream, root);
+            FileSystem::writeFile<FileSystem::FileTypes::JSON>(jsonOutputFilePaths.outputJsonFilePath, root);
         }
         if (outputCBOR) {
-            FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputStreams.cbor_stream, root);
+            FileSystem::writeFile<FileSystem::FileTypes::CBOR>(jsonOutputFilePaths.outputCborFilePath, root);
         }
         if (outputMsgPack) {
-            FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputStreams.msgpack_stream, root);
+            FileSystem::writeFile<FileSystem::FileTypes::MsgPack>(jsonOutputFilePaths.outputMsgPackFilePath, root);
         }
     }
 

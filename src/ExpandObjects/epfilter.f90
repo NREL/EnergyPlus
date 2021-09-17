@@ -5684,7 +5684,7 @@ DO iSys = 1, prelimCount
     CALL SetIfBlank(fldValStart + vsMaxOutsideFlowOff, 'autosize')
     CALL SetIfBlank(fldValStart + vsMinOutsideFlowOff, 'autosize')
     CALL SetIfBlank(fldValStart + vsMinOutsideControlOff, 'ProportionalMinimum')
-    CALL SetIfBlank(fldValStart + vsEconomizerKindOff, 'None')
+    CALL SetIfBlank(fldValStart + vsEconomizerKindOff, 'NoEconomizer')
     CALL SetIfBlank(fldValStart + vsEconoLockoutKindOff, 'NoLockout')
     CALL SetIfBlank(fldValStart + vsSupplyFanPlaceOff, 'DrawThrough')
     CALL SetIfBlank(fldValStart + vsSupplyFanPLRCoeffOff, 'InletVaneDampers')
@@ -5754,7 +5754,7 @@ DO iSys = 1, prelimCount
     CALL SetIfBlank(fldValStart + pvavsHeatSetPtResetTypeOff, 'None')
     CALL SetIfBlank(fldValStart + pvavsDehumCtrlTypeOff, 'None')
     CALL SetIfBlank(fldValStart + pvavsDehumSetPtOff, '60.0')
-    CALL SetIfBlank(fldValStart + pvavsHumidCtrlTypeOff, ' None')
+    CALL SetIfBlank(fldValStart + pvavsHumidCtrlTypeOff, 'None')
     CALL SetIfBlank(fldValStart + pvavsHumidCapOff, '0.000001')
     CALL SetIfBlank(fldValStart + pvavsHumidRatedElecOff, 'autosize')
     CALL SetIfBlank(fldValStart + pvavsHumidSetPtOff, '30.0')
@@ -6171,7 +6171,7 @@ DO iSys = 1, prelimCount
     CALL SetIfBlank(fldValStart + cvsCoolResetODBLoOff, '15.6')
     CALL SetIfBlank(fldValStart + cvsCoolSetPtAtODBHiOff, '12.8')
     CALL SetIfBlank(fldValStart + cvsCoolResetODBHiOff, '23.3')
-    CALL SetIfBlank(fldValStart + cvsHeatCoilKindOff, 'None')
+    CALL SetIfBlank(fldValStart + cvsHeatCoilKindOff, 'HotWater')
     CALL SetIfBlank(fldValStart + cvsHeatSetPtCtrlTypeOff, 'FixedSetpoint')
     CALL SetIfBlank(fldValStart + cvsHeatSetPtDesignOff, '10')
     CALL SetIfBlank(fldValStart + cvsHeatSetPtAtODBLoOff, '15')
@@ -6187,7 +6187,7 @@ DO iSys = 1, prelimCount
     CALL SetIfBlank(fldValStart + cvsPreheatParasiticOff, '0')
     CALL SetIfBlank(fldValStart + cvsMaxOutsideFlowOff, 'autosize')
     CALL SetIfBlank(fldValStart + cvsMinOutsideFlowOff, 'autosize')
-    CALL SetIfBlank(fldValStart + cvsEconomizerKindOff, 'None')
+    CALL SetIfBlank(fldValStart + cvsEconomizerKindOff, 'NoEconomizer')
     CALL SetIfBlank(fldValStart + cvsNightCycleControlOff, 'StayOff')
     CALL SetIfBlank(fldValStart + cvsHeatRecTypeOff, 'None')
     CALL SetIfBlank(fldValStart + cvsHeatRecSenEffOff, '0.7')
@@ -10235,7 +10235,7 @@ DO iSys = 1, numCompactSysVAV
   ENDIF
   ! check if there is no heating coil and heating design setpoint is > preheat design setpoint
   IF (heatCoilType == ctNone) THEN
-    IF(StringToReal(FldVal(base + vsHeatSetPtDesignOff)) .GT. StringToReal(FldVal(base + vsPreheatSetPtConstantOff))) THEN
+    IF((preHeatCoilType .NE. ctNone) .AND. (StringToReal(FldVal(base + vsHeatSetPtDesignOff)) .GT. StringToReal(FldVal(base + vsPreheatSetPtConstantOff)))) THEN
       usePreheatTempforHeatDesignSuppT = .TRUE.
       CALL WriteError('Warning:  In HVACTemplate:System:VAV "'//TRIM(FldVal(base + vsAirHandlerNameOff))//'"'// &
                     ' the Heating Coil Design Setpoint is greater than the Preheat Coil Design Setpoint,'// &
@@ -11181,6 +11181,13 @@ DO iSys = 1, numCompactSysVAV
   !AIR LOOP EQUIPMENT LIST ~ line 552
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem:EquipmentList')
   CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' OA System Equipment')
+  IF (heatRecovery .EQ. htrecSens) THEN
+    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
+    CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Heat Recovery')
+  ELSEIF (heatRecovery .EQ. htrecEnth) THEN
+    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
+    CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Heat Recovery')
+  END IF
   IF (preHeatCoilType .EQ. ctHotWater) THEN
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Preheat Coil')
@@ -11190,13 +11197,6 @@ DO iSys = 1, numCompactSysVAV
   ELSEIF (preHeatCoilType .EQ. ctGas) THEN
     CALL AddToObjStr('Component Object Type','Coil:Heating:Fuel')
     CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Preheat Coil')
-  END IF
-  IF (heatRecovery .EQ. htrecSens) THEN
-    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
-    CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Heat Recovery')
-  ELSEIF (heatRecovery .EQ. htrecEnth) THEN
-    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
-    CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' Heat Recovery')
   END IF
   CALL AddToObjStr('Component Object Type','OutdoorAir:Mixer')
   CALL AddToObjFld('Component Name', base + vsAirHandlerNameOff,' OA Mixing Box',.TRUE.)
@@ -11628,9 +11628,9 @@ DO iSys = 1, numCompactSysPVAV
   ! Warn if fixed heating or preheat setpoint is greater than fixed cooling setpoint, and no reset option is active
   IF (isCoolStPtSchedBlank .AND. (coolSetPtReset == csprNone)) THEN
     IF ((heatCoilType .NE. ctNone) .AND. isHeatStPtSchedBlank .AND. (heatSetPtReset == hsprNone)) THEN
-      IF (FldVal(base + pvavsHeatSetPtDesignOff) .GT. FldVal(base + pvavsCoolSetPtDesignOff)) THEN
+      IF (StringToReal(FldVal(base + pvavsHeatSetPtDesignOff)) .GT. StringToReal(FldVal(base + pvavsCoolSetPtDesignOff))) THEN
        CALL WriteError('Warning:  In HVACTemplate:System:PackagedVAV "'//TRIM(FldVal(base + pvavsAirHandlerNameOff))//'"'// &
-                      ' the Heating Coil Design Setpoint is greater than the Cooling Coil Design Setpoint.'// &
+                      ' the Heating Coil Design Setpoint= is greater than the Cooling Coil Design Setpoint.'// &
                       ' This may cause the heating coil and cooling coil to operate simultaneously.'// &
                       ' Check results carefully and adjust controls if needed.',msgWarning)
       ENDIF
@@ -12435,45 +12435,47 @@ DO iSys = 1, numCompactSysPVAV
       CALL AddToObjStr('Maximum Value of x','1.0',.TRUE.)
   END SELECT
   ! Humdistat(s) if needed
-  !    Single humidistat if humidification and dehumidification are both active and control zones are the same
-  IF ((.NOT. isHumidifierNone) .AND. (.NOT. isDehumidifyNone) &
-       .AND. SameString(FldVal(base +  pvavsDehumCtrlZoneOff),FldVal(base +  pvavsHumidCtrlZoneOff))) THEN
-    !Object ==> ZoneControl:Humidistat
-    CALL CreateNewObj('ZoneControl:Humidistat')
-    CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Humidistat')
-    CALL AddToObjFld('Zone Name', base + pvavsDehumCtrlZoneOff,'')
-    CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name', &
-                     'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsHumidSetPtOff)))
-    CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', &
-                     'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsDehumSetPtOff)),.TRUE.)
-    CALL AddAlwaysSchedule(FldVal(base + pvavsHumidSetPtOff))
-    CALL AddAlwaysSchedule(FldVal(base + pvavsDehumSetPtOff))
-  ELSE
-    IF (.NOT. isDehumidifyNone) THEN
-      !   Dehumidification humidistat
+  IF (.NOT. isHumidifierNone .OR. .NOT. isDehumidifyNone) THEN
+    !    Single humidistat if humidification and dehumidification are both active and control zones are the same
+    IF ((.NOT. isHumidifierNone) .AND. (.NOT. isDehumidifyNone) &
+         .AND. SameString(FldVal(base +  pvavsDehumCtrlZoneOff),FldVal(base +  pvavsHumidCtrlZoneOff))) THEN
       !Object ==> ZoneControl:Humidistat
       CALL CreateNewObj('ZoneControl:Humidistat')
-      CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Dehumidification Humidistat')
+      CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Humidistat')
       CALL AddToObjFld('Zone Name', base + pvavsDehumCtrlZoneOff,'')
-      CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 1')
-      CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', &
-                       'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsDehumSetPtOff)),.TRUE.)
-
-      CALL AddAlwaysSchedule('1')
-      CALL AddAlwaysSchedule(FldVal(base + pvavsDehumSetPtOff))
-    ENDIF
-    IF (.NOT. isHumidifierNone) THEN
-      !    Humidification humidistat
-      !Object ==> ZoneControl:Humidistat
-      CALL CreateNewObj('ZoneControl:Humidistat')
-      CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Humidification Humidistat')
-      CALL AddToObjFld('Zone Name', base + pvavsHumidCtrlZoneOff,'')
       CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name', &
                        'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsHumidSetPtOff)))
-      CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 100',.TRUE.)
-
+      CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', &
+                       'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsDehumSetPtOff)),.TRUE.)
       CALL AddAlwaysSchedule(FldVal(base + pvavsHumidSetPtOff))
-      CALL AddAlwaysSchedule('100')
+      CALL AddAlwaysSchedule(FldVal(base + pvavsDehumSetPtOff))
+    ELSE
+      IF (.NOT. isDehumidifyNone) THEN
+        !   Dehumidification humidistat
+        !Object ==> ZoneControl:Humidistat
+        CALL CreateNewObj('ZoneControl:Humidistat')
+        CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Dehumidification Humidistat')
+        CALL AddToObjFld('Zone Name', base + pvavsDehumCtrlZoneOff,'')
+        CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 1')
+        CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', &
+                         'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsDehumSetPtOff)),.TRUE.)
+  
+        CALL AddAlwaysSchedule('1')
+        CALL AddAlwaysSchedule(FldVal(base + pvavsDehumSetPtOff))
+      ENDIF
+      IF (.NOT. isHumidifierNone) THEN
+        !    Humidification humidistat
+        !Object ==> ZoneControl:Humidistat
+        CALL CreateNewObj('ZoneControl:Humidistat')
+        CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Humidification Humidistat')
+        CALL AddToObjFld('Zone Name', base + pvavsHumidCtrlZoneOff,'')
+        CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name', &
+                         'HVACTemplate-Always ' // TRIM(FldVal(base + pvavsHumidSetPtOff)))
+        CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 100',.TRUE.)
+  
+        CALL AddAlwaysSchedule(FldVal(base + pvavsHumidSetPtOff))
+        CALL AddAlwaysSchedule('100')
+      ENDIF
     ENDIF
   ENDIF
   !Set point manager for dehumidification
@@ -14391,7 +14393,7 @@ DO iSys = 1, numCompactSysUnit
   CALL CreateNewObj('SetpointManager:SingleZone:Cooling')
   CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Economizer Supply Air Temp Manager')
   CALL AddToObjStr('Control Variable','Temperature')
-  CALL AddToObjStr('minimum supply air temperature {C}','13')
+  CALL AddToObjFld('minimum supply air temperature {C}',base + usCoolDesignSupplyTempOff,'')
   CALL AddToObjStr('maximum supply air temperature {C}','45')
   CALL AddToObjFld('Control Zone Name', base + usControlZoneOff,'')
   CALL AddToObjFld('Zone Node Name', base + usControlZoneOff,' Zone Air Node')
@@ -14426,11 +14428,7 @@ DO iSys = 1, numCompactSysUnit
   ENDIF
   CALL AddToObjFld('Economizer Maximum Limit Dry-Bulb Temperature {C}', base + usEconoUpLimitOff,' ')
   CALL AddToObjFld('Economizer Maximum Limit Enthalpy {J/kg}', base + usEconoEnthLimitOff,' ')
-  IF (econoKind .EQ. etFixedDewPointAndDryBulb) THEN
-    CALL AddToObjFld('Economizer Maximum Limit Dewpoint Temperature (C)',base + usEconoUpDewLimitOff, ' ')
-  ELSE
-    CALL AddToObjStr('Economizer Maximum Limit Dewpoint Temperature (C)',' ')
-  ENDIF
+  CALL AddToObjFld('Economizer Maximum Limit Dewpoint Temperature (C)',base + usEconoUpDewLimitOff, ' ')
   IF (econoKind .EQ. etElectronicEnthalpy) THEN
     CALL AddToObjFld('Electronic Enthalpy Limit Curve Name',base + usAirHandlerNameOff,' ElectrEnthCurve')
   ELSE
@@ -15000,7 +14998,7 @@ DO iSys = 1, numCompactSysUnitHP
   CALL AddToObjFld('Availability Schedule Name', base + uhpsHeatAvailSchedNameOff,'')
   CALL AddToObjFld('Rated Total Heating Capacity {W}', base + uhpsHPHeatCoilCapOff,'')
   CALL AddToObjFld('Rated COP', base + uhpsHPHeatCoilCOPOff,'')
-  CALL AddToObjFld('Rated Air Flow Rate {m3/s}', base + uhpsSupplyHeatFlowRateOff,'')
+  CALL AddToObjStr('Rated Air Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Rated Evaporator Fan Power Per Volume Flow Rate','')
   CALL AddToObjFld('Air Inlet Node Name', base + uhpsAirHandlerNameOff,' Cooling Coil Outlet')
   CALL AddToObjFld('Air Outlet Node Name', base + uhpsAirHandlerNameOff,' Heating Coil Outlet')
@@ -15154,7 +15152,7 @@ DO iSys = 1, numCompactSysUnitHP
   CALL AddToObjFld('Gross Rated Total Cooling Capacity {W}', base + uhpsCoolCoilCapOff,' ')
   CALL AddToObjFld('Gross Rated Sensible Heat Ratio', base + uhpsCoolCoilSHROff,' ')
   CALL AddToObjFld('Rated COP', base + uhpsCoolCoilCOPOff,' ')
-  CALL AddToObjFld('Rated Air Flow Rate {m3/s}', base + uhpsSupplyCoolFlowRateOff,' ')
+  CALL AddToObjStr('Rated Air Flow Rate {m3/s}', 'autosize')
   CALL AddToObjStr('Rated Evaporator Fan Power per Volume Flow Rate {W/(m3/s)}','')
   CALL AddToObjFld('Air Inlet Node Name', base + uhpsAirHandlerNameOff, TRIM(coolCoilInlet))
   CALL AddToObjFld('Air Outlet Node Name', base + uhpsAirHandlerNameOff, TRIM(coolCoilOutlet))
@@ -22201,6 +22199,13 @@ DO iSys = 1, numCompactSysDualDuct
   !AIR LOOP EQUIPMENT LIST ~ line 552
   CALL CreateNewObj('AirLoopHVAC:OutdoorAirSystem:EquipmentList')
   CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' OA System Equipment')
+  IF (heatRecovery .EQ. htrecSens) THEN
+    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
+    CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Heat Recovery')
+  ELSEIF (heatRecovery .EQ. htrecEnth) THEN
+    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
+    CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Heat Recovery')
+  END IF
   IF (preHeatCoilType .EQ. ctHotWater) THEN
     CALL AddToObjStr('Component Object Type','Coil:Heating:Water')
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Preheat Coil')
@@ -22210,13 +22215,6 @@ DO iSys = 1, numCompactSysDualDuct
   ELSEIF (preHeatCoilType .EQ. ctGas) THEN
     CALL AddToObjStr('Component Object Type','Coil:Heating:Fuel')
     CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Preheat Coil')
-  END IF
-  IF (heatRecovery .EQ. htrecSens) THEN
-    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
-    CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Heat Recovery')
-  ELSEIF (heatRecovery .EQ. htrecEnth) THEN
-    CALL AddToObjStr('Component Object Type','HeatExchanger:AirToAir:SensibleAndLatent')
-    CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' Heat Recovery')
   END IF
   CALL AddToObjStr('Component Object Type','OutdoorAir:Mixer')
   CALL AddToObjFld('Component Name', base + ddsAirHandlerNameOff,' OA Mixing Box',.TRUE.)
@@ -26046,7 +26044,6 @@ LOGICAL :: isBoilerHotWater
 LOGICAL :: isBoilerCondHotWater
 LOGICAL :: isHotPumpVariable
 LOGICAL :: isCapacityAutosize
-LOGICAL :: isFuelTypeValid
 LOGICAL :: isPumpBranch
 LOGICAL :: isPumpSchedNameBlank
 CHARACTER(len=MaxAlphaLength) :: blrInletNode=''
@@ -26093,21 +26090,6 @@ DO iBoiler = 1, numCompactBoiler
                     TRIM(FldVal(base + blrTypeOff)))
   END IF
   isCapacityAutosize = SameString(FldVal(base + blrCapacityOff),'autosize')
-  isFuelTypeValid = .FALSE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'Electricity')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'NaturalGas')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'PropaneGas')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'FuelOil#1')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'FuelOil#2')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'Coal')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'Diesel')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'Gasoline')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'OtherFuel1')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'OtherFuel2')) isFuelTypeValid = .TRUE.
-  IF (SameString(FldVal(base + blrFuelTypeOff),'')) isFuelTypeValid = .TRUE.
-  IF (.NOT. isFuelTypeValid) THEN
-    CALL WriteError('Invalid choice in HVACTemplate:Plant:Boiler in the Fuel Type field')
-  END IF
   ! add Boiler Outlet Node to list of node names for HW setpoints
   IF ((compactHotLoopBase .NE. 0) .AND. &
       (SameString(FldVal(base + blrLoopTypeOff),'HotWater') .OR. SameString(FldVal(base + blrLoopTypeOff),''))) THEN
