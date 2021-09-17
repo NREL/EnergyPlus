@@ -472,6 +472,12 @@ class EPlusRunManager(object):
             if os.path.exists(eplusout_bnd_path):
                 os.remove(eplusout_bnd_path)
 
+        # Now the last thing to do is to collect all the relevant output files for this simulation and put them back
+        # in the original run directory.  This is because EP Launch will expect to find them right there.
+        file_names_to_copy = [f for f in os.listdir(output_directory) if f.startswith(file_name_no_ext)]
+        for f in file_names_to_copy:
+            shutil.copy(os.path.join(output_directory, f), os.path.join(run_directory, f))
+
         # check on .end file and finish up
         err_file_name = "{0}.err".format(file_name_no_ext)
         err_file_path = os.path.join(output_directory, err_file_name)
