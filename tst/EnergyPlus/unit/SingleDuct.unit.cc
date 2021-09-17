@@ -2494,7 +2494,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
     // DesZoneHeatLoad = 0 from simulating design days and forcing heating load = 0
     // this can still provide a negative coil load if CoilInTemp > ZoneDesTemp
     // CoilInTemp = Sizing:System, 16.0000, !- Central Heating Design Supply Air Temperature{ C }
-    // ZoneDesTemp = min zone temperature from simulating design days = 17.0 C
+    // ZoneDesTemp = max of thermostat heating set point temperature = 17.0 C
     // "Schedule:Compact,",
     //	" HTGSETP_SCH,              !- Name",
     //	" Any Number,               !- Schedule Type Limits Name",
