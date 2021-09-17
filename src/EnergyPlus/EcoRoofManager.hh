@@ -84,6 +84,11 @@ namespace EcoRoofManager {
                          Real64 const Qsoil // unused1208
     );
 
+    void CalculateEcoRoofSolar(EnergyPlusData &state,
+                               Real64 &RS, // Solar radiation on a horizontal surface (roof)
+                               Real64 &f1, // Solar term in Stomatal Resistance
+                               int const SurfNum);
+
 } // namespace EcoRoofManager
 
 struct EcoRoofManagerData : BaseGlobalStruct

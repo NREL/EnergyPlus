@@ -56,9 +56,12 @@
 
 namespace EnergyPlus::DataRootFinder {
 
-constexpr int iSlopeNone(0);        // Undefined slope specification
-constexpr int iSlopeIncreasing(1);  // For overall increasing function F(X) between min and max points
-constexpr int iSlopeDecreasing(-1); // For overall decreasing function F(X) between min and max points
+enum class Slope
+{
+    Unassigned = -1, // Undefined slope specification
+    Increasing,      // For overall increasing function F(X) between min and max points
+    Decreasing       // For overall decreasing function F(X) between min and max points
+};
 
 enum class iStatus
 {
@@ -99,15 +102,15 @@ enum class iMethod
 struct ControlsType
 {
     // Members
-    int SlopeType;      // Set to any of the iSlope<...> codes
-    iMethod MethodType; // Desired solution method.
+    DataRootFinder::Slope SlopeType; // Set to any of the iSlope<...> codes
+    iMethod MethodType;              // Desired solution method.
     // Set to any of the iMethod<...> codes except for iMethodNone and iMethodBracket
     Real64 TolX;  // Relative tolerance for variable X
     Real64 ATolX; // Absolute tolerance for variable X
     Real64 ATolY; // Absolute tolerance for variable Y
 
     // Default Constructor
-    ControlsType() : SlopeType(iSlopeNone), MethodType(iMethod::None), TolX(1.0e-3), ATolX(1.0e-3), ATolY(1.0e-3)
+    ControlsType() : SlopeType(DataRootFinder::Slope::Unassigned), MethodType(iMethod::None), TolX(1.0e-3), ATolX(1.0e-3), ATolY(1.0e-3)
     {
     }
 };

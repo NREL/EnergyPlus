@@ -312,6 +312,7 @@
     Wall,                    !- Surface Type
     Basement Wall Construction,  !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Foundation,              !- Outside Boundary Condition
     Basement Foundation,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -328,6 +329,7 @@
     Wall,                    !- Surface Type
     Basement Wall Construction,  !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Foundation,              !- Outside Boundary Condition
     Basement Foundation,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -344,6 +346,7 @@
     Wall,                    !- Surface Type
     Basement Wall Construction,  !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Foundation,              !- Outside Boundary Condition
     Basement Foundation,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -360,6 +363,7 @@
     Wall,                    !- Surface Type
     Basement Wall Construction,  !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Foundation,              !- Outside Boundary Condition
     Basement Foundation,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -386,6 +390,7 @@
     Floor,                   !- Surface Type
     Basement Floor Construction,  !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Foundation,              !- Outside Boundary Condition
     Basement Foundation,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -402,6 +407,7 @@
     Ceiling,                 !- Surface Type
     Ceiling Construction,    !- Construction Name
     Basement,                !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Main Floor,              !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -434,6 +440,7 @@
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -450,6 +457,7 @@
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -466,6 +474,7 @@
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -482,6 +491,7 @@
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -498,6 +508,7 @@
     Roof,                    !- Surface Type
     Roof Construction,       !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

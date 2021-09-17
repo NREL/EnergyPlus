@@ -64,7 +64,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSurfaces;
-using namespace ObjexxFCL;
 using Vertex = SurfaceOctreeCube::Vertex;
 using Surfaces = SurfaceOctreeCube::Surfaces;
 

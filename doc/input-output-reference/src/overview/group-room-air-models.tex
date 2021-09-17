@@ -282,7 +282,7 @@ This field specifies the temperature difference between the air leaving the zone
 
 \paragraph{Field Set Zeta and Temperature Difference}\label{field-set-zeta-and-temperature-difference}
 
-The remaining fields contain pairs of values that define a lookup table for the temperature pattern in the vertical direction. The first value is Zeta and the second value is DeltaTai. This object is extensible, by duplicating the last two fields and revising the IDD -- note that you will have to replace ``inner'' semi-colons with commas.
+The remaining fields contain pairs of values that define a lookup table for the temperature pattern in the vertical direction. The first value is Zeta and the second value is DeltaTai.
 
 \paragraph{Field: Pair \textless{}\#\textgreater{} Zeta non-dimensional Height}\label{field-pair-zeta-non-dimensional-height}
 
@@ -292,7 +292,7 @@ Zeta is the normalized height and should be a fractional value from 0.0 to 1.0. 
 
 DeltaT\(_{ai}\) is the temperature difference between the air temperature at the associated Zeta (T\(_{ai}\)) and the mean air temperature and is given in degrees Celsius.
 
-An example of this object corresponding to the figure above is:
+This object is extensible, so additional pairs of these last two fields of this type can be added to the end of this object. An example of this object corresponding to the figure above is:
 
 \begin{lstlisting}
 RoomAir:TemperaturePattern:NondimensionalHeight,
@@ -347,7 +347,7 @@ This field specifies the temperature difference between the air leaving the zone
 
 \paragraph{Fields (6 and on): Pairs of Surface Names and Temperature Differences}\label{fields-6-and-on-pairs-of-surface-names-and-temperature-differences}
 
-The remaining fields contain pairs that define a lookup table for the temperature pattern on a surface-by-surface basis. This object is extensible, by duplicating the last two fields and revising the IDD -- note that you will have to replace ``inner'' semi-colons with commas.
+The remaining fields contain pairs that define a lookup table for the temperature pattern on a surface-by-surface basis.
 
 \paragraph{Field: Surface Name Pair \textless{}\#\textgreater{}}\label{field-surface-name-pair}
 
@@ -357,7 +357,7 @@ The name of a surface defined elsewhere in the input file.
 
 DeltaT\(_{ai}\) is the temperature difference between the air temperature adjacent to the associated surface (T\(_{ai}\)) and the mean air temperature and is given in degrees Celsius.
 
-An example of this object, which might be used to elevate temperatures near west windows in the afternoon, is:
+This object is extensible, so additional pairs of fields of these types can be added to the end of this object.  An example of this object, which might be used to elevate temperatures near west windows in the afternoon, is:
 
 \begin{lstlisting}
 
@@ -1194,13 +1194,13 @@ RoomAir:Node:AirflowNetwork,
 
 This object is used to provide a list of connected adjacent surfaces with convective heat transfer between surfaces and this particular node. When a moisture mode is assigned to surfaces, convective moisture transfer will be calculated. It should be pointed out that a fraction of a surface exposed to this particular node is not allowed.
 
-\subsubsection{Field: Name}\label{field-name-9-015}
+\paragraph{Field: Name}\label{field-name-9-015}
 
 This is a unique character string associated with this instance of the Room\-Air\-:Node:\-Airflow\-Network:\-Adjacent\-Surface\-List object.
 
-\subsubsection{Field: Surface x Name}\label{field-surface-x-name-000}
+\paragraph{Field: Surface \textless{}\#\textgreater{} Name}\label{field-surface-x-name-000}
 
-The field specifies a surface name based on the order from 1 to 21. The maximum number of surfaces can be extensible.
+The field specifies a surface name. This object is extensible, so additional fields of this type can be added to the end of this object.
 
 \begin{lstlisting}
 
@@ -1219,17 +1219,19 @@ This object is used to define a list of internal gains in the same zone and asso
 
 This is a unique character string associated with this instance of the Room\-Air:\-Node:\-Air\-flow\-Net\-work:\-Internal\-Gains object.
 
-\paragraph{Field: Internal Gain Object x Type}\label{field-internal-gain-object-x-type}
+\paragraph{Field: Internal Gain Object \textless{}\#\textgreater{} Type}\label{field-internal-gain-object-x-type}
 
-The field specifies an internal gain object type based on the list in the Energy+.
+The field specifies an internal gain object type based on the list in EnergyPlus.
 
-\paragraph{Field: Internal Gain Object x Name}\label{field-internal-gain-object-x-name}
+\paragraph{Field: Internal Gain Object \textless{}\#\textgreater{} Name}\label{field-internal-gain-object-x-name}
 
-The field specifies an internal gain object name based on the list in the Energy+.
+The field specifies an internal gain object name based on the list in EnergyPlus.
 
-\paragraph{Field: Fraction of Gains to Node x}\label{field-fraction-of-gains-to-node-x}
+\paragraph{Field: Fraction of Gains to Node \textless{}\#\textgreater{}}\label{field-fraction-of-gains-to-node-x}
 
 The field specifies a fraction of the particular internal gain object assigned to this node.
+
+This object is extensible, so additional groups of these last three fields can be added to the end of this object.
 
 \begin{lstlisting}
 RoomAir:Node:AirflowNetwork:InternalGains,
@@ -1245,8 +1247,6 @@ RoomAir:Node:AirflowNetwork:InternalGains,
   0.15;                 !- Fraction of Gains to Node 3
 \end{lstlisting}
 
-\{Field set: 3 fields (Internal Gain Object x Type, Internal Gain Object x Name, and Fraction of Gains to Node x). are extensible.\}
-
 \subsection{RoomAir:Node:AirflowNetwork:HVACEquipment}\label{roomairnodeairflownetworkhvacequipment}
 
 This object is used to define a list of HVAC equipment objects in the same zone and associated fractions assigned to this particular node.
@@ -1257,21 +1257,23 @@ This object is used to define a list of HVAC equipment objects in the same zone 
 
 This is a unique character string associated with this instance of the Room\-Air:\-Node:\-Air\-flow\-Net\-work:\-HVAC\-Equipment object.
 
-\paragraph{Field: ZoneHVAC or Air Terminal Equipment Object Type x}\label{field-zonehvac-or-air-terminal-equipment-object-type-x}
+\paragraph{Field: ZoneHVAC or Air Terminal Equipment Object Type \textless{}\#\textgreater{}}\label{field-zonehvac-or-air-terminal-equipment-object-type-x}
 
 The field specifies an object type of ZoneHVAC equipment or terminal type based on the list in the Energy+.idd.
 
-\paragraph{Field: ZoneHVAC or Air Terminal Equipment Object Name x}\label{field-zonehvac-or-air-terminal-equipment-object-name-x}
+\paragraph{Field: ZoneHVAC or Air Terminal Equipment Object Name \textless{}\#\textgreater{}}\label{field-zonehvac-or-air-terminal-equipment-object-name-x}
 
 The field specifies the object name based on the object type defined in the previous field.
 
-\paragraph{Field: Fraction of Output or Supply Air from HVAC Equipment x}\label{field-fraction-of-output-or-supply-air-from-hvac-equipment-x}
+\paragraph{Field: Fraction of Output or Supply Air from HVAC Equipment \textless{}\#\textgreater{}}\label{field-fraction-of-output-or-supply-air-from-hvac-equipment-x}
 
 The field specifies a fraction of supply air from the particular equipment to this node.
 
-\paragraph{Field: Fraction of Input or Return Air from HVAC Equipment x}\label{field-fraction-of-input-or-return-air-from-hvac-equipment-x}
+\paragraph{Field: Fraction of Input or Return Air from HVAC Equipment \textless{}\#\textgreater{}}\label{field-fraction-of-input-or-return-air-from-hvac-equipment-x}
 
 The field specifies a fraction of return air from the particular equipment to this node.
+
+This object is extensible, so additional groups fields of these last four fields can be added to the end of this object.
 
 \begin{lstlisting}
 
@@ -1282,8 +1284,6 @@ RoomAir:Node:AirflowNetwork:HVACEquipment,
   0.14,                   !- Fraction of Output or Supply Air from HVAC Equipment 1
   0.14;                   !- Fraction of Input or Return Air to HVAC Equipment 1
 \end{lstlisting}
-
-\{Field set: 4 fields (ZoneHVAC or Air Terminal Equipment Object Type x, ZoneHVAC or Air Terminal Equipment Object Name x, Fraction of Output or Supply Air from HVAC Equipment x, and Fraction of Input or Return Air from HVAC Equipment x) are extensible.\}
 
 \subsubsection{Outputs}\label{outputs-1-023}
 

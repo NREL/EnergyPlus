@@ -79,7 +79,7 @@ namespace EnergyPlus::MixerComponent {
 // Using/Aliasing
 using namespace DataLoopNode;
 
-void SimAirMixer(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
+void SimAirMixer(EnergyPlusData &state, std::string_view CompName, int &CompIndex)
 {
 
     // SUBROUTINE INFORMATION:
@@ -106,7 +106,7 @@ void SimAirMixer(EnergyPlusData &state, std::string const &CompName, int &CompIn
     if (CompIndex == 0) {
         MixerNum = UtilityRoutines::FindItemInList(CompName, state.dataMixerComponent->MixerCond, &MixerConditions::MixerName);
         if (MixerNum == 0) {
-            ShowFatalError(state, "SimAirLoopMixer: Mixer not found=" + CompName);
+            ShowFatalError(state, "SimAirLoopMixer: Mixer not found=" + std::string{CompName});
         }
         CompIndex = MixerNum;
     } else {
@@ -164,7 +164,7 @@ void GetMixerInput(EnergyPlusData &state)
     using NodeInputManager::GetOnlySingleNode;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetMixerInput: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetMixerInput: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int MixerNum; // The Mixer that you are currently loading input into
@@ -222,7 +222,7 @@ void GetMixerInput(EnergyPlusData &state)
                                                                                      AlphArray(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
                                                                                      DataLoopNode::NodeConnectionType::Outlet,
-                                                                                     1,
+                                                                                     NodeInputManager::compFluidStream::Primary,
                                                                                      ObjectIsNotParent);
         state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes = NumAlphas - 2;
 
@@ -263,7 +263,7 @@ void GetMixerInput(EnergyPlusData &state)
                                                                                                  AlphArray(1),
                                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 1,
+                                                                                                 NodeInputManager::compFluidStream::Primary,
                                                                                                  ObjectIsNotParent);
             if (lAlphaBlanks(2 + NodeNum)) {
                 ShowSevereError(state, cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));
@@ -308,7 +308,7 @@ void GetMixerInput(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in getting input.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.");
     }
 }
 

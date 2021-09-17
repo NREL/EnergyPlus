@@ -53,35 +53,33 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
 
 namespace DataComplexFenestration {
 
-    // Using/Aliasing
-
-    // Data
-
     // Parameters for gas definitions
-    constexpr int GasCoeffsCustom(0);
-    constexpr int GasCoeffsAir(1);
-    constexpr int GasCoeffsArgon(2);
-    constexpr int GasCoeffsKrypton(3);
-    constexpr int GasCoeffsXenon(4);
-
-    // Parameters for calculation standard
-    constexpr int csISO15099(1);
-    constexpr int csEN673Declared(2);
-    constexpr int csEN673Design(3);
+    enum class GasCoeffs
+    {
+        Unassigned = -1,
+        Custom,
+        Air,
+        Argon,
+        Krypton,
+        Xenon
+    };
 
     // Parameters for thermal model
-    constexpr int tmISO15099(0);
-    constexpr int tmScaledCavityWidth(1);
-    constexpr int tmConvectiveScalarModel_NoSDThickness(2);
-    constexpr int tmConvectiveScalarModel_WithSDThickness(3);
-
-    // Types
+    enum class ThermalModel
+    {
+        Unassigned = -1,
+        ISO15099,
+        ScaledCavityWidth,
+        ConvectiveScalarModel_NoSDThickness,
+        ConvectiveScalarModel_WithSDThickness
+    };
 
     struct GapSupportPillar
     {
@@ -143,7 +141,7 @@ namespace DataComplexFenestration {
     {
         // Members
         std::string Name;                                    // Window thermal model name
-        int CalculationStandard;                             // Tarcog calculation standard
+        TARCOGGassesParams::Stdrd CalculationStandard;       // Tarcog calculation standard
         TARCOGParams::TARCOGThermalModel ThermalModel;       // Tarcog thermal model
         Real64 SDScalar;                                     // SDScalar coefficient
         TARCOGParams::DeflectionCalculation DeflectionModel; // Deflection model
@@ -153,7 +151,7 @@ namespace DataComplexFenestration {
 
         // Default Constructor
         WindowThermalModelParams()
-            : CalculationStandard(-1), ThermalModel(TARCOGParams::TARCOGThermalModel::UNASSIGNED), SDScalar(0.0),
+            : CalculationStandard(TARCOGGassesParams::Stdrd::Unassigned), ThermalModel(TARCOGParams::TARCOGThermalModel::UNASSIGNED), SDScalar(0.0),
               DeflectionModel(TARCOGParams::DeflectionCalculation::UNASSIGNED), VacuumPressureLimit(0.0), InitialTemperature(0.0),
               InitialPressure(0.0)
         {

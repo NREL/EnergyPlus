@@ -68,6 +68,7 @@ import os
 import platform
 import shutil
 import sys
+import glob as gb
 
 print("PYTHON: Copying standard library files")
 
@@ -80,12 +81,37 @@ else:
     sys.exit(1)
 exe_dir = os.path.dirname(exe_path)
 target_dir = os.path.join(exe_dir, folder_name)
-if os.path.exists(target_dir):
-    sys.exit(0)
 
 ctypes_import_file = os.path.abspath(ctypes.__file__)
 ctypes_package_dir = os.path.dirname(ctypes_import_file)
 standard_lib_dir = os.path.dirname(ctypes_package_dir)
+
+if os.path.exists(target_dir):
+    # Let's check the library files to see if the ABI matches
+    # Otherwise if you build with say python 3.8 initially, and then switch to
+    # python 3.9, your lib-dynload will still have the 38 .so files
+    std_lib_ctypes_sos = gb.glob(os.path.join(standard_lib_dir, "**/_ctypes.*"), recursive=True)
+    this_lib_ctypes_sos = gb.glob(os.path.join(target_dir, "**/_ctypes.*"), recursive=True)
+
+    def find_libs(dirPath):
+        sos = []
+        for ext in ['a', 'so', 'lib']:
+            sos += gb.glob(os.path.join(dirPath, "**/*.{}*".format(ext)),
+                           recursive=True)
+        return [os.path.basename(f) for f in sos]
+
+    std_lib_ctypes_sos = find_libs(standard_lib_dir)
+    this_lib_ctypes_sos = find_libs(target_dir)
+
+    if ((set(std_lib_ctypes_sos) - set(this_lib_ctypes_sos)) or
+        (set(this_lib_ctypes_sos) - set(std_lib_ctypes_sos))):
+        print("Detected changes in the python libs, wiping and recopying")
+        shutil.rmtree(target_dir)
+    else:
+        # File names match
+        sys.exit(0)
+
+
 shutil.copytree(standard_lib_dir, target_dir)
 
 # On Windows, we also need to grab the DLLs folder, which is one folder up

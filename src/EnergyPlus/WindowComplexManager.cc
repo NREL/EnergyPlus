@@ -61,12 +61,14 @@
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataShadowingCombinations.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/PierceSurface.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -599,10 +601,10 @@ namespace WindowComplexManager {
             std::size_t lHTI(0); // Linear index for ( Hour, TS, I )
             for (int Hour = 1; Hour <= 24; ++Hour) {
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS, ++lHT) { // [ lHT ] == ( Hour, TS )
-                    SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour, {1, 3});
+                    SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour);
                     Theta = 0.0;
                     Phi = 0.0;
-                    if (state.dataBSDFWindow->SUNCOSTS(TS, Hour, 3) > DataEnvironment::SunIsUpValue) {
+                    if (state.dataBSDFWindow->SUNCOSTS(TS, Hour)(3) > DataEnvironment::SunIsUpValue) {
                         IncRay = FindInBasis(
                             state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                         complexWindowGeom.ThetaBm[lHT] = Theta;
@@ -651,10 +653,10 @@ namespace WindowComplexManager {
         } else {  // detailed timestep integration
             std::size_t const lHT(
                 complexWindowGeom.ThetaBm.index(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep)); // [ lHT ] == ( HourOfDay, TimeStep )
-            SunDir = state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, 3});
+            SunDir = state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
             Theta = 0.0;
             Phi = 0.0;
-            if (state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, 3) > DataEnvironment::SunIsUpValue) {
+            if (state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay)(3) > DataEnvironment::SunIsUpValue) {
                 IncRay = FindInBasis(state, SunDir, state.dataWindowComplexManager->Front_Incident, iSurf, iState, complexWindowGeom.Inc, Theta, Phi);
                 complexWindowGeom.ThetaBm[lHT] = Theta;
                 complexWindowGeom.PhiBm[lHT] = Phi;
@@ -852,7 +854,7 @@ namespace WindowComplexManager {
         }
         if (RegWindFnd) {
             Absorb.allocate(State.NLayers);
-            SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour, {1, 3});
+            SunDir = state.dataBSDFWindow->SUNCOSTS(TS, Hour);
             BkIncRay = FindInBasis(state,
                                    SunDir,
                                    state.dataWindowComplexManager->Back_Incident,
@@ -958,35 +960,6 @@ namespace WindowComplexManager {
         }
     }
 
-    void DetermineMaxBackSurfaces(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Joe Klems
-        //       DATE WRITTEN   September 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calculates the basis length for a Window6 Non-Symmetric or Axisymmetric basis
-        // from the input basis matrix
-
-        int NumSurfInZone(0); // Number of zone surfaces
-        bool ComplexFenInZone(false);
-
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            ComplexFenInZone = false;
-            for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
-                 ++SurfNum) {
-                if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) ComplexFenInZone = true;
-            }
-            if (ComplexFenInZone) {
-                NumSurfInZone = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1;
-                if (state.dataBSDFWindow->MaxBkSurf < NumSurfInZone) state.dataBSDFWindow->MaxBkSurf = NumSurfInZone;
-            }
-        }
-    }
-
     void ConstructBasis(EnergyPlusData &state,
                         int const IConst, // Index for accessing Construct array
                         BasisStruct &Basis)
@@ -1033,12 +1006,12 @@ namespace WindowComplexManager {
 
         Basis.Lamda.allocate(state.dataConstruction->Construct(IConst).BSDFInput.NBasis);
         Basis.SolAng.allocate(state.dataConstruction->Construct(IConst).BSDFInput.NBasis);
-        if (state.dataConstruction->Construct(IConst).BSDFInput.BasisType == DataBSDFWindow::BasisType_WINDOW) {
+        if (state.dataConstruction->Construct(IConst).BSDFInput.BasisType == DataBSDFWindow::Basis::WINDOW) {
             //   WINDOW6 Basis
-            Basis.BasisType = DataBSDFWindow::BasisType_WINDOW;
-            if (state.dataConstruction->Construct(IConst).BSDFInput.BasisSymmetryType == DataBSDFWindow::BasisSymmetry_None) {
+            Basis.BasisType = DataBSDFWindow::Basis::WINDOW;
+            if (state.dataConstruction->Construct(IConst).BSDFInput.BasisSymmetryType == DataBSDFWindow::BasisSymmetry::None) {
                 // No basis symmetry
-                Basis.BasisSymmetryType = DataBSDFWindow::BasisSymmetry_None;
+                Basis.BasisSymmetryType = DataBSDFWindow::BasisSymmetry::None;
                 Thetas(1) = 0.0;                                     // By convention, the first basis point is at the center (theta=0,phi=0)
                 Thetas(NThetas + 1) = 0.5 * DataGlobalConstants::Pi; // and there is an N+1st point (not a basis element) at Pi/2
                 NPhis(1) = 1;
@@ -1106,14 +1079,14 @@ namespace WindowComplexManager {
                                          LowerTheta,
                                          UpperTheta,
                                          DPhi,
-                                         DataBSDFWindow::BasisType_WINDOW); // This gets all the simple grid characteristics
+                                         DataBSDFWindow::Basis::WINDOW); // This gets all the simple grid characteristics
                         Basis.Lamda(ElemNo) = Lamda;
                         Basis.SolAng(ElemNo) = SolAng;
                     }
                 }
             } else { // BST
                 //  Axisymmetric basis symmetry (Note this only useful specular systems, where it allows shorter data input)
-                Basis.BasisSymmetryType = DataBSDFWindow::BasisSymmetry_Axisymmetric;
+                Basis.BasisSymmetryType = DataBSDFWindow::BasisSymmetry::Axisymmetric;
                 Thetas(1) = 0.0;                                     // By convention, the first basis point is at the center (theta=0,phi=0)
                 Thetas(NThetas + 1) = 0.5 * DataGlobalConstants::Pi; // and there is an N+1st point (not a basis element) at Pi/2
                 NPhis = 1;                                           // As insurance, define one phi for each theta
@@ -1176,7 +1149,7 @@ namespace WindowComplexManager {
                                      LowerTheta,
                                      UpperTheta,
                                      DPhi,
-                                     DataBSDFWindow::BasisType_WINDOW); // This gets all the simple grid characteristics
+                                     DataBSDFWindow::Basis::WINDOW); // This gets all the simple grid characteristics
                     Basis.Lamda(ElemNo) = Lamda;
                     Basis.SolAng(ElemNo) = SolAng;
                 }
@@ -1193,10 +1166,10 @@ namespace WindowComplexManager {
                           Real64 const Phi,   // Central azimuthal angle of element
                           int const Elem,     // Index number of element in basis
                           BasisElemDescr &BasisElem,
-                          Real64 const LowerTheta, // Lower edge of element (polar angle)
-                          Real64 const UpperTheta, // Upper edge of element (polar angle)
-                          Real64 const DPhi,       // Width of element (azimuthal angle)
-                          int const InputType      // Basis type
+                          Real64 const LowerTheta,              // Lower edge of element (polar angle)
+                          Real64 const UpperTheta,              // Upper edge of element (polar angle)
+                          Real64 const DPhi,                    // Width of element (azimuthal angle)
+                          DataBSDFWindow::Basis const InputType // Basis type
     )
     {
 
@@ -1209,7 +1182,7 @@ namespace WindowComplexManager {
         // PURPOSE OF THIS SUBROUTINE:
         // fill in values for all the components of a basis element
 
-        if (InputType == DataBSDFWindow::BasisType_WINDOW) {
+        if (InputType == DataBSDFWindow::Basis::WINDOW) {
             // WINDOW6 Type BASIS
             if (Elem == 1) {
                 // first element, theta=0, is special case
@@ -2262,7 +2235,7 @@ namespace WindowComplexManager {
             RayIndex = 0;
             return RayIndex;
         }
-        if (Basis.BasisSymmetryType == DataBSDFWindow::BasisSymmetry_None) {
+        if (Basis.BasisSymmetryType == DataBSDFWindow::BasisSymmetry::None) {
             // Search the basis thetas
             if (Theta <= 0.0) {
                 // Special case, Theta = 0.; this is always the first basis element
@@ -2302,7 +2275,7 @@ namespace WindowComplexManager {
             }
             RayIndex = Basis.BasisIndex(IPhi, ITheta);
             return RayIndex;
-        } else if (Basis.BasisSymmetryType == DataBSDFWindow::BasisSymmetry_Axisymmetric) {
+        } else if (Basis.BasisSymmetryType == DataBSDFWindow::BasisSymmetry::Axisymmetric) {
             // Search the basis thetas
             if (Theta <= 0.0) {
                 // Special case, Theta = 0.; this is always the first basis element
@@ -2468,7 +2441,7 @@ namespace WindowComplexManager {
                                   Real64 &SurfInsideTemp,     // Inside window surface temperature
                                   Real64 &SurfOutsideTemp,    // Outside surface temperature (C)
                                   Real64 &SurfOutsideEmiss,
-                                  int const CalcCondition // Calucation condition (summer, winter or no condition)
+                                  DataBSDFWindow::Condition const CalcCondition // Calucation condition (summer, winter or no condition)
     )
     {
 
@@ -2486,7 +2459,6 @@ namespace WindowComplexManager {
         // based off of 1-26-2009 version of WinCOG/TARCOG solution from Carli, Inc.
 
         using namespace DataBSDFWindow;
-        using DataHeatBalance::GasCoeffsAir;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -2597,7 +2569,7 @@ namespace WindowComplexManager {
         Real64 Tini;      // Initial temperature at time of fabrication (used only if CalcDeflection = 1)
         Real64 hin(0.0);  // Indoor combined film coefficient (if non-zero) [W/m^2.K]
         Real64 hout(0.0); // Outdoor combined film coefficient (if non-zero) [W/m^2.K]
-        int standard(1);  // Calculation standard switch:
+        TARCOGGassesParams::Stdrd standard(TARCOGGassesParams::Stdrd::ISO15099); // Calculation standard switch:
         //                 1 - ISO 15099,
         //                 2 - EN673 / ISO 10292 Declared,
         //                 3 - EN673 / ISO 10292 Design.
@@ -2646,19 +2618,11 @@ namespace WindowComplexManager {
 
         int TotLay; // Total number of layers in a construction
         //   (sum of solid layers and gap layers)
-        int Lay;         // Layer number
-        int LayPtr;      // Material number for a layer
-        int IGlass;      // glass layer number (1,2,3,...)
-        int IGap;        // Gap layer number (1,2,...)
-        int TotGlassLay; // Total number of glass layers in a construction
-        int ZoneEquipConfigNum;
-        int NodeNum;
-        Real64 SumSysMCp;  // Zone sum of air system MassFlowRate*Cp
-        Real64 SumSysMCpT; // Zone sum of air system MassFlowRate*Cp*T
-        Real64 MassFlowRate;
-        Real64 NodeTemp;
-        Real64 CpAir;
-        Real64 RefAirTemp;        // reference air temperatures
+        int Lay;                  // Layer number
+        int LayPtr;               // Material number for a layer
+        int IGlass;               // glass layer number (1,2,3,...)
+        int IGap;                 // Gap layer number (1,2,...)
+        int TotGlassLay;          // Total number of glass layers in a construction
         int k;                    // Layer counter
         int SurfNumAdj;           // An interzone surface's number in the adjacent zone
         int ZoneNumAdj;           // An interzone surface's adjacent zone number
@@ -2702,7 +2666,7 @@ namespace WindowComplexManager {
         int CalcSHGC(0);              // SHGC calculations are not necessary for E+ run
         int NumOfIterations(0);
 
-        int GasType; // locally used coefficent to point at correct gas type
+        DataComplexFenestration::GasCoeffs GasType; // locally used coefficent to point at correct gas type
         int ICoeff;
 
         std::string tarcogErrorMessage; // store error text from tarcog
@@ -2733,7 +2697,7 @@ namespace WindowComplexManager {
         CalcDeflection = TARCOGParams::DeflectionCalculation::NONE;
         CalcSHGC = 0;
 
-        if (CalcCondition == DataBSDFWindow::noCondition) {
+        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
             ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
             SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
@@ -2763,114 +2727,26 @@ namespace WindowComplexManager {
         isky = 3; // IR radiation is provided from external source
         iwd = 0;  // assume windward for now.  TODO compare surface normal with wind direction
 
-        if (CalcCondition == DataBSDFWindow::noCondition) {
+        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
             ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
-
-            // determine reference air temperature for this surface
-            {
-                auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
-                if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
-                } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
-                    // determine ZoneEquipConfigNum for this zone
-                    //            ControlledZoneAirFlag = .FALSE.
-                    ZoneEquipConfigNum = ZoneNum;
-                    //            DO ZoneEquipConfigNum = 1, NumOfControlledZones
-                    //                IF (ZoneEquipConfig(ZoneEquipConfigNum)%ActualZoneNum /= ZoneNum) CYCLE
-                    //                ControlledZoneAirFlag = .TRUE.
-                    //                EXIT
-                    //            END DO ! ZoneEquipConfigNum
-                    // check whether this zone is a controlled zone or not
-                    if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
-                        ShowFatalError(state,
-                                       "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                           state.dataHeatBal->Zone(ZoneNum).Name);
-                        return;
-                    }
-                    // determine supply air conditions
-                    SumSysMCp = 0.0;
-                    SumSysMCpT = 0.0;
-                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                        NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                        MassFlowRate =
-                            state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
-                        SumSysMCp += MassFlowRate * CpAir;
-                        SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-                    }
-                    // a weighted average of the inlet temperatures.
-                    if (SumSysMCp > 0.0) {
-                        RefAirTemp = SumSysMCpT / SumSysMCp;
-                    } else {
-                        RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                    }
-                } else {
-                    // currently set to mean air temp but should add error warning here
-                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                }
-            }
-
+            Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
             tind = RefAirTemp + DataGlobalConstants::KelvinConv; // Inside air temperature
 
             // now get "outside" air temperature
             if (SurfNumAdj > 0) { // Interzone window
 
                 ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
-
-                // determine reference air temperature for this surface
-                {
-                    auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNumAdj));
-                    if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                        RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
-                    } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                        RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj);
-                    } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
-                        // determine ZoneEquipConfigNum for this zone
-                        ZoneEquipConfigNum = ZoneNum;
-                        // check whether this zone is a controlled zone or not
-                        if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
-                            ShowFatalError(state,
-                                           "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                               state.dataHeatBal->Zone(ZoneNum).Name);
-                            return;
-                        }
-                        // determine supply air conditions
-                        SumSysMCp = 0.0;
-                        SumSysMCpT = 0.0;
-                        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                            NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                            MassFlowRate =
-                                state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNumAdj));
-                            SumSysMCp += MassFlowRate * CpAir;
-                            SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-                        }
-                        // a weighted average of the inlet temperatures.
-                        if (SumSysMCp > 0.0) {
-                            RefAirTemp = SumSysMCpT / SumSysMCp;
-                        } else {
-                            RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
-                        }
-                    } else {
-                        // currently set to mean air temp but should add error warning here
-                        RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
-                    }
-                }
-
+                RefAirTemp = state.dataSurface->Surface(SurfNumAdj).getInsideAirTemperature(state, SurfNumAdj);
                 tout = RefAirTemp + DataGlobalConstants::KelvinConv; // outside air temperature
 
                 tsky = state.dataHeatBal->ZoneMRT(ZoneNumAdj) +
                        DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
 
                 //  ! Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.
-                //  AbsRadGlassFace(1) = AbsRadGlassFace(1) + QRadThermInAbs(SurfNumAdj)
+                //  AbsRadGlassFace(1) = AbsRadGlassFace(1) + SurfQRadThermInAbs(SurfNumAdj)
                 //  ! The IR radiance of this window's "exterior" surround is the IR radiance
                 //  ! from surfaces and high-temp radiant sources in the adjacent zone
-                outir = state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNumAdj) +
-                        state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNumAdj) + state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNumAdj) +
-                        state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNumAdj) + state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNumAdj);
+                outir = state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNumAdj);
 
             } else { // Exterior window (ExtBoundCond = 0)
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
@@ -2915,8 +2791,8 @@ namespace WindowComplexManager {
                         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
             }
 
-            hin = state.dataHeatBal->HConvIn(SurfNum); // Room-side surface convective film conductance
-            ibc(2) = 0;                                // convective coefficient on indoor side will be recalculated (like in Winkelmann routines)
+            hin = state.dataHeatBalSurf->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
+            ibc(2) = 0; // convective coefficient on indoor side will be recalculated (like in Winkelmann routines)
 
             // hcout=HextConvCoeff  ! Exterior convection coefficient is passed in from outer routine
             hout = HextConvCoeff; // Exterior convection coefficient is passed in from outer routine
@@ -2928,9 +2804,7 @@ namespace WindowComplexManager {
 
             // indoor mean radiant temperature.
             // IR incident on window from zone surfaces and high-temp radiant sources
-            rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) +
-                   state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) + state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) +
-                   state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum);
+            rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum);
             trmin = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
 
             // outdoor wind speed
@@ -2964,13 +2838,13 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        GasType = GasCoeffsAir;
-        wght(iprop(1, 1)) = GasWght(GasType);
-        gama(iprop(1, 1)) = GasSpecificHeatRatio(GasType);
+        GasType = DataComplexFenestration::GasCoeffs::Air;
+        wght(iprop(1, 1)) = GasWght(static_cast<int>(GasType));
+        gama(iprop(1, 1)) = GasSpecificHeatRatio(static_cast<int>(GasType));
         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon(ICoeff, GasType);
-            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis(ICoeff, GasType);
-            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp(ICoeff, GasType);
+            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon(ICoeff, static_cast<int>(GasType));
+            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis(ICoeff, static_cast<int>(GasType));
+            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp(ICoeff, static_cast<int>(GasType));
         }
 
         // Fill window layer properties needed for window layer heat balance calculation
@@ -2979,7 +2853,8 @@ namespace WindowComplexManager {
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
 
-            if ((state.dataMaterial->Material(LayPtr).Group == WindowGlass) || (state.dataMaterial->Material(LayPtr).Group == WindowSimpleGlazing)) {
+            if ((state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::WindowGlass) ||
+                (state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing)) {
                 ++IGlass;
                 LayerType(IGlass) = TARCOGParams::TARCOGLayerType::SPECULAR; // this marks specular layer type
                 thick(IGlass) = state.dataMaterial->Material(LayPtr).Thickness;
@@ -2990,7 +2865,7 @@ namespace WindowComplexManager {
                 tir(2 * IGlass) = state.dataMaterial->Material(LayPtr).TransThermal;
                 YoungsMod(IGlass) = state.dataMaterial->Material(LayPtr).YoungModulus;
                 PoissonsRat(IGlass) = state.dataMaterial->Material(LayPtr).PoissonsRatio;
-            } else if (state.dataMaterial->Material(LayPtr).Group == ComplexWindowShade) {
+            } else if (state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::ComplexWindowShade) {
                 ++IGlass;
                 TempInt = state.dataMaterial->Material(LayPtr).ComplexShadePtr;
                 LayerType(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LayerType;
@@ -3015,7 +2890,7 @@ namespace WindowComplexManager {
                 SlatCond(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatConductivity;
                 SlatSpacing(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatSpacing;
                 SlatCurve(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatCurve;
-            } else if (state.dataMaterial->Material(LayPtr).Group == ComplexWindowGap) {
+            } else if (state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
                 ++IGap;
                 gap(IGap) = state.dataMaterial->Material(LayPtr).Thickness;
                 presure(IGap) = state.dataMaterial->Material(LayPtr).Pressure;
@@ -3070,7 +2945,7 @@ namespace WindowComplexManager {
 
         } // End of loop over glass, gap and blind/shade layers in a window construction
 
-        if (CalcCondition == DataBSDFWindow::noCondition) {
+        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
             // now calculate correct areas for multipliers
             for (Lay = 1; Lay <= nlayer; ++Lay) {
                 if (LayerType(Lay) != TARCOGParams::TARCOGLayerType::SPECULAR) { // Layer is shading
@@ -3099,7 +2974,7 @@ namespace WindowComplexManager {
         // vector of absorbed solar energy fractions for each layer.
         asol = 0.0;
         // direct solar radiation
-        if (CalcCondition == DataBSDFWindow::noCondition) {
+        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
             dir = state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) +
                   state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex); // TODO, check , !
@@ -3128,13 +3003,13 @@ namespace WindowComplexManager {
         }
 
         // Standard conditions run (winter and summer)
-        if (CalcCondition == DataBSDFWindow::winterCondition) {
+        if (CalcCondition == DataBSDFWindow::Condition::winterCondition) {
             tind = 294.15;
             tout = 255.15;
             hcout = 26.0;
             wso = 5.5;
             dir = 0.0;
-        } else if (CalcCondition == DataBSDFWindow::summerCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::summerCondition) {
             tind = 297.15;
             tout = 305.15;
             hcout = 15.0;
@@ -3144,7 +3019,7 @@ namespace WindowComplexManager {
         }
 
         // Common condition data
-        if (CalcCondition != DataBSDFWindow::noCondition) {
+        if (CalcCondition != DataBSDFWindow::Condition::Unassigned) {
             trmin = tind;
             outir = 0.0;
             tsky = tout;
@@ -3290,14 +3165,14 @@ namespace WindowComplexManager {
             ShowSevereError(state, "Window tarcog returned an error");
             tarcogErrorMessage = "message = \"" + tarcogErrorMessage + "\"";
             ShowContinueErrorTimeStamp(state, tarcogErrorMessage);
-            if (CalcCondition == DataBSDFWindow::noCondition) {
+            if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
                 ShowContinueError(state, "surface name = " + state.dataSurface->Surface(SurfNum).Name);
             }
             ShowContinueError(state, "construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
             ShowFatalError(state, "halting because of error in tarcog");
-        } else if (CalcCondition == DataBSDFWindow::winterCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::winterCondition) {
             state.dataHeatBal->NominalU(ConstrNum) = ufactor;
-        } else if (CalcCondition == DataBSDFWindow::summerCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::summerCondition) {
             // tempInt = SurfaceWindow(SurfNum)%ComplexFen%CurrentState
             // tempReal = SurfaceWindow(SurfNum)%ComplexFen%State(tempInt)%WinDiffTrans
 
@@ -3320,11 +3195,11 @@ namespace WindowComplexManager {
             state.dataConstruction->Construct(ConstrNum).SummerSHGC = shgc;
 
             // Construct(SurfNum)%VisTransNorm = SurfaceWindow(SurfNum)%ComplexFen%State(tempInt)%WinDiffVisTrans
-        } else if (CalcCondition == DataBSDFWindow::noCondition) { // expect converged results...
+        } else if (CalcCondition == DataBSDFWindow::Condition::Unassigned) { // expect converged results...
             // Window heat balance solution has converged.
 
             state.dataSurface->SurfWinWindowCalcIterationsRep(SurfNum) = NumOfIterations;
-            state.dataHeatBal->HConvIn(SurfNum) = hcin;
+            state.dataHeatBalSurf->SurfHConvInt(SurfNum) = hcin;
 
             // For interior shade, add convective gain from glass/shade gap air flow to zone convective gain;
             // For all cases, get total window heat gain for reporting. See CalcWinFrameAndDividerTemps for

@@ -126,12 +126,12 @@ void UnitarySystemSizingHandler(EnergyPlusState state)
 }
 void stdOutHandler(const char *message)
 {
-    printf("CAPTURED STDOUT: %s\n", message);
+    printf("STANDARD OUTPUT CALLBACK: %s\n", message);
 }
 
 void newEnvrnHandler(EnergyPlusState state)
 {
-    printf("Starting a new environment\n");
+    printf("NEW ENVIRONMENT CALLBACK: Starting a new environment\n");
 }
 
 void progressHandler(EnergyPlusState state, int const progress)
@@ -183,23 +183,29 @@ int main(int argc, const char *argv[])
     }
     oneTimeHalfway = 0;
     // reset and run again
-    stateReset(state); // note previous callbacks are cleared here
-    callbackAfterNewEnvironmentWarmupComplete(state, newEnvrnHandler);
-    registerStdOutCallback(state, stdOutHandler);
-    energyplus(state, argc, argv);
+    EnergyPlusState state2 = stateNew(); // stateReset(state); // note previous callbacks are cleared here
+    callbackAfterNewEnvironmentWarmupComplete(state2, newEnvrnHandler);
+    registerStdOutCallback(state2, stdOutHandler);
+    setConsoleOutputState(state2, 0);
+    printf("Running EnergyPlus with Console Output Muted...\n");
+    energyplus(state2, argc, argv);
+    printf("...and it is done.\n");
     if (numWarnings > 0) {
         printf("There were %d warnings!\n", numWarnings);
         numWarnings = 0;
     }
     // reset and run a test with an external hvac manager
-    stateReset(state);
-    registerExternalHVACManager(state, externalHVAC);
-    energyplus(state, argc, argv);
-    // create a new state and run it with console output muted
-    printf("Running EnergyPlus with Console Output Muted...\n");
-    EnergyPlusState state2 = stateNew();
-    setConsoleOutputState(state2, 0);
-    energyplus(state2, argc, argv);
-    printf("...and it is done.");
+    EnergyPlusState state3 = stateNew(); // stateReset(state);
+    registerExternalHVACManager(state3, externalHVAC);
+    energyplus(state3, argc, argv);
+    // We would like to know call EnergyPlus through the C API and have it run the auxiliary tools, like readvars
+    // With the Python API, we can leverage Python's introspection to find the pyenergyplus folder, and thus the E+ repo
+    // For C programs that link to the API, we don't have this.
+    // Of course, we do have the path to the E+ library in CMake land, but that would then require configuring this file, adding complexity
+    // For now we will call the setEnergyPlusRootDirectory function to exercise the funcional interface, but not attempt anything further
+    // The Python API tests will exercise the functionality of the setEnergyPlusRootDirectory implicitly
+    printf("Setting EnergyPlus root directory for potential runs with auxiliary tools...\n");
+    EnergyPlusState state4 = stateNew();
+    setEnergyPlusRootDirectory(state4, "/path/to/EnergyPlus/Root");
     return 0;
 }

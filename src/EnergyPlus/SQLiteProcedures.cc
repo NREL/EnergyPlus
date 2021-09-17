@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ headers
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 
@@ -133,13 +134,12 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                 }
             }
         }
-        std::shared_ptr<std::ofstream> errorStream =
-            std::make_shared<std::ofstream>(state.dataStrGlobals->outputSqliteErrFileName, std::ofstream::out | std::ofstream::trunc);
-        return std::unique_ptr<SQLite>(new SQLite(errorStream,
-                                                  state.dataStrGlobals->outputSqlFileName,
-                                                  state.dataStrGlobals->outputSqliteErrFileName,
-                                                  writeOutputToSQLite,
-                                                  writeTabularDataToSQLite));
+        auto errorStream = std::make_shared<std::ofstream>(state.dataStrGlobals->outputSqliteErrFilePath, std::ofstream::out | std::ofstream::trunc);
+        return std::make_unique<SQLite>(errorStream,
+                                        state.dataStrGlobals->outputSqlFilePath,
+                                        state.dataStrGlobals->outputSqliteErrFilePath,
+                                        writeOutputToSQLite,
+                                        writeTabularDataToSQLite);
     } catch (const std::runtime_error &error) {
         ShowFatalError(state, error.what());
         return nullptr;
@@ -220,11 +220,11 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
 }
 
 SQLite::SQLite(std::shared_ptr<std::ostream> errorStream,
-               std::string const &dbName,
-               std::string const &errorFileName,
+               fs::path const &dbName,
+               fs::path const &errorFilePath,
                bool writeOutputToSQLite,
                bool writeTabularDataToSQLite)
-    : SQLiteProcedures(errorStream, writeOutputToSQLite, dbName, errorFileName), m_writeTabularDataToSQLite(writeTabularDataToSQLite),
+    : SQLiteProcedures(errorStream, writeOutputToSQLite, dbName, errorFilePath), m_writeTabularDataToSQLite(writeTabularDataToSQLite),
       m_sqlDBTimeIndex(0), m_reportDataInsertStmt(nullptr), m_reportExtendedDataInsertStmt(nullptr), m_reportDictionaryInsertStmt(nullptr),
       m_timeIndexInsertStmt(nullptr), m_zoneInfoInsertStmt(nullptr), m_zoneInfoZoneListInsertStmt(nullptr), m_nominalLightingInsertStmt(nullptr),
       m_nominalElectricEquipmentInsertStmt(nullptr), m_nominalGasEquipmentInsertStmt(nullptr), m_nominalSteamEquipmentInsertStmt(nullptr),
@@ -1366,7 +1366,7 @@ void SQLite::adjustReportingHourAndMinutes(int &hour, int &minutes)
     }
 }
 
-void SQLite::parseUnitsAndDescription(const std::string &combinedString, std::string &units, std::string &description)
+void SQLite::parseUnitsAndDescription(std::string_view combinedString, std::string &units, std::string &description)
 {
     std::size_t leftPos = combinedString.find("[");
     std::size_t rightPos = combinedString.find("]");
@@ -1388,7 +1388,7 @@ int SQLite::logicalToInteger(const bool value)
 void SQLite::createSQLiteReportDictionaryRecord(int const reportVariableReportID,
                                                 int const storeTypeIndex,
                                                 std::string const &indexGroup,
-                                                std::string const &keyedValueString,
+                                                std::string_view keyedValueString,
                                                 std::string const &variableName,
                                                 int const indexType,
                                                 std::string const &units,
@@ -1786,10 +1786,10 @@ void SQLite::addSQLiteSystemSizingRecord(std::string const &SysName,      // the
     }
 }
 
-void SQLite::addSQLiteComponentSizingRecord(std::string const &compType, // the type of the component
-                                            std::string const &compName, // the name of the component
-                                            std::string const &varDesc,  // the description of the input variable
-                                            Real64 const varValue        // the value from the sizing calculation
+void SQLite::addSQLiteComponentSizingRecord(std::string_view compType, // the type of the component
+                                            std::string_view compName, // the name of the component
+                                            std::string_view varDesc,  // the description of the input variable
+                                            Real64 const varValue      // the value from the sizing calculation
 )
 {
     if (m_writeOutputToSQLite) {
@@ -1812,13 +1812,8 @@ void SQLite::addSQLiteComponentSizingRecord(std::string const &compType, // the 
     }
 }
 
-void SQLite::createSQLiteDaylightMapTitle(int const mapNum,
-                                          std::string const &mapName,
-                                          std::string const &environmentName,
-                                          int const zone,
-                                          std::string const &refPt1,
-                                          std::string const &refPt2,
-                                          Real64 const zCoord)
+void SQLite::createSQLiteDaylightMapTitle(
+    int const mapNum, std::string const &mapName, std::string const &environmentName, int const zone, std::string const &refPts, Real64 const zCoord)
 {
     if (m_writeOutputToSQLite) {
         // for some reason it is adding extra mapNumbers that are getting UNIQUE constraint ignored.
@@ -1827,9 +1822,8 @@ void SQLite::createSQLiteDaylightMapTitle(int const mapNum,
         sqliteBindText(m_daylightMapTitleInsertStmt, 2, mapName);
         sqliteBindText(m_daylightMapTitleInsertStmt, 3, environmentName);
         sqliteBindForeignKey(m_daylightMapTitleInsertStmt, 4, zone);
-        sqliteBindText(m_daylightMapTitleInsertStmt, 5, refPt1);
-        sqliteBindText(m_daylightMapTitleInsertStmt, 6, refPt2);
-        sqliteBindDouble(m_daylightMapTitleInsertStmt, 7, zCoord);
+        sqliteBindText(m_daylightMapTitleInsertStmt, 5, refPts);
+        sqliteBindDouble(m_daylightMapTitleInsertStmt, 6, zCoord);
 
         sqliteStepCommand(m_daylightMapTitleInsertStmt);
         sqliteResetCommand(m_daylightMapTitleInsertStmt);
@@ -2107,88 +2101,82 @@ void SQLite::createSQLiteEnvironmentPeriodRecord(const int curEnvirNum,
 
 void SQLite::addScheduleData(int const number, std::string const &name, std::string const &type, double const minValue, double const maxValue)
 {
-    schedules.push_back(std::unique_ptr<Schedule>(new Schedule(m_errorStream, m_db, number, name, type, minValue, maxValue)));
+    schedules.push_back(std::make_unique<Schedule>(m_errorStream, m_db, number, name, type, minValue, maxValue));
 }
 
 void SQLite::addZoneData(int const number, DataHeatBalance::ZoneData const &zoneData)
 {
-    zones.push_back(std::unique_ptr<Zone>(new Zone(m_errorStream, m_db, number, zoneData)));
+    zones.push_back(std::make_unique<Zone>(m_errorStream, m_db, number, zoneData));
 }
 
 void SQLite::addZoneListData(int const number, DataHeatBalance::ZoneListData const &zoneListData)
 {
-    zoneLists.push_back(std::unique_ptr<ZoneList>(new ZoneList(m_errorStream, m_db, number, zoneListData)));
+    zoneLists.push_back(std::make_unique<ZoneList>(m_errorStream, m_db, number, zoneListData));
 }
 
 void SQLite::addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string const &surfaceClass)
 {
-    surfaces.push_back(std::unique_ptr<Surface>(new Surface(m_errorStream, m_db, number, surfaceData, surfaceClass)));
+    surfaces.push_back(std::make_unique<Surface>(m_errorStream, m_db, number, surfaceData, surfaceClass));
 }
 
 void SQLite::addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData const &zoneGroupData)
 {
-    zoneGroups.push_back(std::unique_ptr<ZoneGroup>(new ZoneGroup(m_errorStream, m_db, number, zoneGroupData)));
+    zoneGroups.push_back(std::make_unique<ZoneGroup>(m_errorStream, m_db, number, zoneGroupData));
 }
 
 void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialProperties const &materialData)
 {
-    materials.push_back(std::unique_ptr<Material>(new Material(m_errorStream, m_db, number, materialData)));
+    materials.push_back(std::make_unique<Material>(m_errorStream, m_db, number, materialData));
 }
 void SQLite::addConstructionData(int const number,
                                  EnergyPlus::Construction::ConstructionProps const &constructionData,
                                  double const &constructionUValue)
 {
-    constructions.push_back(std::unique_ptr<Construction>(new Construction(m_errorStream, m_db, number, constructionData, constructionUValue)));
+    constructions.push_back(std::make_unique<Construction>(m_errorStream, m_db, number, constructionData, constructionUValue));
 }
 void SQLite::addNominalLightingData(int const number, DataHeatBalance::LightsData const &nominalLightingData)
 {
-    nominalLightings.push_back(std::unique_ptr<NominalLighting>(new NominalLighting(m_errorStream, m_db, number, nominalLightingData)));
+    nominalLightings.push_back(std::make_unique<NominalLighting>(m_errorStream, m_db, number, nominalLightingData));
 }
 void SQLite::addNominalPeopleData(int const number, DataHeatBalance::PeopleData const &nominalPeopleData)
 {
-    nominalPeoples.push_back(std::unique_ptr<NominalPeople>(new NominalPeople(m_errorStream, m_db, number, nominalPeopleData)));
+    nominalPeoples.push_back(std::make_unique<NominalPeople>(m_errorStream, m_db, number, nominalPeopleData));
 }
 void SQLite::addNominalElectricEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalElectricEquipmentData)
 {
-    nominalElectricEquipments.push_back(
-        std::unique_ptr<NominalElectricEquipment>(new NominalElectricEquipment(m_errorStream, m_db, number, nominalElectricEquipmentData)));
+    nominalElectricEquipments.push_back(std::make_unique<NominalElectricEquipment>(m_errorStream, m_db, number, nominalElectricEquipmentData));
 }
 void SQLite::addNominalGasEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalGasEquipmentData)
 {
-    nominalGasEquipments.push_back(
-        std::unique_ptr<NominalGasEquipment>(new NominalGasEquipment(m_errorStream, m_db, number, nominalGasEquipmentData)));
+    nominalGasEquipments.push_back(std::make_unique<NominalGasEquipment>(m_errorStream, m_db, number, nominalGasEquipmentData));
 }
 void SQLite::addNominalSteamEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalSteamEquipmentData)
 {
-    nominalSteamEquipments.push_back(
-        std::unique_ptr<NominalSteamEquipment>(new NominalSteamEquipment(m_errorStream, m_db, number, nominalSteamEquipmentData)));
+    nominalSteamEquipments.push_back(std::make_unique<NominalSteamEquipment>(m_errorStream, m_db, number, nominalSteamEquipmentData));
 }
 void SQLite::addNominalHotWaterEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalHotWaterEquipmentData)
 {
-    nominalHotWaterEquipments.push_back(
-        std::unique_ptr<NominalHotWaterEquipment>(new NominalHotWaterEquipment(m_errorStream, m_db, number, nominalHotWaterEquipmentData)));
+    nominalHotWaterEquipments.push_back(std::make_unique<NominalHotWaterEquipment>(m_errorStream, m_db, number, nominalHotWaterEquipmentData));
 }
 void SQLite::addNominalOtherEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalOtherEquipmentData)
 {
-    nominalOtherEquipments.push_back(
-        std::unique_ptr<NominalOtherEquipment>(new NominalOtherEquipment(m_errorStream, m_db, number, nominalOtherEquipmentData)));
+    nominalOtherEquipments.push_back(std::make_unique<NominalOtherEquipment>(m_errorStream, m_db, number, nominalOtherEquipmentData));
 }
 void SQLite::addNominalBaseboardData(int const number, DataHeatBalance::BBHeatData const &nominalBaseboardData)
 {
-    nominalBaseboardHeats.push_back(
-        std::unique_ptr<NominalBaseboardHeat>(new NominalBaseboardHeat(m_errorStream, m_db, number, nominalBaseboardData)));
+    nominalBaseboardHeats.push_back(std::make_unique<NominalBaseboardHeat>(m_errorStream, m_db, number, nominalBaseboardData));
 }
 void SQLite::addInfiltrationData(int const number, DataHeatBalance::InfiltrationData const &infiltrationData)
 {
-    infiltrations.push_back(std::unique_ptr<Infiltration>(new Infiltration(m_errorStream, m_db, number, infiltrationData)));
+    infiltrations.push_back(std::make_unique<Infiltration>(m_errorStream, m_db, number, infiltrationData));
 }
 void SQLite::addVentilationData(int const number, DataHeatBalance::VentilationData const &ventilationData)
 {
-    ventilations.push_back(std::unique_ptr<Ventilation>(new Ventilation(m_errorStream, m_db, number, ventilationData)));
+    ventilations.push_back(std::make_unique<Ventilation>(m_errorStream, m_db, number, ventilationData));
 }
 void SQLite::addRoomAirModelData(int const number, DataRoomAirModel::AirModelData const &roomAirModelData)
 {
-    roomAirModels.push_back(std::unique_ptr<RoomAirModel>(new RoomAirModel(m_errorStream, m_db, number, roomAirModelData)));
+    roomAirModels.push_back(std::make_unique<RoomAirModel>(m_errorStream, m_db, number, roomAirModelData));
 }
 
 bool SQLite::ZoneGroup::insertIntoSQLite(sqlite3_stmt *insertStmt)
@@ -2207,8 +2195,8 @@ bool SQLite::Material::insertIntoSQLite(sqlite3_stmt *insertStmt)
 {
     sqliteBindInteger(insertStmt, 1, number);
     sqliteBindText(insertStmt, 2, name);
-    sqliteBindInteger(insertStmt, 3, group);
-    sqliteBindInteger(insertStmt, 4, roughness);
+    sqliteBindInteger(insertStmt, 3, static_cast<int>(group));
+    sqliteBindInteger(insertStmt, 4, static_cast<int>(roughness));
     sqliteBindDouble(insertStmt, 5, conductivity);
     sqliteBindDouble(insertStmt, 6, density);
     sqliteBindDouble(insertStmt, 7, isoMoistCap);
@@ -2238,7 +2226,7 @@ bool SQLite::Construction::insertIntoSQLite(sqlite3_stmt *insertStmt)
     sqliteBindDouble(insertStmt, 9, outsideAbsorpSolar);
     sqliteBindDouble(insertStmt, 10, insideAbsorpThermal);
     sqliteBindDouble(insertStmt, 11, outsideAbsorpThermal);
-    sqliteBindInteger(insertStmt, 12, outsideRoughness);
+    sqliteBindInteger(insertStmt, 12, static_cast<int>(outsideRoughness));
     sqliteBindLogical(insertStmt, 13, typeIsWindow);
     sqliteBindDouble(insertStmt, 14, uValue);
 
@@ -2305,7 +2293,7 @@ bool SQLite::NominalPeople::insertIntoSQLite(sqlite3_stmt *insertStmt)
     sqliteBindLogical(insertStmt, 12, fanger);
     sqliteBindLogical(insertStmt, 13, pierce);
     sqliteBindLogical(insertStmt, 14, ksu);
-    sqliteBindInteger(insertStmt, 15, mrtCalcType);
+    sqliteBindInteger(insertStmt, 15, static_cast<int>(mrtCalcType));
     sqliteBindForeignKey(insertStmt, 16, surfacePtr);
     sqliteBindText(insertStmt, 17, angleFactorListName);
     sqliteBindInteger(insertStmt, 18, angleFactorListPtr);
@@ -2584,8 +2572,8 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
 
 SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream,
                                    bool writeOutputToSQLite,
-                                   std::string const &dbName,
-                                   std::string const &errorFileName)
+                                   fs::path const &dbName,
+                                   fs::path const &errorFilePath)
     : m_writeOutputToSQLite(writeOutputToSQLite), m_errorStream(errorStream), m_connection(nullptr)
 {
     if (m_writeOutputToSQLite) {
@@ -2595,7 +2583,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
         // Test if we can write to the sqlite error file
         //  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
         if (m_errorStream) {
-            *m_errorStream << "SQLite3 message, " << errorFileName << " open for processing!" << std::endl;
+            *m_errorStream << "SQLite3 message, " << errorFilePath.string() << " open for processing!" << std::endl;
         } else {
             ok = false;
         }
@@ -2613,7 +2601,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
         // Test if we can write to the database
         // If we can't then there are probably locks on the database
         if (ok) {
-            sqlite3_open_v2(dbName.c_str(), &m_connection, SQLITE_OPEN_READWRITE, nullptr);
+            sqlite3_open_v2(dbName.string().c_str(), &m_connection, SQLITE_OPEN_READWRITE, nullptr);
             char *zErrMsg = nullptr;
             rc = sqlite3_exec(m_connection, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
             sqlite3_close(m_connection);
@@ -2623,7 +2611,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
             } else {
                 if (dbName != ":memory:") {
                     // Remove test db
-                    rc = remove(dbName.c_str());
+                    rc = remove(dbName.string().c_str());
                     if (rc) {
                         *m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_connection) << std::endl;
                         ok = false;
@@ -2635,7 +2623,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
 
         if (ok) {
             // Now open the output db for the duration of the simulation
-            rc = sqlite3_open_v2(dbName.c_str(), &m_connection, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
+            rc = sqlite3_open_v2(dbName.string().c_str(), &m_connection, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
             m_db = std::shared_ptr<sqlite3>(m_connection, sqlite3_close);
             if (rc) {
                 *m_errorStream << "SQLite3 message, can't open new database: " << sqlite3_errmsg(m_connection) << std::endl;
@@ -2672,9 +2660,9 @@ int SQLiteProcedures::sqlitePrepareStatement(sqlite3_stmt *&stmt, const std::str
     return rc;
 }
 
-int SQLiteProcedures::sqliteBindText(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, const std::string &textBuffer)
+int SQLiteProcedures::sqliteBindText(sqlite3_stmt *stmt, const int stmtInsertLocationIndex, std::string_view textBuffer)
 {
-    int rc = sqlite3_bind_text(stmt, stmtInsertLocationIndex, textBuffer.c_str(), -1, SQLITE_TRANSIENT);
+    int rc = sqlite3_bind_text(stmt, stmtInsertLocationIndex, textBuffer.data(), textBuffer.size(), SQLITE_TRANSIENT);
     if (rc != SQLITE_OK) {
         *m_errorStream << "SQLite3 message, sqlite3_bind_text failed: " << textBuffer << std::endl;
     }

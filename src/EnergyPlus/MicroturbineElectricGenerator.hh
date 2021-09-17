@@ -221,6 +221,8 @@ namespace MicroturbineElectricGenerator {
         void setupOutputVars(EnergyPlusData &state);
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetMTGeneratorInput(EnergyPlusData &state);

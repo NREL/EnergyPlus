@@ -589,7 +589,7 @@ utility periods or simulating several years of differing weather data. Leap days
 actual weather (see ``Treat as Actual Weather'' below), but will be processed and used during leap years
 when the days are present in the weather file and enabled in the weather file header. Note that when the
 weather is treated as non-actual, the leap day will be skipped if it is not present, resulting in incorrect
-day types for the remainder of the year.
+day types for the remainder of the year. Further, the weather data interpolation for the first hour can also be specified to use Hour1 (natural) or Hour24 (considering warning up). 
 
 \subsubsection{Inputs}\label{inputs-5-016}
 
@@ -705,6 +705,12 @@ EnergyPlus (EPW) weather files contain a year field, this data is not typically 
 Begin Day of Month, Begin Year) and for the end date (i.e. End Month, End Day of Month, End Year) and require
 that leap days be present for leap years.
 
+\paragraph{Field: First Hour Interpolation Starting Values}\label{field-first-hour-interpolation-starting-values}
+
+This field allows the user to choose which hour of data should be used for the first day interpolation. In general, EnergyPlus uses a warm-up period to achieve a periodic initial condition for simulation. After the warming up period, EnergyPlus sets the first day's starting conditions the same as the end of that day. Therefore, Hour 24 is usually used for this type of annual simulations. However, there are other running scenarios where the user would like to examine the natural transition in the first hour, since the first day's beginning and end weather condition usually do not match in a weather file---sometimes or even often, with large differences, e.g. in temperature, humidity, or wind conditions. This input field allows a user to choose a more suitable option based on the user's specific simulation goals.
+
+If the ``\textbf{Hour1}'' is selected for this field, the weather data interpolation during the first hour will be based on the weather data on Hour 1 of the simulation period. If the ``\textbf{Hour24}'' is selected, the interpolation during the first hour will be based on the Hour 1 and Hour 24 (now assumed this is the intended conditions from a successful warm-up cycling). The default value is ``\textbf{Hour24}''. Note that this option only affects the first hour of the first day in the entire run period; the succeeding days in a run period would not be affected.
+
 And, as shown in an IDF:
 
 \begin{lstlisting}
@@ -721,7 +727,9 @@ Yes,  !- Use Weather File Holidays and Special Days
 Yes,  !- Use Weather File Daylight Saving Period
 No,   !- Apply Weekend Holiday Rule
 Yes,  !- Use Weather File Rain Indicators
-Yes;  !- Use Weather File Snow Indicators
+Yes,  !- Use Weather File Snow Indicators
+No,   !- Treat Weather as Actual
+Hour24;  !- First Hour Interpolation Starting Values
 
 ! Actual weather simulation example
 RunPeriod,
@@ -738,7 +746,8 @@ Yes,  !- Use Weather File Daylight Saving Period
 No,   !- Apply Weekend Holiday Rule
 Yes,  !- Use Weather File Rain Indicators
 Yes,  !- Use Weather File Snow Indicators
-Yes;  !- Treat Weather as Actual
+Yes,  !- Treat Weather as Actual
+Hour1;  !- First Hour Interpolation Starting Values
 \end{lstlisting}
 
 \subsection{RunPeriodControl:SpecialDays}\label{runperiodcontrolspecialdays}
@@ -1265,7 +1274,7 @@ Site:GroundTemperature:Undisturbed:Xing,
 
 This section documents the input object used to simulate ground coupled heat transfer with horizontal building surfaces within EnergyPlus. Horizontal ground surfaces within EnergyPlus interact with the Site:GroundDomain object by utilizing the \hyperref[surfacepropertyothersideconditionsmodel]{SurfaceProperty:OtherSideConditionsModel} object. By utilizing this object, multiple horizontal surfaces can be coupled to the same Site:GroundDomain object. Each horizontal surface may also have its unique ground domain, however, runtime will be adversely affected.
 
-Generally, there are two scenarios which Site:GroundDomain is equipped to model: in-grade slabs, and on-grade slabs.
+Generally, there are two scenarios which Site:GroundDomain is equipped to model: in-grade slabs and on-grade slabs.
 
 \begin{figure}[htbp]
 \centering

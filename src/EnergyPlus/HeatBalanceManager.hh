@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/SurfaceOctree.hh>
 
 namespace EnergyPlus {
@@ -114,6 +115,10 @@ namespace HeatBalanceManager {
 
     void GetZoneData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
+    void GetSpaceData(EnergyPlusData &state, bool &ErrorsFound);
+
+    int GetGeneralSpaceTypeNum(EnergyPlusData &state);
+
     void GetZoneLocalEnvData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void ProcessZoneData(EnergyPlusData &state,
@@ -151,7 +156,7 @@ namespace HeatBalanceManager {
     void GetFrameAndDividerData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
 
     void SearchWindow5DataFile(EnergyPlusData &state,
-                               std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
+                               fs::path const &DesiredFilePath,            // File path (or just name) that contains the Window5 constructions.
                                std::string const &DesiredConstructionName, // Name that will be searched for in the Window5 data file
                                bool &ConstructionFound,                    // True if DesiredConstructionName is in the Window5 data file
                                bool &EOFonFile,                            // True if EOF during file read

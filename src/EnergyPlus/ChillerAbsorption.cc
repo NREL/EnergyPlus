@@ -304,7 +304,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                           1,
+                                                                           NodeInputManager::compFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
         thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(3),
@@ -313,7 +313,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            1,
+                                                                            NodeInputManager::compFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -329,7 +329,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                           2,
+                                                                           NodeInputManager::compFluidStream::Secondary,
                                                                            DataLoopNode::ObjectIsNotParent);
         thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(5),
@@ -338,7 +338,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            2,
+                                                                            NodeInputManager::compFluidStream::Secondary,
                                                                             DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -374,7 +374,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                        3,
+                                                                                        NodeInputManager::compFluidStream::Tertiary,
                                                                                         DataLoopNode::ObjectIsNotParent);
                 thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                          state.dataIPShortCut->cAlphaArgs(7),
@@ -383,7 +383,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                                          DataLoopNode::NodeFluidType::Water,
                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                         3,
+                                                                                         NodeInputManager::compFluidStream::Tertiary,
                                                                                          DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -400,7 +400,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::Steam,
                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                        3,
+                                                                                        NodeInputManager::compFluidStream::Tertiary,
                                                                                         DataLoopNode::ObjectIsNotParent);
                 thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                          state.dataIPShortCut->cAlphaArgs(7),
@@ -409,7 +409,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                                          DataLoopNode::NodeFluidType::Steam,
                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                         3,
+                                                                                         NodeInputManager::compFluidStream::Tertiary,
                                                                                          DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -465,7 +465,8 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                 thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
             } else {
                 ShowSevereError(state,
-                                RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    "\",");
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
                 ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
@@ -507,68 +508,121 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
 
 void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
 {
-    SetupOutputVariable(state, "Chiller Electricity Rate", OutputProcessor::Unit::W, this->Report.PumpingPower, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        this->Report.PumpingPower,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Chiller Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->Report.PumpingEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         "ELECTRICITY",
                         "Cooling",
                         _,
                         "Plant");
-    SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->Report.QEvap, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Evaporator Cooling Rate",
+                        OutputProcessor::Unit::W,
+                        this->Report.QEvap,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Energy",
                         OutputProcessor::Unit::J,
                         this->Report.EvapEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         "ENERGYTRANSFER",
                         "CHILLERS",
                         _,
                         "Plant");
-    SetupOutputVariable(
-        state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->Report.EvapInletTemp, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->Report.EvapOutletTemp, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.Evapmdot, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Evaporator Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->Report.EvapInletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Evaporator Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->Report.EvapOutletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Evaporator Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->Report.Evapmdot,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
-    SetupOutputVariable(state, "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->Report.QCond, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Condenser Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->Report.QCond,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Chiller Condenser Heat Transfer Energy",
                         OutputProcessor::Unit::J,
                         this->Report.CondEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         _,
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
                         _,
                         "Plant");
-    SetupOutputVariable(
-        state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->Report.CondInletTemp, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->Report.CondOutletTemp, "System", "Average", this->Name);
-    SetupOutputVariable(
-        state, "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.Condmdot, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Condenser Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->Report.CondInletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Condenser Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->Report.CondOutletTemp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Chiller Condenser Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->Report.Condmdot,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
     if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
-        SetupOutputVariable(
-            state, "Chiller Hot Water Consumption Rate", OutputProcessor::Unit::W, this->Report.QGenerator, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Chiller Hot Water Consumption Rate",
+                            OutputProcessor::Unit::W,
+                            this->Report.QGenerator,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
         SetupOutputVariable(state,
                             "Chiller Source Hot Water Energy",
                             OutputProcessor::Unit::J,
                             this->Report.GeneratorEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             _,
                             "PLANTLOOPHEATINGDEMAND",
@@ -577,14 +631,19 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                             "Plant");
     } else {
         if (this->GenInputOutputNodesUsed) {
-            SetupOutputVariable(
-                state, "Chiller Source Steam Rate", OutputProcessor::Unit::W, this->Report.QGenerator, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Source Steam Rate",
+                                OutputProcessor::Unit::W,
+                                this->Report.QGenerator,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Chiller Source Steam Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.GeneratorEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "PLANTLOOPHEATINGDEMAND",
@@ -592,14 +651,19 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 _,
                                 "Plant");
         } else {
-            SetupOutputVariable(
-                state, "Chiller Source Steam Rate", OutputProcessor::Unit::W, this->Report.QGenerator, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Chiller Source Steam Rate",
+                                OutputProcessor::Unit::W,
+                                this->Report.QGenerator,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
             SetupOutputVariable(state,
                                 "Chiller Source Steam Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.GeneratorEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 fluidNameSteam,
@@ -609,7 +673,13 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
         }
     }
 
-    SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->Report.ActualCOP, "System", "Average", this->Name);
+    SetupOutputVariable(state,
+                        "Chiller COP",
+                        OutputProcessor::Unit::W_W,
+                        this->Report.ActualCOP,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
         SetupEMSInternalVariable(state, "Chiller Nominal Capacity", this->Name, "[W]", this->NomCap);
@@ -801,8 +871,9 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
             Real64 SteamDeltaT = this->GeneratorSubcool;
             Real64 SteamOutletTemp = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
             Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
-            Real64 CpWater = FluidProperties::GetDensityGlycol(
-                state, fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorption + this->Name);
+            auto curWaterIndex = waterIndex;
+            Real64 CpWater =
+                FluidProperties::GetDensityGlycol(state, fluidNameWater, SteamOutletTemp, curWaterIndex, calcChillerAbsorption + this->Name);
             this->GenMassFlowRateMax = this->QGenerator / (HfgSteam + CpWater * SteamDeltaT);
         }
 
@@ -1288,8 +1359,8 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                                                                0.0,
                                                                                this->SteamFluidIndex,
                                                                                moduleObjectType + this->Name);
-                Real64 CpWater =
-                    FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, GeneratorOutletTemp, const_cast<int &>(waterIndex), RoutineName);
+                auto curWaterIndex = waterIndex;
+                Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, GeneratorOutletTemp, curWaterIndex, RoutineName);
                 Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
                 this->SteamMassFlowRate = (this->NomCap * SteamInputRatNom) / ((HfgSteam) + (SteamDeltaT * CpWater));
                 tmpGeneratorVolFlowRate = this->SteamMassFlowRate / SteamDensity;
@@ -1761,8 +1832,9 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
             Real64 SteamDeltaT = this->GeneratorSubcool;
             Real64 SteamOutletTemp = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
             Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
-            CpFluid = FluidProperties::GetSpecificHeatGlycol(
-                state, fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorption + this->Name);
+            auto curWaterIndex = waterIndex;
+            CpFluid =
+                FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, SteamOutletTemp, curWaterIndex, calcChillerAbsorption + this->Name);
             this->SteamMassFlowRate = this->QGenerator / (HfgSteam + CpFluid * SteamDeltaT);
             PlantUtilities::SetComponentFlowRate(state,
                                                  this->SteamMassFlowRate,

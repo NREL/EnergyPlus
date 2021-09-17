@@ -57,6 +57,9 @@
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/string.functions.hh>
 
+// Third-party Headers
+#include <fast_float/fast_float.h>
+
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -65,6 +68,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -180,7 +184,7 @@ namespace CurveManager {
         // Return value
         Real64 CurveValue(0.0);
 
-        // need to be careful on where and how resetting curve outputs to some "iactive value" is done
+        // need to be careful on where and how resetting curve outputs to some "inactive value" is done
         // EMS can intercept curves and modify output
         if (state.dataGlobal->BeginEnvrnFlag && state.dataCurveManager->CurveValueMyBeginTimeStepFlag) {
             ResetPerformanceCurveOutput(state);
@@ -195,15 +199,17 @@ namespace CurveManager {
             ShowFatalError(state, "CurveValue: Invalid curve passed.");
         }
 
-        {
-            auto const SELECT_CASE_var(state.dataCurveManager->PerfCurve(CurveIndex).InterpolationType);
-            if (SELECT_CASE_var == InterpTypeEnum::EvaluateCurveToLimits) {
-                CurveValue = PerformanceCurveObject(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
-            } else if (SELECT_CASE_var == InterpTypeEnum::BtwxtMethod) {
-                CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
-            } else {
-                ShowFatalError(state, "CurveValue: Invalid Interpolation Type");
-            }
+        switch (state.dataCurveManager->PerfCurve(CurveIndex).InterpolationType) {
+        case InterpTypeEnum::EvaluateCurveToLimits: {
+            CurveValue = PerformanceCurveObject(state, CurveIndex, Var1, Var2, Var3, Var4, Var5);
+            break;
+        }
+        case InterpTypeEnum::BtwxtMethod: {
+            CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
+            break;
+        }
+        default:
+            ShowFatalError(state, "CurveValue: Invalid Interpolation Type");
         }
 
         if (state.dataCurveManager->PerfCurve(CurveIndex).EMSOverrideOn)
@@ -290,8 +296,6 @@ namespace CurveManager {
         std::string CurrentModuleObject; // for ease in renaming.
         int MaxTableNums(0);             // Maximum number of numeric input fields in Tables
         //   certain object in the input file
-
-        std::string FileName; // name of external table data file
 
         // Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
@@ -1341,7 +1345,7 @@ namespace CurveManager {
             }
         }
 
-        // Loop over Fan Pressure Rise curves and load data - udated 15Sep2010 for unit types
+        // Loop over Fan Pressure Rise curves and load data
         CurrentModuleObject = "Curve:FanPressureRise";
         for (CurveIndex = 1; CurveIndex <= NumFanPressRise; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -1970,7 +1974,7 @@ namespace CurveManager {
 
                 // Loop through independent variables in list and add them to the grid
                 for (auto indVar : fields.at("independent_variables")) {
-                    std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name"));
+                    std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name").get<std::string>());
                     std::string contextString = "Table:IndependentVariable \"" + indVarName + "\"";
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                     Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
@@ -1982,7 +1986,7 @@ namespace CurveManager {
 
                         // TODO: Actually use this to define output variable units
                         if (indVarInstance.count("unit_type")) {
-                            std::string unitType = indVarInstance.at("unit_type");
+                            std::string unitType = indVarInstance.at("unit_type").get<std::string>();
                             if (!IsCurveOutputTypeValid(unitType)) {
                                 ShowSevereError(state, contextString + ": Unit Type [" + unitType + "] is invalid");
                             }
@@ -1991,13 +1995,15 @@ namespace CurveManager {
                         std::vector<double> axis;
 
                         if (indVarInstance.count("external_file_name")) {
-                            std::string filePath = indVarInstance.at("external_file_name");
+                            std::string tmp = indVarInstance.at("external_file_name").get<std::string>();
+                            fs::path filePath(tmp);
                             if (!indVarInstance.count("external_file_column_number")) {
-                                ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath + "\"");
+                                ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath.string() + "\"");
                                 ErrorsFound = true;
                             }
                             if (!indVarInstance.count("external_file_starting_row_number")) {
-                                ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath + "\"");
+                                ShowSevereError(state,
+                                                contextString + ": No starting row number defined for external file \"" + filePath.string() + "\"");
                                 ErrorsFound = true;
                             }
 
@@ -2024,8 +2030,8 @@ namespace CurveManager {
                             axis.erase(std::unique(axis.begin(), axis.end()), axis.end());
 
                         } else if (indVarInstance.count("values")) {
-                            for (auto value : indVarInstance.at("values")) {
-                                axis.push_back(value.at("value"));
+                            for (auto const &value : indVarInstance.at("values")) {
+                                axis.push_back(value.at("value").get<Real64>());
                             }
                         } else {
                             ShowSevereError(state, contextString + ": No values defined.");
@@ -2034,7 +2040,7 @@ namespace CurveManager {
 
                         Btwxt::Method interpMethod, extrapMethod;
                         if (indVarInstance.count("interpolation_method")) {
-                            interpMethod = CurveManager::BtwxtManager::interpMethods.at(indVarInstance.at("interpolation_method"));
+                            interpMethod = CurveManager::BtwxtManager::interpMethods.at(indVarInstance.at("interpolation_method").get<std::string>());
                         } else {
                             interpMethod = Btwxt::Method::CUBIC;
                         }
@@ -2044,7 +2050,7 @@ namespace CurveManager {
                                 ShowSevereError(state, contextString + ": Extrapolation method \"Unavailable\" is not yet available.");
                                 ErrorsFound = true;
                             }
-                            extrapMethod = CurveManager::BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method"));
+                            extrapMethod = CurveManager::BtwxtManager::extrapMethods.at(indVarInstance.at("extrapolation_method").get<std::string>());
                         } else {
                             extrapMethod = Btwxt::Method::LINEAR;
                         }
@@ -2054,13 +2060,13 @@ namespace CurveManager {
 
                         double min_val, max_val;
                         if (indVarInstance.count("minimum_value")) {
-                            min_val = indVarInstance.at("minimum_value");
+                            min_val = indVarInstance.at("minimum_value").get<Real64>();
                         } else {
                             min_val = min_grid_value;
                         }
 
                         if (indVarInstance.count("maximum_value")) {
-                            max_val = indVarInstance.at("maximum_value");
+                            max_val = indVarInstance.at("maximum_value").get<Real64>();
                         } else {
                             max_val = max_grid_value;
                         }
@@ -2069,7 +2075,7 @@ namespace CurveManager {
 
                         Real64 normalizationRefValue;
                         if (indVarInstance.count("normalization_reference_value")) {
-                            normalizationRefValue = indVarInstance.at("normalization_reference_value");
+                            normalizationRefValue = indVarInstance.at("normalization_reference_value").get<Real64>();
                         } else {
                             normalizationRefValue = std::numeric_limits<double>::quiet_NaN();
                         }
@@ -2106,7 +2112,7 @@ namespace CurveManager {
                 state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Table:Lookup";
                 state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
 
-                std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name"));
+                std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name").get<std::string>());
 
                 std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveNum).Name + "\"";
                 std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
@@ -2114,7 +2120,7 @@ namespace CurveManager {
 
                 // TODO: Actually use this to define output variable units
                 if (fields.count("output_unit_type")) {
-                    std::string unitType = fields.at("output_unit_type");
+                    std::string unitType = fields.at("output_unit_type").get<std::string>();
                     if (!IsCurveOutputTypeValid(unitType)) {
                         ShowSevereError(state, contextString + ": Output Unit Type [" + unitType + "] is invalid");
                     }
@@ -2150,7 +2156,7 @@ namespace CurveManager {
                 }
 
                 if (fields.count("minimum_output")) {
-                    state.dataCurveManager->PerfCurve(CurveNum).CurveMin = fields.at("minimum_output");
+                    state.dataCurveManager->PerfCurve(CurveNum).CurveMin = fields.at("minimum_output").get<Real64>();
                     state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
                 } else {
                     state.dataCurveManager->PerfCurve(CurveNum).CurveMin = -DBL_MAX;
@@ -2158,7 +2164,7 @@ namespace CurveManager {
                 }
 
                 if (fields.count("maximum_output")) {
-                    state.dataCurveManager->PerfCurve(CurveNum).CurveMax = fields.at("maximum_output");
+                    state.dataCurveManager->PerfCurve(CurveNum).CurveMax = fields.at("maximum_output").get<Real64>();
                     state.dataCurveManager->PerfCurve(CurveNum).CurveMaxPresent = true;
                 } else {
                     state.dataCurveManager->PerfCurve(CurveNum).CurveMax = DBL_MAX;
@@ -2175,27 +2181,28 @@ namespace CurveManager {
                 };
                 NormalizationMethod normalizeMethod = NM_NONE;
                 if (fields.count("normalization_method")) {
-                    if (UtilityRoutines::SameString(fields.at("normalization_method"), "DIVISORONLY")) {
+                    if (UtilityRoutines::SameString(fields.at("normalization_method").get<std::string>(), "DIVISORONLY")) {
                         normalizeMethod = NM_DIVISOR_ONLY;
-                    } else if (UtilityRoutines::SameString(fields.at("normalization_method"), "AUTOMATICWITHDIVISOR")) {
+                    } else if (UtilityRoutines::SameString(fields.at("normalization_method").get<std::string>(), "AUTOMATICWITHDIVISOR")) {
                         normalizeMethod = NM_AUTO_WITH_DIVISOR;
                     }
                 }
 
                 if (normalizeMethod != NM_NONE && fields.count("normalization_divisor")) {
-                    normalizationDivisor = fields.at("normalization_divisor");
+                    normalizationDivisor = fields.at("normalization_divisor").get<Real64>();
                 }
 
                 std::vector<double> lookupValues;
                 if (fields.count("external_file_name")) {
-                    std::string filePath = fields.at("external_file_name");
+                    std::string tmp = fields.at("external_file_name").get<std::string>();
+                    fs::path filePath(tmp);
 
                     if (!fields.count("external_file_column_number")) {
-                        ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath + "\"");
+                        ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath.string() + "\"");
                         ErrorsFound = true;
                     }
                     if (!fields.count("external_file_starting_row_number")) {
-                        ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath + "\"");
+                        ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath.string() + "\"");
                         ErrorsFound = true;
                     }
 
@@ -2320,14 +2327,13 @@ namespace CurveManager {
         tableFiles.clear();
     }
 
-    bool TableFile::load(EnergyPlusData &state, std::string path)
+    bool TableFile::load(EnergyPlusData &state, fs::path const &path)
     {
-        filePath = path;
-        bool fileFound;
-        std::string fullPath;
+        this->filePath = path;
         std::string contextString = "CurveManager::TableFile::load: ";
-        DataSystemVariables::CheckForActualFileName(state, path, fileFound, fullPath, contextString);
-        if (!fileFound) {
+        fs::path fullPath = DataSystemVariables::CheckForActualFilePath(state, path, contextString);
+        if (fullPath.empty()) {
+            // Note: we return 'ErrorsFound' apparently
             return true;
         }
         std::ifstream file(fullPath);
@@ -2373,29 +2379,26 @@ namespace CurveManager {
             std::size_t row = colAndRow.second; // 0 indexed
             auto &content = contents[col];
             if (col >= numColumns) {
-                ShowFatalError(state,
-                               format("File \"{}\" : Requested column ({}) exceeds the number of columns ({}).", filePath, col + 1, numColumns));
+                ShowFatalError(
+                    state, format("File \"{}\" : Requested column ({}) exceeds the number of columns ({}).", filePath.string(), col + 1, numColumns));
             }
             if (row >= numRows) {
-                ShowFatalError(state,
-                               format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath, row + 1, numRows));
+                ShowFatalError(
+                    state, format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath.string(), row + 1, numRows));
             }
             std::vector<double> array(numRows - row);
-            std::transform(content.begin() + row, content.end(), array.begin(), [](const std::string &str) {
+            std::transform(content.begin() + row, content.end(), array.begin(), [](std::string_view str) {
                 // Convert strings to double
-                // see https://stackoverflow.com/a/16575025/1344457
-                char *pEnd;
-                double ret = std::strtod(&str[0], &pEnd);
-                if (*pEnd == '\r') {
-                    std::string st = str;
-                    st.pop_back();
-                    ret = std::strtod(&st[0], &pEnd);
+                auto first_char = str.find_first_not_of(' ');
+                if (first_char != std::string_view::npos) {
+                    str.remove_prefix(first_char);
                 }
-                if (*pEnd || str.size() == 0) {
+                double result = 0;
+                auto answer = fast_float::from_chars(str.data(), str.data() + str.size(), result);
+                if (answer.ec != std::errc()) {
                     return std::numeric_limits<double>::quiet_NaN();
-                } else {
-                    return ret;
                 }
+                return result;
             });
             arrays[colAndRow] = array;
         }
@@ -2429,8 +2432,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput1,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 2:
@@ -2438,8 +2441,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput2,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 3:
@@ -2447,8 +2450,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput3,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 4:
@@ -2456,8 +2459,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput4,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 5:
@@ -2465,8 +2468,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput5,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 6:
@@ -2474,8 +2477,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput6,
-                                        "HVAC",
-                                        "Average",
+                                        OutputProcessor::SOVTimeStepType::HVAC,
+                                        OutputProcessor::SOVStoreType::Average,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 default:
@@ -2488,8 +2491,8 @@ namespace CurveManager {
                                 "Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
                                 state.dataCurveManager->PerfCurve(CurveIndex).CurveOutput,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataCurveManager->PerfCurve(CurveIndex).Name);
         }
 
@@ -2498,29 +2501,29 @@ namespace CurveManager {
                                 "Performance Curve Input Variable 1 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput1,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 2 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput2,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 3 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput3,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
             SetupOutputVariable(state,
                                 "Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveOutput,
-                                "HVAC",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::HVAC,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
         }
 
@@ -2549,13 +2552,12 @@ namespace CurveManager {
     }
 
     Real64 PerformanceCurveObject(EnergyPlusData &state,
-                                  int const CurveIndex,                        // index of curve in curve array
-                                  Real64 const Var1,                           // 1st independent variable
-                                  Optional<Real64 const> Var2,                 // 2nd independent variable
-                                  Optional<Real64 const> Var3,                 // 3rd independent variable
-                                  Optional<Real64 const> Var4,                 // 4th independent variable
-                                  Optional<Real64 const> Var5,                 // 5th independent variable
-                                  [[maybe_unused]] Optional<Real64 const> Var6 // 6th independent variable
+                                  int const CurveIndex,        // index of curve in curve array
+                                  Real64 const Var1,           // 1st independent variable
+                                  Optional<Real64 const> Var2, // 2nd independent variable
+                                  Optional<Real64 const> Var3, // 3rd independent variable
+                                  Optional<Real64 const> Var4, // 4th independent variable
+                                  Optional<Real64 const> Var5  // 5th independent variable
     )
     {
 
@@ -2591,7 +2593,6 @@ namespace CurveManager {
         Real64 const V3(Var3.present() ? max(min(Var3, Curve.Var3Max), Curve.Var3Min) : 0.0); // 3rd independent variable after limits imposed
         Real64 const V4(Var4.present() ? max(min(Var4, Curve.Var4Max), Curve.Var4Min) : 0.0); // 4th independent variable after limits imposed
         Real64 const V5(Var5.present() ? max(min(Var5, Curve.Var5Max), Curve.Var5Min) : 0.0); // 5th independent variable after limits imposed
-        // Real64 const V6(Var6.present() ? max(min(Var6, Curve.Var6Max), Curve.Var6Min) : 0.0); // 6th independent variable after limits imposed
 
         {
             auto const SELECT_CASE_var(Curve.CurveType);
@@ -2802,10 +2803,10 @@ namespace CurveManager {
     bool CheckCurveDims(EnergyPlusData &state,
                         int const CurveIndex,
                         std::vector<int> validDims,
-                        std::string_view routineName,
-                        const std::string &objectType,
-                        const std::string &objectName,
-                        const std::string &curveFieldText)
+                        const std::string_view routineName,
+                        std::string_view objectType,
+                        std::string_view objectName,
+                        std::string_view curveFieldText)
     {
         // Returns true if errors found
         int curveDim = state.dataCurveManager->PerfCurve(CurveIndex).NumDims;
@@ -2815,7 +2816,7 @@ namespace CurveManager {
         } else {
             // Not compatible
             ShowSevereError(state, fmt::format("{}{}=\"{}\"", routineName, objectType, objectName));
-            ShowContinueError(state, "...Invalid curve for " + curveFieldText + ".");
+            ShowContinueError(state, "...Invalid curve for " + std::string{curveFieldText} + ".");
             std::string validString = fmt::to_string(validDims[0]);
             for (std::size_t i = 1; i < validDims.size(); i++) {
                 validString += format(" or {}", validDims[i]);

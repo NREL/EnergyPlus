@@ -218,6 +218,8 @@ namespace PlantHeatExchangerFluidToFluid {
                                       Real64 DmdSideMassFlowRate,
                                       Array1D<Real64> const &Par // Par(1) = HX index number
         );
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetFluidHeatExchangerInput(EnergyPlusData &state);

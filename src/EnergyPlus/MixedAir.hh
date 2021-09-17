@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
 
@@ -77,6 +78,7 @@ namespace MixedAir {
 
     enum class iLockoutType
     {
+        Unassigned = -1,
         NoLockoutPossible,
         LockoutWithHeatingPossible,
         LockoutWithCompressorPossible,
@@ -84,6 +86,7 @@ namespace MixedAir {
 
     enum class iEconoOp
     {
+        Unassigned = -1,
         NoEconomizer,
         FixedDryBulb,
         FixedEnthalpy,
@@ -98,32 +101,6 @@ namespace MixedAir {
     constexpr int On(1);  // normal coil operation
     constexpr int Off(0); // signal coil shouldn't run
 
-    // component types addressed by this module
-    constexpr int OAMixer_Num(1);
-    constexpr int Fan_Simple_CV(2);
-    constexpr int Fan_Simple_VAV(3);
-    constexpr int WaterCoil_SimpleCool(4);
-    constexpr int WaterCoil_Cooling(5);
-    constexpr int WaterCoil_SimpleHeat(6);
-    constexpr int SteamCoil_AirHeat(7);
-    constexpr int WaterCoil_DetailedCool(8);
-    constexpr int Coil_ElectricHeat(9);
-    constexpr int Coil_GasHeat(10);
-    constexpr int WaterCoil_CoolingHXAsst(11);
-    constexpr int DXSystem(12);
-    constexpr int HeatXchngr(13);
-    constexpr int Desiccant(14);
-    constexpr int Unglazed_SolarCollector(15);
-    constexpr int EvapCooler(16);
-    constexpr int PVT_AirBased(17);
-    constexpr int Fan_ComponentModel(18);
-    constexpr int DXHeatPumpSystem(19);
-    constexpr int Coil_UserDefined(20);
-    constexpr int Humidifier(21);
-    constexpr int Fan_System_Object(22);
-    constexpr int UnitarySystemModel(23);
-    constexpr int VRFTerminalUnit(24);
-
     enum class iControllerType
     {
         None,
@@ -134,14 +111,19 @@ namespace MixedAir {
 
     // Parameters below (CMO - Current Module Object.  used primarily in Get Inputs)
     // Multiple Get Input routines in this module or these would be in individual routines.
-    constexpr int CMO_OASystem(1);
-    constexpr int CMO_AirLoopEqList(2);
-    constexpr int CMO_ControllerList(3);
-    constexpr int CMO_SysAvailMgrList(4);
-    constexpr int CMO_OAController(5);
-    constexpr int CMO_ERVController(6);
-    constexpr int CMO_MechVentilation(7);
-    constexpr int CMO_OAMixer(8);
+    enum class CMO
+    {
+        Unassigned = -1,
+        None,
+        OASystem,
+        AirLoopEqList,
+        ControllerList,
+        SysAvailMgrList,
+        OAController,
+        ERVController,
+        MechVentilation,
+        OAMixer
+    };
 
     // OA Controller Limiting Factor (used for integer output variable values for OAControllerProps::OALimitingFactor
     constexpr int limitFactorNone = 0;        // No limit other than fixed OA amount
@@ -315,7 +297,7 @@ namespace MixedAir {
         Real64 TotPeopleOAFlow;                 // Total outdoor air flow rate for all PEOPLE objects in zones (m3/s)
         Real64 TotZoneOAFlow;                   // Total outdoor air flow rate for all zones (m3/s)
         Real64 TotZoneOAACH;                    // Total outdoor air flow rate for all zones Air Changes per hour (m3/s/m3)
-        int SystemOAMethod;                     // System Outdoor Air Method - SOAM_ZoneSum, SOAM_VRP
+        int SystemOAMethod;                     // System Outdoor Air Method - SOAM_ZoneSum, SOAM_VRP, SOAM_VRPL
         Real64 ZoneMaxOAFraction;               // Zone maximum outdoor air fraction
         Array1D<Real64> ZoneOAAreaRate;         // Mechanical ventilation rate (m3/s/m2) for each zone
         Array1D<Real64> ZoneOAPeopleRate;       // Mechanical ventilation rate (m3/s/person) for each zone
@@ -346,8 +328,9 @@ namespace MixedAir {
         Real64 Fa = 1.0;                        // temporary variable used in multi-path VRP calc
         Real64 Fb = 1.0;
         Real64 Fc = 1.0;
-        Real64 Xs = 1.0;  // uncorrected system outdoor air fraction
-        Real64 Evz = 1.0; // zone ventilation efficiency
+        Real64 Xs = 1.0;       // uncorrected system outdoor air fraction
+        Real64 Evz = 1.0;      // zone ventilation efficiency
+        Real64 SysDesOA = 0.0; // System design OA
 
         // Default Constructor
         VentilationMechanicalProps()
@@ -423,9 +406,9 @@ namespace MixedAir {
     void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
     void SimOAComponent(EnergyPlusData &state,
-                        std::string const &CompType, // the component type
-                        std::string const &CompName, // the component Name
-                        int const CompTypeNum,       // Component Type -- Integerized for this module
+                        std::string const &CompType,                    // the component type
+                        std::string const &CompName,                    // the component Name
+                        SimAirServingZones::CompType const CompTypeNum, // Component Type -- Integerized for this module
                         bool const FirstHVACIteration,
                         int &CompIndex,
                         int const AirLoopNum, // air loop index for economizer lockout coordination
@@ -574,9 +557,9 @@ namespace MixedAir {
                               int const InListNum // In-list Number
     );
 
-    int GetOACompTypeNum(EnergyPlusData &state,
-                         int const OASysNum, // OA Sys Number
-                         int const InListNum // In-list Number
+    SimAirServingZones::CompType GetOACompTypeNum(EnergyPlusData &state,
+                                                  int const OASysNum, // OA Sys Number
+                                                  int const InListNum // In-list Number
     );
 
     int GetOAMixerNumber(EnergyPlusData &state, std::string const &OAMixerName); // must match OA mixer names for the OA mixer type

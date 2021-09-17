@@ -135,6 +135,14 @@ namespace DataZoneEquipment {
         SequentialUniformPLRLoading
     };
 
+    enum class iLightReturnExhaustConfig : int
+    {
+        NoExhast = 0, // No exhaust node
+        Single = 1,   // One to one configuration
+        Multi = 2,    // Multiple return node referred
+        Shared = 3    // Shared exhaust node
+    };
+
     struct EquipMeterData
     {
         // Members
@@ -146,14 +154,15 @@ namespace DataZoneEquipment {
         std::string Group;
         int ReportVarIndex;
         OutputProcessor::TimeStepType ReportVarIndexType;
-        int ReportVarType;
+        OutputProcessor::VariableType ReportVarType;
         Real64 CurMeterReading;
 
         // Default Constructor
         EquipMeterData()
             : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None),
               EndUse_CompMode(SystemReports::iEndUseType::NoHeatNoCool), ReportVarIndex(0),
-              ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(0), CurMeterReading(0.0)
+              ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(OutputProcessor::VariableType::NotFound),
+              CurMeterReading(0.0)
         {
         }
     };
@@ -262,9 +271,14 @@ namespace DataZoneEquipment {
         Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
         Array1D_int
             ReturnNodeInletNum; // zone supply air inlet index that matched this return node (same zone, same airloop) - not the inlet node number
-        Array1D_bool FixedReturnFlow;    // true if return node is fixed and cannot be adjusted in CalcZoneReturnFlows
-        Array1D_int ReturnNodePlenumNum; // number of the return plenum attached to this return node (zero if none)
-        Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
+        Array1D_bool FixedReturnFlow;         // true if return node is fixed and cannot be adjusted in CalcZoneReturnFlows
+        Array1D_int ReturnNodePlenumNum;      // number of the return plenum attached to this return node (zero if none)
+        Array1D_int ReturnFlowBasisNode;      // return air flow basis nodes
+        Array1D_int ReturnNodeExhaustNodeNum; // Exhaust node number flow to a corrsponding return node due to light heat gain
+        // Array1D_int SharedExhaustNode;        // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the
+        // exhaust node value
+        Array1D<iLightReturnExhaustConfig>
+            SharedExhaustNode; // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the exhaust node value
 
         bool ZonalSystemOnly;     // TRUE if served by a zonal system (only)
         bool IsControlled;        // True when this is a controlled zone.
@@ -432,8 +446,8 @@ namespace DataZoneEquipment {
     void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
 
     bool CheckZoneEquipmentList(EnergyPlusData &state,
-                                std::string const &ComponentType, // Type of component
-                                std::string const &ComponentName, // Name of component
+                                std::string_view ComponentType, // Type of component
+                                std::string_view ComponentName, // Name of component
                                 Optional_int CtrlZoneNum = _);
 
     int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
@@ -460,9 +474,16 @@ namespace DataZoneEquipment {
                                       int ActualZoneNum,    // Zone index
                                       bool UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
                                       bool UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
-                                      Optional_bool_const PerPersonNotSet = _, // when calculation should not include occupants (e.g., dual duct)
-                                      Optional_bool_const MaxOAVolFlowFlag = _ // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
+                                      Optional_bool_const PerPersonNotSet = _,  // when calculation should not include occupants (e.g., dual duct)
+                                      Optional_bool_const MaxOAVolFlowFlag = _, // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
+                                      Optional_int_const spaceNum = _           // Space index (if applicable)
     );
+
+    int GetZoneEquipControlledZoneNum(EnergyPlusData &state, int const ZoneEquipTypeNum, std::string const &EquipmentName);
+
+    bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum);
+
+    void CheckSharedExhaust(EnergyPlusData &state);
 
 } // namespace DataZoneEquipment
 

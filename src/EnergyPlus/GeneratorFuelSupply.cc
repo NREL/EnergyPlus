@@ -171,7 +171,7 @@ namespace GeneratorFuelSupply {
                                                                                         AlphArray(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Sensor,
-                                                                                        1,
+                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                         ObjectIsNotParent);
 
                 state.dataGenerator->FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
@@ -698,7 +698,7 @@ namespace GeneratorFuelSupply {
         print(state.files.eio,
               "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
               "Heating Value [KJ/kg],  Molecular Weight [g/mol] \n");
-        static constexpr auto Format_501(" Fuel Supply, {},{:13.6N},{:13.6N},{:13.6N},{:13.6N}\n");
+        static constexpr std::string_view Format_501(" Fuel Supply, {},{:13.6N},{:13.6N},{:13.6N},{:13.6N}\n");
         print(state.files.eio,
               Format_501,
               state.dataGenerator->FuelSupply(FuelSupplyNum).Name,

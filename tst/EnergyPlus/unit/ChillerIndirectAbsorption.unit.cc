@@ -58,7 +58,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ChillerIndirectAbsorption;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ChillerIndirectAbsorption_GetInput)
 {

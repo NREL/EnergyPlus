@@ -66,19 +66,30 @@ namespace DataBSDFWindow {
     // Using/Aliasing
     using DataVectorTypes::Vector;
 
-    constexpr int BasisType_WINDOW = 1;
-    constexpr int BasisType_Custom = 2;
+    enum class Basis
+    {
+        Unassigned = -1,
+        WINDOW,
+        Custom
+    };
 
-    constexpr int BasisSymmetry_Axisymmetric = 1;
-    constexpr int BasisSymmetry_None = 2;
+    enum class BasisSymmetry
+    {
+        Unassigned = -1,
+        Axisymmetric,
+        None
+    };
 
     // Thermal calculations for complex fenestration can be used to generate reports for standard cases
     // noCondition is used when performing timestep calculations
     // summerCondtion will override certain parameters so that produced results are matching standard summer WINDOW  = software results
     // winterCondition will override certain parameters so that produced results are matching standard winter WINDOW  = software results
-    constexpr int noCondition = 0;
-    constexpr int summerCondition = 1;
-    constexpr int winterCondition = 2;
+    enum class Condition
+    {
+        Unassigned = -1,
+        summerCondition,
+        winterCondition
+    };
 
     struct BasisElemDescr
     {
@@ -134,21 +145,21 @@ namespace DataBSDFWindow {
     struct BasisStruct
     {
         // Members
-        int BasisType;                // BasisType_WINDOW or BasisType_Custom  (see HeatBalanceManager)
-        int BasisSymmetryType;        // BasisSymmetry_Axisymmetric or BasisSymmetry_None  (see HeatBalanceManager)
-        int BasisMatIndex;            // pointer to matrix for basis
-        int NBasis;                   // No. elements in basis
-        Array1D<Real64> Lamda;        // Vector of diagonal Lamda matrix elems for grid
-        Array1D<Real64> SolAng;       // Vector of basis element solid angles for grid
-        int NThetas;                  // No. Theta values in basis
-        Array1D<Real64> Thetas;       // List of basis theta values
-        Array1D_int NPhis;            // No. basis phi values for each theta
-        Array2D<Real64> Phis;         // List of basis phi values for each theta
-        Array2D_int BasisIndex;       // Index of basis element for theta, phi
-        Array1D<BasisElemDescr> Grid; // actual basis (to be constructed from matrix)
+        Basis BasisType;                 // BasisType_WINDOW or BasisType_Custom  (see HeatBalanceManager)
+        BasisSymmetry BasisSymmetryType; // BasisSymmetry_Axisymmetric or BasisSymmetry_None  (see HeatBalanceManager)
+        int BasisMatIndex;               // pointer to matrix for basis
+        int NBasis;                      // No. elements in basis
+        Array1D<Real64> Lamda;           // Vector of diagonal Lamda matrix elems for grid
+        Array1D<Real64> SolAng;          // Vector of basis element solid angles for grid
+        int NThetas;                     // No. Theta values in basis
+        Array1D<Real64> Thetas;          // List of basis theta values
+        Array1D_int NPhis;               // No. basis phi values for each theta
+        Array2D<Real64> Phis;            // List of basis phi values for each theta
+        Array2D_int BasisIndex;          // Index of basis element for theta, phi
+        Array1D<BasisElemDescr> Grid;    // actual basis (to be constructed from matrix)
 
         // Default Constructor
-        BasisStruct() : BasisType(0), BasisSymmetryType(0), BasisMatIndex(0), NBasis(0), NThetas(0)
+        BasisStruct() : BasisType(Basis::Unassigned), BasisSymmetryType(BasisSymmetry::Unassigned), BasisMatIndex(0), NBasis(0), NThetas(0)
         {
         }
     };
@@ -383,8 +394,8 @@ namespace DataBSDFWindow {
     {
         // Members
         // nested data for Construction
-        int BasisType;
-        int BasisSymmetryType;
+        Basis BasisType;
+        BasisSymmetry BasisSymmetryType;
         int ThermalModel;            // Pointer to thermal model
         int BasisMatIndex;           // pointer to matrix for basis
         int BasisMatNrows;           // No. rows in matrix
@@ -412,9 +423,10 @@ namespace DataBSDFWindow {
 
         // Default Constructor
         BSDFWindowInputStruct()
-            : BasisType(0), BasisSymmetryType(0), ThermalModel(0), BasisMatIndex(0), BasisMatNrows(0), BasisMatNcols(0), NBasis(0),
-              SolFrtTransIndex(0), SolFrtTransNrows(0), SolFrtTransNcols(0), SolBkReflIndex(0), SolBkReflNrows(0), SolBkReflNcols(0),
-              VisFrtTransIndex(0), VisFrtTransNrows(0), VisFrtTransNcols(0), VisBkReflIndex(0), VisBkReflNrows(0), VisBkReflNcols(0), NumLayers(0)
+            : BasisType(Basis::Unassigned), BasisSymmetryType(BasisSymmetry::Unassigned), ThermalModel(0), BasisMatIndex(0), BasisMatNrows(0),
+              BasisMatNcols(0), NBasis(0), SolFrtTransIndex(0), SolFrtTransNrows(0), SolFrtTransNcols(0), SolBkReflIndex(0), SolBkReflNrows(0),
+              SolBkReflNcols(0), VisFrtTransIndex(0), VisFrtTransNrows(0), VisFrtTransNcols(0), VisBkReflIndex(0), VisBkReflNrows(0),
+              VisBkReflNcols(0), NumLayers(0)
         {
         }
     };
@@ -430,9 +442,9 @@ struct BSDFWindowData : BaseGlobalStruct
     int TotThermalModels = 0;    // Number of thermal models
 
     // calculation
-    Array3D<Real64> SUNCOSTS = Array3D<Real64>(60, 24, 3);     // Timestep values of solar direction cosines
-    Array2D<Real64> BSDFTempMtrx;                              // Temporary matrix for holding axisymmetric input
-    EPVector<DataBSDFWindow::BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
+    Array2D<Vector3<Real64>> SUNCOSTS = Array2D<Vector3<Real64>>(60, 24); // Timestep values of solar direction cosines
+    Array2D<Real64> BSDFTempMtrx;                                         // Temporary matrix for holding axisymmetric input
+    EPVector<DataBSDFWindow::BSDFWindowGeomDescr> ComplexWind;            // Window geometry structure: set in CalcPerSolarBeam/SolarShading
 
     void clear_state() override
     {
@@ -440,7 +452,7 @@ struct BSDFWindowData : BaseGlobalStruct
         this->FirstBSDF = 0;
         this->MaxBkSurf = 20;
         this->TotThermalModels = 0;
-        this->SUNCOSTS = Array3D<Real64>(60, 24, 3);
+        this->SUNCOSTS = Array2D<Vector3<Real64>>(60, 24);
         this->BSDFTempMtrx.deallocate();
         this->ComplexWind.deallocate();
     }

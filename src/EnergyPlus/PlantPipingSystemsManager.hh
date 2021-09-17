@@ -706,6 +706,10 @@ namespace PlantPipingSystemsManager {
         }
 
         static Circuit *factory(EnergyPlusData &state, std::string circuit, bool &errorsFound);
+
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     struct ZoneCoupledSurfaceData
@@ -987,7 +991,7 @@ namespace PlantPipingSystemsManager {
     bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &state, Real64 const MaterialThickness, int const MaterialNum);
 
     void SiteGroundDomainNoMassMatError(EnergyPlusData &state,
-                                        std::string const &FieldName,
+                                        std::string_view FieldName,
                                         std::string const &UserInputField,
                                         std::string const &ObjectName);
 
@@ -1003,19 +1007,19 @@ namespace PlantPipingSystemsManager {
     void SetupPipingSystemOutputVariables(EnergyPlusData &state);
 
     void IssueSevereInputFieldError(EnergyPlusData &state,
-                                    std::string const &RoutineName,
+                                    std::string_view const RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
-                                    std::string const &FieldName,
+                                    std::string_view FieldName,
                                     std::string const &FieldEntry,
                                     std::string const &Condition,
                                     bool &ErrorsFound);
 
     void IssueSevereInputFieldError(EnergyPlusData &state,
-                                    std::string const &RoutineName,
+                                    std::string_view const RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
-                                    std::string const &FieldName,
+                                    std::string_view FieldName,
                                     Real64 FieldEntry,
                                     std::string const &Condition,
                                     bool &ErrorsFound);

@@ -239,13 +239,13 @@
     2200,                    !- Liquid State Density {kg/m3}
     2000,                    !- Liquid State Specific Heat {J/kg-K}
     1,                       !- High Temperature Difference of Melting Curve {deltaC}
-    20,                      !- Peak Melting Temperature {C}
+    23,                      !- Peak Melting Temperature {C}
     1,                       !- Low Temperature Difference of Melting Curve {deltaC}
     1.8,                     !- Solid State Thermal Conductivity {W/m-K}
     2300,                    !- Solid State Density {kg/m3}
     2000,                    !- Solid State Specific Heat {J/kg-K}
     1,                       !- High Temperature Difference of Freezing Curve {deltaC}
-    23,                      !- Peak Freezing Temperature {C}
+    20,                      !- Peak Freezing Temperature {C}
     1;                       !- Low Temperature Difference of Freezing Curve {deltaC}
 
   Construction,
@@ -287,6 +287,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -303,6 +304,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -319,6 +321,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -335,6 +338,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -351,6 +355,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -367,6 +372,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

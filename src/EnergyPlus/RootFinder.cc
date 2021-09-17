@@ -171,7 +171,7 @@ using namespace DataRootFinder;
 
 void SetupRootFinder(EnergyPlusData &state,
                      RootFinderDataType &RootFinderData,       // Data used by root finding algorithm
-                     int const SlopeType,                      // Either iSlopeIncreasing or iSlopeDecreasing
+                     DataRootFinder::Slope const SlopeType,    // Either Slope::Increasing or Slope::Decreasing
                      DataRootFinder::iMethod const MethodType, // Any of the iMethod<name> code but iMethodNone
                      Real64 const TolX,                        // Relative tolerance for X variables
                      Real64 const ATolX,                       // Absolute tolerance for X variables
@@ -189,10 +189,10 @@ void SetupRootFinder(EnergyPlusData &state,
     // This subroutine loads the numerical controls for the root finder.
 
     // Load assumed action for underlying function F(X)
-    if (SlopeType != iSlopeIncreasing && SlopeType != iSlopeDecreasing) {
+    if (SlopeType != DataRootFinder::Slope::Increasing && SlopeType != DataRootFinder::Slope::Decreasing) {
         ShowSevereError(state, "SetupRootFinder: Invalid function slope specification. Valid choices are:");
-        ShowContinueError(state, format("SetupRootFinder: iSlopeIncreasing={}", iSlopeIncreasing));
-        ShowContinueError(state, format("SetupRootFinder: iSlopeDecreasing={}", iSlopeDecreasing));
+        ShowContinueError(state, format("SetupRootFinder: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
+        ShowContinueError(state, format("SetupRootFinder: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
         ShowFatalError(state, "SetupRootFinder: Preceding error causes program termination.");
     }
     RootFinderData.Controls.SlopeType = SlopeType;
@@ -593,14 +593,14 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
         // Check for non-monotonicity between the existing lower and upper points
         {
             auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
-            if (SELECT_CASE_var == iSlopeIncreasing) {
+            if (SELECT_CASE_var == DataRootFinder::Slope::Increasing) {
                 // Y-value of lower point must be strictly smaller than Y-value of upper point
                 if (RootFinderData.LowerPoint.Y > RootFinderData.UpperPoint.Y) {
                     CheckInternalConsistency = iStatus::WarningNonMonotonic;
                     return CheckInternalConsistency;
                 }
 
-            } else if (SELECT_CASE_var == iSlopeDecreasing) {
+            } else if (SELECT_CASE_var == DataRootFinder::Slope::Decreasing) {
                 // Y-value of lower point must be strictly larger than Y-value of upper point
                 if (RootFinderData.LowerPoint.Y < RootFinderData.UpperPoint.Y) {
                     CheckInternalConsistency = iStatus::WarningNonMonotonic;
@@ -610,8 +610,8 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
             } else {
                 // Should never happen
                 ShowSevereError(state, "CheckInternalConsistency: Invalid function slope specification. Valid choices are:");
-                ShowContinueError(state, format("CheckInternalConsistency: iSlopeIncreasing={}", iSlopeIncreasing));
-                ShowContinueError(state, format("CheckInternalConsistency: iSlopeDecreasing={}", iSlopeDecreasing));
+                ShowContinueError(state, format("CheckInternalConsistency: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
+                ShowContinueError(state, format("CheckInternalConsistency: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
                 ShowFatalError(state, "CheckInternalConsistency: Preceding error causes program termination.");
             }
         }
@@ -630,13 +630,13 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
     if (RootFinderData.MinPoint.DefinedFlag) {
         {
             auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
-            if (SELECT_CASE_var == iSlopeIncreasing) {
+            if (SELECT_CASE_var == DataRootFinder::Slope::Increasing) {
                 if (RootFinderData.MinPoint.Y >= 0.0) {
                     CheckInternalConsistency = iStatus::OKMin;
                     return CheckInternalConsistency;
                 }
 
-            } else if (SELECT_CASE_var == iSlopeDecreasing) {
+            } else if (SELECT_CASE_var == DataRootFinder::Slope::Decreasing) {
                 if (RootFinderData.MinPoint.Y <= 0.0) {
                     CheckInternalConsistency = iStatus::OKMin;
                     return CheckInternalConsistency;
@@ -645,8 +645,8 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
             } else {
                 // Should never happen
                 ShowSevereError(state, "CheckInternalConsistency: Invalid function slope specification. Valid choices are:");
-                ShowContinueError(state, format("CheckInternalConsistency: iSlopeIncreasing={}", iSlopeIncreasing));
-                ShowContinueError(state, format("CheckInternalConsistency: iSlopeDecreasing={}", iSlopeDecreasing));
+                ShowContinueError(state, format("CheckInternalConsistency: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
+                ShowContinueError(state, format("CheckInternalConsistency: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
                 ShowFatalError(state, "CheckInternalConsistency: Preceding error causes program termination.");
             }
         }
@@ -656,13 +656,13 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
     if (RootFinderData.MaxPoint.DefinedFlag) {
         {
             auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
-            if (SELECT_CASE_var == iSlopeIncreasing) {
+            if (SELECT_CASE_var == DataRootFinder::Slope::Increasing) {
                 if (RootFinderData.MaxPoint.Y <= 0.0) {
                     CheckInternalConsistency = iStatus::OKMax;
                     return CheckInternalConsistency;
                 }
 
-            } else if (SELECT_CASE_var == iSlopeDecreasing) {
+            } else if (SELECT_CASE_var == DataRootFinder::Slope::Decreasing) {
                 if (RootFinderData.MaxPoint.Y >= 0.0) {
                     CheckInternalConsistency = iStatus::OKMax;
                     return CheckInternalConsistency;
@@ -671,8 +671,8 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
             } else {
                 // Should never happen
                 ShowSevereError(state, "CheckInternalConsistency: Invalid function slope specification. Valid choices are:");
-                ShowContinueError(state, format("CheckInternalConsistency: iSlopeIncreasing={}", iSlopeIncreasing));
-                ShowContinueError(state, format("CheckInternalConsistency: iSlopeDecreasing={}", iSlopeDecreasing));
+                ShowContinueError(state, format("CheckInternalConsistency: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
+                ShowContinueError(state, format("CheckInternalConsistency: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
                 ShowFatalError(state, "CheckInternalConsistency: Preceding error causes program termination.");
             }
         }
@@ -812,13 +812,13 @@ bool CheckSlope(EnergyPlusData &state, RootFinderDataType const &RootFinderData)
     // therefore we use strict comparison operators < and >.
     {
         auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
-        if (SELECT_CASE_var == iSlopeIncreasing) {
+        if (SELECT_CASE_var == DataRootFinder::Slope::Increasing) {
             if (RootFinderData.MinPoint.Y < RootFinderData.MaxPoint.Y) {
                 CheckSlope = true;
                 return CheckSlope;
             }
 
-        } else if (SELECT_CASE_var == iSlopeDecreasing) {
+        } else if (SELECT_CASE_var == DataRootFinder::Slope::Decreasing) {
             if (RootFinderData.MinPoint.Y > RootFinderData.MaxPoint.Y) {
                 CheckSlope = true;
                 return CheckSlope;
@@ -827,8 +827,8 @@ bool CheckSlope(EnergyPlusData &state, RootFinderDataType const &RootFinderData)
         } else {
             // Should never happen
             ShowSevereError(state, "CheckSlope: Invalid function slope specification. Valid choices are:");
-            ShowContinueError(state, format("CheckSlope: iSlopeIncreasing={}", iSlopeIncreasing));
-            ShowContinueError(state, format("CheckSlope: iSlopeDecreasing={}", iSlopeDecreasing));
+            ShowContinueError(state, format("CheckSlope: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
+            ShowContinueError(state, format("CheckSlope: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
             ShowFatalError(state, "CheckSlope: Preceding error causes program termination.");
         }
     }
@@ -910,13 +910,13 @@ bool CheckMinConstraint(EnergyPlusData &state, RootFinderDataType const &RootFin
 
     {
         auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
-        if (SELECT_CASE_var == iSlopeIncreasing) {
+        if (SELECT_CASE_var == DataRootFinder::Slope::Increasing) {
             if (RootFinderData.MinPoint.Y >= 0.0) {
                 CheckMinConstraint = true;
                 return CheckMinConstraint;
             }
 
-        } else if (SELECT_CASE_var == iSlopeDecreasing) {
+        } else if (SELECT_CASE_var == DataRootFinder::Slope::Decreasing) {
             if (RootFinderData.MinPoint.Y <= 0.0) {
                 CheckMinConstraint = true;
                 return CheckMinConstraint;
@@ -925,8 +925,8 @@ bool CheckMinConstraint(EnergyPlusData &state, RootFinderDataType const &RootFin
         } else {
             // Should never happen
             ShowSevereError(state, "CheckMinConstraint: Invalid function slope specification. Valid choices are:");
-            ShowContinueError(state, format("CheckMinConstraint: iSlopeIncreasing={}", iSlopeIncreasing));
-            ShowContinueError(state, format("CheckMinConstraint: iSlopeDecreasing={}", iSlopeDecreasing));
+            ShowContinueError(state, format("CheckMinConstraint: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
+            ShowContinueError(state, format("CheckMinConstraint: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
             ShowFatalError(state, "CheckMinConstraint: Preceding error causes program termination.");
         }
     }
@@ -958,13 +958,13 @@ bool CheckMaxConstraint(EnergyPlusData &state, RootFinderDataType const &RootFin
     // Check for max constrained convergence with respect to the new iterate (X,Y)
     {
         auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
-        if (SELECT_CASE_var == iSlopeIncreasing) {
+        if (SELECT_CASE_var == DataRootFinder::Slope::Increasing) {
             if (RootFinderData.MaxPoint.Y <= 0.0) {
                 CheckMaxConstraint = true;
                 return CheckMaxConstraint;
             }
 
-        } else if (SELECT_CASE_var == iSlopeDecreasing) {
+        } else if (SELECT_CASE_var == DataRootFinder::Slope::Decreasing) {
             if (RootFinderData.MaxPoint.Y >= 0.0) {
                 CheckMaxConstraint = true;
                 return CheckMaxConstraint;
@@ -973,8 +973,8 @@ bool CheckMaxConstraint(EnergyPlusData &state, RootFinderDataType const &RootFin
         } else {
             // Should never happen
             ShowSevereError(state, "CheckMaxConstraint: Invalid function slope specification. Valid choices are:");
-            ShowContinueError(state, format("CheckMaxConstraint: iSlopeIncreasing={}", iSlopeIncreasing));
-            ShowContinueError(state, format("CheckMaxConstraint: iSlopeDecreasing={}", iSlopeDecreasing));
+            ShowContinueError(state, format("CheckMaxConstraint: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
+            ShowContinueError(state, format("CheckMaxConstraint: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
             ShowFatalError(state, "CheckMaxConstraint: Preceding error causes program termination.");
         }
     }
@@ -1115,7 +1115,7 @@ void UpdateBracket(EnergyPlusData &state,
     {
         auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
 
-        if (SELECT_CASE_var == iSlopeIncreasing) {
+        if (SELECT_CASE_var == DataRootFinder::Slope::Increasing) {
             // Update lower point
             if (Y <= 0.0) {
                 if (!RootFinderData.LowerPoint.DefinedFlag) {
@@ -1170,7 +1170,7 @@ void UpdateBracket(EnergyPlusData &state,
             }
 
             // Monotone, decreasing function
-        } else if (SELECT_CASE_var == iSlopeDecreasing) {
+        } else if (SELECT_CASE_var == DataRootFinder::Slope::Decreasing) {
             // Update lower point
             if (Y >= 0.0) {
                 if (!RootFinderData.LowerPoint.DefinedFlag) {
@@ -1227,8 +1227,8 @@ void UpdateBracket(EnergyPlusData &state,
         } else {
             // Should never happen
             ShowSevereError(state, "UpdateBracket: Invalid function slope specification. Valid choices are:");
-            ShowContinueError(state, format("UpdateBracket: iSlopeIncreasing={}", iSlopeIncreasing));
-            ShowContinueError(state, format("UpdateBracket: iSlopeDecreasing={}", iSlopeDecreasing));
+            ShowContinueError(state, format("UpdateBracket: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
+            ShowContinueError(state, format("UpdateBracket: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
             ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
         }
     }

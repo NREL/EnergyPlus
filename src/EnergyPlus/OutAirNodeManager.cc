@@ -135,7 +135,7 @@ namespace OutAirNodeManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetOutAirNodesInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetOutAirNodesInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumOutAirInletNodeLists;
@@ -151,11 +151,11 @@ namespace OutAirNodeManager {
         int OutAirInletNodeListNum;  // OUTSIDE AIR INLET NODE LIST index
         int OutsideAirNodeSingleNum; // OUTSIDE AIR NODE index
         int AlphaNum;                // index into Alphas
-        int ListSize;                // size of OutAirInletNodeList
+        std::size_t ListSize;        // size of OutAirInletNodeList
         //  LOGICAL :: AlreadyInList ! flag used for checking for duplicate input
         bool ErrorsFound;
         bool ErrInList;
-        int CurSize;
+        std::size_t CurSize;
         int NextFluidStreamNum; // Fluid stream index (all outside air inlet nodes need a unique fluid stream number)
         Array1D_int TmpNums;
         std::string CurrentModuleObject; // Object type for getting and error messages
@@ -227,7 +227,7 @@ namespace OutAirNodeManager {
                                 CurrentModuleObject,
                                 CurrentModuleObject,
                                 DataLoopNode::NodeConnectionType::OutsideAir,
-                                NextFluidStreamNum,
+                                static_cast<NodeInputManager::compFluidStream>(NextFluidStreamNum),
                                 ObjectIsNotParent,
                                 IncrementFluidStreamYes,
                                 cAlphaFields(AlphaNum));
@@ -250,7 +250,7 @@ namespace OutAirNodeManager {
             }
 
             if (ErrorsFound) {
-                ShowFatalError(state, RoutineName + "Errors found in getting " + CurrentModuleObject + " input.");
+                ShowFatalError(state, std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.");
             }
         }
 
@@ -284,7 +284,7 @@ namespace OutAirNodeManager {
                             CurrentModuleObject,
                             CurrentModuleObject,
                             DataLoopNode::NodeConnectionType::OutsideAir,
-                            NextFluidStreamNum,
+                            static_cast<NodeInputManager::compFluidStream>(NextFluidStreamNum),
                             ObjectIsNotParent,
                             IncrementFluidStreamYes,
                             cAlphaFields(1));
@@ -324,7 +324,7 @@ namespace OutAirNodeManager {
                 if (NumAlphas > 1 && !lAlphaBlanks(2)) {
                     state.dataLoopNodes->Node(NodeNums(1)).OutAirDryBulbSchedNum = GetScheduleIndex(state, Alphas(2));
                     if (state.dataLoopNodes->Node(NodeNums(1)).OutAirDryBulbSchedNum == 0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(2) + "\", invalid schedule.");
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFields(2) + "\", invalid schedule.");
                         ShowContinueError(state, "Dry Bulb Temperature Schedule not found=\"" + Alphas(2) + "\".");
                         ErrorsFound = true;
                     }
@@ -333,7 +333,7 @@ namespace OutAirNodeManager {
                 if (NumAlphas > 2 && !lAlphaBlanks(3)) {
                     state.dataLoopNodes->Node(NodeNums(1)).OutAirWetBulbSchedNum = GetScheduleIndex(state, Alphas(3));
                     if (state.dataLoopNodes->Node(NodeNums(1)).OutAirWetBulbSchedNum == 0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(3) + "\", invalid schedule.");
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFields(3) + "\", invalid schedule.");
                         ShowContinueError(state, "Wet Bulb Temperature Schedule not found=\"" + Alphas(3) + "\".");
                         ErrorsFound = true;
                     }
@@ -342,7 +342,7 @@ namespace OutAirNodeManager {
                 if (NumAlphas > 3 && !lAlphaBlanks(4)) {
                     state.dataLoopNodes->Node(NodeNums(1)).OutAirWindSpeedSchedNum = GetScheduleIndex(state, Alphas(4));
                     if (state.dataLoopNodes->Node(NodeNums(1)).OutAirWindSpeedSchedNum == 0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(4) + "\", invalid schedule.");
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFields(4) + "\", invalid schedule.");
                         ShowContinueError(state, "Wind Speed Schedule not found=\"" + Alphas(4) + "\".");
                         ErrorsFound = true;
                     }
@@ -351,7 +351,7 @@ namespace OutAirNodeManager {
                 if (NumAlphas > 4 && !lAlphaBlanks(5)) {
                     state.dataLoopNodes->Node(NodeNums(1)).OutAirWindDirSchedNum = GetScheduleIndex(state, Alphas(5));
                     if (state.dataLoopNodes->Node(NodeNums(1)).OutAirWindDirSchedNum == 0) {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\", invalid schedule.");
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\", invalid schedule.");
                         ShowContinueError(state, "Wind Direction Schedule not found=\"" + Alphas(5) + "\".");
                         ErrorsFound = true;
                     }
@@ -369,13 +369,13 @@ namespace OutAirNodeManager {
                 }
             }
             if (ErrorsFound) {
-                ShowFatalError(state, RoutineName + "Errors found in getting " + CurrentModuleObject + " input.");
+                ShowFatalError(state, std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.");
             }
         }
 
         if (ListSize > 0) {
             state.dataOutAirNodeMgr->NumOutsideAirNodes = ListSize;
-            state.dataOutAirNodeMgr->OutsideAirNodeList = TmpNums({1, ListSize});
+            state.dataOutAirNodeMgr->OutsideAirNodeList = TmpNums({1, static_cast<int>(ListSize)});
         }
     }
 
@@ -533,7 +533,7 @@ namespace OutAirNodeManager {
                             "OutdoorAir:Node",
                             "OutdoorAir:Node",
                             DataLoopNode::NodeConnectionType::OutsideAir,
-                            state.dataOutAirNodeMgr->NumOutsideAirNodes,
+                            static_cast<NodeInputManager::compFluidStream>(state.dataOutAirNodeMgr->NumOutsideAirNodes),
                             ObjectIsNotParent,
                             IncrementFluidStreamYes);
                 SetOANodeValues(state, NodeNumber, false);

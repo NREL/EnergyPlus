@@ -450,10 +450,10 @@ namespace EMSManager {
             if ((ErlVariableNum > 0) && (state.dataRuntimeLang->Sensor(SensorNum).Index > 0)) {
                 if (state.dataRuntimeLang->Sensor(SensorNum).SchedNum == 0) { // not a schedule so get from output processor
 
-                    state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value =
-                        SetErlValueNumber(GetInternalVariableValue(
-                                              state, state.dataRuntimeLang->Sensor(SensorNum).Type, state.dataRuntimeLang->Sensor(SensorNum).Index),
-                                          state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value);
+                    state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value = SetErlValueNumber(
+                        GetInternalVariableValue(
+                            state, state.dataRuntimeLang->Sensor(SensorNum).VariableType, state.dataRuntimeLang->Sensor(SensorNum).Index),
+                        state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value);
                 } else { // schedule so use schedule service
 
                     state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value =
@@ -522,7 +522,7 @@ namespace EMSManager {
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
-        int VarType;
+        OutputProcessor::VariableType VarType;
         int VarIndex;
         bool FoundObjectType;
         bool FoundObjectName;
@@ -650,15 +650,15 @@ namespace EMSManager {
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ShowContinueError(state, "Meter Name found; Key Name will be ignored"); // why meters have no keys..
                     } else {
-                        state.dataRuntimeLang->Sensor(SensorNum).Type = 3;
+                        state.dataRuntimeLang->Sensor(SensorNum).VariableType = OutputProcessor::VariableType::Meter;
                         state.dataRuntimeLang->Sensor(SensorNum).Index = VarIndex;
                         state.dataRuntimeLang->Sensor(SensorNum).CheckedOkay = true;
                     }
                 } else {
                     // Search for variable names
                     GetVariableTypeAndIndex(state, cAlphaArgs(3), cAlphaArgs(2), VarType, VarIndex);
-                    if (VarType != 0) {
-                        state.dataRuntimeLang->Sensor(SensorNum).Type = VarType;
+                    if (VarType != OutputProcessor::VariableType::NotFound) {
+                        state.dataRuntimeLang->Sensor(SensorNum).VariableType = VarType;
                         if (VarIndex != 0) {
                             state.dataRuntimeLang->Sensor(SensorNum).Index = VarIndex;
                             state.dataRuntimeLang->Sensor(SensorNum).CheckedOkay = true;
@@ -1039,7 +1039,7 @@ namespace EMSManager {
         int SensorNum; // local loop
         //  INTEGER :: VariableNum  ! local do loop index
         int VarIndex;
-        int VarType;
+        OutputProcessor::VariableType VarType;
         bool ErrorsFound(false);
         int ActuatorNum;
         bool FoundObjectType;
@@ -1058,7 +1058,7 @@ namespace EMSManager {
             VarIndex = GetMeterIndex(state, state.dataRuntimeLang->Sensor(SensorNum).OutputVarName);
             if (VarIndex > 0) {
 
-                state.dataRuntimeLang->Sensor(SensorNum).Type = 3;
+                state.dataRuntimeLang->Sensor(SensorNum).VariableType = OutputProcessor::VariableType::Meter;
                 state.dataRuntimeLang->Sensor(SensorNum).Index = VarIndex;
 
             } else {
@@ -1068,7 +1068,7 @@ namespace EMSManager {
                                         state.dataRuntimeLang->Sensor(SensorNum).UniqueKeyName,
                                         VarType,
                                         VarIndex);
-                if (VarType == 0) {
+                if (VarType == OutputProcessor::VariableType::NotFound) {
                     if (reportErrors) {
                         ShowSevereError(state,
                                         "Invalid Output:Variable or Output:Meter Name =" + state.dataRuntimeLang->Sensor(SensorNum).OutputVarName);
@@ -1087,7 +1087,7 @@ namespace EMSManager {
                         ErrorsFound = true;
                     }
                 } else {
-                    state.dataRuntimeLang->Sensor(SensorNum).Type = VarType;
+                    state.dataRuntimeLang->Sensor(SensorNum).VariableType = VarType;
                     state.dataRuntimeLang->Sensor(SensorNum).Index = VarIndex;
                     state.dataRuntimeLang->Sensor(SensorNum).CheckedOkay = true;
                     // If variable is Schedule Value, then get the schedule id to register it as being used
@@ -1288,7 +1288,8 @@ namespace EMSManager {
         }
     }
 
-    void GetVariableTypeAndIndex(EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex)
+    void GetVariableTypeAndIndex(
+        EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, OutputProcessor::VariableType &VarType, int &VarIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1322,7 +1323,7 @@ namespace EMSManager {
         Array1D_int KeyIndex;
         bool Found;
 
-        VarType = 0;
+        VarType = OutputProcessor::VariableType::NotFound;
         VarIndex = 0;
         Found = false;
         GetVariableKeyCountandType(state, VarName, NumKeys, VarType, AvgOrSum, StepType, Units);
@@ -2353,10 +2354,10 @@ namespace EMSManager {
 //  ScheduleManager and OutputProcessor. Followed pattern used for SetupOutputVariable
 
 void SetupEMSActuator(EnergyPlusData &state,
-                      std::string const &cComponentTypeName,
-                      std::string const &cUniqueIDName,
-                      std::string const &cControlTypeName,
-                      std::string const &cUnits,
+                      std::string_view cComponentTypeName,
+                      std::string_view cUniqueIDName,
+                      std::string_view cControlTypeName,
+                      std::string_view cUnits,
                       bool &lEMSActuated,
                       Real64 &rValue)
 {
@@ -2409,10 +2410,10 @@ void SetupEMSActuator(EnergyPlusData &state,
 }
 
 void SetupEMSActuator(EnergyPlusData &state,
-                      std::string const &cComponentTypeName,
-                      std::string const &cUniqueIDName,
-                      std::string const &cControlTypeName,
-                      std::string const &cUnits,
+                      std::string_view cComponentTypeName,
+                      std::string_view cUniqueIDName,
+                      std::string_view cControlTypeName,
+                      std::string_view cUnits,
                       bool &lEMSActuated,
                       int &iValue)
 {
@@ -2465,10 +2466,10 @@ void SetupEMSActuator(EnergyPlusData &state,
 }
 
 void SetupEMSActuator(EnergyPlusData &state,
-                      std::string const &cComponentTypeName,
-                      std::string const &cUniqueIDName,
-                      std::string const &cControlTypeName,
-                      std::string const &cUnits,
+                      std::string_view cComponentTypeName,
+                      std::string_view cUniqueIDName,
+                      std::string_view cControlTypeName,
+                      std::string_view cUnits,
                       bool &lEMSActuated,
                       bool &lValue)
 {
@@ -2521,7 +2522,7 @@ void SetupEMSActuator(EnergyPlusData &state,
 }
 
 void SetupEMSInternalVariable(
-    EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue)
+    EnergyPlusData &state, std::string_view cDataTypeName, std::string_view cUniqueIDName, std::string_view cUnits, Real64 &rValue)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2556,7 +2557,7 @@ void SetupEMSInternalVariable(
 
     if (FoundDuplicate) {
         ShowSevereError(state, "Duplicate internal variable was sent to SetupEMSInternalVariable.");
-        ShowContinueError(state, "Internal variable type = " + cDataTypeName + " ; name = " + cUniqueIDName);
+        ShowContinueError(state, "Internal variable type = " + std::string{cDataTypeName} + " ; name = " + std::string{cUniqueIDName});
         ShowContinueError(state, "Called from SetupEMSInternalVariable.");
     } else {
         // add new internal data variable
@@ -2582,7 +2583,7 @@ void SetupEMSInternalVariable(
 }
 
 void SetupEMSInternalVariable(
-    EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue)
+    EnergyPlusData &state, std::string_view cDataTypeName, std::string_view cUniqueIDName, std::string_view cUnits, int &iValue)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2617,7 +2618,7 @@ void SetupEMSInternalVariable(
 
     if (FoundDuplicate) {
         ShowSevereError(state, "Duplicate internal variable was sent to SetupEMSInternalVariable.");
-        ShowContinueError(state, "Internal variable type = " + cDataTypeName + " ; name = " + cUniqueIDName);
+        ShowContinueError(state, "Internal variable type = " + std::string{cDataTypeName} + " ; name = " + std::string{cUniqueIDName});
         ShowContinueError(state, "called from SetupEMSInternalVariable");
     } else {
         // add new internal data variable

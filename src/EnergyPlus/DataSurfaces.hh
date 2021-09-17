@@ -50,6 +50,7 @@
 
 // C++ Headers
 #include <cstddef>
+#include <unordered_map>
 #include <vector>
 
 // ObjexxFCL Headers
@@ -59,10 +60,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BITF.hh>
+#include <EnergyPlus/ConvectionConstants.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Shape.hh>
 
@@ -172,7 +175,6 @@ namespace DataSurfaces {
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
     // Note:  Positive values correspond to an interzone adjacent surface
-
     constexpr int ExternalEnvironment(0);
     constexpr int Ground(-1);
     constexpr int OtherSideCoefNoCalcExt(-2);
@@ -191,12 +193,6 @@ namespace DataSurfaces {
     constexpr int LowerRightCorner(3);
     constexpr int UpperRightCorner(4);
 
-    // Parameters to indicate user specified convection coefficients (for surface)
-    constexpr int ConvCoefValue(1);          // User specified "value" as the override type
-    constexpr int ConvCoefSchedule(2);       // User specified "schedule" as the override type
-    constexpr int ConvCoefUserCurve(3);      // User specified "UserCurve" as the override type
-    constexpr int ConvCoefSpecifiedModel(4); // one of the direct named model equation keys
-
     // Parameters to indicate reference air temperatures for inside surface temperature calculations
     constexpr int ZoneMeanAirTemp(1);   // mean air temperature of the zone => MAT
     constexpr int AdjacentAirTemp(2);   // air temperature adjacent ot surface => TempEffBulkAir
@@ -213,9 +209,9 @@ namespace DataSurfaces {
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential
 
-    enum class iHeatTransferModel
+    enum class iHeatTransferModel : int
     {
-        NotSet,
+        NotSet = -1,
         None, // shading surfaces
         CTF,
         EMPD,
@@ -226,34 +222,33 @@ namespace DataSurfaces {
         TDD,                 // tubular daylighting device
         Kiva,                // Kiva ground calculations
         AirBoundaryNoHT,     // Construction:AirBoundary - not IRT or interior window
+        Num,                 // count, always the final element
     };
 
-    inline std::string HeatTransferModelNames(iHeatTransferModel const &m)
+    constexpr std::array<std::string_view, (int)DataSurfaces::iHeatTransferModel::Num> HeatTransAlgoStrs = {
+        "None",
+        "CTF - ConductionTransferFunction",
+        "EMPD - MoisturePenetrationDepthConductionTransferFunction",
+        "CondFD - ConductionFiniteDifference",
+        "HAMT - CombinedHeatAndMoistureFiniteElement",
+        "Window5 Detailed Fenestration",
+        "Window7 Complex Fenestration",
+        "Tubular Daylighting Device",
+        "KivaFoundation - TwoDimensionalFiniteDifference",
+        "Air Boundary - No Heat Transfer"};
+
+    // Parameters to indicate surface roughness for use with the Material
+    // derived type:
+    enum class SurfaceRoughness
     {
-        switch (m) {
-        case iHeatTransferModel::CTF:
-            return "CTF - ConductionTransferFunction";
-        case iHeatTransferModel::EMPD:
-            return "EMPD - MoisturePenetrationDepthConductionTransferFunction";
-        case iHeatTransferModel::CondFD:
-            return "CondFD - ConductionFiniteDifference";
-        case iHeatTransferModel::HAMT:
-            return "HAMT - CombinedHeatAndMoistureFiniteElement";
-        case iHeatTransferModel::Window5:
-            return "Window - Detailed layer-by-layer";
-        case iHeatTransferModel::ComplexFenestration:
-            return "Window - ComplexFenestration";
-        case iHeatTransferModel::TDD:
-            return "Tubular daylighting device";
-        case iHeatTransferModel::Kiva:
-            return "KivaFoundation - TwoDimensionalFiniteDifference";
-        case iHeatTransferModel::None:
-        case iHeatTransferModel::AirBoundaryNoHT:
-        case iHeatTransferModel::NotSet:
-        default:
-            return "";
-        }
-    }
+        Unassigned = -1,
+        VeryRough,
+        Rough,
+        MediumRough,
+        MediumSmooth,
+        Smooth,
+        VerySmooth
+    };
 
     // IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
     // original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
@@ -311,67 +306,6 @@ namespace DataSurfaces {
     {
         return BITF_TEST_ANY(BITF(ShadingFlag), BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind));
     }
-
-    // Parameters for classification of outside face of surfaces
-    constexpr int OutConvClass_WindwardVertWall(101);
-    constexpr int OutConvClass_LeewardVertWall(102);
-    constexpr int OutConvClass_RoofStable(103);
-    constexpr int OutConvClass_RoofUnstable(104);
-
-    // Parameters for adpative convection algorithm's classification of inside face of surfaces
-    constexpr int InConvClass_A1_VertWalls(1);           // flow regime A1, vertical walls
-    constexpr int InConvClass_A1_StableHoriz(2);         // flow regime A1
-    constexpr int InConvClass_A1_UnstableHoriz(3);       // flow regime A1
-    constexpr int InConvClass_A1_HeatedFloor(4);         // flow regime A1
-    constexpr int InConvClass_A1_ChilledCeil(5);         // flow regime A1
-    constexpr int InConvClass_A1_StableTilted(6);        // flow regime A1
-    constexpr int InConvClass_A1_UnstableTilted(7);      // flow regime A1
-    constexpr int InConvClass_A1_Windows(8);             // flow regime A1
-    constexpr int InConvClass_A2_VertWallsNonHeated(9);  // flow regime A2
-    constexpr int InConvClass_A2_HeatedVerticalWall(10); // flow regime A2
-    constexpr int InConvClass_A2_StableHoriz(11);        // flow regime A2
-    constexpr int InConvClass_A2_UnstableHoriz(12);      // flow regime A2
-    constexpr int InConvClass_A2_StableTilted(13);       // flow regime A2
-    constexpr int InConvClass_A2_UnstableTilted(14);     // flow regime A2
-    constexpr int InConvClass_A2_Windows(15);            // flow regime A2
-    constexpr int InConvClass_A3_VertWalls(16);          // flow regime A3
-    constexpr int InConvClass_A3_StableHoriz(17);        // flow regime A3
-    constexpr int InConvClass_A3_UnstableHoriz(18);      // flow regime A3
-    constexpr int InConvClass_A3_StableTilted(19);       // flow regime A3
-    constexpr int InConvClass_A3_UnstableTilted(20);     // flow regime A3
-    constexpr int InConvClass_A3_Windows(21);            // flow regime A3
-    constexpr int InConvClass_B_VertWalls(22);           // flow regime B
-    constexpr int InConvClass_B_VertWallsNearHeat(23);   // flow regime B
-    constexpr int InConvClass_B_StableHoriz(24);         // flow regime B
-    constexpr int InConvClass_B_UnstableHoriz(25);       // flow regime B
-    constexpr int InConvClass_B_StableTilted(26);        // flow regime B
-    constexpr int InConvClass_B_UnstableTilted(27);      // flow regime B
-    constexpr int InConvClass_B_Windows(28);             // flow regime B
-    constexpr int InConvClass_C_Walls(29);               // flow regime C
-    constexpr int InConvClass_C_Ceiling(30);             // flow regime C
-    constexpr int InConvClass_C_Floor(31);               // flow regime C
-    constexpr int InConvClass_C_Windows(32);             // flow regime C
-    constexpr int InConvClass_D_Walls(33);               // flow regime D
-    constexpr int InConvClass_D_StableHoriz(34);         // flow regime D
-    constexpr int InConvClass_D_UnstableHoriz(35);       // flow regime D
-    constexpr int InConvClass_D_StableTilted(36);        // flow regime D
-    constexpr int InConvClass_D_UnstableTilted(37);      // flow regime D
-    constexpr int InConvClass_D_Windows(38);             // flow regime D
-    constexpr int InConvClass_E_AssistFlowWalls(39);     // flow regime E
-    constexpr int InConvClass_E_OpposFlowWalls(40);      // flow regime E
-    constexpr int InConvClass_E_StableFloor(41);         // flow regime E
-    constexpr int InConvClass_E_UnstableFloor(42);       // flow regime E
-    constexpr int InConvClass_E_StableCeiling(43);       // flow regime E
-    constexpr int InConvClass_E_UnstableCieling(44);     // flow regime E
-    constexpr int InConvClass_E_Windows(45);             // flow regime E
-
-    // Parameters for fenestration relative location in zone
-    constexpr int InConvWinLoc_NotSet(0);
-    constexpr int InConvWinLoc_LowerPartOfExteriorWall(1); // this is a window in the lower part of wall
-    constexpr int InConvWinLoc_UpperPartOfExteriorWall(2); // this is a window in the upper part of wall
-    constexpr int InConvWinLoc_WindowAboveThis(3);         // this is a wall with window above it
-    constexpr int InConvWinLoc_WindowBelowThis(4);         // this is a wall with window below it
-    constexpr int InConvWinLoc_LargePartOfExteriorWall(5); // this is a big window taking up most of wall
 
     // Parameters for window shade status
     constexpr int NoShade(-1);
@@ -543,6 +477,132 @@ namespace DataSurfaces {
 
     }; // Surface2D
 
+    struct SurfaceCalcHashKey
+    {
+        // Values that must be the same in order for surfaces to use a representative calculation
+
+        int Construction;        // Pointer to the construction in the Construct derived type
+        Real64 Azimuth;          // Direction the surface outward normal faces (degrees) or FACING
+        Real64 Tilt;             // Angle (deg) between the ground outward normal and the surface outward normal
+        Real64 Height;           // Height of the surface (m)
+        int Zone;                // Interior environment or zone the surface is a part of
+        int EnclIndex;           // Pointer to enclosure this surface belongs to
+        int TAirRef;             // Flag for reference air temperature
+        int ExtZone;             // For an "interzone" surface, this is the adjacent ZONE number (not adjacent SURFACE number).
+        int ExtEnclIndex;        // For an "interzone" surface, this is the adjacent ENCLOSURE number
+        bool ExtSolar;           // True if the "outside" of the surface is exposed to solar
+        bool ExtWind;            // True if the "outside" of the surface is exposed to wind
+        Real64 ViewFactorGround; // View factor to the ground from the exterior of the surface for diffuse solar radiation
+        Real64 ViewFactorSky;    // View factor to the sky from the exterior of the surface for diffuse solar radiation
+
+        // Special Properties
+        iHeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
+        int IntConvCoeff;                         // Interior Convection Coefficient Algorithm pointer (different data structure)
+        int ExtConvCoeff;                         // Exterior Convection Coefficient Algorithm pointer (different data structure)
+        int OSCPtr;                               // Pointer to OSC data structure
+        int OSCMPtr;                              // "Pointer" to OSCM data structure (other side conditions from a model)
+
+        // Windows
+        int FrameDivider;          // Pointer to frame and divider information (windows only)
+        int SurfWinStormWinConstr; // Construction with storm window (windows only)
+        //   Airflow control                      // Not supported
+        //   Shading Control                      // Not supported
+
+        // Other special boundary conditions
+        //   SolarIncidentInside                  // Not supported
+        int MaterialMovInsulExt;           // Pointer to the material used for exterior movable insulation
+        int MaterialMovInsulInt;           // Pointer to the material used for interior movable insulation
+        int SchedMovInsulExt;              // Schedule for exterior movable insulation
+        int SchedMovInsulInt;              // Schedule for interior movable insulation
+        int ExternalShadingSchInd;         // Schedule for a the external shading
+        int SurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
+        int LinkedOutAirNode;              // Index of the an OutdoorAir:Node
+        int OutsideHeatSourceTermSchedule; // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
+        int InsideHeatSourceTermSchedule;  // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
+
+        // based on boost::hash_combine
+        std::size_t hash_combine(std::size_t current_hash, std::size_t new_hash) const
+        {
+            current_hash ^= new_hash + 0x9e3779b9 + (current_hash << 6) + (current_hash >> 2);
+            return current_hash;
+        }
+
+        std::vector<std::size_t> get_hash_list() const
+        {
+            using std::hash;
+
+            return {hash<int>()(Construction),
+                    hash<Real64>()(Azimuth),
+                    hash<Real64>()(Tilt),
+                    hash<Real64>()(Height),
+                    hash<int>()(Zone),
+                    hash<int>()(EnclIndex),
+                    hash<int>()(TAirRef),
+                    hash<int>()(ExtZone),
+                    hash<int>()(ExtEnclIndex),
+                    hash<bool>()(ExtSolar),
+                    hash<bool>()(ExtWind),
+                    hash<Real64>()(ViewFactorGround),
+                    hash<Real64>()(ViewFactorSky),
+
+                    hash<iHeatTransferModel>()(HeatTransferAlgorithm),
+                    hash<int>()(IntConvCoeff),
+                    hash<int>()(ExtConvCoeff),
+                    hash<int>()(OSCPtr),
+                    hash<int>()(OSCMPtr),
+
+                    hash<int>()(FrameDivider),
+                    hash<int>()(SurfWinStormWinConstr),
+
+                    hash<int>()(MaterialMovInsulExt),
+                    hash<int>()(MaterialMovInsulInt),
+                    hash<int>()(SchedMovInsulExt),
+                    hash<int>()(SchedMovInsulInt),
+                    hash<int>()(ExternalShadingSchInd),
+                    hash<int>()(SurroundingSurfacesNum),
+                    hash<int>()(LinkedOutAirNode),
+                    hash<int>()(OutsideHeatSourceTermSchedule),
+                    hash<int>()(InsideHeatSourceTermSchedule)};
+        }
+
+        std::size_t get_hash() const
+        {
+            auto hash_list = get_hash_list();
+            std::size_t combined_hash = 0u;
+            for (auto hash : hash_list) {
+                combined_hash = hash_combine(combined_hash, hash);
+            }
+            return combined_hash;
+        }
+
+        bool operator==(const SurfaceCalcHashKey &other) const
+        {
+            return (Construction == other.Construction && Azimuth == other.Azimuth && Tilt == other.Tilt && Height == other.Height &&
+                    Zone == other.Zone && EnclIndex == other.EnclIndex && ExtZone == other.ExtZone && ExtEnclIndex == other.ExtEnclIndex &&
+                    ExtSolar == other.ExtSolar && ExtWind == other.ExtWind && ViewFactorGround == other.ViewFactorGround &&
+                    ViewFactorSky == other.ViewFactorSky &&
+
+                    HeatTransferAlgorithm == other.HeatTransferAlgorithm && IntConvCoeff == other.IntConvCoeff &&
+                    ExtConvCoeff == other.ExtConvCoeff && OSCPtr == other.OSCPtr && OSCMPtr == other.OSCMPtr &&
+
+                    FrameDivider == other.FrameDivider && SurfWinStormWinConstr == other.SurfWinStormWinConstr &&
+
+                    MaterialMovInsulExt == other.MaterialMovInsulExt && MaterialMovInsulInt == other.MaterialMovInsulInt &&
+                    SchedMovInsulExt == other.SchedMovInsulExt && SchedMovInsulInt == other.SchedMovInsulInt &&
+                    ExternalShadingSchInd == other.ExternalShadingSchInd && SurroundingSurfacesNum == other.SurroundingSurfacesNum &&
+                    LinkedOutAirNode == other.LinkedOutAirNode && OutsideHeatSourceTermSchedule == other.OutsideHeatSourceTermSchedule &&
+                    InsideHeatSourceTermSchedule == other.InsideHeatSourceTermSchedule);
+        }
+    };
+
+    struct SurfaceCalcHasher
+    {
+        std::size_t operator()(const SurfaceCalcHashKey &key) const
+        {
+            return key.get_hash();
+        }
+    };
+
     struct SurfaceData
     {
 
@@ -551,8 +611,12 @@ namespace DataSurfaces {
         using Plane = Vector4<Real64>;
 
         // Members
-        std::string Name;                 // User supplied name of the surface (must be unique)
-        int Construction;                 // Pointer to the construction in the Construct derived type
+        std::string Name; // User supplied name of the surface (must be unique)
+        int Construction; // Pointer to the construction in the Construct derived type
+
+        int RepresentativeCalcSurfNum; // Index of the surface that is used to calculate the heat
+        // balance for this surface
+
         int ConstructionStoredInputValue; // holds the original value for Construction per surface input
         SurfaceClass Class;
 
@@ -614,6 +678,7 @@ namespace DataSurfaces {
         int Zone;                     // Interior environment or zone the surface is a part of
                                       // Note that though attached shading surfaces are part of a zone, this
                                       // value is 0 there to facilitate using them as detached surfaces (more accurate shading.
+        int spaceNum;                 // Space the surface is part of
         std::string ExtBoundCondName; // Name for the Outside Environment Object
         int ExtBoundCond;             // For an "interzone" surface, this is the adjacent surface number.
                                       // for an internal/adiabatic surface this is the current surface number.
@@ -645,6 +710,7 @@ namespace DataSurfaces {
         std::vector<int> windowShadingControlList; // List of possible window shading controls
         bool HasShadeControl;                      // True if the surface is listed in a WindowShadingControl object
         int activeShadedConstruction;              // The currently active shaded construction (windows only)
+        int activeShadedConstructionPrev;          // The currently active shaded construction (windows only)
         std::vector<int> shadedConstructionList;   // List of shaded constructions that correspond with window shading controls (windows only - same
                                                    // indexes as windowShadingControlList)
         std::vector<int> shadedStormWinConstructionList; // List of shaded constructions with storm window that correspond with window shading
@@ -652,24 +718,30 @@ namespace DataSurfaces {
         int FrameDivider;                                // Pointer to frame and divider information (windows only)
         Real64 Multiplier;                               // Multiplies glazed area, frame area and divider area (windows only)
 
-        // Air boundaries
+        // Air boundaries and spaces
+        int RadEnclIndex;       // Pointer to raidant enclosure this surface belongs to
         int SolarEnclIndex;     // Pointer to solar enclosure this surface belongs to
-        int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, ZoneSolarInfo(n).SurfacePtr(RadEnclSurfIndex) points to this surface
+        int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, EnclSolInfo(n).SurfacePtr(SolarEnclSurfIndex) points to this surface
         bool IsAirBoundarySurf; // True if surface is an air boundary surface (Construction:AirBoundary)
+
+        ConvectionConstants::SurfConvOrientation ConvOrientation; // Surface orientation for convection calculations
+
+        SurfaceCalcHashKey calcHashKey; // Hash key used for determining if this surface requires unique calculations.
+
         // Default Constructor
         SurfaceData()
-            : Construction(0), ConstructionStoredInputValue(0), Class(SurfaceClass::None), Shape(SurfaceShape::None), Sides(0), Area(0.0),
-              GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0), Azimuth(0.0), Height(0.0), Reveal(0.0), Tilt(0.0), Width(0.0),
-              shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
+            : Construction(0), RepresentativeCalcSurfNum(-1), ConstructionStoredInputValue(0), Class(SurfaceClass::None), Shape(SurfaceShape::None),
+              Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0), Azimuth(0.0), Height(0.0), Reveal(0.0), Tilt(0.0),
+              Width(0.0), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
               lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
-
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
-              HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), ExtBoundCond(0), ExtSolar(false),
-              ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0),
-              MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
-              SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), FrameDivider(0),
-              Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false)
+              HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
+              ExtSolar(false), ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0),
+              OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
+              SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),
+              FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false),
+              ConvOrientation(ConvectionConstants::SurfConvOrientation::Invalid)
         {
         }
 
@@ -685,8 +757,6 @@ namespace DataSurfaces {
 
         Real64 getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
 
-        static Real64 getInsideIR(EnergyPlusData &state, const int t_SurfNum);
-
         Real64 getOutsideAirTemperature(EnergyPlusData &state, int t_SurfNum) const;
 
         Real64 getOutsideIR(EnergyPlusData &state, int t_SurfNum) const;
@@ -696,6 +766,10 @@ namespace DataSurfaces {
         int getTotLayers(EnergyPlusData &state) const;
 
         Real64 get_average_height(EnergyPlusData &state) const;
+
+        void make_hash_key(EnergyPlusData &state, const int SurfNum);
+
+        void set_representative_surface(EnergyPlusData &state, const int SurfNum);
 
     private: // Methods
              // Computed Shape Category
@@ -729,9 +803,9 @@ namespace DataSurfaces {
         Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point N [lux]
         Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point N [cd/m2]
         // for shadowing of ground by building and obstructions [W/m2]
-        Array1D<Real64> ZoneAreaMinusThisSurf; // Zone inside surface area minus this surface and its subsurfaces
+        Array1D<Real64> EnclAreaMinusThisSurf; // Enclosure inside surface area minus this surface and its subsurfaces
         // for floor/wall/ceiling (m2)
-        Array1D<Real64> ZoneAreaReflProdMinusThisSurf; // Zone product of inside surface area times vis reflectance
+        Array1D<Real64> EnclAreaReflProdMinusThisSurf; // Enclosure product of inside surface area times vis reflectance
         // minus this surface and its subsurfaces,
         // for floor/wall/ceiling (m2)
 
@@ -740,7 +814,7 @@ namespace DataSurfaces {
         // Default Constructor
         SurfaceWindowCalc()
             : WinCenter(3, 0.0), ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0), EffShBlindEmiss(MaxSlatAngs, 0.0),
-              EffGlassEmiss(MaxSlatAngs, 0.0), ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0)
+              EffGlassEmiss(MaxSlatAngs, 0.0), EnclAreaMinusThisSurf(3, 0.0), EnclAreaReflProdMinusThisSurf(3, 0.0)
         {
         }
     };
@@ -773,10 +847,10 @@ namespace DataSurfaces {
         Real64 DividerConductance;         // Effective conductance of divider (no air films) {W/m2-K}
         Real64 DivEdgeToCenterGlCondRatio; // Ratio of divider edge of glass conductance (without air films) to
         // center of glass conductance (without air films)
-        Real64 DividerSolAbsorp; // Solar absorptance of divider corrected for self-shading
-        Real64 DividerVisAbsorp; // Visible absorptance of divider corrected for self-shading
-        Real64 DividerEmis;      // Thermal emissivity of divider
-        int MullionOrientation;  // Horizontal or Vertical; used only for windows with two glazing systems
+        Real64 DividerSolAbsorp;                                   // Solar absorptance of divider corrected for self-shading
+        Real64 DividerVisAbsorp;                                   // Visible absorptance of divider corrected for self-shading
+        Real64 DividerEmis;                                        // Thermal emissivity of divider
+        DataWindowEquivalentLayer::Orientation MullionOrientation; // Horizontal or Vertical; used only for windows with two glazing systems
         //  divided by a mullion; obtained from Window5 data file.
         Real64 OutsideRevealSolAbs; // Solar absorptance of outside reveal
         Real64 InsideSillDepth;     // Inside sill depth (m)
@@ -790,7 +864,8 @@ namespace DataSurfaces {
               FrEdgeToCenterGlCondRatio(1.0), FrameSolAbsorp(0.0), FrameVisAbsorp(0.0), FrameEmis(0.9), DividerType(0), DividerWidth(0.0),
               HorDividers(0), VertDividers(0), DividerProjectionOut(0.0), DividerProjectionIn(0.0), DividerEdgeWidth(0.06355),
               DividerConductance(0.0), DivEdgeToCenterGlCondRatio(1.0), DividerSolAbsorp(0.0), DividerVisAbsorp(0.0), DividerEmis(0.9),
-              MullionOrientation(0), OutsideRevealSolAbs(0.0), InsideSillDepth(0.0), InsideReveal(0.0), InsideSillSolAbs(0.0), InsideRevealSolAbs(0.0)
+              MullionOrientation(DataWindowEquivalentLayer::Orientation::Unassigned), OutsideRevealSolAbs(0.0), InsideSillDepth(0.0),
+              InsideReveal(0.0), InsideSillSolAbs(0.0), InsideRevealSolAbs(0.0)
         {
         }
     };
@@ -977,17 +1052,19 @@ namespace DataSurfaces {
     struct ConvectionCoefficient
     {
         // Members
-        int WhichSurface;         // Which surface number this is applied to
-        std::string SurfaceName;  // Which surface (name)
-        int OverrideType;         // Override type, 1=value, 2=schedule, 3=model, 4=user curve
-        Real64 OverrideValue;     // User specified value
-        std::string ScheduleName; // Which surface (name)
-        int ScheduleIndex;        // if type="schedule" is used
-        int UserCurveIndex;       // if type=UserCurve is used
-        int HcModelEq;            // if type is one of specific model equations
+        int WhichSurface;                                       // Which surface number this is applied to
+        std::string SurfaceName;                                // Which surface (name)
+        ConvectionConstants::ConvCoefOverrideType OverrideType; // Override type, 1=value, 2=schedule, 3=model, 4=user curve
+        Real64 OverrideValue;                                   // User specified value
+        std::string ScheduleName;                               // Which surface (name)
+        int ScheduleIndex;                                      // if type="schedule" is used
+        int UserCurveIndex;                                     // if type=UserCurve is used
+        int HcModelEq;                                          // if type is one of specific model equations
 
         // Default Constructor
-        ConvectionCoefficient() : WhichSurface(0), OverrideType(0), OverrideValue(0.0), ScheduleIndex(0), UserCurveIndex(0), HcModelEq(0)
+        ConvectionCoefficient()
+            : WhichSurface(0), OverrideType(ConvectionConstants::ConvCoefOverrideType::Invalid), OverrideValue(0.0), ScheduleIndex(0),
+              UserCurveIndex(0), HcModelEq(0)
         {
         }
     };
@@ -1011,20 +1088,20 @@ namespace DataSurfaces {
         // Members
         // from input data
         std::string Name;
-        std::string OSCMName; // OtherSideConditionsModel
-        int OSCMPtr;          // OtherSideConditionsModel index
-        Real64 Porosity;      // fraction of absorber plate [--]
-        Real64 LWEmitt;       // Thermal Emissivity of Baffle Surface [dimensionless]
-        Real64 SolAbsorp;     // Solar Absorbtivity of Baffle Surface [dimensionless]
-        int BaffleRoughness;  // surface roughness for exterior convection calcs.
-        Real64 PlenGapThick;  // Depth of Plenum Behind Baffle [m]
-        int NumSurfs;         // a single baffle can have multiple surfaces underneath it
-        Array1D_int SurfPtrs; // = 0  ! array of pointers for participating underlying surfaces
-        Real64 HdeltaNPL;     // Height scale for Cavity bouyancy  [m]
-        Real64 AreaRatio;     // Ratio of actual surface are to projected surface area [dimensionless]
-        Real64 Cv;            // volume-based effectiveness of openings for wind-driven vent when Passive
-        Real64 Cd;            // discharge coefficient of openings for bouyancy-driven vent when Passive
-        // data from elswhere and calculated
+        std::string OSCMName;             // OtherSideConditionsModel
+        int OSCMPtr;                      // OtherSideConditionsModel index
+        Real64 Porosity;                  // fraction of absorber plate [--]
+        Real64 LWEmitt;                   // Thermal Emissivity of Baffle Surface [dimensionless]
+        Real64 SolAbsorp;                 // Solar Absorbtivity of Baffle Surface [dimensionless]
+        SurfaceRoughness BaffleRoughness; // surface roughness for exterior convection calcs.
+        Real64 PlenGapThick;              // Depth of Plenum Behind Baffle [m]
+        int NumSurfs;                     // a single baffle can have multiple surfaces underneath it
+        Array1D_int SurfPtrs;             // = 0  ! array of pointers for participating underlying surfaces
+        Real64 HdeltaNPL;                 // Height scale for Cavity buoyancy  [m]
+        Real64 AreaRatio;                 // Ratio of actual surface are to projected surface area [dimensionless]
+        Real64 Cv;                        // volume-based effectiveness of openings for wind-driven vent when Passive
+        Real64 Cd;                        // discharge coefficient of openings for buoyancy-driven vent when Passive
+        // data from elsewhere and calculated
         Real64 ActualArea;  // Overall Area of Collect with surface corrugations.
         Real64 ProjArea;    // Overall Area of Collector projected, as if flat [m2]
         Vector Centroid;    // computed centroid
@@ -1043,14 +1120,14 @@ namespace DataSurfaces {
         Real64 PassiveACH;       // air changes per hour when passive [1/hr]
         Real64 PassiveMdotVent;  // Total Nat Vent air change rate  [kg/s]
         Real64 PassiveMdotWind;  // Nat Vent air change rate from Wind-driven [kg/s]
-        Real64 PassiveMdotTherm; // Nat. Vent air change rate from bouyancy-driven flow [kg/s]
+        Real64 PassiveMdotTherm; // Nat. Vent air change rate from buoyancy-driven flow [kg/s]
 
         // Default Constructor
         ExtVentedCavityStruct()
-            : OSCMPtr(0), Porosity(0.0), LWEmitt(0.0), SolAbsorp(0.0), BaffleRoughness(1), PlenGapThick(0.0), NumSurfs(0), HdeltaNPL(0.0),
-              AreaRatio(0.0), Cv(0.0), Cd(0.0), ActualArea(0.0), ProjArea(0.0), Centroid(0.0, 0.0, 0.0), TAirCav(0.0), Tbaffle(0.0), TairLast(20.0),
-              TbaffleLast(20.0), HrPlen(0.0), HcPlen(0.0), MdotVent(0.0), Tilt(0.0), Azimuth(0.0), QdotSource(0.0), Isc(0.0), PassiveACH(0.0),
-              PassiveMdotVent(0.0), PassiveMdotWind(0.0), PassiveMdotTherm(0.0)
+            : OSCMPtr(0), Porosity(0.0), LWEmitt(0.0), SolAbsorp(0.0), BaffleRoughness(SurfaceRoughness::VeryRough), PlenGapThick(0.0), NumSurfs(0),
+              HdeltaNPL(0.0), AreaRatio(0.0), Cv(0.0), Cd(0.0), ActualArea(0.0), ProjArea(0.0), Centroid(0.0, 0.0, 0.0), TAirCav(0.0), Tbaffle(0.0),
+              TairLast(20.0), TbaffleLast(20.0), HrPlen(0.0), HcPlen(0.0), MdotVent(0.0), Tilt(0.0), Azimuth(0.0), QdotSource(0.0), Isc(0.0),
+              PassiveACH(0.0), PassiveMdotVent(0.0), PassiveMdotWind(0.0), PassiveMdotTherm(0.0)
         {
         }
     };
@@ -1132,15 +1209,21 @@ namespace DataSurfaces {
     {
         // Members
         std::string Name;
-        std::string ZoneOrZoneListName; // zone or zone list name
-        int ZoneOrZoneListPtr;          // pointer to a zone list
-        int NumOfZones;                 // number of zones in a zone list
-        int Construction;               // pointer to contruction object
-        Real64 GrossArea;               // internal surface area, [m2]
-        bool ZoneListActive;            // flag to a list
+        std::string ZoneOrZoneListName;   // zone or zone list name
+        int ZoneOrZoneListPtr;            // pointer to a zone list
+        int NumOfZones;                   // number of zones in a zone list
+        int Construction;                 // pointer to contruction object
+        Real64 GrossArea;                 // internal surface area, [m2]
+        bool ZoneListActive;              // flag to a list
+        std::string spaceOrSpaceListName; // Space or Space list name
+        int spaceOrSpaceListPtr;          // pointer to a Space list
+        int numOfSpaces;                  // number of Spaces in a Space list
+        bool spaceListActive;             // flag to a list
 
         // Default Constructor
-        IntMassObject() : ZoneOrZoneListPtr(0), NumOfZones(0), Construction(0), GrossArea(0.0), ZoneListActive(false)
+        IntMassObject()
+            : ZoneOrZoneListPtr(0), NumOfZones(0), Construction(0), GrossArea(0.0), ZoneListActive(false), spaceOrSpaceListPtr(0), numOfSpaces(0),
+              spaceListActive(false)
         {
         }
     };
@@ -1195,17 +1278,21 @@ struct SurfacesData : BaseGlobalStruct
     int MaxReflRays = 0;                  // Max number of rays from a receiving surface for solar reflection calc
     Real64 GroundLevelZ = 0.0;            // Z value of ground level for solar refl calc (m)
     bool AirflowWindows = false;          // TRUE if one or more airflow windows
-    bool ShadingTransmittanceVaries = false;      // overall, shading transmittance varies for the building
-    bool AnyHeatBalanceInsideSourceTerm = false;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
-    bool AnyHeatBalanceOutsideSourceTerm = false; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
-    bool AnyMovableInsulation = false;            // True if any movable insulation presents
-    Array1D_int InsideGlassCondensationFlag;      // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
-    Array1D_int InsideFrameCondensationFlag;      // 1 if frame inside surface temp < zone air dew point; 0 otherwise
-    Array1D_int InsideDividerCondensationFlag;    // 1 if divider inside surface temp < zone air dew point;  0 otherwise
-    Array1D_int AdjacentZoneToSurface;            // Array of adjacent zones to each surface
-    Array1D<Real64> X0;                           // X-component of translation vector
-    Array1D<Real64> Y0;                           // Y-component of translation vector
-    Array1D<Real64> Z0;                           // Z-component of translation vector
+    bool ShadingTransmittanceVaries = false;           // overall, shading transmittance varies for the building
+    bool UseRepresentativeSurfaceCalculations = false; // Use Representative Surfaces for Calculations
+    bool AnyHeatBalanceInsideSourceTerm = false;       // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
+    bool AnyHeatBalanceOutsideSourceTerm = false;      // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
+    bool AnyMovableInsulation = false;                 // True if any movable insulation presents
+    bool AnyMovableSlat = false;                       // True if there are any movable slats for window blinds presented
+
+    Array1D_int SurfAdjacentZone; // Array of adjacent zones to each surface
+    Array1D<Real64> X0;           // X-component of translation vector
+    Array1D<Real64> Y0;           // Y-component of translation vector
+    Array1D<Real64> Z0;           // Z-component of translation vector
+
+    std::unordered_map<DataSurfaces::SurfaceCalcHashKey, int, DataSurfaces::SurfaceCalcHasher>
+        RepresentativeSurfaceMap; // A map that categorizes similar surfaces with
+                                  // a single representative surface index
 
     std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
@@ -1223,22 +1310,22 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfHighTempErrCount;
 
     // Surface solar arrays
-    Array1D<Real64> SurfAirSkyRadSplit;     // Fractional split between the air and the sky for radiation from the surface
-                                            // Fraction of sky IR coming from sky itself; 1-SurfAirSkyRadSplit comes from the atmosphere.
-    Array2D<Real64> SurfSunCosHourly;       // Hourly values of SUNCOS (solar direction cosines)
-                                            // Autodesk: Init Zero-initialization added to avoid use uninitialized
-    Array1D<Real64> SurfSunlitArea;         // Sunlit area by surface number
-    Array1D<Real64> SurfSunlitFrac;         // Sunlit fraction by surface number
-    Array1D<Real64> SurfSkySolarInc;        // Incident diffuse solar from sky; if CalcSolRefl is true, includes reflection of sky diffuse
-                                            // and beam solar from exterior obstructions [W/m2]
-    Array1D<Real64> SurfGndSolarInc;        // Incident diffuse solar from ground; if CalcSolRefl is true,
-                                            // accounts for shadowing of ground by building and obstructions [W/m2]
-    Array1D<Real64> SurfBmToBmReflFacObs;   // Factor for incident solar from specular beam refl from obstructions (W/m2)/(W/m2)
-    Array1D<Real64> SurfBmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl from obstructions (W/m2)/(W/m2)
-    Array1D<Real64> SurfBmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
-    Array1D<Real64> SurfSkyDiffReflFacGnd;  // sky diffuse reflection view factors from ground
-    Array1D<Real64> SurfOpaqAI;             // Time step value of factor for beam absorbed on inside of opaque surface
-    Array1D<Real64> SurfOpaqAO;             // Time step value of factor for beam absorbed on outside of opaque surface
+    Array1D<Real64> SurfAirSkyRadSplit;        // Fractional split between the air and the sky for radiation from the surface
+                                               // Fraction of sky IR coming from sky itself; 1-SurfAirSkyRadSplit comes from the atmosphere.
+    Array1D<Vector3<Real64>> SurfSunCosHourly; // Hourly values of SUNCOS (solar direction cosines)
+                                               // Autodesk: Init Zero-initialization added to avoid use uninitialized
+    Array1D<Real64> SurfSunlitArea;            // Sunlit area by surface number
+    Array1D<Real64> SurfSunlitFrac;            // Sunlit fraction by surface number
+    Array1D<Real64> SurfSkySolarInc;           // Incident diffuse solar from sky; if CalcSolRefl is true, includes reflection of sky diffuse
+                                               // and beam solar from exterior obstructions [W/m2]
+    Array1D<Real64> SurfGndSolarInc;           // Incident diffuse solar from ground; if CalcSolRefl is true,
+                                               // accounts for shadowing of ground by building and obstructions [W/m2]
+    Array1D<Real64> SurfBmToBmReflFacObs;      // Factor for incident solar from specular beam refl from obstructions (W/m2)/(W/m2)
+    Array1D<Real64> SurfBmToDiffReflFacObs;    // Factor for incident solar from diffuse beam refl from obstructions (W/m2)/(W/m2)
+    Array1D<Real64> SurfBmToDiffReflFacGnd;    // Factor for incident solar from diffuse beam refl from ground
+    Array1D<Real64> SurfSkyDiffReflFacGnd;     // sky diffuse reflection view factors from ground
+    Array1D<Real64> SurfOpaqAI;                // Time step value of factor for beam absorbed on inside of opaque surface
+    Array1D<Real64> SurfOpaqAO;                // Time step value of factor for beam absorbed on outside of opaque surface
     Array1D<int> SurfPenumbraID;
 
     // Surface reflectance
@@ -1300,13 +1387,17 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIsRadSurfOrVentSlabOrPool;    // surface cannot be part of both a radiant surface & ventilated slab group
 
     // Surface ConvCoeff Properties
-    Array1D<int> SurfTAirRef;                     // Flag for reference air temperature
-    Array1D<int> SurfIntConvCoeffIndex;           // Interior Convection Coefficient pointer (different data structure) when being overridden
-    Array1D<int> SurfExtConvCoeffIndex;           // Exterior Convection Coefficient pointer (different data structure) when being overridden
-    Array1D<int> SurfIntConvClassification;       // current classification for inside face air flow regime and surface orientation
-    Array1D<int> SurfIntConvHcModelEq;            // current convection model for inside face
-    Array1D<int> SurfIntConvHcUserCurveIndex;     // current index to user convection model if used
-    Array1D<int> SurfOutConvClassification;       // current classification for outside face wind regime and convection orientation
+    Array1D<int> SurfTAirRef;           // Flag for reference air temperature
+    Array1D<int> SurfIntConvCoeffIndex; // Interior Convection Coefficient pointer (different data structure) when being overridden
+    Array1D<int> SurfExtConvCoeffIndex; // Exterior Convection Coefficient pointer (different data structure) when being overridden
+    Array1D<ConvectionConstants::InConvClass>
+        SurfIntConvClassification;             // current classification for inside face air flow regime and surface orientation
+    Array1D<int> SurfIntConvClassificationRpt; // current classification for inside face air flow regime and surface orientation for reporting
+    Array1D<int> SurfIntConvHcModelEq;         // current convection model for inside face
+    Array1D<int> SurfIntConvHcUserCurveIndex;  // current index to user convection model if used
+    Array1D<ConvectionConstants::OutConvClass>
+        SurfOutConvClassification;                // current classification for outside face wind regime and convection orientation
+    Array1D<int> SurfOutConvClassificationRpt;    // current classification for outside face wind regime and convection orientation for reporting
     Array1D<int> SurfOutConvHfModelEq;            // current convection model for forced convection at outside face
     Array1D<int> SurfOutConvHfUserCurveIndex;     // current index to user forced convection model if used
     Array1D<int> SurfOutConvHnModelEq;            // current Convection model for natural convection at outside face
@@ -1318,11 +1409,15 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfIntConvZonePerimLength;   // [m] length of perimeter zone's exterior wall
     Array1D<Real64> SurfIntConvZoneHorizHydrDiam; // [m] hydraulic diameter, usually 4 times the zone floor area div by perimeter
     Array1D<Real64> SurfIntConvWindowWallRatio;   // [-] area of windows over area of exterior wall for zone
-    Array1D<int> SurfIntConvWindowLocation;       // relative location of window in zone for interior Hc models
+    Array1D<ConvectionConstants::InConvWinLoc> SurfIntConvWindowLocation; // relative location of window in zone for interior Hc models
     Array1D<bool> SurfIntConvSurfGetsRadiantHeat;
     Array1D<bool> SurfIntConvSurfHasActiveInIt;
 
     // Surface Window Heat Balance
+    Array1D_int SurfWinInsideGlassCondensationFlag;   // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
+    Array1D_int SurfWinInsideFrameCondensationFlag;   // 1 if frame inside surface temp < zone air dew point; 0 otherwise
+    Array1D_int SurfWinInsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;  0 otherwise
+
     Array2D<Real64> SurfWinA;            // Time step value of factor for beam absorbed in window glass layers
     Array2D<Real64> SurfWinADiffFront;   // Time step value of factor for diffuse absorbed in window layers
     Array2D<Real64> SurfWinACFOverlap;   // Time step value of factor for beam absorbed in window glass layers which comes from other windows
@@ -1454,8 +1549,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinFrEdgeToCenterGlCondRatio;  // Ratio of frame edge of glass conductance (without air films) to center of glass conductance
                                                        // (without air films)
     Array1D<Real64> SurfWinFrameEdgeArea;              // Area of glass near frame (m2)
-    Array1D<Real64> SurfWinFrameTempSurfIn;            // Frame inside surface temperature (C)
-    Array1D<Real64> SurfWinFrameTempSurfInOld;         // Previous value of frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFrameTempIn;                // Frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFrameTempInOld;             // Previous value of frame inside surface temperature (C)
     Array1D<Real64> SurfWinFrameTempSurfOut;           // Frame outside surface temperature (C)
     Array1D<Real64> SurfWinProjCorrFrOut;              // Correction factor to absorbed radiation due to frame outside projection
     Array1D<Real64> SurfWinProjCorrFrIn;               // Correction factor to absorbed radiation due to frame inside projection
@@ -1468,8 +1563,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinDivEdgeToCenterGlCondRatio; // Ratio of divider edge of glass conductance (without air films) to center of glass
                                                        // conductance (without air films)
     Array1D<Real64> SurfWinDividerEdgeArea;            // Area of glass near dividers (m2)
-    Array1D<Real64> SurfWinDividerTempSurfIn;          // Divider inside surface temperature (C)
-    Array1D<Real64> SurfWinDividerTempSurfInOld;       // Previous value of divider inside surface temperature (C)
+    Array1D<Real64> SurfWinDividerTempIn;              // Divider inside surface temperature (C)
+    Array1D<Real64> SurfWinDividerTempInOld;           // Previous value of divider inside surface temperature (C)
     Array1D<Real64> SurfWinDividerTempSurfOut;         // Divider outside surface temperature (C)
     Array1D<Real64> SurfWinProjCorrDivOut;             // Correction factor to absorbed radiation due to divider outside projection
     Array1D<Real64> SurfWinProjCorrDivIn;              // Correction factor to absorbed radiation due to divider inside projection
@@ -1588,14 +1683,17 @@ struct SurfacesData : BaseGlobalStruct
         this->GroundLevelZ = 0.0;
         this->AirflowWindows = false;
         this->ShadingTransmittanceVaries = false;
+        this->UseRepresentativeSurfaceCalculations = false;
         this->AnyMovableInsulation = false;
-        this->InsideGlassCondensationFlag.deallocate();
-        this->InsideFrameCondensationFlag.deallocate();
-        this->InsideDividerCondensationFlag.deallocate();
-        this->AdjacentZoneToSurface.deallocate();
+        this->AnyMovableSlat = false;
+        this->SurfWinInsideGlassCondensationFlag.deallocate();
+        this->SurfWinInsideFrameCondensationFlag.deallocate();
+        this->SurfWinInsideDividerCondensationFlag.deallocate();
+        this->SurfAdjacentZone.deallocate();
         this->X0.deallocate();
         this->Y0.deallocate();
         this->Z0.deallocate();
+        this->RepresentativeSurfaceMap.clear();
         this->AllHTSurfaceList.clear();
         this->AllIZSurfaceList.clear();
         this->AllHTNonWindowSurfaceList.clear();
@@ -1799,8 +1897,8 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinFrameEmis.deallocate();
         this->SurfWinFrEdgeToCenterGlCondRatio.deallocate();
         this->SurfWinFrameEdgeArea.deallocate();
-        this->SurfWinFrameTempSurfIn.deallocate();
-        this->SurfWinFrameTempSurfInOld.deallocate();
+        this->SurfWinFrameTempIn.deallocate();
+        this->SurfWinFrameTempInOld.deallocate();
         this->SurfWinFrameTempSurfOut.deallocate();
         this->SurfWinProjCorrFrOut.deallocate();
         this->SurfWinProjCorrFrIn.deallocate();
@@ -1812,8 +1910,8 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinDividerEmis.deallocate();
         this->SurfWinDivEdgeToCenterGlCondRatio.deallocate();
         this->SurfWinDividerEdgeArea.deallocate();
-        this->SurfWinDividerTempSurfIn.deallocate();
-        this->SurfWinDividerTempSurfInOld.deallocate();
+        this->SurfWinDividerTempIn.deallocate();
+        this->SurfWinDividerTempInOld.deallocate();
         this->SurfWinDividerTempSurfOut.deallocate();
         this->SurfWinProjCorrDivOut.deallocate();
         this->SurfWinProjCorrDivIn.deallocate();

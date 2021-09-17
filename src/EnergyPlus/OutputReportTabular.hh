@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
@@ -115,6 +116,12 @@ namespace OutputReportTabular {
         JtoGJ,
         InchPound,
         NotFound,
+    };
+
+    enum class endUseSubTableType
+    {
+        bySubCategory,
+        bySpaceType
     };
 
     // These correspond to the columns in the load component table
@@ -228,7 +235,7 @@ namespace OutputReportTabular {
         // the lowest bin and above the value of the last bin are also shown.
         int resIndex; // result index - pointer to BinResults array
         int numTables;
-        int typeOfVar;                          // 0=not found, 1=integer, 2=real, 3=meter
+        OutputProcessor::VariableType typeOfVar;
         OutputProcessor::StoreType avgSum;      // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType stepType; // Variable time step is Zone=1 or HVAC=2
         OutputProcessor::Unit units;            // the units enumeration
@@ -237,7 +244,7 @@ namespace OutputReportTabular {
 
         // Default Constructor
         OutputTableBinnedType()
-            : intervalStart(0.0), intervalSize(0.0), intervalCount(0), resIndex(0), numTables(0), typeOfVar(0),
+            : intervalStart(0.0), intervalSize(0.0), intervalCount(0), resIndex(0), numTables(0), typeOfVar(OutputProcessor::VariableType::NotFound),
               avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone), scheduleIndex(0)
         {
         }
@@ -313,12 +320,12 @@ namespace OutputReportTabular {
     struct MonthlyFieldSetInputType
     {
         // Members
-        std::string variMeter;                     // the name of the variable or meter
-        std::string colHead;                       // the column header to use instead of the variable name (only for predefined)
-        iAggType aggregate;                        // the type of aggregation for the variable (see aggType parameters)
-        OutputProcessor::Unit varUnits;            // Units enumeration
-        std::string variMeterUpper;                // the name of the variable or meter uppercased
-        int typeOfVar;                             // 0=not found, 1=integer, 2=real, 3=meter
+        std::string variMeter;          // the name of the variable or meter
+        std::string colHead;            // the column header to use instead of the variable name (only for predefined)
+        iAggType aggregate;             // the type of aggregation for the variable (see aggType parameters)
+        OutputProcessor::Unit varUnits; // Units enumeration
+        std::string variMeterUpper;     // the name of the variable or meter uppercased
+        OutputProcessor::VariableType typeOfVar;
         int keyCount;                              // noel
         OutputProcessor::StoreType varAvgSum;      // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType varStepType; // Variable time step is Zone=1 or HVAC=2
@@ -327,7 +334,7 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyFieldSetInputType()
-            : aggregate(iAggType::Unassigned), varUnits(OutputProcessor::Unit::None), typeOfVar(0), keyCount(0),
+            : aggregate(iAggType::Unassigned), varUnits(OutputProcessor::Unit::None), typeOfVar(OutputProcessor::VariableType::NotFound), keyCount(0),
               varAvgSum(OutputProcessor::StoreType::Averaged), varStepType(OutputProcessor::TimeStepType::TimeStepZone)
         {
         }
@@ -349,24 +356,25 @@ namespace OutputReportTabular {
     struct MonthlyColumnsType
     {
         // Members
-        std::string varName;                    // name of variable
-        std::string colHead;                    // column header (not used for user defined monthly)
-        int varNum;                             // variable or meter number
-        int typeOfVar;                          // 0=not found, 1=integer, 2=real, 3=meter
-        OutputProcessor::StoreType avgSum;      // Variable  is Averaged=1 or Summed=2
-        OutputProcessor::TimeStepType stepType; // Variable time step is Zone=1 or HVAC=2
-        OutputProcessor::Unit units;            // the units string, may be blank
-        iAggType aggType;                       // index to the type of aggregation (see list of parameters)
-        Array1D<Real64> reslt;                  // monthly results
-        Array1D<Real64> duration;               // the time during which results are summed for use in averages
-        Array1D_int timeStamp;                  // encoded timestamp of max or min
-        Real64 aggForStep;                      // holds the aggregation for the HVAC time steps when smaller than
+        std::string varName;                     // name of variable
+        std::string colHead;                     // column header (not used for user defined monthly)
+        int varNum;                              // variable or meter number
+        OutputProcessor::VariableType typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
+        OutputProcessor::StoreType avgSum;       // Variable  is Averaged=1 or Summed=2
+        OutputProcessor::TimeStepType stepType;  // Variable time step is Zone=1 or HVAC=2
+        OutputProcessor::Unit units;             // the units string, may be blank
+        iAggType aggType;                        // index to the type of aggregation (see list of parameters)
+        Array1D<Real64> reslt;                   // monthly results
+        Array1D<Real64> duration;                // the time during which results are summed for use in averages
+        Array1D_int timeStamp;                   // encoded timestamp of max or min
+        Real64 aggForStep;                       // holds the aggregation for the HVAC time steps when smaller than
         // the zone timestep
 
         // Default Constructor
         MonthlyColumnsType()
-            : varNum(0), typeOfVar(0), avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone),
-              units(OutputProcessor::Unit::None), aggType(iAggType::Unassigned), reslt(12, 0.0), duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
+            : varNum(0), typeOfVar(OutputProcessor::VariableType::NotFound), avgSum(OutputProcessor::StoreType::Averaged),
+              stepType(OutputProcessor::TimeStepType::TimeStepZone), units(OutputProcessor::Unit::None), aggType(iAggType::Unassigned),
+              reslt(12, 0.0), duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
         {
         }
     };
@@ -474,7 +482,7 @@ namespace OutputReportTabular {
 
     // Functions
 
-    std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const &filename, bool output_to_file = true);
+    std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, fs::path const &filePath, bool output_to_file = true);
 
     void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
@@ -589,7 +597,17 @@ namespace OutputReportTabular {
 
     void WriteBEPSTable(EnergyPlusData &state);
 
-    std::string ResourceWarningMessage(std::string resource);
+    void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
+                                            endUseSubTableType tableType,
+                                            Array2D<Real64> &endUseSubOther,
+                                            Array2D<Real64> &collapsedEndUse,
+                                            Array3D<Real64> &collapsedEndUseSub,
+                                            Array1D_bool &needOtherRow,
+                                            const iUnitsStyle unitsStyle_cur,
+                                            const bool produceTabular,
+                                            const bool produceSQLite);
+
+    std::string ResourceWarningMessage(std::string const &resource);
 
     Real64 WaterConversionFunct(Real64 WaterTotal, Real64 ConversionFactor);
 
@@ -600,6 +618,8 @@ namespace OutputReportTabular {
     void WriteCompCostTable(EnergyPlusData &state);
 
     void WriteVeriSumTable(EnergyPlusData &state);
+
+    void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool produceSQLite);
 
     void WriteAdaptiveComfortTable(EnergyPlusData &state);
 
@@ -753,8 +773,8 @@ namespace OutputReportTabular {
 
     void DetermineBuildingFloorArea(EnergyPlusData &state);
 
-    /* Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
-     * This routine will fill up the blanks for output to Sql in particular */
+    // Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
+    // This routine will fill up the blanks for output to Sql in particular
     void FillRowHead(Array1D_string &rowHead);
 
     //======================================================================================================================
@@ -815,13 +835,13 @@ namespace OutputReportTabular {
 
     std::string RealToStr(Real64 const RealIn, int const numDigits);
 
-    Real64 StrToReal(std::string const &stringIn);
+    Real64 StrToReal(std::string_view stringIn);
 
     std::string DateToString(int const codedDate); // word containing encoded month, day, hour, minute
 
     bool isNumber(std::string const &s);
 
-    int digitsAferDecimal(std::string s);
+    int digitsAferDecimal(std::string const &s);
 
     void AddTOCEntry(EnergyPlusData &state, std::string const &nameSection, std::string const &nameReport);
 
@@ -919,6 +939,7 @@ struct OutputReportTabularData : BaseGlobalStruct
     Array1D_int ffSchedIndex = Array1D_int(OutputReportTabular::numResourceTypes, 0);
     Array2D_int meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0);
     Array3D_int meterNumEndUseSubBEPS;
+    Array3D_int meterNumEndUseSpTypeBEPS;
     // arrays that hold the names of the resource and end uses
     Array1D_string resourceTypeNames = Array1D_string(OutputReportTabular::numResourceTypes);
     Array1D_string sourceTypeNames = Array1D_string(OutputReportTabular::numSourceTypes);
@@ -931,7 +952,9 @@ struct OutputReportTabularData : BaseGlobalStruct
     Array2D<Real64> gatherEndUseBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
     Array2D<Real64> gatherEndUseBySourceBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
     Array3D<Real64> gatherEndUseSubBEPS;
+    Array3D<Real64> gatherEndUseSpTypeBEPS;
     Array1D_bool needOtherRowLEED45 = Array1D_bool(DataGlobalConstantsData::iEndUseSize);
+    Array1D_bool needOtherRowEndUse = Array1D_bool(DataGlobalConstantsData::iEndUseSize);
 
     // arrays the hold the demand values
     Array1D<Real64> gatherDemandTotal = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
@@ -1103,7 +1126,7 @@ struct OutputReportTabularData : BaseGlobalStruct
     Real64 BigNum = 0.0;
     bool VarWarning = true;
     int ErrCount1 = 0;
-    Array1D_int MonthlyColumnsTypeOfVar;
+    Array1D<OutputProcessor::VariableType> MonthlyColumnsTypeOfVar;
     Array1D<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
     Array1D<OutputReportTabular::iAggType> MonthlyColumnsAggType;
     Array1D_int MonthlyColumnsVarNum;
@@ -1259,6 +1282,7 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->ffSchedIndex = Array1D_int(OutputReportTabular::numResourceTypes, 0);
         this->meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0);
         this->meterNumEndUseSubBEPS.deallocate();
+        this->meterNumEndUseSpTypeBEPS.deallocate();
         this->resourceTypeNames = Array1D_string(OutputReportTabular::numResourceTypes);
         this->sourceTypeNames = Array1D_string(OutputReportTabular::numSourceTypes);
         this->endUseNames = Array1D_string(DataGlobalConstantsData::iEndUseSize);
@@ -1269,7 +1293,9 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->gatherEndUseBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
         this->gatherEndUseBySourceBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
         this->gatherEndUseSubBEPS.deallocate();
+        this->gatherEndUseSpTypeBEPS.deallocate();
         this->needOtherRowLEED45 = Array1D_bool(DataGlobalConstantsData::iEndUseSize);
+        this->needOtherRowEndUse = Array1D_bool(DataGlobalConstantsData::iEndUseSize);
         this->gatherDemandTotal = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
         this->gatherDemandEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);
         this->gatherDemandIndEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstantsData::iEndUseSize, 0.0);

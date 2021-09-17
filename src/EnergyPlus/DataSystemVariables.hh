@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
@@ -88,11 +89,12 @@ namespace DataSystemVariables {
 
     // Functions
 
-    void CheckForActualFileName(EnergyPlusData &state,
-                                std::string const &originalInputFileName, // name as input for object
-                                bool &FileFound,                          // Set to true if file found and is in CheckedFileName
-                                std::string &foundFileName,               // Blank if not found.
-                                const std::string contextString = std::string());
+    // Helper to try and locate a file in common folders if it's not found directly (such as when passed as a filename only). Looks in current
+    // working folder, programs folder, etc.
+    // Returns an empty path if not found.
+    [[nodiscard]] fs::path CheckForActualFilePath(EnergyPlusData &state,
+                                                  fs::path const &originalInputFilePath, // path (or filename only) as input for object
+                                                  const std::string &contextString = std::string());
 
     void processEnvironmentVariables(EnergyPlusData &state);
 
@@ -143,8 +145,8 @@ struct SystemVarsData : BaseGlobalStruct
     std::string MinReportFrequency; // String for minimum reporting frequency
     bool SortedIDD = true;          // after processing, use sorted IDD to obtain Defs, etc.
     bool lMinimalShadowing = false; // TRUE if MinimalShadowing is to override Solar Distribution flag
-    std::string envinputpath1;
-    std::string envinputpath2;
+    fs::path envinputpath1;
+    fs::path envinputpath2;
     bool TestAllPaths = false;
     int iEnvSetThreads = 0;
     bool lEnvSetThreadsInput = false;

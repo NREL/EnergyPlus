@@ -66,7 +66,7 @@
 namespace EnergyPlus {
 namespace DataPlant {
 
-    static std::string const fluidNameSteam("STEAM");
+    static constexpr std::string_view fluidNameSteam("STEAM");
 
     void HalfLoopData::solve(EnergyPlusData &state, bool const FirstHVACIteration, bool &ReSimOtherSideNeeded)
     {
@@ -659,8 +659,8 @@ namespace DataPlant {
         // Return value
         Real64 LoadToLoopSetPoint = 0.0; // function result
 
-        static std::string const RoutineName("PlantLoopSolver::EvaluateLoopSetPointLoad");
-        static std::string const RoutineNameAlt("PlantSupplySide:EvaluateLoopSetPointLoad");
+        static constexpr std::string_view RoutineName("PlantLoopSolver::EvaluateLoopSetPointLoad");
+        static constexpr std::string_view RoutineNameAlt("PlantSupplySide:EvaluateLoopSetPointLoad");
 
         //~ General variables
         Real64 SumMdotTimesTemp = 0.0;
@@ -1673,8 +1673,6 @@ namespace DataPlant {
 
         //~ Flags
         bool LoadDistributionWasPerformed;
-        bool DummyInit = false;
-        bool const DoNotGetCompSizFac(false);
 
         //~ General variables
         Real64 LoadToLoopSetPoint;
@@ -1698,7 +1696,7 @@ namespace DataPlant {
                 switch (CurOpSchemeType) {
                 case DataPlant::WSEconOpSchemeType: //~ coils
                     this_comp.MyLoad = UpdatedDemandToLoopSetPoint;
-                    branch.Comp(CompCounter).simulate(state, FirstHVACIteration, DummyInit, DoNotGetCompSizFac);
+                    branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     break;
                 case DataPlant::PumpOpSchemeType: //~ pump
                     if (this->BranchPumpsExist) {
@@ -1718,7 +1716,7 @@ namespace DataPlant {
                                                                         FirstHVACIteration,
                                                                         LoopShutDownFlag,
                                                                         LoadDistributionWasPerformed);
-                    branch.Comp(CompCounter).simulate(state, FirstHVACIteration, DummyInit, DoNotGetCompSizFac);
+                    branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     break;
                 case DataPlant::EMSOpSchemeType:
                     if (this->myLoopSideNum == DataPlant::SupplySide) {
@@ -1736,14 +1734,14 @@ namespace DataPlant {
                                                                         FirstHVACIteration,
                                                                         LoopShutDownFlag,
                                                                         LoadDistributionWasPerformed);
-                    branch.Comp(CompCounter).simulate(state, FirstHVACIteration, DummyInit, DoNotGetCompSizFac);
+                    branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     break;
                 default:
                     if ((CurOpSchemeType >= DataPlant::LoadRangeBasedMin) && (CurOpSchemeType <= DataPlant::LoadRangeBasedMax)) { //~ load range based
                         EncounteredLRBObjDuringPass1 = true;
                         goto components_end; // don't do any more components on this branch
                     } else {                 // demand, , etc.
-                        branch.Comp(CompCounter).simulate(state, FirstHVACIteration, DummyInit, DoNotGetCompSizFac);
+                        branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     }
                 }
 
@@ -1789,7 +1787,7 @@ namespace DataPlant {
 
                 switch (CurOpSchemeType) {
                 case DataPlant::NoControlOpSchemeType: //~ pipes, for example
-                    branch.Comp(CompCounter).simulate(state, FirstHVACIteration, DummyInit, DoNotGetCompSizFac);
+                    branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     break;
                 case DataPlant::DemandOpSchemeType:
                 case DataPlant::CompSetPtBasedSchemeType:
@@ -1821,7 +1819,7 @@ namespace DataPlant {
                                                                                 LoopShutDownFlag,
                                                                                 LoadDistributionWasPerformed);
                         }
-                        branch.Comp(CompCounter).simulate(state, FirstHVACIteration, DummyInit, DoNotGetCompSizFac);
+                        branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     }
                 }
 
@@ -1857,7 +1855,7 @@ namespace DataPlant {
 
                 switch (CurOpSchemeType) {
                 case DataPlant::DemandOpSchemeType: //~ coils
-                    branch.Comp(CompCounter).simulate(state, FirstHVACIteration, DummyInit, DoNotGetCompSizFac);
+                    branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     break;
                 case DataPlant::PumpOpSchemeType: //~ pump
                     PumpLocation.loopNum = this->myLoopNum;
@@ -1874,7 +1872,7 @@ namespace DataPlant {
                     if ((CurOpSchemeType >= DataPlant::LoadRangeBasedMin) && (CurOpSchemeType <= DataPlant::LoadRangeBasedMax)) { //~ load range based
                         ShowFatalError(state, "Encountered Load Based Object after other components, invalid.");
                     } else { //~ Typical control equipment
-                        branch.Comp(CompCounter).simulate(state, FirstHVACIteration, DummyInit, DoNotGetCompSizFac);
+                        branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     }
                 }
 
@@ -1925,7 +1923,7 @@ namespace DataPlant {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PlantLoopSolver::UpdateAnyLoopDemandAlterations");
+        static constexpr std::string_view RoutineName("PlantLoopSolver::UpdateAnyLoopDemandAlterations");
 
         // Init to zero, so that if we don't find anything, we exit early
         Real64 ComponentMassFlowRate(0.0);

@@ -87,6 +87,8 @@ void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
     state.files.debug.open_as_stringstream();
     state.files.mtd.open_as_stringstream();
     state.files.edd.open_as_stringstream();
+    state.files.zsz.open_as_stringstream();
+    state.files.ssz.open_as_stringstream();
 }
 
 void EnergyPlusFixture::SetUp()
@@ -102,16 +104,16 @@ void EnergyPlusFixture::SetUp()
     openOutputFiles(*state);
 
     this->err_stream = new std::ostringstream;
-    this->json_stream = new std::ostringstream;
+    // this->json_stream = new std::ostringstream;
 
     state->files.err_stream = std::unique_ptr<std::ostream>(this->err_stream);
-    state->files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
+    // state->files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
 
     m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    m_redirect_cout = std::unique_ptr<RedirectCout>(new RedirectCout(m_cout_buffer));
+    m_redirect_cout = std::make_unique<RedirectCout>(m_cout_buffer);
 
     m_cerr_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    m_redirect_cerr = std::unique_ptr<RedirectCerr>(new RedirectCerr(m_cerr_buffer));
+    m_redirect_cerr = std::make_unique<RedirectCerr>(m_cerr_buffer);
 
     state->dataUtilityRoutines->outputErrorHeader = false;
 
@@ -153,7 +155,7 @@ std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &
     return compare_text.str();
 }
 
-std::vector<std::string> EnergyPlusFixture::read_lines_in_file(std::string const &filePath)
+std::vector<std::string> EnergyPlusFixture::read_lines_in_file(fs::path const &filePath)
 {
     std::ifstream infile(filePath);
     std::vector<std::string> lines;
@@ -164,14 +166,14 @@ std::vector<std::string> EnergyPlusFixture::read_lines_in_file(std::string const
     return lines;
 }
 
-bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, bool reset_stream)
-{
-    auto const stream_str = this->json_stream->str();
-    EXPECT_EQ(expected_string, stream_str);
-    bool are_equal = (expected_string == stream_str);
-    if (reset_stream) this->json_stream->str(std::string());
-    return are_equal;
-}
+// bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, bool reset_stream)
+// {
+//     auto const stream_str = this->json_stream->str();
+//     EXPECT_EQ(expected_string, stream_str);
+//     bool are_equal = (expected_string == stream_str);
+//     if (reset_stream) this->json_stream->str(std::string());
+//     return are_equal;
+// }
 
 bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, bool reset_stream)
 {
@@ -236,12 +238,12 @@ bool EnergyPlusFixture::compare_dfs_stream(std::string const &expected_string, b
     return are_equal;
 }
 
-bool EnergyPlusFixture::has_json_output(bool reset_stream)
-{
-    auto const has_output = this->json_stream->str().size() > 0;
-    if (reset_stream) this->json_stream->str(std::string());
-    return has_output;
-}
+// bool EnergyPlusFixture::has_json_output(bool reset_stream)
+// {
+//     auto const has_output = this->json_stream->str().size() > 0;
+//     if (reset_stream) this->json_stream->str(std::string());
+//     return has_output;
+// }
 
 bool EnergyPlusFixture::has_eso_output(bool reset_stream)
 {
@@ -353,6 +355,10 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
 
     inputProcessor->initializeMaps();
     SimulationManager::PostIPProcessing(*state);
+
+    FluidProperties::GetFluidPropertiesData(*state);
+    state->dataFluidProps->GetInput = false;
+
     // inputProcessor->state->printErrors();
 
     bool successful_processing = success && is_valid && !hasErrors;
@@ -369,15 +375,15 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
 //
 //    std::unique_ptr<std::istream> idd_stream;
 //    if (!idd.empty()) {
-//        idd_stream = std::unique_ptr<std::istringstream>(new std::istringstream(idd));
+//        idd_stream = std::make_unique<std::istringstream>(idd);
 //    } else {
-//        static auto const exeDirectory = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
-//        static auto idd_location = exeDirectory + "Energy+.schema.epJSON";
+//        static auto const exeDirectoryPath = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+//        static auto idd_location = exeDirectoryPath / "Energy+.schema.epJSON";
 //        static auto file_exists = FileSystem::fileExists(idd_location);
 //
 //        if (!file_exists) {
 //            // Energy+.schema.epJSON is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
-//            idd_location = FileSystem::getParentDirectoryPath(exeDirectory) + "Energy+.schema.epJSON";
+//            idd_location = FileSystem::getParentDirectoryPath(exeDirectoryPath) / "Energy+.schema.epJSON";
 //            file_exists = FileSystem::fileExists(idd_location);
 //        }
 //
@@ -388,7 +394,7 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
 //            return errors_found;
 //        }
 //
-//        idd_stream = std::unique_ptr<std::ifstream>(new std::ifstream(idd_location, std::ios_base::in | std::ios_base::binary));
+//        idd_stream = std::make_unique<std::ifstream>(idd_location, std::ios_base::in | std::ios_base::binary);
 //    }
 //
 //    if (!idd_stream->good()) {

@@ -62,7 +62,6 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
-using namespace ObjexxFCL;
 using namespace EnergyPlus;
 using namespace EnergyPlus::ConvectionCoefficients;
 using namespace EnergyPlus::DataSurfaces;
@@ -124,10 +123,11 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataSurface->ExtVentedCavity(NumOfSurf).SurfPtrs(NumOfSurf) = 1;
     // allocate zone variable data
     state->dataHeatBal->Zone.allocate(ZoneNum);
-    state->dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo = ASHRAESimple;
+    state->dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
     // allocate surface temperature variable data
-    state->dataHeatBalSurf->TH.allocate(NumOfSurf, 1, 2);
-    state->dataHeatBalSurf->TH(SurfNum, 1, 1) = 22.0;
+    state->dataHeatBalSurf->SurfOutsideTempHist.allocate(1);
+    state->dataHeatBalSurf->SurfOutsideTempHist(1).allocate(NumOfSurf);
+    state->dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = 22.0;
     // allocate solar incident radiation variable data
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(1);
     state->dataHeatBal->SurfQRadSWOutIncident(1) = 0.0;
@@ -150,16 +150,16 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 const Tilt(0.283);    // Tilt of gap [Degrees]
     Real64 const AspRat(0.9);    // aspect ratio of gap  Height/gap [--]
     Real64 const GapThick(0.05); // Thickness of air space between baffle and underlying heat transfer surface
-    int Roughness(1);            // Roughness index (1-6), see DataHeatBalance parameters
-    Real64 QdotSource(0.0);      // Source/sink term, e.g. electricity exported from solar cell [W]
-    Real64 TsBaffle(20.0);       // Temperature of baffle (both sides) use lagged value on input [C]
-    Real64 TaGap(22.0);          // Temperature of air gap (assumed mixed) use lagged value on input [C]
-    Real64 HcGapRpt;             // gap convection coefficient [W/m2C]
-    Real64 HrGapRpt;             // gap radiation coefficient [W/m2C]
-    Real64 IscRpt;               //
-    Real64 MdotVentRpt;          // gap air mass flow rate [kg/s]
-    Real64 VdotWindRpt;          // gap wind driven air volume flow rate [m3/s]
-    Real64 VdotBouyRpt;          // gap buoyancy driven volume flow rate [m3/s]
+    DataSurfaces::SurfaceRoughness Roughness(DataSurfaces::SurfaceRoughness::VeryRough); // Roughness index (1-6), see DataHeatBalance parameters
+    Real64 QdotSource(0.0); // Source/sink term, e.g. electricity exported from solar cell [W]
+    Real64 TsBaffle(20.0);  // Temperature of baffle (both sides) use lagged value on input [C]
+    Real64 TaGap(22.0);     // Temperature of air gap (assumed mixed) use lagged value on input [C]
+    Real64 HcGapRpt;        // gap convection coefficient [W/m2C]
+    Real64 HrGapRpt;        // gap radiation coefficient [W/m2C]
+    Real64 IscRpt;          //
+    Real64 MdotVentRpt;     // gap air mass flow rate [kg/s]
+    Real64 VdotWindRpt;     // gap wind driven air volume flow rate [m3/s]
+    Real64 VdotBuoyRpt;     // gap buoyancy driven volume flow rate [m3/s]
 
     // call to test fix to resolve crash
     CalcPassiveExteriorBaffleGap(*state,
@@ -182,7 +182,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
                                  IscRpt,
                                  MdotVentRpt,
                                  VdotWindRpt,
-                                 VdotBouyRpt);
+                                 VdotBuoyRpt);
 
     EXPECT_NEAR(21.862, TsBaffle, 0.001);
     EXPECT_NEAR(1.692, HcGapRpt, 0.001);
@@ -197,6 +197,5 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataSurface->ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
     state->dataSurface->ExtVentedCavity.deallocate();
     state->dataHeatBal->Zone.deallocate();
-    state->dataHeatBalSurf->TH.deallocate();
     state->dataHeatBal->SurfQRadSWOutIncident.deallocate();
 }

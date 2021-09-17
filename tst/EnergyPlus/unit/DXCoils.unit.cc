@@ -105,7 +105,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(2).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(2).PerfMode(1).FieldNames.allocate(17);
-    state->dataDXCoils->DXCoil(2).DefrostStrategy = Resistive;
+    state->dataDXCoils->DXCoil(2).DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
     state->dataDXCoils->DXCoil(2).DefrostCapacity = 5000.0;
     state->dataDXCoils->DXCoil(2).Name = "DX Heating coil";
     state->dataDXCoils->DXCoil(1).NumOfSpeeds = 2;
@@ -301,7 +301,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(2).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(2).PerfMode(1).FieldNames.allocate(20);
-    state->dataDXCoils->DXCoil(2).DefrostStrategy = Resistive;
+    state->dataDXCoils->DXCoil(2).DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
     state->dataDXCoils->DXCoil(2).DefrostCapacity = 5000.0;
     state->dataDXCoils->DXCoil(2).Name = "DX Heating coil";
 
@@ -418,7 +418,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(15);
-    Coil.DefrostStrategy = Resistive;
+    Coil.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
     Coil.Name = "DX Heating coil";
     Coil.NumOfSpeeds = 2;
     state->dataLoopNodes->Node.allocate(1);
@@ -449,7 +449,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.MinOATCompressor = -73.27777777777779;
     Coil.CrankcaseHeaterCapacity = 0.0;
     Coil.MaxOATDefrost = 0.0;
-    Coil.DefrostStrategy = Resistive;
+    Coil.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
     Coil.DefrostControl = StandardRatings::HPdefrostControl::Timed;
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
@@ -806,7 +806,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.MinOATCompressor = -73.27777777777779;
     Coil.CrankcaseHeaterCapacity = 0.0;
     Coil.MaxOATDefrost = 0.0;
-    Coil.DefrostStrategy = Resistive;
+    Coil.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
     Coil.DefrostControl = StandardRatings::HPdefrostControl::Timed;
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
@@ -1308,7 +1308,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     GetDXCoils(*state);
 
     EXPECT_EQ("Electricity", state->dataDXCoils->DXCoil(1).FuelType); // it also covers a test for fuel type input
-    EXPECT_EQ(DataGlobalConstants::ResourceType::Electricity, state->dataDXCoils->DXCoil(1).FuelTypeNum);
+    EXPECT_TRUE(compare_enums(DataGlobalConstants::ResourceType::Electricity, state->dataDXCoils->DXCoil(1).FuelTypeNum));
     EXPECT_EQ(0, state->dataDXCoils->DXCoil(1).MSWasteHeat(2));
 
     // Test calculations of the waste heat function #5162
@@ -1790,8 +1790,8 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
     GetDXCoils(*state);
 
     ASSERT_EQ(1, state->dataDXCoils->NumDXCoils);
-    ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostStrategy, ReverseCycle);
-    ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostControl, StandardRatings::HPdefrostControl::Timed);
+    ASSERT_TRUE(compare_enums(state->dataDXCoils->DXCoil(1).DefrostStrategy, StandardRatings::DefrostStrat::ReverseCycle));
+    ASSERT_TRUE(compare_enums(state->dataDXCoils->DXCoil(1).DefrostControl, StandardRatings::HPdefrostControl::Timed));
     ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostEIRFT, 1);
     ASSERT_EQ(state->dataDXCoils->DXCoil(1).MaxOATDefrost, 5.0);
     ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostTime, 0.058333);

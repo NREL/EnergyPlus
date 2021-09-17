@@ -175,7 +175,7 @@ namespace ICEngineElectricGenerator {
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Electric,
                                                     DataLoopNode::NodeConnectionType::Electric,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
 
             state.dataICEngElectGen->ICEngineGenerator(genNum).MinPartLoadRat = NumArray(2);
@@ -248,7 +248,7 @@ namespace ICEngineElectricGenerator {
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecInletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
@@ -263,7 +263,7 @@ namespace ICEngineElectricGenerator {
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecOutletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphArray(9));
@@ -307,15 +307,20 @@ namespace ICEngineElectricGenerator {
 
     void ICEngineGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable(
-            state, "Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Produced AC Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            this->ElecPowerGenerated,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->ElecEnergyGenerated,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             _,
                             "ElectricityProduced",
@@ -323,15 +328,20 @@ namespace ICEngineElectricGenerator {
                             _,
                             "Plant");
 
-        SetupOutputVariable(
-            state, "Generator " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator " + this->FuelType + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->FuelEnergyUseRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator " + this->FuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             _,
                             this->FuelType,
@@ -340,35 +350,61 @@ namespace ICEngineElectricGenerator {
                             "Plant");
 
         //    general fuel use report to match other generators.
-        SetupOutputVariable(
-            state, "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Fuel HHV Basis Rate",
+                            OutputProcessor::Unit::W,
+                            this->FuelEnergyUseRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(state, "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, this->FuelEnergy, "System", "Sum", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Fuel HHV Basis Energy",
+                            OutputProcessor::Unit::J,
+                            this->FuelEnergy,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Generator " + this->FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, this->FuelMdot, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator " + this->FuelType + " Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->FuelMdot,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Generator Exhaust Air Temperature", OutputProcessor::Unit::C, this->ExhaustStackTemp, "System", "Average", this->Name);
+        SetupOutputVariable(state,
+                            "Generator Exhaust Air Temperature",
+                            OutputProcessor::Unit::C,
+                            this->ExhaustStackTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->Name);
 
         if (this->HeatRecActive) {
             SetupOutputVariable(state,
                                 "Generator Heat Recovery Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 this->HeatRecMdotActual,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Jacket Heat Recovery Rate", OutputProcessor::Unit::W, this->QJacketRecovered, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Generator Jacket Heat Recovery Rate",
+                                OutputProcessor::Unit::W,
+                                this->QJacketRecovered,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Jacket Heat Recovery Energy",
                                 OutputProcessor::Unit::J,
                                 this->JacketEnergyRec,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -376,15 +412,20 @@ namespace ICEngineElectricGenerator {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
-                state, "Generator Lube Heat Recovery Rate", OutputProcessor::Unit::W, this->QLubeOilRecovered, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Generator Lube Heat Recovery Rate",
+                                OutputProcessor::Unit::W,
+                                this->QLubeOilRecovered,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Lube Heat Recovery Energy",
                                 OutputProcessor::Unit::J,
                                 this->LubeOilEnergyRec,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -392,15 +433,20 @@ namespace ICEngineElectricGenerator {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
-                state, "Generator Exhaust Heat Recovery Rate", OutputProcessor::Unit::W, this->QExhaustRecovered, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Generator Exhaust Heat Recovery Rate",
+                                OutputProcessor::Unit::W,
+                                this->QExhaustRecovered,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Exhaust Heat Recovery Energy",
                                 OutputProcessor::Unit::J,
                                 this->ExhaustEnergyRec,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -408,26 +454,36 @@ namespace ICEngineElectricGenerator {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable(
-                state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->QTotalHeatRecovered, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Generator Produced Thermal Rate",
+                                OutputProcessor::Unit::W,
+                                this->QTotalHeatRecovered,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->Name);
 
-            SetupOutputVariable(
-                state, "Generator Produced Thermal Energy", OutputProcessor::Unit::J, this->TotalHeatEnergyRec, "System", "Sum", this->Name);
+            SetupOutputVariable(state,
+                                "Generator Produced Thermal Energy",
+                                OutputProcessor::Unit::J,
+                                this->TotalHeatEnergyRec,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Heat Recovery Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 this->HeatRecInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Heat Recovery Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 this->HeatRecOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 this->Name);
         }
     }
@@ -477,9 +533,8 @@ namespace ICEngineElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // curve fit of performance data:
 
-        Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat (J/kg-K)
-        Real64 const KJtoJ(1000.0);    // convert Kjoules to joules
-        static std::string const RoutineName("CalcICEngineGeneratorModel");
+        constexpr Real64 ExhaustCP(1.047); // Exhaust Gas Specific Heat (J/kg-K)
+        constexpr Real64 KJtoJ(1000.0);    // convert Kjoules to joules
 
         // Heat Recovery Fluid Mass FlowRate (kg/s)
         Real64 HeatRecMdot;
@@ -694,7 +749,7 @@ namespace ICEngineElectricGenerator {
         // The chiller sets the flow on the loop first by the input design flow rate and then
         // performs a check to verify that
 
-        static std::string const RoutineName("CalcICEngineGeneratorModel");
+        static constexpr std::string_view RoutineName("CalcICEngineGeneratorModel");
 
         // Need to set the HeatRecRatio to 1.0 if it is not modified
         HRecRatio = 1.0;
@@ -760,61 +815,7 @@ namespace ICEngineElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        static std::string const RoutineName("InitICEngineGenerators");
-
-        bool errFlag;
-
-        if (this->myFlag) {
-            this->setupOutputVars(state);
-            this->myFlag = false;
-        }
-
-        if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
-            errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::TypeOf_Generator_ICEngine,
-                                                    this->HRLoopNum,
-                                                    this->HRLoopSideNum,
-                                                    this->HRBranchNum,
-                                                    this->HRCompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
-            if (errFlag) {
-                ShowFatalError(state, "InitICEngineGenerators: Program terminated due to previous condition(s).");
-            }
-
-            this->MyPlantScanFlag = false;
-        }
-
-        if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
-
-            // size mass flow rate
-            Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
-                                                           RoutineName);
-
-            this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
-            this->HeatRecMdotDesign = this->DesignHeatRecMassFlowRate;
-
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->DesignHeatRecMassFlowRate,
-                                               this->HeatRecInletNodeNum,
-                                               this->HeatRecOutletNodeNum,
-                                               this->HRLoopNum,
-                                               this->HRLoopSideNum,
-                                               this->HRBranchNum,
-                                               this->HRCompNum);
-
-            this->MySizeAndNodeInitFlag = false;
-        } // end one time inits
+        this->oneTimeInit(state); // end one time inits
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && this->HeatRecActive) {
@@ -876,6 +877,64 @@ namespace ICEngineElectricGenerator {
         if (this->HeatRecActive) {
             int HeatRecOutletNode = this->HeatRecOutletNodeNum;
             state.dataLoopNodes->Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
+        }
+    }
+    void ICEngineGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
+    {
+        static constexpr std::string_view RoutineName("InitICEngineGenerators");
+
+        bool errFlag;
+
+        if (this->myFlag) {
+            this->setupOutputVars(state);
+            this->myFlag = false;
+        }
+
+        if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
+            errFlag = false;
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    DataPlant::TypeOf_Generator_ICEngine,
+                                                    this->HRLoopNum,
+                                                    this->HRLoopSideNum,
+                                                    this->HRBranchNum,
+                                                    this->HRCompNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _);
+            if (errFlag) {
+                ShowFatalError(state, "InitICEngineGenerators: Program terminated due to previous condition(s).");
+            }
+
+            this->MyPlantScanFlag = false;
+        }
+
+        if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
+
+            // size mass flow rate
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                           DataGlobalConstants::InitConvTemp,
+                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
+                                                           RoutineName);
+
+            this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
+            this->HeatRecMdotDesign = this->DesignHeatRecMassFlowRate;
+
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
+                                               this->DesignHeatRecMassFlowRate,
+                                               this->HeatRecInletNodeNum,
+                                               this->HeatRecOutletNodeNum,
+                                               this->HRLoopNum,
+                                               this->HRLoopSideNum,
+                                               this->HRBranchNum,
+                                               this->HRCompNum);
+
+            this->MySizeAndNodeInitFlag = false;
         }
     }
 

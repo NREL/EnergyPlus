@@ -16,10 +16,6 @@ An optional text string that is compared to the names of the objects referenced 
 
 Optional schedule name. If left blank, aggregation is performed for all hours simulated. If a schedule is specified, aggregation is performed for non-zero hours in the schedule.
 
-\paragraph{Field Set: Variable and Aggregation Type}\label{field-set-variable-and-aggregation-type}
-
-The Variable Name field and the Aggregation Type field may be repeated for each column desired in the report. These two fields define each column of the report. The IDD object has been set up to allow up to 25 columns. This object is extensible, so the number of columns may be increased by editing the IDD file and adding the desired number of fields at the end of the object.
-
 \paragraph{Field: Variable or Meter \textless{}\#\textgreater{} Name}\label{field-variable-or-meter-name}
 
 The remainder of this input object consists of pairs of fields that can be repeatedVariable Or Meter Name fields contain the name of a variable (see \hyperref[outputvariable]{Output:Variable} and eplusout.rdd), meter (see \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} and eplusout.mdd), or schedule. This value is shown using the aggregation method specified. If the selected name is used for both a variable or a meter and a schedule name, the variable or meter will be used.
@@ -70,7 +66,7 @@ The advanced aggregation types are described below. These aggregation types rely
 
 The Digits After Decimal field is a numeric value that indicates how many digits after the decimal point should be shown for that column.
 
-An example of this object follows.
+The VariableOrMeterName, AggregationType, and DigitsAfterDecimal fields may be repeated for each column desired in the annual report. These three fields define each column of the report.  These fields are extensible, so additional groups of these fields can be added to the end of this object.  An example of this object follows.
 
 \begin{lstlisting}
 

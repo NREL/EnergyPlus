@@ -68,7 +68,18 @@ namespace DataPlant {
         return false;
     }
 
-    void CompData::simulate(EnergyPlusData &state, bool const FirstHVACIteration, bool &InitLoopEquip, bool const GetCompSizFac)
+    void CompData::initLoopEquip(EnergyPlusData &state, bool const GetCompSizFac)
+    {
+        this->compPtr->onInitLoopEquip(state, this->location);
+        this->compPtr->getDesignCapacities(state, this->location, this->MaxLoad, this->MinLoad, this->OptLoad);
+        this->compPtr->getDesignTemperatures(this->TempDesCondIn, this->TempDesEvapOut);
+
+        if (GetCompSizFac) {
+            this->compPtr->getSizingFactor(this->SizFac);
+        }
+    }
+
+    void CompData::simulate(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -114,17 +125,16 @@ namespace DataPlant {
         // If you add a module or new equipment type, you must set up this structure.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        if (InitLoopEquip) {
 
-            this->compPtr->onInitLoopEquip(state, this->location);
-            this->compPtr->getDesignCapacities(state, this->location, this->MaxLoad, this->MinLoad, this->OptLoad);
-            this->compPtr->getDesignTemperatures(this->TempDesCondIn, this->TempDesEvapOut);
-
-            if (GetCompSizFac) {
-                this->compPtr->getSizingFactor(this->SizFac);
-            }
-        }
         this->compPtr->simulate(state, this->location, FirstHVACIteration, this->MyLoad, this->ON);
+    }
+
+    void CompData::oneTimeInit(EnergyPlusData &state) const
+    {
+        if (this->compPtr->oneTimeInitFlag) {
+            this->compPtr->oneTimeInit_new(state);
+            this->compPtr->oneTimeInitFlag = false;
+        }
     }
 
 } // namespace DataPlant

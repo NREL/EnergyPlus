@@ -532,7 +532,24 @@ namespace TarcogShading {
         Real64 con;
         Real64 visc;
 
-        GASSES90(state, Tav, iprop, frct, press, nmix, xwght, xgcon, xgvis, xgcp, con, visc, dens, cp, pr, 1, nperr, ErrorMessage);
+        GASSES90(state,
+                 Tav,
+                 iprop,
+                 frct,
+                 press,
+                 nmix,
+                 xwght,
+                 xgcon,
+                 xgvis,
+                 xgcp,
+                 con,
+                 visc,
+                 dens,
+                 cp,
+                 pr,
+                 TARCOGGassesParams::Stdrd::ISO15099,
+                 nperr,
+                 ErrorMessage);
 
         H0 = (dens * cp * s * forcedspeed) / (4.0 * hc + 8.0 * forcedspeed);
 
@@ -689,7 +706,24 @@ namespace TarcogShading {
         P1 = 0.0;
         P2 = 0.0;
 
-        GASSES90(state, T0, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con0, visc0, dens0, cp0, pr0, 1, nperr, ErrorMessage);
+        GASSES90(state,
+                 T0,
+                 iprop1,
+                 frct1,
+                 press1,
+                 nmix1,
+                 xwght,
+                 xgcon,
+                 xgvis,
+                 xgcp,
+                 con0,
+                 visc0,
+                 dens0,
+                 cp0,
+                 pr0,
+                 TARCOGGassesParams::Stdrd::ISO15099,
+                 nperr,
+                 ErrorMessage);
 
         // exit on error:
         if ((nperr > 0) && (nperr < 1000)) return;
@@ -716,8 +750,42 @@ namespace TarcogShading {
         Real64 const cos_Tilt = std::cos(tilt);
         while (!converged) {
             ++iter;
-            GASSES90(state, Tgap1, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con1, visc1, dens1, cp1, pr1, 1, nperr, ErrorMessage);
-            GASSES90(state, Tgap2, iprop2, frct2, press2, nmix2, xwght, xgcon, xgvis, xgcp, con2, visc2, dens2, cp2, pr2, 1, nperr, ErrorMessage);
+            GASSES90(state,
+                     Tgap1,
+                     iprop1,
+                     frct1,
+                     press1,
+                     nmix1,
+                     xwght,
+                     xgcon,
+                     xgvis,
+                     xgcp,
+                     con1,
+                     visc1,
+                     dens1,
+                     cp1,
+                     pr1,
+                     TARCOGGassesParams::Stdrd::ISO15099,
+                     nperr,
+                     ErrorMessage);
+            GASSES90(state,
+                     Tgap2,
+                     iprop2,
+                     frct2,
+                     press2,
+                     nmix2,
+                     xwght,
+                     xgcon,
+                     xgvis,
+                     xgcp,
+                     con2,
+                     visc2,
+                     dens2,
+                     cp2,
+                     pr2,
+                     TARCOGGassesParams::Stdrd::ISO15099,
+                     nperr,
+                     ErrorMessage);
 
             //  A = dens0 * T0 * GravityConstant * ABS(cos(tilt)) * ABS(Tgap1 - Tgap2) / (Tgap1 * Tgap2)
 
@@ -954,7 +1022,24 @@ namespace TarcogShading {
         tilt = DataGlobalConstants::Pi / 180.0 * (angle - 90.0);
         T0 = 0.0 + DataGlobalConstants::KelvinConv;
 
-        GASSES90(state, T0, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con0, visc0, dens0, cp0, pr0, 1, nperr, ErrorMessage);
+        GASSES90(state,
+                 T0,
+                 iprop1,
+                 frct1,
+                 press1,
+                 nmix1,
+                 xwght,
+                 xgcon,
+                 xgvis,
+                 xgcp,
+                 con0,
+                 visc0,
+                 dens0,
+                 cp0,
+                 pr0,
+                 TARCOGGassesParams::Stdrd::ISO15099,
+                 nperr,
+                 ErrorMessage);
         // call gasses90(Tenv, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con1, visc1, dens1, cp1, pr1, 1, &
         //                nperr, ErrorMessage)
 
@@ -985,7 +1070,24 @@ namespace TarcogShading {
 
         while (!converged) {
             ++iter;
-            GASSES90(state, Tgap, iprop2, frct2, press2, nmix2, xwght, xgcon, xgvis, xgcp, con2, visc2, dens2, cp2, pr2, 1, nperr, ErrorMessage);
+            GASSES90(state,
+                     Tgap,
+                     iprop2,
+                     frct2,
+                     press2,
+                     nmix2,
+                     xwght,
+                     xgcon,
+                     xgvis,
+                     xgcp,
+                     con2,
+                     visc2,
+                     dens2,
+                     cp2,
+                     pr2,
+                     TARCOGGassesParams::Stdrd::ISO15099,
+                     nperr,
+                     ErrorMessage);
 
             if ((nperr > 0) && (nperr < 1000)) return;
 

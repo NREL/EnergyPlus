@@ -70,7 +70,7 @@ public:
     }
 
     virtual void simulate(EnergyPlusData &state,
-                          std::string const &Name,
+                          std::string_view Name,
                           bool const firstHVACIteration,
                           int const &AirLoopNum,
                           int &CompIndex,
@@ -84,8 +84,8 @@ public:
                           ) = 0;
 
     virtual void sizeSystem(EnergyPlusData &state, bool const FirstHVACIteration, int const AirLoopNum) = 0;
-    virtual int getAirInNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) = 0;
-    virtual int getAirOutNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) = 0;
+    virtual int getAirInNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) = 0;
+    virtual int getAirOutNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) = 0;
 };
 
 } // namespace EnergyPlus

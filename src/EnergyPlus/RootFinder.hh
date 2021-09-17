@@ -64,7 +64,7 @@ using DataRootFinder::RootFinderDataType;
 
 void SetupRootFinder(EnergyPlusData &state,
                      RootFinderDataType &RootFinderData, // Data used by root finding algorithm
-                     int SlopeType,                      // Either iSlopeIncreasing or iSlopeDecreasing
+                     DataRootFinder::Slope SlopeType,    // Either iSlopeIncreasing or iSlopeDecreasing
                      DataRootFinder::iMethod MethodType, // Any of the iMethod<name> code but iMethodNone
                      Real64 TolX,                        // Relative tolerance for X variables
                      Real64 ATolX,                       // Absolute tolerance for X variables

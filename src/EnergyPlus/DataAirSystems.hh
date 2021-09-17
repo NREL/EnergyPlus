@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
 
@@ -90,18 +91,18 @@ namespace DataAirSystems {
     struct AirLoopCompData // data for an individual component
     {
         // Members
-        std::string TypeOf;          // The 'keyWord' identifying  component type
-        std::string Name;            // Component name
-        int CompType_Num;            // Numeric designator for CompType (TypeOf)
-        int CompIndex;               // Component Index in whatever is using this component
-        HVACSystemData *compPointer; // pointer to HVAC system
-        int FlowCtrl;                // Component flow control (ACTIVE/PASSIVE)
-        bool ON;                     // When true, the designated component or operation scheme is available
-        bool Parent;                 // When true, the designated component is made up of sub-components
-        std::string NodeNameIn;      // Component inlet node name
-        std::string NodeNameOut;     // Component outlet node name
-        int NodeNumIn;               // Component inlet node number
-        int NodeNumOut;              // Component outlet node number
+        std::string TypeOf;                        // The 'keyWord' identifying  component type
+        std::string Name;                          // Component name
+        SimAirServingZones::CompType CompType_Num; // Numeric designator for CompType (TypeOf)
+        int CompIndex;                             // Component Index in whatever is using this component
+        HVACSystemData *compPointer = nullptr;     // pointer to HVAC system
+        int FlowCtrl;                              // Component flow control (ACTIVE/PASSIVE)
+        bool ON;                                   // When true, the designated component or operation scheme is available
+        bool Parent;                               // When true, the designated component is made up of sub-components
+        std::string NodeNameIn;                    // Component inlet node name
+        std::string NodeNameOut;                   // Component outlet node name
+        int NodeNumIn;                             // Component inlet node number
+        int NodeNumOut;                            // Component outlet node number
         bool MeteredVarsFound;
         int NumMeteredVars;
         int NumSubComps;
@@ -126,10 +127,10 @@ namespace DataAirSystems {
 
         // Default Constructor
         AirLoopCompData()
-            : CompType_Num(0), CompIndex(0), FlowCtrl(0), ON(true), Parent(false), NodeNumIn(0), NodeNumOut(0), MeteredVarsFound(false),
-              NumMeteredVars(0), NumSubComps(0), EnergyTransComp(0), Capacity(0.0), OpMode(0), TotPlantSupplyElec(0.0), PlantSupplyElecEff(0.0),
-              PeakPlantSupplyElecEff(0.0), TotPlantSupplyGas(0.0), PlantSupplyGasEff(0.0), PeakPlantSupplyGasEff(0.0), TotPlantSupplyPurch(0.0),
-              PlantSupplyPurchEff(0.0), PeakPlantSupplyPurchEff(0.0), TotPlantSupplyOther(0.0), PlantSupplyOtherEff(0.0),
+            : CompType_Num(SimAirServingZones::CompType::Unassigned), CompIndex(0), FlowCtrl(0), ON(true), Parent(false), NodeNumIn(0), NodeNumOut(0),
+              MeteredVarsFound(false), NumMeteredVars(0), NumSubComps(0), EnergyTransComp(0), Capacity(0.0), OpMode(0), TotPlantSupplyElec(0.0),
+              PlantSupplyElecEff(0.0), PeakPlantSupplyElecEff(0.0), TotPlantSupplyGas(0.0), PlantSupplyGasEff(0.0), PeakPlantSupplyGasEff(0.0),
+              TotPlantSupplyPurch(0.0), PlantSupplyPurchEff(0.0), PeakPlantSupplyPurchEff(0.0), TotPlantSupplyOther(0.0), PlantSupplyOtherEff(0.0),
               PeakPlantSupplyOtherEff(0.0), AirSysToPlantPtr(0)
         {
         }

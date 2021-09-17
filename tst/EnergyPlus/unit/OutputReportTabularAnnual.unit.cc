@@ -62,7 +62,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::OutputReportTabularAnnual;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GetInput)
 {
@@ -134,8 +133,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -145,8 +144,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         _,
                         "Electricity",
@@ -156,16 +155,34 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         _,
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite1");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite2");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite3");
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -208,8 +225,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -219,8 +236,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         _,
                         "Electricity",
@@ -230,16 +247,34 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         _,
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite1");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite2");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite3");
 
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 0.25;
@@ -336,8 +371,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
                         "Misc Facility Electric Energy",
                         OutputProcessor::Unit::J,
                         facilUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -394,8 +429,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
                         "Misc Facility Electric Energy",
                         OutputProcessor::Unit::J,
                         facilUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",

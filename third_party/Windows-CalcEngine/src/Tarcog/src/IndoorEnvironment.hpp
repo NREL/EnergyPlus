@@ -3,37 +3,42 @@
 
 #include "Environment.hpp"
 
-namespace Tarcog {
+namespace Tarcog
+{
+    namespace ISO15099
+    {
+        class CIndoorEnvironment : public CEnvironment
+        {
+        public:
+            CIndoorEnvironment(double t_AirTemperature, double t_Pressure = 101325);
+            CIndoorEnvironment(const CIndoorEnvironment & t_Indoor);
+            CIndoorEnvironment & operator=(const CIndoorEnvironment & t_Environment);
 
-	class CIndoorEnvironment : public CEnvironment {
-	public:
-		CIndoorEnvironment( double const t_AirTemperature, double const t_Pressure );
-		CIndoorEnvironment( CIndoorEnvironment const& t_Indoor );
-		CIndoorEnvironment & operator=( CIndoorEnvironment const & t_Environment );
+            void connectToIGULayer(const std::shared_ptr<CBaseLayer> & t_IGULayer) override;
 
-		void connectToIGULayer( std::shared_ptr< CBaseLayer > const& t_IGULayer ) override;
+            void setRoomRadiationTemperature(double t_RadiationTemperature);
 
-		void setRoomRadiationTemperature( double const t_RadiationTemperature );
+            std::shared_ptr<CBaseLayer> clone() const override;
+            std::shared_ptr<CEnvironment> cloneEnvironment() const override;
 
-		std::shared_ptr< CBaseLayer > clone() const override;
-		std::shared_ptr< CEnvironment > cloneEnvironment() const override;
+        private:
+            double getGasTemperature() override;
+            double calculateIRFromVariables() override;
+            void calculateConvectionOrConductionFlow() override;
 
-	private:
-		double getGasTemperature() override;
-		double calculateIRFromVariables() override;
-		void calculateConvectionOrConductionFlow() override;
+            void calculateHc();
+            double getHr() override;
 
-		void calculateHc();
-		double getHr() override;
+            void setIRFromEnvironment(double t_IR) override;
+            double getIRFromEnvironment() const override;
 
-		void setIRFromEnvironment( double const t_IR ) override;
-		double getIRFromEnvironment() const override;
+            double getRadiationTemperature() const override;
 
-		double getRadiationTemperature() const override;
+            double m_RoomRadiationTemperature;
+        };
 
-		double m_RoomRadiationTemperature;
-	};
+    }   // namespace ISO15099
 
-}
+}   // namespace Tarcog
 
 #endif

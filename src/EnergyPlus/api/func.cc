@@ -67,6 +67,10 @@ const char *apiVersionFromEPlus(EnergyPlusState)
 {
     return EnergyPlus::DataStringGlobals::PythonAPIVersion.c_str();
 }
+const char *energyPlusVersion()
+{
+    return EnergyPlus::DataStringGlobals::VerString.c_str();
+}
 
 void registerErrorCallback(EnergyPlusState state, std::function<void(EnergyPlus::Error, const std::string &)> f)
 {

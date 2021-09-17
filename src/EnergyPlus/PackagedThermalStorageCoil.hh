@@ -57,8 +57,9 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
+#include <EnergyPlus/HVACUnitaryBypassVAV.hh>
 
 namespace EnergyPlus {
 
@@ -277,28 +278,28 @@ namespace PackagedThermalStorageCoil {
         int DischargeOnlySHRFFLowCurve; // curve index for
         int DischargeOnlySHRFFLowObjectNum;
         // other inputs
-        Real64 AncillaryControlsPower;       // standby and controls electric power, draws when available [W]
-        Real64 ColdWeatherMinimumTempLimit;  // temperature limit for cold weather operation mode [C]
-        Real64 ColdWeatherAncillaryPower;    // electrical power draw during cold weather [W]
-        int CondAirInletNodeNum;             // Condenser air inlet node num pointer
-        int CondAirOutletNodeNum;            // condenser air outlet node num pointer
-        int CondenserType;                   // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
-        Real64 CondenserAirVolumeFlow;       // design air flow rate thru condenser [m3/s]
-        Real64 CondenserAirFlowSizingFactor; // scale condenser air flow relative to evap air flow when autosizing
-        Real64 CondenserAirMassFlow;         // design air flow rate thru condenser [kg/s]
-        Real64 EvapCondEffect;               // effectiveness of the evaporatively cooled condenser
-        Real64 CondInletTemp;                // air temperature drybulb entering condenser section after evap cooling [C]
-        Real64 EvapCondPumpElecNomPower;     // Nominal power input to the evap condenser water circulation pump [W]
-        Real64 EvapCondPumpElecEnergy;       // Electric energy used by condenser water circulation pump [J]
-        Real64 BasinHeaterPowerFTempDiff;    // Basin heater power for evaporatively cooled condensers [W/K]
-        int BasinHeaterAvailSchedNum;        // basin heater availability schedule pointer num
-        Real64 BasinHeaterSetpointTemp;      // evap water basin temperature setpoint [C]
-        iWaterSupply EvapWaterSupplyMode;    // where does evap water come from
-        std::string EvapWaterSupplyName;     // name of water source e.g. water storage tank
-        int EvapWaterSupTankID;              // supply tank index, if any
-        int EvapWaterTankDemandARRID;        // evap water demand array index
-        iWaterSys CondensateCollectMode;     // where does condensate  water go to
-        std::string CondensateCollectName;   // name of water source e.g. water storage tank
+        Real64 AncillaryControlsPower;                      // standby and controls electric power, draws when available [W]
+        Real64 ColdWeatherMinimumTempLimit;                 // temperature limit for cold weather operation mode [C]
+        Real64 ColdWeatherAncillaryPower;                   // electrical power draw during cold weather [W]
+        int CondAirInletNodeNum;                            // Condenser air inlet node num pointer
+        int CondAirOutletNodeNum;                           // condenser air outlet node num pointer
+        DataHeatBalance::RefrigCondenserType CondenserType; // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
+        Real64 CondenserAirVolumeFlow;                      // design air flow rate thru condenser [m3/s]
+        Real64 CondenserAirFlowSizingFactor;                // scale condenser air flow relative to evap air flow when autosizing
+        Real64 CondenserAirMassFlow;                        // design air flow rate thru condenser [kg/s]
+        Real64 EvapCondEffect;                              // effectiveness of the evaporatively cooled condenser
+        Real64 CondInletTemp;                               // air temperature drybulb entering condenser section after evap cooling [C]
+        Real64 EvapCondPumpElecNomPower;                    // Nominal power input to the evap condenser water circulation pump [W]
+        Real64 EvapCondPumpElecEnergy;                      // Electric energy used by condenser water circulation pump [J]
+        Real64 BasinHeaterPowerFTempDiff;                   // Basin heater power for evaporatively cooled condensers [W/K]
+        int BasinHeaterAvailSchedNum;                       // basin heater availability schedule pointer num
+        Real64 BasinHeaterSetpointTemp;                     // evap water basin temperature setpoint [C]
+        iWaterSupply EvapWaterSupplyMode;                   // where does evap water come from
+        std::string EvapWaterSupplyName;                    // name of water source e.g. water storage tank
+        int EvapWaterSupTankID;                             // supply tank index, if any
+        int EvapWaterTankDemandARRID;                       // evap water demand array index
+        iWaterSys CondensateCollectMode;                    // where does condensate  water go to
+        std::string CondensateCollectName;                  // name of water source e.g. water storage tank
         int CondensateTankID;
         int CondensateTankSupplyARRID;
         // TES tank
@@ -398,9 +399,9 @@ namespace PackagedThermalStorageCoil {
               DischargeOnlyEIRFFlowCurve(0), DischargeOnlyEIRFFlowObjectNum(0), DischargeOnlyPLFFPLRCurve(0), DischargeOnlyPLFFPLRObjectNum(0),
               DischargeOnlySHRFTempCurve(0), DischargeOnlySHRFTempObjectNum(0), DischargeOnlySHRFFLowCurve(0), DischargeOnlySHRFFLowObjectNum(0),
               AncillaryControlsPower(0.0), ColdWeatherMinimumTempLimit(0.0), ColdWeatherAncillaryPower(0.0), CondAirInletNodeNum(0),
-              CondAirOutletNodeNum(0), CondenserType(AirCooled), CondenserAirVolumeFlow(0.0), CondenserAirFlowSizingFactor(0.0),
-              CondenserAirMassFlow(0.0), EvapCondEffect(0.0), CondInletTemp(0.0), EvapCondPumpElecNomPower(0.0), EvapCondPumpElecEnergy(0.0),
-              BasinHeaterPowerFTempDiff(0.0), BasinHeaterAvailSchedNum(0), BasinHeaterSetpointTemp(0.0),
+              CondAirOutletNodeNum(0), CondenserType(DataHeatBalance::RefrigCondenserType::Air), CondenserAirVolumeFlow(0.0),
+              CondenserAirFlowSizingFactor(0.0), CondenserAirMassFlow(0.0), EvapCondEffect(0.0), CondInletTemp(0.0), EvapCondPumpElecNomPower(0.0),
+              EvapCondPumpElecEnergy(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterAvailSchedNum(0), BasinHeaterSetpointTemp(0.0),
               EvapWaterSupplyMode(iWaterSupply::WaterSupplyFromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
               CondensateCollectMode(iWaterSys::CondensateDiscarded), CondensateTankID(0), CondensateTankSupplyARRID(0),
               StorageMedia(iMedia::Unassigned), StorageFluidIndex(0), FluidStorageVolume(0.0), IceStorageCapacity(0.0),
@@ -419,7 +420,7 @@ namespace PackagedThermalStorageCoil {
     };
 
     void SimTESCoil(EnergyPlusData &state,
-                    std::string const &CompName, // name of the fan coil unit
+                    std::string_view CompName, // name of the fan coil unit
                     int &CompIndex,
                     int const FanOpMode, // allows parent object to control fan mode
                     int &TESOpMode,
@@ -459,7 +460,7 @@ namespace PackagedThermalStorageCoil {
                                       Real64 const DesiredOutletHumRat,
                                       Real64 &PartLoadFrac,
                                       int &TESOpMode,
-                                      HVACDXSystem::DehumidControl &ControlType,
+                                      HVACUnitaryBypassVAV::DehumidControl &ControlType,
                                       int &SensPLRIter,
                                       int &SensPLRIterIndex,
                                       int &SensPLRFail,

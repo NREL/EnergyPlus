@@ -398,6 +398,8 @@ namespace WaterThermalTanks {
                                  Real64 &MaxLoad,
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct WaterThermalTankData : PlantComponent
@@ -794,6 +796,8 @@ namespace WaterThermalTanks {
                                  Real64 &MaxLoad,
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct WaterHeaterDesuperheaterData
@@ -881,7 +885,7 @@ namespace WaterThermalTanks {
     void SimulateWaterHeaterStandAlone(EnergyPlusData &state, int WaterHeaterNum, bool FirstHVACIteration);
 
     void SimHeatPumpWaterHeater(EnergyPlusData &state,
-                                std::string const &CompName,
+                                std::string_view CompName,
                                 bool FirstHVACIteration,
                                 Real64 &SensLoadMet, // sensible load met by this equipment and sent to zone, W
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
@@ -903,9 +907,9 @@ namespace WaterThermalTanks {
 
     void CalcWaterThermalTankZoneGains(EnergyPlusData &state);
 
-    int getTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
+    int getTankIDX(EnergyPlusData &state, std::string_view CompName, int &CompIndex);
 
-    int getHPTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
+    int getHPTankIDX(EnergyPlusData &state, std::string_view CompName, int &CompIndex);
 
     bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumber);
 

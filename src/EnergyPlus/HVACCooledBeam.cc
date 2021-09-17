@@ -111,7 +111,7 @@ namespace HVACCooledBeam {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     void SimCoolBeam(EnergyPlusData &state,
-                     std::string const &CompName,   // name of the cooled beam unit
+                     std::string_view CompName,     // name of the cooled beam unit
                      bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                      int const ZoneNum,             // index of zone served by the unit
                      int const ZoneNodeNum,         // zone node number of zone served by the unit
@@ -143,7 +143,7 @@ namespace HVACCooledBeam {
         if (CompIndex == 0) {
             CBNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACCooledBeam->CoolBeam);
             if (CBNum == 0) {
-                ShowFatalError(state, "SimCoolBeam: Cool Beam Unit not found=" + CompName);
+                ShowFatalError(state, "SimCoolBeam: Cool Beam Unit not found=" + std::string{CompName});
             }
             CompIndex = CBNum;
         } else {
@@ -167,7 +167,7 @@ namespace HVACCooledBeam {
             }
         }
         if (CBNum == 0) {
-            ShowFatalError(state, "Cool Beam Unit not found = " + CompName);
+            ShowFatalError(state, "Cool Beam Unit not found = " + std::string{CompName});
         }
 
         state.dataSize->CurTermUnitSizingNum =
@@ -208,7 +208,7 @@ namespace HVACCooledBeam {
         using WaterCoils::GetCoilWaterInletNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetCoolBeams "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetCoolBeams "); // include trailing blank space
 
         int CBIndex;                     // loop index
         int CBNum;                       // current fan coil number
@@ -291,8 +291,8 @@ namespace HVACCooledBeam {
                 CoolBeam(CBNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (CoolBeam(CBNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
             }
@@ -303,7 +303,7 @@ namespace HVACCooledBeam {
                                                           Alphas(1),
                                                           DataLoopNode::NodeFluidType::Air,
                                                           DataLoopNode::NodeConnectionType::Inlet,
-                                                          1,
+                                                          NodeInputManager::compFluidStream::Primary,
                                                           ObjectIsNotParent,
                                                           cAlphaFields(4));
             CoolBeam(CBNum).AirOutNode = GetOnlySingleNode(state,
@@ -313,7 +313,7 @@ namespace HVACCooledBeam {
                                                            Alphas(1),
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                           1,
+                                                           NodeInputManager::compFluidStream::Primary,
                                                            ObjectIsNotParent,
                                                            cAlphaFields(5));
             CoolBeam(CBNum).CWInNode = GetOnlySingleNode(state,
@@ -323,7 +323,7 @@ namespace HVACCooledBeam {
                                                          Alphas(1),
                                                          DataLoopNode::NodeFluidType::Water,
                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                         2,
+                                                         NodeInputManager::compFluidStream::Secondary,
                                                          ObjectIsNotParent,
                                                          cAlphaFields(6));
             CoolBeam(CBNum).CWOutNode = GetOnlySingleNode(state,
@@ -333,7 +333,7 @@ namespace HVACCooledBeam {
                                                           Alphas(1),
                                                           DataLoopNode::NodeFluidType::Water,
                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                          2,
+                                                          NodeInputManager::compFluidStream::Secondary,
                                                           ObjectIsNotParent,
                                                           cAlphaFields(7));
             CoolBeam(CBNum).MaxAirVolFlow = Numbers(1);
@@ -373,8 +373,8 @@ namespace HVACCooledBeam {
                                 "Zone Air Terminal Beam Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 CoolBeam(CBNum).BeamCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 CoolBeam(CBNum).Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -385,8 +385,8 @@ namespace HVACCooledBeam {
                                 "Zone Air Terminal Beam Chilled Water Energy",
                                 OutputProcessor::Unit::J,
                                 CoolBeam(CBNum).BeamCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 CoolBeam(CBNum).Name,
                                 _,
                                 "PLANTLOOPCOOLINGDEMAND",
@@ -397,44 +397,44 @@ namespace HVACCooledBeam {
                                 "Zone Air Terminal Beam Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 CoolBeam(CBNum).BeamCoolingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 CoolBeam(CBNum).Name);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Supply Air Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 CoolBeam(CBNum).SupAirCoolingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 CoolBeam(CBNum).Name);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Supply Air Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 CoolBeam(CBNum).SupAirCoolingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 CoolBeam(CBNum).Name);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Supply Air Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
                                 CoolBeam(CBNum).SupAirHeatingEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 CoolBeam(CBNum).Name);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Supply Air Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
                                 CoolBeam(CBNum).SupAirHeatingRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 CoolBeam(CBNum).Name);
 
             SetupOutputVariable(state,
                                 "Zone Air Terminal Outdoor Air Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 CoolBeam(CBNum).OutdoorAirFlowRate,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 CoolBeam(CBNum).Name);
 
             for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
@@ -445,8 +445,9 @@ namespace HVACCooledBeam {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (CoolBeam(CBNum).ADUNum == 0) {
-                ShowSevereError(
-                    state, RoutineName + "No matching Air Distribution Unit, for Unit = [" + CurrentModuleObject + ',' + CoolBeam(CBNum).Name + "].");
+                ShowSevereError(state,
+                                std::string{RoutineName} + "No matching Air Distribution Unit, for Unit = [" + CurrentModuleObject + ',' +
+                                    CoolBeam(CBNum).Name + "].");
                 ShowContinueError(state, "...should have outlet node=" + state.dataLoopNodes->NodeID(CoolBeam(CBNum).AirOutNode));
                 ErrorsFound = true;
             } else {
@@ -485,7 +486,7 @@ namespace HVACCooledBeam {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in getting input. Preceding conditions cause termination.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input. Preceding conditions cause termination.");
         }
     }
 
@@ -516,7 +517,7 @@ namespace HVACCooledBeam {
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitCoolBeam");
+        static constexpr std::string_view RoutineName("InitCoolBeam");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InAirNode;    // supply air inlet node number
@@ -690,7 +691,7 @@ namespace HVACCooledBeam {
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineName("SizeCoolBeam");
+        static constexpr std::string_view RoutineName("SizeCoolBeam");
         int PltSizCoolNum(0);          // index of plant sizing object for the cooling loop
         int NumBeams(0);               // number of beams in the zone
         int Iter(0);                   // beam length iteration index
@@ -1090,7 +1091,7 @@ namespace HVACCooledBeam {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcCoolBeam");
+        static constexpr std::string_view RoutineName("CalcCoolBeam");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

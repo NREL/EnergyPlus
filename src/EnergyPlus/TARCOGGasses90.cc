@@ -95,7 +95,7 @@ void GASSES90(EnergyPlusData &state,
               Real64 &dens,
               Real64 &cp,
               Real64 &pr,
-              int const standard,
+              TARCOGGassesParams::Stdrd const standard,
               int &nperr,
               std::string &ErrorMessage)
 {
@@ -125,7 +125,7 @@ void GASSES90(EnergyPlusData &state,
     // Density using ideal gas law: rho=(presure*mol. weight)/(gas const*Tmean)
     state.dataTARCOGGasses90->fdens(1) = pres * xwght(iprop(1)) / (DataGlobalConstants::UniversalGasConst * tmean);
     // Mollecular weights in kg/kmol
-    if ((standard == EN673) || (standard == EN673Design)) {
+    if ((standard == TARCOGGassesParams::Stdrd::EN673) || (standard == TARCOGGassesParams::Stdrd::EN673Design)) {
         // fdens( 1 ) = xgrho( iprop( 1 ), 1 ) + xgrho( iprop( 1 ), 2 ) * tmean + xgrho( iprop( 1 ), 3 ) * pow_2( tmean ); //Autodesk:Uninit xgrho
         // was uninitialized
         state.dataTARCOGGasses90->fdens(1) = ENpressure * xwght(iprop(1)) / (gaslaw * tmean);
@@ -137,8 +137,8 @@ void GASSES90(EnergyPlusData &state,
         cp = state.dataTARCOGGasses90->fcp(1);     // SpecIFic heat in J/(kg*K)
         dens = state.dataTARCOGGasses90->fdens(1); // density in kg/m^3
     } else {                                       // Mixture properties
-        bool const stdISO15099(standard == ISO15099);
-        bool const stdEN673((standard == EN673) || (standard == EN673Design));
+        bool const stdISO15099(standard == TARCOGGassesParams::Stdrd::ISO15099);
+        bool const stdEN673((standard == TARCOGGassesParams::Stdrd::EN673) || (standard == TARCOGGassesParams::Stdrd::EN673Design));
         if (stdISO15099) {
             molmix = frct(1) * xwght(iprop(1));                 // initialize equation 56
             cpmixm = molmix * state.dataTARCOGGasses90->fcp(1); // initialize equation 58

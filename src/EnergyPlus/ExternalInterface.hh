@@ -57,6 +57,8 @@ extern "C" {
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExternalInterface.hh>
+#include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 // C++ Standard Library Headers
 #include <string>
@@ -110,17 +112,18 @@ namespace ExternalInterface {
     struct eplusOutputVariableType
     {
 
-        std::string Name;     // Variable name in EnergyPlus
-        std::string VarKey;   // Key value in EnergyPlus
-        Real64 RTSValue;      // Real value of variable at the Zone Time Step
-        int ITSValue;         // Integer value of variable at the Zone Time Step
-        int VarIndex;         // Index Value of variable
-        int VarType;          // Type of variable at the Zone Time Step
-        std::string VarUnits; // Units string, may be blank
+        std::string Name;                      // Variable name in EnergyPlus
+        std::string VarKey;                    // Key value in EnergyPlus
+        Real64 RTSValue;                       // Real value of variable at the Zone Time Step
+        int ITSValue;                          // Integer value of variable at the Zone Time Step
+        int VarIndex;                          // Index Value of variable
+        OutputProcessor::VariableType VarType; // Type of variable at the Zone Time Step
+        std::string VarUnits;                  // Units string, may be blank
 
         // Default Constructor
         eplusOutputVariableType()
-            : Name(std::string()), VarKey(std::string()), RTSValue(0.0), ITSValue(0), VarIndex(0), VarType(0), VarUnits(std::string())
+            : Name(std::string()), VarKey(std::string()), RTSValue(0.0), ITSValue(0), VarIndex(0), VarType(OutputProcessor::VariableType::NotFound),
+              VarUnits(std::string())
         {
         }
     };
@@ -208,8 +211,8 @@ namespace ExternalInterface {
         std::string Name;               // FMU Filename
         std::string modelID;            // FMU modelID
         std::string modelGUID;          // FMU modelGUID
-        std::string WorkingFolder;      // Path to the FMU wokring folder
-        std::string WorkingFolder_wLib; // Path to the binaries
+        fs::path WorkingFolder;         // Path to the FMU wokring folder
+        fs::path WorkingFolder_wLib;    // Path to the binaries
         std::string fmiVersionNumber;   // Version number of FMI used
         int NumInputVariablesInFMU;     // Number of input variables in fmu
         int NumInputVariablesInIDF;     // Number of fmus input variables in idf
@@ -246,7 +249,7 @@ namespace ExternalInterface {
 
         // Default Constructor
         InstanceType()
-            : Name(std::string()), modelID(std::string()), modelGUID(std::string()), WorkingFolder(std::string()), WorkingFolder_wLib(std::string()),
+            : Name(std::string()), modelID(std::string()), modelGUID(std::string()), WorkingFolder(fs::path()), WorkingFolder_wLib(fs::path()),
               fmiVersionNumber(std::string()), NumInputVariablesInFMU(0), NumInputVariablesInIDF(0), NumOutputVariablesInFMU(0),
               NumOutputVariablesInIDF(0), NumOutputVariablesSchedule(0), NumOutputVariablesVariable(0), NumOutputVariablesActuator(0), LenModelID(0),
               LenModelGUID(0), LenWorkingFolder(0), LenWorkingFolder_wLib(0)
@@ -298,7 +301,7 @@ namespace ExternalInterface {
                               int numberOfKeys,
                               const Array1D_string &varNames,
                               Array1D_int &keyVarIndexes,
-                              Array1D_int &varTypes);
+                              Array1D<OutputProcessor::VariableType> &varTypes);
 
     std::vector<char> getCharArrayFromString(std::string const &originalString);
 
@@ -335,7 +338,7 @@ struct ExternalInterfaceData : BaseGlobalStruct
     Real64 tStart = 0.0;
     Real64 hStep = 15.0;
     bool FlagReIni = false;
-    std::string FMURootWorkingFolder;
+    fs::path FMURootWorkingFolder;
     int nInKeys = 3; // Number of input variables available in ExternalInterface (=highest index* number)
 
     Array1D<ExternalInterface::FMUType> FMU;                                // Variable Types structure
@@ -353,12 +356,12 @@ struct ExternalInterfaceData : BaseGlobalStruct
     bool haveExternalInterfaceFMUExport = false; // Flag for FMU-Export interface
     int simulationStatus = 1; // Status flag. Used to report during which phase an error occurred. (1=initialization, 2=time stepping)
 
-    Array1D<int> keyVarIndexes; // Array index for specific key name
-    Array1D<int> varTypes;      // Types of variables in keyVarIndexes
-    Array1D<int> varInd;        // Index of ErlVariables for ExternalInterface
-    int socketFD = -1;          // socket file descriptor
-    bool ErrorsFound = false;   // Set to true if errors are found
-    bool noMoreValues = false;  // Flag, true if no more values will be sent by the server
+    Array1D<int> keyVarIndexes;                      // Array index for specific key name
+    Array1D<OutputProcessor::VariableType> varTypes; // Types of variables in keyVarIndexes
+    Array1D<int> varInd;                             // Index of ErlVariables for ExternalInterface
+    int socketFD = -1;                               // socket file descriptor
+    bool ErrorsFound = false;                        // Set to true if errors are found
+    bool noMoreValues = false;                       // Flag, true if no more values will be sent by the server
 
     Array1D<std::string> varKeys;     // Keys of report variables used for data exchange
     Array1D<std::string> varNames;    // Names of report variables used for data exchange
@@ -379,7 +382,7 @@ struct ExternalInterfaceData : BaseGlobalStruct
     bool FirstCallTStep = true;        // Flag for first call during time stepping
     int fmiEndSimulation = 0;          // Flag to indicate end of simulation
 
-    std::string const socCfgFilNam = "socket.cfg"; // socket configuration file
+    fs::path const socCfgFilPath = "socket.cfg"; // socket configuration file
     std::unordered_map<std::string, std::string> UniqueFMUInputVarNames;
 
     int nOutVal; // Number of output values (E+ -> ExternalInterface)
@@ -392,7 +395,7 @@ struct ExternalInterfaceData : BaseGlobalStruct
         this->tStart = 0.0;
         this->hStep = 15.0;
         this->FlagReIni = false;
-        this->FMURootWorkingFolder = "";
+        this->FMURootWorkingFolder.clear();
         this->nInKeys = 3; // Number of input variables available in ExternalInterface (=highest index* number)
 
         this->FMU.clear();               // Variable Types structure

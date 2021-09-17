@@ -815,6 +815,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -856,6 +857,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -917,6 +919,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -978,6 +981,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1039,6 +1043,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn004:Wall006,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1055,6 +1060,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn004:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1071,6 +1077,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall006,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1087,6 +1094,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1103,6 +1111,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn005:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1119,6 +1128,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn005:Wall006,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1135,6 +1145,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall006,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1151,6 +1162,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1166,13 +1178,15 @@
     Zn001:IntM001,           !- Name
     CUSTPARTITION,           !- Construction Name
     HEARTLAND AREA,          !- Zone or ZoneList Name
-    130.0000;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    130.0000;                !- Extended Field
 
   InternalMass,
     Zn001:IntM002,           !- Name
     CUSTPARTITION,           !- Construction Name
     HEARTLAND AREA,          !- Zone or ZoneList Name
-    920.0000;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    920.0000;                !- Extended Field
 
 ! Floor subdivided:
 !  BuildingSurface:Detailed,
@@ -1261,6 +1275,7 @@
     Floor,                   !- Surface Type
     FLOOR32,                 !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1287,6 +1302,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1303,6 +1319,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1319,6 +1336,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1335,6 +1353,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1351,6 +1370,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     HEARTLAND AREA,          !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1391,13 +1411,15 @@
     Zn001:IntM003,           !- Name
     CUSTPARTITION,           !- Construction Name
     HEARTLAND AREA,          !- Zone or ZoneList Name
-    2380.000;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    2380.000;                !- Extended Field
 
   BuildingSurface:Detailed,
     Zn002:Wall001,           !- Name
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     OREGON WING,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1414,6 +1436,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     OREGON WING,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1430,6 +1453,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     OREGON WING,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1476,6 +1500,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     OREGON WING,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1522,6 +1547,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     OREGON WING,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall012,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1538,6 +1564,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     OREGON WING,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall011,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1554,6 +1581,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     OREGON WING,             !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1570,6 +1598,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     OREGON WING,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1586,6 +1615,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     GEORGIA WING,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1652,6 +1682,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     GEORGIA WING,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1708,6 +1739,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     GEORGIA WING,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1724,6 +1756,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     GEORGIA WING,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1740,6 +1773,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     GEORGIA WING,            !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall008,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1756,6 +1790,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     GEORGIA WING,            !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall007,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1772,6 +1807,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     GEORGIA WING,            !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1788,6 +1824,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     GEORGIA WING,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1804,6 +1841,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ARIZONA WING,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1870,6 +1908,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ARIZONA WING,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1886,6 +1925,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ARIZONA WING,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1902,6 +1942,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ARIZONA WING,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1958,6 +1999,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ARIZONA WING,            !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall006,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1974,6 +2016,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ARIZONA WING,            !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1990,6 +2033,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     ARIZONA WING,            !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2006,6 +2050,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ARIZONA WING,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2022,6 +2067,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     MAINE WING,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2038,6 +2084,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     MAINE WING,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2084,6 +2131,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     MAINE WING,              !- Zone Name
+    ,                        !- Space Name
     OtherSideCoefficients,   !- Outside Boundary Condition
     OSCCoef:Zn005:Wall003,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2130,6 +2178,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     MAINE WING,              !- Zone Name
+    ,                        !- Space Name
     OtherSideCoefficients,   !- Outside Boundary Condition
     OSCCoef:Zn005:Wall004,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2146,6 +2195,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     MAINE WING,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall009,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2162,6 +2212,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     MAINE WING,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall010,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2178,6 +2229,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     MAINE WING,              !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2194,6 +2246,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     MAINE WING,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

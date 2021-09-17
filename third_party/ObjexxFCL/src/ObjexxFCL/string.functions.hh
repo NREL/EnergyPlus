@@ -32,58 +32,41 @@ namespace ObjexxFCL {
 // Predicate /////
 
 // string is Empty?
-inline
+constexpr
 bool
-empty( std::string const & s )
+empty( std::string_view const s )
 {
 	return s.empty();
 }
 
 // string is Blank?
-inline
+constexpr
 bool
-is_blank( std::string const & s )
+is_blank( std::string_view const s )
 {
 	return ( s.empty() ? true : s.find_first_not_of( ' ' ) == std::string::npos );
 }
 
 // string is Not Blank?
-inline
+constexpr
 bool
-not_blank( std::string const & s )
+not_blank( std::string_view const s )
 {
 	return ! is_blank( s );
 }
 
 // string is Whitespace?
-inline
+constexpr
 bool
-is_whitespace( std::string const & s )
+is_whitespace( std::string_view const s )
 {
 	return ( s.empty() ? true : s.find_last_not_of( " \t\000" ) == std::string::npos );
-}
-
-// string is Consonants?
-inline
-bool
-is_consonant( std::string const & s )
-{
-	static std::string const vowels( "aeiou" );
-	if ( s.empty() ) {
-		return false;
-	} else {
-		for ( char const c : s ) {
-			if ( std::isalpha( c ) == 0 ) return false;
-			if ( vowels.find( std::tolower( c ) ) != std::string::npos ) return false;
-		}
-		return true;
-	}
 }
 
 // string is Digits?
 inline
 bool
-is_digit( std::string const & s )
+is_digit( std::string_view const s )
 {
 	if ( s.empty() ) {
 		return false;
@@ -98,7 +81,7 @@ is_digit( std::string const & s )
 // string is Lowercase Alphabetic?
 inline
 bool
-is_lower( std::string const & s )
+is_lower( std::string_view const s )
 {
 	if ( s.empty() ) {
 		return false;
@@ -113,7 +96,7 @@ is_lower( std::string const & s )
 // string is Uppercase Alphabetic?
 inline
 bool
-is_upper( std::string const & s )
+is_upper( std::string_view const s )
 {
 	if ( s.empty() ) {
 		return false;
@@ -128,7 +111,7 @@ is_upper( std::string const & s )
 // string has a Lowercase Character?
 inline
 bool
-has_lower( std::string const & s )
+has_lower( std::string_view const s )
 {
 	for ( char const c : s ) {
 		if ( std::islower( c ) != 0 ) return true;
@@ -139,7 +122,7 @@ has_lower( std::string const & s )
 // string has an Uppercase Character?
 inline
 bool
-has_upper( std::string const & s )
+has_upper( std::string_view const s )
 {
 	for ( char const c : s ) {
 		if ( std::isupper( c ) != 0 ) return true;
@@ -148,17 +131,9 @@ has_upper( std::string const & s )
 }
 
 // string has a string?
-inline
+constexpr
 bool
-has( std::string const & s, std::string const & t )
-{
-	return ( s.find( t ) != std::string::npos );
-}
-
-// string has a cstring?
-inline
-bool
-has( std::string const & s, char const * const t )
+has( std::string_view const s, std::string_view const t )
 {
 	return ( s.find( t ) != std::string::npos );
 }
@@ -166,7 +141,7 @@ has( std::string const & s, char const * const t )
 // string has a Character?
 inline
 bool
-has( std::string const & s, char const c )
+has( std::string_view const s, char const c )
 {
 	return ( s.find( c ) != std::string::npos );
 }
@@ -174,48 +149,68 @@ has( std::string const & s, char const c )
 // string has a String/Character Case-Insensitively?
 template< typename T >
 bool
-hasi( std::string const & s, T const & t ); // Implementation below
+hasi( std::string_view const s, T const & t ); // Implementation below
 
-// string has any Character of a string?
-inline
+// string has any Character of a string_view?
+constexpr
 bool
-has_any_of( std::string const & s, std::string const & t )
+has_any_of( std::string_view const s, std::string_view const t )
 {
 	return ( s.find_first_of( t ) != std::string::npos );
 }
 
-// string has any Character of a cstring?
-inline
+
+// Has a Prefix Case-Optionally?
+constexpr
 bool
-has_any_of( std::string const & s, char const * const t )
+has_prefix( std::string_view const s, std::string_view const pre, bool const exact_case = true )
 {
-	return ( s.find_first_of( t ) != std::string::npos );
+	std::string::size_type const pre_len( pre.length() );
+	if ( pre_len == 0 ) {
+		return false;
+	} else if ( s.length() < pre_len ) {
+		return false;
+	} else if ( exact_case ) {
+		for ( std::string::size_type i = 0; i < pre_len; ++i ) {
+			if ( s[ i ] != pre[ i ] ) return false;
+		}
+		return true;
+	} else {
+		for ( std::string::size_type i = 0; i < pre_len; ++i ) {
+			if ( ! equali( s[ i ], pre[ i ] ) ) return false;
+		}
+		return true;
+	}
 }
 
-// Has a Prefix Case-Optionally?
-bool
-has_prefix( std::string const & s, std::string const & pre, bool const exact_case = true );
 
 // Has a Prefix Case-Optionally?
+constexpr
 bool
-has_prefix( std::string const & s, char const * const pre, bool const exact_case = true );
+has_prefix( std::string_view const s, char const pre, bool const exact_case = true )
+{
+	if ( s.length() == 0 ) {
+		return false;
+	} else if ( exact_case ) {
+		return ( s[ 0 ] == pre );
+	} else {
+		return equali( s[ 0 ], pre );
+	}
+}
 
-// Has a Prefix Case-Optionally?
-bool
-has_prefix( std::string const & s, char const pre, bool const exact_case = true );
 
 // Has a Prefix Case-Insensitively?
 template< typename S >
-inline
+constexpr
 bool
-has_prefixi( std::string const & s, S const & pre )
+has_prefixi( std::string_view const s, S const & pre )
 {
 	return has_prefix( s, pre, false );
 }
 
 // Trailing Whitespace Trimmed Copy of a string
 std::string
-trimmed_whitespace( std::string const & s ); // Declaration copy for use below
+trimmed_whitespace( std::string_view const s ); // Declaration copy for use below
 
 // string is Readable as a Type Supporting Stream Input?
 template< typename T >
@@ -587,7 +582,7 @@ is_binary( char const * const s, bool const allow_sign = true )
 // Comparison /////
 
 // char == char Case-Insensitively?
-inline
+constexpr
 bool
 equali_char( char const c, char const d )
 {
@@ -595,9 +590,9 @@ equali_char( char const c, char const d )
 }
 
 // string == string Case-Insensitively?
-inline
+constexpr
 bool
-equali( std::string const & s, std::string const & t )
+equali( std::string_view const s, std::string_view const t )
 {
 #if defined(__linux__) || defined(__INTEL_COMPILER) // This is faster
 	std::string::size_type const s_len( s.length() );
@@ -615,103 +610,15 @@ equali( std::string const & s, std::string const & t )
 #endif
 }
 
-// string == cstring Case-Insensitively?
-inline
-bool
-equali( std::string const & s, char const * const t )
-{
-#if defined(__linux__) || defined(__INTEL_COMPILER) // This is faster
-	std::string::size_type const s_len( s.length() );
-	std::string::size_type i( 0u );
-	char c( to_lower( t[ 0 ] ) );
-	while ( ( i < s_len ) && ( c != '\0' ) && ( to_lower( s[ i ] ) == c ) ) {
-		c = to_lower( t[ ++i ] );
-		if ( ( i == s_len ) || ( c == '\0' ) || ( to_lower( s[ i ] ) != c ) ) break; // Unroll
-		c = to_lower( t[ ++i ] );
-		if ( ( i == s_len ) || ( c == '\0' ) || ( to_lower( s[ i ] ) != c ) ) break; // Unroll
-		c = to_lower( t[ ++i ] );
-		if ( ( i == s_len ) || ( c == '\0' ) || ( to_lower( s[ i ] ) != c ) ) break; // Unroll
-		c = to_lower( t[ ++i ] );
-	}
-	return ( ( i == s_len ) && ( c == '\0' ) );
-#else
-	return ( s.length() == std::strlen( t ) ? std::equal( s.begin(), s.end(), t, equali_char ) : false );
-#endif
-}
-
-// cstring == string Case-Insensitively?
-inline
-bool
-equali( char const * const t, std::string const & s )
-{
-#if defined(__linux__) || defined(__INTEL_COMPILER) // This is faster
-	std::string::size_type const s_len( s.length() );
-	std::string::size_type i( 0u );
-	char c( to_lower( t[ 0 ] ) );
-	while ( ( i < s_len ) && ( c != '\0' ) && ( to_lower( s[ i ] ) == c ) ) {
-		c = to_lower( t[ ++i ] );
-		if ( ( i == s_len ) || ( c == '\0' ) || ( to_lower( s[ i ] ) != c ) ) break; // Unroll
-		c = to_lower( t[ ++i ] );
-		if ( ( i == s_len ) || ( c == '\0' ) || ( to_lower( s[ i ] ) != c ) ) break; // Unroll
-		c = to_lower( t[ ++i ] );
-		if ( ( i == s_len ) || ( c == '\0' ) || ( to_lower( s[ i ] ) != c ) ) break; // Unroll
-		c = to_lower( t[ ++i ] );
-	}
-	return ( ( i == s_len ) && ( c == '\0' ) );
-#else
-	return ( std::strlen( t ) == s.length() ? std::equal( s.begin(), s.end(), t, equali_char ) : false );
-#endif
-}
-
-// cstring == cstring Case-Insensitively?
-inline
-bool
-equali( char const * const s, char const * const t )
-{
-	std::string::size_type i( 0u );
-	char c( to_lower( s[ 0 ] ) );
-	while ( c == to_lower( t[ i ] ) ) {
-		if ( c == '\0' ) return true;
-		c = to_lower( s[ ++i ] );
-		if ( c != to_lower( t[ i ] ) ) break; // Unroll
-		if ( c == '\0' ) return true;
-		c = to_lower( s[ ++i ] );
-	}
-	return false;
-}
 
 // string == string Case-Optionally?
 inline
 bool
-equal( std::string const & s, std::string const & t, bool const exact_case = true )
+equal( std::string_view const s, std::string_view const t, bool const exact_case = true )
 {
 	return ( exact_case ? s == t : equali( s, t ) );
 }
 
-// string == cstring Case-Optionally?
-inline
-bool
-equal( std::string const & s, char const * const t, bool const exact_case = true )
-{
-	return ( exact_case ? s == t : equali( s, t ) );
-}
-
-// cstring == string Case-Optionally?
-inline
-bool
-equal( char const * const s, std::string const & t, bool const exact_case = true )
-{
-	return ( exact_case ? s == t : equali( s, t ) );
-}
-
-// cstring == cstring Case-Optionally?
-inline
-bool
-equal( char const * const s, char const * const t, bool const exact_case = true )
-{
-	auto const s_len( std::strlen( s ) );
-	return ( s_len == std::strlen( t ) ? ( exact_case ? std::equal( s, s + s_len, t ) : std::equal( s, s + s_len, t, equali_char ) ) : false );
-}
 
 // char < char Case-Sensitively?
 inline
@@ -732,7 +639,7 @@ lessthani_char( char const c, char const d )
 // string < string Case-Insensitively?
 inline
 bool
-lessthan( std::string const & s, std::string const & t, bool const exact_case = true )
+lessthan( std::string_view const s, std::string_view const t, bool const exact_case = true )
 {
 	if ( exact_case ) {
 		return std::lexicographical_compare( s.begin(), s.end(), t.begin(), t.end(), lessthan_char );
@@ -741,67 +648,18 @@ lessthan( std::string const & s, std::string const & t, bool const exact_case = 
 	}
 }
 
-// string < cstring Case-Insensitively?
-inline
-bool
-lessthan( std::string const & s, char const * const t, bool const exact_case = true )
-{
-	std::string::size_type const t_len( std::strlen( t ) );
-	if ( exact_case ) {
-		return std::lexicographical_compare( s.begin(), s.end(), t, t + t_len, lessthan_char );
-	} else {
-		return std::lexicographical_compare( s.begin(), s.end(), t, t + t_len, lessthani_char );
-	}
-}
-
-// cstring < string Case-Insensitively?
-inline
-bool
-lessthan( char const * const t, std::string const & s, bool const exact_case = true )
-{
-	std::string::size_type const t_len( std::strlen( t ) );
-	if ( exact_case ) {
-		return std::lexicographical_compare( t, t + t_len, s.begin(), s.end(), lessthan_char );
-	} else {
-		return std::lexicographical_compare( t, t + t_len, s.begin(), s.end(), lessthani_char );
-	}
-}
-
-// cstring < cstring Case-Insensitively?
-inline
-bool
-lessthan( char const * const s, char const * const t, bool const exact_case = true )
-{
-	std::string::size_type const s_len( std::strlen( s ) );
-	std::string::size_type const t_len( std::strlen( t ) );
-	if ( exact_case ) {
-		return std::lexicographical_compare( s, s + s_len, t, t + t_len, lessthan_char );
-	} else {
-		return std::lexicographical_compare( s, s + s_len, t, t + t_len, lessthani_char );
-	}
-}
-
 // string < string Case-Insensitively?
 inline
 bool
-lessthani( std::string const & s, std::string const & t )
+lessthani( std::string_view const s, std::string_view const t )
 {
 	return std::lexicographical_compare( s.begin(), s.end(), t.begin(), t.end(), lessthani_char );
-}
-
-// string < cstring Case-Insensitively?
-inline
-bool
-lessthani( std::string const & s, char const * const t )
-{
-	std::string::size_type const t_len( std::strlen( t ) );
-	return std::lexicographical_compare( s.begin(), s.end(), t, t + t_len, lessthani_char );
 }
 
 // ASCII Lexical < Comparison
 inline
 bool
-llt( std::string const & s, std::string const & t )
+llt( std::string_view const s, std::string_view const t )
 {
 	return ( s < t );
 }
@@ -809,7 +667,7 @@ llt( std::string const & s, std::string const & t )
 // ASCII Lexical <= Comparison
 inline
 bool
-lle( std::string const & s, std::string const & t )
+lle( std::string_view const s, std::string_view const t )
 {
 	return ( s <= t );
 }
@@ -817,7 +675,7 @@ lle( std::string const & s, std::string const & t )
 // ASCII Lexical >= Comparison
 inline
 bool
-lge( std::string const & s, std::string const & t )
+lge( std::string_view const s, std::string_view const t )
 {
 	return ( s >= t );
 }
@@ -825,109 +683,52 @@ lge( std::string const & s, std::string const & t )
 // ASCII Lexical < Comparison
 inline
 bool
-lgt( std::string const & s, std::string const & t )
+lgt( std::string_view const s, std::string_view const t )
 {
 	return ( s > t );
-}
-
-// ASCII Lexical < Comparison
-inline
-bool
-llt( char const * const s, char const * const t )
-{
-	return ( std::string( s ) < std::string( t ) );
-}
-
-// ASCII Lexical <= Comparison
-inline
-bool
-lle( char const * const s, char const * const t )
-{
-	return ( std::string( s ) <= std::string( t ) );
-}
-
-// ASCII Lexical >= Comparison
-inline
-bool
-lge( char const * const s, char const * const t )
-{
-	return ( std::string( s ) >= std::string( t ) );
-}
-
-// ASCII Lexical < Comparison
-inline
-bool
-lgt( char const * const s, char const * const t )
-{
-	return ( std::string( s ) > std::string( t ) );
 }
 
 // Inspector /////
 
 // Length
-inline
+constexpr
 std::string::size_type
-len( std::string const & s )
+len( std::string_view const s )
 {
 	return s.length();
 }
 
-// Length
-inline
-std::string::size_type
-len( char const * const s )
-{
-	return std::strlen( s );
-}
 
 // Length Space-Trimmed
-inline
+constexpr
 std::string::size_type
-len_trim( std::string const & s )
+len_trim( std::string_view const s )
 {
 	return s.find_last_not_of( ' ' ) + 1; // Works if npos returned: npos + 1 == 0
 }
 
 // Index of a Substring
 template< typename T >
-inline
+constexpr
 std::string::size_type
-index( std::string const & s, T const & t, bool const last = false )
+index( std::string_view const s, T const & t, bool const last = false )
 {
 	return ( last ? s.rfind( t ) : s.find( t ) );
 }
 
-// Index of a Substring
-template< typename T >
-inline
-std::string::size_type
-index( char const * const s, T const & t, bool const last = false )
-{
-	return ( last ? std::string( s ).rfind( t ) : std::string( s ).find( t ) );
-}
-
 // Last Index of a Substring
 template< typename T >
-inline
+constexpr
 std::string::size_type
-rindex( std::string const & s, T const & t )
+rindex( std::string_view const s, T const & t )
 {
 	return s.rfind( t );
-}
-
-// Last Index of a Substring
-template< typename T >
-inline
-std::string::size_type
-rindex( char const * const s, T const & t )
-{
-	return std::string( s ).rfind( t );
 }
 
 // Index of a Substring Case-Insensitively
 inline
 std::string::size_type
-indexi( std::string const & s, std::string const & t, bool const last = false )
+indexi( std::string_view const s, std::string_view const t, bool const last = false )
 {
 	if ( last ) {
 		auto const i( std::find_end( s.begin(), s.end(), t.begin(), t.end(), equali_char ) );
@@ -938,24 +739,10 @@ indexi( std::string const & s, std::string const & t, bool const last = false )
 	}
 }
 
-// Index of a Substring Case-Insensitively
-inline
-std::string::size_type
-indexi( std::string const & s, char const * const t, bool const last = false )
-{
-	if ( last ) {
-		auto const i( std::find_end( s.begin(), s.end(), t, t + std::strlen( t ), equali_char ) );
-		return ( i == s.end() ? std::string::npos : static_cast< std::string::size_type >( i - s.begin() ) );
-	} else {
-		auto const i( std::search( s.begin(), s.end(), t, t + std::strlen( t ), equali_char ) );
-		return ( i == s.end() ? std::string::npos : static_cast< std::string::size_type >( i - s.begin() ) );
-	}
-}
-
 // Index of a Character Case-Insensitively
-inline
+constexpr
 std::string::size_type
-indexi( std::string const & s, char const c, bool const last = false )
+indexi( std::string_view const s, char const c, bool const last = false )
 {
 	if ( last ) {
 		for ( std::string::size_type i = s.length() - 1, e = 0; i >= e; --i ) {
@@ -969,67 +756,11 @@ indexi( std::string const & s, char const c, bool const last = false )
 	return std::string::npos;
 }
 
-// Index of a Substring Case-Insensitively
-inline
-std::string::size_type
-indexi( char const * const s, std::string const & t, bool const last = false )
-{
-	auto const s_end( s + std::strlen( s ) );
-	if ( last ) {
-		auto const i( std::find_end( s, s_end, t.begin(), t.end(), equali_char ) );
-		return ( i == s_end ? std::string::npos : static_cast< std::string::size_type >( i - s ) );
-	} else {
-		auto const i( std::search( s, s_end, t.begin(), t.end(), equali_char ) );
-		return ( i == s_end ? std::string::npos : static_cast< std::string::size_type >( i - s ) );
-	}
-}
-
-// Index of a Substring Case-Insensitively
-inline
-std::string::size_type
-indexi( char const * const s, char const * const t, bool const last = false )
-{
-	auto const s_end( s + std::strlen( s ) );
-	if ( last ) {
-		auto const i( std::find_end( s, s_end, t, t + std::strlen( t ), equali_char ) );
-		return ( i == s_end ? std::string::npos : static_cast< std::string::size_type >( i - s ) );
-	} else {
-		auto const i( std::search( s, s_end, t, t + std::strlen( t ), equali_char ) );
-		return ( i == s_end ? std::string::npos : static_cast< std::string::size_type >( i - s ) );
-	}
-}
-
-// Index of a Character Case-Insensitively
-inline
-std::string::size_type
-indexi( char const * const s, char const c, bool const last = false )
-{
-	if ( last ) {
-		for ( std::string::size_type i = std::strlen( s ) - 1, e = 0; i >= e; --i ) {
-			if ( equali_char( s[ i ], c ) ) return i;
-		}
-	} else {
-		for ( std::string::size_type i = 0, e = std::strlen( s ); i < e; ++i ) {
-			if ( equali_char( s[ i ], c ) ) return i;
-		}
-	}
-	return std::string::npos;
-}
-
 // Last Index of a Substring Case-Insensitively
 template< typename T >
 inline
 std::string::size_type
-rindexi( std::string const & s, T const & t )
-{
-	return indexi( s, t, true );
-}
-
-// Last Index of a Substring Case-Insensitively
-template< typename T >
-inline
-std::string::size_type
-rindexi( char const * const s, T const & t )
+rindexi( std::string_view const s, T const & t )
 {
 	return indexi( s, t, true );
 }
@@ -1038,16 +769,7 @@ rindexi( char const * const s, T const & t )
 template< typename T >
 inline
 bool
-hasi( std::string const & s, T const & t ) // Declaration above
-{
-	return ( indexi( s, t ) != std::string::npos );
-}
-
-// string has a String/Character Case-Insensitively?
-template< typename T >
-inline
-bool
-hasi( char const * const s, T const & t ) // Declaration above
+hasi( std::string_view const s, T const & t ) // Declaration above
 {
 	return ( indexi( s, t ) != std::string::npos );
 }
@@ -1056,36 +778,18 @@ hasi( char const * const s, T const & t ) // Declaration above
 template< typename T >
 inline
 std::string::size_type
-scan( std::string const & s, T const & t, bool const last = false )
+scan( std::string_view const s, T const & t, bool const last = false )
 {
 	return ( last ? s.find_last_of( t ) : s.find_first_of( t ) );
 }
 
-// Find any Characters of Another String
-template< typename T >
-inline
-std::string::size_type
-scan( char const * const s, T const & t, bool const last = false )
-{
-	return ( last ? std::string( s ).find_last_of( t ) : std::string( s ).find_first_of( t ) );
-}
-
 // Find any Characters not of Another String
 template< typename T >
 inline
 std::string::size_type
-verify( std::string const & s, T const & t, bool const last = false )
+verify( std::string_view const s, T const & t, bool const last = false )
 {
 	return ( last ? s.find_last_not_of( t ) : s.find_first_not_of( t ) );
-}
-
-// Find any Characters not of Another String
-template< typename T >
-inline
-std::string::size_type
-verify( char const * const s, T const & t, bool const last = false )
-{
-	return ( last ? std::string( s ).find_last_not_of( t ) : std::string( s ).find_first_not_of( t ) );
 }
 
 // Conversion /////
@@ -1093,17 +797,9 @@ verify( char const * const s, T const & t, bool const last = false )
 // Integer Value of a string
 inline
 int
-ichar( std::string const & s )
+ichar( std::string_view const s )
 {
 	return ( ! s.empty() ? static_cast< int >( s[ 0 ] ) : 0 );
-}
-
-// Integer Value of a string
-inline
-int
-ichar( char const * const s )
-{
-	return ( strlen( s ) > 0u ? static_cast< int >( s[ 0 ] ) : 0 );
 }
 
 // One-Character string of a Given ASCII Integer Value
@@ -1120,250 +816,12 @@ achar( int const i )
 template< typename T >
 inline
 T
-type_of( std::string const & s ) // Check is_type first
+type_of( std::string_view const s ) // Check is_type first
 {
 	std::istringstream t_stream( trimmed_whitespace( s ) );
 	T t;
 	t_stream >> t;
 	return ( t_stream && t_stream.eof() ? t : T() );
-}
-
-// Type of a string for Type Supporting Stream Input
-template< typename T >
-inline
-T
-type_of( char const * const s ) // Check is_type first
-{
-	return type_of< T >( std::string( s ) );
-}
-
-// bool of a string
-template<>
-inline
-bool
-type_of< bool >( std::string const & s )
-{
-	std::string const t( trimmed_whitespace( s ) );
-	if ( t.empty() ) { // Treat empty or whitespace string as false
-		return false;
-	} else if ( ( t == "T" ) || ( t == "t" ) || ( t == "true" ) ) { // Accept for true
-		return true;
-	} else if ( ( t == "F" ) || ( t == "f" ) || ( t == "false" ) ) { // Accept for false
-		return false;
-	} else { // Try to read the string as 0/1 bool
-		std::istringstream b_stream( t );
-		bool b;
-		b_stream >> b;
-		if ( b_stream && b_stream.eof() ) {
-			return b;
-		} else {
-			return false;
-		}
-	}
-}
-
-// short int of a string
-template<>
-inline
-short int
-type_of< short int >( std::string const & s )
-{
-	return static_cast< short int >( std::stoi( s ) );
-}
-
-// int of a string
-template<>
-inline
-int
-type_of< int >( std::string const & s )
-{
-	return std::stoi( s );
-}
-
-// long int of a string
-template<>
-inline
-long int
-type_of< long int >( std::string const & s )
-{
-	return std::stol( s );
-}
-
-// long long int of a string
-template<>
-inline
-long long int
-type_of< long long int >( std::string const & s )
-{
-	return std::stoll( s );
-}
-
-// unsigned short int of a string
-template<>
-inline
-unsigned short int
-type_of< unsigned short int >( std::string const & s )
-{
-	return static_cast< unsigned short int >( std::stoul( s ) );
-}
-
-// unsigned int of a string
-template<>
-inline
-unsigned int
-type_of< unsigned int >( std::string const & s )
-{
-	return static_cast< unsigned int >( std::stoul( s ) );
-}
-
-// unsigned long int of a string
-template<>
-inline
-unsigned long int
-type_of< unsigned long int >( std::string const & s )
-{
-	return std::stoul( s );
-}
-
-// unsigned long long int of a string
-template<>
-inline
-unsigned long long int
-type_of< unsigned long long int >( std::string const & s )
-{
-	return std::stoull( s );
-}
-
-// float of a string
-template<>
-inline
-float
-type_of< float >( std::string const & s )
-{
-	return std::stof( s );
-}
-
-// double of a string
-template<>
-inline
-double
-type_of< double >( std::string const & s )
-{
-	return std::stod( s );
-}
-
-// long double of a string
-template<>
-inline
-long double
-type_of< long double >( std::string const & s )
-{
-	return std::stold( s );
-}
-
-// char of a string
-template<>
-inline
-char
-type_of< char >( std::string const & s )
-{
-	return ( s.length() == 1 ? s[ 0 ] : char() );
-}
-
-// short int of a string
-inline
-short int
-short_of( std::string const & s )
-{
-	return type_of< short int >( s );
-}
-
-// int of a string
-inline
-int
-int_of( std::string const & s )
-{
-	return type_of< int >( s );
-}
-
-// unsigned int of a string
-inline
-unsigned int
-uint_of( std::string const & s )
-{
-	return type_of< unsigned int >( s );
-}
-
-// char of a string
-inline
-char
-char_of( std::string const & s )
-{
-	return type_of< char >( s );
-}
-
-// long int of a Binary string
-inline
-long int
-binary_of( std::string const & s )
-{
-	return std::strtol( s.c_str(), nullptr, 2 );
-}
-
-// long int of an Octal string
-inline
-long int
-octal_of( std::string const & s )
-{
-	return std::strtol( s.c_str(), nullptr, 8 );
-}
-
-// short int of a string
-inline
-short int
-short_of( char const * const s )
-{
-	return type_of< short int >( s );
-}
-
-// int of a string
-inline
-int
-int_of( char const * const s )
-{
-	return type_of< int >( s );
-}
-
-// unsigned int of a string
-inline
-unsigned int
-uint_of( char const * const s )
-{
-	return type_of< unsigned int >( s );
-}
-
-// char of a string
-inline
-char
-char_of( char const * const s )
-{
-	return type_of< char >( s );
-}
-
-// long int of a Binary string
-inline
-long int
-binary_of( char const * const s )
-{
-	return std::strtol( s, nullptr, 2 );
-}
-
-// long int of an Octal string
-inline
-long int
-octal_of( char const * const s )
-{
-	return std::strtol( s, nullptr, 8 );
 }
 
 // Modifier /////
@@ -1492,7 +950,7 @@ unique( std::string & s );
 
 // Substring Replaced in a string
 std::string &
-replace( std::string & s, std::string const & a, std::string const & b );
+replace( std::string & s, std::string_view const a, std::string_view const b );
 
 // Wrap in Double Quotes
 inline
@@ -1505,7 +963,7 @@ quote( std::string & s )
 
 // Overlay a string with Another string, Expanding Size as Needed
 std::string &
-overlay( std::string & s, std::string const & t, std::string::size_type const pos = 0 );
+overlay( std::string & s, std::string_view const t, std::string::size_type const pos = 0 );
 
 // Generator /////
 
@@ -1519,140 +977,140 @@ blank( std::string::size_type const len )
 
 // Lowercased Copy of a string
 std::string
-lowercased( std::string const & s );
+lowercased( std::string_view const s );
 
 // Uppercased Copy of a string
 std::string
-uppercased( std::string const & s );
+uppercased( std::string_view const s );
 
 // Left-Justified Copy of a string
 std::string
-ljustified( std::string const & s );
+ljustified( std::string_view const s );
 
 // Right-Justified Copy of a string
 std::string
-rjustified( std::string const & s );
+rjustified( std::string_view const s );
 
 // Trailing Space Trimmed Copy of a string
 std::string
-trimmed( std::string const & s );
+trimmed( std::string_view const s );
 
 // Trailing Whitespace Trimmed Copy of a string
 std::string
-trimmed_whitespace( std::string const & s );
+trimmed_whitespace( std::string_view const s );
 
 // Specified Characters Stripped from a string's Tails Copy of a string
 std::string
-stripped( std::string const & s, std::string const & chars );
+stripped( std::string_view const s, std::string_view const chars );
 
 // Specified Characters Stripped from a string's Left Tail Copy of a string
 std::string
-lstripped( std::string const & s, std::string const & chars );
+lstripped( std::string_view const s, std::string_view const chars );
 
 // Specified Characters Stripped from a string's Right Tail Copy of a string
 std::string
-rstripped( std::string const & s, std::string const & chars );
+rstripped( std::string_view const s, std::string_view const chars );
 
 // Space Stripped from a string's Tails Copy of a string
 std::string
-stripped( std::string const & s );
+stripped( std::string_view const s );
 
 // Space Stripped from a string's Left Tail Copy of a string
 std::string
-lstripped( std::string const & s );
+lstripped( std::string_view const s );
 
 // Space Stripped from a string's Right Tail Copy of a string
 std::string
-rstripped( std::string const & s );
+rstripped( std::string_view const s );
 
 // Whitespace Stripped from a string's Tails Copy of a string
 std::string
-stripped_whitespace( std::string const & s );
+stripped_whitespace( std::string_view const s );
 
 // Padded to a Specified Length Copy of a string
 inline
 std::string
-padded( std::string const & s, std::string::size_type const len )
+padded( std::string_view const s, std::string::size_type const len )
 {
 	std::string::size_type const s_len( s.length() );
-	return ( s_len < len ? s + std::string( len - s_len, ' ' ) : s );
+	return ( s_len < len ? std::string{s} + std::string( len - s_len, ' ' ) : std::string{s} );
 }
 
 // Left-Padded to a Specified Length Copy of a string
 inline
 std::string
-lpadded( std::string const & s, std::string::size_type const len )
+lpadded( std::string_view const s, std::string::size_type const len )
 {
 	std::string::size_type const s_len( s.length() );
-	return ( s_len < len ? std::string( len - s_len, ' ' ).append( s ) : s );
+	return ( s_len < len ? std::string( len - s_len, ' ' ).append( s ) : std::string{s} );
 }
 
 // Right-Padded to a Specified Length Copy of a string
 inline
 std::string
-rpadded( std::string const & s, std::string::size_type const len )
+rpadded( std::string_view const s, std::string::size_type const len )
 {
 	std::string::size_type const s_len( s.length() );
-	return ( s_len < len ? s + std::string( len - s_len, ' ' ) : s );
+	return ( s_len < len ? std::string{s} + std::string( len - s_len, ' ' ) : std::string{s} );
 }
 
 // Pared to a Specified Length Copy of a string
 inline
 std::string
-pared( std::string const & s, std::string::size_type const len )
+pared( std::string_view const s, std::string::size_type const len )
 {
-	return ( s.length() > len ? std::string( s, 0, len ) : s );
+	return ( s.length() > len ? std::string( s, 0, len ) : std::string{s} );
 }
 
 // Left-Pared to a Specified Length Copy of a string
 inline
 std::string
-lpared( std::string const & s, std::string::size_type const len )
+lpared( std::string_view const s, std::string::size_type const len )
 {
 	std::string::size_type const s_len( s.length() );
-	return ( s_len > len ? std::string( s, s_len - len ) : s );
+	return ( s_len > len ? std::string( s, s_len - len, std::string::npos ) : std::string{s} );
 }
 
 // Right-Pared to a Specified Length Copy of a string
 inline
 std::string
-rpared( std::string const & s, std::string::size_type const len )
+rpared( std::string_view const s, std::string::size_type const len )
 {
-	return ( s.length() > len ? std::string( s, 0, len ) : s );
+	return ( s.length() > len ? std::string( s, 0, len ) : std::string{s} );
 }
 
 // Sized to a Specified Length Copy of a string
 std::string
-sized( std::string const & s, std::string::size_type const len );
+sized( std::string_view const s, std::string::size_type const len );
 
 // Left-Sized to a Specified Length Copy of a string
 std::string
-lsized( std::string const & s, std::string::size_type const len );
+lsized( std::string_view const s, std::string::size_type const len );
 
 // Right-Sized to a Specified Length Copy of a string
 std::string
-rsized( std::string const & s, std::string::size_type const len );
+rsized( std::string_view const s, std::string::size_type const len );
 
 // Centered in a string of Specified Length Copy of a string
 std::string
-centered( std::string const & s, std::string::size_type const len );
+centered( std::string_view const s, std::string::size_type const len );
 
 // Centered wrt Whitespace Copy of a string
 inline
 std::string
-centered( std::string const & s )
+centered( std::string_view const s )
 {
 	return centered( stripped_whitespace( s ), s.length() );
 }
 
 // Removed Repeat Characters from a Possibly Unsorted string Preserving Order Copy of a string
 std::string
-uniqued( std::string const & s );
+uniqued( std::string_view const s );
 
 // Substring Replaced Copy of a string
 inline
 std::string
-replaced( std::string const & s, std::string const & a, std::string const & b )
+replaced( std::string_view const s, std::string_view const a, std::string_view const b )
 {
 	std::string r( s );
 	replace( r, a, b );
@@ -1661,27 +1119,27 @@ replaced( std::string const & s, std::string const & a, std::string const & b )
 
 // Overlayed string with Another string, Expanding Size as Needed
 std::string
-overlayed( std::string const & s, std::string const & t, std::string::size_type const pos = 0 );
+overlayed( std::string_view const s, std::string_view const t, std::string::size_type const pos = 0 );
 
 // Overlayed string with Another string, Expanding Size as Needed
 inline
 std::string
-overlaid( std::string const & s, std::string const & t, std::string::size_type const pos = 0 )
+overlaid( std::string_view const s, std::string_view const t, std::string::size_type const pos = 0 )
 {
 	return overlayed( s, t, pos );
 }
 
 // Repeated Copies
 std::string
-repeated( std::string const & s, int const n );
+repeated( std::string_view const s, int const n );
 
 // Repeated Copies
 std::string
-repeat( std::string const & s, int const n );
+repeat( std::string_view const s, int const n );
 
 // Space-Free Head Copy of a string
 std::string
-head( std::string const & s );
+head( std::string_view const s );
 
 // Concatenation: Non-template to Support Conversions
 inline

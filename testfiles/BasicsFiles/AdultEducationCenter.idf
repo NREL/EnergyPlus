@@ -375,6 +375,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -408,6 +409,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -439,6 +441,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -470,6 +473,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -501,6 +505,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -532,6 +537,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -563,6 +569,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -594,6 +601,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -625,6 +633,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -656,6 +665,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -672,6 +682,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -703,6 +714,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -736,6 +748,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -770,6 +783,7 @@
     Wall,                    !- Surface Type
     Medium Exterior Wall,    !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -807,6 +821,7 @@
     Floor,                   !- Surface Type
     Medium Floor,            !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -825,6 +840,7 @@
     Roof,                    !- Surface Type
     Medium Roof/Ceiling,     !- Construction Name
     Full Building - 1 Zone,  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -842,13 +858,15 @@
     Zn001:IntM001,           !- Name
     Medium Partitions,       !- Construction Name
     Full Building - 1 Zone,  !- Zone or ZoneList Name
-    956.9014;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    956.9014;                !- Extended Field
 
   InternalMass,
     Zn001:IntM002,           !- Name
     Medium/Heavy Partitions, !- Construction Name
     Full Building - 1 Zone,  !- Zone or ZoneList Name
-    1757.725;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    1757.725;                !- Extended Field
 
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULETYPE ===========
 ! Not limited
