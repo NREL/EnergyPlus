@@ -3714,23 +3714,22 @@ namespace WindowManager {
         auto &hcvBG = state.dataWindowManager->hcvBG;
         auto &AbsRadShadeFace = state.dataWindowManager->AbsRadShadeFace;
 
-        int iter = 0;                     // Iteration number
-        Real64 errtemp = 0.0;             // Absolute value of sum of face temperature differences between iterations, divided by number of faces
-        Real64 VGap = 0.0;                // Air velocity in gap between glass and shade/blind (m/s)
-        Real64 VAirflowGap = 0.0;         // Air velocity in airflow gap between glass panes (m/s)
-        Real64 VGapPrev = 0.0;            // Value of VGap from previous iteration
-        Real64 TGapNew = 0.0;             // Average air temp in gap between glass and shade/blind (K)
-        Real64 TAirflowGapNew = 0.0;      // Average air temp in airflow gap between glass panes (K)
-        Real64 TGapOutlet = 0.0;          // Temperature of air leaving gap between glass and shade/blind (K)
-        Real64 TAirflowGapOutlet = 0.0;   // Temperature of air leaving airflow gap between glass panes (K)
-        Real64 TAirflowGapOutletC = 0.0;  // Temperature of air leaving airflow gap between glass panes (C)
-        Real64 hcv = 0.0;                 // Convection coefficient from gap glass or shade/blind to gap air (W/m2-K)
-        Real64 hcvAirflowGap = 0.0;       // Convection coefficient from airflow gap glass to airflow gap air (W/m2-K)
-        Real64 hcvPrev = 0.0;             // Value of hcv from previous iteration
-        Real64 ConvHeatFlowNatural = 0.0; // Convective heat flow from gap between glass and interior shade or blind (W)
-        Real64 ConvHeatFlowForced = 0.0;  // Convective heat flow from forced airflow gap (W)
-        Real64 ShGlReflFacIR = 0.0;       // Factor for long-wave inter-reflection between shade/blind and adjacent glass
-        Real64 RhoGlIR1 = 0.0;            // Long-wave reflectance of glass surface facing shade/blind; 1=exterior shade/blind,
+        int iter = 0;                    // Iteration number
+        Real64 errtemp = 0.0;            // Absolute value of sum of face temperature differences between iterations, divided by number of faces
+        Real64 VGap = 0.0;               // Air velocity in gap between glass and shade/blind (m/s)
+        Real64 VAirflowGap = 0.0;        // Air velocity in airflow gap between glass panes (m/s)
+        Real64 VGapPrev = 0.0;           // Value of VGap from previous iteration
+        Real64 TGapNew = 0.0;            // Average air temp in gap between glass and shade/blind (K)
+        Real64 TAirflowGapNew = 0.0;     // Average air temp in airflow gap between glass panes (K)
+        Real64 TGapOutlet = 0.0;         // Temperature of air leaving gap between glass and shade/blind (K)
+        Real64 TAirflowGapOutlet = 0.0;  // Temperature of air leaving airflow gap between glass panes (K)
+        Real64 TAirflowGapOutletC = 0.0; // Temperature of air leaving airflow gap between glass panes (C)
+        Real64 hcv = 0.0;                // Convection coefficient from gap glass or shade/blind to gap air (W/m2-K)
+        Real64 hcvAirflowGap = 0.0;      // Convection coefficient from airflow gap glass to airflow gap air (W/m2-K)
+        Real64 hcvPrev = 0.0;            // Value of hcv from previous iteration
+        Real64 ConvHeatFlowForced = 0.0; // Convective heat flow from forced airflow gap (W)
+        Real64 ShGlReflFacIR = 0.0;      // Factor for long-wave inter-reflection between shade/blind and adjacent glass
+        Real64 RhoGlIR1 = 0.0;           // Long-wave reflectance of glass surface facing shade/blind; 1=exterior shade/blind,
         Real64 RhoGlIR2 = 0.0;
         //  2=exterior shade/blind
         Real64 EpsShIR1 = 0.0; // Long-wave emissivity of shade/blind surface facing glass; 1=interior shade/blind,
@@ -3744,24 +3743,18 @@ namespace WindowManager {
 
         WinShadingType ShadeFlag = WinShadingType::NoShade; // Shading flag
         //  radiation from lights and zone equipment absorbed by faces of shade/blind (W/m2)
-        Real64 ShadeArea = 0.0;          // shade/blind area (m2)
-        Real64 CondHeatGainGlass = 0.0;  // Conduction through inner glass layer, outside to inside (W)
-        Real64 CondHeatGainShade = 0.0;  // Conduction through shade/blind, outside to inside (W)
-        Real64 NetIRHeatGainGlass = 0.0; // Net IR heat gain to zone from shade/blind side of glass when interior
+        Real64 ShadeArea = 0.0; // shade/blind area (m2)
+        // Real64 CondHeatGainGlass = 0.0; // Conduction through inner glass layer, outside to inside (W)
+        // Real64 CondHeatGainShade = 0.0; // Conduction through shade/blind, outside to inside (W)
         //  shade/blind is present. Zero if shade/blind has zero IR transmittance (W)
-        Real64 NetIRHeatGainShade = 0.0;            // Net IR heat gain to zone from interior shade/blind (W)
-        Real64 ConvHeatGainFrZoneSideOfShade = 0.0; // Convective heat gain to zone from side of interior shade facing zone (W)
-        Real64 ConvHeatGainFrZoneSideOfGlass = 0.0; // Convective heat gain to zone from side of glass facing zone when
-        //  no interior shade/blind is present (W)
-        Real64 IncidentSolar = 0.0;         // Solar incident on outside of window (W)
-        Real64 TransDiff = 0.0;             // Diffuse shortwave transmittance
-        Real64 ConvHeatGainToZoneAir = 0.0; // Convective heat gain to zone air from window gap airflow (W)
-        Real64 TotAirflowGap = 0.0;         // Total volumetric airflow through window gap (m3/s)
-        Real64 CpAirOutlet = 0.0;           // Heat capacity of air from window gap (J/kg-K)
-        Real64 CpAirZone = 0.0;             // Heat capacity of zone air (J/kg-K)
-        Real64 InletAirHumRat = 0.0;        // Humidity ratio of air from window gap entering fan
-        Real64 ZoneTemp = 0.0;              // Zone air temperature (C)
-        int InsideFaceIndex = 0;            // intermediate variable for index of inside face in thetas
+        // Real64 IncidentSolar = 0.0;         // Solar incident on outside of window (W)
+        Real64 TransDiff = 0.0;      // Diffuse shortwave transmittance
+        Real64 TotAirflowGap = 0.0;  // Total volumetric airflow through window gap (m3/s)
+        Real64 CpAirOutlet = 0.0;    // Heat capacity of air from window gap (J/kg-K)
+        Real64 CpAirZone = 0.0;      // Heat capacity of zone air (J/kg-K)
+        Real64 InletAirHumRat = 0.0; // Humidity ratio of air from window gap entering fan
+        Real64 ZoneTemp = 0.0;       // Zone air temperature (C)
+        int InsideFaceIndex = 0;     // intermediate variable for index of inside face in thetas
 
         state.dataWindowManager->nglfacep = state.dataWindowManager->nglface;
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
@@ -3834,7 +3827,8 @@ namespace WindowManager {
             // effective gap air temperature, velocity of air in gap and gap outlet temperature.
 
             if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag) || ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
-                ExtOrIntShadeNaturalFlow(state, SurfNum, iter, VGap, TGapNew, TGapOutlet, hcv, ConvHeatFlowNatural);
+                ExtOrIntShadeNaturalFlow(
+                    state, SurfNum, iter, VGap, TGapNew, TGapOutlet, hcv, state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum));
                 if (iter >= 1) {
                     hcv = 0.5 * (hcvPrev + hcv);
                     VGap = 0.5 * (VGapPrev + VGap);
@@ -3867,7 +3861,6 @@ namespace WindowManager {
             }
 
             ++iter;
-            state.dataSurface->SurfWinWindowCalcIterationsRep(SurfNum) = iter;
 
             // Calculations based on number of glass layers
             auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
@@ -3916,6 +3909,8 @@ namespace WindowManager {
             errtemp /= state.dataWindowManager->nglfacep;
         }
 
+        state.dataSurface->SurfWinWindowCalcIterationsRep(SurfNum) = iter;
+
         // We have reached iteration limit or we have converged. If we have reached the
         // iteration limit the following test relaxes the convergence tolerance.
         // If we have converged (errtemp <= errtemptol) the following test has not effect.
@@ -3927,20 +3922,19 @@ namespace WindowManager {
             // For interior shade, add convective gain from glass/shade gap air flow to zone convective gain;
             // For all cases, get total window heat gain for reporting. See CalcWinFrameAndDividerTemps for
             // contribution of frame and divider.
-            IncidentSolar = state.dataSurface->Surface(SurfNum).Area * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
+            // IncidentSolar = state.dataSurface->Surface(SurfNum).Area * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
             if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 // Interior shade or blind
-                state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
                 // Window heat gain from glazing and shade/blind to zone. Consists of transmitted solar, convection
                 //   from air exiting gap, convection from zone-side of shade/blind, net IR to zone from shade and net IR to
                 //   zone from the glass adjacent to the shade/blind (zero if shade/blind IR transmittance is zero).
                 // Following assumes glazed area = window area (i.e., dividers ignored) in calculating
                 //   IR to zone from glass when interior shade/blind is present.
                 ShadeArea = state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum);
-                CondHeatGainShade = ShadeArea * sconsh *
-                                    (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep - 1) -
-                                     state.dataWindowManager->thetas(state.dataWindowManager->nglfacep));
-                NetIRHeatGainShade =
+                // CondHeatGainShade = ShadeArea * sconsh *
+                //                     (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep - 1) -
+                //                     state.dataWindowManager->thetas(state.dataWindowManager->nglfacep));
+                state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) =
                     ShadeArea * EpsShIR2 *
                         (state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep)) -
                          state.dataWindowManager->Rmir) +
@@ -3948,36 +3942,32 @@ namespace WindowManager {
                         (state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep - 1)) -
                          state.dataWindowManager->Rmir) *
                         RhoGlIR2 * TauShIR / ShGlReflFacIR;
-                NetIRHeatGainGlass = ShadeArea * (state.dataWindowManager->emis(2 * state.dataWindowManager->ngllayer) * TauShIR / ShGlReflFacIR) *
-                                     (state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer)) -
-                                      state.dataWindowManager->Rmir);
-                ConvHeatGainFrZoneSideOfShade = ShadeArea * state.dataWindowManager->hcin *
-                                                (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - state.dataWindowManager->tin);
-                state.dataSurface->SurfWinHeatGain(SurfNum) = state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatFlowNatural +
-                                                              ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
-                state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
-                // store components for reporting
-                state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural;
-                state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfShade;
-                state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
-                state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainShade;
+                state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) =
+                    ShadeArea * (state.dataWindowManager->emis(2 * state.dataWindowManager->ngllayer) * TauShIR / ShGlReflFacIR) *
+                    (state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer)) -
+                     state.dataWindowManager->Rmir);
+                state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) =
+                    ShadeArea * state.dataWindowManager->hcin *
+                    (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - state.dataWindowManager->tin);
+                state.dataSurface->SurfWinHeatGain(SurfNum) =
+                    state.dataSurface->SurfWinTransSolar(SurfNum) + state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum) +
+                    state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) + state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) +
+                    state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum);
             } else {
                 // Interior shade or blind not present; innermost layer is glass
-                CondHeatGainGlass = state.dataSurface->Surface(SurfNum).Area * state.dataWindowManager->scon(state.dataWindowManager->ngllayer) *
-                                    (state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer - 1) -
-                                     state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer));
-                NetIRHeatGainGlass = state.dataSurface->Surface(SurfNum).Area * state.dataWindowManager->emis(2 * state.dataWindowManager->ngllayer) *
-                                     (state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer)) -
-                                      state.dataWindowManager->Rmir);
-                ConvHeatGainFrZoneSideOfGlass =
+                // CondHeatGainGlass = state.dataSurface->Surface(SurfNum).Area * state.dataWindowManager->scon(state.dataWindowManager->ngllayer) *
+                //                     (state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer - 1) -
+                //                     state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer));
+                state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) =
+                    state.dataSurface->Surface(SurfNum).Area * state.dataWindowManager->emis(2 * state.dataWindowManager->ngllayer) *
+                    (state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer)) -
+                     state.dataWindowManager->Rmir);
+                state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfNum) =
                     state.dataSurface->Surface(SurfNum).Area * state.dataWindowManager->hcin *
                     (state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer) - state.dataWindowManager->tin);
-                state.dataSurface->SurfWinHeatGain(SurfNum) =
-                    state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
-                state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
-                // store components for reporting
-                state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfGlass;
-                state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
+                state.dataSurface->SurfWinHeatGain(SurfNum) = state.dataSurface->SurfWinTransSolar(SurfNum) +
+                                                              state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfNum) +
+                                                              state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum);
             }
 
             // Add convective heat gain from airflow window
@@ -4005,13 +3995,10 @@ namespace WindowManager {
                     ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum); // this should be Tin (account for different reference temps)
                     CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
                     CpAirZone = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
-                    ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
+                    state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum) =
+                        TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
                     if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir) {
-                        state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
-                        state.dataSurface->SurfWinHeatGain(SurfNum) += ConvHeatGainToZoneAir;
-                        state.dataSurface->SurfWinHeatTransfer(SurfNum) += ConvHeatGainToZoneAir;
-                    } else {
-                        state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
+                        state.dataSurface->SurfWinHeatGain(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
                     }
                 }
                 // For AirflowDestination = ReturnAir in a controlled (i.e., conditioned) zone with return air, see CalcZoneLeavingConditions
@@ -4043,14 +4030,11 @@ namespace WindowManager {
                                      state.dataConstruction->Construct(ConstrNum).TransDiff,
                                      state.dataConstruction->Construct(ConstrNumSh).TransDiff);
             }
-            state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) *
-                                                           state.dataSurface->Surface(SurfNum).Area * TransDiff;
-            state.dataSurface->SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) *
-                                                               state.dataSurface->Surface(SurfNum).Area * TransDiff;
             // shouldn't this be + outward flowing fraction of absorbed SW? -- do not know whose comment this is?  LKL (9/2012)
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
                 state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area *
                 TransDiff;
+            state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum);
 
             if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
                 state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum) =
@@ -6403,7 +6387,6 @@ namespace WindowManager {
             }
 
             state.dataSurface->SurfWinHeatGain(SurfNum) += FrameHeatGain;
-            state.dataSurface->SurfWinHeatTransfer(SurfNum) += FrameHeatTransfer;
             state.dataSurface->SurfWinGainFrameDividerToZoneRep(SurfNum) = FrameHeatGain;
         } // End of check if window has a frame
 
@@ -6481,7 +6464,6 @@ namespace WindowManager {
                 state.dataSurface->SurfWinDividerHeatLoss(SurfNum) = std::abs(DividerHeatGain);
             }
             state.dataSurface->SurfWinHeatGain(SurfNum) += DividerHeatGain;
-            state.dataSurface->SurfWinHeatTransfer(SurfNum) += DividerHeatTransfer;
             state.dataSurface->SurfWinGainFrameDividerToZoneRep(SurfNum) += DividerHeatGain;
             // If interior shade is present it is assumed that both the convective and IR radiative gain
             // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative

@@ -1415,30 +1415,27 @@ struct SurfacesData : BaseGlobalStruct
     Array1D_int SurfWinInsideFrameCondensationFlag;   // 1 if frame inside surface temp < zone air dew point; 0 otherwise
     Array1D_int SurfWinInsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;  0 otherwise
 
-    Array2D<Real64> SurfWinA;            // Time step value of factor for beam absorbed in window glass layers
-    Array2D<Real64> SurfWinADiffFront;   // Time step value of factor for diffuse absorbed in window layers
-    Array2D<Real64> SurfWinACFOverlap;   // Time step value of factor for beam absorbed in window glass layers which comes from other windows
-                                         // It happens sometimes that beam enters one window and hits back of second window.
-                                         // It is used in complex fenestration only
-    Array1D<Real64> SurfWinTransSolar;   // Exterior beam plus diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
-    Array1D<Real64> SurfWinBmSolar;      // Exterior beam solar transmitted through window, or window plus blind, into zone (W)
-    Array1D<Real64> SurfWinBmBmSolar;    // Exterior beam-to-beam solar transmitted through window, or window plus blind, into zone (W)
-    Array1D<Real64> SurfWinBmDifSolar;   // Exterior beam-to-diffuse solar transmitted through window, or window plus blind, into zone (W)
-    Array1D<Real64> SurfWinDifSolar;     // Exterior diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
-    Array1D<Real64> SurfWinHeatGain;     // Total heat gain from window = WinTransSolar + (IR and convection from glazing, or,
-                                         // if interior shade, IR and convection from zone-side of shade plus gap air convection to zone) +
-                                         // (IR convection from frame) + (IR and convection from divider if no interior shade) (W)
-    Array1D<Real64> SurfWinHeatTransfer; // Total heat transfer through the window = WinTransSolar + conduction through glazing and frame
-    Array1D<Real64> SurfWinHeatGainRep;  // Equals WinHeatGain when WinHeatGain >= 0.0
-    Array1D<Real64> SurfWinHeatLossRep;  // Equals -WinHeatGain when WinHeatGain < 0.0
-    Array1D<Real64> SurfWinGainConvGlazToZoneRep;        // component of WinHeatGain convect to zone from glazing (W)
-    Array1D<Real64> SurfWinGainIRGlazToZoneRep;          // component of WinHeatGain net IR to zone from glazing (W)
-    Array1D<Real64> SurfWinLossSWZoneToOutWinRep;        // component of WinHeatGain shortwave transmit back out (W)
-    Array1D<Real64> SurfWinGainFrameDividerToZoneRep;    // component of WinHeatGain to zone from frame/divider (W)
-    Array1D<Real64> SurfWinGainConvGlazShadGapToZoneRep; // component of WinHeatGain convection to zone from the gap between the inner most glazing
-                                                         // and the shade   (W)
-    Array1D<Real64> SurfWinGainConvShadeToZoneRep;       // component of WinHeatGain convect to zone from front shade (W)
-    Array1D<Real64> SurfWinGainIRShadeToZoneRep;         // component of WinHeatGain net IR to zone from front shade (W)
+    Array2D<Real64> SurfWinA;           // Time step value of factor for beam absorbed in window glass layers
+    Array2D<Real64> SurfWinADiffFront;  // Time step value of factor for diffuse absorbed in window layers
+    Array2D<Real64> SurfWinACFOverlap;  // Time step value of factor for beam absorbed in window glass layers which comes from other windows
+                                        // It happens sometimes that beam enters one window and hits back of second window.
+                                        // It is used in complex fenestration only
+    Array1D<Real64> SurfWinTransSolar;  // Exterior beam plus diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
+    Array1D<Real64> SurfWinBmSolar;     // Exterior beam solar transmitted through window, or window plus blind, into zone (W)
+    Array1D<Real64> SurfWinBmBmSolar;   // Exterior beam-to-beam solar transmitted through window, or window plus blind, into zone (W)
+    Array1D<Real64> SurfWinBmDifSolar;  // Exterior beam-to-diffuse solar transmitted through window, or window plus blind, into zone (W)
+    Array1D<Real64> SurfWinDifSolar;    // Exterior diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
+    Array1D<Real64> SurfWinHeatGain;    // Total heat gain from window = WinTransSolar + (IR and convection from glazing, or,
+                                        // if interior shade, IR and convection from zone-side of shade plus gap air convection to zone) +
+                                        // (IR convection from frame) + (IR and convection from divider if no interior shade) (W)
+    Array1D<Real64> SurfWinHeatGainRep; // Equals WinHeatGain when WinHeatGain >= 0.0
+    Array1D<Real64> SurfWinHeatLossRep; // Equals -WinHeatGain when WinHeatGain < 0.0
+    Array1D<Real64> SurfWinGainConvGlazToZoneRep;            // component of WinHeatGain convect to zone from glazing (W)
+    Array1D<Real64> SurfWinGainIRGlazToZoneRep;              // component of WinHeatGain net IR to zone from glazing (W)
+    Array1D<Real64> SurfWinLossSWZoneToOutWinRep;            // component of WinHeatGain shortwave transmit back out (W)
+    Array1D<Real64> SurfWinGainFrameDividerToZoneRep;        // component of WinHeatGain to zone from frame/divider (W)
+    Array1D<Real64> SurfWinGainConvShadeToZoneRep;           // component of WinHeatGain convect to zone from front shade (W)
+    Array1D<Real64> SurfWinGainIRShadeToZoneRep;             // component of WinHeatGain net IR to zone from front shade (W)
     Array1D<Real64> SurfWinOtherConvGainInsideFaceToZoneRep; // net imbalance of convection heat gain from equivalent Layer window
                                                              // inside face to zone air
     Array1D<Real64> SurfWinGapConvHtFlowRep;                 // Convective heat flow from gap in airflow window (W)
@@ -1795,14 +1792,12 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinBmDifSolar.deallocate();
         this->SurfWinDifSolar.deallocate();
         this->SurfWinHeatGain.deallocate();
-        this->SurfWinHeatTransfer.deallocate();
         this->SurfWinHeatGainRep.deallocate();
         this->SurfWinHeatLossRep.deallocate();
         this->SurfWinGainConvGlazToZoneRep.deallocate();
         this->SurfWinGainIRGlazToZoneRep.deallocate();
         this->SurfWinLossSWZoneToOutWinRep.deallocate();
         this->SurfWinGainFrameDividerToZoneRep.deallocate();
-        this->SurfWinGainConvGlazShadGapToZoneRep.deallocate();
         this->SurfWinGainConvShadeToZoneRep.deallocate();
         this->SurfWinGainIRShadeToZoneRep.deallocate();
         this->SurfWinOtherConvGainInsideFaceToZoneRep.deallocate();

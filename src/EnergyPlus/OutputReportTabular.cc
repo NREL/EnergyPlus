@@ -13835,7 +13835,7 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
             // IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
             ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, state.dataOutRptTab->ZoneNumGCLS) +=
                 state.dataSurface->SurfWinGainConvGlazToZoneRep(state.dataOutRptTab->iSurfGCLS) +
-                state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(state.dataOutRptTab->iSurfGCLS) +
+                state.dataSurface->SurfWinConvHeatFlowNatural(state.dataOutRptTab->iSurfGCLS) +
                 state.dataSurface->SurfWinGainConvShadeToZoneRep(state.dataOutRptTab->iSurfGCLS) +
                 state.dataSurface->SurfWinGainFrameDividerToZoneRep(state.dataOutRptTab->iSurfGCLS);
             // for now assume zero instant solar - may change related

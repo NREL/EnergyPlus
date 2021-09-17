@@ -2515,7 +2515,6 @@ void InitSolarHeatGains(EnergyPlusData &state)
             state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinGainFrameDividerToZoneRep(SurfNum) = 0.0;
-            state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) = 0.0;
@@ -2524,13 +2523,11 @@ void InitSolarHeatGains(EnergyPlusData &state)
         }
         for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
             state.dataSurface->SurfWinHeatGain(SurfNum) = 0.0;
-            state.dataSurface->SurfWinHeatTransfer(SurfNum) = 0.0;
             state.dataSurface->SurfWinHeatGainRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinHeatLossRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinHeatGainRepEnergy(SurfNum) = 0.0;
             state.dataSurface->SurfWinHeatLossRepEnergy(SurfNum) = 0.0;
             state.dataSurface->SurfWinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
-            state.dataSurface->SurfWinHeatTransferRepEnergy(SurfNum) = 0.0;
             state.dataSurface->SurfWinShadingAbsorbedSolarEnergy(SurfNum) = 0.0;
             state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = 0.0;
         }
@@ -6956,14 +6953,12 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
     // Only for Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window
     for (int surfNum : HTWindowSurfs) {
         state.dataSurface->SurfWinHeatGain(surfNum) = 0.0;
-        state.dataSurface->SurfWinHeatTransfer(surfNum) = 0.0;
         state.dataSurface->SurfWinHeatGainRep(surfNum) = 0.0;
         state.dataSurface->SurfWinHeatLossRep(surfNum) = 0.0;
         state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) = 0.0;
         state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) = 0.0;
         state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = 0.0;
         state.dataSurface->SurfWinGainFrameDividerToZoneRep(surfNum) = 0.0;
-        state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(surfNum) = 0.0;
         state.dataSurface->SurfWinGainConvShadeToZoneRep(surfNum) = 0.0;
         state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
         state.dataSurface->SurfWinGainIRShadeToZoneRep(surfNum) = 0.0;
@@ -7425,7 +7420,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         state.dataConstruction->Construct(surface.Construction).TransDiff;
                 // Transmitted solar | Convection | IR exchange | IR
                 // Zone diffuse interior shortwave reflected back into the TDD
-                state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
 
                 // fill out report vars for components of Window Heat Gain
                 state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfNum) =
@@ -7788,14 +7782,12 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         int const lastWindowSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
         for (int surfNum = firstWindowSurf; surfNum <= lastWindowSurf; ++surfNum) {
             state.dataSurface->SurfWinHeatGain(surfNum) = 0.0;
-            state.dataSurface->SurfWinHeatTransfer(surfNum) = 0.0;
             state.dataSurface->SurfWinHeatGainRep(surfNum) = 0.0;
             state.dataSurface->SurfWinHeatLossRep(surfNum) = 0.0;
             state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) = 0.0;
             state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) = 0.0;
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = 0.0;
             state.dataSurface->SurfWinGainFrameDividerToZoneRep(surfNum) = 0.0;
-            state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(surfNum) = 0.0;
             state.dataSurface->SurfWinGainConvShadeToZoneRep(surfNum) = 0.0;
             state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
             state.dataSurface->SurfWinGainIRShadeToZoneRep(surfNum) = 0.0;
@@ -8071,7 +8063,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                         state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
                             state.dataConstruction->Construct(surface.Construction).TransDiff; // Transmitted solar | Convection | IR exchange | IR
                     // Zone diffuse interior shortwave reflected back into the TDD
-                    state.dataSurface->SurfWinHeatTransfer(surfNum) = state.dataSurface->SurfWinHeatGain(surfNum);
 
                     // fill out report vars for components of Window Heat Gain
                     state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) =
