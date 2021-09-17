@@ -504,7 +504,7 @@ namespace UnitarySystems {
             state.dataUnitarySystems->myOneTimeFlag = false;
         }
 
-        if (allocated(state.dataHVACGlobal->ZoneComp)) {
+        if (this->m_IsZoneEquipment && !state.dataHVACGlobal->ZoneComp.empty()) {
             // this won't work when parent types are different
             // also need to move to better location and save thisObjectIndex and thisObjectType in struct
             // also, thisObjectIndex needs to be by parent type, not total UnitarySystems
@@ -3794,6 +3794,9 @@ namespace UnitarySystems {
             }
 
             // how can ZoneEquipmentFound be true? this is inside !ZoneEquipmentFound
+            // might this be if (!AirLoopFound && ...) ? and next else if
+            // or these are correct and in the wrong place
+            // leaving as is based on unit test crashes, but unit tests could be ill formed
             if (ZoneEquipmentFound && !ZoneExhaustNodeFound && !InducedNodeFound) {
                 // Exhaust Node was not found
                 ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
@@ -3805,7 +3808,7 @@ namespace UnitarySystems {
                                       "object inputs.");
                 ShowContinueError(state, "or Induced Air Outlet Node Name specified in AirLoopHVAC:ReturnPlenum object.");
                 errorsFound = true;
-            } else if (AirLoopFound && !ZoneInletNodeFound) {
+            } else if (ZoneEquipmentFound && !ZoneInletNodeFound) {
                 bool ZoneInletNodeExists = false;
                 int InletControlledZoneNum = 0;
                 int ZoneInletNum = 0;
