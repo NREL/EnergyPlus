@@ -1090,7 +1090,7 @@
     ZN_1_FLR_1_SEC_1,        !- Zone Name
     ,                        !- Space Name
     OtherSideConditionsModel,                !- Outside Boundary Condition
-    OSCM,                        !- Outside Boundary Condition Object
+    OSCM_ZN_1_FLR_1_SEC_1,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000,                  !- View Factor to Ground
@@ -1471,7 +1471,7 @@
     ZN_1_FLR_1_SEC_2,        !- Zone Name
     ,                        !- Space Name
     OtherSideConditionsModel,                !- Outside Boundary Condition
-    OSCM,                        !- Outside Boundary Condition Object
+    OSCM_ZN_1_FLR_1_SEC_2,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000,                  !- View Factor to Ground
@@ -1852,7 +1852,7 @@
     ZN_1_FLR_1_SEC_3,        !- Zone Name
     ,                        !- Space Name
     OtherSideConditionsModel,                !- Outside Boundary Condition
-    OSCM,                        !- Outside Boundary Condition Object
+    OSCM_ZN_1_FLR_1_SEC_3,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000,                  !- View Factor to Ground
@@ -2233,7 +2233,7 @@
     ZN_1_FLR_1_SEC_4,        !- Zone Name
     ,                        !- Space Name
     OtherSideConditionsModel,                !- Outside Boundary Condition
-    OSCM,                        !- Outside Boundary Condition Object
+    OSCM_ZN_1_FLR_1_SEC_4,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000,                  !- View Factor to Ground
@@ -2599,7 +2599,7 @@
     ZN_1_FLR_1_SEC_5,        !- Zone Name
     ,                        !- Space Name
     OtherSideConditionsModel,                    !- Outside Boundary Condition
-    OSCM,                        !- Outside Boundary Condition Object
+    OSCM_ZN_1_FLR_1_SEC_5,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
     WindExposed,             !- Wind Exposure
     0.0000,                  !- View Factor to Ground
@@ -4774,11 +4774,27 @@
     ,                        !- Generator 10 Availability Schedule Name
     1.5;                     !- Generator 10 Rated Thermal to Electrical Power Ratio
 
-  PhotovoltaicPerformance:Simple,
-    20percentEffPV65percentArea,  !- Name
-    0.65,                    !- Fraction of Surface Area with Active Solar Cells {dimensionless}
-    Fixed,                   !- Conversion Efficiency Input Mode
-    0.20;                    !- Value for Cell Efficiency if Fixed
+  PhotovoltaicPerformance:EquivalentOne-Diode,
+    SiemensSamplePVModule, !- Name
+    CrystallineSilicon, !- Cell Type
+    36, !- Number of Cells in Series [-]
+    1.0, !- Area Active [m2]
+    0.957, !- Transmittance Absorptance Product
+    1.12, !- Semiconductor Bandgap [eV]
+    1000000, !- Shunt Resistance [Ohms]
+    6.5, !- Short Circuit Current [A/K]
+    21.6, !- Open Circuit Voltage [V/K]
+    25, !- Reference Temperature [C]
+    1000, !- Reference Insolation [W/m2]
+    5.9, !- Module Current at Maximum Power [A]
+    17, !- Module Voltage at Maximum Power [V]
+    0.002, !- Temperature Coefficient of Short Circuit Current
+    -0.079, !- Temperature Coefficient of Open Circuit Voltage
+    20, !- Nominal Operating Cell Temperature Test Ambient Temperature [C]
+    45, !- Nominal Operating Cell Temperature Test Cell Temperature [C]
+    800, !- Nominal Operating Cell Temperature Test Insolation [W/m2]
+    30, !- Module Heat Loss Coefficient [W/m2.K]
+    50000; !- Total Heat Capacity [J/m2-K]
 
   SolarCollector:FlatPlate:PhotovoltaicThermal,
     PVT:ZN_1_FLR_1_SEC_1_Ceiling,  !- Name
@@ -4795,11 +4811,11 @@
   Generator:Photovoltaic,
     PV:ZN_1_FLR_1_SEC_1_Ceiling,  !- Name
     ZN_1_FLR_1_SEC_1_Ceiling,!- Surface Name
-    PhotovoltaicPerformance:Simple,  !- Photovoltaic Performance Object Type
-    20percentEffPV65percentArea,  !- Module Performance Name
+    PhotovoltaicPerformance:EquivalentOne-Diode,  !- Photovoltaic Performance Object Type
+    SiemensSamplePVModule,  !- Module Performance Name
     PhotovoltaicThermalSolarCollector,  !- Heat Transfer Integration Mode
-    1.0,                     !- Number of Series Strings in Parallel {dimensionless}
-    1.0;                     !- Number of Modules in Series {dimensionless}
+    17.0,                     !- Number of Series Strings in Parallel {dimensionless}
+    4.0;                     !- Number of Modules in Series {dimensionless}
 
   SolarCollector:FlatPlate:PhotovoltaicThermal,
     PVT:ZN_1_FLR_1_SEC_2_Ceiling,  !- Name
@@ -4816,11 +4832,11 @@
   Generator:Photovoltaic,
     PV:ZN_1_FLR_1_SEC_2_Ceiling,  !- Name
     ZN_1_FLR_1_SEC_2_Ceiling,!- Surface Name
-    PhotovoltaicPerformance:Simple,  !- Photovoltaic Performance Object Type
-    20percentEffPV65percentArea,  !- Module Performance Name
-    Decoupled,               !- Heat Transfer Integration Mode
-    1.0,                     !- Number of Series Strings in Parallel {dimensionless}
-    1.0;                     !- Number of Modules in Series {dimensionless}
+    PhotovoltaicPerformance:EquivalentOne-Diode,  !- Photovoltaic Performance Object Type
+    SiemensSamplePVModule,  !- Module Performance Name
+    PhotovoltaicThermalSolarCollector,               !- Heat Transfer Integration Mode
+    4.0,                     !- Number of Series Strings in Parallel {dimensionless}
+    13.0;                     !- Number of Modules in Series {dimensionless}
 
   SolarCollector:FlatPlate:PhotovoltaicThermal,
     PVT:ZN_1_FLR_1_SEC_3_Ceiling,  !- Name
@@ -4837,11 +4853,11 @@
   Generator:Photovoltaic,
     PV:ZN_1_FLR_1_SEC_3_Ceiling,  !- Name
     ZN_1_FLR_1_SEC_3_Ceiling,!- Surface Name
-    PhotovoltaicPerformance:Simple,  !- Photovoltaic Performance Object Type
-    20percentEffPV65percentArea,  !- Module Performance Name
-    Decoupled,               !- Heat Transfer Integration Mode
-    1.0,                     !- Number of Series Strings in Parallel {dimensionless}
-    1.0;                     !- Number of Modules in Series {dimensionless}
+    PhotovoltaicPerformance:EquivalentOne-Diode,  !- Photovoltaic Performance Object Type
+    SiemensSamplePVModule,  !- Module Performance Name
+    PhotovoltaicThermalSolarCollector,               !- Heat Transfer Integration Mode
+    17.0,                     !- Number of Series Strings in Parallel {dimensionless}
+    4.0;                     !- Number of Modules in Series {dimensionless}
 
   SolarCollector:FlatPlate:PhotovoltaicThermal,
     PVT:ZN_1_FLR_1_SEC_4_Ceiling,  !- Name
@@ -4858,11 +4874,11 @@
   Generator:Photovoltaic,
     PV:ZN_1_FLR_1_SEC_4_Ceiling,  !- Name
     ZN_1_FLR_1_SEC_4_Ceiling,!- Surface Name
-    PhotovoltaicPerformance:Simple,  !- Photovoltaic Performance Object Type
-    20percentEffPV65percentArea,  !- Module Performance Name
-    Decoupled,               !- Heat Transfer Integration Mode
-    1.0,                     !- Number of Series Strings in Parallel {dimensionless}
-    1.0;                     !- Number of Modules in Series {dimensionless}
+    PhotovoltaicPerformance:EquivalentOne-Diode,  !- Photovoltaic Performance Object Type
+    SiemensSamplePVModule,  !- Module Performance Name
+    PhotovoltaicThermalSolarCollector,               !- Heat Transfer Integration Mode
+    4.0,                     !- Number of Series Strings in Parallel {dimensionless}
+    13.0;                     !- Number of Modules in Series {dimensionless}
 
   SolarCollector:FlatPlate:PhotovoltaicThermal,
     PVT:ZN_1_FLR_1_SEC_5_Ceiling,  !- Name
@@ -4879,11 +4895,11 @@
   Generator:Photovoltaic,
     PV:ZN_1_FLR_1_SEC_5_Ceiling,  !- Name
     ZN_1_FLR_1_SEC_5_Ceiling,!- Surface Name
-    PhotovoltaicPerformance:Simple,  !- Photovoltaic Performance Object Type
-    20percentEffPV65percentArea,  !- Module Performance Name
-    Decoupled,               !- Heat Transfer Integration Mode
-    1.0,                     !- Number of Series Strings in Parallel {dimensionless}
-    1.0;                     !- Number of Modules in Series {dimensionless}
+    PhotovoltaicPerformance:EquivalentOne-Diode,  !- Photovoltaic Performance Object Type
+    SiemensSamplePVModule,  !- Module Performance Name
+    PhotovoltaicThermalSolarCollector,               !- Heat Transfer Integration Mode
+    12.0,                     !- Number of Series Strings in Parallel {dimensionless}
+    8.0;                     !- Number of Modules in Series {dimensionless}
 
   SetpointManager:MixedAir,
     PVT:ZN_1_FLR_1_SEC_1 Air Temp Manager,  !- Name
@@ -4927,7 +4943,7 @@
 
   SolarCollectorPerformance:PhotovoltaicThermal:BIPVT,
     ZN_1_FLR_1_SEC_5_Ceiling_BIPVT, !- Name
-    OSCM,  !- Boundary Conditions Model Name
+    OSCM_ZN_1_FLR_1_SEC_5,  !- Boundary Conditions Model Name
     , !- Availability Schedule Name
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
     12.616, !- Effective Overall Height of Collector
@@ -4949,7 +4965,7 @@
 
   SolarCollectorPerformance:PhotovoltaicThermal:BIPVT,
     ZN_1_FLR_1_SEC_4_Ceiling_BIPVT, !- Name
-    OSCM,  !- Boundary Conditions Model Name
+    OSCM_ZN_1_FLR_1_SEC_4,  !- Boundary Conditions Model Name
     , !- Availability Schedule Name
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
     4.57, !- Effective Overall Height of Collector
@@ -4971,7 +4987,7 @@
  
   SolarCollectorPerformance:PhotovoltaicThermal:BIPVT,
     ZN_1_FLR_1_SEC_3_Ceiling_BIPVT, !- Name
-    OSCM,  !- Boundary Conditions Model Name
+    OSCM_ZN_1_FLR_1_SEC_3,  !- Boundary Conditions Model Name
     , !- Availability Schedule Name
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
     17.18, !- Effective Overall Height of Collector
@@ -4993,7 +5009,7 @@
 
   SolarCollectorPerformance:PhotovoltaicThermal:BIPVT,
     ZN_1_FLR_1_SEC_2_Ceiling_BIPVT, !- Name
-    OSCM,  !- Boundary Conditions Model Name
+    OSCM_ZN_1_FLR_1_SEC_2,  !- Boundary Conditions Model Name
     , !- Availability Schedule Name
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
     4.57, !- Effective Overall Height of Collector
@@ -5015,7 +5031,7 @@
 
   SolarCollectorPerformance:PhotovoltaicThermal:BIPVT,
     ZN_1_FLR_1_SEC_1_Ceiling_BIPVT, !- Name
-    OSCM,  !- Boundary Conditions Model Name
+    OSCM_ZN_1_FLR_1_SEC_1,  !- Boundary Conditions Model Name
     , !- Availability Schedule Name
     0.1, !- Effective Plenum Gap Thickness Behind PV Modules
     17.18, !- Effective Overall Height of Collector
@@ -5036,7 +5052,23 @@
     4.0; !- Glass Extinction Coefficient
 
   SurfaceProperty:OtherSideConditionsModel,
-    OSCM, !- Name
+    OSCM_ZN_1_FLR_1_SEC_1, !- Name
+    GapConvectionRadiation; !- Type of Modeling
+
+  SurfaceProperty:OtherSideConditionsModel,
+    OSCM_ZN_1_FLR_1_SEC_2, !- Name
+    GapConvectionRadiation; !- Type of Modeling
+
+  SurfaceProperty:OtherSideConditionsModel,
+    OSCM_ZN_1_FLR_1_SEC_3, !- Name
+    GapConvectionRadiation; !- Type of Modeling
+
+  SurfaceProperty:OtherSideConditionsModel,
+    OSCM_ZN_1_FLR_1_SEC_4, !- Name
+    GapConvectionRadiation; !- Type of Modeling
+
+  SurfaceProperty:OtherSideConditionsModel,
+    OSCM_ZN_1_FLR_1_SEC_5, !- Name
     GapConvectionRadiation; !- Type of Modeling
 
 !***PLANT COLLECTOR LOOP***
@@ -5538,6 +5570,10 @@
   Output:Variable,ZN_1_FLR_1_SEC_1:Sys_OA-ZN_1_FLR_1_SEC_1:SysCoolCNode,System Node Temperature,timestep;
 
   Output:Variable,ZN_1_FLR_1_SEC_1:Sys_OA-ZN_1_FLR_1_SEC_1:SysCoolCNode,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,*,Surface Other Side Conditions Modeled Convection Air Temperature,timestep;
+
+  Output:Variable,*,Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient,timestep;
 
   Output:Variable,Collector 1 Outlet Node,System Node Temperature,timestep;
 
