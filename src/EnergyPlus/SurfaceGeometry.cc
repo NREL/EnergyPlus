@@ -88,6 +88,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/WindowManager.hh>
 
 namespace EnergyPlus {
 
@@ -2817,10 +2818,15 @@ namespace SurfaceGeometry {
                 int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
                 int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
                 for (int surfNum = firstSurf; surfNum <= lastSurf; surfNum++) {
+                    auto &surface(state.dataSurface->Surface(surfNum));
                     // Conditions where surface always needs to be unique
-                    bool forceUniqueSurface = state.dataSurface->Surface(surfNum).HasShadeControl ||
-                                              state.dataSurface->SurfWinAirflowSource(surfNum) ||
-                                              state.dataConstruction->Construct(state.dataSurface->Surface(surfNum).Construction).SourceSinkPresent;
+                    bool forceUniqueSurface =
+                        surface.HasShadeControl || state.dataSurface->SurfWinAirflowSource(surfNum) ||
+                        state.dataConstruction->Construct(surface.Construction).SourceSinkPresent || surface.Class == SurfaceClass::TDD_Dome ||
+                        (surface.Class == SurfaceClass::Window && (state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser ||
+                                                                   state.dataSurface->SurfWinWindowModelType(surfNum) != Window5DetailedModel ||
+                                                                   state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() ||
+                                                                   state.dataConstruction->Construct(surface.Construction).TCFlag == 1));
                     if (!forceUniqueSurface) {
                         state.dataSurface->Surface(surfNum).set_representative_surface(state, surfNum);
                     }
