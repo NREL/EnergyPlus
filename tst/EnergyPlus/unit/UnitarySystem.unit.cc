@@ -1402,6 +1402,25 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
     EXPECT_LT(state->dataLoopNodes->Node(2).Temp, CoolingCoilAirOutletTempAtSpeedOne);
     // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(2).Temp);
+
+    state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
+    thisSys->m_EMSOverrideCoilSpeedNumValue = 2.2;
+    thisSys->simulate(*state,
+                      thisSys->Name,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatActive,
+                      CoolActive,
+                      ZoneOAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipment,
+                      sensOut,
+                      latOut);
+
+    EXPECT_EQ(thisSys->m_CoolingSpeedNum, 2);
+    EXPECT_EQ(thisSys->m_SpeedNum, 2);
+    EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 1.0, 0.001); // RESET TO MAX SPEED ALLOWED
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
