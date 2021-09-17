@@ -158,16 +158,16 @@ namespace UnitarySystems {
           m_minAirToWaterTempOffset(0.0), m_HRcoolCoilFluidInletNode(0), m_HRcoolCoilAirInNode(0), m_minWaterLoopTempForHR(0.0),
           m_waterSideEconomizerFlag(false), m_WaterHRPlantLoopModel(false), m_CoolOutAirVolFlow(0.0), m_CoolOutAirMassFlow(0.0),
           m_HeatOutAirVolFlow(0.0), m_HeatOutAirMassFlow(0.0), m_NoCoolHeatOutAirVolFlow(0.0), m_NoCoolHeatOutAirMassFlow(0.0), m_HeatConvTol(0.0),
-          m_CoolConvTol(0.0), m_HVACSizingIndex(-1), m_AvailStatus(0), m_IsZoneEquipment(false), m_ZoneCompFlag(true),
-          m_ZoneUnitaryNum(0), m_PTACNum(0), m_PTHPNum(0), m_PTWSHPNum(0), UnitarySystemType_Num(0), MaxIterIndex(0),
-          RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0),
-          ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0),
-          DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0),
-          MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0),
-          CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0),
-          HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0),
-          HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr),
-          LoadSHR(0.0), CoilSHR(0.0), temperatureOffsetControlStatus(0), OAMixerIndex(-1), OAMixerExists(false)
+          m_CoolConvTol(0.0), m_HVACSizingIndex(-1), m_AvailStatus(0), m_IsZoneEquipment(false), m_ZoneCompFlag(true), m_ZoneUnitaryNum(0),
+          m_PTACNum(0), m_PTHPNum(0), m_PTWSHPNum(0), UnitarySystemType_Num(0), MaxIterIndex(0), RegulaFalsiFailedIndex(0),
+          NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0),
+          AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0),
+          DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0),
+          CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0), CoolCoilLoopSide(0),
+          CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0),
+          HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0),
+          ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr), LoadSHR(0.0),
+          CoilSHR(0.0), temperatureOffsetControlStatus(0), OAMixerIndex(-1), OAMixerExists(false)
     {
     }
 
@@ -218,7 +218,7 @@ namespace UnitarySystems {
             // Get the unitary system input
             getUnitarySystemInput(state, Name, ZoneEquipment, ZoneOAUnitNum);
         }
-            CompIndex = this->m_UnitarySysNum;
+        CompIndex = this->m_UnitarySysNum;
 
         state.dataUnitarySystems->FanSpeedRatio = 1.0;
         if (ZoneEquipment) {
@@ -3795,7 +3795,7 @@ namespace UnitarySystems {
 
             // how can ZoneEquipmentFound be true? this is inside !ZoneEquipmentFound
             // might this be if (!AirLoopFound && ...) ? and next else if
-            // or these are correct and in the wrong place
+            // or these are correct and in the wrong place?
             // leaving as is based on unit test crashes, but unit tests could be ill formed
             if (ZoneEquipmentFound && !ZoneExhaustNodeFound && !InducedNodeFound) {
                 // Exhaust Node was not found
@@ -3861,7 +3861,7 @@ namespace UnitarySystems {
             int thisObjectType = 0;
             switch (this->m_sysType) {
             case SysType::Unitary:
-                thisObjectIndex = 0; //this->m_ZoneUnitaryNum; this object does not accept sys avail managers yet
+                thisObjectIndex = 0; // this->m_ZoneUnitaryNum; this object does not accept sys avail managers yet
                 thisObjectType = DataZoneEquipment::ZoneUnitarySys_Num;
                 break;
             case SysType::PackagedAC:
