@@ -3060,8 +3060,8 @@ namespace HVACMultiSpeedHeatPump {
                                            "Wrong coil speed EMS override value, for unit=\"" + useMaxedSpeedCoilName +
                                                "\". Exceeding maximum coil speed level. Speed level is set to the maximum coil speed level allowed.",
                                            MSHeatPump(MSHeatPumpNum).CoilSpeedErrIndex,
-                                           ceil(SpeedVal),
-                                           ceil(SpeedVal),
+                                           SpeedVal,
+                                           SpeedVal,
                                            _,
                                            "",
                                            "");
@@ -3071,7 +3071,7 @@ namespace HVACMultiSpeedHeatPump {
 
         if (SpeedNum == 1) {
             SpeedRatio = 0.0;
-            if (useMaxedSpeed or floor(SpeedVal) == SpeedVal) {
+            if (useMaxedSpeed || floor(SpeedVal) == SpeedVal) {
                 PartLoadFrac = 1;
             } else {
                 PartLoadFrac = SpeedVal - floor(SpeedVal);
@@ -3089,7 +3089,7 @@ namespace HVACMultiSpeedHeatPump {
                            SupHeaterLoad);
         } else {
             PartLoadFrac = 0.0;
-            if (useMaxedSpeed or floor(SpeedVal) == SpeedVal) {
+            if (useMaxedSpeed || floor(SpeedVal) == SpeedVal) {
                 SpeedRatio = 1;
             } else {
                 SpeedRatio = SpeedVal - floor(SpeedVal);

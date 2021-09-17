@@ -8182,8 +8182,8 @@ namespace UnitarySystems {
                                            "Wrong coil speed EMS override value, for unit=\"" + useMaxedSpeedCoilName +
                                                "\". Exceeding maximum coil speed level. Speed level is set to the maximum coil speed level allowed.",
                                            this->m_CoilSpeedErrIdx,
-                                           ceil(this->m_EMSOverrideCoilSpeedNumValue),
-                                           ceil(this->m_EMSOverrideCoilSpeedNumValue),
+                                           this->m_EMSOverrideCoilSpeedNumValue,
+                                           this->m_EMSOverrideCoilSpeedNumValue,
                                            _,
                                            "",
                                            "");
@@ -8197,13 +8197,13 @@ namespace UnitarySystems {
             if (this->m_HeatingSpeedNum == 1) {
                 this->m_HeatingSpeedRatio = 0.0;
                 this->m_HeatingCycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
-                if (useMaxedSpeed or this->m_HeatingCycRatio == 0) {
+                if (useMaxedSpeed || this->m_HeatingCycRatio == 0) {
                     this->m_HeatingCycRatio = 1;
                 }
             } else {
                 this->m_HeatingCycRatio = 1.0;
                 this->m_HeatingSpeedRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
-                if (useMaxedSpeed or this->m_HeatingSpeedRatio == 0) {
+                if (useMaxedSpeed || this->m_HeatingSpeedRatio == 0) {
                     this->m_HeatingSpeedRatio = 1;
                 }
             }
@@ -8221,13 +8221,13 @@ namespace UnitarySystems {
             if (this->m_CoolingSpeedNum == 1) {
                 this->m_CoolingSpeedRatio = 0.0;
                 this->m_CoolingCycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
-                if (useMaxedSpeed or this->m_CoolingCycRatio == 0) {
+                if (useMaxedSpeed || this->m_CoolingCycRatio == 0) {
                     this->m_CoolingCycRatio = 1;
                 }
             } else {
                 this->m_CoolingCycRatio = 1.0;
                 this->m_CoolingSpeedRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
-                if (useMaxedSpeed or this->m_CoolingSpeedRatio == 0) {
+                if (useMaxedSpeed || this->m_CoolingSpeedRatio == 0) {
                     this->m_CoolingSpeedRatio = 1;
                 }
             }
@@ -11969,8 +11969,8 @@ namespace UnitarySystems {
                                 "Wrong coil speed EMS override value, for unit=\"" + this->m_CoolingCoilName +
                                     "\". Exceeding maximum coil speed level. Speed level is set to the maximum coil speed level allowed.",
                                 this->m_CoilSpeedErrIdx,
-                                ceil(this->m_EMSOverrideCoilSpeedNumValue),
-                                ceil(this->m_EMSOverrideCoilSpeedNumValue),
+                                this->m_EMSOverrideCoilSpeedNumValue,
+                                this->m_EMSOverrideCoilSpeedNumValue,
                                 _,
                                 "",
                                 "");
@@ -11978,13 +11978,13 @@ namespace UnitarySystems {
                         if (this->m_CoolingSpeedNum == 1) {
                             this->m_CoolingSpeedRatio = 0.0;
                             this->m_CoolingCycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
-                            if (useMaxedSpeed or this->m_CoolingCycRatio == 0) {
+                            if (useMaxedSpeed || this->m_CoolingCycRatio == 0) {
                                 this->m_CoolingCycRatio = 1;
                             }
                         } else {
                             this->m_CoolingCycRatio = 1.0;
                             this->m_CoolingSpeedRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
-                            if (useMaxedSpeed or this->m_CoolingSpeedRatio == 0) {
+                            if (useMaxedSpeed || this->m_CoolingSpeedRatio == 0) {
                                 this->m_CoolingSpeedRatio = 1;
                             }
                         }
@@ -13615,8 +13615,8 @@ namespace UnitarySystems {
                                     "Wrong coil speed EMS override value, for unit=\"" + this->m_HeatingCoilName +
                                         "\". Exceeding maximum coil speed level. Speed level is set to the maximum coil speed level allowed.",
                                     this->m_CoilSpeedErrIdx,
-                                    ceil(this->m_EMSOverrideCoilSpeedNumValue),
-                                    ceil(this->m_EMSOverrideCoilSpeedNumValue),
+                                    this->m_EMSOverrideCoilSpeedNumValue,
+                                    this->m_EMSOverrideCoilSpeedNumValue,
                                     _,
                                     "",
                                     "");
@@ -13625,7 +13625,7 @@ namespace UnitarySystems {
                                 this->m_HeatingSpeedRatio = 0.0;
                                 CycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
                                 this->m_HeatingCycRatio = CycRatio;
-                                if (useMaxedSpeed or CycRatio == 0) {
+                                if (useMaxedSpeed || CycRatio == 0) {
                                     this->m_HeatingCycRatio = 1;
                                 } else {
                                     this->m_HeatingCycRatio = CycRatio;
@@ -13634,7 +13634,7 @@ namespace UnitarySystems {
                                 this->m_HeatingCycRatio = 1.0;
                                 SpeedRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
                                 this->m_HeatingSpeedRatio = SpeedRatio;
-                                if (useMaxedSpeed or SpeedRatio == 0) {
+                                if (useMaxedSpeed || SpeedRatio == 0) {
                                     this->m_HeatingSpeedRatio = 1;
                                 } else {
                                     this->m_HeatingSpeedRatio = SpeedRatio;
