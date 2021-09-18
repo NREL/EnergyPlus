@@ -5845,6 +5845,9 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                 // Interior, exterior or between-glass shade, screen or blind in place
                 TotGlassLayers = state.dataConstruction->Construct(constrNumSh).TotGlassLayers;
             }
+            state.dataHeatBal->SurfWinSWwinAbsTotalReport(surfNum) = 0.0;
+            state.dataHeatBal->SurfSWInAbsTotalReport(surfNum) = 0.0;
+            state.dataHeatBal->SurfInitialDifSolInAbsReport(surfNum) = 0.0;
             for (int lay = 1; lay <= TotGlassLayers; ++lay) {
                 // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
                 state.dataHeatBal->SurfInitialDifSolInAbsReport(surfNum) +=
