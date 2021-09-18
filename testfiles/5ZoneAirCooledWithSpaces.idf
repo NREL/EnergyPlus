@@ -5,9 +5,12 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 ! 5ZoneAirCooledWithSpaces.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
+!                          Two of the zones are divided into spaces. Zone 5 is divided into 2 spaces using floor surfaces only
+!                          which results in both spaces being in the same enclosure. Zone 3 is divided into 3 spaces, one
+!                          fully enclosed space (this is one enclosure) and two spaces joined by an air boundary (this is another enclosure).
 !
-! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
-!                          outside air stream controlled to preheat and precool setpoints.
+! Highlights:              Illustrates various uses of Space. Electric chiller with air cooled condenser; autosized preheating and 
+!                          precooling water coils in the outside air stream controlled to preheat and precool setpoints.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
@@ -556,7 +559,7 @@ Space,
     ,                        !- Floor Area {m2}
     Office,                  !- Space Type
     Std 62.1 Office Space,   !- Tag 1
-    Std 90.1 Office-Enclosed;  !- Tag 2
+    Std 90.1 Office-Open Plan;  !- Tag 2
 
 Space,
     Space 5 Conference,      !- Name
@@ -575,12 +578,28 @@ Space,
     Std 90.1 Lobby;          !- Tag 2
 
 Space,
-    Space 3,                 !- Name
+    Space 3 Open Office 1,   !- Name
     Zone 3,                  !- Zone Name
     ,                        !- Floor Area {m2}
     Office,                  !- Space Type
     Std 62.1 Office Space,   !- Tag 1
     Std 90.1 Office-Open Plan;  !- Tag 2
+
+Space,
+    Space 3 Open Office 2,   !- Name
+    Zone 3,                  !- Zone Name
+    ,                        !- Floor Area {m2}
+    Office,                  !- Space Type
+    Std 62.1 Office Space,   !- Tag 1
+    Std 90.1 Office-Open Plan;  !- Tag 2
+
+Space,
+    Space 3 Storage,         !- Name
+    Zone 3,                  !- Zone Name
+    ,                        !- Floor Area {m2}
+    Storage,                 !- Space Type
+    Std 62.1 Storage,        !- Tag 1
+    Std 90.1 Storage;        !- Tag 2
 
 Space,
     Space 4,                 !- Name
@@ -602,10 +621,12 @@ SpaceList,
     AllConditionedSpaces,    !- Name
     Space 1,                 !- Space 1 Name
     Space 2,                 !- Space 2 Name
-    Space 3,                 !- Space 3 Name
-    Space 4,                 !- Space 4 Name
-    Space 5 Office,          !- Space 5 Name
-    Space 5 Conference;      !- Space 6 Name
+    Space 3 Open Office 1,   !- Space 3 Name
+    Space 3 Open Office 2,   !- Space 4 Name
+    Space 3 Storage,         !- Space 5 Name
+    Space 4,                 !- Space 6 Name
+    Space 5 Office,          !- Space 7 Name
+    Space 5 Conference;      !- Space 8 Name
 
 ZoneList,
     All Zones,               !- Name
@@ -758,10 +779,43 @@ BuildingSurface:Detailed,
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     0.0,                     !- View Factor to Ground
-    4,                       !- Number of Vertices
-    26.8, 11.6, 2.4,                    !- X,Y,Z  1 {m}
+    3,                       !- Number of Vertices
     3.7, 11.6, 2.4,                     !- X,Y,Z  2 {m}
     0.0, 15.2, 2.4,                     !- X,Y,Z  3 {m}
+    3.7, 15.2, 2.4;                     !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    C3-2P,                   !- Name
+    FLOOR,                   !- Surface Type
+    CLNG-1,                  !- Construction Name
+    PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    C3-2,                    !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    12.0, 11.6, 2.4,                    !- X,Y,Z  1 {m}
+    3.7, 11.6, 2.4,                     !- X,Y,Z  2 {m}
+    3.7, 15.2, 2.4,                     !- X,Y,Z  3 {m}
+    12.0, 15.2, 2.4;                    !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    C3-3P,                   !- Name
+    FLOOR,                   !- Surface Type
+    CLNG-1,                  !- Construction Name
+    PLENUM-1,                !- Zone Name
+    ,                        !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    C3-3,                    !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    26.8, 11.6, 2.4,                    !- X,Y,Z  1 {m}
+    12.0, 11.6, 2.4,                    !- X,Y,Z  2 {m}
+    12.0, 15.2, 2.4,                    !- X,Y,Z  3 {m}
     30.5, 15.2, 2.4;                    !- X,Y,Z  4 {m}
 
 BuildingSurface:Detailed,
@@ -834,8 +888,8 @@ People,
     ActSchd;                 !- Activity Level Schedule Name
 
 Lights,
-    Zone 1 Lights 1,         !- Name
-    Zone 1,                  !- Zone or ZoneList Name
+    Zone 1 Lights,           !- Name
+    Zone 1,                  !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     1584,                    !- Lighting Level {W}
@@ -848,12 +902,12 @@ Lights,
     GeneralLights;           !- End-Use Subcategory
 
 ElectricEquipment,
-    Zone 1 ElecEq 1,         !- Name
-    Zone 1,                  !- Zone or ZoneList Name
+    All Spaces Elec Equip,   !- Name
+    AllConditionedSpaces,    !- Zone or ZoneList or Space or SpaceList Name
     EQUIP-1,                 !- Schedule Name
-    EquipmentLevel,          !- Design Level Calculation Method
-    1056,                    !- Design Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Design Level {W}
+    10.0,                    !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0,                       !- Fraction Latent
     0.3,                     !- Fraction Radiant
@@ -1047,8 +1101,8 @@ People,
     ActSchd;                 !- Activity Level Schedule Name
 
 Lights,
-    Zone 2 Lights 1,         !- Name
-    Zone 2,                  !- Zone or ZoneList Name
+    Zone 2 Lights,           !- Name
+    Zone 2,                  !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1059,18 +1113,6 @@ Lights,
     0.2,                     !- Fraction Visible
     0,                       !- Fraction Replaceable
     GeneralLights;           !- End-Use Subcategory
-
-ElectricEquipment,
-    Zone 2 ElecEq 1,         !- Name
-    Zone 2,                  !- Zone or ZoneList Name
-    EQUIP-1,                 !- Schedule Name
-    EquipmentLevel,          !- Design Level Calculation Method
-    456,                     !- Design Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
-    ,                        !- Watts per Person {W/person}
-    0,                       !- Fraction Latent
-    0.3,                     !- Fraction Radiant
-    0;                       !- Fraction Lost
 
 BuildingSurface:Detailed,
     RIGHT-1,                 !- Name
@@ -1199,7 +1241,7 @@ Zone,
     239.247360229;           !- Volume {m3}
 
 ZoneInfiltration:DesignFlowRate,
-    Zone 3 Infil 1,          !- Name
+    Zone 3 Infil,            !- Name
     Zone 3,                  !- Zone or ZoneList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
@@ -1225,12 +1267,12 @@ People,
     ActSchd;                 !- Activity Level Schedule Name
 
 Lights,
-    Zone 3 Lights 1,         !- Name
-    Zone 3,                  !- Zone or ZoneList Name
+    Space 3 Open Office 1 Lights,  !- Name
+    Space 3 Open Office 1,   !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
-    LightingLevel,           !- Design Level Calculation Method
-    1584,                    !- Lighting Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    10.76,                   !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
     0.2,                     !- Return Air Fraction
     0.59,                    !- Fraction Radiant
@@ -1238,24 +1280,74 @@ Lights,
     0,                       !- Fraction Replaceable
     GeneralLights;           !- End-Use Subcategory
 
-ElectricEquipment,
-    Zone 3 ElecEq 1,         !- Name
-    Zone 3,                  !- Zone or ZoneList Name
-    EQUIP-1,                 !- Schedule Name
-    EquipmentLevel,          !- Design Level Calculation Method
-    1056,                    !- Design Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
+Lights,
+    Space 3 Open Office 2 Lights,  !- Name
+    Space 3 Open Office 2,   !- Zone or ZoneList or Space or SpaceList Name
+    LIGHTS-1,                !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    10.76,                   !- Watts per Zone Floor Area {W/m2}
     ,                        !- Watts per Person {W/person}
-    0,                       !- Fraction Latent
-    0.3,                     !- Fraction Radiant
-    0;                       !- Fraction Lost
+    0.2,                     !- Return Air Fraction
+    0.59,                    !- Fraction Radiant
+    0.2,                     !- Fraction Visible
+    0,                       !- Fraction Replaceable
+    GeneralLights;           !- End-Use Subcategory
+
+Lights,
+    Space 3 Storage Lights,  !- Name
+    Space 3 Storage,         !- Zone or ZoneList or Space or SpaceList Name
+    LIGHTS-1,                !- Schedule Name
+    Watts/Area,              !- Design Level Calculation Method
+    ,                        !- Lighting Level {W}
+    5.0,                     !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0.2,                     !- Return Air Fraction
+    0.59,                    !- Fraction Radiant
+    0.2,                     !- Fraction Visible
+    0,                       !- Fraction Replaceable
+    GeneralLights;           !- End-Use Subcategory
 
 BuildingSurface:Detailed,
     BACK-1,                  !- Name
     WALL,                    !- Surface Type
     WALL-1,                  !- Construction Name
     Zone 3,                  !- Zone Name
-    ,                        !- Space Name
+    Space 3 Storage,   !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.50000,                 !- View Factor to Ground
+    4,                       !- Number of Vertices
+    3.7, 15.2, 2.4,                     !- X,Y,Z  1 {m}
+    3.7, 15.2, 0.0,                     !- X,Y,Z  2 {m}
+    0.0, 15.2, 0.0,                     !- X,Y,Z  3 {m}
+    0.0, 15.2, 2.4;                     !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    BACK-2,                  !- Name
+    WALL,                    !- Surface Type
+    WALL-1,                  !- Construction Name
+    Zone 3,                  !- Zone Name
+    Space 3 Open Office 1,   !- Space Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.50000,                 !- View Factor to Ground
+    4,                       !- Number of Vertices
+    12.0, 15.2, 2.4,                    !- X,Y,Z  1 {m}
+    12.0, 15.2, 0.0,                    !- X,Y,Z  2 {m}
+    3.7, 15.2, 0.0,                     !- X,Y,Z  3 {m}
+    3.7, 15.2, 2.4;                     !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    BACK-3,                  !- Name
+    WALL,                    !- Surface Type
+    WALL-1,                  !- Construction Name
+    Zone 3,                  !- Zone Name
+    Space 3 Open Office 2,   !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1264,14 +1356,85 @@ BuildingSurface:Detailed,
     4,                       !- Number of Vertices
     30.5, 15.2, 2.4,                    !- X,Y,Z  1 {m}
     30.5, 15.2, 0.0,                    !- X,Y,Z  2 {m}
-    0.0, 15.2, 0.0,                     !- X,Y,Z  3 {m}
-    0.0, 15.2, 2.4;                     !- X,Y,Z  4 {m}
+    12.0, 15.2, 0.0,                    !- X,Y,Z  3 {m}
+    12.0, 15.2, 2.4;                    !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    Storage-Office Wall,     !- Name
+    WALL,                    !- Surface Type
+    INT-WALL-1,              !- Construction Name
+    Zone 3,                  !- Zone Name
+    Space 3 Storage,   !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    Office-Storage Wall,     !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    3.7, 11.6, 2.4,                    !- X,Y,Z  1 {m}
+    3.7, 11.6, 0.0,                    !- X,Y,Z  2 {m}
+    3.7, 15.2, 0.0,                    !- X,Y,Z  3 {m}
+    3.7, 15.2, 2.4;                    !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    Office-Storage Wall,     !- Name
+    WALL,                    !- Surface Type
+    INT-WALL-1,              !- Construction Name
+    Zone 3,                  !- Zone Name
+    Space 3 Open Office 1,   !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    Storage-Office Wall,     !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    3.7, 15.2, 2.4,                    !- X,Y,Z  4 {m}
+    3.7, 15.2, 0.0,                    !- X,Y,Z  3 {m}
+    3.7, 11.6, 0.0,                    !- X,Y,Z  2 {m}
+    3.7, 11.6, 2.4;                    !- X,Y,Z  1 {m}
+    
+Construction:AirBoundary,
+AirBoundary;
+
+BuildingSurface:Detailed,
+    AirWall 1,               !- Name
+    WALL,                    !- Surface Type
+    AirBoundary,             !- Construction Name
+    Zone 3,                  !- Zone Name
+    Space 3 Open Office 1,   !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    AirWall 2,               !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    12.0, 11.6, 2.4,                    !- X,Y,Z  1 {m}
+    12.0, 11.6, 0.0,                    !- X,Y,Z  2 {m}
+    12.0, 15.2, 0.0,                    !- X,Y,Z  3 {m}
+    12.0, 15.2, 2.4;                    !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    AirWall 2,               !- Name
+    WALL,                    !- Surface Type
+    AirBoundary,             !- Construction Name
+    Zone 3,                  !- Zone Name
+    Space 3 Open Office 2,   !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    AirWall 1,               !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    12.0, 15.2, 2.4,                    !- X,Y,Z  4 {m}
+    12.0, 15.2, 0.0,                    !- X,Y,Z  3 {m}
+    12.0, 11.6, 0.0,                    !- X,Y,Z  2 {m}
+    12.0, 11.6, 2.4;                    !- X,Y,Z  1 {m}
 
 FenestrationSurface:Detailed,
     WB-1,                    !- Name
     WINDOW,                  !- Surface Type
     Dbl Clr 3mm/13mm Air,    !- Construction Name
-    BACK-1,                  !- Building Surface Name
+    BACK-3,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
     ,                        !- Frame and Divider Name
@@ -1286,7 +1449,7 @@ FenestrationSurface:Detailed,
     DB-1,                    !- Name
     GLASSDOOR,               !- Surface Type
     Sgl Grey 3mm,            !- Construction Name
-    BACK-1,                  !- Building Surface Name
+    BACK-2,                  !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
     ,                        !- Frame and Divider Name
@@ -1302,16 +1465,49 @@ BuildingSurface:Detailed,
     CEILING,                 !- Surface Type
     CLNG-1,                  !- Construction Name
     Zone 3,                  !- Zone Name
-    ,                        !- Space Name
+    Space 3 Storage,         !- Space Name
     Surface,                 !- Outside Boundary Condition
     C3-1P,                   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     0.0,                     !- View Factor to Ground
+    3,                       !- Number of Vertices
+    0.0, 15.2, 2.4,                     !- X,Y,Z  4 {m}
+    3.7, 11.6, 2.4,                     !- X,Y,Z  3 {m}
+    3.7, 15.2, 2.4;                     !- X,Y,Z  2 {m}
+
+BuildingSurface:Detailed,
+    C3-2,                    !- Name
+    CEILING,                 !- Surface Type
+    CLNG-1,                  !- Construction Name
+    Zone 3,                  !- Zone Name
+    Space 3 Open Office 1,   !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    C3-2P,                   !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    12.0, 15.2, 2.4,                    !- X,Y,Z  1 {m}
+    3.7, 15.2, 2.4,                     !- X,Y,Z  2 {m}
+    3.7, 11.6, 2.4,                     !- X,Y,Z  3 {m}
+    12.0, 11.6, 2.4;                    !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    C3-3,                    !- Name
+    CEILING,                 !- Surface Type
+    CLNG-1,                  !- Construction Name
+    Zone 3,                  !- Zone Name
+    Space 3 Open Office 2,   !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    C3-3P,                   !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
     4,                       !- Number of Vertices
     30.5, 15.2, 2.4,                    !- X,Y,Z  1 {m}
-    0.0, 15.2, 2.4,                     !- X,Y,Z  2 {m}
-    3.7, 11.6, 2.4,                     !- X,Y,Z  3 {m}
+    12.0, 15.2, 2.4,                    !- X,Y,Z  2 {m}
+    12.0, 11.6, 2.4,                    !- X,Y,Z  3 {m}
     26.8, 11.6, 2.4;                    !- X,Y,Z  4 {m}
 
 BuildingSurface:Detailed,
@@ -1319,7 +1515,40 @@ BuildingSurface:Detailed,
     FLOOR,                   !- Surface Type
     FLOOR-SLAB-1,            !- Construction Name
     Zone 3,                  !- Zone Name
-    ,                        !- Space Name
+    Space 3 Storage,         !- Space Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    3,                       !- Number of Vertices
+    3.7, 15.2, 0.0,                    !- X,Y,Z  1 {m}
+    3.7, 11.6, 0.0,                    !- X,Y,Z  2 {m}
+    0.0, 15.2, 0.0;                    !- X,Y,Z  3 {m}
+
+BuildingSurface:Detailed,
+    F3-2,                    !- Name
+    FLOOR,                   !- Surface Type
+    FLOOR-SLAB-1,            !- Construction Name
+    Zone 3,                  !- Zone Name
+    Space 3 Open Office 1,   !- Space Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    12.0, 11.6, 0.0,                    !- X,Y,Z  1 {m}
+    3.7, 11.6, 0.0,                     !- X,Y,Z  2 {m}
+    3.7, 15.2, 0.0,                     !- X,Y,Z  3 {m}
+    12.0, 15.2, 0.0;                    !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    F3-3,                    !- Name
+    FLOOR,                   !- Surface Type
+    FLOOR-SLAB-1,            !- Construction Name
+    Zone 3,                  !- Zone Name
+    Space 3 Open Office 2,   !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1327,8 +1556,8 @@ BuildingSurface:Detailed,
     0.0,                     !- View Factor to Ground
     4,                       !- Number of Vertices
     26.8, 11.6, 0.0,                    !- X,Y,Z  1 {m}
-    3.7, 11.6, 0.0,                     !- X,Y,Z  2 {m}
-    0.0, 15.2, 0.0,                     !- X,Y,Z  3 {m}
+    12.0, 11.6, 0.0,                    !- X,Y,Z  2 {m}
+    12.0, 15.2, 0.0,                    !- X,Y,Z  3 {m}
     30.5, 15.2, 0.0;                    !- X,Y,Z  4 {m}
 
 BuildingSurface:Detailed,
@@ -1336,7 +1565,7 @@ BuildingSurface:Detailed,
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     Zone 3,                  !- Zone Name
-    ,                        !- Space Name
+    Space 3 Open Office 2,   !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB23,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1353,7 +1582,7 @@ BuildingSurface:Detailed,
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     Zone 3,                  !- Zone Name
-    ,                        !- Space Name
+    Space 3 Storage,         !- Space Name
     Surface,                 !- Outside Boundary Condition
     SB43,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1366,19 +1595,36 @@ BuildingSurface:Detailed,
     3.7, 11.6, 2.4;                     !- X,Y,Z  4 {m}
 
 BuildingSurface:Detailed,
-    SB35,                    !- Name
+    SB35-1,                  !- Name
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     Zone 3,                  !- Zone Name
-    ,                        !- Space Name
+    Space 3 Open Office 1,   !- Space Name
     Surface,                 !- Outside Boundary Condition
-    SB53,                    !- Outside Boundary Condition Object
+    SB53-1,                  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     0.0,                     !- View Factor to Ground
     4,                       !- Number of Vertices
     3.7, 11.6, 2.4,                     !- X,Y,Z  1 {m}
     3.7, 11.6, 0.0,                     !- X,Y,Z  2 {m}
+    12.0, 11.6, 0.0,                    !- X,Y,Z  3 {m}
+    12.0, 11.6, 2.4;                    !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    SB35-2,                  !- Name
+    WALL,                    !- Surface Type
+    INT-WALL-1,              !- Construction Name
+    Zone 3,                  !- Zone Name
+    Space 3 Open Office 2,   !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    SB53-2,                  !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    12.0, 11.6, 2.4,                    !- X,Y,Z  1 {m}
+    12.0, 11.6, 0.0,                    !- X,Y,Z  2 {m}
     26.8, 11.6, 0.0,                    !- X,Y,Z  3 {m}
     26.8, 11.6, 2.4;                    !- X,Y,Z  4 {m}
 
@@ -1392,7 +1638,7 @@ Zone,
     103.311355591;           !- Volume {m3}
 
 ZoneInfiltration:DesignFlowRate,
-    Zone 4 Infil 1,          !- Name
+    Zone 4 Infil,            !- Name
     Zone 4,                  !- Zone or ZoneList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
@@ -1418,8 +1664,8 @@ People,
     ActSchd;                 !- Activity Level Schedule Name
 
 Lights,
-    Zone 4 Lights 1,         !- Name
-    Zone 4,                  !- Zone or ZoneList Name
+    Zone 4 Lights,           !- Name
+    Zone 4,                  !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     684,                     !- Lighting Level {W}
@@ -1430,18 +1676,6 @@ Lights,
     0.2,                     !- Fraction Visible
     0,                       !- Fraction Replaceable
     GeneralLights;           !- End-Use Subcategory
-
-ElectricEquipment,
-    Zone 4 ElecEq 1,         !- Name
-    Zone 4,                  !- Zone or ZoneList Name
-    EQUIP-1,                 !- Schedule Name
-    EquipmentLevel,          !- Design Level Calculation Method
-    456,                     !- Design Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
-    ,                        !- Watts per Person {W/person}
-    0,                       !- Fraction Latent
-    0.3,                     !- Fraction Radiant
-    0;                       !- Fraction Lost
 
 BuildingSurface:Detailed,
     LEFT-1,                  !- Name
@@ -1570,7 +1804,7 @@ Zone,
     447.682556152;           !- Volume {m3}
 
 ZoneInfiltration:DesignFlowRate,
-    Zone 5 Infil 1,          !- Name
+    Zone 5 Infil,            !- Name
     Zone 5,                  !- Zone or ZoneList Name
     INFIL-SCH,               !- Schedule Name
     flow/zone,               !- Design Flow Rate Calculation Method
@@ -1614,8 +1848,8 @@ People,
     ClothingInsulationSchedule;  !- Clothing Insulation Calculation Method
 
 Lights,
-    Zone 5 Lights 1,         !- Name
-    Zone 5,                  !- Zone or ZoneList Name
+    Zone 5 Lights,           !- Name
+    Zone 5,                  !- Zone or ZoneList or Space or SpaceList Name
     LIGHTS-1,                !- Schedule Name
     LightingLevel,           !- Design Level Calculation Method
     2964,                    !- Lighting Level {W}
@@ -1626,18 +1860,6 @@ Lights,
     0.2,                     !- Fraction Visible
     0,                       !- Fraction Replaceable
     GeneralLights;           !- End-Use Subcategory
-
-ElectricEquipment,
-    Zone 5 ElecEq 1,         !- Name
-    Zone 5,                  !- Zone or ZoneList Name
-    EQUIP-1,                 !- Schedule Name
-    EquipmentLevel,          !- Design Level Calculation Method
-    1976,                    !- Design Level {W}
-    ,                        !- Watts per Zone Floor Area {W/m2}
-    ,                        !- Watts per Person {W/person}
-    0,                       !- Fraction Latent
-    0.3,                     !- Fraction Radiant
-    0;                       !- Fraction Lost
 
 BuildingSurface:Detailed,
     C5-1,                    !- Name
@@ -1725,21 +1947,38 @@ BuildingSurface:Detailed,
     26.8, 11.6, 2.4;                    !- X,Y,Z  4 {m}
 
 BuildingSurface:Detailed,
-    SB53,                    !- Name
+    SB53-1,                  !- Name
     WALL,                    !- Surface Type
     INT-WALL-1,              !- Construction Name
     Zone 5,                  !- Zone Name
     ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
-    SB35,                    !- Outside Boundary Condition Object
+    SB35-1,                  !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    12.0, 11.6, 2.4,                    !- X,Y,Z  1 {m}
+    12.0, 11.6, 0.0,                    !- X,Y,Z  2 {m}
+    3.7, 11.6, 0.0,                     !- X,Y,Z  3 {m}
+    3.7, 11.6, 2.4;                     !- X,Y,Z  4 {m}
+
+BuildingSurface:Detailed,
+    SB53-2,                  !- Name
+    WALL,                    !- Surface Type
+    INT-WALL-1,              !- Construction Name
+    Zone 5,                  !- Zone Name
+    ,                        !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    SB35-2,                  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
     NoWind,                  !- Wind Exposure
     0.0,                     !- View Factor to Ground
     4,                       !- Number of Vertices
     26.8, 11.6, 2.4,                    !- X,Y,Z  1 {m}
     26.8, 11.6, 0.0,                    !- X,Y,Z  2 {m}
-    3.7, 11.6, 0.0,                     !- X,Y,Z  3 {m}
-    3.7, 11.6, 2.4;                     !- X,Y,Z  4 {m}
+    12.0, 11.6, 0.0,                    !- X,Y,Z  3 {m}
+    12.0, 11.6, 2.4;                    !- X,Y,Z  4 {m}
 
 BuildingSurface:Detailed,
     SB54,                    !- Name
@@ -3501,17 +3740,21 @@ Output:Meter:MeterFileOnly,MyBuildingOther,runperiod;
 Meter:Custom,
     MyGeneralLights,         !- Name
     Electricity,             !- Resource Type
-    Zone 1 Lights 1,         !- Key Name 1
+    Zone 1 Lights,         !- Key Name 1
     Lights Electricity Energy,  !- Output Variable or Meter Name 1
-    Zone 2 Lights 1,         !- Key Name 2
+    Zone 2 Lights,         !- Key Name 2
     Lights Electricity Energy,  !- Output Variable or Meter Name 2
-    Zone 3 Lights 1,         !- Key Name 3
+    Space 3 Storage Lights,         !- Key Name 3
     Lights Electricity Energy,  !- Output Variable or Meter Name 3
-    Zone 4 Lights 1,         !- Key Name 4
+    Space 3 Open Office 1 Lights ,         !- Key Name 3
+    Lights Electricity Energy,  !- Output Variable or Meter Name 3
+    Space 3 Open Office 2 Lights ,         !- Key Name 3
+    Lights Electricity Energy,  !- Output Variable or Meter Name 3
+    Zone 4 Lights,         !- Key Name 4
     Lights Electricity Energy,  !- Output Variable or Meter Name 4
-    Space 5 Office Zone 5 Lights 1,         !- Key Name 5
+    Space 5 Office Zone 5 Lights,         !- Key Name 5
     Lights Electricity Energy,  !- Output Variable or Meter Name 5
-    Space 5 Conference Zone 5 Lights 1,         !- Key Name 6
+    Space 5 Conference Zone 5 Lights,         !- Key Name 6
     Lights Electricity Energy;  !- Output Variable or Meter Name 6
 
 Meter:Custom,
