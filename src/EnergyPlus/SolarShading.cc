@@ -827,7 +827,6 @@ void AllocateModuleArrays(EnergyPlusData &state)
     state.dataSurface->SurfWinLossSWZoneToOutWinRep.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfWinGainFrameDividerToZoneRep.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfWinGainConvShadeToZoneRep.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfWinGainIRShadeToZoneRep.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfWinGapConvHtFlowRep.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfWinShadingAbsorbedSolar.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -1400,7 +1399,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
                         SetupOutputVariable(state,
                                             "Surface Window Inside Face Other Convection Heat Gain Rate",
                                             OutputProcessor::Unit::W,
-                                            state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(SurfLoop),
+                                            state.dataSurface->SurfWinOtherConvHeatGain(SurfLoop),
                                             OutputProcessor::SOVTimeStepType::Zone,
                                             OutputProcessor::SOVStoreType::Average,
                                             state.dataSurface->Surface(SurfLoop).Name);

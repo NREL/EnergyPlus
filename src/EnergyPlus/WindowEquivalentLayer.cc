@@ -854,8 +854,6 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
         // Interior shade exists
         state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
     }
-    // Advanced report variable (DisplayAdvancedReportVariables)
-    state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
 }
 
 void OPENNESS_LW(Real64 const OPENNESS, // shade openness (=tausbb at normal incidence)

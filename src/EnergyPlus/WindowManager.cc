@@ -6309,17 +6309,17 @@ namespace WindowManager {
         //   with inside projection (W/m2-K)
         Real64 HInConvDiv; // Effective inside convective coeff for divider
         //   with inside projection (W/m2-K)
-        Real64 EmisGlassOut;        // Outside surface emissivity of window glazing
-        Real64 EmisGlassIn;         // Inside surface emissivity of window glazing
-        int TotGlassLayers;         // Total number of glass layers
-        int TotLayers;              // Total number of layers in unshaded construction
-        Real64 DivTempOut;          // Outside surface divider temperature (K)
-        Real64 FrameHeatGain;       // Heat gain to zone from frame (W)
-        Real64 FrameHeatTransfer;   // Heat tansfer through frame (W)
-        Real64 ProjCorrWinHeatGain; // Inside projection correction to IR from divider to zone
+        Real64 EmisGlassOut; // Outside surface emissivity of window glazing
+        Real64 EmisGlassIn;  // Inside surface emissivity of window glazing
+        int TotGlassLayers;  // Total number of glass layers
+        int TotLayers;       // Total number of layers in unshaded construction
+        // Real64 DivTempOut;          // Outside surface divider temperature (K)
+        Real64 FrameHeatGain; // Heat gain to zone from frame (W)
+        // Real64 FrameHeatTransfer;   // Heat tansfer through frame (W)
+        // Real64 ProjCorrWinHeatGain; // Inside projection correction to IR from divider to zone
         //   for window heat gain calculation
-        Real64 DividerHeatGain;     // Heat gain to zone from divider (W)
-        Real64 DividerHeatTransfer; // Heat transfer through divider (W)
+        Real64 DividerHeatGain; // Heat gain to zone from divider (W)
+        // Real64 DividerHeatTransfer; // Heat transfer through divider (W)
 
         TInRad = root_4(state.dataSurface->SurfWinIRfromParentZone(SurfNum) / state.dataWindowManager->sigma);
         TOutRad = root_4(Outir / state.dataWindowManager->sigma);
@@ -6375,8 +6375,8 @@ namespace WindowManager {
                 Afac + Bfac * (state.dataSurface->SurfWinFrameTempIn(SurfNum) + state.dataWindowManager->TKelvin) - state.dataWindowManager->TKelvin;
             // Heat gain to zone from frame
 
-            FrameHeatTransfer = state.dataSurface->SurfWinFrameArea(SurfNum) * FrameCon *
-                                (state.dataSurface->SurfWinFrameTempSurfOut(SurfNum) - state.dataSurface->SurfWinFrameTempIn(SurfNum));
+            // FrameHeatTransfer = state.dataSurface->SurfWinFrameArea(SurfNum) * FrameCon *
+            //                     (state.dataSurface->SurfWinFrameTempSurfOut(SurfNum) - state.dataSurface->SurfWinFrameTempIn(SurfNum));
             FrameHeatGain = state.dataSurface->SurfWinFrameArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
                             (HInConvFr * (state.dataSurface->SurfWinFrameTempIn(SurfNum) + state.dataWindowManager->TKelvin - tin));
 
@@ -6451,12 +6451,12 @@ namespace WindowManager {
                 Afac + Bfac * (state.dataSurface->SurfWinDividerTempIn(SurfNum) + state.dataWindowManager->TKelvin) -
                 state.dataWindowManager->TKelvin;
             // Contribution of divider to window heat gain
-            ProjCorrWinHeatGain = 1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum);
+            // ProjCorrWinHeatGain = 1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum);
 
             DividerHeatGain = state.dataSurface->SurfWinDividerArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
                               (HInConvDiv * (state.dataSurface->SurfWinDividerTempIn(SurfNum) + state.dataWindowManager->TKelvin - tin));
-            DividerHeatTransfer = state.dataSurface->SurfWinDividerArea(SurfNum) * DivCon *
-                                  (state.dataSurface->SurfWinDividerTempSurfOut(SurfNum) - state.dataSurface->SurfWinDividerTempIn(SurfNum));
+            // DividerHeatTransfer = state.dataSurface->SurfWinDividerArea(SurfNum) * DivCon *
+            //                      (state.dataSurface->SurfWinDividerTempSurfOut(SurfNum) - state.dataSurface->SurfWinDividerTempIn(SurfNum));
 
             if (DividerHeatGain > 0.0) {
                 state.dataSurface->SurfWinDividerHeatGain(SurfNum) = DividerHeatGain;
@@ -6471,7 +6471,7 @@ namespace WindowManager {
             // at the same time that the interaction between glass and shade is calculated.
             if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum)))
                 state.dataSurface->SurfWinDividerHeatGain(SurfNum) = DividerHeatGain;
-            DivTempOut = state.dataSurface->SurfWinDividerTempSurfOut(SurfNum) + state.dataWindowManager->TKelvin;
+            // DivTempOut = state.dataSurface->SurfWinDividerTempSurfOut(SurfNum) + state.dataWindowManager->TKelvin;
         } // End of check if window has dividers
     }
 

@@ -2529,7 +2529,6 @@ void InitSolarHeatGains(EnergyPlusData &state)
             state.dataSurface->SurfWinHeatLossRepEnergy(SurfNum) = 0.0;
             state.dataSurface->SurfWinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
             state.dataSurface->SurfWinShadingAbsorbedSolarEnergy(SurfNum) = 0.0;
-            state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = 0.0;
         }
         for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL + 1; Lay++) {
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
@@ -4941,9 +4940,39 @@ void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_c
 
             if (surfNum != repSurfNum) {
                 auto areaRatio = surface.Area / state.dataSurface->Surface(surfNum).Area;
-                state.dataSurface->SurfWinHeatGain(surfNum) = state.dataSurface->SurfWinHeatGain(repSurfNum) * areaRatio;
+
+                // Glazing
                 state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) = state.dataSurface->SurfWinGainConvGlazToZoneRep(repSurfNum) * areaRatio;
                 state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) = state.dataSurface->SurfWinGainIRGlazToZoneRep(repSurfNum) * areaRatio;
+
+                // Frame
+                Real64 frameHeatGain = 0.0;
+                if (state.dataSurface->SurfWinFrameArea(surfNum) > 0.0) {
+                    auto frameAreaRatio = state.dataSurface->SurfWinFrameArea(surfNum) / state.dataSurface->SurfWinFrameArea(repSurfNum);
+                    state.dataSurface->SurfWinFrameHeatGain(surfNum) = state.dataSurface->SurfWinFrameHeatGain(repSurfNum) * frameAreaRatio;
+                    state.dataSurface->SurfWinFrameHeatLoss(surfNum) = state.dataSurface->SurfWinFrameHeatLoss(repSurfNum) * frameAreaRatio;
+                    state.dataSurface->SurfWinFrameTempIn(surfNum) = state.dataSurface->SurfWinFrameTempIn(repSurfNum);
+                    state.dataSurface->SurfWinFrameTempSurfOut(surfNum) = state.dataSurface->SurfWinFrameTempSurfOut(repSurfNum);
+                    frameHeatGain = state.dataSurface->SurfWinFrameHeatGain(surfNum) - state.dataSurface->SurfWinFrameHeatLoss(surfNum);
+                }
+
+                // Divider
+                Real64 dividerHeatGain = 0.0;
+                if (state.dataSurface->SurfWinDividerArea(surfNum) > 0.0) {
+                    auto dividerAreaRatio = state.dataSurface->SurfWinDividerArea(surfNum) / state.dataSurface->SurfWinDividerArea(repSurfNum);
+                    state.dataSurface->SurfWinDividerHeatGain(surfNum) = state.dataSurface->SurfWinDividerHeatGain(repSurfNum) * dividerAreaRatio;
+                    state.dataSurface->SurfWinDividerHeatLoss(surfNum) = state.dataSurface->SurfWinDividerHeatLoss(repSurfNum) * dividerAreaRatio;
+                    state.dataSurface->SurfWinDividerTempIn(surfNum) = state.dataSurface->SurfWinDividerTempIn(repSurfNum);
+                    state.dataSurface->SurfWinDividerTempSurfOut(surfNum) = state.dataSurface->SurfWinDividerTempSurfOut(repSurfNum);
+                    dividerHeatGain = state.dataSurface->SurfWinDividerHeatGain(surfNum) - state.dataSurface->SurfWinDividerHeatLoss(surfNum);
+                }
+
+                state.dataSurface->SurfWinGainFrameDividerToZoneRep(surfNum) = frameHeatGain + dividerHeatGain;
+
+                // Whole window
+                state.dataSurface->SurfWinHeatGain(surfNum) =
+                    (state.dataSurface->SurfWinHeatGain(repSurfNum) - state.dataSurface->SurfWinGainFrameDividerToZoneRep(repSurfNum) * areaRatio) +
+                    state.dataSurface->SurfWinGainFrameDividerToZoneRep(surfNum);
             }
         }
     }
@@ -6031,8 +6060,28 @@ void ReportNonRepresentativeSurfaceResults(EnergyPlusData &state)
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             auto &surface(state.dataSurface->Surface(surfNum));
             int repSurfNum = surface.RepresentativeCalcSurfNum;
-            state.dataSurface->SurfIntConvClassificationRpt(surfNum) = state.dataSurface->SurfIntConvClassificationRpt(repSurfNum);
-            state.dataSurface->SurfOutConvClassificationRpt(surfNum) = state.dataSurface->SurfOutConvClassificationRpt(repSurfNum);
+            if (surfNum != repSurfNum) {
+                state.dataSurface->SurfIntConvClassificationRpt(surfNum) = state.dataSurface->SurfIntConvClassificationRpt(repSurfNum);
+                state.dataSurface->SurfOutConvClassificationRpt(surfNum) = state.dataSurface->SurfOutConvClassificationRpt(repSurfNum);
+            }
+        }
+
+        // Windows
+        if (state.dataGlobal->DisplayAdvancedReportVariables) {
+            firstSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+            lastSurf = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
+            for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+                auto &surface(state.dataSurface->Surface(surfNum));
+                int repSurfNum = surface.RepresentativeCalcSurfNum;
+                if (surfNum != repSurfNum) {
+                    auto areaRatio = surface.Area / state.dataSurface->Surface(surfNum).Area;
+                    state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) =
+                        state.dataSurface->SurfWinGainConvGlazToZoneRep(repSurfNum) * areaRatio;
+                    state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) = state.dataSurface->SurfWinGainIRGlazToZoneRep(repSurfNum) * areaRatio;
+                    state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) =
+                        state.dataSurface->SurfWinLossSWZoneToOutWinRep(repSurfNum) * areaRatio;
+                }
+            }
         }
     }
 }
@@ -6929,7 +6978,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
         state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = 0.0;
         state.dataSurface->SurfWinGainFrameDividerToZoneRep(surfNum) = 0.0;
         state.dataSurface->SurfWinGainConvShadeToZoneRep(surfNum) = 0.0;
-        state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
         state.dataSurface->SurfWinGainIRShadeToZoneRep(surfNum) = 0.0;
         state.dataSurface->SurfWinFrameQRadOutAbs(surfNum) = 0.0;
         state.dataSurface->SurfWinFrameQRadInAbs(surfNum) = 0.0;
@@ -7771,7 +7819,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = 0.0;
             state.dataSurface->SurfWinGainFrameDividerToZoneRep(surfNum) = 0.0;
             state.dataSurface->SurfWinGainConvShadeToZoneRep(surfNum) = 0.0;
-            state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
             state.dataSurface->SurfWinGainIRShadeToZoneRep(surfNum) = 0.0;
             state.dataSurface->SurfWinFrameQRadOutAbs(surfNum) = 0.0;
             state.dataSurface->SurfWinFrameQRadInAbs(surfNum) = 0.0;
