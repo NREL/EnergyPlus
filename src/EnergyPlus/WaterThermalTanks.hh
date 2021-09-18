@@ -798,6 +798,8 @@ namespace WaterThermalTanks {
                                  Real64 &OptLoad) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
+
+        void setBackupElementCapacity(EnergyPlusData &state);
     };
 
     struct WaterHeaterDesuperheaterData
