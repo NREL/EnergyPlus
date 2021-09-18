@@ -1157,7 +1157,7 @@ Surfaces with the following objects defined are currently never grouped because 
     \item SurfaceProperty:SolarIncidentInside
 \end{itemize}
 
-Currently, the only calculations performed across all surfaces within a group is the interior radiation exchange, where surfaces within a group are collected into a single area for participating in interior longwave radiation exchange. This will reduce the scale and complexity of the algorithm with minimal impact on accuracy. Additional calculations may be performed for a group of surfaces in future releases.
+Surface heat balance and interior radiation exchange calculations are performed across all surfaces within a group. Surface heat balance calculations are skipped for all but one surface within a group, and subsequently updated using the results from the representative surface. For interior radiation exchange, surfaces within a group are collected into a single area for participating in interior longwave radiation exchange. This will reduce the scale and complexity of the algorithm with minimal impact on accuracy. Solar shading and interior solar distribution are still calculated for each individual surface. The absorbed solar radiation used for the surface heat balance equations within a group is the area weighted average of all surfaces within the group.
 
 An IDF example:
 
