@@ -70,13 +70,14 @@ namespace EnergyPlus {
 class EnergyPlusFixture;
 class ResultsFrameworkFixture;
 struct EnergyPlusData;
+struct JsonOutputFilePaths;
 
 namespace ResultsFramework {
 
     using json = nlohmann::json;
 
     // trim string
-    std::string trim(std::string str);
+    std::string trim(std::string_view const s);
 
     // base result object
     class BaseResultObject
@@ -231,7 +232,7 @@ namespace ResultsFramework {
         json getVariablesJSON();
         json getJSON() const;
 
-        void writeReport(JsonOutputStreams &jsonOutputStreams, bool outputJSON, bool outputCBOR, bool outputMsgPack);
+        void writeReport(JsonOutputFilePaths &jsonOutputFilePaths, bool outputJSON, bool outputCBOR, bool outputMsgPack);
 
     protected:
         bool IDataFrameEnabled = false;
@@ -416,9 +417,9 @@ namespace ResultsFramework {
         bool outputMsgPack = false;
         std::vector<std::string> outputVariables;
 
-        void writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams);
+        void writeTimeSeriesReports(JsonOutputFilePaths &jsonOutputFilePaths);
 
-        void writeReport(JsonOutputStreams &jsonOutputStreams);
+        void writeReport(JsonOutputFilePaths &jsonOutputFilePaths);
 
         void writeCSVOutput(EnergyPlusData &state);
 
