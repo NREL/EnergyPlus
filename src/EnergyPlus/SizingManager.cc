@@ -1041,12 +1041,12 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                             bool UseOccSchFlag = false;
                             bool UseMinOASchFlag = false;
                             Real64 designOAductFlow(0.0);
-                            designOAductFlow = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
-                                state,
-                                state.dataDualDuct->dd_airterminal(dualDuctATUNum).OARequirementsPtr,
-                                state.dataDualDuct->dd_airterminal(dualDuctATUNum).ActualZoneNum,
-                                UseOccSchFlag,
-                                UseMinOASchFlag);
+                            designOAductFlow =
+                                DataSizing::calcDesignSpecificationOutdoorAir(state,
+                                                                              state.dataDualDuct->dd_airterminal(dualDuctATUNum).OARequirementsPtr,
+                                                                              state.dataDualDuct->dd_airterminal(dualDuctATUNum).ActualZoneNum,
+                                                                              UseOccSchFlag,
+                                                                              UseMinOASchFlag);
                             airLoopHeatingMinimumFlowRateSum += designOAductFlow;
                             // is this a dual duct is dual path for Std 62.1 ?? not sure, assume not because Vpz = Vdz
                             // anyDualPathAirTerminals = true;

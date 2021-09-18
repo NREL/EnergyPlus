@@ -5566,6 +5566,7 @@ namespace HeatBalanceManager {
                 }
 
                 // List of spaces
+                thisSpaceList.numListSpaces = 0;
                 auto extensibles = objectFields.find("spaces");
                 auto const &extensionSchemaProps = objectSchemaProps["spaces"]["items"]["properties"];
                 if (extensibles != objectFields.end()) {
@@ -5575,9 +5576,10 @@ namespace HeatBalanceManager {
                         int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
                         if (thisSpaceNum > 0) {
                             thisSpaceList.spaces.emplace_back(thisSpaceNum);
+                            ++thisSpaceList.numListSpaces;
                         } else {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpaceList.Name);
-                            ShowContinueError(state, "Space Name =" + thisSpaceName + "not found.");
+                            ShowContinueError(state, "Space Name=" + thisSpaceName + " not found.");
                             ErrorsFound = true;
                         }
                         thisSpaceList.maxSpaceNameLength = max(thisSpaceList.maxSpaceNameLength, len(thisSpaceName));
@@ -8062,7 +8064,10 @@ namespace HeatBalanceManager {
                 thisConstruct.IsUsedCTF = false;
 
                 // Air Exchange Method
-                std::string const airMethod = fields.at("air_exchange_method").get<std::string>();
+                std::string airMethod = "None";
+                if (fields.find("air_exchange_method") != fields.end()) {
+                    airMethod = fields.at("air_exchange_method").get<std::string>();
+                }
                 if (UtilityRoutines::SameString(airMethod, "SimpleMixing")) {
                     thisConstruct.TypeIsAirBoundaryMixing = true;
                     if (fields.find("simple_mixing_air_changes_per_hour") != fields.end()) {
