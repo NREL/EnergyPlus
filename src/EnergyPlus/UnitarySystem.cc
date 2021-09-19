@@ -1774,6 +1774,7 @@ namespace UnitarySystems {
                 state.dataSize->DataFracOfAutosizedCoolingCapacity = coolingCapacityMultiplier;
                 sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 CoolCapAtPeak = sizerCoolingCapacity.size(state, TempSize, errorsFound);
+                // this probably needs to be more specific. Letting heating coil size itself if user has scalable sizing
                 if (this->m_HVACSizingIndex == 0) state.dataSize->DXCoolCap = CoolCapAtPeak;
                 // CoilSystem does not size the cooling coil (#8761)
                 switch (this->m_sysType) {
