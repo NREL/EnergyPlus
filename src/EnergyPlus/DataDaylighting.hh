@@ -102,7 +102,7 @@ namespace DataDaylighting {
         Invalid = 0,
         Continuous = 1,
         Stepped = 2,
-        ContinuousOff = 3,
+        ContinuousOff = 3
     };
 
     constexpr std::array<std::string_view, 4> LtgCtrlTypeNamesUC = {"INVALID", "CONTINUOUS", "STEPPED", "CONTINUOUSOFF"};

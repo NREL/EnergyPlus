@@ -3,10 +3,9 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
-! SlabInGradeWithInsulation.idf
+! GSHP-GLHE-CalcGFunctions-cpg.idf
 ! Basic File Description:
-! This input file exemplifies the use of the Site:GroundDomain:Slab
-! object to perform the simulation of ground coupled heat transfer.
+! This input file exemplifies the use of the Water to water ground source heat pump model.
 ! Highlights: Simulate a heat transfer interaction with the slab
 ! Simulation Location/Run:
 ! Location: Chicago, IL

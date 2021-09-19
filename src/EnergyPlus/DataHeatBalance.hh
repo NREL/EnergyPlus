@@ -338,7 +338,7 @@ namespace DataHeatBalance {
 
     struct SpaceData
     {
-        std::string Name = "";             // Space name
+        std::string Name;                  // Space name
         int zoneNum = 0;                   // Pointer to Zone wich contains this space
         Real64 userEnteredFloorArea = 0.0; // User input floor area for this space
         std::string spaceType = "General"; // Space type tag
@@ -355,14 +355,15 @@ namespace DataHeatBalance {
         Real64 totOccupants = 0.0;         // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
         Real64 minOccupants = 0.0;         // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
         Real64 maxOccupants = 0.0;         // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
+        bool isRemainderSpace = false;     // True if this space is auto-generated "-Remainder" space
         std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
         std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this space
     };
 
     struct SpaceListData
     {
-        std::string Name = "";                          // Space List name
-        int numOfSpaces = 0;                            // Number of spaces in the list
+        std::string Name;                               // Space List name
+        int numListSpaces = 0;                          // Number of spaces in the list
         std::string::size_type maxSpaceNameLength = 0u; // Max Name length of Spaces in the list
         EPVector<int> spaces;                           // Pointers to Spaces in the list
     };
@@ -587,7 +588,7 @@ namespace DataHeatBalance {
     struct GlobalInternalGainMiscObject
     {
         // Members
-        std::string Name = "";
+        std::string Name;
         int ZoneOrZoneListPtr = 0;
         int NumOfZones = 0;
         int StartPtr = 0;

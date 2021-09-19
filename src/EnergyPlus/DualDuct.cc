@@ -1883,7 +1883,6 @@ namespace DualDuct {
         // METHODOLOGY EMPLOYED:
         // User input defines method used to calculate OA.
 
-        using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
@@ -1903,11 +1902,11 @@ namespace DualDuct {
             if (this->NoOAFlowInputFromUser) return;
             // Calculate outdoor air flow rate, zone multipliers are applied in GetInput
             if (AirLoopOAFrac > 0.0) {
-                OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state,
-                                                                     this->OARequirementsPtr,
-                                                                     this->ActualZoneNum,
-                                                                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
-                                                                     UseMinOASchFlag);
+                OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state,
+                                                                                 this->OARequirementsPtr,
+                                                                                 this->ActualZoneNum,
+                                                                                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
+                                                                                 UseMinOASchFlag);
                 OAMassFlow = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
                 // convert OA mass flow rate to supply air flow rate based on air loop OA fraction
@@ -1939,7 +1938,6 @@ namespace DualDuct {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // Locals
@@ -1980,14 +1978,14 @@ namespace DualDuct {
             if (this->OAPerPersonMode == PerPersonMode::ModeNotSet) PerPersonNotSet = true;
         }
 
-        OAVolumeFlowRate =
-            CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet);
+        OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
+            state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet);
 
         OAMassFlow = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
         if (present(MaxOAVolFlow)) {
-            OAVolumeFlowRate =
-                CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, _, true);
+            OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
+                state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, false, true);
             MaxOAVolFlow = OAVolumeFlowRate;
         }
     }

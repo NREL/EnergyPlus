@@ -416,8 +416,6 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
     int ISA;
     int ISlatAngle;
 
-    // auto &Zone(state.dataHeatBal->Zone);
-
     if (state.dataDaylightingManager->CalcDayltghCoefficients_firstTime) {
         GetDaylightingParametersInput(state);
         CheckTDDsAndLightShelvesInDaylitZones(state);
@@ -6597,7 +6595,7 @@ void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum) // Da
 
         int count = 0;
         for (std::size_t igroup = 1; igroup <= thisDaylightControl.ShadeDeployOrderExtWins.size(); igroup++) {
-            std::vector<int> listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
+            std::vector<int> const &listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
             for (const auto IWin : listOfExtWin) {
                 ++count;
                 // need to map back to the original order of the "loop" to not change all the other data structures
@@ -6636,7 +6634,7 @@ void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum) // Da
         continueOuterLoop = false;
         for (std::size_t igroup = 1; igroup <= thisDaylightControl.ShadeDeployOrderExtWins.size(); igroup++) {
 
-            std::vector<int> listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
+            std::vector<int> const &listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
             auto &thisTVIS1 = state.dataDaylightingManager->TVIS1(igroup);
             auto &thisTVIS2 = state.dataDaylightingManager->TVIS2(igroup);
             auto &thisASETIL = state.dataDaylightingManager->ASETIL(igroup);
@@ -6750,7 +6748,7 @@ void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum) // Da
         continueOuterLoop = false;
         for (std::size_t igroup = 1; igroup <= thisDaylightControl.ShadeDeployOrderExtWins.size(); igroup++) {
 
-            std::vector<int> listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
+            std::vector<int> const &listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
             auto &thisTVIS1 = state.dataDaylightingManager->TVIS1(igroup);
             auto &thisTVIS2 = state.dataDaylightingManager->TVIS1(igroup);
 
