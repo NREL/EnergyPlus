@@ -389,7 +389,8 @@ namespace InternalHeatGains {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
                                     thisPeople.NumberOfPeople = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
+                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                        !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          std::string{RoutineName} + peopleModuleObject + "=\"" + thisPeople.Name + "\", specifies " +
                                                              state.dataIPShortCut->cNumericFieldNames(2) +
@@ -417,7 +418,8 @@ namespace InternalHeatGains {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(3) > 0.0) {
                                     thisPeople.NumberOfPeople = state.dataHeatBal->space(spaceNum).floorArea / IHGNumbers(3);
-                                    if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
+                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                        !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          std::string{RoutineName} + peopleModuleObject + "=\"" + thisPeople.Name + "\", specifies " +
                                                              state.dataIPShortCut->cNumericFieldNames(3) +
@@ -1164,7 +1166,8 @@ namespace InternalHeatGains {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
                                     thisLights.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
+                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                        !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          std::string{RoutineName} + lightsModuleObject + "=\"" + thisLights.Name + "\", specifies " +
                                                              state.dataIPShortCut->cNumericFieldNames(2) +
@@ -1561,7 +1564,8 @@ namespace InternalHeatGains {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
                                     thisZoneElectric.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
+                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                        !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          std::string{RoutineName} + elecEqModuleObject + "=\"" + thisZoneElectric.Name +
                                                              "\", specifies " + state.dataIPShortCut->cNumericFieldNames(2) +
@@ -1780,7 +1784,8 @@ namespace InternalHeatGains {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
                                     thisZoneGas.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
+                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                        !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          std::string{RoutineName} + gasEqModuleObject + "=\"" + thisZoneGas.Name + "\", specifies " +
                                                              state.dataIPShortCut->cNumericFieldNames(2) +
@@ -2022,7 +2027,8 @@ namespace InternalHeatGains {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
                                     thisZoneHWEq.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
+                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                        !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          std::string{RoutineName} + hwEqModuleObject + "=\"" + thisZoneHWEq.Name + "\", specifies " +
                                                              state.dataIPShortCut->cNumericFieldNames(2) +
@@ -2234,7 +2240,8 @@ namespace InternalHeatGains {
                             if (spaceNum > 0) {
                                 if (IHGNumbers(2) >= 0.0) {
                                     thisZoneStmEq.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
+                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                        !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          std::string{RoutineName} + stmEqModuleObject + "=\"" + thisZoneStmEq.Name +
                                                              "\", specifies " + state.dataIPShortCut->cNumericFieldNames(2) +
@@ -2481,7 +2488,7 @@ namespace InternalHeatGains {
                             DesignLevelFieldNumber = 2;
                             if (spaceNum > 0) {
                                 thisZoneOthEq.DesignLevel = IHGNumbers(DesignLevelFieldNumber) * state.dataHeatBal->space(spaceNum).floorArea;
-                                if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
+                                if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) && !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                     ShowWarningError(state,
                                                      std::string{RoutineName} + othEqModuleObject + "=\"" + thisZoneOthEq.Name + "\", specifies " +
                                                          state.dataIPShortCut->cNumericFieldNames(DesignLevelFieldNumber) +
@@ -2701,7 +2708,8 @@ namespace InternalHeatGains {
                                 if (IHGNumbers(3) >= 0.0) {
                                     if (spaceNum > 0) {
                                         thisZoneITEq.DesignTotalPower = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).floorArea;
-                                        if (state.dataHeatBal->space(spaceNum).floorArea <= 0.0) {
+                                        if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                            !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                             ShowWarningError(state,
                                                              std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", specifies " +
                                                                  state.dataIPShortCut->cNumericFieldNames(3) +

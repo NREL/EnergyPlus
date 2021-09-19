@@ -416,8 +416,6 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
     int ISA;
     int ISlatAngle;
 
-    // auto &Zone(state.dataHeatBal->Zone);
-
     if (state.dataDaylightingManager->CalcDayltghCoefficients_firstTime) {
         GetDaylightingParametersInput(state);
         CheckTDDsAndLightShelvesInDaylitZones(state);

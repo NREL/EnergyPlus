@@ -1880,22 +1880,24 @@ namespace SurfaceGeometry {
                         // Check that matching interzone surface has construction with reversed layers
                         if (Found != SurfNum) { // Interzone surface
                             // Make sure different zones too (CR 4110)
-                            if (state.dataSurface->Surface(SurfNum).Zone == state.dataSurface->Surface(Found).Zone) {
+                            if (state.dataSurface->Surface(SurfNum).spaceNum == state.dataSurface->Surface(Found).spaceNum) {
                                 ++ErrCount2;
                                 if (ErrCount2 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                                     ShowWarningError(state,
-                                                     std::string{RoutineName} + "CAUTION -- Interzone surfaces are occuring in the same zone(s).");
+                                                     std::string{RoutineName} + "CAUTION -- Interspace surfaces are occuring in the same space(s).");
                                     ShowContinueError(
                                         state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual occurrences.");
                                 }
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     ShowWarningError(state,
-                                                     std::string{RoutineName} + "CAUTION -- Interzone surfaces are usually in different zones");
+                                                     std::string{RoutineName} + "CAUTION -- Interspace surfaces are usually in different spaces");
                                     ShowContinueError(state,
                                                       "Surface=" + state.dataSurface->Surface(SurfNum).Name +
+                                                          ", Space=" + state.dataHeatBal->space(state.dataSurface->Surface(SurfNum).spaceNum).Name +
                                                           ", Zone=" + state.dataSurface->Surface(SurfNum).ZoneName);
                                     ShowContinueError(state,
                                                       "Surface=" + state.dataSurface->Surface(Found).Name +
+                                                          ", Space=" + state.dataHeatBal->space(state.dataSurface->Surface(Found).spaceNum).Name +
                                                           ", Zone=" + state.dataSurface->Surface(Found).ZoneName);
                                 }
                             }
@@ -2864,6 +2866,7 @@ namespace SurfaceGeometry {
                     assert(state.dataHeatBal->Zone(zoneNum).numSpaces == int(state.dataHeatBal->Zone(zoneNum).spaceIndexes.size()));
                     // If some surfaces in the zone are assigned to a space, the new space is the remainder of the zone
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).Name = thisZone.Name + "-Remainder";
+                    state.dataHeatBal->space(state.dataGlobal->numSpaces).isRemainderSpace = true;
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceType = "GENERAL";
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceTypeNum = HeatBalanceManager::GetGeneralSpaceTypeNum(state);
                 }
