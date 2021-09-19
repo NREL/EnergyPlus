@@ -414,7 +414,7 @@ namespace UnitarySystems {
         Real64 m_MoistureLoadPredicted = 0.0;
 
         // Fault model of coil SAT sensor
-        bool m_FaultyCoilSATFlag = false;       // True if the coil has SAT sensor fault
+        bool m_FaultyCoilSATFlag = false;   // True if the coil has SAT sensor fault
         int m_FaultyCoilSATIndex = 0;       // Index of the fault object corresponding to the coil
         Real64 m_FaultyCoilSATOffset = 0.0; // Coil SAT sensor offset
 
@@ -428,9 +428,9 @@ namespace UnitarySystems {
         bool m_SuppCompNotSetYet = true;
         bool m_OKToPrintSizing = false;
         bool m_IsDXCoil = true;
-        Real64 m_SmallLoadTolerance = 5.0; // watts
+        Real64 m_SmallLoadTolerance = 5.0;             // watts
         bool m_TemperatureOffsetControlActive = false; // true if water-side economizer coil is active
-        Real64 m_minAirToWaterTempOffset = 0.0; // coil entering air to entering water temp offset
+        Real64 m_minAirToWaterTempOffset = 0.0;        // coil entering air to entering water temp offset
 
         int m_HRcoolCoilFluidInletNode = 0;
         int m_HRcoolCoilAirInNode = 0;
@@ -462,37 +462,37 @@ namespace UnitarySystems {
         Real64 FanPartLoadRatio = 0.0;
         Real64 CoolCoilWaterFlowRatio = 0.0;
         Real64 HeatCoilWaterFlowRatio = 0.0;
-        int ControlZoneNum = 0;          // index of unit in ZoneEquipConfig
-        int AirInNode = 0;               // Parent inlet air node number
-        int AirOutNode = 0;              // Parent outlet air node number
-        Real64 MaxCoolAirMassFlow = 0.0; // Maximum coil air mass flow for cooling [kg/s]
-        Real64 MaxHeatAirMassFlow = 0.0; // Maximum coil air mass flow for heating [kg/s]
+        int ControlZoneNum = 0;                // index of unit in ZoneEquipConfig
+        int AirInNode = 0;                     // Parent inlet air node number
+        int AirOutNode = 0;                    // Parent outlet air node number
+        Real64 MaxCoolAirMassFlow = 0.0;       // Maximum coil air mass flow for cooling [kg/s]
+        Real64 MaxHeatAirMassFlow = 0.0;       // Maximum coil air mass flow for heating [kg/s]
         Real64 MaxNoCoolHeatAirMassFlow = 0.0; // Maximum coil air mass flow for no cooling or heating [kg/s]
         Real64 DesignMinOutletTemp = 0.0;      // DOAS DX Cooling or SZVAV coil outlet air minimum temperature [C]
         Real64 DesignMaxOutletTemp = 0.0;      // Maximum supply air temperature from heating coil [C]
         Real64 LowSpeedCoolFanRatio = 0.0;     // cooling mode ratio of low speed fan flow to full flow rate
         Real64 LowSpeedHeatFanRatio = 0.0;     // heating mode ratio of low speed fan flow to full flow rate
-        Real64 MaxCoolCoilFluidFlow = 0.0; // Maximum cooling coil fluid flow for chilled water coil
+        Real64 MaxCoolCoilFluidFlow = 0.0;     // Maximum cooling coil fluid flow for chilled water coil
         Real64 MaxHeatCoilFluidFlow = 0.0;     // Maximum heating coil fluid flow for hot water or steam coil
-        int CoolCoilInletNodeNum = 0;    // Cooling coil air inlet node number
-        int CoolCoilOutletNodeNum = 0;   // Cooling coil air outlet node number
-        int CoolCoilFluidOutletNodeNum = 0; // Cooling coil fluid outlet node number (from Plant Loop data)
-        int CoolCoilLoopNum = 0;         // Plant loop num of chilled water coil
-        int CoolCoilLoopSide = 0;        // Supply side or demand side
-        int CoolCoilBranchNum = 0;       // Branch of number of the cooling coil in the plant loop
-        int CoolCoilCompNum = 0;         // Comp num of the cooling coil in the plant loop
-        int CoolCoilFluidInletNode = 0;  // Cooling coil fluid inlet node
-        int HeatCoilLoopNum = 0;         // Plant loop num of hot water or steam coil
-        int HeatCoilLoopSide = 0;        // Supply side or demand side
-        int HeatCoilBranchNum = 0;       // Branch of number of the heating coil in the plant loop
-        int HeatCoilCompNum = 0;         // Comp num of the heating coil in the plant loop
-        int HeatCoilFluidInletNode = 0;  // Heating coil fluid inlet node
-        int HeatCoilFluidOutletNodeNum = 0; // Heating coil fluid outlet node number (from Plant Loop data)
-        int HeatCoilInletNodeNum = 0;    // Heating coil air inlet node number
-        int HeatCoilOutletNodeNum = 0;   // Heating coil air outlet node number
-        bool ATMixerExists = false;          // true if AT mixer is connected to Unitary System
-        int ATMixerType = 0;             // type of AT mixer, inlet-side or supply-side
-        int ATMixerOutNode = 0;          // AT mixer outlet node number
+        int CoolCoilInletNodeNum = 0;          // Cooling coil air inlet node number
+        int CoolCoilOutletNodeNum = 0;         // Cooling coil air outlet node number
+        int CoolCoilFluidOutletNodeNum = 0;    // Cooling coil fluid outlet node number (from Plant Loop data)
+        int CoolCoilLoopNum = 0;               // Plant loop num of chilled water coil
+        int CoolCoilLoopSide = 0;              // Supply side or demand side
+        int CoolCoilBranchNum = 0;             // Branch of number of the cooling coil in the plant loop
+        int CoolCoilCompNum = 0;               // Comp num of the cooling coil in the plant loop
+        int CoolCoilFluidInletNode = 0;        // Cooling coil fluid inlet node
+        int HeatCoilLoopNum = 0;               // Plant loop num of hot water or steam coil
+        int HeatCoilLoopSide = 0;              // Supply side or demand side
+        int HeatCoilBranchNum = 0;             // Branch of number of the heating coil in the plant loop
+        int HeatCoilCompNum = 0;               // Comp num of the heating coil in the plant loop
+        int HeatCoilFluidInletNode = 0;        // Heating coil fluid inlet node
+        int HeatCoilFluidOutletNodeNum = 0;    // Heating coil fluid outlet node number (from Plant Loop data)
+        int HeatCoilInletNodeNum = 0;          // Heating coil air inlet node number
+        int HeatCoilOutletNodeNum = 0;         // Heating coil air outlet node number
+        bool ATMixerExists = false;            // true if AT mixer is connected to Unitary System
+        int ATMixerType = 0;                   // type of AT mixer, inlet-side or supply-side
+        int ATMixerOutNode = 0;                // AT mixer outlet node number
         Real64 ControlZoneMassFlowFrac = 0.0;  // fraction of air flow to the control zone
         DesignSpecMSHP *m_CompPointerMSHP = nullptr;
         std::string Name;
@@ -500,8 +500,8 @@ namespace UnitarySystems {
         Real64 LoadSHR = 0.0;                   // Load sensible heat ratio with humidity control
         Real64 CoilSHR = 0.0;                   // Load sensible heat ratio with humidity control
         int temperatureOffsetControlStatus = 0; // water side economizer status flag, also report variable
-        int OAMixerIndex = -1;              // index to zone equipment OA mixer
-        bool OAMixerExists = false;         // true if OA mixer is connected to inlet of UnitarySystem
+        int OAMixerIndex = -1;                  // index to zone equipment OA mixer
+        bool OAMixerExists = false;             // true if OA mixer is connected to inlet of UnitarySystem
 
         //    private:
         // private members not initialized in constructor
@@ -860,7 +860,6 @@ namespace UnitarySystems {
         );
 
     public:
-
         static void
         getUnitarySystemInputData(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 

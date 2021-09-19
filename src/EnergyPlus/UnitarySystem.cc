@@ -1802,9 +1802,15 @@ namespace UnitarySystems {
                     }
                     SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
                     state.dataSize->DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
-                    TempSize = DataSizing::AutoSize;
+                    if (this->m_CoolingCapMethod == DataSizing::CapacityPerFloorArea ||
+                        (this->m_CoolingCapMethod == DataSizing::CoolingDesignCapacity && this->m_DesignCoolingCapacity > 0.0)) {
+                        TempSize = this->m_DesignCoolingCapacity;
+                    } else {
+                        TempSize = DataSizing::AutoSize;
+                    }
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
+                    state.dataSize->DataFracOfAutosizedCoolingCapacity = coolingCapacityMultiplier;
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     CoolCapAtPeak = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                     state.dataSize->DXCoolCap = CoolCapAtPeak;
@@ -3420,11 +3426,9 @@ namespace UnitarySystems {
             return;
         }
 
-        if (this->OAMixerExists) {
-            this->m_CoolOutAirVolFlow = input_data.cooling_oa_flow_rate;
-            this->m_HeatOutAirVolFlow = input_data.heating_oa_flow_rate;
-            this->m_NoCoolHeatOutAirVolFlow = input_data.no_load_oa_flow_rate;
-        }
+        this->m_CoolOutAirVolFlow = input_data.cooling_oa_flow_rate;
+        this->m_HeatOutAirVolFlow = input_data.heating_oa_flow_rate;
+        this->m_NoCoolHeatOutAirVolFlow = input_data.no_load_oa_flow_rate;
 
         if (ZoneEquipment) {
             this->UnitarySystemType_Num = DataZoneEquipment::ZoneUnitarySys_Num;
@@ -3513,6 +3517,7 @@ namespace UnitarySystems {
 
         // check that control zone name is valid for load based control
         if (this->m_ControlType == ControlType::Load || this->m_ControlType == ControlType::CCMASHRAE) {
+            // bypass this error for PTUnits
             if (this->ControlZoneNum == 0 && this->m_sysType < SysType::PackagedAC) {
                 ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
                 ShowContinueError(state, "When Control Type = Load or SingleZoneVAV");
@@ -5691,6 +5696,7 @@ namespace UnitarySystems {
         // if (!lNumericBlanks(iDOASDXMinTempNumericNum)) {
         this->DesignMinOutletTemp = loc_DesignMinOutletTemp;
         if (this->m_ControlType != ControlType::CCMASHRAE && this->DesignMinOutletTemp == DataSizing::AutoSize) {
+            // skip error for PTUnits
             if (this->m_sysType < SysType::PackagedAC) {
                 ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                 ShowContinueError(state, "Invalid entry for Minimum Supply Air Temperature = AutoSize.");
@@ -6035,6 +6041,8 @@ namespace UnitarySystems {
         }
 
         // translate DesignSpecification:ZoneHVAC:Sizing inputs
+        // UnitarySystem already has air flow scalable sizing, update locals
+        // UnitarySystem does not have capacity sizing, set inputs accordingly
         if (this->m_HVACSizingIndex > 0) {
             int zoneHVACIndex = this->m_HVACSizingIndex;
             auto &zoneHVACSizing = state.dataSize->ZoneHVACSizing(zoneHVACIndex);
