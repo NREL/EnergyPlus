@@ -364,6 +364,10 @@ namespace UnitarySystems {
         int m_HeatingSpeedNum = 0;
         int m_SpeedNum = 0;
 
+        bool m_EMSOverrideCoilSpeedNumOn = false;
+        Real64 m_EMSOverrideCoilSpeedNumValue = 0.0;
+        int m_CoilSpeedErrIdx = 0;
+
         Real64 m_DehumidInducedHeatingDemandRate = 0.0;
 
         Real64 m_TotalAuxElecPower = 0.0;
@@ -744,6 +748,14 @@ namespace UnitarySystems {
                                         Real64 &ZoneLoad,
                                         Real64 const MaxOutletTemp // limits heating coil outlet temp [C]
         );
+        void controlUnitarySystemOutputEMS(EnergyPlusData &state,
+                                           int const AirLoopNum,          // Index to air loop
+                                           bool const FirstHVACIteration, // True when first HVAC iteration
+                                           Real64 &OnOffAirFlowRatio,     // ratio of heating PLR to cooling PLR (is this correct?)
+                                           Real64 const ZoneLoad,
+                                           Real64 &FullSensibleOutput,
+                                           bool &HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
+                                           int CompOn);
 
         void controlUnitarySystemOutput(EnergyPlusData &state,
                                         int const AirLoopNum,          // Index to air loop

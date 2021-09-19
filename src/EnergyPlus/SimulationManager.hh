@@ -72,13 +72,12 @@ namespace SimulationManager {
 
     void CheckForRequestedReporting(EnergyPlusData &state);
 
-    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const fs::path &fileName);
+    std::unique_ptr<std::ostream>
+    OpenStreamFile(EnergyPlusData &state, const fs::path &fileName, std::ios_base::openmode mode = (std::ios_base::out | std::ios_base::trunc));
 
     std::unique_ptr<fmt::ostream> OpenFmtStreamFile(EnergyPlusData &state, const fs::path &filePath);
 
     void OpenOutputFiles(EnergyPlusData &state);
-
-    void OpenOutputJsonFiles(EnergyPlusData &state, JsonOutputStreams &jsonOutputStreams);
 
     void CloseOutputFiles(EnergyPlusData &state);
 

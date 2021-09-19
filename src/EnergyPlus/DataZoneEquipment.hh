@@ -471,17 +471,6 @@ namespace DataZoneEquipment {
                             std::string const &NodeName  // Return air node name to match (may be blank)
     );
 
-    Real64
-    CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
-                                      int DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
-                                      int ActualZoneNum,    // Zone index
-                                      bool UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
-                                      bool UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
-                                      Optional_bool_const PerPersonNotSet = _,  // when calculation should not include occupants (e.g., dual duct)
-                                      Optional_bool_const MaxOAVolFlowFlag = _, // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
-                                      Optional_int_const spaceNum = _           // Space index (if applicable)
-    );
-
     int GetZoneEquipControlledZoneNum(EnergyPlusData &state, int const ZoneEquipTypeNum, std::string const &EquipmentName);
 
     bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum);
@@ -511,8 +500,6 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     Array1D<DataZoneEquipment::EquipList> ZoneEquipList;
     Array1D<DataZoneEquipment::SupplyAir> SupplyAirPath;
     Array1D<DataZoneEquipment::ReturnAir> ReturnAirPath;
-    bool CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
-    Array1D_bool MyEnvrnFlag;
 
     void clear_state() override
     {
@@ -534,8 +521,6 @@ struct DataZoneEquipmentData : BaseGlobalStruct
         this->ZoneEquipList.deallocate();
         this->SupplyAirPath.deallocate();
         this->ReturnAirPath.deallocate();
-        this->CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
-        this->MyEnvrnFlag.clear();
     }
 };
 

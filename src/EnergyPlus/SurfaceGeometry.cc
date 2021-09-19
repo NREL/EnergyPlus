@@ -2842,6 +2842,10 @@ namespace SurfaceGeometry {
         for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
             auto &thisSurf = state.dataSurface->Surface(surfNum);
             if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
+            if (thisSurf.BaseSurf != surfNum) {
+                // Set space for subsurfaces
+                thisSurf.spaceNum = state.dataSurface->Surface(thisSurf.BaseSurf).spaceNum;
+            }
             if (thisSurf.spaceNum > 0) {
                 state.dataHeatBal->Zone(thisSurf.Zone).anySurfacesWithSpace = true;
             } else {
@@ -7064,7 +7068,7 @@ namespace SurfaceGeometry {
                     state.dataSurface->IntMassObjects(Item).spaceListActive = false;
                     state.dataSurface->IntMassObjects(Item).spaceOrSpaceListPtr = Item1;
                 } else if (SLItem > 0) {
-                    int numOfSpaces = int(state.dataHeatBal->spaceList(SLItem).spaces.size());
+                    int numOfSpaces = int(state.dataHeatBal->spaceList(SLItem).numListSpaces);
                     NumIntMassSurfaces += numOfSpaces;
                     state.dataSurface->IntMassObjects(Item).numOfSpaces = numOfSpaces;
                     state.dataSurface->IntMassObjects(Item).spaceListActive = true;
