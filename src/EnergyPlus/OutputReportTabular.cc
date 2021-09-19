@@ -12519,12 +12519,12 @@ void WriteVisualResilienceTables(EnergyPlusData &state)
     // Using/Aliasing
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) {
+        if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) {
             if (state.dataOutRptTab->displayVisualResilienceSummaryExplicitly) {
                 ShowWarningError(state,
                                  "Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
                                  "Zone Average Daylighting Reference Point Illuminance output is required, "
-                                 "but no Daylight Method is defined in Zone:" +
+                                 "but no Daylighting Controls are defined in Zone:" +
                                      state.dataHeatBal->Zone(ZoneNum).Name);
             }
         }

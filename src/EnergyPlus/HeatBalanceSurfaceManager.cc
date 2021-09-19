@@ -379,8 +379,10 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     // Do the Begin Simulation initializations
     if (state.dataGlobal->BeginSimFlag) {
         AllocateSurfaceHeatBalArrays(state); // Allocate the Module Arrays before any inits take place
-        state.dataHeatBalSurf->InterZoneWindow = std::any_of(
-            state.dataHeatBal->Zone.begin(), state.dataHeatBal->Zone.end(), [](DataHeatBalance::ZoneData const &e) { return e.HasInterZoneWindow; });
+        state.dataHeatBalSurf->InterZoneWindow =
+            std::any_of(state.dataViewFactor->EnclSolInfo.begin(),
+                        state.dataViewFactor->EnclSolInfo.end(),
+                        [](DataViewFactorInformation::EnclosureViewFactorInformation const &e) { return e.HasInterZoneWindow; });
         state.dataRoomAirMod->IsZoneDV.dimension(state.dataGlobal->NumOfZones, false);
         state.dataRoomAirMod->IsZoneCV.dimension(state.dataGlobal->NumOfZones, false);
         state.dataRoomAirMod->IsZoneUI.dimension(state.dataGlobal->NumOfZones, false);
@@ -467,33 +469,42 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         }
     }
 
-    for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
-        if (state.dataDaylightingData->ZoneDaylight(NZ).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) continue;
-        state.dataDaylightingData->ZoneDaylight(NZ).DaylIllumAtRefPt = 0.0;
-        state.dataDaylightingData->ZoneDaylight(NZ).GlareIndexAtRefPt = 0.0;
-        state.dataDaylightingData->ZoneDaylight(NZ).ZonePowerReductionFactor = 1.0;
-        state.dataDaylightingData->ZoneDaylight(NZ).InterReflIllFrIntWins = 0.0; // inter-reflected illuminance from interior windows
-        if (state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0) {
-            state.dataDaylightingData->ZoneDaylight(NZ).TimeExceedingGlareIndexSPAtRefPt = 0.0;
-            state.dataDaylightingData->ZoneDaylight(NZ).TimeExceedingDaylightIlluminanceSPAtRefPt = 0.0;
+    // Reset space power reduction factors
+    for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+        state.dataDaylightingData->spacePowerReductionFactor(spaceNum) = 1.0;
+    }
+    for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+        auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
+        auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(thisDaylightControl.enclIndex);
+        thisDaylightControl.DaylIllumAtRefPt = 0.0;
+        thisDaylightControl.GlareIndexAtRefPt = 0.0;
+        thisDaylightControl.PowerReductionFactor = 1.0;
+        thisEnclDaylight.InterReflIllFrIntWins = 0.0; // inter-reflected illuminance from interior windows
+        if (thisDaylightControl.TotalDaylRefPoints != 0) {
+            thisDaylightControl.TimeExceedingGlareIndexSPAtRefPt = 0.0;
+            thisDaylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt = 0.0;
         }
 
-        if (state.dataEnvrn->SunIsUp && state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0) {
+        if (state.dataEnvrn->SunIsUp && thisDaylightControl.TotalDaylRefPoints != 0) {
             if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Daylighting Illumination");
-            if (state.dataDaylightingManager->maxNumRefPtInAnyZone > 0) DayltgInteriorIllum(state, NZ);
-            if (!state.dataGlobal->DoingSizing) DayltgInteriorMapIllum(state, NZ);
+            DayltgInteriorIllum(state, daylightCtrlNum);
         }
+    }
 
-        if (state.dataEnvrn->SunIsUp && state.dataDaylightingDevicesData->NumOfTDDPipes > 0 && NZ == 1) {
-            if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime)
-                DisplayString(state, "Computing Interior Daylighting Illumination for TDD pipes");
-            DayltgInteriorTDDIllum(state);
-        }
+    if (state.dataEnvrn->SunIsUp && state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
+        if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime)
+            DisplayString(state, "Computing Interior Daylighting Illumination for TDD pipes");
+        DayltgInteriorTDDIllum(state);
+    }
+
+    for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+        auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
 
         // RJH DElight Modification Begin - Call to DElight electric lighting control subroutine
         // Check if the sun is up and the current Thermal Zone hosts a Daylighting:DElight object
-        if (state.dataEnvrn->SunIsUp && state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints != 0 &&
-            (state.dataDaylightingData->ZoneDaylight(NZ).DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting)) {
+        if (state.dataEnvrn->SunIsUp && thisDaylightControl.TotalDaylRefPoints != 0 &&
+            (thisDaylightControl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting)) {
+            int zoneNum = thisDaylightControl.zoneIndex;
             // Call DElight interior illuminance and electric lighting control subroutine
             Real64 dPowerReducFac = 1.0; // Return value Electric Lighting Power Reduction Factor for current Zone and Timestep
             Real64 dHISKFFC = state.dataEnvrn->HISKF * LUX2FC;
@@ -511,8 +522,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
             std::string cErrorMsg; // Each DElight Error Message can be up to 200 characters long
             bool bEndofErrFile;    // End of Error File flag
 
-            DElightElecLtgCtrl(len(state.dataHeatBal->Zone(NZ).Name),
-                               state.dataHeatBal->Zone(NZ).Name,
+            DElightElecLtgCtrl(len(state.dataHeatBal->Zone(zoneNum).Name),
+                               state.dataHeatBal->Zone(zoneNum).Name,
                                dLatitude,
                                dHISKFFC,
                                dHISUNFFC,
@@ -597,8 +608,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                     // Increment refpt counter
                     ++iDElightRefPt;
                     // Assure refpt index does not exceed number of refpts in this zone
-                    if (iDElightRefPt <= state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints) {
-                        state.dataDaylightingData->ZoneDaylight(NZ).DaylIllumAtRefPt(iDElightRefPt) = dRefPtIllum;
+                    if (iDElightRefPt <= thisDaylightControl.TotalDaylRefPoints) {
+                        thisDaylightControl.DaylIllumAtRefPt(iDElightRefPt) = dRefPtIllum;
                     }
                 }
 
@@ -610,11 +621,14 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
             }
             // Store the calculated total zone Power Reduction Factor due to DElight daylighting
             // in the ZoneDaylight structure for later use
-            state.dataDaylightingData->ZoneDaylight(NZ).ZonePowerReductionFactor = dPowerReducFac;
+            thisDaylightControl.PowerReductionFactor = dPowerReducFac;
         }
         // RJH DElight Modification End - Call to DElight electric lighting control subroutine
     }
 
+    if (state.dataEnvrn->SunIsUp && !state.dataGlobal->DoingSizing) {
+        DayltgInteriorMapIllum(state);
+    }
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
         int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
@@ -638,15 +652,18 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     InitSolarHeatGains(state);
     if (state.dataEnvrn->SunIsUp && (state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad > 0.0)) {
-        for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
-            if (state.dataDaylightingData->ZoneDaylight(NZ).TotalDaylRefPoints > 0) {
-                if (state.dataHeatBal->Zone(NZ).HasInterZoneWindow) {
-                    DayltgInterReflIllFrIntWins(state, NZ);
-                    DayltgGlareWithIntWins(state, state.dataDaylightingData->ZoneDaylight(NZ).GlareIndexAtRefPt, NZ);
+        for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+            if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints > 0) {
+                if (state.dataViewFactor->EnclSolInfo(enclNum).HasInterZoneWindow) {
+                    DayltgInterReflIllFrIntWins(state, enclNum);
+                    for (int daylightCtrlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
+                        auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
+                        DayltgGlareWithIntWins(state, thisDaylightControl.GlareIndexAtRefPt, enclNum);
+                    }
                 }
-                if (state.dataDaylightingManager->maxNumRefPtInAnyZone > 0) DayltgElecLightingControl(state, NZ);
             }
         }
+        DayltgElecLightingControl(state);
     } else if (state.dataDaylightingData->mapResultsToReport && state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
         for (int MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
             ReportIllumMap(state, MapNum);
@@ -4380,8 +4397,8 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
         if (Surface(SurfNum).ExtBoundCond == SurfNum) continue;
         if (state.dataConstruction->Construct(Surface(SurfNum).Construction).TransDiff <= 0.0) continue;
 
-        int surfZoneNum = Surface(SurfNum).Zone;
-        if (!state.dataHeatBal->Zone(surfZoneNum).HasInterZoneWindow) continue;
+        int surfEnclNum = Surface(SurfNum).SolarEnclIndex;
+        if (!state.dataViewFactor->EnclSolInfo(surfEnclNum).HasInterZoneWindow) continue;
         int NZ = Surface(SurfNum).SolarEnclIndex;
         int MZ = Surface(Surface(SurfNum).ExtBoundCond).SolarEnclIndex;
         state.dataHeatBalSurf->ZoneFractDifShortZtoZ(NZ, MZ) +=
@@ -5572,14 +5589,7 @@ void ReportVisualResilience(EnergyPlusData &state)
             state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum).assign(NoBins, 0.0);
         }
         state.dataHeatBalSurfMgr->reportVisualResilienceFirstTime = false;
-        bool hasDayLighting = false;
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::NoDaylighting) {
-                hasDayLighting = true;
-                break;
-            }
-        }
-        if (!hasDayLighting) {
+        if (state.dataDaylightingData->totDaylightingControls == 0) {
             if (state.dataOutRptTab->displayVisualResilienceSummaryExplicitly) {
                 ShowWarningError(state,
                                  "Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
@@ -5597,34 +5607,38 @@ void ReportVisualResilience(EnergyPlusData &state)
             state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum) = state.dataHeatBal->People(iPeople).NumberOfPeople *
                                                            GetCurrentScheduleValue(state, state.dataHeatBal->People(iPeople).NumberOfPeoplePtr);
         }
+        // Accumulate across daylighting controls first
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            // Place holder
-            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) continue;
-
-            Array1D<Real64> ZoneIllumRef = state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllumAtRefPt;
-            Real64 ZoneIllum = 0.0;
-            for (size_t i = 1; i <= ZoneIllumRef.size(); i++) {
-                ZoneIllum += ZoneIllumRef(i);
-            }
-            ZoneIllum /= ZoneIllumRef.size();
-
-            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).ZonePowerReductionFactor > 0) {
-                Array1D<Real64> ZoneIllumSetpoint = state.dataDaylightingData->ZoneDaylight(ZoneNum).IllumSetPoint;
-                ZoneIllum = 0.0;
-                for (size_t i = 1; i <= ZoneIllumSetpoint.size(); i++) {
-                    ZoneIllum += ZoneIllumSetpoint(i);
+            state.dataDaylightingData->ZoneDaylight(ZoneNum).zoneAvgIllumSum = 0.0;
+        }
+        for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+            auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
+            if (thisDaylightControl.PowerReductionFactor > 0) {
+                for (int refPt = 1; refPt <= thisDaylightControl.TotalDaylRefPoints; ++refPt) {
+                    state.dataDaylightingData->ZoneDaylight(thisDaylightControl.zoneIndex).zoneAvgIllumSum +=
+                        thisDaylightControl.IllumSetPoint(refPt);
                 }
-                ZoneIllum /= ZoneIllumSetpoint.size();
+            } else {
+                for (int refPt = 1; refPt <= thisDaylightControl.TotalDaylRefPoints; ++refPt) {
+                    state.dataDaylightingData->ZoneDaylight(thisDaylightControl.zoneIndex).zoneAvgIllumSum +=
+                        thisDaylightControl.DaylIllumAtRefPt(refPt);
+                }
             }
+        }
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
+            // Now divide by total reference points to get average
+            Real64 avgZoneIllum =
+                state.dataDaylightingData->ZoneDaylight(ZoneNum).zoneAvgIllumSum / state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts;
 
             int NumOcc = state.dataHeatBalFanSys->ZoneNumOcc(ZoneNum);
-            if (ZoneIllum <= 100) {
+            if (avgZoneIllum <= 100) {
                 state.dataHeatBalFanSys->ZoneLightingLevelHourBins(ZoneNum)[0] += state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum)[0] += NumOcc * state.dataGlobal->TimeStepZone;
-            } else if (ZoneIllum > 100 && ZoneIllum <= 300) {
+            } else if (avgZoneIllum > 100 && avgZoneIllum <= 300) {
                 state.dataHeatBalFanSys->ZoneLightingLevelHourBins(ZoneNum)[1] += state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum)[1] += NumOcc * state.dataGlobal->TimeStepZone;
-            } else if (ZoneIllum > 300 && ZoneIllum <= 500) {
+            } else if (avgZoneIllum > 300 && avgZoneIllum <= 500) {
                 state.dataHeatBalFanSys->ZoneLightingLevelHourBins(ZoneNum)[2] += state.dataGlobal->TimeStepZone;
                 state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins(ZoneNum)[2] += NumOcc * state.dataGlobal->TimeStepZone;
             } else {

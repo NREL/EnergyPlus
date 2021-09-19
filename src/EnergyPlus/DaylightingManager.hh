@@ -86,19 +86,19 @@ namespace DaylightingManager {
     constexpr int NPHMAX(10);           // Number of sky/ground integration steps in altitude
     constexpr int NTHMAX(16);           // Number of sky/ground integration steps in azimuth
 
-    void DayltgAveInteriorReflectance(EnergyPlusData &state, int const ZoneNum);
+    void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum); // Enclosure number
 
     void CalcDayltgCoefficients(EnergyPlusData &state);
 
-    void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state, int const ZoneNum);
+    void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state);
 
-    void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const ZoneNum);
+    void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum);
 
-    void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum);
+    void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum);
 
     void FigureDayltgCoeffsAtPointsSetupForWindow(
         EnergyPlusData &state,
-        int const ZoneNum,
+        int const daylightCtrlNum, // zero if called for map points
         int const iRefPoint,
         int const loopwin,
         DataDaylighting::iCalledFor const CalledFrom, // indicate  which type of routine called this routine
@@ -136,7 +136,7 @@ namespace DaylightingManager {
 
     void FigureDayltgCoeffsAtPointsForWindowElements(
         EnergyPlusData &state,
-        int const ZoneNum,
+        int const daylightCtrlNum, // Current daylighting control number (only used when called from RefPoint)
         int const iRefPoint,
         int const loopwin,
         DataDaylighting::iCalledFor const CalledFrom, // indicate  which type of routine called this routine
@@ -182,7 +182,7 @@ namespace DaylightingManager {
         Optional<Real64> MapWindowSolidAngAtRefPtWtd = _);
 
     void InitializeCFSDaylighting(EnergyPlusData &state,
-                                  int const ZoneNum,               // Current zone number
+                                  int const daylightCtrlNum,       // Current daylighting control number
                                   int const IWin,                  // Complex fenestration number
                                   int const NWX,                   // Number of horizontal divisions
                                   int const NWY,                   // Number of vertical divisions
@@ -195,7 +195,7 @@ namespace DaylightingManager {
     void InitializeCFSStateData(EnergyPlusData &state,
                                 DataBSDFWindow::BSDFRefPoints &StateRefPoint,
                                 DataBSDFWindow::BSDFRefPointsGeomDescr &DaylghtGeomDescr,
-                                int const ZoneNum, // Current zone number
+                                int const daylightCtrlNum, // Current daylighting control number
                                 int const iWin,
                                 Vector3<Real64> const &RefPoint, // reference point
                                 int const CurFenState,
@@ -247,7 +247,7 @@ namespace DaylightingManager {
 
     void FigureDayltgCoeffsAtPointsForSunPosition(
         EnergyPlusData &state,
-        int const ZoneNum,
+        int const daylightCtrlNum, // Current daylighting control number
         int const iRefPoint,
         int const iXelement,
         int const NWX, // Number of window elements in x direction for dayltg calc
@@ -286,7 +286,7 @@ namespace DaylightingManager {
         Optional<Real64 const> MapWindowSolidAngAtRefPtWtd = _);
 
     void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
-                                                int const ZoneNum,
+                                                int const daylightCtrlNum, // Current daylighting control number
                                                 int const iRefPoint,
                                                 int const iHour,
                                                 int &ISunPos,
@@ -312,9 +312,7 @@ namespace DaylightingManager {
 
     void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetDaylightingControls(EnergyPlusData &state,
-                                int const TotDaylightingControls, // Total daylighting controls inputs
-                                bool &ErrorsFound);
+    void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound);
 
     void GeometryTransformForDaylighting(EnergyPlusData &state);
 
@@ -331,15 +329,15 @@ namespace DaylightingManager {
     int findWinShadingStatus(int const IWin);
 
     void DayltgGlare(EnergyPlusData &state,
-                     int &IL,        // Reference point index: 1=first ref pt, 2=second ref pt
-                     Real64 &BLUM,   // Window background (surround) luminance (cd/m2)
-                     Real64 &GLINDX, // Glare index
-                     int &ZoneNum    // Zone number
+                     int &IL,                  // Reference point index: 1=first ref pt, 2=second ref pt
+                     Real64 &BLUM,             // Window background (surround) luminance (cd/m2)
+                     Real64 &GLINDX,           // Glare index
+                     int const daylightCtrlNum // Current daylighting control number
     );
 
     void DayltgGlareWithIntWins(EnergyPlusData &state,
-                                Array1D<Real64> &GLINDX, // Glare index
-                                int const ZoneNum        // Zone number
+                                Array1D<Real64> &GLINDX,  // Glare index
+                                int const daylightCtrlNum // Current daylighting control number
     );
 
     void DayltgExtHorizIllum(EnergyPlusData &state,
@@ -370,11 +368,11 @@ namespace DaylightingManager {
                                     bool &hit                  // True iff ray hits an obstruction
     );
 
-    void DayltgInteriorIllum(EnergyPlusData &state, int &ZoneNum); // Zone number
+    void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum); // Daylighting:Controls number
 
     void DayltgInteriorTDDIllum(EnergyPlusData &state);
 
-    void DayltgElecLightingControl(EnergyPlusData &state, int &ZoneNum); // Zone number
+    void DayltgElecLightingControl(EnergyPlusData &state);
 
     Real64 DayltgGlarePositionFactor(Real64 &X, // Lateral and vertical distance of luminous window element from
                                      Real64 &Y);
@@ -382,7 +380,7 @@ namespace DaylightingManager {
     void DayltgInterReflectedIllum(EnergyPlusData &state,
                                    int const ISunPos, // Sun position counter; used to avoid calculating various
                                    int const IHR,     // Hour of day
-                                   int const ZoneNum, // Zone number
+                                   int const enclNum, // Daylighting enclosure index
                                    int const IWin     // Window index
     );
 
@@ -399,11 +397,11 @@ namespace DaylightingManager {
                                        Optional_int_const MapNum = _);
 
     void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
-                                                      int const IWin,      // Window index
-                                                      int const WinEl,     // Current window element counter
-                                                      int const IHR,       // Hour of day
-                                                      int const ZoneNum,   // Zone number
-                                                      int const iRefPoint, // reference point counter
+                                                      int const IWin,            // Window index
+                                                      int const WinEl,           // Current window element counter
+                                                      int const IHR,             // Hour of day
+                                                      int const daylightCtrlNum, // Daylighting control number
+                                                      int const iRefPoint,       // reference point counter
                                                       DataDaylighting::iCalledFor const CalledFrom,
                                                       Optional_int_const MapNum = _);
 
@@ -411,15 +409,13 @@ namespace DaylightingManager {
                                               int const IWin,      // Window index
                                               int const WinEl,     // Current window element counter
                                               int const IHR,       // Hour of day
-                                              int const ZoneNum,   // Zone number
                                               int const iRefPoint, // reference point index
                                               DataDaylighting::iCalledFor const CalledFrom,
                                               Optional_int_const MapNum = _);
 
     void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
-                                                int const iWin,    // Window index
-                                                int const ZoneNum, // Zone number
-                                                int const iHour,   // Hour of day
+                                                int const iWin,  // Window index
+                                                int const iHour, // Hour of day
                                                 int const iRefPoint,
                                                 int const NumEl,                              // Total number of window elements
                                                 Real64 const AZVIEW,                          // Azimuth of view vector in absolute coord system for
@@ -454,7 +450,7 @@ namespace DaylightingManager {
                                  Real64 &LumAtReflHitPtFrSun       // Luminance at ReflHitPt from beam solar reflection for unit
     );
 
-    void DayltgInteriorMapIllum(EnergyPlusData &state, int &ZoneNum); // Zone number
+    void DayltgInteriorMapIllum(EnergyPlusData &state);
 
     void ReportIllumMap(EnergyPlusData &state, int const MapNum);
 
@@ -464,11 +460,11 @@ namespace DaylightingManager {
 
     void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state);
 
-    void CreateShadeDeploymentOrder(EnergyPlusData &state, int &ZoneNum);
+    void CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum);
 
-    void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int &ZoneNum);
+    void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNum);
 
-    void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int &ZoneNum); // Zone number
+    void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int const enclNum);
 
     void CalcMinIntWinSolidAngs(EnergyPlusData &state);
 
@@ -489,6 +485,7 @@ struct DaylightingManagerData : BaseGlobalStruct
 {
 
     bool CalcDayltghCoefficients_firstTime = true;
+    bool getDaylightingParametersInputFlag = true;
     bool refFirstTime = true;
     bool DayltgInteriorIllum_firstTime = true; // true first time routine is called
     bool FirstTimeDaylFacCalc = true;
@@ -504,7 +501,7 @@ struct DaylightingManagerData : BaseGlobalStruct
 
     int TotWindowsWithDayl = 0;                          // Total number of exterior windows in all daylit zones
     Array1D<Real64> DaylIllum;                           // Daylight illuminance at reference points (lux)
-    int maxNumRefPtInAnyZone = 0;                        // The most number of reference points that any single zone has
+    int maxNumRefPtInAnyDaylCtrl = 0;                    // The most number of reference points that any single daylighting control has
     int maxNumRefPtInAnyEncl = 0;                        // The most number of reference points that any single enclosure has
     Real64 PHSUN = 0.0;                                  // Solar altitude (radians)
     Real64 SPHSUN = 0.0;                                 // Sine of solar altitude
@@ -722,6 +719,7 @@ struct DaylightingManagerData : BaseGlobalStruct
     void clear_state() override
     {
         this->CalcDayltghCoefficients_firstTime = true;
+        this->getDaylightingParametersInputFlag = true;
         this->refFirstTime = true;
         this->DayltgInteriorIllum_firstTime = true;
         this->FirstTimeDaylFacCalc = true;
@@ -736,7 +734,7 @@ struct DaylightingManagerData : BaseGlobalStruct
         this->CreateDFSReportFile = true;
         this->TotWindowsWithDayl = 0;
         this->DaylIllum.deallocate();
-        this->maxNumRefPtInAnyZone = 0;
+        this->maxNumRefPtInAnyDaylCtrl = 0;
         this->maxNumRefPtInAnyEncl = 0;
         this->PHSUN = 0.0;
         this->SPHSUN = 0.0;
