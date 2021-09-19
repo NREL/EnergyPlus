@@ -1401,6 +1401,35 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPump(2).CompPartLoadRatio, 0.1530992, 0.0001);
 
     state->dataGlobal->DoCoilDirectSolutions = false;
+
+    state->dataHVACMultiSpdHP->MSHeatPump(2).EMSOverrideCoilSpeedNumOn = true;
+    state->dataHVACMultiSpdHP->MSHeatPump(2).EMSOverrideCoilSpeedNumValue = 0.1530992;
+
+    SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
+    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedNum, 1);
+    EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).CycRatio, 0.1530992, 0.0001);
+    EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPump(2).CompPartLoadRatio, 0.1530992, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(22).Temp, 26.546664, 0.001);
+
+    QZnReq = 50000.00;
+    // when speed overwrite value is exactly 1.0, use full load of speed 1
+    state->dataHVACMultiSpdHP->MSHeatPump(2).EMSOverrideCoilSpeedNumValue = 1;
+    SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
+    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedNum, 1);
+    // when speed overwrite value is 1.2 (between 1.0 and 2.0), use speed 2 with cycling ratio 0.2
+    state->dataHVACMultiSpdHP->MSHeatPump(2).EMSOverrideCoilSpeedNumValue = 1.2;
+    SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
+    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedNum, 2);
+    EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedRatio, 0.2, 0.001);
+    EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPump(2).CompPartLoadRatio, 0.2, 0.001);
+    // SpeedNumValue = 1.2 is overheating under QZnReq = 50000.00
+    EXPECT_GT(state->dataLoopNodes->Node(22).Temp, 26.546664);
+
+    state->dataHVACMultiSpdHP->MSHeatPump(2).EMSOverrideCoilSpeedNumValue = 2.2;
+    SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
+    EXPECT_EQ(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedNum, 2);
+    EXPECT_NEAR(state->dataHVACMultiSpdHP->MSHeatPumpReport(2).SpeedRatio, 1.0, 0.001);
+
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
 }
