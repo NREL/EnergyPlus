@@ -2339,11 +2339,13 @@ If you enter \textbf{autocalculate} in this field, EnergyPlus will automatically
 
 If \textbf{you do use the reflections option in the Solar Distribution field} in your BUILDING object input, you do \textbf{not} have to enter View Factor to Ground values. In this case the program will automatically calculate the value to use for each exterior surface taking into account solar shadowing (including shadowing of the ground by the building) and reflections from obstructions (ref: Building, Field: Solar Distribution).
 
-However, if you do use the reflections option AND you are modeling a \hyperref[daylightingdeviceshelf]{DaylightingDevice:Shelf} or \hyperref[daylightingdevicetubular]{DaylightingDevice:Tubular}, then you still need to enter some values of View Factor to Ground. For \hyperref[daylightingdeviceshelf]{DaylightingDevice:Shelf} you need to enter View Factor to Ground for the window associated with the shelf. And for \hyperref[daylightingdevicetubular]{DaylightingDevice:Tubular} you need to enter the View Factor to Ground for the FenestrationSurface:Detailed corresponding to the dome of the tubular device (ref: \hyperref[daylightingdevicetubular]{DaylightingDevice:Tubular}).
+However, if you do use the reflections option AND you are modeling a \hyperref[daylightingdeviceshelf]{DaylightingDevice:Shelf} or \hyperref[daylightingdevicetubular]{DaylightingDevice:Tubular}, then you should enter some values of View Factor to Ground. For \hyperref[daylightingdeviceshelf]{DaylightingDevice:Shelf} you need to enter View Factor to Ground for the window associated with the shelf. And for \hyperref[daylightingdevicetubular]{DaylightingDevice:Tubular} you need to enter the View Factor to Ground for the FenestrationSurface:Detailed corresponding to the dome of the tubular device (ref: \hyperref[daylightingdevicetubular]{DaylightingDevice:Tubular}).
 
 Note 1: The corresponding view factor to the sky for diffuse solar radiation is not a user input; it is calculated within EnergyPlus based on surface orientation, sky solar radiance distribution, and shadowing surfaces.
 
 Note 2: The view factors to the sky and ground for thermal infrared (long-wave) radiation are not user inputs; they are calculated within EnergyPlus based on surface tilt and shadowing surfaces. Shadowing surfaces are considered to have the same emissivity and temperature as the ground, so they are lumped together with the ground in calculating the ground infrared view factor.
+
+Note 3: If the view factor to the ground is autosized and a \hyperref[daylightingdeviceshelf]{DaylightingDevice:Shelf} is present, EnergyPlus will adjust both the view factor to the ground first and then the sky so that the sum of all three view factors (to the ground, to the sky, and to the shelf) does not exceed 1.0.
 
 \paragraph{Field: Frame and Divider Name}\label{field-frame-and-divider-name-2}
 
@@ -2557,6 +2559,7 @@ Output variables applicable to all exterior heat transfer surfaces:
 Zone,Average,Surface Outside Face Outdoor Air Drybulb Temperature [C]
 Zone,Average,Surface Outside Face Outdoor Air Wetbulb Temperature [C]
 Zone,Average,Surface Outside Face Outdoor Air Wind Speed [m/s]
+Zone,Average,Surface Outside Face Outdoor Air Wind Direction [deg]
 Zone,Average,Surface Outside Face Sunlit Area [m2]
 Zone,Average,Surface Outside Face Sunlit Fraction \protect\hyperlinksection-1
 Zone,Average,Surface Outside Face Incident Solar Radiation Rate per Area[W/m2]
@@ -2920,7 +2923,11 @@ The outdoor air wet-bulb temperature calculated at the height above ground of th
 
 \subsubsection{Surface Outside Face Outdoor Air Wind Speed {[}m/s{]}}\label{surface-outside-face-outdoor-air-wind-speed-ms}
 
-The outdoor wind speed calculated at the height above ground of the surface centroid. Former Name: Prior to version 7.1, this output was called ``Surface Ext Wind Speed.''
+The outdoor wind speed calculated at the height above ground of the surface centroid. This value may differ from site wind speed depending on the height of the surface (ref. \hyperref[siteheightvariation]{Site:HeightVariation}). In addition, the value may be different from the site wind speed when using \hyperref[outdoorairnode]{OutdoorAir:Node} with  \hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment} or \hyperref[ZonePropertylocalEnvironment]{ZoneProperty:LocalEnvironment}. It can also be modified using EMS. Former Name: Prior to version 7.1, this output was called ``Surface Ext Wind Speed.''
+
+\subsubsection{Surface Outside Face Outdoor Air Wind Direction {[}deg{]}}\label{surface-outside-face-outdoor-air-wind-direction-def}
+
+This output reports the actual wind direction at the outside face of a surface.  As with the wind speed variable above, this value may be different from the site wind direction when using \hyperref[outdoorairnode]{OutdoorAir:Node} with \hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment} or \hyperref[ZonePropertylocalEnvironment]{ZoneProperty:LocalEnvironment}. It can also be modified using EMS.
 
 \subsubsection{Surface Outside Face Sunlit Area {[}m2{]}}\label{surface-outside-face-sunlit-area-m2}
 

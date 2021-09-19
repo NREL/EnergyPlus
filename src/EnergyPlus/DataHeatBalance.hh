@@ -362,7 +362,7 @@ namespace DataHeatBalance {
     struct SpaceListData
     {
         std::string Name = "";                          // Space List name
-        int numOfSpaces = 0;                            // Number of spaces in the list
+        int numListSpaces = 0;                          // Number of spaces in the list
         std::string::size_type maxSpaceNameLength = 0u; // Max Name length of Spaces in the list
         EPVector<int> spaces;                           // Pointers to Spaces in the list
     };

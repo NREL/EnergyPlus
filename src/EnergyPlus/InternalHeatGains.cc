@@ -3915,7 +3915,7 @@ namespace InternalHeatGains {
                         localErrFlag = true;
                     } else {
                         inputObjects(objNum).StartPtr = numGainInstances + 1;
-                        int numSpaces = state.dataHeatBal->spaceList(spaceListNum).numOfSpaces;
+                        int numSpaces = state.dataHeatBal->spaceList(spaceListNum).numListSpaces;
                         numGainInstances += numSpaces;
                         inputObjects(objNum).numOfSpaces = numSpaces;
                         inputObjects(objNum).spaceListActive = true;
