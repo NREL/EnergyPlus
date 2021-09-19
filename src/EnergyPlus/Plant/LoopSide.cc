@@ -489,47 +489,57 @@ namespace DataPlant {
             //~  For air connections, trip the LoopSide air flag
             //~  Similar for zone, none zone, and electric load center
             {
-                auto const SELECT_CASE_var(ComponentType);
+                switch (ComponentType) {
 
-                // possibly air-connected components
-                if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilSteamAirHeating) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilUserDefined) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilVSWAHPCoolingEquationFit) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilVSWAHPHeatingEquationFit) ||
-                    (SELECT_CASE_var == DataPlant::PlantEquipmentType::PackagedTESCoolingCoil)) {
+                    // possibly air-connected components
+                case DataPlant::PlantEquipmentType::CoilWaterCooling:
+                case DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling:
+                case DataPlant::PlantEquipmentType::CoilWaterSimpleHeating:
+                case DataPlant::PlantEquipmentType::CoilSteamAirHeating:
+                case DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit:
+                case DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit:
+                case DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst:
+                case DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst:
+                case DataPlant::PlantEquipmentType::CoilUserDefined:
+                case DataPlant::PlantEquipmentType::CoilVSWAHPCoolingEquationFit:
+                case DataPlant::PlantEquipmentType::CoilVSWAHPHeatingEquationFit:
+                case DataPlant::PlantEquipmentType::PackagedTESCoolingCoil:
 
+                {
                     this->SimAirLoopsNeeded = true;
                     // sometimes these coils are children in ZoneHVAC equipment
                     // PlantLoop(LoopNum)%LoopSide(LoopSideNum)%SimZoneEquipNeeded= .TRUE.
+                    break;
+                }
 
-                } else if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::CoolingPanel_Simple) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Baseboard_Conv_Water) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::LowTempRadiant_ConstFlow) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::CooledBeamAirTerminal) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::ZoneHVACAirUserDefined) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::AirTerminalUserDefined) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::FourPipeBeamAirTerminal)) { // zone connected components
-
+                    // zone connected components
+                case DataPlant::PlantEquipmentType::CoolingPanel_Simple:
+                case DataPlant::PlantEquipmentType::Baseboard_Conv_Water:
+                case DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam:
+                case DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water:
+                case DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow:
+                case DataPlant::PlantEquipmentType::LowTempRadiant_ConstFlow:
+                case DataPlant::PlantEquipmentType::CooledBeamAirTerminal:
+                case DataPlant::PlantEquipmentType::ZoneHVACAirUserDefined:
+                case DataPlant::PlantEquipmentType::AirTerminalUserDefined:
+                case DataPlant::PlantEquipmentType::FourPipeBeamAirTerminal: {
                     this->SimZoneEquipNeeded = true;
+                    break;
+                }
 
-                } else if ((SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_FCExhaust) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_FCStackCooler) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_MicroCHP) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_MicroTurbine) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_ICEngine) ||
-                           (SELECT_CASE_var == DataPlant::PlantEquipmentType::Generator_CTurbine)) { // electric center connected components
-
+                // electric center connected components
+                case DataPlant::PlantEquipmentType::Generator_FCExhaust:
+                case DataPlant::PlantEquipmentType::Generator_FCStackCooler:
+                case DataPlant::PlantEquipmentType::Generator_MicroCHP:
+                case DataPlant::PlantEquipmentType::Generator_MicroTurbine:
+                case DataPlant::PlantEquipmentType::Generator_ICEngine:
+                case DataPlant::PlantEquipmentType::Generator_CTurbine: {
                     this->SimElectLoadCentrNeeded = true;
+                    break;
+                }
+
+                default:
+                    break;
                 }
             }
         }
