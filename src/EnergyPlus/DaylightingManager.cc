@@ -6570,7 +6570,7 @@ void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum) // Da
 
         int count = 0;
         for (std::size_t igroup = 1; igroup <= thisDaylightControl.ShadeDeployOrderExtWins.size(); igroup++) {
-            std::vector<int> listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
+            std::vector<int> const &listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
             for (const auto IWin : listOfExtWin) {
                 ++count;
                 // need to map back to the original order of the "loop" to not change all the other data structures
@@ -6612,7 +6612,7 @@ void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum) // Da
         continueOuterLoop = false;
         for (std::size_t igroup = 1; igroup <= thisDaylightControl.ShadeDeployOrderExtWins.size(); igroup++) {
 
-            std::vector<int> listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
+            std::vector<int> const &listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
 
             for (const auto IWin : listOfExtWin) {
                 ++count;
@@ -6733,7 +6733,7 @@ void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum) // Da
         continueOuterLoop = false;
         for (std::size_t igroup = 1; igroup <= thisDaylightControl.ShadeDeployOrderExtWins.size(); igroup++) {
 
-            std::vector<int> listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
+            std::vector<int> const &listOfExtWin = thisDaylightControl.ShadeDeployOrderExtWins[igroup - 1];
 
             int countBeforeListOfExtWinLoop = count;
             bool atLeastOneGlareControlIsActive = false;
