@@ -338,7 +338,7 @@ namespace DataHeatBalance {
 
     struct SpaceData
     {
-        std::string Name;             // Space name
+        std::string Name;                  // Space name
         int zoneNum = 0;                   // Pointer to Zone wich contains this space
         Real64 userEnteredFloorArea = 0.0; // User input floor area for this space
         std::string spaceType = "General"; // Space type tag
@@ -362,7 +362,7 @@ namespace DataHeatBalance {
 
     struct SpaceListData
     {
-        std::string Name;                          // Space List name
+        std::string Name;                               // Space List name
         int numListSpaces = 0;                          // Number of spaces in the list
         std::string::size_type maxSpaceNameLength = 0u; // Max Name length of Spaces in the list
         EPVector<int> spaces;                           // Pointers to Spaces in the list
