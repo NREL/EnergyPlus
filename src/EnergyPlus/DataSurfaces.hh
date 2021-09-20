@@ -1646,6 +1646,8 @@ struct SurfacesData : BaseGlobalStruct
     EPVector<DataSurfaces::SurroundingSurfacesProperty> SurroundingSurfsProperty;
     EPVector<DataSurfaces::IntMassObject> IntMassObjects;
 
+    int actualMaxSlatAngs = DataSurfaces::MaxSlatAngs; // If there are no blinds in the model, then this is changed to 1 (used for shades)
+
     void clear_state() override
     {
         this->TotSurfaces = 0;
@@ -1986,6 +1988,7 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfLocalEnvironment.deallocate();
         this->SurroundingSurfsProperty.deallocate();
         this->IntMassObjects.deallocate();
+        this->actualMaxSlatAngs = DataSurfaces::MaxSlatAngs;
     }
 };
 
