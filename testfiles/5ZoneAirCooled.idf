@@ -3499,3 +3499,5 @@
 
   Output:Surfaces:List,DecayCurvesFromComponentLoadsSummary;
 
+  Output:Surfaces:List,ViewFactorInfo;
+
