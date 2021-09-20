@@ -135,8 +135,8 @@ namespace UnitarySystems {
         Real64 cooling_oa_flow_rate = 0.0;
         Real64 heating_oa_flow_rate = 0.0;
         Real64 no_load_oa_flow_rate = 0.0;
-        Real64 heat_conv_tol = 0.0;
-        Real64 cool_conv_tol = 0.0;
+        Real64 heat_conv_tol = 0.001;
+        Real64 cool_conv_tol = 0.001;
 
         UnitarySysInputSpec() = default;
         ~UnitarySysInputSpec() = default;
@@ -380,11 +380,17 @@ namespace UnitarySystems {
         bool m_FirstPass = true;
 
         Real64 m_TotCoolEnergyRate = 0.0;
+        Real64 m_TotCoolEnergy = 0.0;
         Real64 m_SensCoolEnergyRate = 0.0;
+        Real64 m_SensCoolEnergy = 0.0;
         Real64 m_LatCoolEnergyRate = 0.0;
+        Real64 m_LatCoolEnergy = 0.0;
         Real64 m_TotHeatEnergyRate = 0.0;
+        Real64 m_TotHeatEnergy = 0.0;
         Real64 m_SensHeatEnergyRate = 0.0;
+        Real64 m_SensHeatEnergy = 0.0;
         Real64 m_LatHeatEnergyRate = 0.0;
+        Real64 m_LatHeatEnergy = 0.0;
 
         bool m_DesignFanVolFlowRateEMSOverrideOn = false;       // If true, then EMS is calling to override autosize fan flow
         bool m_MaxHeatAirVolFlowEMSOverrideOn = false;          // If true, then EMS is calling to override autosize fan flow
@@ -444,8 +450,8 @@ namespace UnitarySystems {
         Real64 m_HeatOutAirMassFlow = 0.0;
         Real64 m_NoCoolHeatOutAirVolFlow = 0.0;
         Real64 m_NoCoolHeatOutAirMassFlow = 0.0;
-        Real64 m_HeatConvTol = 0.0;
-        Real64 m_CoolConvTol = 0.0;
+        Real64 m_HeatConvTol = 0.001;
+        Real64 m_CoolConvTol = 0.001;
         int m_HVACSizingIndex = -1;
         int m_AvailStatus = 0;
         bool m_IsZoneEquipment = false;
