@@ -1122,7 +1122,7 @@ namespace WaterUse {
                 // print error for variables of hot water temperature
                 ++this->HWTempErrorCount;
                 if (this->HWTempErrorCount < 2) {
-                    ShowWarningError(state, "CalcEquipmentFlowRates: Hot water temperature is less than the cold water temperature");
+                    ShowWarningError(state, "TESTCalcEquipmentFlowRates: Hot water temperature is less than the cold water temperature");
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, format("...hot water temperature       = {:.3R} C", this->HotTemp));
                     ShowContinueError(state, format("...cold water temperature       = {:.3R} C", this->ColdTemp));
@@ -1144,7 +1144,7 @@ namespace WaterUse {
                 // print error for variables of target water temperature
                 ++this->TargetTempErrorCount;
                 if (this->TargetTempErrorCount < 2) {
-                    ShowWarningError(state, "CalcEquipmentFlowRates: Target water temperature is greater than the hot water temperature");
+                    ShowWarningError(state, "TESTCalcEquipmentFlowRates: Target water temperature is greater than the hot water temperature");
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, format("...target water temperature       = {:.3R} C", this->TargetTemp));
                     ShowContinueError(state, format("...hot water temperature       = {:.3R} C", this->HotTemp));
@@ -1170,7 +1170,7 @@ namespace WaterUse {
                 // print error for variables of target water temperature
                 ++this->TargetTempErrorCount;
                 if (this->TargetTempErrorCount < 2) {
-                    ShowWarningError(state, "CalcEquipmentFlowRates: Target water temperature is less than the cold water temperature");
+                    ShowWarningError(state, "TESTCalcEquipmentFlowRates: Target water temperature is less than the cold water temperature");
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, format("...target water temperature       = {:.3R} C", this->TargetTemp));
                     ShowContinueError(state, format("...cold water temperature       = {:.3R} C", this->ColdTemp));
