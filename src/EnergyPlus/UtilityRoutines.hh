@@ -64,6 +64,9 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
 
 namespace EnergyPlus {
 
@@ -131,9 +134,78 @@ bool env_var_on(std::string const &env_var_str);
 
 using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
+void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+
 void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+/// @defgroup ShowSevereError template overloads
+/// @{
+// ------------------------------------------------------------------------------------------------
+/// @brief	This subroutine puts ErrorMessage with a Severe designation on designated output files.
+/// @author Linda Lawrie 1997
+/// @author T. Mankad
+/// @param	ErrorMessage    The primary (severe) error message
+/// @param	OutUnit1        EnergyPlus::InputOutputFile
+/// @param	OutUnit2        EnergyPlus::InputOutputFile
+/// @param	ContinueErrors  Any number of string-like continuation error messages
+// ------------------------------------------------------------------------------------------------
+template<typename... Args>
+void ShowSevereError(EnergyPlusData& state, 
+                     std::string const& ErrorMessage, 
+                     OptionalOutputFileRef OutUnit1, 
+                     OptionalOutputFileRef OutUnit2, 
+                     Args... ContinueErrors)
+{
+    using namespace DataStringGlobals;
+    using namespace DataErrorTracking;
+    int Loop;
+
+    for (Loop = 1; Loop <= SearchCounts; ++Loop) {
+        if (has(ErrorMessage, MessageSearch[Loop])) ++state.dataErrTracking->MatchCounts(Loop);
+    }
+
+    ++state.dataErrTracking->TotalSevereErrors;
+    if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation &&
+        !state.dataErrTracking->AbortProcessing)
+        ++state.dataErrTracking->TotalSevereErrorsDuringWarmup;
+    if (state.dataGlobal->DoingSizing) ++state.dataErrTracking->TotalSevereErrorsDuringSizing;
+    ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
+    state.dataErrTracking->LastSevereError = ErrorMessage;
+
+    // C++17 fold expression (folding over comma op) applies each of ContinueErrors to calls to ShowErrorMessage
+    // Temporary object of type std::string allows us to use the + operator here
+    (ShowErrorMessage(state, " **   ~~~   ** " + std::string(ContinueErrors), OutUnit1, OutUnit2), ...);
+    
+    if (state.dataSQLiteProcedures->sqlite) {
+        state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 1);
+        (state.dataSQLiteProcedures->sqlite->updateSQLiteErrorRecord(ContinueErrors), ...); // fold
+    }
+    if (state.dataGlobal->errorCallback) {
+        state.dataGlobal->errorCallback(Error::Severe, ErrorMessage);
+        (state.dataGlobal->errorCallback(Error::Continue, ContinueErrors), ...); // fold
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+/// @brief	SFINAE overload that allows one pre-variadic argument to be an InputOutputFile
+// ------------------------------------------------------------------------------------------------
+template<typename... Args, typename = typename std::enable_if<(std::is_convertible_v<Args, const std::string&> && ...)>::type>
+void ShowSevereError(EnergyPlusData& state, std::string const& ErrorMessage, OptionalOutputFileRef OutUnit1, Args... ContinueErrors)
+{
+    ShowSevereError(state, ErrorMessage, OutUnit1, _, ContinueErrors...);
+}
+
+// ------------------------------------------------------------------------------------------------
+/// @brief	This is the "catch-all" overload. However, substitution will fail if any of the 
+///         variadic arguments are not string-type, allowing SFINAE to attempt matching to a 
+///         different overload.
+// ------------------------------------------------------------------------------------------------
+template<typename... Args, typename = typename std::enable_if<(std::is_convertible_v<Args, const std::string&> && ...)>::type>
+void ShowSevereError(EnergyPlusData& state, std::string const& ErrorMessage, Args... ContinueErrors)
+{
+    ShowSevereError(state, ErrorMessage, _, _, ContinueErrors...);
+}
+/// @}
 
 void ShowSevereMessage(EnergyPlusData &state,
                        std::string const &ErrorMessage,
@@ -199,8 +271,6 @@ void StoreRecurringErrorMessage(EnergyPlusData &state,
                                 std::string const &ErrorReportMinUnits = "", // Units for "min" reporting
                                 std::string const &ErrorReportSumUnits = ""  // Units for "sum" reporting
 );
-
-void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
 void SummarizeErrors(EnergyPlusData &state);
 

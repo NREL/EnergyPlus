@@ -66,10 +66,8 @@ extern "C" {
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DaylightingManager.hh>
@@ -83,7 +81,6 @@ extern "C" {
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/ResultsFramework.hh>
-#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SystemReports.hh>
@@ -1081,48 +1078,6 @@ void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, Opti
         state.dataGlobal->errorCallback(Error::Fatal, ErrorMessage);
     }
     throw FatalError(ErrorMessage);
-}
-
-void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine puts ErrorMessage with a Severe designation on
-    // designated output files.
-
-    // METHODOLOGY EMPLOYED:
-    // Calls ShowErrorMessage utility routine.
-
-    using namespace DataStringGlobals;
-    using namespace DataErrorTracking;
-    int Loop;
-
-    for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-        if (has(ErrorMessage, MessageSearch[Loop])) ++state.dataErrTracking->MatchCounts(Loop);
-    }
-
-    ++state.dataErrTracking->TotalSevereErrors;
-    if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation &&
-        !state.dataErrTracking->AbortProcessing)
-        ++state.dataErrTracking->TotalSevereErrorsDuringWarmup;
-    if (state.dataGlobal->DoingSizing) ++state.dataErrTracking->TotalSevereErrorsDuringSizing;
-    ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
-    state.dataErrTracking->LastSevereError = ErrorMessage;
-
-    //  Could set a variable here that gets checked at some point?
-
-    if (state.dataSQLiteProcedures->sqlite) {
-        state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 1);
-    }
-    if (state.dataGlobal->errorCallback) {
-        state.dataGlobal->errorCallback(Error::Severe, ErrorMessage);
-    }
 }
 
 void ShowSevereMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
