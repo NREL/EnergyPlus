@@ -489,6 +489,7 @@ namespace DataSurfaces {
         int EnclIndex;           // Pointer to enclosure this surface belongs to
         int TAirRef;             // Flag for reference air temperature
         int ExtZone;             // For an "interzone" surface, this is the adjacent ZONE number (not adjacent SURFACE number).
+        int ExtCond;             // Exterior condition type. Same as ExtBoundCond for non-interzone surfaces. Value = 1 for interzone surfaces.
         int ExtEnclIndex;        // For an "interzone" surface, this is the adjacent ENCLOSURE number
         bool ExtSolar;           // True if the "outside" of the surface is exposed to solar
         bool ExtWind;            // True if the "outside" of the surface is exposed to wind
@@ -539,6 +540,7 @@ namespace DataSurfaces {
                     hash<int>()(EnclIndex),
                     hash<int>()(TAirRef),
                     hash<int>()(ExtZone),
+                    hash<int>()(ExtCond),
                     hash<int>()(ExtEnclIndex),
                     hash<bool>()(ExtSolar),
                     hash<bool>()(ExtWind),
@@ -578,9 +580,9 @@ namespace DataSurfaces {
         bool operator==(const SurfaceCalcHashKey &other) const
         {
             return (Construction == other.Construction && Azimuth == other.Azimuth && Tilt == other.Tilt && Height == other.Height &&
-                    Zone == other.Zone && EnclIndex == other.EnclIndex && ExtZone == other.ExtZone && ExtEnclIndex == other.ExtEnclIndex &&
-                    ExtSolar == other.ExtSolar && ExtWind == other.ExtWind && ViewFactorGround == other.ViewFactorGround &&
-                    ViewFactorSky == other.ViewFactorSky &&
+                    Zone == other.Zone && EnclIndex == other.EnclIndex && ExtZone == other.ExtZone && ExtCond == other.ExtCond &&
+                    ExtEnclIndex == other.ExtEnclIndex && ExtSolar == other.ExtSolar && ExtWind == other.ExtWind &&
+                    ViewFactorGround == other.ViewFactorGround && ViewFactorSky == other.ViewFactorSky &&
 
                     HeatTransferAlgorithm == other.HeatTransferAlgorithm && IntConvCoeff == other.IntConvCoeff &&
                     ExtConvCoeff == other.ExtConvCoeff && OSCPtr == other.OSCPtr && OSCMPtr == other.OSCMPtr &&
@@ -614,10 +616,11 @@ namespace DataSurfaces {
         std::string Name; // User supplied name of the surface (must be unique)
         int Construction; // Pointer to the construction in the Construct derived type
 
-        int RepresentativeCalcSurfNum; // Index of the surface that is used to calculate the heat
-        // balance for this surface
+        int RepresentativeCalcSurfNum; // Index of the surface that is used to calculate the heat balance for this surface. Equal to this surfaces
+                                       // index when not using representative surface calculations.
 
-        int ConstructionStoredInputValue; // holds the original value for Construction per surface input
+        std::vector<int> ConstituentSurfaceNums; // A vector of surface numbers which reference this surface for representative calculations
+        int ConstructionStoredInputValue;        // holds the original value for Construction per surface input
         SurfaceClass Class;
 
         // Geometry related parameters
@@ -1412,37 +1415,32 @@ struct SurfacesData : BaseGlobalStruct
     Array1D_int SurfWinInsideFrameCondensationFlag;   // 1 if frame inside surface temp < zone air dew point; 0 otherwise
     Array1D_int SurfWinInsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;  0 otherwise
 
-    Array2D<Real64> SurfWinA;            // Time step value of factor for beam absorbed in window glass layers
-    Array2D<Real64> SurfWinADiffFront;   // Time step value of factor for diffuse absorbed in window layers
-    Array2D<Real64> SurfWinACFOverlap;   // Time step value of factor for beam absorbed in window glass layers which comes from other windows
-                                         // It happens sometimes that beam enters one window and hits back of second window.
-                                         // It is used in complex fenestration only
-    Array1D<Real64> SurfWinTransSolar;   // Exterior beam plus diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
-    Array1D<Real64> SurfWinBmSolar;      // Exterior beam solar transmitted through window, or window plus blind, into zone (W)
-    Array1D<Real64> SurfWinBmBmSolar;    // Exterior beam-to-beam solar transmitted through window, or window plus blind, into zone (W)
-    Array1D<Real64> SurfWinBmDifSolar;   // Exterior beam-to-diffuse solar transmitted through window, or window plus blind, into zone (W)
-    Array1D<Real64> SurfWinDifSolar;     // Exterior diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
-    Array1D<Real64> SurfWinHeatGain;     // Total heat gain from window = WinTransSolar + (IR and convection from glazing, or,
-                                         // if interior shade, IR and convection from zone-side of shade plus gap air convection to zone) +
-                                         // (IR convection from frame) + (IR and convection from divider if no interior shade) (W)
-    Array1D<Real64> SurfWinHeatTransfer; // Total heat transfer through the window = WinTransSolar + conduction through glazing and frame
-    Array1D<Real64> SurfWinHeatGainRep;  // Equals WinHeatGain when WinHeatGain >= 0.0
-    Array1D<Real64> SurfWinHeatLossRep;  // Equals -WinHeatGain when WinHeatGain < 0.0
-    Array1D<Real64> SurfWinGainConvGlazToZoneRep;        // component of WinHeatGain convect to zone from glazing (W)
-    Array1D<Real64> SurfWinGainIRGlazToZoneRep;          // component of WinHeatGain net IR to zone from glazing (W)
-    Array1D<Real64> SurfWinLossSWZoneToOutWinRep;        // component of WinHeatGain shortwave transmit back out (W)
-    Array1D<Real64> SurfWinGainFrameDividerToZoneRep;    // component of WinHeatGain to zone from frame/divider (W)
-    Array1D<Real64> SurfWinGainConvGlazShadGapToZoneRep; // component of WinHeatGain convection to zone from the gap between the inner most glazing
-                                                         // and the shade   (W)
-    Array1D<Real64> SurfWinGainConvShadeToZoneRep;       // component of WinHeatGain convect to zone from front shade (W)
-    Array1D<Real64> SurfWinGainIRShadeToZoneRep;         // component of WinHeatGain net IR to zone from front shade (W)
-    Array1D<Real64> SurfWinOtherConvGainInsideFaceToZoneRep; // net imbalance of convection heat gain from equivalent Layer window
-                                                             // inside face to zone air
-    Array1D<Real64> SurfWinGapConvHtFlowRep;                 // Convective heat flow from gap in airflow window (W)
-    Array1D<Real64> SurfWinShadingAbsorbedSolar;             // Exterior beam plus diffuse solar absorbed by window shading device (W)
-    Array1D<Real64> SurfWinSysSolTransmittance;              // Effective solar transmittance of window + shading device, if present
-    Array1D<Real64> SurfWinSysSolReflectance;                // Effective solar reflectance of window + shading device, if present
-    Array1D<Real64> SurfWinSysSolAbsorptance;                // Effective solar absorptance of window + shading device, if present
+    Array2D<Real64> SurfWinA;           // Time step value of factor for beam absorbed in window glass layers
+    Array2D<Real64> SurfWinADiffFront;  // Time step value of factor for diffuse absorbed in window layers
+    Array2D<Real64> SurfWinACFOverlap;  // Time step value of factor for beam absorbed in window glass layers which comes from other windows
+                                        // It happens sometimes that beam enters one window and hits back of second window.
+                                        // It is used in complex fenestration only
+    Array1D<Real64> SurfWinTransSolar;  // Exterior beam plus diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
+    Array1D<Real64> SurfWinBmSolar;     // Exterior beam solar transmitted through window, or window plus blind, into zone (W)
+    Array1D<Real64> SurfWinBmBmSolar;   // Exterior beam-to-beam solar transmitted through window, or window plus blind, into zone (W)
+    Array1D<Real64> SurfWinBmDifSolar;  // Exterior beam-to-diffuse solar transmitted through window, or window plus blind, into zone (W)
+    Array1D<Real64> SurfWinDifSolar;    // Exterior diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
+    Array1D<Real64> SurfWinHeatGain;    // Total heat gain from window = WinTransSolar + (IR and convection from glazing, or,
+                                        // if interior shade, IR and convection from zone-side of shade plus gap air convection to zone) +
+                                        // (IR convection from frame) + (IR and convection from divider if no interior shade) (W)
+    Array1D<Real64> SurfWinHeatGainRep; // Equals WinHeatGain when WinHeatGain >= 0.0
+    Array1D<Real64> SurfWinHeatLossRep; // Equals -WinHeatGain when WinHeatGain < 0.0
+    Array1D<Real64> SurfWinGainConvGlazToZoneRep;     // component of WinHeatGain convect to zone from glazing (W)
+    Array1D<Real64> SurfWinGainIRGlazToZoneRep;       // component of WinHeatGain net IR to zone from glazing (W)
+    Array1D<Real64> SurfWinLossSWZoneToOutWinRep;     // component of WinHeatGain shortwave transmit back out (W)
+    Array1D<Real64> SurfWinGainFrameDividerToZoneRep; // component of WinHeatGain to zone from frame/divider (W)
+    Array1D<Real64> SurfWinGainConvShadeToZoneRep;    // component of WinHeatGain convect to zone from front shade (W)
+    Array1D<Real64> SurfWinGainIRShadeToZoneRep;      // component of WinHeatGain net IR to zone from front shade (W)
+    Array1D<Real64> SurfWinGapConvHtFlowRep;          // Convective heat flow from gap in airflow window (W)
+    Array1D<Real64> SurfWinShadingAbsorbedSolar;      // Exterior beam plus diffuse solar absorbed by window shading device (W)
+    Array1D<Real64> SurfWinSysSolTransmittance;       // Effective solar transmittance of window + shading device, if present
+    Array1D<Real64> SurfWinSysSolReflectance;         // Effective solar reflectance of window + shading device, if present
+    Array1D<Real64> SurfWinSysSolAbsorptance;         // Effective solar absorptance of window + shading device, if present
 
     // Surface Window Energy
     Array1D<Real64> SurfWinTransSolarEnergy;           // Energy of WinTransSolar [J]
@@ -1794,17 +1792,14 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinBmDifSolar.deallocate();
         this->SurfWinDifSolar.deallocate();
         this->SurfWinHeatGain.deallocate();
-        this->SurfWinHeatTransfer.deallocate();
         this->SurfWinHeatGainRep.deallocate();
         this->SurfWinHeatLossRep.deallocate();
         this->SurfWinGainConvGlazToZoneRep.deallocate();
         this->SurfWinGainIRGlazToZoneRep.deallocate();
         this->SurfWinLossSWZoneToOutWinRep.deallocate();
         this->SurfWinGainFrameDividerToZoneRep.deallocate();
-        this->SurfWinGainConvGlazShadGapToZoneRep.deallocate();
         this->SurfWinGainConvShadeToZoneRep.deallocate();
         this->SurfWinGainIRShadeToZoneRep.deallocate();
-        this->SurfWinOtherConvGainInsideFaceToZoneRep.deallocate();
         this->SurfWinGapConvHtFlowRep.deallocate();
         this->SurfWinShadingAbsorbedSolar.deallocate();
         this->SurfWinSysSolTransmittance.deallocate();
