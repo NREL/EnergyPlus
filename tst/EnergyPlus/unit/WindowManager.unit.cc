@@ -315,7 +315,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         inSurfTempPrev = inSurfTemp;
     }
 
-    EXPECT_GT(state->dataSurface->SurfWinHeatLossRep(winNum), state->dataSurface->SurfWinHeatTransfer(winNum));
+    EXPECT_GT(state->dataSurface->SurfWinHeatLossRep(winNum), state->dataSurface->SurfWinHeatGain(winNum));
 }
 
 TEST_F(EnergyPlusFixture, WindowManager_TransAndReflAtPhi)
@@ -557,7 +557,6 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
     state->dataSurface->SurfWinHeatGain.allocate(3);
-    state->dataSurface->SurfWinHeatTransfer.allocate(3);
     state->dataSurface->SurfWinGainConvGlazToZoneRep.allocate(3);
     state->dataSurface->SurfWinGainIRGlazToZoneRep.allocate(3);
     state->dataSurface->SurfWinGapConvHtFlowRep.allocate(3);

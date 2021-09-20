@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -797,6 +798,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
         state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
+        state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
     }
 
     for (ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
