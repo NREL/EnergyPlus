@@ -207,6 +207,7 @@ namespace UnitarySystems {
             CoilCoolingWater, // CoilSystem:Cooling:Water
             PackagedAC,       // ZoneHVAC:PackagedTerminalAirConditioner
             PackagedHP,       // ZoneHVAC:PackagedTerminalHeatPump
+            PackagedWSHP,     // ZoneHVAC:WaterToAirHeatPump
             Num,
         };
 
