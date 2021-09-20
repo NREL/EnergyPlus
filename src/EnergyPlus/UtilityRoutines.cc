@@ -784,9 +784,6 @@ int AbortEnergyPlus(EnergyPlusData &state)
             tempfl, "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
     }
 
-    // Output detailed ZONE time series data
-    SimulationManager::OpenOutputJsonFiles(state, state.files.json);
-
     state.dataResultsFramework->resultsFramework->writeOutputs(state);
 
 #ifdef EP_Detailed_Timings
@@ -933,9 +930,6 @@ int EndEnergyPlus(EnergyPlusData &state)
         }
         print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
     }
-
-    // Output detailed ZONE time series data
-    SimulationManager::OpenOutputJsonFiles(state, state.files.json);
 
     state.dataResultsFramework->resultsFramework->writeOutputs(state);
 

@@ -338,30 +338,32 @@ namespace DataHeatBalance {
 
     struct SpaceData
     {
-        std::string Name = "";                        // Space name
-        int zoneNum = 0;                              // Pointer to Zone wich contains this space
-        Real64 userEnteredFloorArea = 0.0;            // User input floor area for this space
-        std::string spaceType = "General";            // Space type tag
-        int spaceTypeNum = 0;                         // Points to spaceType for this space
-        EPVector<std::string> tags;                   // Optional tags for reporting
-        EPVector<int> surfaces;                       // Pointers to surfaces in this space
-        Real64 calcFloorArea = 0.0;                   // Calculated floor area used for this space
-        Real64 floorArea = 0.0;                       // Floor area used for this space
-        bool hasFloor = false;                        // Has "Floor" surface
-        Real64 extWindowArea = 0.0;                   // Exterior Window Area for Zone
-        Real64 totalSurfArea = 0.0;                   // Total surface area for Zone
-        int radiantEnclosureNum = 0;                  // Radiant exchange enclosure this space belongs to
-        int solarEnclosureNum = 0;                    // Solar distribution enclosure this space belongs to
-        Real64 totOccupants = 0.0;                    // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
-        Real64 minOccupants = 0.0;                    // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
-        Real64 maxOccupants = 0.0;                    // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
-        std::vector<std::string> otherEquipFuelTypes; // List of fuel types used by other equipment in this space
+        std::string Name;                  // Space name
+        int zoneNum = 0;                   // Pointer to Zone wich contains this space
+        Real64 userEnteredFloorArea = 0.0; // User input floor area for this space
+        std::string spaceType = "General"; // Space type tag
+        int spaceTypeNum = 0;              // Points to spaceType for this space
+        EPVector<std::string> tags;        // Optional tags for reporting
+        EPVector<int> surfaces;            // Pointers to surfaces in this space
+        Real64 calcFloorArea = 0.0;        // Calculated floor area used for this space
+        Real64 floorArea = 0.0;            // Floor area used for this space
+        bool hasFloor = false;             // Has "Floor" surface
+        Real64 extWindowArea = 0.0;        // Exterior Window Area for Zone
+        Real64 totalSurfArea = 0.0;        // Total surface area for Zone
+        int radiantEnclosureNum = 0;       // Radiant exchange enclosure this space belongs to
+        int solarEnclosureNum = 0;         // Solar distribution enclosure this space belongs to
+        Real64 totOccupants = 0.0;         // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
+        Real64 minOccupants = 0.0;         // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
+        Real64 maxOccupants = 0.0;         // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
+        bool isRemainderSpace = false;     // True if this space is auto-generated "-Remainder" space
+        std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
+        std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this space
     };
 
     struct SpaceListData
     {
-        std::string Name = "";                          // Space List name
-        int numOfSpaces = 0;                            // Number of spaces in the list
+        std::string Name;                               // Space List name
+        int numListSpaces = 0;                          // Number of spaces in the list
         std::string::size_type maxSpaceNameLength = 0u; // Max Name length of Spaces in the list
         EPVector<int> spaces;                           // Pointers to Spaces in the list
     };
@@ -383,13 +385,12 @@ namespace DataHeatBalance {
         // 2=Plenum Zone, 11=Solar Wall, 12=Roof Pond
         Real64 UserEnteredFloorArea; // User input floor area for this zone
         // Calculated after input
-        Real64 FloorArea;        // Floor area used for this zone
-        Real64 CalcFloorArea;    // Calculated floor area used for this zone
-        Real64 CeilingArea;      // Ceiling area for the zone
-        bool HasFloor;           // Has "Floor" surface
-        bool HasRoof;            // Has "Roof" or "Ceiling" Surface
-        bool HasInterZoneWindow; // Interzone Window(s) present in this zone
-        bool HasWindow;          // Window(s) present in this zone
+        Real64 FloorArea;     // Floor area used for this zone
+        Real64 CalcFloorArea; // Calculated floor area used for this zone
+        Real64 CeilingArea;   // Ceiling area for the zone
+        bool HasFloor;        // Has "Floor" surface
+        bool HasRoof;         // Has "Roof" or "Ceiling" Surface
+        bool HasWindow;       // Window(s) present in this zone
         Real64 AirCapacity;
         Real64 ExtWindowArea;               // Exterior Window Area for Zone
         Real64 ExtGrossWallArea;            // Exterior Wall Area for Zone (Gross)
@@ -441,7 +442,6 @@ namespace DataHeatBalance {
         std::vector<int> ZoneExtSolarSurfaceList;    // List of exterior solar surfaces in a zone
         int zoneRadEnclosureFirst;                   // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
         int zoneRadEnclosureLast;                    // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
-        int zoneFirstSpaceSolEnclosure; // TODO: For daylighting, this is a punt, it's the solar enclosure number of the first space in the zone
 
         Real64 OutDryBulbTemp;                 // Zone outside dry bulb air temperature (C)
         bool OutDryBulbTempEMSOverrideOn;      // if true, EMS is calling to override the surface's outdoor air temp
@@ -474,16 +474,17 @@ namespace DataHeatBalance {
         bool HasLtsRetAirGain;       // TRUE means that zone lights return air heat > 0.0 calculated from plenum temperature
         bool HasAirFlowWindowReturn; // TRUE means that zone has return air flow from windows
         // from refrigeration cases for this zone
-        Real64 InternalHeatGains;                     // internal loads (W)
-        Real64 NominalInfilVent;                      // internal infiltration/ventilation
-        Real64 NominalMixing;                         // internal mixing/cross mixing
-        bool TempOutOfBoundsReported;                 // if any temp out of bounds errors, first will show zone details.
-        bool EnforcedReciprocity;                     // if zone/space required forced reciprocity -- less out of bounds temp errors allowed
-        int ZoneMinCO2SchedIndex;                     // Index for the schedule the schedule which determines minimum CO2 concentration
-        int ZoneMaxCO2SchedIndex;                     // Index for the schedule the schedule which determines maximum CO2 concentration
-        int ZoneContamControllerSchedIndex;           // Index for this schedule
-        bool FlagCustomizedZoneCap;                   // True if customized Zone Capacitance Multiplier is used
-        std::vector<std::string> otherEquipFuelTypes; // List of fuel types used by other equipment in this zone
+        Real64 InternalHeatGains;           // internal loads (W)
+        Real64 NominalInfilVent;            // internal infiltration/ventilation
+        Real64 NominalMixing;               // internal mixing/cross mixing
+        bool TempOutOfBoundsReported;       // if any temp out of bounds errors, first will show zone details.
+        bool EnforcedReciprocity;           // if zone/space required forced reciprocity -- less out of bounds temp errors allowed
+        int ZoneMinCO2SchedIndex;           // Index for the schedule the schedule which determines minimum CO2 concentration
+        int ZoneMaxCO2SchedIndex;           // Index for the schedule the schedule which determines maximum CO2 concentration
+        int ZoneContamControllerSchedIndex; // Index for this schedule
+        bool FlagCustomizedZoneCap;         // True if customized Zone Capacitance Multiplier is used
+        std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this zone
+        std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this zone
 
         // Hybrid Modeling
         Real64 ZoneMeasuredTemperature;               // Measured zone air temperature input by user
@@ -521,16 +522,15 @@ namespace DataHeatBalance {
             : Multiplier(1), ListMultiplier(1), ListGroup(0), RelNorth(0.0), OriginX(0.0), OriginY(0.0), OriginZ(0.0),
               CeilingHeight(DataGlobalConstants::AutoCalculate), Volume(DataGlobalConstants::AutoCalculate), OfType(1),
               UserEnteredFloorArea(DataGlobalConstants::AutoCalculate), FloorArea(0.0), CalcFloorArea(0.0), CeilingArea(0.0), HasFloor(false),
-              HasRoof(false), HasInterZoneWindow(false), HasWindow(false), AirCapacity(0.0), ExtWindowArea(0.0), ExtGrossWallArea(0.0),
-              ExtWindowArea_Multiplied(0.0), ExtGrossWallArea_Multiplied(0.0), ExtNetWallArea(0.0), TotalSurfArea(0.0), ExteriorTotalSurfArea(0.0),
-              ExteriorTotalGroundSurfArea(0.0), ExtGrossGroundWallArea(0.0), ExtGrossGroundWallArea_Multiplied(0.0), SystemZoneNodeNumber(0),
-              IsControlled(false), IsSupplyPlenum(false), IsReturnPlenum(false), ZoneEqNum(0), PlenumCondNum(0), TempControlledZoneIndex(0),
-              AllSurfaceFirst(0), AllSurfaceLast(-1), HTSurfaceFirst(0), HTSurfaceLast(-1), OpaqOrIntMassSurfaceFirst(0),
-              OpaqOrIntMassSurfaceLast(-1), WindowSurfaceFirst(0), WindowSurfaceLast(-1), OpaqOrWinSurfaceFirst(0), OpaqOrWinSurfaceLast(-1),
-              TDDDomeFirst(0), TDDDomeLast(-1), InsideConvectionAlgo(ConvectionConstants::HcInt_ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0),
-              NumShadingSurfaces(0), OutsideConvectionAlgo(ConvectionConstants::HcExt_ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0),
-              MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0), zoneRadEnclosureFirst(-1), zoneRadEnclosureLast(-1),
-              zoneFirstSpaceSolEnclosure(0),
+              HasRoof(false), HasWindow(false), AirCapacity(0.0), ExtWindowArea(0.0), ExtGrossWallArea(0.0), ExtWindowArea_Multiplied(0.0),
+              ExtGrossWallArea_Multiplied(0.0), ExtNetWallArea(0.0), TotalSurfArea(0.0), ExteriorTotalSurfArea(0.0), ExteriorTotalGroundSurfArea(0.0),
+              ExtGrossGroundWallArea(0.0), ExtGrossGroundWallArea_Multiplied(0.0), SystemZoneNodeNumber(0), IsControlled(false),
+              IsSupplyPlenum(false), IsReturnPlenum(false), ZoneEqNum(0), PlenumCondNum(0), TempControlledZoneIndex(0), AllSurfaceFirst(0),
+              AllSurfaceLast(-1), HTSurfaceFirst(0), HTSurfaceLast(-1), OpaqOrIntMassSurfaceFirst(0), OpaqOrIntMassSurfaceLast(-1),
+              WindowSurfaceFirst(0), WindowSurfaceLast(-1), OpaqOrWinSurfaceFirst(0), OpaqOrWinSurfaceLast(-1), TDDDomeFirst(0), TDDDomeLast(-1),
+              InsideConvectionAlgo(ConvectionConstants::HcInt_ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0), NumShadingSurfaces(0),
+              OutsideConvectionAlgo(ConvectionConstants::HcExt_ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0), MaximumX(0.0), MinimumY(0.0),
+              MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0), zoneRadEnclosureFirst(-1), zoneRadEnclosureLast(-1),
 
               OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0),
               OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),
@@ -588,7 +588,7 @@ namespace DataHeatBalance {
     struct GlobalInternalGainMiscObject
     {
         // Members
-        std::string Name = "";
+        std::string Name;
         int ZoneOrZoneListPtr = 0;
         int NumOfZones = 0;
         int StartPtr = 0;

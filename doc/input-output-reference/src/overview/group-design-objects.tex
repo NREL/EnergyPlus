@@ -943,6 +943,37 @@ DesignSpecification:OutdoorAir
 
 \end{lstlisting}
 
+\subsection{DesignSpecification:OutdoorAir:SpaceList}\label{designspecificationoutdoorairspacelist}
+
+This object creates a composite outdoor air specification for a list of Spaces (ref \hyperref[space]{Space}). The individual \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} objects in the list are evaluated during sizing and operation at the respective Space floor area, volume, and/or occupancy and summed for a total outdoor air requirement.
+
+\subsubsection{Inputs}\label{inputs-dsoaspacelist}
+
+\paragraph{Field: Name}\label{field-dsoaspacelist-name}
+
+Unique identifying name. Any reference to this name by other objects will denote that the following outdoor air requirements will be used.
+
+\paragraph{Field: Space \textless{}\#\textgreater{} Name}\label{field-dsoaspacelist-space-name}
+
+Reference to a \hyperref[space]{Space} object.
+
+\paragraph{Field: Space \textless{}\#\textgreater{} Design Specification Outdoor Air Object Name}\label{field-dsoaspacelist-dsoa-name}
+
+Reference to a \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object.
+
+An IDF example:
+
+\begin{lstlisting}
+
+DesignSpecification:OutdoorAir:SpaceList,
+    SZ DSOA Zone 5 List,     !- Name
+    Space 5 Office,          !- Space 1 Name
+    SZ DSOA Zone 5 Office,   !- Space 1 Design Specification Outdoor Air Object Name
+    Space 5 Conference,      !- Space 2 Name
+    SZ DSOA Zone 5 Conference;  !- Space 2 Design Specification Outdoor Air Object Name
+
+\end{lstlisting}
+
 \subsection{DesignSpecification:ZoneAirDistribution}\label{designspecificationzoneairdistribution}
 
 This object is used to describe the air distribution effectiveness and fraction of secondary recirculation air (return air not directly mixed with outdoor air) of a zone. It is referenced by the \hyperref[sizingzone]{Sizing:Zone} and \hyperref[controllermechanicalventilation]{Controller:MechanicalVentilation} objects.

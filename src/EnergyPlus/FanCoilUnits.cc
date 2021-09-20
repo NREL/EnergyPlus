@@ -2294,7 +2294,6 @@ namespace FanCoilUnits {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
         using General::SolveRoot;
 
         using PlantUtilities::SetComponentFlowRate;
@@ -3162,7 +3161,7 @@ namespace FanCoilUnits {
 
                 // determine minimum outdoor air flow rate
                 if (FanCoil(FanCoilNum).DSOAPtr > 0 && FanCoil(FanCoilNum).OutsideAirNode > 0) {
-                    OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state, FanCoil(FanCoilNum).DSOAPtr, ZoneNum, true, true);
+                    OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state, FanCoil(FanCoilNum).DSOAPtr, ZoneNum, true, true);
                     RhoAir = PsyRhoAirFnPbTdbW(state,
                                                Node(FanCoil(FanCoilNum).OutsideAirNode).Press,
                                                Node(FanCoil(FanCoilNum).OutsideAirNode).Temp,

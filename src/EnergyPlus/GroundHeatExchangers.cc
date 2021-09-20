@@ -1024,7 +1024,7 @@ void GLHEVert::calcGFunctions(EnergyPlusData &state)
     this->combineShortAndLongTimestepGFunctions();
 
     // save data for later
-    if (!state.dataSysVars->DisableGLHECaching) {
+    if (state.files.outputControl.glhe && !state.dataSysVars->DisableGLHECaching) {
         myCacheData["Response Factors"]["time"] = std::vector<Real64>(this->myRespFactors->time.begin(), this->myRespFactors->time.end());
         myCacheData["Response Factors"]["LNTTS"] = std::vector<Real64>(this->myRespFactors->LNTTS.begin(), this->myRespFactors->LNTTS.end());
         myCacheData["Response Factors"]["GFNC"] = std::vector<Real64>(this->myRespFactors->GFNC.begin(), this->myRespFactors->GFNC.end());
@@ -1438,7 +1438,7 @@ void GLHEVert::combineShortAndLongTimestepGFunctions()
 
 void GLHEBase::makeThisGLHECacheAndCompareWithFileCache(EnergyPlusData &state)
 {
-    if (!state.dataSysVars->DisableGLHECaching) {
+    if (state.files.outputControl.glhe && !state.dataSysVars->DisableGLHECaching) {
         makeThisGLHECacheStruct();
         readCacheFileAndCompareWithThisGLHECache(state);
     }
@@ -1467,10 +1467,11 @@ void GLHEVert::makeThisGLHECacheStruct()
     d["Max Simulation Years"] = this->myRespFactors->maxSimYears;
     d["g-Function Calc Method"] = GroundHeatExchangers::GFuncCalcMethodsStrs[int(this->gFuncCalcMethod)];
 
+    auto &d_bh_data = d["BH Data"];
     int i = 0;
     for (auto &thisBH : this->myRespFactors->myBorholes) {
         ++i;
-        auto &d_bh = d["BH Data"][format("BH {}", i)];
+        auto &d_bh = d_bh_data[fmt::format("BH {}", i)];
         d_bh["X-Location"] = thisBH->xLoc;
         d_bh["Y-Location"] = thisBH->yLoc;
     }
@@ -1480,52 +1481,32 @@ void GLHEVert::makeThisGLHECacheStruct()
 
 void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
 {
-    // For convenience
-    using json = nlohmann::json;
 
-    if (!FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath)) {
+    if (!(state.files.outputControl.glhe && FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath))) {
         // if the file doesn't exist, there are no data to read
         return;
-    } else {
-        // file exists -- read data and load if possible
+    }
+    // file exists -- read data and load if possible
 
-        // open file
-        std::ifstream ifs(state.dataStrGlobals->outputGLHEFilePath);
+    auto const cached_json = FileSystem::readJSON(state.dataStrGlobals->outputGLHEFilePath);
 
-        // create empty json object
-        json json_in;
-
-        // read json_in data
-        try {
-            ifs >> json_in;
-            ifs.close();
-        } catch (...) {
-            if (!json_in.empty()) {
-                // file exists, is not empty, but failed for some other reason
-                ShowWarningError(state, state.dataStrGlobals->outputGLHEFilePath.string() + " contains invalid file format");
-            }
-            ifs.close();
-            return;
+    for (auto const &existing_data : cached_json) {
+        if (myCacheData["Phys Data"] == existing_data["Phys Data"]) {
+            myCacheData["Response Factors"] = existing_data["Response Factors"];
+            gFunctionsExist = true;
+            break;
         }
+    }
 
-        for (auto &existing_data : json_in) {
-            if (myCacheData["Phys Data"] == existing_data["Phys Data"]) {
-                myCacheData["Response Factors"] = existing_data["Response Factors"];
-                gFunctionsExist = true;
-                break;
-            }
-        }
+    if (gFunctionsExist) {
+        // Populate the time array
+        this->myRespFactors->time = Array1D<Real64>(myCacheData["Response Factors"]["time"].get<std::vector<Real64>>());
 
-        if (gFunctionsExist) {
-            // Populate the time array
-            this->myRespFactors->time = Array1D<Real64>(myCacheData["Response Factors"]["time"].get<std::vector<Real64>>());
+        // Populate the lntts array
+        this->myRespFactors->LNTTS = Array1D<Real64>(myCacheData["Response Factors"]["LNTTS"].get<std::vector<Real64>>());
 
-            // Populate the lntts array
-            this->myRespFactors->LNTTS = Array1D<Real64>(myCacheData["Response Factors"]["LNTTS"].get<std::vector<Real64>>());
-
-            // Populate the g-function array
-            this->myRespFactors->GFNC = Array1D<Real64>(myCacheData["Response Factors"]["GFNC"].get<std::vector<Real64>>());
-        }
+        // Populate the g-function array
+        this->myRespFactors->GFNC = Array1D<Real64>(myCacheData["Response Factors"]["GFNC"].get<std::vector<Real64>>());
     }
 }
 
@@ -1541,7 +1522,7 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
     if (FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath)) {
         // file exists -- add data
         // open file
-        cached_json = FileSystem::readJSON(state.dataStrGlobals->outputGLHEFilePath, std::ios_base::in | std::ios_base::binary);
+        cached_json = FileSystem::readJSON(state.dataStrGlobals->outputGLHEFilePath);
 
         // add current data
         cached_json.emplace(fmt::format("GHLE {}", cached_json.size() + 1), myCacheData);

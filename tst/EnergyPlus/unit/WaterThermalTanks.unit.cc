@@ -5336,3 +5336,82 @@ TEST_F(EnergyPlusFixture, PlantMassFlowRatesFuncTest)
                                          setPtTemp);
     EXPECT_NEAR(result, expected, answerTolerance);
 }
+
+TEST_F(EnergyPlusFixture, setBackupElementCapacityTest)
+{
+    Real64 expectedAnswer;
+    Real64 allowedTolerance = 0.001;
+
+    // Test for #9001: Make sure BackupElementCapacity is reset when equal to DataSizing::Autosize which is -99999.0
+    // or a negative number because this results in negative electricity consumption.
+    state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
+    state->dataWaterThermalTanks->WaterHeaterDesuperheater.allocate(1);
+    state->dataWaterThermalTanks->WaterThermalTank.allocate(1);
+
+    auto &HPWH = state->dataWaterThermalTanks->HPWaterHeater(1);
+    auto &DSup = state->dataWaterThermalTanks->WaterHeaterDesuperheater(1);
+    auto &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
+
+    HPWH.TypeNum = DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped;
+
+    // Test 1: Heat Pump Hot Water Heater.  BackupHeaterCapacity is negative--should be reset to whatever the tank max capacity is.
+    Tank.HeatPumpNum = 1;
+    Tank.DesuperheaterNum = 0;
+    Tank.MaxCapacity = 100.0;
+    HPWH.BackupElementCapacity = DataSizing::AutoSize;
+    expectedAnswer = 100.0;
+    Tank.setBackupElementCapacity(*state);
+    EXPECT_NEAR(HPWH.BackupElementCapacity, expectedAnswer, allowedTolerance);
+
+    // Test 2: Heat Pump Hot Water Heater.  BackupHeaterCapacity is positive--do not reset.
+    Tank.HeatPumpNum = 1;
+    Tank.DesuperheaterNum = 0;
+    Tank.MaxCapacity = 100.0;
+    HPWH.BackupElementCapacity = 50.0;
+    expectedAnswer = 50.0;
+    Tank.setBackupElementCapacity(*state);
+    EXPECT_NEAR(HPWH.BackupElementCapacity, expectedAnswer, allowedTolerance);
+
+    // Test 3: Desuperheater.  BackupHeaterCapacity is negative--should be reset to whatever the tank max capacity is.
+    Tank.HeatPumpNum = 0;
+    Tank.DesuperheaterNum = 1;
+    Tank.MaxCapacity = 200.0;
+    DSup.BackupElementCapacity = DataSizing::AutoSize;
+    expectedAnswer = 200.0;
+    Tank.setBackupElementCapacity(*state);
+    EXPECT_NEAR(DSup.BackupElementCapacity, expectedAnswer, allowedTolerance);
+
+    // Test 4: Desuperheater.  BackupHeaterCapacity is positive--do not reset.
+    Tank.HeatPumpNum = 0;
+    Tank.DesuperheaterNum = 1;
+    Tank.MaxCapacity = 200.0;
+    DSup.BackupElementCapacity = 123.0;
+    expectedAnswer = 123.0;
+    Tank.setBackupElementCapacity(*state);
+    EXPECT_NEAR(DSup.BackupElementCapacity, expectedAnswer, allowedTolerance);
+
+    // Test 5: Not a Heat Pump Water Heater or Desuperheater.  Do not do anything.
+    Tank.HeatPumpNum = 0;
+    Tank.DesuperheaterNum = 0;
+    Tank.MaxCapacity = 200.0;
+    HPWH.BackupElementCapacity = 123.0;
+    DSup.BackupElementCapacity = -456.0;
+    Tank.setBackupElementCapacity(*state);
+    expectedAnswer = 123.0;
+    EXPECT_NEAR(HPWH.BackupElementCapacity, expectedAnswer, allowedTolerance);
+    expectedAnswer = -456.0;
+    EXPECT_NEAR(DSup.BackupElementCapacity, expectedAnswer, allowedTolerance);
+
+    // Test 6: Wrapped Heat Pump Water Heater.  Do not do anything.
+    HPWH.TypeNum = DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped;
+    Tank.HeatPumpNum = 1;
+    Tank.DesuperheaterNum = 0;
+    Tank.MaxCapacity = 200.0;
+    HPWH.BackupElementCapacity = 123.0;
+    DSup.BackupElementCapacity = -456.0;
+    Tank.setBackupElementCapacity(*state);
+    expectedAnswer = 123.0;
+    EXPECT_NEAR(HPWH.BackupElementCapacity, expectedAnswer, allowedTolerance);
+    expectedAnswer = -456.0;
+    EXPECT_NEAR(DSup.BackupElementCapacity, expectedAnswer, allowedTolerance);
+}
