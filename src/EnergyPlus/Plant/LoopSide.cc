@@ -928,7 +928,7 @@ namespace DataPlant {
                     // reference
                     auto &node_with_request(state.dataLoopNodes->Node(NodeToCheckRequest));
 
-                    if (!component.isPump()) {
+                    if (!DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(component.Type)]) {
 
                         if (FlowPriorityStatus == DataPlant::LoopFlowStatus_Unknown) {
                             // do nothing

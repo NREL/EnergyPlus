@@ -672,7 +672,8 @@ void DistributePressureOnBranch(
     }
 
     // If the last component on the branch is the pump, then check if a pressure drop is detected and set the flag and leave
-    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).isPump()) {
+    if (DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(
+            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).Type)]) {
         PumpFound = true;
         if (TempBranchPressureDrop != 0.0) {
             ShowSevereError(state, "Error in plant pressure simulation for plant loop: " + state.dataPlnt->PlantLoop(LoopNum).Name);
@@ -708,7 +709,8 @@ void DistributePressureOnBranch(
         for (CompNum = NumCompsOnBranch - 1; CompNum >= 1; --CompNum) {
 
             // If this component is a pump, stop passing pressure upstream, and set flag to true for calling routine
-            if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).isPump()) {
+            if (DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Type)]) {
                 PumpFound = true;
                 break;
             }

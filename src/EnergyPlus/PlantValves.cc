@@ -357,7 +357,7 @@ namespace PlantValves {
                                     for (auto &thisInnerBranch : thisLoopSide.Branch) {
                                         if (thisInnerBranch.NodeNumOut == this->PltPumpOutletNodeNum) {
                                             for (auto &thisInnerComp : thisInnerBranch.Comp) {
-                                                if (thisInnerComp.isPump()) {
+                                                if (DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(thisInnerComp.Type)]) {
                                                     PumpOutNodeOkay = true;
                                                 }
                                             }

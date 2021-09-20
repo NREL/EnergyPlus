@@ -61,6 +61,13 @@ struct EnergyPlusData;
 
 namespace DataPlant {
 
+    constexpr std::array<bool, static_cast<int>(PlantEquipmentType::Num)> PlantEquipmentTypeIsPump = {
+        false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false, false, false, false, false, true,  true,  true,  true,  true,  false, false,
+        false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+
     struct CompData
     {
         // Members
@@ -124,8 +131,6 @@ namespace DataPlant {
         //                from a the chilled water loop and does not call it sizing routine when called from the condenser loop.
 
         void simulate(EnergyPlusData &state, bool FirstHVACIteration);
-
-        bool isPump();
 
         void oneTimeInit(EnergyPlusData &state) const;
     };

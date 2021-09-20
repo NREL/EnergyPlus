@@ -52,22 +52,6 @@
 namespace EnergyPlus {
 namespace DataPlant {
 
-    bool CompData::isPump()
-    {
-        if (this->Type == DataPlant::PlantEquipmentType::PumpConstantSpeed) {
-            return true;
-        } else if (this->Type == DataPlant::PlantEquipmentType::PumpVariableSpeed) {
-            return true;
-        } else if (this->Type == DataPlant::PlantEquipmentType::PumpBankConstantSpeed) {
-            return true;
-        } else if (this->Type == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) {
-            return true;
-        } else if (this->Type == DataPlant::PlantEquipmentType::PumpCondensate) {
-            return true;
-        }
-        return false;
-    }
-
     void CompData::initLoopEquip(EnergyPlusData &state, bool const GetCompSizFac)
     {
         this->compPtr->onInitLoopEquip(state, this->location);
