@@ -1077,9 +1077,9 @@ struct SetPointManagerData : BaseGlobalStruct
 
     int GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
     int GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
-    DataPlant::PlantEquipmentType InitSetPointManagerTypeNum = DataPlant::PlantEquipmentType::Invalid;
+    DataPlant::PlantEquipmentType ChillerType = DataPlant::PlantEquipmentType::Invalid;
     int InitSetPointManagerNumChiller = 0;
-    DataPlant::PlantEquipmentType InitSetPointManagerTypeOf_Num = DataPlant::PlantEquipmentType::Invalid;
+    DataPlant::PlantEquipmentType InitType = DataPlant::PlantEquipmentType::Invalid;
 
     bool ManagerOn = false;
     bool GetInputFlag = true; // First time, input is "gotten"
@@ -1209,9 +1209,9 @@ struct SetPointManagerData : BaseGlobalStruct
 
         GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
         GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
-        InitSetPointManagerTypeNum = DataPlant::PlantEquipmentType::Invalid;
+        ChillerType = DataPlant::PlantEquipmentType::Invalid;
         InitSetPointManagerNumChiller = 0;
-        InitSetPointManagerTypeOf_Num = DataPlant::PlantEquipmentType::Invalid;
+        InitType = DataPlant::PlantEquipmentType::Invalid;
 
         ManagerOn = false;
         GetInputFlag = true; // First time, input is "gotten"

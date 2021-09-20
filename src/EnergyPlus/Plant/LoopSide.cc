@@ -503,9 +503,7 @@ namespace DataPlant {
                 case DataPlant::PlantEquipmentType::CoilUserDefined:
                 case DataPlant::PlantEquipmentType::CoilVSWAHPCoolingEquationFit:
                 case DataPlant::PlantEquipmentType::CoilVSWAHPHeatingEquationFit:
-                case DataPlant::PlantEquipmentType::PackagedTESCoolingCoil:
-
-                {
+                case DataPlant::PlantEquipmentType::PackagedTESCoolingCoil: {
                     this->SimAirLoopsNeeded = true;
                     // sometimes these coils are children in ZoneHVAC equipment
                     // PlantLoop(LoopNum)%LoopSide(LoopSideNum)%SimZoneEquipNeeded= .TRUE.
