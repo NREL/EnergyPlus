@@ -1089,7 +1089,7 @@ Although, defined view factors cannot be used with CarrollMRT, the algorithm app
 
 \paragraph{Field: Override Mode}\label{override-mode}
 
-The Override Mode field provides a single field that will override other inputs located in the IDF/epJSON file as well as convergence related values that appear in the remaining fields of the PerformancePrecisionTradeoffs object. The Normal option (default) provides no overrides while the Mode options provide overrides based on the following tables. The Advanced option, allows the remaining fields of the PerformancePrecisionTradeoffs to be used.
+The Override Mode field provides a single field that will override other inputs located in the IDF/epJSON file as well as convergence related values that appear in the remaining fields of the PerformancePrecisionTradeoffs object. The Normal option (default) provides no overrides while the Mode options provide overrides based on the following tables. The Advanced option, allows the MaxZoneTempDiff and MaxAllowedDelTemp fields of the PerformancePrecisionTradeoffs to be used.
 
 % table 2
 \begin{longtable}[c]{p{1.5in}p{5.0in}}
@@ -1134,6 +1134,7 @@ Surface are grouped based on the following criteria for similarity:
     \item orientation
     \item surface height
     \item zone
+    \item enclosure
     \item solar/wind exposure
     \item other side boundary condition
     \item conduction and convection heat transfer algorithms
@@ -1148,11 +1149,15 @@ Surfaces with the following objects defined are currently never grouped because 
 \begin{itemize}
     \item ConstructionProperty:InternalHeatSource
     \item ZoneProperty:UserViewFactors:BySurfaceName
-    \item WindowShadingControl (windows only)
-    \item WindowProperty:AirflowControl (windows only)
+    \item WindowShadingControl
+    \item WindowProperty:AirflowControl
+    \item WindowMaterial:GlazingGroup:Thermochromic
+    \item DaylightingDevice:Tubular
+    \item WindowsCalculationEngine
+    \item SurfaceProperty:SolarIncidentInside
 \end{itemize}
 
-Currently, the only calculations performed across all surfaces with a group is the interior radiation exchange, where surfaces within a group are collected into a single area for participating in interior longwave radiation exchange. This will reduce the scale and complexity of the algorithm with minimal impact on accuracy. Additional calculations may be performed for a group of surfaces in future releases.
+Surface heat balance and interior radiation exchange calculations are performed across all surfaces within a group. Surface heat balance calculations are skipped for all but one surface within a group, and subsequently updated using the results from the representative surface. For interior radiation exchange, surfaces within a group are collected into a single area for participating in interior longwave radiation exchange. This will reduce the scale and complexity of the algorithm with minimal impact on accuracy. Solar shading and interior solar distribution are still calculated for each individual surface. The absorbed solar radiation used for the surface heat balance equations within a group is the area weighted average of all surfaces within the group.
 
 An IDF example:
 

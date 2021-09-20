@@ -86,19 +86,19 @@ namespace DaylightingManager {
     constexpr int NPHMAX(10);           // Number of sky/ground integration steps in altitude
     constexpr int NTHMAX(16);           // Number of sky/ground integration steps in azimuth
 
-    void DayltgAveInteriorReflectance(EnergyPlusData &state, int const ZoneNum);
+    void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum); // Enclosure number
 
     void CalcDayltgCoefficients(EnergyPlusData &state);
 
-    void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state, int const ZoneNum);
+    void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state);
 
-    void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const ZoneNum);
+    void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum);
 
-    void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum);
+    void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum);
 
     void FigureDayltgCoeffsAtPointsSetupForWindow(
         EnergyPlusData &state,
-        int const ZoneNum,
+        int const daylightCtrlNum, // zero if called for map points
         int const iRefPoint,
         int const loopwin,
         DataDaylighting::iCalledFor const CalledFrom, // indicate  which type of routine called this routine
@@ -136,7 +136,7 @@ namespace DaylightingManager {
 
     void FigureDayltgCoeffsAtPointsForWindowElements(
         EnergyPlusData &state,
-        int const ZoneNum,
+        int const daylightCtrlNum, // Current daylighting control number (only used when called from RefPoint)
         int const iRefPoint,
         int const loopwin,
         DataDaylighting::iCalledFor const CalledFrom, // indicate  which type of routine called this routine
@@ -182,7 +182,7 @@ namespace DaylightingManager {
         Optional<Real64> MapWindowSolidAngAtRefPtWtd = _);
 
     void InitializeCFSDaylighting(EnergyPlusData &state,
-                                  int const ZoneNum,               // Current zone number
+                                  int const daylightCtrlNum,       // Current daylighting control number
                                   int const IWin,                  // Complex fenestration number
                                   int const NWX,                   // Number of horizontal divisions
                                   int const NWY,                   // Number of vertical divisions
@@ -195,7 +195,7 @@ namespace DaylightingManager {
     void InitializeCFSStateData(EnergyPlusData &state,
                                 DataBSDFWindow::BSDFRefPoints &StateRefPoint,
                                 DataBSDFWindow::BSDFRefPointsGeomDescr &DaylghtGeomDescr,
-                                int const ZoneNum, // Current zone number
+                                int const daylightCtrlNum, // Current daylighting control number
                                 int const iWin,
                                 Vector3<Real64> const &RefPoint, // reference point
                                 int const CurFenState,
@@ -247,7 +247,7 @@ namespace DaylightingManager {
 
     void FigureDayltgCoeffsAtPointsForSunPosition(
         EnergyPlusData &state,
-        int const ZoneNum,
+        int const daylightCtrlNum, // Current daylighting control number
         int const iRefPoint,
         int const iXelement,
         int const NWX, // Number of window elements in x direction for dayltg calc
@@ -286,7 +286,7 @@ namespace DaylightingManager {
         Optional<Real64 const> MapWindowSolidAngAtRefPtWtd = _);
 
     void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
-                                                int const ZoneNum,
+                                                int const daylightCtrlNum, // Current daylighting control number
                                                 int const iRefPoint,
                                                 int const iHour,
                                                 int &ISunPos,
@@ -312,9 +312,7 @@ namespace DaylightingManager {
 
     void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetDaylightingControls(EnergyPlusData &state,
-                                int const TotDaylightingControls, // Total daylighting controls inputs
-                                bool &ErrorsFound);
+    void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound);
 
     void GeometryTransformForDaylighting(EnergyPlusData &state);
 
@@ -331,15 +329,15 @@ namespace DaylightingManager {
     int findWinShadingStatus(int const IWin);
 
     void DayltgGlare(EnergyPlusData &state,
-                     int &IL,        // Reference point index: 1=first ref pt, 2=second ref pt
-                     Real64 &BLUM,   // Window background (surround) luminance (cd/m2)
-                     Real64 &GLINDX, // Glare index
-                     int &ZoneNum    // Zone number
+                     int &IL,                  // Reference point index: 1=first ref pt, 2=second ref pt
+                     Real64 &BLUM,             // Window background (surround) luminance (cd/m2)
+                     Real64 &GLINDX,           // Glare index
+                     int const daylightCtrlNum // Current daylighting control number
     );
 
     void DayltgGlareWithIntWins(EnergyPlusData &state,
-                                Array1D<Real64> &GLINDX, // Glare index
-                                int const ZoneNum        // Zone number
+                                Array1D<Real64> &GLINDX,  // Glare index
+                                int const daylightCtrlNum // Current daylighting control number
     );
 
     void DayltgExtHorizIllum(EnergyPlusData &state,
@@ -370,11 +368,11 @@ namespace DaylightingManager {
                                     bool &hit                  // True iff ray hits an obstruction
     );
 
-    void DayltgInteriorIllum(EnergyPlusData &state, int &ZoneNum); // Zone number
+    void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum); // Daylighting:Controls number
 
     void DayltgInteriorTDDIllum(EnergyPlusData &state);
 
-    void DayltgElecLightingControl(EnergyPlusData &state, int &ZoneNum); // Zone number
+    void DayltgElecLightingControl(EnergyPlusData &state);
 
     Real64 DayltgGlarePositionFactor(Real64 &X, // Lateral and vertical distance of luminous window element from
                                      Real64 &Y);
@@ -382,7 +380,7 @@ namespace DaylightingManager {
     void DayltgInterReflectedIllum(EnergyPlusData &state,
                                    int const ISunPos, // Sun position counter; used to avoid calculating various
                                    int const IHR,     // Hour of day
-                                   int const ZoneNum, // Zone number
+                                   int const enclNum, // Daylighting enclosure index
                                    int const IWin     // Window index
     );
 
@@ -399,11 +397,11 @@ namespace DaylightingManager {
                                        Optional_int_const MapNum = _);
 
     void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
-                                                      int const IWin,      // Window index
-                                                      int const WinEl,     // Current window element counter
-                                                      int const IHR,       // Hour of day
-                                                      int const ZoneNum,   // Zone number
-                                                      int const iRefPoint, // reference point counter
+                                                      int const IWin,            // Window index
+                                                      int const WinEl,           // Current window element counter
+                                                      int const IHR,             // Hour of day
+                                                      int const daylightCtrlNum, // Daylighting control number
+                                                      int const iRefPoint,       // reference point counter
                                                       DataDaylighting::iCalledFor const CalledFrom,
                                                       Optional_int_const MapNum = _);
 
@@ -411,15 +409,13 @@ namespace DaylightingManager {
                                               int const IWin,      // Window index
                                               int const WinEl,     // Current window element counter
                                               int const IHR,       // Hour of day
-                                              int const ZoneNum,   // Zone number
                                               int const iRefPoint, // reference point index
                                               DataDaylighting::iCalledFor const CalledFrom,
                                               Optional_int_const MapNum = _);
 
     void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
-                                                int const iWin,    // Window index
-                                                int const ZoneNum, // Zone number
-                                                int const iHour,   // Hour of day
+                                                int const iWin,  // Window index
+                                                int const iHour, // Hour of day
                                                 int const iRefPoint,
                                                 int const NumEl,                              // Total number of window elements
                                                 Real64 const AZVIEW,                          // Azimuth of view vector in absolute coord system for
@@ -454,7 +450,7 @@ namespace DaylightingManager {
                                  Real64 &LumAtReflHitPtFrSun       // Luminance at ReflHitPt from beam solar reflection for unit
     );
 
-    void DayltgInteriorMapIllum(EnergyPlusData &state, int &ZoneNum); // Zone number
+    void DayltgInteriorMapIllum(EnergyPlusData &state);
 
     void ReportIllumMap(EnergyPlusData &state, int const MapNum);
 
@@ -464,11 +460,11 @@ namespace DaylightingManager {
 
     void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state);
 
-    void CreateShadeDeploymentOrder(EnergyPlusData &state, int &ZoneNum);
+    void CreateShadeDeploymentOrder(EnergyPlusData &state, int const enclNum);
 
-    void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int &ZoneNum);
+    void MapShadeDeploymentOrderToLoopNumber(EnergyPlusData &state, int const enclNum);
 
-    void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int &ZoneNum); // Zone number
+    void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int const enclNum);
 
     void CalcMinIntWinSolidAngs(EnergyPlusData &state);
 
@@ -489,6 +485,7 @@ struct DaylightingManagerData : BaseGlobalStruct
 {
 
     bool CalcDayltghCoefficients_firstTime = true;
+    bool getDaylightingParametersInputFlag = true;
     bool refFirstTime = true;
     bool DayltgInteriorIllum_firstTime = true; // true first time routine is called
     bool FirstTimeDaylFacCalc = true;
@@ -504,7 +501,7 @@ struct DaylightingManagerData : BaseGlobalStruct
 
     int TotWindowsWithDayl = 0;                          // Total number of exterior windows in all daylit zones
     Array1D<Real64> DaylIllum;                           // Daylight illuminance at reference points (lux)
-    int maxNumRefPtInAnyZone = 0;                        // The most number of reference points that any single zone has
+    int maxNumRefPtInAnyDaylCtrl = 0;                    // The most number of reference points that any single daylighting control has
     int maxNumRefPtInAnyEncl = 0;                        // The most number of reference points that any single enclosure has
     Real64 PHSUN = 0.0;                                  // Solar altitude (radians)
     Real64 SPHSUN = 0.0;                                 // Sine of solar altitude
@@ -519,26 +516,24 @@ struct DaylightingManagerData : BaseGlobalStruct
     // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
     // J = 1 for bare window, 2 - 12 for shaded;
     // K = sun position index.
-    Array3D<Real64> EINTSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4, 0.0); // Sky-related portion of internally reflected illuminance
-    Array2D<Real64> EINTSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);    // Sun-related portion of internally reflected illuminance,
+    Array3D<Real64> EINTSK; // Sky-related portion of internally reflected illuminance
+    Array2D<Real64> EINTSU; // Sun-related portion of internally reflected illuminance,
     // excluding entering beam
-    Array2D<Real64> EINTSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0); // Sun-related portion of internally reflected illuminance
+    Array2D<Real64> EINTSUdisk; // Sun-related portion of internally reflected illuminance
     // due to entering beam
-    Array3D<Real64> WLUMSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4, 0.0); // Sky-related window luminance
-    Array2D<Real64> WLUMSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);    // Sun-related window luminance, excluding view of solar disk
-    Array2D<Real64> WLUMSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0); // Sun-related window luminance, due to view of solar disk
+    Array3D<Real64> WLUMSK;     // Sky-related window luminance
+    Array2D<Real64> WLUMSU;     // Sun-related window luminance, excluding view of solar disk
+    Array2D<Real64> WLUMSUdisk; // Sun-related window luminance, due to view of solar disk
 
     Array2D<Real64> GILSK = Array2D<Real64>(24, 4, 0.0); // Horizontal illuminance from sky, by sky type, for each hour of the day
     Array1D<Real64> GILSU = Array1D<Real64>(24, 0.0);    // Horizontal illuminance from sun for each hour of the day
 
-    Array3D<Real64> EDIRSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4); // Sky-related component of direct illuminance
-    Array2D<Real64> EDIRSU =
-        Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1); // Sun-related component of direct illuminance (excluding beam solar at ref pt)
-    Array2D<Real64> EDIRSUdisk =
-        Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1); // Sun-related component of direct illuminance due to beam solar at ref pt
-    Array3D<Real64> AVWLSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4); // Sky-related average window luminance
-    Array2D<Real64> AVWLSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1); // Sun-related average window luminance, excluding view of solar disk
-    Array2D<Real64> AVWLSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1); // Sun-related average window luminance due to view of solar disk
+    Array3D<Real64> EDIRSK;     // Sky-related component of direct illuminance
+    Array2D<Real64> EDIRSU;     // Sun-related component of direct illuminance (excluding beam solar at ref pt)
+    Array2D<Real64> EDIRSUdisk; // Sun-related component of direct illuminance due to beam solar at ref pt
+    Array3D<Real64> AVWLSK;     // Sky-related average window luminance
+    Array2D<Real64> AVWLSU;     // Sun-related average window luminance, excluding view of solar disk
+    Array2D<Real64> AVWLSUdisk; // Sun-related average window luminance due to view of solar disk
 
     // Allocatable daylight factor arrays  -- are in the ZoneDaylight Structure
 
@@ -671,24 +666,24 @@ struct DaylightingManagerData : BaseGlobalStruct
     Array1D<Real64> BACLUM;
     Array1D<Real64> DayltgInteriorMapIllumGLRNDX;
     Array1D<Real64> daylight_illum;
-    Array1D<Real64> FLFWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related downgoing luminous flux, excluding entering beam
-    Array1D<Real64> FLFWSUdisk = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1); // Sun-related downgoing luminous flux, due to entering beam
-    Array1D<Real64> FLCWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related upgoing luminous flux
-    Array1D<Real64> TransMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);      // Transmittance multiplier
-    Array1D<Real64> DayltgInterReflectedIllumTransBmBmMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs); // Isolated blind beam-beam transmittance
-    Array1D<Real64> TransBmBmMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);                          // Beam-beam transmittance of isolated blind
-    Array1D<Real64> TransBmBmMultRefl = Array1D<Real64>(DataSurfaces::MaxSlatAngs); // As above but for beam reflected from exterior obstruction
-    Array1D<Real64> PH = Array1D<Real64>(DaylightingManager::NPH);                  // Altitude of sky element (radians)
-    Array1D<Real64> TH = Array1D<Real64>(DaylightingManager::NTH);                  // Azimuth of sky element (radians)
-    Array1D<Real64> SPHCPH = Array1D<Real64>(DaylightingManager::NPH);              // Sine times cosine of altitude of sky element
-    Array1D<Real64> SetPnt;                                                         // Illuminance setpoint at reference points (lux)
-    Array1D<Real64> GLRNDX;                                                         // Glare index at reference point
-    Array1D<Real64> GLRNEW;                                                         // New glare index at reference point
-    Array2D<Real64> FLCWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);     // Sky-related upgoing luminous flux
+    Array1D<Real64> FLFWSU;                                            // Sun-related downgoing luminous flux, excluding entering beam
+    Array1D<Real64> FLFWSUdisk;                                        // Sun-related downgoing luminous flux, due to entering beam
+    Array1D<Real64> FLCWSU;                                            // Sun-related upgoing luminous flux
+    Array1D<Real64> TransMult;                                         // Transmittance multiplier
+    Array1D<Real64> DayltgInterReflectedIllumTransBmBmMult;            // Isolated blind beam-beam transmittance
+    Array1D<Real64> TransBmBmMult;                                     // Beam-beam transmittance of isolated blind
+    Array1D<Real64> TransBmBmMultRefl;                                 // As above but for beam reflected from exterior obstruction
+    Array1D<Real64> PH = Array1D<Real64>(DaylightingManager::NPH);     // Altitude of sky element (radians)
+    Array1D<Real64> TH = Array1D<Real64>(DaylightingManager::NTH);     // Azimuth of sky element (radians)
+    Array1D<Real64> SPHCPH = Array1D<Real64>(DaylightingManager::NPH); // Sine times cosine of altitude of sky element
+    Array1D<Real64> SetPnt;                                            // Illuminance setpoint at reference points (lux)
+    Array1D<Real64> GLRNDX;                                            // Glare index at reference point
+    Array1D<Real64> GLRNEW;                                            // New glare index at reference point
+    Array2D<Real64> FLCWSK;                                            // Sky-related upgoing luminous flux
     Array2D<Real64> SkyObstructionMult =
         Array2D<Real64>(DaylightingManager::NPHMAX,
                         DaylightingManager::NTHMAX); // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
-    Array2D<Real64> FLFWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);                         // Sky-related downgoing luminous flux
+    Array2D<Real64> FLFWSK;                          // Sky-related downgoing luminous flux
     Array2D<Real64> ObTransM = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX); // ObTrans value for each (TH,PH) direction
     Array2D<Real64> SFSKHR = Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (second index), bare/shaded window (first index)
     Array2D<Real64> DFSKHR = Array2D<Real64>(2, 4); // Sky daylight factor for sky type (second index), bare/shaded window (first index)
@@ -711,6 +706,19 @@ struct DaylightingManagerData : BaseGlobalStruct
     bool GlareOK = false;
     bool blnCycle = false;
 
+    Array1D<Real64> DILLSW;         // Illuminance a ref point from a group of windows that can be switched together,
+    Array1D<Real64> DILLUN;         //  and from those that aren't (lux)
+    Array1D_bool previously_shaded; // array of flags to indicate that previously groups would have already shaded this window
+    Array3D<Real64> WDAYIL;         // Illuminance from window at reference point (second index)
+    //   for shade open/closed (first index), the number of shade deployment groups (third index)
+    Array3D<Real64> WBACLU; // Background illuminance from window at reference point (second index)
+    //   for shade open/closed (first index), the number of shade deployment groups (third index)
+    Array2D<Real64> RDAYIL; // Illuminance from window at reference point after closing shade
+    Array2D<Real64> RBACLU; // Background illuminance from window at reference point after closing shade
+    Array1D<Real64> TVIS1;  // Visible transmittance at normal incidence of unswitched glazing
+    Array1D<Real64> TVIS2;  // Visible transmittance at normal incidence of fully-switched glazing
+    Array1D<Real64> ASETIL; // Illuminance ratio (lux)
+
     DaylightingManagerData()
     {
         this->cos_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // cos( Phi ) table
@@ -722,6 +730,7 @@ struct DaylightingManagerData : BaseGlobalStruct
     void clear_state() override
     {
         this->CalcDayltghCoefficients_firstTime = true;
+        this->getDaylightingParametersInputFlag = true;
         this->refFirstTime = true;
         this->DayltgInteriorIllum_firstTime = true;
         this->FirstTimeDaylFacCalc = true;
@@ -736,7 +745,7 @@ struct DaylightingManagerData : BaseGlobalStruct
         this->CreateDFSReportFile = true;
         this->TotWindowsWithDayl = 0;
         this->DaylIllum.deallocate();
-        this->maxNumRefPtInAnyZone = 0;
+        this->maxNumRefPtInAnyDaylCtrl = 0;
         this->maxNumRefPtInAnyEncl = 0;
         this->PHSUN = 0.0;
         this->SPHSUN = 0.0;
@@ -746,20 +755,20 @@ struct DaylightingManagerData : BaseGlobalStruct
         this->SPHSUNHR = Array1D<Real64>(24, 0.0);
         this->CPHSUNHR = Array1D<Real64>(24, 0.0);
         this->THSUNHR = Array1D<Real64>(24, 0.0);
-        this->EINTSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4, 0.0);
-        this->EINTSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);
-        this->EINTSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);
-        this->WLUMSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4, 0.0);
-        this->WLUMSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);
-        this->WLUMSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 0.0);
+        this->EINTSK.deallocate();
+        this->EINTSU.deallocate();
+        this->EINTSUdisk.deallocate();
+        this->WLUMSK.deallocate();
+        this->WLUMSU.deallocate();
+        this->WLUMSUdisk.deallocate();
         this->GILSK = Array2D<Real64>(24, 4, 0.0);
         this->GILSU = Array1D<Real64>(24, 0.0);
-        this->EDIRSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4);
-        this->EDIRSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);
-        this->EDIRSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);
-        this->AVWLSK = Array3D<Real64>(24, DataSurfaces::MaxSlatAngs + 1, 4);
-        this->AVWLSU = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);
-        this->AVWLSUdisk = Array2D<Real64>(24, DataSurfaces::MaxSlatAngs + 1);
+        this->EDIRSK.deallocate();
+        this->EDIRSU.deallocate();
+        this->EDIRSUdisk.deallocate();
+        this->AVWLSK.deallocate();
+        this->AVWLSU.deallocate();
+        this->AVWLSUdisk.deallocate();
         this->TDDTransVisBeam.deallocate();
         this->TDDFluxInc.deallocate();
         this->TDDFluxTrans.deallocate();
@@ -824,37 +833,32 @@ struct DaylightingManagerData : BaseGlobalStruct
         this->VTDark = 0.0;
         this->VTMULT = 1.0;
 
-        this->DayltgInteriorMapIllumDFSKHR =
-            Array2D<Real64>(2, 4); // Sky daylight factor for sky type (first index), bare/shaded window (second index)
-        this->DayltgInteriorMapIllumBFSKHR =
-            Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (first index), bare/shaded window (second index)
-        this->DayltgInteriorMapIllumSFSKHR =
-            Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (first index), bare/shaded window (second index)
+        this->DayltgInteriorMapIllumDFSKHR = Array2D<Real64>(2, 4);
+        this->DayltgInteriorMapIllumBFSKHR = Array2D<Real64>(2, 4);
+        this->DayltgInteriorMapIllumSFSKHR = Array2D<Real64>(2, 4);
         this->BACLUM.clear();
         this->DayltgInteriorMapIllumGLRNDX.clear();
         this->daylight_illum.clear();
-        this->FLFWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related downgoing luminous flux, excluding entering beam
-        this->FLFWSUdisk = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1); // Sun-related downgoing luminous flux, due to entering beam
-        this->FLCWSU = Array1D<Real64>(DataSurfaces::MaxSlatAngs + 1);     // Sun-related upgoing luminous flux
-        this->TransMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);      // Transmittance multiplier
-        this->DayltgInterReflectedIllumTransBmBmMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs); // Isolated blind beam-beam transmittance
-        this->TransBmBmMult = Array1D<Real64>(DataSurfaces::MaxSlatAngs);                          // Beam-beam transmittance of isolated blind
-        this->TransBmBmMultRefl = Array1D<Real64>(DataSurfaces::MaxSlatAngs); // As above but for beam reflected from exterior obstruction
-        this->PH = Array1D<Real64>(DaylightingManager::NPH);                  // Altitude of sky element (radians)
-        this->TH = Array1D<Real64>(DaylightingManager::NTH);                  // Azimuth of sky element (radians)
-        this->SPHCPH = Array1D<Real64>(DaylightingManager::NPH);              // Sine times cosine of altitude of sky element
+        this->FLFWSU.clear();
+        this->FLFWSUdisk.clear();
+        this->FLCWSU.clear();
+        this->TransMult.clear();
+        this->DayltgInterReflectedIllumTransBmBmMult.clear();
+        this->TransBmBmMult.clear();
+        this->TransBmBmMultRefl.clear();
+        this->PH = Array1D<Real64>(DaylightingManager::NPH);
+        this->TH = Array1D<Real64>(DaylightingManager::NTH);
+        this->SPHCPH = Array1D<Real64>(DaylightingManager::NPH);
         this->SetPnt.clear();
         this->GLRNDX.clear();
         this->GLRNEW.clear();
-        this->FLCWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4); // Sky-related upgoing luminous flux
-        this->SkyObstructionMult = Array2D<Real64>(
-            DaylightingManager::NPHMAX,
-            DaylightingManager::NTHMAX); // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
-        this->FLFWSK = Array2D<Real64>(DataSurfaces::MaxSlatAngs + 1, 4);                         // Sky-related downgoing luminous flux
-        this->ObTransM = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX); // ObTrans value for each (TH,PH) direction
-        this->SFSKHR = Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (second index), bare/shaded window (first index)
-        this->DFSKHR = Array2D<Real64>(2, 4); // Sky daylight factor for sky type (second index), bare/shaded window (first index)
-        this->BFSKHR = Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (second index), bare/shaded window (first index)
+        this->FLCWSK.clear();
+        this->SkyObstructionMult = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX);
+        this->FLFWSK.clear();
+        this->ObTransM = Array2D<Real64>(DaylightingManager::NPHMAX, DaylightingManager::NTHMAX);
+        this->SFSKHR = Array2D<Real64>(2, 4);
+        this->DFSKHR = Array2D<Real64>(2, 4);
+        this->BFSKHR = Array2D<Real64>(2, 4);
         this->tmpIllumFromWinAtRefPt.clear();
         this->tmpBackLumFromWinAtRefPt.clear();
         this->tmpSourceLumFromWinAtRefPt.clear();
@@ -871,6 +875,17 @@ struct DaylightingManagerData : BaseGlobalStruct
         this->tmpMult = 0.0;
         this->GlareOK = false;
         this->blnCycle = false;
+
+        this->DILLSW.clear();
+        this->DILLUN.clear();
+        this->previously_shaded.clear();
+        this->WDAYIL.clear();
+        this->WBACLU.clear();
+        this->RDAYIL.clear();
+        this->RBACLU.clear();
+        this->TVIS1.clear();
+        this->TVIS2.clear();
+        this->ASETIL.clear();
     }
 };
 
