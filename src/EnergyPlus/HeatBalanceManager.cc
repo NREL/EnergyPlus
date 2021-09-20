@@ -3407,6 +3407,9 @@ namespace HeatBalanceManager {
         } // TotScreensEQL loop
 
         // Window Blind Materials
+        if ((state.dataHeatBal->TotBlindsEQL == 0) && (state.dataHeatBal->TotBlinds == 0)) {
+            state.dataSurface->actualMaxSlatAngs = 1; // first slot is used for shades
+        }
 
         if (state.dataHeatBal->TotBlinds > 0) {
             state.dataHeatBal->Blind.allocate(state.dataHeatBal->TotBlinds); // Allocate the array Size to the number of blinds
@@ -5880,6 +5883,7 @@ namespace HeatBalanceManager {
             state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
             state.dataHeatBal->spaceIntGain.allocate(state.dataGlobal->numSpaces);
             state.dataHeatBal->spaceIntGainDevices.allocate(state.dataGlobal->numSpaces);
+            state.dataDaylightingData->spacePowerReductionFactor.dimension(state.dataGlobal->numSpaces, 1.0);
         }
         state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
@@ -8182,8 +8186,19 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 } else {
                     state.dataSurface->SurfIncSolSSG(Loop).SurfPtr = SurfNum;
-                    // Automatic Surface Multipliers: Do not use representative surfaces
-                    state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
+                    if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                        int repSurfNum = state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum;
+                        if (repSurfNum != SurfNum) {
+                            // Do not use representative surfaces
+
+                            // remove surface from representative constituent list
+                            auto &vec = state.dataSurface->Surface(repSurfNum).ConstituentSurfaceNums;
+                            vec.erase(std::remove(vec.begin(), vec.end(), SurfNum), vec.end());
+
+                            // reset representative surface number
+                            state.dataSurface->Surface(SurfNum).RepresentativeCalcSurfNum = SurfNum;
+                        }
+                    }
                 }
 
                 // Assign construction number

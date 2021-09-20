@@ -125,6 +125,8 @@ namespace HeatBalanceSurfaceManager {
 
     void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _);
 
+    void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _);
+
     void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state);
 
     void UpdateThermalHistories(EnergyPlusData &state);
@@ -139,6 +141,8 @@ namespace HeatBalanceSurfaceManager {
     // *****************************************************************************
 
     void ReportSurfaceHeatBalance(EnergyPlusData &state);
+
+    void ReportNonRepresentativeSurfaceResults(EnergyPlusData &state);
 
     void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state);
 
