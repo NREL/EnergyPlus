@@ -501,6 +501,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest)
 
     state->dataViewFactor->NumOfRadiantEnclosures = 3;
     state->dataViewFactor->EnclRadInfo.allocate(3);
+    state->dataViewFactor->EnclSolInfo.allocate(3);
     state->dataViewFactor->EnclRadInfo(1).Name = "Enclosure 1";
     state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
         UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
@@ -519,9 +520,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest)
     HeatBalanceIntRadExchange::AlignInputViewFactors(*state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
     std::string const error_string =
-        delimited_string({"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Perimeter Zones\" found a matching "
+        delimited_string({"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"PERIMETER ZONES\" found a matching "
                           "SpaceList, but did not find a matching radiant or solar enclosure with the same spaces.",
-                          "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Space 6\" did not find a matching "
+                          "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"SPACE 6\" did not find a matching "
                           "radiant or solar enclosure name."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
@@ -600,32 +601,33 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest2)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    state->dataViewFactor->NumOfSolarEnclosures = 3;
+    state->dataViewFactor->NumOfRadiantEnclosures = 3;
+    state->dataViewFactor->EnclRadInfo.allocate(3);
     state->dataViewFactor->EnclSolInfo.allocate(3);
-    state->dataViewFactor->EnclSolInfo(1).Name = "Enclosure 1";
-    state->dataViewFactor->EnclSolInfo(1).spaceNums.push_back(
+    state->dataViewFactor->EnclRadInfo(1).Name = "Enclosure 1";
+    state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
         UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclSolInfo(1).spaceNums.push_back(
+    state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
         UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclSolInfo(2).Name = "Enclosure 2";
-    state->dataViewFactor->EnclSolInfo(2).spaceNums.push_back(
+    state->dataViewFactor->EnclRadInfo(2).Name = "Enclosure 2";
+    state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
         UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclSolInfo(2).spaceNums.push_back(
+    state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
         UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclSolInfo(3).Name = "Space 3";
-    state->dataViewFactor->EnclSolInfo(3).spaceNums.push_back(
+    state->dataViewFactor->EnclRadInfo(3).Name = "Space 3";
+    state->dataViewFactor->EnclRadInfo(3).spaceNums.push_back(
         UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(*state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
-    std::string const error_string = delimited_string({"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Space "
+    std::string const error_string = delimited_string({"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"SPACE "
                                                        "6\" did not find a matching radiant or solar enclosure name."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    EXPECT_EQ(state->dataViewFactor->EnclSolInfo(1).Name, "Perimeter Zones");
-    EXPECT_EQ(state->dataViewFactor->EnclSolInfo(2).Name, "Enclosure 2");
-    EXPECT_EQ(state->dataViewFactor->EnclSolInfo(3).Name, "Space 3");
+    EXPECT_EQ(state->dataViewFactor->EnclRadInfo(1).Name, "PERIMETER ZONES");
+    EXPECT_EQ(state->dataViewFactor->EnclRadInfo(2).Name, "Enclosure 2");
+    EXPECT_EQ(state->dataViewFactor->EnclRadInfo(3).Name, "Space 3");
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest3)
@@ -698,35 +700,36 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest3)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    state->dataViewFactor->NumOfSolarEnclosures = 3;
+    state->dataViewFactor->NumOfRadiantEnclosures = 3;
+    state->dataViewFactor->EnclRadInfo.allocate(3);
     state->dataViewFactor->EnclSolInfo.allocate(3);
-    state->dataViewFactor->EnclSolInfo(1).Name = "Enclosure 1";
-    state->dataViewFactor->EnclSolInfo(1).spaceNums.push_back(
+    state->dataViewFactor->EnclRadInfo(1).Name = "Enclosure 1";
+    state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
         UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclSolInfo(1).spaceNums.push_back(
+    state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
         UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 1"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclSolInfo(2).Name = "Enclosure 2";
-    state->dataViewFactor->EnclSolInfo(2).spaceNums.push_back(
+    state->dataViewFactor->EnclRadInfo(2).Name = "Enclosure 2";
+    state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
         UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclSolInfo(2).spaceNums.push_back(
+    state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
         UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
-    state->dataViewFactor->EnclSolInfo(3).Name = "Space 3";
-    state->dataViewFactor->EnclSolInfo(3).spaceNums.push_back(
+    state->dataViewFactor->EnclRadInfo(3).Name = "Space 3";
+    state->dataViewFactor->EnclRadInfo(3).spaceNums.push_back(
         UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(*state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
     std::string const error_string =
-        delimited_string({"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Perimeter Zones\" found a matching "
+        delimited_string({"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"PERIMETER ZONES\" found a matching "
                           "SpaceList, but did not find a matching radiant or solar enclosure with the same spaces.",
-                          "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Space 6\" did not find a matching "
+                          "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"SPACE 6\" did not find a matching "
                           "radiant or solar enclosure name."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    EXPECT_EQ(state->dataViewFactor->EnclSolInfo(1).Name, "Enclosure 1");
-    EXPECT_EQ(state->dataViewFactor->EnclSolInfo(2).Name, "Enclosure 2");
-    EXPECT_EQ(state->dataViewFactor->EnclSolInfo(3).Name, "Space 3");
+    EXPECT_EQ(state->dataViewFactor->EnclRadInfo(1).Name, "Enclosure 1");
+    EXPECT_EQ(state->dataViewFactor->EnclRadInfo(2).Name, "Enclosure 2");
+    EXPECT_EQ(state->dataViewFactor->EnclRadInfo(3).Name, "Space 3");
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
@@ -801,6 +804,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
 
     state->dataViewFactor->NumOfRadiantEnclosures = 3;
     state->dataViewFactor->EnclRadInfo.allocate(3);
+    state->dataViewFactor->EnclSolInfo.allocate(3);
     state->dataViewFactor->EnclRadInfo(1).Name = "Enclosure 1";
     state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
         UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Space 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
@@ -818,11 +822,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(*state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
-    std::string const error_string = delimited_string({"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Space "
+    std::string const error_string = delimited_string({"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"SPACE "
                                                        "6\" did not find a matching radiant or solar enclosure name."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    EXPECT_EQ(state->dataViewFactor->EnclRadInfo(1).Name, "Perimeter Zones");
+    EXPECT_EQ(state->dataViewFactor->EnclRadInfo(1).Name, "PERIMETER ZONES");
     EXPECT_EQ(state->dataViewFactor->EnclRadInfo(2).Name, "Enclosure 2");
     EXPECT_EQ(state->dataViewFactor->EnclRadInfo(3).Name, "Space 3");
 }
