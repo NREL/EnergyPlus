@@ -224,8 +224,8 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
                                                                                             NodeInputManager::compFluidStream::Primary,
                                                                                             DataLoopNode::ObjectIsNotParent);
         if (state.dataPondGHE->PondGHE(Item).InletNodeNum == 0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ErrorsFound = true;
         }
 
@@ -241,8 +241,8 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
                                                                                              NodeInputManager::compFluidStream::Primary,
                                                                                              DataLoopNode::ObjectIsNotParent);
         if (state.dataPondGHE->PondGHE(Item).OutletNodeNum == 0) {
-            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ErrorsFound = true;
         }
 
@@ -257,15 +257,15 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
         state.dataPondGHE->PondGHE(Item).Depth = state.dataIPShortCut->rNumericArgs(1);
         state.dataPondGHE->PondGHE(Item).Area = state.dataIPShortCut->rNumericArgs(2);
         if (state.dataIPShortCut->rNumericArgs(1) <= 0.0) {
-            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Value must be greater than 0.0");
+            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+            				"Value must be greater than 0.0");
             ErrorsFound = true;
         }
         if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) {
-            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Value must be greater than 0.0");
+            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+            				"Value must be greater than 0.0");
             ErrorsFound = true;
         }
 
@@ -274,21 +274,20 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
         state.dataPondGHE->PondGHE(Item).TubeOutDiameter = state.dataIPShortCut->rNumericArgs(4);
 
         if (state.dataIPShortCut->rNumericArgs(3) <= 0.0) {
-            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(3), state.dataIPShortCut->rNumericArgs(3)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Value must be greater than 0.0");
+            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(3), state.dataIPShortCut->rNumericArgs(3)),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+            				"Value must be greater than 0.0");
             ErrorsFound = true;
         }
         if (state.dataIPShortCut->rNumericArgs(4) <= 0.0) {
-            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(4), state.dataIPShortCut->rNumericArgs(4)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Value must be greater than 0.0");
+            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(4), state.dataIPShortCut->rNumericArgs(4)),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+            				"Value must be greater than 0.0");
             ErrorsFound = true;
         }
         if (state.dataIPShortCut->rNumericArgs(3) > state.dataIPShortCut->rNumericArgs(4)) { // error
-            ShowSevereError(state, "For " + state.dataIPShortCut->cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state,
-                              format("{} [{:.2R}] > {} [{:.2R}]",
+            ShowSevereError(state, "For " + state.dataIPShortCut->cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1),
+            				format("{} [{:.2R}] > {} [{:.2R}]",
                                      state.dataIPShortCut->cNumericFieldNames(3),
                                      state.dataIPShortCut->rNumericArgs(3),
                                      state.dataIPShortCut->cNumericFieldNames(4),
@@ -301,15 +300,15 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
         state.dataPondGHE->PondGHE(Item).GrndConductivity = state.dataIPShortCut->rNumericArgs(6);
 
         if (state.dataIPShortCut->rNumericArgs(5) <= 0.0) {
-            ShowSevereError(state, format("Invalid {}={:.4R}", state.dataIPShortCut->cNumericFieldNames(5), state.dataIPShortCut->rNumericArgs(5)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Value must be greater than 0.0");
+            ShowSevereError(state, format("Invalid {}={:.4R}", state.dataIPShortCut->cNumericFieldNames(5), state.dataIPShortCut->rNumericArgs(5)),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+            				"Value must be greater than 0.0");
             ErrorsFound = true;
         }
         if (state.dataIPShortCut->rNumericArgs(6) <= 0.0) {
-            ShowSevereError(state, format("Invalid {}={:.4R}", state.dataIPShortCut->cNumericFieldNames(6), state.dataIPShortCut->rNumericArgs(6)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Value must be greater than 0.0");
+            ShowSevereError(state, format("Invalid {}={:.4R}", state.dataIPShortCut->cNumericFieldNames(6), state.dataIPShortCut->rNumericArgs(6)),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+            				"Value must be greater than 0.0");
             ErrorsFound = true;
         }
 
@@ -317,16 +316,16 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
         state.dataPondGHE->PondGHE(Item).NumCircuits = state.dataIPShortCut->rNumericArgs(7);
 
         if (state.dataIPShortCut->rNumericArgs(7) <= 0) {
-            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(7), state.dataIPShortCut->rNumericArgs(7)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Value must be greater than 0.0");
+            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(7), state.dataIPShortCut->rNumericArgs(7)),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+            				"Value must be greater than 0.0");
             ErrorsFound = true;
         }
         state.dataPondGHE->PondGHE(Item).CircuitLength = state.dataIPShortCut->rNumericArgs(8);
         if (state.dataIPShortCut->rNumericArgs(8) <= 0) {
-            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(8), state.dataIPShortCut->rNumericArgs(8)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Value must be greater than 0.0");
+            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(8), state.dataIPShortCut->rNumericArgs(8)),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+            				"Value must be greater than 0.0");
             ErrorsFound = true;
         }
 

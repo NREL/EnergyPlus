@@ -484,8 +484,8 @@ void SizeZoneEquipment(EnergyPlusData &state)
                 SupplyAirNode2 = 0;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + ": to account for the effect a Dedicated Outside Air System on zone equipment sizing");
-                ShowContinueError(state, "there must be at least one zone air inlet node");
+                                std::string{RoutineName} + ": to account for the effect a Dedicated Outside Air System on zone equipment sizing",
+                				"there must be at least one zone air inlet node");
                 ShowFatalError(state, "Previous severe error causes abort ");
             }
             // set the DOAS mass flow rate and supply temperature and humidity ratio
@@ -1330,21 +1330,21 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
                     if (thisSpaceNum > 0) {
                         thisOAReq.dsoaSpaceIndexes.emplace_back(thisSpaceNum);
                         if (state.dataHeatBal->space(thisSpaceNum).zoneNum != state.dataSize->FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
-                            ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
-                            ShowContinueError(state, "is invalid for Sizing:Zone=" + state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName);
-                            ShowContinueError(state, "All spaces in the list must be part of this zone.");
+                            ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name,
+                            				"is invalid for Sizing:Zone=" + state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
+                            				"All spaces in the list must be part of this zone.");
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
-                        ShowContinueError(state, "Space Name=" + thisSpaceName + " not found.");
+                        ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name,
+                        				"Space Name=" + thisSpaceName + " not found.");
                         ErrorsFound = true;
                     }
                     // Check for duplicate spaces
                     for (int loop = 1; loop <= int(thisOAReq.dsoaSpaceIndexes.size()) - 1; ++loop) {
                         if (thisSpaceNum == thisOAReq.dsoaSpaceIndexes(loop)) {
-                            ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name);
-                            ShowContinueError(state, "Space Name=" + thisSpaceName + " appears more than once in list.");
+                            ShowSevereError(state, "SetUpZoneSizingArrays: DesignSpecification:OutdoorAir:SpaceList=" + thisOAReq.Name,
+                            				"Space Name=" + thisSpaceName + " appears more than once in list.");
                             ErrorsFound = true;
                         }
                     }
@@ -2113,22 +2113,14 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                         } else if (std::abs(DeltaTemp) > SmallTempDiff && SupplyTemp > state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtCoolPeak) {
                             ShowSevereError(
                                 state,
-                                "UpdateZoneSizing: Supply air temperature is greater than zone temperature during cooling air flow calculations");
-                            ShowContinueError(
-                                state,
-                                format("...calculated volume flow rate  = {:.5R} m3/s", (state.dataSize->CalcFinalZoneSizing(I).DesCoolVolFlow)));
-                            ShowContinueError(
-                                state,
-                                format("...calculated mass flow rate    = {:.5R} kg/s", (state.dataSize->CalcFinalZoneSizing(I).DesCoolMassFlow)));
-                            ShowContinueError(
-                                state, format("...thermostat set point temp    = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).CoolTstatTemp));
-                            ShowContinueError(
-                                state,
-                                format("...zone temperature            = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtCoolPeak));
-                            ShowContinueError(state, format("...supply air temperature      = {:.3R} C", SupplyTemp));
-                            ShowContinueError(state, "...occurs in zone              = " + state.dataSize->CalcFinalZoneSizing(I).ZoneName);
-                            ShowContinueError(
-                                state, "...Note: supply air temperature should be less than zone temperature during cooling air flow calculations");
+                                "UpdateZoneSizing: Supply air temperature is greater than zone temperature during cooling air flow calculations",
+                            				format("...calculated volume flow rate  = {:.5R} m3/s", (state.dataSize->CalcFinalZoneSizing(I).DesCoolVolFlow)),
+                            				format("...calculated mass flow rate    = {:.5R} kg/s", (state.dataSize->CalcFinalZoneSizing(I).DesCoolMassFlow)),
+                            				format("...thermostat set point temp    = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).CoolTstatTemp),
+                            				format("...zone temperature            = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtCoolPeak),
+                            				format("...supply air temperature      = {:.3R} C", SupplyTemp),
+                            				"...occurs in zone              = " + state.dataSize->CalcFinalZoneSizing(I).ZoneName,
+                            				"...Note: supply air temperature should be less than zone temperature during cooling air flow calculations");
                         }
                     }
                     // Should this be done only if there is a heating load? Or would this message help determine why there was no load?
@@ -2172,22 +2164,16 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                                                   "flow calculations");
                         } else if (std::abs(DeltaTemp) > SmallTempDiff && SupplyTemp < state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtHeatPeak) {
                             ShowSevereError(
-                                state, "UpdateZoneSizing: Supply air temperature is less than zone temperature during heating air flow calculations");
-                            ShowContinueError(state,
-                                              format("...calculated design heating volume flow rate = {:.5R} m3/s",
-                                                     (state.dataSize->CalcFinalZoneSizing(I).DesHeatVolFlow)));
-                            ShowContinueError(state,
-                                              format("...calculated design heating mass flow rate   = {:.5R} kg/s",
-                                                     (state.dataSize->CalcFinalZoneSizing(I).DesHeatMassFlow)));
-                            ShowContinueError(
-                                state, format("...thermostat set piont temp   = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).HeatTstatTemp));
-                            ShowContinueError(
-                                state,
-                                format("...zone temperature            = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtHeatPeak));
-                            ShowContinueError(state, format("...supply air temperature      = {:.3R} C", SupplyTemp));
-                            ShowContinueError(state, "...occurs in zone              = " + state.dataSize->CalcFinalZoneSizing(I).ZoneName);
-                            ShowContinueError(state,
-                                              "...Note: supply air temperature should be greater than zone temperature during heating air "
+                                state, "UpdateZoneSizing: Supply air temperature is less than zone temperature during heating air flow calculations",
+                            				format("...calculated design heating volume flow rate = {:.5R} m3/s",
+                                                     (state.dataSize->CalcFinalZoneSizing(I).DesHeatVolFlow)),
+                            				format("...calculated design heating mass flow rate   = {:.5R} kg/s",
+                                                     (state.dataSize->CalcFinalZoneSizing(I).DesHeatMassFlow)),
+                            				format("...thermostat set piont temp   = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).HeatTstatTemp),
+                            				format("...zone temperature            = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtHeatPeak),
+                            				format("...supply air temperature      = {:.3R} C", SupplyTemp),
+                            				"...occurs in zone              = " + state.dataSize->CalcFinalZoneSizing(I).ZoneName,
+                            				"...Note: supply air temperature should be greater than zone temperature during heating air "
                                               "flow calculations");
                         }
                     }
@@ -3008,9 +2994,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                      SupPathInletChanged);
 
                 } else {
-                    ShowSevereError(state, "Error found in Supply Air Path=" + state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).Name);
-                    ShowContinueError(
-                        state, "Invalid Supply Air Path Component=" + state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentType(CompNum));
+                    ShowSevereError(state, "Error found in Supply Air Path=" + state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).Name,
+                    				"Invalid Supply Air Path Component=" + state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentType(CompNum));
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
             }
@@ -3536,9 +3521,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                      SupPathInletChanged);
 
                 } else {
-                    ShowSevereError(state, "Error found in Supply Air Path=" + state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).Name);
-                    ShowContinueError(
-                        state, "Invalid Supply Air Path Component=" + state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentType(CompNum));
+                    ShowSevereError(state, "Error found in Supply Air Path=" + state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).Name,
+                    				"Invalid Supply Air Path Component=" + state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentType(CompNum));
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
             }
@@ -6343,8 +6327,8 @@ void AutoCalcDOASControlStrategy(EnergyPlusData &state)
                                            state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint);
             }
             if (state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint > state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint) {
-                ShowSevereError(state, "For Sizing:Zone = " + state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName);
-                ShowContinueError(state, "... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint");
+                ShowSevereError(state, "For Sizing:Zone = " + state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName,
+                				"... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint");
                 ErrorsFound = true;
             }
         }

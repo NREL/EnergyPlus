@@ -593,8 +593,8 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
             // no companion coil, and no plant sizing, so can't do anything
             if ((this->loadSideDesignVolFlowRateWasAutoSized || this->referenceCapacityWasAutoSized) &&
                 state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "EIRPlantLoopHeatPump::size(): Autosizing requires a loop Sizing:Plant object.");
-                ShowContinueError(state, "Occurs in HeatPump:PlantLoop:EquationFit:Cooling object = " + this->name);
+                ShowSevereError(state, "EIRPlantLoopHeatPump::size(): Autosizing requires a loop Sizing:Plant object.",
+                				"Occurs in HeatPump:PlantLoop:EquationFit:Cooling object = " + this->name);
                 errorsFound = true;
             }
         }
@@ -814,8 +814,8 @@ void EIRPlantLoopHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
                 }
                 if (potentialCompanionName == targetCompanionName) {
                     if (thisCoilType == potentialCompanionType) {
-                        ShowSevereError(state, "Invalid companion specification for EIR Plant Loop Heat Pump named \"" + thisCoilName + "\"");
-                        ShowContinueError(state, "For heating objects, the companion must be a cooling object, and vice-versa");
+                        ShowSevereError(state, "Invalid companion specification for EIR Plant Loop Heat Pump named \"" + thisCoilName + "\"",
+                        				"For heating objects, the companion must be a cooling object, and vice-versa");
                         ShowFatalError(state, "Invalid companion object causes program termination");
                     }
                     thisHP.companionHeatPumpCoil = &potentialCompanionCoil;
@@ -823,9 +823,9 @@ void EIRPlantLoopHeatPump::pairUpCompanionCoils(EnergyPlusData &state)
                 }
             }
             if (!thisHP.companionHeatPumpCoil) {
-                ShowSevereError(state, "Could not find matching companion heat pump coil.");
-                ShowContinueError(state, "Base coil: " + thisCoilName);
-                ShowContinueError(state, "Looking for companion coil named: " + targetCompanionName);
+                ShowSevereError(state, "Could not find matching companion heat pump coil.",
+                				"Base coil: " + thisCoilName,
+                				"Looking for companion coil named: " + targetCompanionName);
                 ShowFatalError(state, "Simulation aborts due to previous severe error");
             }
         }
@@ -1223,14 +1223,14 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
         if (thisErrFlag) {
             ShowSevereError(state,
                             routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                                this->name + "\"");
-            ShowContinueError(state, "Could not locate component's load side connections on a plant loop");
+                                this->name + "\"",
+            				"Could not locate component's load side connections on a plant loop");
             errFlag = true;
         } else if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // only check if !thisErrFlag
             ShowSevereError(state,
                             routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                                this->name + "\"");
-            ShowContinueError(state, "The load side connections are not on the Supply Side of a plant loop");
+                                this->name + "\"",
+            				"The load side connections are not on the Supply Side of a plant loop");
             errFlag = true;
         }
 
@@ -1253,14 +1253,14 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
             if (thisErrFlag) {
                 ShowSevereError(state,
                                 routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                                    this->name + "\"");
-                ShowContinueError(state, "Could not locate component's source side connections on a plant loop");
+                                    this->name + "\"",
+                				"Could not locate component's source side connections on a plant loop");
                 errFlag = true;
             } else if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // only check if !thisErrFlag
                 ShowSevereError(state,
                                 routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                                    this->name + "\"");
-                ShowContinueError(state, "The source side connections are not on the Demand Side of a plant loop");
+                                    this->name + "\"",
+                				"The source side connections are not on the Demand Side of a plant loop");
                 errFlag = true;
             }
 
@@ -1268,8 +1268,8 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
             if (this->loadSideLocation.loopNum == this->sourceSideLocation.loopNum) { // user is being too tricky, don't allow
                 ShowSevereError(state,
                                 routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                                    this->name + "\"");
-                ShowContinueError(state, "The load and source sides need to be on different loops.");
+                                    this->name + "\"",
+                				"The load and source sides need to be on different loops.");
                 errFlag = true;
             } else {
 

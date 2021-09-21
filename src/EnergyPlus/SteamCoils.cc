@@ -287,8 +287,8 @@ namespace SteamCoils {
             } else {
                 state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                 if (state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\", invalid data.");
-                    ShowContinueError(state, cAlphaFields(2) + " not found=" + AlphArray(2));
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\", invalid data.",
+                    				cAlphaFields(2) + " not found=" + AlphArray(2));
                     ErrorsFound = true;
                 }
             }
@@ -353,8 +353,8 @@ namespace SteamCoils {
                                                                                                      ObjectIsNotParent);
                     if (state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));
-                        ShowContinueError(state, "..required for Temperature Setpoint Controlled Coils.");
+                                        std::string{RoutineName} + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1),
+                        				"..required for Temperature Setpoint Controlled Coils.");
                         ErrorsFound = true;
                     }
 
@@ -381,8 +381,8 @@ namespace SteamCoils {
             if (state.dataSteamCoils->SteamIndex == 0 && CoilNum == 1) {
                 state.dataSteamCoils->SteamIndex = FindRefrigerant(state, "Steam");
                 if (state.dataSteamCoils->SteamIndex == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + "Steam Properties for " + AlphArray(1) + " not found.");
-                    ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
+                    ShowSevereError(state, std::string{RoutineName} + "Steam Properties for " + AlphArray(1) + " not found.",
+                    				"Steam Fluid Properties should have been included in the input file.");
                     ErrorsFound = true;
                 }
             }
@@ -968,8 +968,8 @@ namespace SteamCoils {
         } else {
             // if there is no heating Plant Sizing object and autosizng was requested, issue an error message
             if (state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate == AutoSize) {
-                ShowSevereError(state, "Autosizing of Steam coil requires a heating loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Steam coil object= " + state.dataSteamCoils->SteamCoil(CoilNum).Name);
+                ShowSevereError(state, "Autosizing of Steam coil requires a heating loop Sizing:Plant object",
+                				"Occurs in Steam coil object= " + state.dataSteamCoils->SteamCoil(CoilNum).Name);
                 ErrorsFound = true;
             }
         } // end of heating Plant Sizing existence IF - ELSE

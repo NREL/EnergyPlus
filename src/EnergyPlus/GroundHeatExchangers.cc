@@ -222,10 +222,10 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
         // Vertical configuration
         if (this->trenchDepth - this->coilDiameter < 0.0) {
             // Error: part of the coil is above ground
-            ShowSevereError(state, this->moduleName + "=\"" + this->name + "\", invalid value in field.");
-            ShowContinueError(state, format("...{}=[{:.3R}].", "Trench Depth", this->trenchDepth));
-            ShowContinueError(state, format("...{}=[{:.3R}].", "Coil Depth", this->coilDepth));
-            ShowContinueError(state, "...Part of coil will be above ground.");
+            ShowSevereError(state, this->moduleName + "=\"" + this->name + "\", invalid value in field.",
+            				format("...{}=[{:.3R}].", "Trench Depth", this->trenchDepth),
+            				format("...{}=[{:.3R}].", "Coil Depth", this->coilDepth),
+            				"...Part of coil will be above ground.");
             errorsFound = true;
 
         } else {
@@ -245,10 +245,10 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     state.dataGroundHeatExchanger->prevTimeSteps = 0.0;
 
     if (this->pipe.thickness >= this->pipe.outDia / 2.0) {
-        ShowSevereError(state, this->moduleName + "=\"" + this->name + "\", invalid value in field.");
-        ShowContinueError(state, format("...{}=[{:.3R}].", "Pipe Thickness", this->pipe.thickness));
-        ShowContinueError(state, format("...{}=[{:.3R}].", "Pipe Outer Diameter", this->pipe.outDia));
-        ShowContinueError(state, "...Radius will be <=0.");
+        ShowSevereError(state, this->moduleName + "=\"" + this->name + "\", invalid value in field.",
+        				format("...{}=[{:.3R}].", "Pipe Thickness", this->pipe.thickness),
+        				format("...{}=[{:.3R}].", "Pipe Outer Diameter", this->pipe.outDia),
+        				"...Radius will be <=0.");
         errorsFound = true;
     }
 
@@ -2473,10 +2473,10 @@ void GetGroundHeatExchangerInput(EnergyPlusData &state)
         state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "GroundHeatExchanger:Vertical:Single");
 
     if (state.dataGroundHeatExchanger->numVerticalGLHEs <= 0 && state.dataGroundHeatExchanger->numSlinkyGLHEs <= 0) {
-        ShowSevereError(state, "Error processing inputs for GLHE objects");
-        ShowContinueError(state, "Simulation indicated these objects were found, but input processor doesn't find any");
-        ShowContinueError(state, "Check inputs for GroundHeatExchanger:System and GroundHeatExchanger:Slinky");
-        ShowContinueError(state, "Also check plant/branch inputs for references to invalid/deleted objects");
+        ShowSevereError(state, "Error processing inputs for GLHE objects",
+        				"Simulation indicated these objects were found, but input processor doesn't find any",
+        				"Check inputs for GroundHeatExchanger:System and GroundHeatExchanger:Slinky",
+        				"Also check plant/branch inputs for references to invalid/deleted objects");
         errorsFound = true;
     }
 

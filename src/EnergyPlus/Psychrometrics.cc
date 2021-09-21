@@ -202,8 +202,8 @@ namespace Psychrometrics {
         // Using/Aliasing
 
         if (rhoair < 0.0) {
-            ShowSevereError(state, format("PsyRhoAirFnPbTdbW: RhoAir (Density of Air) is calculated <= 0 [{:.5R}].", rhoair));
-            ShowContinueError(state, format("pb =[{:.2R}], tdb=[{:.2R}], w=[{:.7R}].", pb, tdb, dw));
+            ShowSevereError(state, format("PsyRhoAirFnPbTdbW: RhoAir (Density of Air) is calculated <= 0 [{:.5R}].", rhoair),
+            				format("pb =[{:.2R}], tdb=[{:.2R}], w=[{:.7R}].", pb, tdb, dw));
             if (!CalledFrom.empty()) {
                 ShowContinueErrorTimeStamp(state, format(" Routine={}", CalledFrom));
             } else {

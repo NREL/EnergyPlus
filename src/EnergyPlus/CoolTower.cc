@@ -200,8 +200,8 @@ namespace CoolTower {
             } else {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr == 0) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
-                    ShowContinueError(state, "Invalid-Schedule not found " + cAlphaFields(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data",
+                    				"Invalid-Schedule not found " + cAlphaFields(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -678,8 +678,8 @@ namespace CoolTower {
                 }
 
                 if (OutletTemp < state.dataEnvrn->OutWetBulbTemp) {
-                    ShowSevereError(state, "Cooltower outlet temperature exceed the outdoor wet bulb temperature reset to input values");
-                    ShowContinueError(state, "Occurs in Cooltower =" + state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name);
+                    ShowSevereError(state, "Cooltower outlet temperature exceed the outdoor wet bulb temperature reset to input values",
+                    				"Occurs in Cooltower =" + state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name);
                 }
 
                 WaterFlowRate /= UCFactor;

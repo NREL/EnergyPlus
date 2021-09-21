@@ -460,11 +460,9 @@ namespace PlantPipingSystemsManager {
                         (thisSegment->PipeLocation.Y > thisDomain.Extents.yMax) || (thisSegment->PipeLocation.Y < 0.0)) {
                         ShowSevereError(state,
                                         "PipingSystems::" + std::string{RoutineName} +
-                                            ": A pipe was outside of the domain extents after performing corrections for basement or burial depth.");
-                        ShowContinueError(state, "Pipe segment name:" + thisSegment->Name);
-                        ShowContinueError(
-                            state,
-                            format("Corrected pipe location: ( x,y )=( {:.2T},{:.2T} )", thisSegment->PipeLocation.X, thisSegment->PipeLocation.Y));
+                                            ": A pipe was outside of the domain extents after performing corrections for basement or burial depth.",
+                        				"Pipe segment name:" + thisSegment->Name,
+                        				format("Corrected pipe location: ( x,y )=( {:.2T},{:.2T} )", thisSegment->PipeLocation.X, thisSegment->PipeLocation.Y));
                     }
                 } // segment loop
             }     // circuit loop
@@ -644,8 +642,8 @@ namespace PlantPipingSystemsManager {
                 if (state.dataIPShortCut->lNumericFieldBlanks(15) || state.dataIPShortCut->lNumericFieldBlanks(16) ||
                     state.dataIPShortCut->lAlphaFieldBlanks(8) || state.dataIPShortCut->lAlphaFieldBlanks(9) ||
                     state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                    ShowSevereError(state, "Erroneous basement inputs for " + ObjName_ug_GeneralDomain + '=' + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "Object specified to have a basement, while at least one basement input was left blank.");
+                    ShowSevereError(state, "Erroneous basement inputs for " + ObjName_ug_GeneralDomain + '=' + state.dataIPShortCut->cAlphaArgs(1),
+                    				"Object specified to have a basement, while at least one basement input was left blank.");
                     ErrorsFound = true;
                 }
 
@@ -869,8 +867,8 @@ namespace PlantPipingSystemsManager {
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "ONGRADE")) {
                 thisDomain.SlabInGradeFlag = false;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "=" + state.dataIPShortCut->cAlphaArgs(5));
-                ShowContinueError(state, "Found in: " + thisDomain.Name);
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "=" + state.dataIPShortCut->cAlphaArgs(5),
+                				"Found in: " + thisDomain.Name);
                 ErrorsFound = true;
             }
 
@@ -879,8 +877,8 @@ namespace PlantPipingSystemsManager {
                 thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInList(
                     state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
                 if (thisDomain.SlabMaterialNum == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=" + state.dataIPShortCut->cAlphaArgs(6));
-                    ShowContinueError(state, "Found in: " + thisDomain.Name);
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=" + state.dataIPShortCut->cAlphaArgs(6),
+                    				"Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 } else {
                     thisDomain.SlabThickness = state.dataMaterial->Material(thisDomain.SlabMaterialNum).Thickness;
@@ -897,8 +895,8 @@ namespace PlantPipingSystemsManager {
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "YES")) {
                     thisDomain.HorizInsPresentFlag = true;
                 } else {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + "=" + state.dataIPShortCut->cAlphaArgs(7));
-                    ShowContinueError(state, "Found in: " + thisDomain.Name);
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + "=" + state.dataIPShortCut->cAlphaArgs(7),
+                    				"Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
             }
@@ -908,8 +906,8 @@ namespace PlantPipingSystemsManager {
                 thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(
                     state.dataIPShortCut->cAlphaArgs(8), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
                 if (thisDomain.HorizInsMaterialNum == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + "=" + state.dataIPShortCut->cAlphaArgs(8));
-                    ShowContinueError(state, "Found in: " + thisDomain.Name);
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + "=" + state.dataIPShortCut->cAlphaArgs(8),
+                    				"Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 } else {
                     thisDomain.HorizInsThickness = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum).Thickness;
@@ -928,15 +926,15 @@ namespace PlantPipingSystemsManager {
                     thisDomain.FullHorizInsPresent = false;
                     // Horizontal insulation perimeter width
                     if (thisDomain.HorizInsWidth <= 0.0) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(10));
-                        ShowContinueError(state, "Found in: " + thisDomain.Name);
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(10),
+                        				"Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "FULL")) {
                     thisDomain.FullHorizInsPresent = true;
                 } else {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + "=" + state.dataIPShortCut->cAlphaArgs(9));
-                    ShowContinueError(state, "Found in: " + thisDomain.Name);
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + "=" + state.dataIPShortCut->cAlphaArgs(9),
+                    				"Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
             }
@@ -947,8 +945,8 @@ namespace PlantPipingSystemsManager {
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "YES")) {
                 thisDomain.VertInsPresentFlag = true;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + "=" + state.dataIPShortCut->cAlphaArgs(10));
-                ShowContinueError(state, "Found in: " + thisDomain.Name);
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + "=" + state.dataIPShortCut->cAlphaArgs(10),
+                				"Found in: " + thisDomain.Name);
                 ErrorsFound = true;
             }
 
@@ -957,8 +955,8 @@ namespace PlantPipingSystemsManager {
                 thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(
                     state.dataIPShortCut->cAlphaArgs(11), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
                 if (thisDomain.VertInsMaterialNum == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + "=" + state.dataIPShortCut->cAlphaArgs(11));
-                    ShowContinueError(state, "Found in: " + thisDomain.Name);
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + "=" + state.dataIPShortCut->cAlphaArgs(11),
+                    				"Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 } else {
                     thisDomain.VertInsThickness = state.dataMaterial->Material(thisDomain.VertInsMaterialNum).Thickness;
@@ -974,8 +972,8 @@ namespace PlantPipingSystemsManager {
 
                 // vertical insulation depth
                 if (thisDomain.VertInsDepth > thisDomain.Extents.yMax || thisDomain.VertInsDepth <= 0.0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(11));
-                    ShowContinueError(state, "Found in: " + thisDomain.Name);
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(11),
+                    				"Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
             }
@@ -986,8 +984,8 @@ namespace PlantPipingSystemsManager {
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(12), "HOURLY")) {
                 thisDomain.SimHourlyFlag = true;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + "=" + state.dataIPShortCut->cAlphaArgs(12));
-                ShowContinueError(state, "Found in: " + thisDomain.Name);
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + "=" + state.dataIPShortCut->cAlphaArgs(12),
+                				"Found in: " + thisDomain.Name);
                 ErrorsFound = true;
             }
 
@@ -1167,8 +1165,8 @@ namespace PlantPipingSystemsManager {
             // check if there are blank inputs related to the basement,
             if (state.dataIPShortCut->lNumericFieldBlanks(11) || state.dataIPShortCut->lAlphaFieldBlanks(5) ||
                 state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-                ShowSevereError(state, "Erroneous basement inputs for " + ObjName_ZoneCoupled_Basement + '=' + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "At least one basement input was left blank.");
+                ShowSevereError(state, "Erroneous basement inputs for " + ObjName_ZoneCoupled_Basement + '=' + state.dataIPShortCut->cAlphaArgs(1),
+                				"At least one basement input was left blank.");
                 ErrorsFound = true;
             }
 
@@ -1176,8 +1174,8 @@ namespace PlantPipingSystemsManager {
             CurIndex = 11;
             thisDomain.BasementZone.Depth = state.dataIPShortCut->rNumericArgs(CurIndex);
             if (thisDomain.BasementZone.Depth >= thisDomain.Extents.yMax || thisDomain.BasementZone.Depth <= 0.0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(CurIndex));
-                ShowContinueError(state, "Found in: " + thisDomain.Name);
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(CurIndex),
+                				"Found in: " + thisDomain.Name);
                 ErrorsFound = true;
             }
 
@@ -1280,8 +1278,8 @@ namespace PlantPipingSystemsManager {
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "YES")) {
                 thisDomain.HorizInsPresentFlag = true;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "=" + state.dataIPShortCut->cAlphaArgs(5));
-                ShowContinueError(state, "Found in: " + thisDomain.Name);
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + "=" + state.dataIPShortCut->cAlphaArgs(5),
+                				"Found in: " + thisDomain.Name);
                 ErrorsFound = true;
             }
 
@@ -1290,8 +1288,8 @@ namespace PlantPipingSystemsManager {
                 thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(
                     state.dataIPShortCut->cAlphaArgs(6), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
                 if (thisDomain.HorizInsMaterialNum == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=" + state.dataIPShortCut->cAlphaArgs(6));
-                    ShowContinueError(state, "Found in: " + thisDomain.Name);
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + "=" + state.dataIPShortCut->cAlphaArgs(6),
+                    				"Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 } else {
                     thisDomain.HorizInsThickness = state.dataMaterial->Material(thisDomain.HorizInsMaterialNum).Thickness;
@@ -1310,15 +1308,15 @@ namespace PlantPipingSystemsManager {
                     thisDomain.FullHorizInsPresent = false;
                     // Horizontal insulation perimeter width
                     if (thisDomain.HorizInsWidth <= 0.0) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(10));
-                        ShowContinueError(state, "Found in: " + thisDomain.Name);
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(10),
+                        				"Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "FULL")) {
                     thisDomain.FullHorizInsPresent = true;
                 } else {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + "=" + state.dataIPShortCut->cAlphaArgs(7));
-                    ShowContinueError(state, "Found in: " + thisDomain.Name);
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + "=" + state.dataIPShortCut->cAlphaArgs(7),
+                    				"Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
             }
@@ -1329,8 +1327,8 @@ namespace PlantPipingSystemsManager {
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "YES")) {
                 thisDomain.VertInsPresentFlag = true;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + "=" + state.dataIPShortCut->cAlphaArgs(9));
-                ShowContinueError(state, "Found in: " + thisDomain.Name);
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + "=" + state.dataIPShortCut->cAlphaArgs(9),
+                				"Found in: " + thisDomain.Name);
                 ErrorsFound = true;
             }
 
@@ -1338,15 +1336,15 @@ namespace PlantPipingSystemsManager {
             if (thisDomain.VertInsPresentFlag) {
                 // Check if vertical insulation is in domain
                 if (thisDomain.VertInsDepth >= thisDomain.Extents.yMax || thisDomain.VertInsDepth <= 0.0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(12));
-                    ShowContinueError(state, "Found in: " + thisDomain.Name);
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(12),
+                    				"Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 }
                 thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(
                     state.dataIPShortCut->cAlphaArgs(10), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
                 if (thisDomain.VertInsMaterialNum == 0) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + "=" + state.dataIPShortCut->cAlphaArgs(10));
-                    ShowContinueError(state, "Found in: " + thisDomain.Name);
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + "=" + state.dataIPShortCut->cAlphaArgs(10),
+                    				"Found in: " + thisDomain.Name);
                     ErrorsFound = true;
                 } else {
                     thisDomain.VertInsThickness = state.dataMaterial->Material(thisDomain.VertInsMaterialNum).Thickness;
@@ -1367,8 +1365,8 @@ namespace PlantPipingSystemsManager {
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "HOURLY")) {
                 thisDomain.SimHourlyFlag = true;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + "=" + state.dataIPShortCut->cAlphaArgs(11));
-                ShowContinueError(state, "Found in: " + thisDomain.Name);
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + "=" + state.dataIPShortCut->cAlphaArgs(11),
+                				"Found in: " + thisDomain.Name);
                 ErrorsFound = true;
             }
 
@@ -1435,12 +1433,10 @@ namespace PlantPipingSystemsManager {
                                         std::string const &ObjectName)
     {
 
-        ShowSevereError(state, "Invalid " + std::string{FieldName} + "=" + UserInputField + " was found in: " + ObjectName);
-        ShowContinueError(
-            state, "The user of no mass materials or ones with no thickness are not allowed for the insulation fields of the following objects:");
-        ShowContinueError(state, "  " + ObjName_ZoneCoupled_Slab + " or " + ObjName_ZoneCoupled_Basement);
-        ShowContinueError(
-            state, "Change any insulation designations in these objects from no mass materials to regular materials that have a thickness, etc.");
+        ShowSevereError(state, "Invalid " + std::string{FieldName} + "=" + UserInputField + " was found in: " + ObjectName,
+        				"The user of no mass materials or ones with no thickness are not allowed for the insulation fields of the following objects:",
+        				"  " + ObjName_ZoneCoupled_Slab + " or " + ObjName_ZoneCoupled_Basement,
+        				"Change any insulation designations in these objects from no mass materials to regular materials that have a thickness, etc.");
     }
 
     void ReadPipeCircuitInputs(EnergyPlusData &state, bool &ErrorsFound)
@@ -1636,9 +1632,8 @@ namespace PlantPipingSystemsManager {
             if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + ": " + ObjName_HorizTrench + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\" has invalid pipe diameters.");
-                ShowContinueError(state,
-                                  format("Outer diameter [{:.3T}] must be greater than inner diameter [{:.3T}].",
+                                    "\" has invalid pipe diameters.",
+                				format("Outer diameter [{:.3T}] must be greater than inner diameter [{:.3T}].",
                                          thisCircuit.PipeSize.OuterDia,
                                          thisCircuit.PipeSize.InnerDia));
                 ErrorsFound = true;
@@ -2149,9 +2144,9 @@ namespace PlantPipingSystemsManager {
             for (auto &thisDomainCircuit : this->circuits) {
                 for (auto &segment : thisDomainCircuit->pipeSegments) {
                     if (!segment->PipeCellCoordinatesSet) {
-                        ShowSevereError(state, "PipingSystems:" + std::string{RoutineName} + ":Pipe segment index not set.");
-                        ShowContinueError(state, "...Possibly because pipe segment was placed outside of the domain.");
-                        ShowContinueError(state, "...Verify piping system domain inputs, circuits, and segments.");
+                        ShowSevereError(state, "PipingSystems:" + std::string{RoutineName} + ":Pipe segment index not set.",
+                        				"...Possibly because pipe segment was placed outside of the domain.",
+                        				"...Verify piping system domain inputs, circuits, and segments.");
                         ShowFatalError(state, "Preceding error causes program termination");
                     }
                 }
@@ -3075,9 +3070,9 @@ namespace PlantPipingSystemsManager {
 
             // check to make sure this location is valid
             if (CellLeft < 0.0 || CellRight > DirExtentMax) {
-                ShowSevereError(state, "PlantPipingSystems::" + std::string{RoutineName} + ": Invalid partition location in domain.");
-                ShowContinueError(state, "Occurs during mesh development for domain=" + this->Name);
-                ShowContinueError(state, "A pipe or basement is located outside of the domain extents.");
+                ShowSevereError(state, "PlantPipingSystems::" + std::string{RoutineName} + ": Invalid partition location in domain.",
+                				"Occurs during mesh development for domain=" + this->Name,
+                				"A pipe or basement is located outside of the domain extents.");
                 ShowFatalError(state, "Preceding error causes program termination.");
             }
 
@@ -3089,11 +3084,11 @@ namespace PlantPipingSystemsManager {
                     if (IsInRange_BasementModel(CellLeft, thisPartitionRegionSubIndex.Min, thisPartitionRegionSubIndex.Max) ||
                         IsInRangeReal(CellRight, thisPartitionRegionSubIndex.Min, thisPartitionRegionSubIndex.Max)) {
 
-                        ShowSevereError(state, "PlantPipingSystems::" + std::string{RoutineName} + ": Invalid partition location in domain.");
-                        ShowContinueError(state, "Occurs during mesh development for domain=" + this->Name);
-                        ShowContinueError(state, "A mesh conflict was encountered where partitions were overlapping.");
-                        ShowContinueError(state, "Ensure that all pipes exactly line up or are separated to allow meshing in between them");
-                        ShowContinueError(state, "Also verify the pipe and basement dimensions to avoid conflicts there.");
+                        ShowSevereError(state, "PlantPipingSystems::" + std::string{RoutineName} + ": Invalid partition location in domain.",
+                        				"Occurs during mesh development for domain=" + this->Name,
+                        				"A mesh conflict was encountered where partitions were overlapping.",
+                        				"Ensure that all pipes exactly line up or are separated to allow meshing in between them",
+                        				"Also verify the pipe and basement dimensions to avoid conflicts there.");
                         ShowFatalError(state, "Preceding error causes program termination");
                     }
 
@@ -3102,11 +3097,11 @@ namespace PlantPipingSystemsManager {
                     if (IsInRangeReal(CellLeft, thisPartitionRegionSubIndex.Min, thisPartitionRegionSubIndex.Max) ||
                         IsInRangeReal(CellRight, thisPartitionRegionSubIndex.Min, thisPartitionRegionSubIndex.Max)) {
 
-                        ShowSevereError(state, "PlantPipingSystems::" + std::string{RoutineName} + ": Invalid partition location in domain.");
-                        ShowContinueError(state, "Occurs during mesh development for domain=" + this->Name);
-                        ShowContinueError(state, "A mesh conflict was encountered where partitions were overlapping.");
-                        ShowContinueError(state, "Ensure that all pipes exactly line up or are separated to allow meshing in between them");
-                        ShowContinueError(state, "Also verify the pipe and basement dimensions to avoid conflicts there.");
+                        ShowSevereError(state, "PlantPipingSystems::" + std::string{RoutineName} + ": Invalid partition location in domain.",
+                        				"Occurs during mesh development for domain=" + this->Name,
+                        				"A mesh conflict was encountered where partitions were overlapping.",
+                        				"Ensure that all pipes exactly line up or are separated to allow meshing in between them",
+                        				"Also verify the pipe and basement dimensions to avoid conflicts there.");
                         ShowFatalError(state, "Preceding error causes program termination");
                     }
                 }
@@ -5827,21 +5822,21 @@ namespace PlantPipingSystemsManager {
         if (OutOfRange) {
             if (this->HasZoneCoupledSlab) {
                 ShowSevereError(state,
-                                "Site:GroundDomain:Slab" + std::string{RoutineName} + ": Out of range temperatures detected in the ground domain.");
-                ShowContinueError(state, "This could be due to the size of the loads on the domain.");
-                ShowContinueError(state, "Verify inputs are correct. If problem persists, notify EnergyPlus support.");
+                                "Site:GroundDomain:Slab" + std::string{RoutineName} + ": Out of range temperatures detected in the ground domain.",
+                				"This could be due to the size of the loads on the domain.",
+                				"Verify inputs are correct. If problem persists, notify EnergyPlus support.");
                 ShowFatalError(state, "Preceding error(s) cause program termination");
             } else if (this->HasZoneCoupledBasement) {
                 ShowSevereError(
-                    state, "Site:GroundDomain:Basement" + std::string{RoutineName} + ": Out of range temperatures detected in the ground domain.");
-                ShowContinueError(state, "This could be due to the size of the loads on the domain.");
-                ShowContinueError(state, "Verify inputs are correct. If problem persists, notify EnergyPlus support.");
+                    state, "Site:GroundDomain:Basement" + std::string{RoutineName} + ": Out of range temperatures detected in the ground domain.",
+                				"This could be due to the size of the loads on the domain.",
+                				"Verify inputs are correct. If problem persists, notify EnergyPlus support.");
                 ShowFatalError(state, "Preceding error(s) cause program termination");
             } else {
                 ShowSevereError(state,
-                                "PipingSystems:" + std::string{RoutineName} + ": Out of range temperatures detected in piping system simulation.");
-                ShowContinueError(state, "This could be due to the size of the pipe circuit in relation to the loads being imposed.");
-                ShowContinueError(state, "Try increasing the size of the pipe circuit and investigate sizing effects.");
+                                "PipingSystems:" + std::string{RoutineName} + ": Out of range temperatures detected in piping system simulation.",
+                				"This could be due to the size of the pipe circuit in relation to the loads being imposed.",
+                				"Try increasing the size of the pipe circuit and investigate sizing effects.");
                 ShowFatalError(state, "Preceding error(s) cause program termination");
             }
         }

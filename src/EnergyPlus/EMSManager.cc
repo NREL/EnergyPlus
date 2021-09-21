@@ -628,9 +628,9 @@ namespace EMSManager {
                     VariableNum = FindEMSVariable(state, cAlphaArgs(1), 0);
 
                     if (VariableNum > 0) {
-                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, "Object name conflicts with a global variable name in EMS");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1),
+                        				"Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1),
+                        				"Object name conflicts with a global variable name in EMS");
                         ErrorsFound = true;
                     } else {
                         VariableNum = NewEMSVariable(state, cAlphaArgs(1), 0);
@@ -761,9 +761,9 @@ namespace EMSManager {
                     VariableNum = FindEMSVariable(state, cAlphaArgs(1), 0);
 
                     if (VariableNum > 0) {
-                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, "Object name conflicts with a global variable name in EMS");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1),
+                        				"Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1),
+                        				"Object name conflicts with a global variable name in EMS");
                         ErrorsFound = true;
                     } else {
                         VariableNum = NewEMSVariable(state, cAlphaArgs(1), 0);
@@ -847,9 +847,9 @@ namespace EMSManager {
                     state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).Name = cAlphaArgs(1);
                     VariableNum = FindEMSVariable(state, cAlphaArgs(1), 0);
                     if (VariableNum > 0) {
-                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, "Object name conflicts with a global variable name in EMS");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(1) + '=' + cAlphaArgs(1),
+                        				"Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1),
+                        				"Object name conflicts with a global variable name in EMS");
                         ErrorsFound = true;
                     } else {
                         VariableNum = NewEMSVariable(state, cAlphaArgs(1), 0);
@@ -948,8 +948,8 @@ namespace EMSManager {
                     } else if (SELECT_CASE_var == "UNITARYSYSTEMSIZING") {
                         state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint = EMSCallFrom::UnitarySystemSizing;
                     } else {
-                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + '=' + cAlphaArgs(2),
+                        				"Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
@@ -961,9 +961,9 @@ namespace EMSManager {
                 for (AlphaNum = 3; AlphaNum <= NumAlphas; ++AlphaNum) {
                     // find program name in Stack structure
                     if (lAlphaFieldBlanks(AlphaNum)) { // throw error
-                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(AlphaNum) + '=' + cAlphaArgs(AlphaNum));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, "Program names cannot be blank");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(AlphaNum) + '=' + cAlphaArgs(AlphaNum),
+                        				"Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1),
+                        				"Program names cannot be blank");
                         ErrorsFound = true;
                     }
 
@@ -984,9 +984,9 @@ namespace EMSManager {
                         state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).ErlProgramARR(ManagerProgramNum) = StackNum;
 
                     } else {
-                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(AlphaNum) + '=' + cAlphaArgs(AlphaNum));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, "Program Name not found.");
+                        ShowSevereError(state, "Invalid " + cAlphaFieldNames(AlphaNum) + '=' + cAlphaArgs(AlphaNum),
+                        				"Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1),
+                        				"Program Name not found.");
                         ErrorsFound = true;
                     }
                 } // AlphaNum
@@ -1071,19 +1071,19 @@ namespace EMSManager {
                 if (VarType == OutputProcessor::VariableType::NotFound) {
                     if (reportErrors) {
                         ShowSevereError(state,
-                                        "Invalid Output:Variable or Output:Meter Name =" + state.dataRuntimeLang->Sensor(SensorNum).OutputVarName);
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->Sensor(SensorNum).Name);
-                        ShowContinueError(state, "Output:Variable Name not found");
+                                        "Invalid Output:Variable or Output:Meter Name =" + state.dataRuntimeLang->Sensor(SensorNum).OutputVarName,
+                        				"Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->Sensor(SensorNum).Name,
+                        				"Output:Variable Name not found");
                         ErrorsFound = true;
                     }
                 } else if (VarIndex == 0) {
                     if (reportErrors) {
                         ShowSevereError(state,
                                         "Invalid Output:Variable or Output:Meter Index Key Name =" +
-                                            state.dataRuntimeLang->Sensor(SensorNum).UniqueKeyName);
-                        ShowContinueError(state, "For Output:Variable or Output:Meter = " + state.dataRuntimeLang->Sensor(SensorNum).OutputVarName);
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->Sensor(SensorNum).Name);
-                        ShowContinueError(state, "Unique Key Name not found.");
+                                            state.dataRuntimeLang->Sensor(SensorNum).UniqueKeyName,
+                        				"For Output:Variable or Output:Meter = " + state.dataRuntimeLang->Sensor(SensorNum).OutputVarName,
+                        				"Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->Sensor(SensorNum).Name,
+                        				"Unique Key Name not found.");
                         ErrorsFound = true;
                     }
                 } else {
@@ -1099,11 +1099,10 @@ namespace EMSManager {
                             if (reportErrors) {
                                 ShowSevereError(state,
                                                 "Invalid Output:Variable or Output:Meter Index Key Name =" +
-                                                    state.dataRuntimeLang->Sensor(SensorNum).UniqueKeyName);
-                                ShowContinueError(state,
-                                                  "For Output:Variable or Output:Meter = " + state.dataRuntimeLang->Sensor(SensorNum).OutputVarName);
-                                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->Sensor(SensorNum).Name);
-                                ShowContinueError(state, "Schedule Name not found.");
+                                                    state.dataRuntimeLang->Sensor(SensorNum).UniqueKeyName,
+                                				"For Output:Variable or Output:Meter = " + state.dataRuntimeLang->Sensor(SensorNum).OutputVarName,
+                                				"Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->Sensor(SensorNum).Name,
+                                				"Schedule Name not found.");
                                 ErrorsFound = true;
                             }
                         }
@@ -1160,9 +1159,9 @@ namespace EMSManager {
             if (!FoundObjectType) {
                 if (reportErrors) {
                     ShowSevereError(state,
-                                    "Invalid Actuated Component Type =" + state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ComponentTypeName);
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).Name);
-                    ShowContinueError(state, "Component Type not found");
+                                    "Invalid Actuated Component Type =" + state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ComponentTypeName,
+                    				"Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).Name,
+                    				"Component Type not found");
                     if (state.dataRuntimeLang->OutputEDDFile) {
                         ShowContinueError(state, "Review .edd file for valid component types.");
                     } else {
@@ -1175,9 +1174,9 @@ namespace EMSManager {
             if (!FoundObjectName) {
                 if (reportErrors) {
                     ShowSevereError(state,
-                                    "Invalid Actuated Component Unique Name =" + state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).UniqueIDName);
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).Name);
-                    ShowContinueError(state, "Component Unique key name not found ");
+                                    "Invalid Actuated Component Unique Name =" + state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).UniqueIDName,
+                    				"Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).Name,
+                    				"Component Unique key name not found ");
                     if (state.dataRuntimeLang->OutputEDDFile) {
                         ShowContinueError(state, "Review edd file for valid component names.");
                     } else {
@@ -1190,9 +1189,9 @@ namespace EMSManager {
             if (!FoundActuatorName) {
                 if (reportErrors) {
                     ShowSevereError(
-                        state, "Invalid Actuated Component Control Type =" + state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ControlTypeName);
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).Name);
-                    ShowContinueError(state, "Control Type not found");
+                        state, "Invalid Actuated Component Control Type =" + state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ControlTypeName,
+                    				"Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).Name,
+                    				"Control Type not found");
                     if (state.dataRuntimeLang->OutputEDDFile) {
                         ShowContinueError(state, "Review edd file for valid component control types.");
                     } else {
@@ -1252,10 +1251,9 @@ namespace EMSManager {
             if (!FoundObjectType) {
                 if (reportErrors) {
                     ShowSevereError(state,
-                                    "Invalid Internal Data Type =" + state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).InternalDataTypeName);
-                    ShowContinueError(state,
-                                      "Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).Name);
-                    ShowContinueError(state, "Internal data type name not found");
+                                    "Invalid Internal Data Type =" + state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).InternalDataTypeName,
+                    				"Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).Name,
+                    				"Internal data type name not found");
                     ErrorsFound = true;
                 }
             }
@@ -1263,10 +1261,9 @@ namespace EMSManager {
             if (!FoundObjectName) {
                 if (reportErrors) {
                     ShowSevereError(state,
-                                    "Invalid Internal Data Index Key Name =" + state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).UniqueIDName);
-                    ShowContinueError(state,
-                                      "Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).Name);
-                    ShowContinueError(state, "Internal data unique identifier not found");
+                                    "Invalid Internal Data Index Key Name =" + state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).UniqueIDName,
+                    				"Entered in " + cCurrentModuleObject + '=' + state.dataRuntimeLang->EMSInternalVarsUsed(InternVarNum).Name,
+                    				"Internal data unique identifier not found");
                     ErrorsFound = true;
                 }
             } else {
@@ -1983,11 +1980,10 @@ namespace EMSManager {
                     ShowSevereError(state,
                                     "Missing shade or blind layer in window construction name = '" +
                                         state.dataConstruction->Construct(state.dataSurface->Surface(loopSurfNum).activeShadedConstruction).Name +
-                                        "', surface name = '" + state.dataSurface->Surface(loopSurfNum).Name + "'.");
-                    ShowContinueError(state,
-                                      "...'Control Status' or 'Slat Angle' EMS Actuator cannot be set for a construction that does not have a shade "
-                                      "or a blind layer.");
-                    ShowContinueError(state, "...Add shade or blind layer to this construction in order to be able to apply EMS Actuator.");
+                                        "', surface name = '" + state.dataSurface->Surface(loopSurfNum).Name + "'.",
+                    				"...'Control Status' or 'Slat Angle' EMS Actuator cannot be set for a construction that does not have a shade "
+                                      "or a blind layer.",
+                    				"...Add shade or blind layer to this construction in order to be able to apply EMS Actuator.");
                 }
             }
         }
@@ -2556,8 +2552,8 @@ void SetupEMSInternalVariable(
     }
 
     if (FoundDuplicate) {
-        ShowSevereError(state, "Duplicate internal variable was sent to SetupEMSInternalVariable.");
-        ShowContinueError(state, "Internal variable type = " + std::string{cDataTypeName} + " ; name = " + std::string{cUniqueIDName});
+        ShowSevereError(state, "Duplicate internal variable was sent to SetupEMSInternalVariable.",
+        				"Internal variable type = " + std::string{cDataTypeName} + " ; name = " + std::string{cUniqueIDName});
         ShowContinueError(state, "Called from SetupEMSInternalVariable.");
     } else {
         // add new internal data variable
@@ -2617,8 +2613,8 @@ void SetupEMSInternalVariable(
     }
 
     if (FoundDuplicate) {
-        ShowSevereError(state, "Duplicate internal variable was sent to SetupEMSInternalVariable.");
-        ShowContinueError(state, "Internal variable type = " + std::string{cDataTypeName} + " ; name = " + std::string{cUniqueIDName});
+        ShowSevereError(state, "Duplicate internal variable was sent to SetupEMSInternalVariable.",
+        				"Internal variable type = " + std::string{cDataTypeName} + " ; name = " + std::string{cUniqueIDName});
         ShowContinueError(state, "called from SetupEMSInternalVariable");
     } else {
         // add new internal data variable

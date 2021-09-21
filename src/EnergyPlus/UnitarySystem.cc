@@ -441,9 +441,8 @@ namespace UnitarySystems {
                             }
                         }
                     } else if (numSpeedInputs < maxSpeeds) {
-                        ShowSevereError(state, cCurrentModuleObject + ": Error getting inputs for system named: " + thisObjectName);
-                        ShowContinueError(state,
-                                          format("Number of speed inputs ({:.0T} is less than number of speeds ({:.0T}).",
+                        ShowSevereError(state, cCurrentModuleObject + ": Error getting inputs for system named: " + thisObjectName,
+                        				format("Number of speed inputs ({:.0T} is less than number of speeds ({:.0T}).",
                                                  Real64(numSpeedInputs),
                                                  Real64(maxSpeeds)));
                         errorsFound = true;
@@ -585,8 +584,8 @@ namespace UnitarySystems {
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr = this->m_FanOpModeSchedPtr;
             } else if (AirLoopNum < 0) {
                 if (this->m_ControlType == ControlType::CCMASHRAE) {
-                    ShowSevereError(state, this->UnitType + ": " + this->Name);
-                    ShowContinueError(state, "  Invalid application of Control Type = SingleZoneVAV in outdoor air system.");
+                    ShowSevereError(state, this->UnitType + ": " + this->Name,
+                    				"  Invalid application of Control Type = SingleZoneVAV in outdoor air system.");
                     ShowFatalError(state, "InitUnitarySystems: Program terminated for previous conditions.");
                 }
             }
@@ -1446,16 +1445,16 @@ namespace UnitarySystems {
             if (state.dataLoopNodes->Node(ControlNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue &&
                 this->m_ControlType == ControlType::Setpoint) {
                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                    ShowSevereError(state, this->UnitType + ": Missing temperature setpoint for unitary system = " + this->Name);
-                    ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
+                    ShowSevereError(state, this->UnitType + ": Missing temperature setpoint for unitary system = " + this->Name,
+                    				"  use a Setpoint Manager to establish a setpoint at the coil control node.");
                     SetPointErrorFlag = true;
                 } else {
                     EMSManager::CheckIfNodeSetPointManagedByEMS(
                         state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
-                        ShowSevereError(state, this->UnitType + ": Missing temperature setpoint for unitary system = " + this->Name);
-                        ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
-                        ShowContinueError(state, "  or use an EMS actuator to establish a temperature setpoint at the coil control node.");
+                        ShowSevereError(state, this->UnitType + ": Missing temperature setpoint for unitary system = " + this->Name,
+                        				"  use a Setpoint Manager to establish a setpoint at the coil control node.",
+                        				"  or use an EMS actuator to establish a temperature setpoint at the coil control node.");
                     }
                 }
             }
@@ -1464,17 +1463,17 @@ namespace UnitarySystems {
                 this->m_ControlType == ControlType::Setpoint && CoilType == state.dataUnitarySystems->CoolingCoil) {
                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel &&
                     state.dataLoopNodes->Node(this->CoolCoilOutletNodeNum).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
-                    ShowSevereError(state, this->UnitType + ": Missing humidity ratio setpoint (HUMRATMAX) for unitary system = " + this->Name);
-                    ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
+                    ShowSevereError(state, this->UnitType + ": Missing humidity ratio setpoint (HUMRATMAX) for unitary system = " + this->Name,
+                    				"  use a Setpoint Manager to establish a setpoint at the coil control node.");
                     SetPointErrorFlag = true;
                 } else if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     EMSManager::CheckIfNodeSetPointManagedByEMS(
                         state, ControlNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
                         ShowSevereError(state,
-                                        this->UnitType + ": Missing maximum humidity ratio setpoint (HUMRATMAX) for unitary system = " + this->Name);
-                        ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
-                        ShowContinueError(state, "  or use an EMS actuator to establish a maximum humidity ratio setpoint.");
+                                        this->UnitType + ": Missing maximum humidity ratio setpoint (HUMRATMAX) for unitary system = " + this->Name,
+                        				"  use a Setpoint Manager to establish a setpoint at the coil control node.",
+                        				"  or use an EMS actuator to establish a maximum humidity ratio setpoint.");
                     }
                 }
             }
@@ -1774,8 +1773,8 @@ namespace UnitarySystems {
                 this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
             } else {
                 // should never happen
-                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
-                ShowContinueError(state, "Illegal entry for Cooling Supply Air Flow Rate Method.");
+                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName},
+                				"Illegal entry for Cooling Supply Air Flow Rate Method.");
             }
 
             state.dataSize->CurDuctType = SaveCurDuctType;
@@ -1912,8 +1911,8 @@ namespace UnitarySystems {
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
             } else {
                 // should never happen
-                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
-                ShowContinueError(state, "Illegal entry for Heating Supply Air Flow Rate Method.");
+                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName},
+                				"Illegal entry for Heating Supply Air Flow Rate Method.");
             }
 
             state.dataSize->CurDuctType = SaveCurDuctType;
@@ -2936,8 +2935,8 @@ namespace UnitarySystems {
                         this->ControlZoneMassFlowFrac =
                             state.dataUnitarySystems->initLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax / SumOfMassFlowRateMax;
                     } else {
-                        ShowSevereError(state, this->UnitType + " = " + this->Name);
-                        ShowContinueError(state, " The Fraction of Supply Air Flow That Goes Through the Controlling Zone is set to 1.");
+                        ShowSevereError(state, this->UnitType + " = " + this->Name,
+                        				" The Fraction of Supply Air Flow That Goes Through the Controlling Zone is set to 1.");
                         this->ControlZoneMassFlowFrac = 1.0;
                     }
                     this->m_SmallLoadTolerance = 5.0 / this->ControlZoneMassFlowFrac; // adjust 5W load tolerance by control zone fraction
@@ -2993,9 +2992,8 @@ namespace UnitarySystems {
 
             // check that MaxNoCoolHeatAirVolFlow is less than both MaxCoolAirVolFlow and MaxHeatAirVolFlow
             if (this->m_MaxNoCoolHeatAirVolFlow >= this->m_MaxCoolAirVolFlow || this->m_MaxNoCoolHeatAirVolFlow >= this->m_MaxHeatAirVolFlow) {
-                ShowSevereError(state, this->UnitType + " = " + this->Name);
-                ShowContinueError(state,
-                                  " For SingleZoneVAV control the No Load Supply Air Flow Rate must be less than both the cooling and heating supply "
+                ShowSevereError(state, this->UnitType + " = " + this->Name,
+                				" For SingleZoneVAV control the No Load Supply Air Flow Rate must be less than both the cooling and heating supply "
                                   "air flow rates.");
                 this->m_MaxNoCoolHeatAirVolFlow = min(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow) - 0.01;
                 ShowContinueError(state,
@@ -3202,8 +3200,8 @@ namespace UnitarySystems {
                     }
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Illegal Cooling Coil Object Type = " + loc_coolingCoilType);
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Illegal Cooling Coil Object Type = " + loc_coolingCoilType);
             }
 
             if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
@@ -3234,8 +3232,8 @@ namespace UnitarySystems {
             this->m_ValidASHRAECoolCoil = true;
             this->m_ValidASHRAEHeatCoil = true;
         } else {
-            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-            ShowContinueError(state, "Invalid Control Type = " + loc_m_ControlType);
+            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName,
+            				"Invalid Control Type = " + loc_m_ControlType);
             errorsFound = true;
         }
 
@@ -3328,17 +3326,17 @@ namespace UnitarySystems {
         if (loc_controlZoneName.size() > 0) { // not required field
             this->ControlZoneNum = UtilityRoutines::FindItemInList(loc_controlZoneName, state.dataHeatBal->Zone);
         } else if (this->m_ControlType == ControlType::Load || this->m_ControlType == ControlType::CCMASHRAE) {
-            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-            ShowContinueError(state, "Controlling Zone or Thermostat Location cannot be blank when Control Type = Load or SingleZoneVAV");
+            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName,
+            				"Controlling Zone or Thermostat Location cannot be blank when Control Type = Load or SingleZoneVAV");
             errorsFound = true;
         }
 
         // check that control zone name is valid for load based control
         if (this->m_ControlType == ControlType::Load || this->m_ControlType == ControlType::CCMASHRAE) {
             if (this->ControlZoneNum == 0) {
-                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                ShowContinueError(state, "When Control Type = Load or SingleZoneVAV");
-                ShowContinueError(state, " Controlling Zone or Thermostat Location must be a valid zone name, zone name = " + loc_controlZoneName);
+                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName,
+                				"When Control Type = Load or SingleZoneVAV",
+                				" Controlling Zone or Thermostat Location must be a valid zone name, zone name = " + loc_controlZoneName);
                 errorsFound = true;
             }
         }
@@ -3354,8 +3352,8 @@ namespace UnitarySystems {
             this->m_DehumidControlType_Num = DehumCtrlType::Multimode;
             this->m_Humidistat = true;
         } else {
-            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-            ShowContinueError(state, "Illegal dehumidification control type = " + loc_dehumm_ControlType);
+            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName,
+            				"Illegal dehumidification control type = " + loc_dehumm_ControlType);
             this->m_Humidistat = false;
             errorsFound = true;
         }
@@ -3366,9 +3364,9 @@ namespace UnitarySystems {
                 AirNodeFound = true;
             }
             if (!AirNodeFound && this->ControlZoneNum > 0) {
-                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                ShowContinueError(state, "Did not find Air Node (Zone with Humidistat).");
-                ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
+                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName,
+                				"Did not find Air Node (Zone with Humidistat).",
+                				"specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
                 errorsFound = true;
             }
         }
@@ -3511,9 +3509,9 @@ namespace UnitarySystems {
                         AirNodeFound = true;
                     }
                     if (!AirNodeFound && this->ControlZoneNum > 0) {
-                        ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                        ShowContinueError(state, "Did not find Air Node (Zone with Thermostat or Thermal Comfort Thermostat).");
-                        ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
+                        ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName,
+                        				"Did not find Air Node (Zone with Thermostat or Thermal Comfort Thermostat).",
+                        				"specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
                         errorsFound = true;
                     }
                 }
@@ -3555,9 +3553,9 @@ namespace UnitarySystems {
                                     AirNodeFound = true;
                                 }
                                 if (!AirNodeFound && this->ControlZoneNum > 0) {
-                                    ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                                    ShowContinueError(state, "Did not find Air Node (Zone with Thermostat or Thermal Comfort Thermostat).");
-                                    ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
+                                    ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName,
+                                    				"Did not find Air Node (Zone with Thermostat or Thermal Comfort Thermostat).",
+                                    				"specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
                                     errorsFound = true;
                                 }
                                 break;
@@ -3569,14 +3567,12 @@ namespace UnitarySystems {
 
             if (ZoneEquipmentFound && !ZoneExhaustNodeFound && !InducedNodeFound) {
                 // Exhaust Node was not found
-                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                ShowContinueError(state,
-                                  "Incorrect or misspelled Air Inlet Node Name or Exhaust Node Name or Induced Node Name. = " + loc_AirInNodeName);
-                ShowContinueError(state,
-                                  "Air Inlet Node " + loc_AirInNodeName +
+                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName,
+                				"Incorrect or misspelled Air Inlet Node Name or Exhaust Node Name or Induced Node Name. = " + loc_AirInNodeName,
+                				"Air Inlet Node " + loc_AirInNodeName +
                                       " name does not match any controlled zone exhaust node name. Check ZoneHVAC:EquipmentConnections "
-                                      "object inputs.");
-                ShowContinueError(state, "or Induced Air Outlet Node Name specified in AirLoopHVAC:ReturnPlenum object.");
+                                      "object inputs.",
+                				"or Induced Air Outlet Node Name specified in AirLoopHVAC:ReturnPlenum object.");
                 errorsFound = true;
             } else if (ZoneEquipmentFound && !ZoneInletNodeFound) {
                 bool ZoneInletNodeExists = false;
@@ -3584,10 +3580,9 @@ namespace UnitarySystems {
                 int ZoneInletNum = 0;
                 ZoneInletNodeExists = searchZoneInletNodes(state, this->AirOutNode, InletControlledZoneNum, ZoneInletNum);
                 if (!ZoneInletNodeExists) {
-                    ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                    ShowContinueError(state, "Incorrect or misspelled Air Outlet Node Name = " + loc_AirOutNodeName);
-                    ShowContinueError(state,
-                                      "Node name does not match any controlled zone inlet node name. Check ZoneHVAC:EquipmentConnections "
+                    ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName,
+                    				"Incorrect or misspelled Air Outlet Node Name = " + loc_AirOutNodeName,
+                    				"Node name does not match any controlled zone inlet node name. Check ZoneHVAC:EquipmentConnections "
                                       "object inputs.");
                     errorsFound = true;
                 }
@@ -3626,12 +3621,12 @@ namespace UnitarySystems {
 
         if (AirLoopNumber == 0 && !ZoneEquipmentFound &&
             (this->m_ControlType == ControlType::Load || this->m_ControlType == ControlType::CCMASHRAE)) {
-            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-            ShowContinueError(state, "Did not find proper connection for AirLoopHVAC or ZoneHVAC system.");
-            ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
+            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+            				"Did not find proper connection for AirLoopHVAC or ZoneHVAC system.",
+            				"specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
             if (!AirNodeFound && !ZoneEquipmentFound) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Did not find air node (zone with thermostat).");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Did not find air node (zone with thermostat).");
                 // ShowContinueError(state, "specified " + cAlphaFields(iControlZoneAlphaNum) + " = " + Alphas(iControlZoneAlphaNum));
                 ShowContinueError(state,
                                   "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone.");
@@ -3669,9 +3664,9 @@ namespace UnitarySystems {
                             this->m_FanAvailSchedPtr = state.dataHVACFan->fanObjs[this->m_FanIndex]->availSchedIndex;
                             FanVolFlowRate = state.dataHVACFan->fanObjs[this->m_FanIndex]->designAirVolFlowRate;
                         } else {
-                            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                            ShowContinueError(state, "Unable to access fan data.");
-                            ShowContinueError(state, "Fan Type = " + loc_fanType + ", Fan name = " + loc_m_FanName);
+                            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                            				"Unable to access fan data.",
+                            				"Fan Type = " + loc_fanType + ", Fan name = " + loc_m_FanName);
                             errorsFound = true;
                         }
                         if (FanVolFlowRate == DataSizing::AutoSize) this->m_RequestAutoSize = true;
@@ -3740,8 +3735,8 @@ namespace UnitarySystems {
             this->m_FanName = loc_m_FanName;
         } else {
             if ((loc_m_FanName == "" && loc_fanType != "") || (loc_m_FanName != "" && loc_fanType == "")) {
-                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                ShowContinueError(state, "Invalid Fan Type or Name: Fan Name = " + loc_m_FanName + ", Fan Type = " + loc_fanType);
+                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName,
+                				"Invalid Fan Type or Name: Fan Name = " + loc_m_FanName + ", Fan Type = " + loc_fanType);
                 errorsFound = true;
             }
         }
@@ -3762,8 +3757,8 @@ namespace UnitarySystems {
         if (UtilityRoutines::SameString(loc_supFanPlace, "BlowThrough")) this->m_FanPlace = FanPlace::BlowThru;
         if (UtilityRoutines::SameString(loc_supFanPlace, "DrawThrough")) this->m_FanPlace = FanPlace::DrawThru;
         if (this->m_FanPlace == FanPlace::NotYetSet && this->m_FanExists) {
-            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-            ShowContinueError(state, "Illegal Fan Placement = " + loc_supFanPlace);
+            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+            				"Illegal Fan Placement = " + loc_supFanPlace);
             errorsFound = true;
         }
 
@@ -3771,8 +3766,8 @@ namespace UnitarySystems {
 
         this->m_FanOpModeSchedPtr = ScheduleManager::GetScheduleIndex(state, loc_supFanOpMode);
         if (loc_supFanOpMode != "" && this->m_FanOpModeSchedPtr == 0) {
-            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-            ShowContinueError(state, "Illegal Fan Operating Mode Schedule Name = " + loc_supFanOpMode);
+            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+            				"Illegal Fan Operating Mode Schedule Name = " + loc_supFanOpMode);
             // ShowContinueError(state, "Illegal " + cAlphaFields(iFanSchedAlphaNum) + " = " + Alphas(iFanSchedAlphaNum));
             errorsFound = true;
         } else if (this->m_FanOpModeSchedPtr == 0) {
@@ -3795,11 +3790,11 @@ namespace UnitarySystems {
             }
         } else if (this->m_FanOpModeSchedPtr > 0 && this->m_ControlType == ControlType::Setpoint) {
             if (!ScheduleManager::CheckScheduleValueMinMax(state, this->m_FanOpModeSchedPtr, ">", 0.0, "<=", 1.0)) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "For " + loc_fanType + " = " + loc_m_FanName);
-                ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
-                ShowContinueError(state, "Error found in Supply Air Fan Operating Mode Schedule Name " + loc_supFanOpMode);
-                ShowContinueError(state, "...schedule values must be (>0., <=1.)");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"For " + loc_fanType + " = " + loc_m_FanName,
+                				"Fan operating mode must be continuous (fan operating mode schedule values > 0).",
+                				"Error found in Supply Air Fan Operating Mode Schedule Name " + loc_supFanOpMode,
+                				"...schedule values must be (>0., <=1.)");
                 errorsFound = true;
             }
         }
@@ -3807,10 +3802,10 @@ namespace UnitarySystems {
         // Check fan's schedule for cycling fan operation IF constant volume fan is used
         if (this->m_FanOpModeSchedPtr > 0 && this->m_FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
             if (!ScheduleManager::CheckScheduleValueMinMax(state, this->m_FanOpModeSchedPtr, ">", 0.0, "<=", 1.0)) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
-                ShowContinueError(state, "Error found in Supply Air Fan Operating Mode Schedule Name " + loc_supFanOpMode);
-                ShowContinueError(state, "...schedule values must be (>0., <=1.)");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Fan operating mode must be continuous (fan operating mode schedule values > 0).",
+                				"Error found in Supply Air Fan Operating Mode Schedule Name " + loc_supFanOpMode,
+                				"...schedule values must be (>0., <=1.)");
                 errorsFound = true;
             }
         }
@@ -4171,8 +4166,8 @@ namespace UnitarySystems {
 
                 this->m_HeatingCoilIndex = SteamCoils::GetSteamCoilIndex(state, "COIL:HEATING:STEAM", loc_m_HeatingCoilName, errFlag);
                 if (this->m_HeatingCoilIndex == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Illegal Heating Coil Name = " + loc_m_HeatingCoilName);
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Illegal Heating Coil Name = " + loc_m_HeatingCoilName);
                     errorsFound = true;
                     errFlag = false;
                 }
@@ -4242,8 +4237,8 @@ namespace UnitarySystems {
 
                 this->m_HeatingCoilIndex = WaterToAirHeatPumpSimple::GetCoilIndex(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
                 if (this->m_HeatingCoilIndex == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Illegal Heating Coil Name = " + loc_m_HeatingCoilName);
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Illegal Heating Coil Name = " + loc_m_HeatingCoilName);
                     errorsFound = true;
                     errFlag = false;
                 }
@@ -4300,8 +4295,8 @@ namespace UnitarySystems {
 
                 this->m_HeatingCoilIndex = WaterToAirHeatPump::GetCoilIndex(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
                 if (this->m_HeatingCoilIndex == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Illegal Heating Coil Name = " + loc_m_HeatingCoilName);
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Illegal Heating Coil Name = " + loc_m_HeatingCoilName);
                     errorsFound = true;
                     errFlag = false;
                 }
@@ -4348,8 +4343,8 @@ namespace UnitarySystems {
 
                 UserDefinedComponents::GetUserDefinedCoilIndex(state, loc_m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag, cCurrentModuleObject);
                 if (this->m_HeatingCoilIndex == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Illegal Heating Coil Name = " + loc_m_HeatingCoilName);
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Illegal Heating Coil Name = " + loc_m_HeatingCoilName);
                     errorsFound = true;
                     errFlag = false;
                 }
@@ -4385,8 +4380,8 @@ namespace UnitarySystems {
             }
 
         } else if (this->m_HeatCoilExists) {
-            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-            ShowContinueError(state, "Illegal Heating Coil Object Type = " + loc_heatingCoilType);
+            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+            				"Illegal Heating Coil Object Type = " + loc_heatingCoilType);
             errorsFound = true;
         } // IF (this->m_HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
@@ -4600,9 +4595,8 @@ namespace UnitarySystems {
                                 this->SpeedSHR.resize(this->m_NumOfSpeedCooling + 1);
                             }
                             if (this->m_ControlType == ControlType::Setpoint) {
-                                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                                ShowContinueError(state,
-                                                  "Setpoint control is not available for SubcoolReheat cooling coil. Load control is forced. "
+                                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                                				"Setpoint control is not available for SubcoolReheat cooling coil. Load control is forced. "
                                                   "Simulation continues.");
                                 this->m_ControlType = ControlType::Load;
                             }
@@ -5086,8 +5080,8 @@ namespace UnitarySystems {
 
                     this->m_CoolingCoilIndex = WaterCoils::GetWaterCoilIndex(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                     if (this->m_CoolingCoilIndex == 0) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
                         errorsFound = true;
                         errFlag = false;
                     }
@@ -5113,11 +5107,10 @@ namespace UnitarySystems {
                     bool InletNodeNotControlled = true;
                     //  CALL CheckCoilWaterInletNode(this->CoolCoilFluidInletNode,InletNodeNotControlled)
                     if (!InletNodeNotControlled) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state,
-                                          state.dataHVACCtrl->ControllerTypes(DataHVACControllers::ControllerSimple_Type) + " found for " +
-                                              loc_coolingCoilType + " = \"" + loc_m_CoolingCoilName + ".\"");
-                        ShowContinueError(state, "...water coil controllers are not used with " + this->UnitType);
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				state.dataHVACCtrl->ControllerTypes(DataHVACControllers::ControllerSimple_Type) + " found for " +
+                                              loc_coolingCoilType + " = \"" + loc_m_CoolingCoilName + ".\"",
+                        				"...water coil controllers are not used with " + this->UnitType);
                         errorsFound = true;
                     }
 
@@ -5167,8 +5160,8 @@ namespace UnitarySystems {
 
                     this->m_CoolingCoilIndex = WaterToAirHeatPumpSimple::GetCoilIndex(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                     if (this->m_CoolingCoilIndex == 0) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
                         errorsFound = true;
                         errFlag = false;
                     }
@@ -5237,8 +5230,8 @@ namespace UnitarySystems {
 
                     this->m_CoolingCoilIndex = WaterToAirHeatPump::GetCoilIndex(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                     if (this->m_CoolingCoilIndex == 0) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
                         errorsFound = true;
                         errFlag = false;
                     }
@@ -5297,8 +5290,8 @@ namespace UnitarySystems {
                     UserDefinedComponents::GetUserDefinedCoilIndex(
                         state, loc_m_CoolingCoilName, this->m_CoolingCoilIndex, errFlag, cCurrentModuleObject);
                     if (this->m_CoolingCoilIndex == 0) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
                         errorsFound = true;
                         errFlag = false;
                     }
@@ -5351,8 +5344,8 @@ namespace UnitarySystems {
                     PackagedThermalStorageCoil::GetTESCoilIndex(
                         state, loc_m_CoolingCoilName, this->m_CoolingCoilIndex, errFlag, cCurrentModuleObject);
                     if (this->m_CoolingCoilIndex == 0) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
                         errorsFound = true;
                         errFlag = false;
                     }
@@ -5471,9 +5464,9 @@ namespace UnitarySystems {
             } else if (UtilityRoutines::SameString(loc_m_ISHundredPercentDOASDXCoil, "No")) {
                 this->m_ISHundredPercentDOASDXCoil = false;
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Invalid entry for Use DOAS DX Cooling Coil = " + loc_m_ISHundredPercentDOASDXCoil);
-                ShowContinueError(state, "Must be Yes or No.");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Invalid entry for Use DOAS DX Cooling Coil = " + loc_m_ISHundredPercentDOASDXCoil,
+                				"Must be Yes or No.");
                 errorsFound = true;
             }
         }
@@ -5493,9 +5486,9 @@ namespace UnitarySystems {
         // if (!lNumericBlanks(iDOASDXMinTempNumericNum)) {
         this->DesignMinOutletTemp = loc_DesignMinOutletTemp;
         if (this->m_ControlType != ControlType::CCMASHRAE && this->DesignMinOutletTemp == DataSizing::AutoSize) {
-            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-            ShowContinueError(state, "Invalid entry for Minimum Supply Air Temperature = AutoSize.");
-            ShowContinueError(state, "AutoSizing not allowed when Control Type = Load or Setpoint");
+            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+            				"Invalid entry for Minimum Supply Air Temperature = AutoSize.",
+            				"AutoSizing not allowed when Control Type = Load or Setpoint");
             errorsFound = true;
         }
         if (this->m_ControlType != ControlType::CCMASHRAE && this->DesignMinOutletTemp > 7.5) {
@@ -5523,10 +5516,9 @@ namespace UnitarySystems {
                 this->m_RunOnLatentLoad = true;
                 this->m_RunOnLatentOnlyWithSensible = true;
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Invalid entry for Latent Load Control = " + loc_latentControlFlag);
-                ShowContinueError(state,
-                                  "Must be SensibleOnlyLoadControl, LatentOnlyLoadControl, LatentOrSensibleLoadControl, or "
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Invalid entry for Latent Load Control = " + loc_latentControlFlag,
+                				"Must be SensibleOnlyLoadControl, LatentOnlyLoadControl, LatentOrSensibleLoadControl, or "
                                   "LatentWithSensibleLoadControl.");
             }
         }
@@ -5843,9 +5835,9 @@ namespace UnitarySystems {
                 }
 
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for Cooling Supply Air Flow Rate Method = SupplyAirFlowRate.");
-                ShowContinueError(state, "Blank field not allowed for Cooling Supply Air Flow Rate.");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for Cooling Supply Air Flow Rate Method = SupplyAirFlowRate.",
+                				"Blank field not allowed for Cooling Supply Air Flow Rate.");
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_CoolingSAFMethod, "FlowPerFloorArea")) {
@@ -5855,11 +5847,9 @@ namespace UnitarySystems {
                 this->m_MaxCoolAirVolFlow = loc_m_CoolingSAFMethod_SAFlowPerFloorArea;
                 if (this->m_MaxCoolAirVolFlow != DataSizing::AutoSize) {
                     if (this->m_MaxCoolAirVolFlow <= 0.0001 && this->m_CoolCoilExists) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Input for Cooling Supply Air Flow Rate Method = FlowPerFloorArea.");
-                        ShowContinueError(
-                            state,
-                            format("Suspicious Cooling Supply Air Flow Rate Per Floor Area = {:.7R} [m3/s/m2] when cooling coil is present.",
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Input for Cooling Supply Air Flow Rate Method = FlowPerFloorArea.",
+                        				format("Suspicious Cooling Supply Air Flow Rate Per Floor Area = {:.7R} [m3/s/m2] when cooling coil is present.",
                                    this->m_MaxCoolAirVolFlow));
                         if (this->m_MaxCoolAirVolFlow < 0.0) errorsFound = true;
                     }
@@ -5867,15 +5857,15 @@ namespace UnitarySystems {
                     this->m_RequestAutoSize = true;
                     // AutoSized input is not allowed
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Input for Cooling Supply Air Flow Rate Method = FlowPerFloorArea.");
-                    ShowContinueError(state, "Illegal Cooling Supply Air Flow Rate Per Floor Area = Autosize");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Input for Cooling Supply Air Flow Rate Method = FlowPerFloorArea.",
+                    				"Illegal Cooling Supply Air Flow Rate Per Floor Area = Autosize");
                     errorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for Cooling Supply Air Flow Rate Method = FlowPerFloorArea.");
-                ShowContinueError(state, "Blank field not allowed for Cooling Supply Air Flow Rate Per Floor Area.");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for Cooling Supply Air Flow Rate Method = FlowPerFloorArea.",
+                				"Blank field not allowed for Cooling Supply Air Flow Rate Per Floor Area.");
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_CoolingSAFMethod, "FractionOfAutosizedCoolingValue")) {
@@ -5885,10 +5875,9 @@ namespace UnitarySystems {
                 this->m_MaxCoolAirVolFlow = loc_m_CoolingSAFMethod_FracOfAutosizedCoolingSAFlow;
                 if (this->m_MaxCoolAirVolFlow != DataSizing::AutoSize) {
                     if (this->m_MaxCoolAirVolFlow <= DataHVACGlobals::SmallAirVolFlow && this->m_CoolCoilExists) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Input for Cooling Supply Air Flow Rate Method = FractionOfAutosizedCoolingValue.");
-                        ShowContinueError(state,
-                                          format("Suspicious Cooling Fraction of Autosized Cooling Supply Air Flow Rate = {:.7R} [m3/s/m3] "
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Input for Cooling Supply Air Flow Rate Method = FractionOfAutosizedCoolingValue.",
+                        				format("Suspicious Cooling Fraction of Autosized Cooling Supply Air Flow Rate = {:.7R} [m3/s/m3] "
                                                  "when cooling coil is present.",
                                                  this->m_MaxCoolAirVolFlow));
                         if (this->m_MaxCoolAirVolFlow < 0.0) errorsFound = true;
@@ -5896,15 +5885,15 @@ namespace UnitarySystems {
                     this->m_RequestAutoSize = true;
                     // AutoSized input is not allowed
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Input for Cooling Supply Air Flow Rate Method = FractionOfAutosizedCoolingValue.");
-                    ShowContinueError(state, "Illegal Cooling Fraction of Autosized Cooling Supply Air Flow Rate = Autosize");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Input for Cooling Supply Air Flow Rate Method = FractionOfAutosizedCoolingValue.",
+                    				"Illegal Cooling Fraction of Autosized Cooling Supply Air Flow Rate = Autosize");
                     errorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for Cooling Supply Air Flow Rate Method = FractionOfAutosizedCoolingValue.");
-                ShowContinueError(state, "Blank field not allowed for Cooling Fraction of Autosized Cooling Supply Air Flow Rate.");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for Cooling Supply Air Flow Rate Method = FractionOfAutosizedCoolingValue.",
+                				"Blank field not allowed for Cooling Fraction of Autosized Cooling Supply Air Flow Rate.");
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_CoolingSAFMethod, "FlowPerCoolingCapacity")) {
@@ -5914,10 +5903,9 @@ namespace UnitarySystems {
                 this->m_MaxCoolAirVolFlow = loc_m_CoolingSAFMethod_FlowPerCoolingCapacity;
                 if (this->m_MaxCoolAirVolFlow != DataSizing::AutoSize) {
                     if (this->m_MaxCoolAirVolFlow <= 0.00001 && this->m_CoolCoilExists) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Input for Cooling Supply Air Flow Rate Method = FlowPerCoolingCapacity.");
-                        ShowContinueError(state,
-                                          format("Suspicious Cooling Supply Air Flow Rate Per Unit of Capacity = {:.7R} [m3/s/W] when "
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Input for Cooling Supply Air Flow Rate Method = FlowPerCoolingCapacity.",
+                        				format("Suspicious Cooling Supply Air Flow Rate Per Unit of Capacity = {:.7R} [m3/s/W] when "
                                                  "cooling coil is present.",
                                                  this->m_MaxCoolAirVolFlow));
                         if (this->m_MaxCoolAirVolFlow < 0.0) errorsFound = true;
@@ -5925,15 +5913,15 @@ namespace UnitarySystems {
                     this->m_RequestAutoSize = true;
                     // AutoSized input is not allowed
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Input for Cooling Supply Air Flow Rate Method = FlowPerCoolingCapacity.");
-                    ShowContinueError(state, "Illegal Cooling Supply Air Flow Rate Per Unit of Capacity = Autosize");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Input for Cooling Supply Air Flow Rate Method = FlowPerCoolingCapacity.",
+                    				"Illegal Cooling Supply Air Flow Rate Per Unit of Capacity = Autosize");
                     errorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for Cooling Supply Air Flow Rate Method = FlowPerCoolingCapacity.");
-                ShowContinueError(state, "Blank field not allowed for Cooling Supply Air Flow Rate Per Unit of Capacity.");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for Cooling Supply Air Flow Rate Method = FlowPerCoolingCapacity.",
+                				"Blank field not allowed for Cooling Supply Air Flow Rate Per Unit of Capacity.");
                 errorsFound = true;
             }
 
@@ -5949,10 +5937,9 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         } else {
-            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-            ShowContinueError(state, "Illegal Cooling Supply Air Flow Rate Method = " + loc_m_CoolingSAFMethod);
-            ShowContinueError(state,
-                              "Valid entries are: SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, "
+            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+            				"Illegal Cooling Supply Air Flow Rate Method = " + loc_m_CoolingSAFMethod,
+            				"Valid entries are: SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, "
                               "FlowPerCoolingCapacity, or None ");
             errorsFound = true;
         }
@@ -5975,9 +5962,9 @@ namespace UnitarySystems {
                     if (this->m_MaxHeatAirVolFlow < 0.0) errorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method = SupplyAirFlowRate.");
-                ShowContinueError(state, "Blank field not allowed for Heating Supply Air Flow Rate.");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for Heating Supply Air Flow Rate Method = SupplyAirFlowRate.",
+                				"Blank field not allowed for Heating Supply Air Flow Rate.");
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_HeatingSAFMethod, "FlowPerFloorArea")) {
@@ -5986,11 +5973,9 @@ namespace UnitarySystems {
                 this->m_MaxHeatAirVolFlow = loc_m_HeatingSAFMethod_SAFlowPerFloorArea;
                 if (this->m_MaxHeatAirVolFlow != DataSizing::AutoSize) {
                     if (this->m_MaxHeatAirVolFlow <= 0.0001 && this->m_HeatCoilExists) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method = FlowPerFloorArea.");
-                        ShowContinueError(
-                            state,
-                            format("Suspicious Heating Supply Air Flow Rate Per Floor Area = {:.7R} [m3/s/m2] when heating coil is present.",
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Input for Heating Supply Air Flow Rate Method = FlowPerFloorArea.",
+                        				format("Suspicious Heating Supply Air Flow Rate Per Floor Area = {:.7R} [m3/s/m2] when heating coil is present.",
                                    this->m_MaxHeatAirVolFlow));
                     }
                     if (this->m_MaxHeatAirVolFlow < 0.0) errorsFound = true;
@@ -5998,15 +5983,15 @@ namespace UnitarySystems {
                     this->m_RequestAutoSize = true;
                 } else {
                     // AutoSized input is not allowed
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method = FlowPerFloorArea.");
-                    ShowContinueError(state, "Illegal Heating Supply Air Flow Rate Per Floor Area = Autosize");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Input for Heating Supply Air Flow Rate Method = FlowPerFloorArea.",
+                    				"Illegal Heating Supply Air Flow Rate Per Floor Area = Autosize");
                     errorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method = FlowPerFloorArea.");
-                ShowContinueError(state, "Blank field not allowed for Heating Supply Air Flow Rate Per Floor Area.");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for Heating Supply Air Flow Rate Method = FlowPerFloorArea.",
+                				"Blank field not allowed for Heating Supply Air Flow Rate Per Floor Area.");
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_HeatingSAFMethod, "FractionOfAutosizedHeatingValue")) {
@@ -6015,10 +6000,9 @@ namespace UnitarySystems {
                 this->m_MaxHeatAirVolFlow = loc_m_HeatingSAFMethod_FracOfAutosizedHeatingSAFlow;
                 if (this->m_MaxHeatAirVolFlow != DataSizing::AutoSize) {
                     if (this->m_MaxHeatAirVolFlow <= DataHVACGlobals::SmallAirVolFlow && this->m_HeatCoilExists) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method = FractionOfAutosizedHeatingValue.");
-                        ShowContinueError(state,
-                                          format("Suspicious Heating Fraction of Autosized Heating Supply Air Flow Rate = {:.7R} [m3/s/m3] "
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Input for Heating Supply Air Flow Rate Method = FractionOfAutosizedHeatingValue.",
+                        				format("Suspicious Heating Fraction of Autosized Heating Supply Air Flow Rate = {:.7R} [m3/s/m3] "
                                                  "when heating coil is present.",
                                                  this->m_MaxHeatAirVolFlow));
                         if (this->m_MaxHeatAirVolFlow < 0.0) errorsFound = true;
@@ -6026,15 +6010,15 @@ namespace UnitarySystems {
                     this->m_RequestAutoSize = true;
                     // AutoSized input is not allowed
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method = FractionOfAutosizedHeatingValue");
-                    ShowContinueError(state, "Illegal input for Heating Fraction of Autosized Heating Supply Air Flow Rate = Autosize");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Input for Heating Supply Air Flow Rate Method = FractionOfAutosizedHeatingValue",
+                    				"Illegal input for Heating Fraction of Autosized Heating Supply Air Flow Rate = Autosize");
                     errorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method = FractionOfAutosizedHeatingValue");
-                ShowContinueError(state, "Blank field not allowed for Heating Fraction of Autosized Heating Supply Air Flow Rate");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for Heating Supply Air Flow Rate Method = FractionOfAutosizedHeatingValue",
+                				"Blank field not allowed for Heating Fraction of Autosized Heating Supply Air Flow Rate");
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_HeatingSAFMethod, "FlowPerHeatingCapacity")) {
@@ -6043,10 +6027,9 @@ namespace UnitarySystems {
                 this->m_MaxHeatAirVolFlow = loc_m_HeatingSAFMethod_FlowPerHeatingCapacity;
                 if (this->m_MaxHeatAirVolFlow != DataSizing::AutoSize) {
                     if (this->m_MaxHeatAirVolFlow <= 0.00001 && this->m_HeatCoilExists) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method = FlowPerHeatingCapacity.");
-                        ShowContinueError(state,
-                                          format("Suspicious Heating Supply Air Flow Rate Per Unit of Capacity = {:.7R} [m3/s/W] when "
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Input for Heating Supply Air Flow Rate Method = FlowPerHeatingCapacity.",
+                        				format("Suspicious Heating Supply Air Flow Rate Per Unit of Capacity = {:.7R} [m3/s/W] when "
                                                  "heating coil is present.",
                                                  this->m_MaxHeatAirVolFlow));
                         if (this->m_MaxHeatAirVolFlow < 0.0) errorsFound = true;
@@ -6054,15 +6037,15 @@ namespace UnitarySystems {
                     this->m_RequestAutoSize = true;
                     // AutoSized input is not allowed
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method = FlowPerHeatingCapacity.");
-                    ShowContinueError(state, "Illegal Heating Supply Air Flow Rate Per Unit of Capacity = Autosize");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Input for Heating Supply Air Flow Rate Method = FlowPerHeatingCapacity.",
+                    				"Illegal Heating Supply Air Flow Rate Per Unit of Capacity = Autosize");
                     errorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method = FlowPerHeatingCapacity");
-                ShowContinueError(state, "Blank field not allowed for Heating Supply Air Flow Rate Per Unit of Capacity");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for Heating Supply Air Flow Rate Method = FlowPerHeatingCapacity",
+                				"Blank field not allowed for Heating Supply Air Flow Rate Per Unit of Capacity");
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_HeatingSAFMethod, "None") || loc_m_HeatingSAFMethod == "") {
@@ -6082,10 +6065,9 @@ namespace UnitarySystems {
                 errorsFound = true;
             }
         } else {
-            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-            ShowContinueError(state, "Illegal Heating Supply Air Flow Rate Method = " + loc_m_HeatingSAFMethod);
-            ShowContinueError(state,
-                              "Valid entries are: SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedHeatingValue, "
+            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+            				"Illegal Heating Supply Air Flow Rate Method = " + loc_m_HeatingSAFMethod,
+            				"Valid entries are: SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedHeatingValue, "
                               "FlowPerHeatingCapacity, or None ");
             errorsFound = true;
         }
@@ -6099,17 +6081,17 @@ namespace UnitarySystems {
                     this->m_RequestAutoSize = true;
                 } else {
                     if (this->m_MaxNoCoolHeatAirVolFlow < 0.0) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = SupplyAirFlowRate");
-                        ShowContinueError(state, format("Illegal No Load Supply Air Flow Rate = {:.7R}", this->m_MaxNoCoolHeatAirVolFlow));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Input for No Load Supply Air Flow Rate Method = SupplyAirFlowRate",
+                        				format("Illegal No Load Supply Air Flow Rate = {:.7R}", this->m_MaxNoCoolHeatAirVolFlow));
                         errorsFound = true;
                     }
                 }
 
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = SupplyAirFlowRate");
-                ShowContinueError(state, "Blank field not allowed for No Load Supply Air Flow Rate");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for No Load Supply Air Flow Rate Method = SupplyAirFlowRate",
+                				"Blank field not allowed for No Load Supply Air Flow Rate");
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "FlowPerFloorArea")) {
@@ -6118,26 +6100,24 @@ namespace UnitarySystems {
                 this->m_MaxNoCoolHeatAirVolFlow = loc_m_NoCoolHeatSAFMethod_SAFlowPerFloorArea;
                 if (this->m_MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
                     if (this->m_MaxNoCoolHeatAirVolFlow <= 0.0001) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = FlowPerFloorArea.");
-                        ShowContinueError(
-                            state,
-                            format("Suspicious No Load Supply Air Flow Rate Per Floor Area = {:.7R} [m3/s/m2]", this->m_MaxNoCoolHeatAirVolFlow));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Input for No Load Supply Air Flow Rate Method = FlowPerFloorArea.",
+                        				format("Suspicious No Load Supply Air Flow Rate Per Floor Area = {:.7R} [m3/s/m2]", this->m_MaxNoCoolHeatAirVolFlow));
                     }
                     if (this->m_MaxNoCoolHeatAirVolFlow < 0.0) errorsFound = true;
                     this->m_MaxNoCoolHeatAirVolFlow *= TotalFloorAreaOnAirLoop;
                     this->m_RequestAutoSize = true;
                 } else {
                     // AutoSized input is not allowed
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = FlowPerFloorArea.");
-                    ShowContinueError(state, "Illegal No Load Supply Air Flow Rate Per Floor Area = Autosize");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Input for No Load Supply Air Flow Rate Method = FlowPerFloorArea.",
+                    				"Illegal No Load Supply Air Flow Rate Per Floor Area = Autosize");
                     errorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = FlowPerFloorArea.");
-                ShowContinueError(state, "Blank field not allowed for No Load Supply Air Flow Rate Per Floor Area");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for No Load Supply Air Flow Rate Method = FlowPerFloorArea.",
+                				"Blank field not allowed for No Load Supply Air Flow Rate Per Floor Area");
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "FractionOfAutosizedCoolingValue")) {
@@ -6157,16 +6137,15 @@ namespace UnitarySystems {
                     this->m_RequestAutoSize = true;
                     // AutoSized input is not allowed
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = FractionOfAutosizedCoolingValue");
-                    ShowContinueError(state,
-                                      "Illegal input for No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation = Autosize");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Input for No Load Supply Air Flow Rate Method = FractionOfAutosizedCoolingValue",
+                    				"Illegal input for No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation = Autosize");
                     errorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = FractionOfAutosizedCoolingValue.");
-                ShowContinueError(state, "Blank field not allowed for No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for No Load Supply Air Flow Rate Method = FractionOfAutosizedCoolingValue.",
+                				"Blank field not allowed for No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation");
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "FractionOfAutosizedHeatingValue")) {
@@ -6186,16 +6165,15 @@ namespace UnitarySystems {
                     this->m_RequestAutoSize = true;
                     // AutoSized input is not allowed
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = FractionOfAutosizedHeatingValue");
-                    ShowContinueError(state,
-                                      "Illegal input for No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation = Autosize");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Input for No Load Supply Air Flow Rate Method = FractionOfAutosizedHeatingValue",
+                    				"Illegal input for No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation = Autosize");
                     errorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = FractionOfAutosizedHeatingValue.");
-                ShowContinueError(state, "Blank field not allowed for No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for No Load Supply Air Flow Rate Method = FractionOfAutosizedHeatingValue.",
+                				"Blank field not allowed for No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation");
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "FlowPerCoolingCapacity")) {
@@ -6204,26 +6182,24 @@ namespace UnitarySystems {
                 this->m_MaxNoCoolHeatAirVolFlow = loc_m_NoCoolHeatSAFMethod_FlowPerCoolingCapacity;
                 if (this->m_MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
                     if (this->m_MaxNoCoolHeatAirVolFlow <= 0.00001 && this->m_CoolCoilExists) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = FlowPerCoolingCapacity.");
-                        ShowContinueError(
-                            state,
-                            format("Suspicious No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation = {:.7R} [m3/s/W].",
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Input for No Load Supply Air Flow Rate Method = FlowPerCoolingCapacity.",
+                        				format("Suspicious No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation = {:.7R} [m3/s/W].",
                                    this->m_MaxNoCoolHeatAirVolFlow));
                         if (this->m_MaxNoCoolHeatAirVolFlow < 0.0) errorsFound = true;
                     }
                     this->m_RequestAutoSize = true;
                     // AutoSized input is not allowed
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = FlowPerCoolingCapacity.");
-                    ShowContinueError(state, "Illegal No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation = Autosize");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Input for No Load Supply Air Flow Rate Method = FlowPerCoolingCapacity.",
+                    				"Illegal No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation = Autosize");
                     errorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = FlowPerCoolingCapacity.");
-                ShowContinueError(state, "Blank field not allowed for No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for No Load Supply Air Flow Rate Method = FlowPerCoolingCapacity.",
+                				"Blank field not allowed for No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation");
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "FlowPerHeatingCapacity")) {
@@ -6232,26 +6208,24 @@ namespace UnitarySystems {
                 this->m_MaxNoCoolHeatAirVolFlow = loc_m_NoCoolHeatSAFMethod_FlowPerHeatingCapacity;
                 if (this->m_MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
                     if (this->m_MaxNoCoolHeatAirVolFlow <= 0.00001 && this->m_HeatCoilExists) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = FlowPerHeatingCapacity.");
-                        ShowContinueError(
-                            state,
-                            format("Suspicious No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation = {:.7R} [m3/s/W].",
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"Input for No Load Supply Air Flow Rate Method = FlowPerHeatingCapacity.",
+                        				format("Suspicious No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation = {:.7R} [m3/s/W].",
                                    this->m_MaxNoCoolHeatAirVolFlow));
                         if (this->m_MaxNoCoolHeatAirVolFlow < 0.0) errorsFound = true;
                     }
                     this->m_RequestAutoSize = true;
                     // AutoSized input is not allowed
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = FlowPerHeatingCapacity.");
-                    ShowContinueError(state, "Illegal No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation = Autosize");
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"Input for No Load Supply Air Flow Rate Method = FlowPerHeatingCapacity.",
+                    				"Illegal No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation = Autosize");
                     errorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Input for No Load Supply Air Flow Rate Method = FlowPerHeatingCapacity.");
-                ShowContinueError(state, "Blank field not allowed for No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Input for No Load Supply Air Flow Rate Method = FlowPerHeatingCapacity.",
+                				"Blank field not allowed for No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation");
                 errorsFound = true;
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "None") || loc_m_NoCoolHeatSAFMethod == "") {
@@ -6268,17 +6242,16 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Input for No Load Supply Air Flow Rate cannot be blank.");
                     ShowContinueError(state, "Input for No Load Supply Air Flow Rate has been set to AutoSize and the simulation continues.");
                 } else if (loc_m_NoCoolHeatSAFMethod_SAFlow == 0.0) { // no load air flow for SZVAV cannot be 0
-                    ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                    ShowContinueError(state, "Control Type = " + loc_m_ControlType);
-                    ShowContinueError(state, "Input for No Load Supply Air Flow Rate cannot be 0.");
+                    ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName,
+                    				"Control Type = " + loc_m_ControlType,
+                    				"Input for No Load Supply Air Flow Rate cannot be 0.");
                     errorsFound = true;
                 }
             }
         } else {
-            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-            ShowContinueError(state, "Illegal No Load Supply Air Flow Rate Method = " + loc_m_NoCoolHeatSAFMethod);
-            ShowContinueError(state,
-                              "Valid entries are: SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, "
+            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+            				"Illegal No Load Supply Air Flow Rate Method = " + loc_m_NoCoolHeatSAFMethod,
+            				"Valid entries are: SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingValue, "
                               "FractionOfAutosizedHeatingValue, FlowPerCoolingCapacity, FlowPerHeatingCapacity, or None ");
             errorsFound = true;
         }
@@ -6345,20 +6318,19 @@ namespace UnitarySystems {
         if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling && this->m_DehumidControlType_Num == DehumCtrlType::Multimode) {
             int numCoolingCoilModes = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].getNumModes();
             if (numCoolingCoilModes == 1) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Illegal Dehumidification Control Type = " + loc_dehumm_ControlType);
-                ShowContinueError(state, "Multimode control must be used with a Heat Exchanger Assisted or Multimode Cooling Coil.");
-                ShowContinueError(
-                    state, "Cooling coil named: " + state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].name + " has only one mode");
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Illegal Dehumidification Control Type = " + loc_dehumm_ControlType,
+                				"Multimode control must be used with a Heat Exchanger Assisted or Multimode Cooling Coil.",
+                				"Cooling coil named: " + state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].name + " has only one mode");
                 ShowFatalError(state, "Multimode cooling coil error causes program termination");
             }
         } else if (this->m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingHXAssisted &&
                    this->m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl &&
                    this->m_CoolingCoilType_Num != DataHVACGlobals::CoilWater_CoolingHXAssisted &&
                    this->m_DehumidControlType_Num == DehumCtrlType::Multimode) {
-            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-            ShowContinueError(state, "Illegal Dehumidification Control Type = " + loc_dehumm_ControlType);
-            ShowContinueError(state, "Multimode control must be used with a Heat Exchanger Assisted or Multimode Cooling Coil.");
+            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+            				"Illegal Dehumidification Control Type = " + loc_dehumm_ControlType,
+            				"Multimode control must be used with a Heat Exchanger Assisted or Multimode Cooling Coil.");
             if (loc_m_SuppHeatCoilName == "" && loc_suppHeatCoilType == "") {
             } else {
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_UserDefined) {
@@ -6388,10 +6360,10 @@ namespace UnitarySystems {
                 this->m_CoolingCoilUpstream = false;
             }
             if (ZoneEquipmentFound) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "ZoneHVAC equipment must contain a fan object.");
-                ShowContinueError(state, "specified Supply Fan Object Type = " + loc_fanType);
-                ShowContinueError(state, "specified Supply Fan Name = " + loc_m_FanName);
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"ZoneHVAC equipment must contain a fan object.",
+                				"specified Supply Fan Object Type = " + loc_fanType,
+                				"specified Supply Fan Name = " + loc_m_FanName);
                 errorsFound = true;
             }
         }
@@ -6400,75 +6372,70 @@ namespace UnitarySystems {
         if (this->m_FanPlace == FanPlace::BlowThru) {
 
             if (FanInletNode != this->AirInNode) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state,
-                                  "When a blow through fan is specified, the fan inlet node name must be the same as the unitary system "
-                                  "inlet node name.");
-                ShowContinueError(state, "...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode));
-                ShowContinueError(state, "...UnitarySystem inlet node name = " + state.dataLoopNodes->NodeID(this->AirInNode));
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"When a blow through fan is specified, the fan inlet node name must be the same as the unitary system "
+                                  "inlet node name.",
+                				"...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode),
+                				"...UnitarySystem inlet node name = " + state.dataLoopNodes->NodeID(this->AirInNode));
                 errorsFound = true;
             }
             if (this->m_CoolingCoilUpstream) {
                 if (FanOutletNode != CoolingCoilInletNode && this->m_CoolCoilExists && this->m_FanExists) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state,
-                                      "When a blow through fan is specified, the fan outlet node name must be the same as the cooling coil "
-                                      "inlet node name.");
-                    ShowContinueError(state, "...Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                    ShowContinueError(state, "...Cooling coil inlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"When a blow through fan is specified, the fan outlet node name must be the same as the cooling coil "
+                                      "inlet node name.",
+                    				"...Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                    				"...Cooling coil inlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
                     errorsFound = true;
                 }
                 if (CoolingCoilOutletNode != HeatingCoilInletNode && this->m_CoolCoilExists && this->m_HeatCoilExists) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "The cooling coil outlet node name must be the same as the heating coil inlet node name.");
-                    ShowContinueError(state, "...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode));
-                    ShowContinueError(state, "...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"The cooling coil outlet node name must be the same as the heating coil inlet node name.",
+                    				"...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode),
+                    				"...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
                     errorsFound = true;
                 }
                 if (this->m_SuppCoilExists) {
                     if (SupHeatCoilOutletNode != this->AirOutNode) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "The reheat coil outlet node name must be the same as the unitary system outlet node name.");
-                        ShowContinueError(state, "...Reheat coil outlet node name   = " + state.dataLoopNodes->NodeID(SupHeatCoilOutletNode));
-                        ShowContinueError(state, "...UnitarySystem outlet node name = " + state.dataLoopNodes->NodeID(this->AirOutNode));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"The reheat coil outlet node name must be the same as the unitary system outlet node name.",
+                        				"...Reheat coil outlet node name   = " + state.dataLoopNodes->NodeID(SupHeatCoilOutletNode),
+                        				"...UnitarySystem outlet node name = " + state.dataLoopNodes->NodeID(this->AirOutNode));
                         errorsFound = true;
                     }
                 } else { // IF((this->m_Humidistat ...
                     // Heating coil outlet node name must be the same as the Unitary system outlet node name
                     if (this->m_HeatCoilExists && HeatingCoilOutletNode != this->AirOutNode) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state,
-                                          "When a blow through fan is specified, the heating coil outlet node name must be the same as the "
-                                          "unitary system outlet node name.");
-                        ShowContinueError(state, "...Heating coil outlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
-                        ShowContinueError(state, "...Unitary system outlet node name = " + state.dataLoopNodes->NodeID(this->AirOutNode));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"When a blow through fan is specified, the heating coil outlet node name must be the same as the "
+                                          "unitary system outlet node name.",
+                        				"...Heating coil outlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode),
+                        				"...Unitary system outlet node name = " + state.dataLoopNodes->NodeID(this->AirOutNode));
                         errorsFound = true;
                     }
                 }
             } else { // IF(this->CoolingCoilUpstream)THEN
                 if (FanOutletNode != HeatingCoilInletNode && this->m_FanExists && this->m_HeatCoilExists) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state,
-                                      "When a blow through fan is specified, the fan outlet node name must be the same as the heating coil "
-                                      "inlet node name.");
-                    ShowContinueError(state, "...Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                    ShowContinueError(state, "...Heating coil inlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"When a blow through fan is specified, the fan outlet node name must be the same as the heating coil "
+                                      "inlet node name.",
+                    				"...Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                    				"...Heating coil inlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
                     errorsFound = true;
                 }
                 if (HeatingCoilOutletNode != CoolingCoilInletNode && this->m_CoolCoilExists && this->m_HeatCoilExists) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "The heating coil outlet node name must be the same as the cooling coil inlet node name.");
-                    ShowContinueError(state, "...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
-                    ShowContinueError(state, "...Cooling coil inlet node name  = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"The heating coil outlet node name must be the same as the cooling coil inlet node name.",
+                    				"...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode),
+                    				"...Cooling coil inlet node name  = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
                     errorsFound = true;
                 }
                 if (CoolingCoilOutletNode != this->AirOutNode && this->m_CoolCoilExists) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state,
-                                      "When a blow through fan is specified, the cooling coil outlet node name must be the same as the unitary "
-                                      "system outlet node name.");
-                    ShowContinueError(state, "...Cooling coil outlet node name   = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode));
-                    ShowContinueError(state, "...UnitarySystem outlet node name  = " + state.dataLoopNodes->NodeID(this->AirOutNode));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"When a blow through fan is specified, the cooling coil outlet node name must be the same as the unitary "
+                                      "system outlet node name.",
+                    				"...Cooling coil outlet node name   = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode),
+                    				"...UnitarySystem outlet node name  = " + state.dataLoopNodes->NodeID(this->AirOutNode));
                     errorsFound = true;
                 }
             }
@@ -6477,91 +6444,84 @@ namespace UnitarySystems {
 
             if (this->m_CoolingCoilUpstream) {
                 if (CoolingCoilInletNode != this->AirInNode && CoolingCoilInletNode != 0 && this->m_FanExists) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state,
-                                      "When a draw through fan is specified, the cooling coil inlet node name must be the same as the unitary "
-                                      "system inlet node name.");
-                    ShowContinueError(state, "...Cooling coil inlet node name  = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
-                    ShowContinueError(state, "...UnitarySystem inlet node name = " + state.dataLoopNodes->NodeID(this->AirInNode));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"When a draw through fan is specified, the cooling coil inlet node name must be the same as the unitary "
+                                      "system inlet node name.",
+                    				"...Cooling coil inlet node name  = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode),
+                    				"...UnitarySystem inlet node name = " + state.dataLoopNodes->NodeID(this->AirInNode));
                     errorsFound = true;
                 }
                 if (CoolingCoilOutletNode != HeatingCoilInletNode && this->m_CoolCoilExists && this->m_HeatCoilExists) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "The cooling coil outlet node name must be the same as the heating coil inlet node name.");
-                    ShowContinueError(state, "...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode));
-                    ShowContinueError(state, "...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"The cooling coil outlet node name must be the same as the heating coil inlet node name.",
+                    				"...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode),
+                    				"...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
                     errorsFound = true;
                 }
                 if (HeatingCoilOutletNode != FanInletNode && this->m_HeatCoilExists && this->m_FanExists) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state,
-                                      "When a draw through fan is specified, the heating coil outlet node name must be the same as the fan "
-                                      "inlet node name.");
-                    ShowContinueError(state, "...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
-                    ShowContinueError(state, "...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"When a draw through fan is specified, the heating coil outlet node name must be the same as the fan "
+                                      "inlet node name.",
+                    				"...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode),
+                    				"...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode));
                     errorsFound = true;
                 }
                 if (this->m_SuppCoilExists) {
                     if (FanOutletNode != SupHeatCoilInletNode && this->m_FanExists) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state,
-                                          "When a draw through fan is specified, the fan outlet node name must be the same as the reheat coil "
-                                          "inlet node name.");
-                        ShowContinueError(state, "...Fan outlet node name        = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                        ShowContinueError(state, "...Reheat coil inlet node name = " + state.dataLoopNodes->NodeID(SupHeatCoilInletNode));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"When a draw through fan is specified, the fan outlet node name must be the same as the reheat coil "
+                                          "inlet node name.",
+                        				"...Fan outlet node name        = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                        				"...Reheat coil inlet node name = " + state.dataLoopNodes->NodeID(SupHeatCoilInletNode));
                         errorsFound = true;
                     }
                     if (SupHeatCoilOutletNode != this->AirOutNode) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state, "The reheat coil outlet node name must be the same as the unitary system outlet node name.");
-                        ShowContinueError(state, "...Reheat coil outlet node name   = " + state.dataLoopNodes->NodeID(SupHeatCoilOutletNode));
-                        ShowContinueError(state, "...UnitarySystem outlet node name = " + state.dataLoopNodes->NodeID(this->AirOutNode));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"The reheat coil outlet node name must be the same as the unitary system outlet node name.",
+                        				"...Reheat coil outlet node name   = " + state.dataLoopNodes->NodeID(SupHeatCoilOutletNode),
+                        				"...UnitarySystem outlet node name = " + state.dataLoopNodes->NodeID(this->AirOutNode));
                         errorsFound = true;
                     }
                 } else {
                     if (FanOutletNode != this->AirOutNode && this->m_FanExists) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state,
-                                          "When a draw through fan is specified, the fan outlet node name must be the same as the unitary system "
-                                          "outlet node name.");
-                        ShowContinueError(state, "...Fan outlet node name        = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                        ShowContinueError(state, "...Unitary system outlet node name = " + state.dataLoopNodes->NodeID(this->AirOutNode));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"When a draw through fan is specified, the fan outlet node name must be the same as the unitary system "
+                                          "outlet node name.",
+                        				"...Fan outlet node name        = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                        				"...Unitary system outlet node name = " + state.dataLoopNodes->NodeID(this->AirOutNode));
                         errorsFound = true;
                     }
                 }
             } else { // IF(this->CoolingCoilUpstream)THEN
                 if (HeatingCoilInletNode != this->AirInNode && HeatingCoilInletNode != 0 && this->m_FanExists) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state,
-                                      "When a draw through fan is specified, the heating coil inlet node name must be the same as the unitary "
-                                      "system inlet node name.");
-                    ShowContinueError(state, "...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
-                    ShowContinueError(state, "...UnitarySystem inlet node name = " + state.dataLoopNodes->NodeID(this->AirInNode));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"When a draw through fan is specified, the heating coil inlet node name must be the same as the unitary "
+                                      "system inlet node name.",
+                    				"...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode),
+                    				"...UnitarySystem inlet node name = " + state.dataLoopNodes->NodeID(this->AirInNode));
                     errorsFound = true;
                 }
                 if (HeatingCoilOutletNode != CoolingCoilInletNode && this->m_HeatCoilExists && this->m_CoolCoilExists) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state, "The heating coil outlet node name must be the same as the cooling coil inlet node name.");
-                    ShowContinueError(state, "...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
-                    ShowContinueError(state, "...Cooling coil inlet node name  = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"The heating coil outlet node name must be the same as the cooling coil inlet node name.",
+                    				"...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode),
+                    				"...Cooling coil inlet node name  = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
                     errorsFound = true;
                 }
                 if (CoolingCoilOutletNode != FanInletNode && this->m_CoolCoilExists && this->m_FanExists) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state,
-                                      "When a draw through fan is specified, the cooling coil outlet node name must be the same as the fan "
-                                      "inlet node name.");
-                    ShowContinueError(state, "...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode));
-                    ShowContinueError(state, "...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"When a draw through fan is specified, the cooling coil outlet node name must be the same as the fan "
+                                      "inlet node name.",
+                    				"...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode),
+                    				"...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode));
                     errorsFound = true;
                 }
                 if (FanOutletNode != this->AirOutNode && this->m_FanExists) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError(state,
-                                      "When a draw through fan is specified, the fan outlet node name must be the same as the unitary system "
-                                      "outlet node name.");
-                    ShowContinueError(state, "...Fan outlet node name           = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                    ShowContinueError(state, "...UnitarySystem outlet node name = " + state.dataLoopNodes->NodeID(this->AirOutNode));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                    				"When a draw through fan is specified, the fan outlet node name must be the same as the unitary system "
+                                      "outlet node name.",
+                    				"...Fan outlet node name           = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                    				"...UnitarySystem outlet node name = " + state.dataLoopNodes->NodeID(this->AirOutNode));
                     errorsFound = true;
                 }
             }
@@ -6613,41 +6573,35 @@ namespace UnitarySystems {
                     if (this->m_HeatingCoilType_Num != DataHVACGlobals::CoilDX_HeatingEmpirical &&
                         this->m_HeatingCoilType_Num != DataHVACGlobals::CoilDX_MultiSpeedHeating &&
                         this->m_HeatingCoilType_Num != DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                        ShowContinueError(state,
-                                          "When non-DX heating coils are specified, the heating air flow rate must be entered in Heating "
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                        				"When non-DX heating coils are specified, the heating air flow rate must be entered in Heating "
                                           "Supply Air Flow Rate Method");
                         errorsFound = true;
                     }
                 }
             } else if (this->m_MaxHeatAirVolFlow == 0.0 && !this->m_FanExists && !this->m_CoolCoilExists) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state,
-                                  "When non-DX heating coils are specified, the heating air flow rate must be entered in Heating "
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"When non-DX heating coils are specified, the heating air flow rate must be entered in Heating "
                                   "Supply Air Flow Rate Method");
             }
         }
 
         if (FanVolFlowRate != DataSizing::AutoSize && this->m_FanExists) {
             if (FanVolFlowRate < this->m_MaxCoolAirVolFlow && this->m_MaxCoolAirVolFlow != DataSizing::AutoSize && this->m_CoolCoilExists) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(
-                    state,
-                    format("... air flow rate = {:.7T} in fan object {} is less than the maximum HVAC system air flow rate in cooling mode.",
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				format("... air flow rate = {:.7T} in fan object {} is less than the maximum HVAC system air flow rate in cooling mode.",
                            FanVolFlowRate,
-                           this->m_FanName));
-                ShowContinueError(state, " The Cooling Supply Air Flow Rate is reset to the fan flow rate and the simulation continues.");
+                           this->m_FanName),
+                				" The Cooling Supply Air Flow Rate is reset to the fan flow rate and the simulation continues.");
                 this->m_MaxCoolAirVolFlow = FanVolFlowRate;
                 this->m_DesignFanVolFlowRate = FanVolFlowRate;
             }
             if (FanVolFlowRate < this->m_MaxHeatAirVolFlow && this->m_MaxHeatAirVolFlow != DataSizing::AutoSize && this->m_HeatCoilExists) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(
-                    state,
-                    format("... air flow rate = {:.7T} in fan object {} is less than the maximum HVAC system air flow rate in heating mode.",
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				format("... air flow rate = {:.7T} in fan object {} is less than the maximum HVAC system air flow rate in heating mode.",
                            FanVolFlowRate,
-                           this->m_FanName));
-                ShowContinueError(state, " The Heating Supply Air Flow Rate is reset to the fan flow rate and the simulation continues.");
+                           this->m_FanName),
+                				" The Heating Supply Air Flow Rate is reset to the fan flow rate and the simulation continues.");
                 this->m_MaxHeatAirVolFlow = FanVolFlowRate;
                 this->m_DesignFanVolFlowRate = FanVolFlowRate;
             }
@@ -6797,13 +6751,12 @@ namespace UnitarySystems {
                     errorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "Illegal Heat Recovery Water Inlet Node Name = " + loc_heatRecoveryInletNodeName);
-                ShowContinueError(state, "Illegal Heat Recovery Water Outlet Node Name = " + loc_heatRecoveryOutletNodeName);
-                ShowContinueError(state,
-                                  "... heat recovery nodes must be specified when Design Heat Recovery Water Flow Rate"
-                                  " is greater than 0.");
-                ShowContinueError(state, format("... Design Heat Recovery Water Flow Rate = {:.7R}", this->m_DesignHRWaterVolumeFlow));
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"Illegal Heat Recovery Water Inlet Node Name = " + loc_heatRecoveryInletNodeName,
+                				"Illegal Heat Recovery Water Outlet Node Name = " + loc_heatRecoveryOutletNodeName,
+                				"... heat recovery nodes must be specified when Design Heat Recovery Water Flow Rate"
+                                  " is greater than 0.",
+                				format("... Design Heat Recovery Water Flow Rate = {:.7R}", this->m_DesignHRWaterVolumeFlow));
                 errorsFound = true;
             }
         }
@@ -6854,18 +6807,18 @@ namespace UnitarySystems {
                     }
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state, "... one or both of the following inputs are invalid.");
-                ShowContinueError(state, "Field Design Specification Multispeed Object Type = " + this->m_DesignSpecMultispeedHPType);
-                ShowContinueError(state, "Field Design Specification Multispeed Object Name = " + this->m_DesignSpecMultispeedHPName);
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"... one or both of the following inputs are invalid.",
+                				"Field Design Specification Multispeed Object Type = " + this->m_DesignSpecMultispeedHPType,
+                				"Field Design Specification Multispeed Object Name = " + this->m_DesignSpecMultispeedHPName);
                 errorsFound = true;
             }
         } else if ((loc_m_DesignSpecMultispeedHPType == "" && loc_m_DesignSpecMultispeedHPName != "") ||
                    (loc_m_DesignSpecMultispeedHPType != "" && loc_m_DesignSpecMultispeedHPName == "")) {
-            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-            ShowContinueError(state, "... one or both of the following inputs are invalid.");
-            ShowContinueError(state, "Field Design Specification Multispeed Object Type = " + this->m_DesignSpecMultispeedHPType);
-            ShowContinueError(state, "Field Design Specification Multispeed Object Name = " + this->m_DesignSpecMultispeedHPName);
+            ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+            				"... one or both of the following inputs are invalid.",
+            				"Field Design Specification Multispeed Object Type = " + this->m_DesignSpecMultispeedHPType,
+            				"Field Design Specification Multispeed Object Name = " + this->m_DesignSpecMultispeedHPName);
             errorsFound = true;
             //} else if (this->m_NumOfSpeedHeating > 0) { // how do these last 2 get called?
             //    int m_NumOfSpeedHeating = this->m_NumOfSpeedHeating;
@@ -6887,9 +6840,8 @@ namespace UnitarySystems {
         if (this->m_DiscreteSpeedCoolingCoil) {
 
             if (this->m_NumOfSpeedCooling == 0) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state,
-                                  "... Cooling coil object type requires valid " + std::string{unitarySysHeatPumpPerformanceObjectType} +
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"... Cooling coil object type requires valid " + std::string{unitarySysHeatPumpPerformanceObjectType} +
                                       " for cooling to be specified with number of speeds > 0");
                 errorsFound = true;
             }
@@ -6899,9 +6851,8 @@ namespace UnitarySystems {
             if (this->m_DesignSpecMSHPIndex > -1) this->m_NumOfSpeedHeating = this->m_CompPointerMSHP->numOfSpeedHeating;
 
             if (this->m_NumOfSpeedHeating == 0) {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                ShowContinueError(state,
-                                  "... Heating coil object type requires valid " + std::string{unitarySysHeatPumpPerformanceObjectType} +
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName,
+                				"... Heating coil object type requires valid " + std::string{unitarySysHeatPumpPerformanceObjectType} +
                                       " for heating to be specified with number of speeds > 0");
                 errorsFound = true;
             }
@@ -6921,12 +6872,10 @@ namespace UnitarySystems {
         } else {
             if (this->m_DesignSpecMSHPIndex > -1) {
                 if (this->m_CompPointerMSHP->m_SingleModeFlag) {
-                    ShowSevereError(state, cCurrentModuleObject + ": " + thisObjectName);
-                    ShowContinueError(state,
-                                      "In order to perform Single Mode Operation, the valid cooling coil type is Coil:Cooling:DX:MultiSpeed "
-                                      "or Coil:Cooling:DX and the valid heating is Coil:Heating:DX:MultiSpeed or Coil:Heating:Fuel.");
-                    ShowContinueError(
-                        state, "The input cooling coil type = " + loc_coolingCoilType + " and the input heating coil type = " + loc_heatingCoilType);
+                    ShowSevereError(state, cCurrentModuleObject + ": " + thisObjectName,
+                    				"In order to perform Single Mode Operation, the valid cooling coil type is Coil:Cooling:DX:MultiSpeed "
+                                      "or Coil:Cooling:DX and the valid heating is Coil:Heating:DX:MultiSpeed or Coil:Heating:Fuel.",
+                    				"The input cooling coil type = " + loc_coolingCoilType + " and the input heating coil type = " + loc_heatingCoilType);
                 }
             }
         }
@@ -7026,9 +6975,9 @@ namespace UnitarySystems {
                 this->m_RunOnLatentOnlyWithSensible = false;
             }
             if (this->m_MaxNoCoolHeatAirVolFlow == 0.0) { // 0 min air flow not allowed for SZVAV
-                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                ShowContinueError(state, "Control Type = " + loc_m_ControlType);
-                ShowContinueError(state, "Input for No Load Supply Air Flow Rate cannot be 0.");
+                ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName,
+                				"Control Type = " + loc_m_ControlType,
+                				"Input for No Load Supply Air Flow Rate cannot be 0.");
                 errorsFound = true;
             }
         }

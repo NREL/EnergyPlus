@@ -393,9 +393,8 @@ namespace VentilatedSlab {
                                         state.dataIPShortCut->cAlphaArgs(4) + "\" not found.");
                     ErrorsFound = true;
                 } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(1))) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid Surface");
-                    ShowContinueError(state,
-                                      cAlphaFields(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid Surface",
+                    				cAlphaFields(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
                                           "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
@@ -420,10 +419,8 @@ namespace VentilatedSlab {
                              .SourceSinkPresent) {
                         ShowSevereError(state,
                                         CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid surface=\"" +
-                                            state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).Name + "\".");
-                        ShowContinueError(
-                            state,
-                            "Surface Construction does not have a source/sink, Construction name= \"" +
+                                            state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).Name + "\".",
+                        				"Surface Construction does not have a source/sink, Construction name= \"" +
                                 state.dataConstruction
                                     ->Construct(state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).Construction)
                                     .Name +
@@ -439,10 +436,8 @@ namespace VentilatedSlab {
                         state.dataVentilatedSlab->VentSlab(Item).ZonePtr) {
                         ShowSevereError(state,
                                         CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid surface=\"" +
-                                            state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).Name + "\".");
-                        ShowContinueError(
-                            state,
-                            "Surface in Zone=" +
+                                            state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).Name + "\".",
+                        				"Surface in Zone=" +
                                 state.dataHeatBal->Zone(state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).Zone)
                                     .Name +
                                 ' ' + CurrentModuleObject + " in Zone=" + state.dataIPShortCut->cAlphaArgs(3));
@@ -455,10 +450,8 @@ namespace VentilatedSlab {
                              .SourceSinkPresent) {
                         ShowSevereError(state,
                                         CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid surface=\"" +
-                                            state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).Name + "\".");
-                        ShowContinueError(
-                            state,
-                            "Surface Construction does not have a source/sink, Construction name= \"" +
+                                            state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).Name + "\".",
+                        				"Surface Construction does not have a source/sink, Construction name= \"" +
                                 state.dataConstruction
                                     ->Construct(state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).Construction)
                                     .Name +
@@ -546,8 +539,8 @@ namespace VentilatedSlab {
             } else {
                 ShowSevereError(state,
                                 CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(8) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(8) + "\".");
-                ShowContinueError(state, "Control reset to SLAB ONLY Configuration.");
+                                    state.dataIPShortCut->cAlphaArgs(8) + "\".",
+                				"Control reset to SLAB ONLY Configuration.");
                 state.dataVentilatedSlab->VentSlab(Item).SysConfg = state.dataVentilatedSlab->SlabOnly;
             }
 
@@ -601,8 +594,8 @@ namespace VentilatedSlab {
             } else {
                 ShowSevereError(state,
                                 CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(9) + "=\"" +
-                                    state.dataIPShortCut->cAlphaArgs(9) + "\".");
-                ShowContinueError(state, "Control reset to ODB control.");
+                                    state.dataIPShortCut->cAlphaArgs(9) + "\".",
+                				"Control reset to ODB control.");
                 state.dataVentilatedSlab->VentSlab(Item).ControlType = state.dataVentilatedSlab->ODBControl;
             }
 
@@ -1083,9 +1076,8 @@ namespace VentilatedSlab {
                     }
 
                 } else { // no heating coil
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" missing heating coil.");
-                    ShowContinueError(state,
-                                      "a heating coil is required for " + cAlphaFields(26) + "=\"" + state.dataIPShortCut->cAlphaArgs(26) + "\".");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" missing heating coil.",
+                    				"a heating coil is required for " + cAlphaFields(26) + "=\"" + state.dataIPShortCut->cAlphaArgs(26) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -1133,12 +1125,11 @@ namespace VentilatedSlab {
                             } else {
                                 ShowSevereError(state,
                                                 "GetVentilatedSlabInput: " + CurrentModuleObject + "=\"" +
-                                                    state.dataVentilatedSlab->VentSlab(Item).Name + "\", invalid");
-                                ShowContinueError(state, "For: " + cAlphaFields(30) + "=\"" + state.dataIPShortCut->cAlphaArgs(30) + "\".");
-                                ShowContinueError(state,
-                                                  "Invalid Coil Type=" + state.dataVentilatedSlab->VentSlab(Item).CCoilPlantType +
-                                                      ", Name=" + state.dataVentilatedSlab->VentSlab(Item).CCoilPlantName);
-                                ShowContinueError(state, "must be \"Coil:Cooling:Water\" or \"Coil:Cooling:Water:DetailedGeometry\"");
+                                                    state.dataVentilatedSlab->VentSlab(Item).Name + "\", invalid",
+                                				"For: " + cAlphaFields(30) + "=\"" + state.dataIPShortCut->cAlphaArgs(30) + "\".",
+                                				"Invalid Coil Type=" + state.dataVentilatedSlab->VentSlab(Item).CCoilPlantType +
+                                                      ", Name=" + state.dataVentilatedSlab->VentSlab(Item).CCoilPlantName,
+                                				"must be \"Coil:Cooling:Water\" or \"Coil:Cooling:Water:DetailedGeometry\"");
                                 ErrorsFound = true;
                             }
                         } else {
@@ -1199,9 +1190,8 @@ namespace VentilatedSlab {
                     }
 
                 } else { // No Cooling Coil
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" missing cooling coil.");
-                    ShowContinueError(state,
-                                      "a cooling coil is required for " + cAlphaFields(26) + "=\"" + state.dataIPShortCut->cAlphaArgs(26) + "\".");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" missing cooling coil.",
+                    				"a cooling coil is required for " + cAlphaFields(26) + "=\"" + state.dataIPShortCut->cAlphaArgs(26) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -1214,9 +1204,8 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).HVACSizingIndex =
                     UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(34), state.dataSize->ZoneHVACSizing);
                 if (state.dataVentilatedSlab->VentSlab(Item).HVACSizingIndex == 0) {
-                    ShowSevereError(state, cAlphaFields(34) + " = " + state.dataIPShortCut->cAlphaArgs(34) + " not found.");
-                    ShowContinueError(
-                        state, "Occurs in " + state.dataVentilatedSlab->cMO_VentilatedSlab + " = " + state.dataVentilatedSlab->VentSlab(Item).Name);
+                    ShowSevereError(state, cAlphaFields(34) + " = " + state.dataIPShortCut->cAlphaArgs(34) + " not found.",
+                    				"Occurs in " + state.dataVentilatedSlab->cMO_VentilatedSlab + " = " + state.dataVentilatedSlab->VentSlab(Item).Name);
                     ErrorsFound = true;
                 }
             }
@@ -2220,9 +2209,8 @@ namespace VentilatedSlab {
                             } else {
                                 DoWaterCoilSizing = false;
                                 // If there is no heating Plant Sizing object and autosizing was requested, issue fatal error message
-                                ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object");
-                                ShowContinueError(state,
-                                                  "Occurs in " + state.dataVentilatedSlab->cMO_VentilatedSlab +
+                                ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object",
+                                				"Occurs in " + state.dataVentilatedSlab->cMO_VentilatedSlab +
                                                       " Object=" + state.dataVentilatedSlab->VentSlab(Item).Name);
                                 ErrorsFound = true;
                             }
@@ -2424,8 +2412,8 @@ namespace VentilatedSlab {
                                 MaxVolHotSteamFlowDes = 0.0;
                             }
                         } else {
-                            ShowSevereError(state, "Autosizing of Steam flow requires a heating loop Sizing:Plant object");
-                            ShowContinueError(state, "Occurs in ZoneHVAC:VentilatedSlab Object=" + state.dataVentilatedSlab->VentSlab(Item).Name);
+                            ShowSevereError(state, "Autosizing of Steam flow requires a heating loop Sizing:Plant object",
+                            				"Occurs in ZoneHVAC:VentilatedSlab Object=" + state.dataVentilatedSlab->VentSlab(Item).Name);
                             ErrorsFound = true;
                         }
                     }
@@ -2506,9 +2494,8 @@ namespace VentilatedSlab {
                         } else {
                             DoWaterCoilSizing = false;
                             // If there is no cooling Plant Sizing object and autosizing was requested, issue fatal error message
-                            ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object");
-                            ShowContinueError(state,
-                                              "Occurs in " + state.dataVentilatedSlab->cMO_VentilatedSlab +
+                            ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object",
+                            				"Occurs in " + state.dataVentilatedSlab->cMO_VentilatedSlab +
                                                   " Object=" + state.dataVentilatedSlab->VentSlab(Item).Name);
                             ErrorsFound = true;
                         }
@@ -3014,16 +3001,16 @@ namespace VentilatedSlab {
                 SetPointTempHi = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).HotCtrlHiTempSchedPtr);
                 SetPointTempLo = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).HotCtrlLoTempSchedPtr);
                 if (SetPointTempHi < SetPointTempLo) {
-                    ShowSevereError(state, "Heating setpoint temperature mismatch in" + state.dataVentilatedSlab->VentSlab(Item).Name);
-                    ShowContinueError(state, "High setpoint temperature is less than low setpoint temperature--check your schedule input");
+                    ShowSevereError(state, "Heating setpoint temperature mismatch in" + state.dataVentilatedSlab->VentSlab(Item).Name,
+                    				"High setpoint temperature is less than low setpoint temperature--check your schedule input");
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
                 AirTempHi = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).HotAirHiTempSchedPtr);
                 AirTempLo = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).HotAirLoTempSchedPtr);
 
                 if (AirTempHi < AirTempLo) {
-                    ShowSevereError(state, "Heating Air temperature mismatch in" + state.dataVentilatedSlab->VentSlab(Item).Name);
-                    ShowContinueError(state, "High Air temperature is less than low Air temperature--check your schedule input");
+                    ShowSevereError(state, "Heating Air temperature mismatch in" + state.dataVentilatedSlab->VentSlab(Item).Name,
+                    				"High Air temperature is less than low Air temperature--check your schedule input");
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
 
@@ -3288,16 +3275,16 @@ namespace VentilatedSlab {
                 SetPointTempHi = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).ColdCtrlHiTempSchedPtr);
                 SetPointTempLo = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).ColdCtrlLoTempSchedPtr);
                 if (SetPointTempHi < SetPointTempLo) {
-                    ShowSevereError(state, "Cooling setpoint temperature mismatch in" + state.dataVentilatedSlab->VentSlab(Item).Name);
-                    ShowContinueError(state, "High setpoint temperature is less than low setpoint temperature--check your schedule input");
+                    ShowSevereError(state, "Cooling setpoint temperature mismatch in" + state.dataVentilatedSlab->VentSlab(Item).Name,
+                    				"High setpoint temperature is less than low setpoint temperature--check your schedule input");
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
 
                 AirTempHi = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).ColdAirHiTempSchedPtr);
                 AirTempLo = GetCurrentScheduleValue(state, state.dataVentilatedSlab->VentSlab(Item).ColdAirLoTempSchedPtr);
                 if (AirTempHi < AirTempLo) {
-                    ShowSevereError(state, "Cooling Air temperature mismatch in" + state.dataVentilatedSlab->VentSlab(Item).Name);
-                    ShowContinueError(state, "High Air temperature is less than low Air temperature--check your schedule input");
+                    ShowSevereError(state, "Cooling Air temperature mismatch in" + state.dataVentilatedSlab->VentSlab(Item).Name,
+                    				"High Air temperature is less than low Air temperature--check your schedule input");
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
 

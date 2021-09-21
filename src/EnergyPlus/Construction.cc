@@ -231,14 +231,12 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                         ShowSevereError(state,
                                         "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, "
                                         "material name = " +
-                                            state.dataMaterial->Material(CurrentLayer).Name);
-                        ShowContinueError(state,
-                                          format("High conductivity Material layers are not well supported for internal source constructions, "
+                                            state.dataMaterial->Material(CurrentLayer).Name,
+                        				format("High conductivity Material layers are not well supported for internal source constructions, "
                                                  "material conductivity = {:.3R} [W/m-K]",
-                                                 state.dataMaterial->Material(CurrentLayer).Conductivity));
-                        ShowContinueError(state, format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha));
-                        ShowContinueError(state,
-                                          format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
+                                                 state.dataMaterial->Material(CurrentLayer).Conductivity),
+                        				format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha),
+                        				format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
                         if (state.dataMaterial->Material(CurrentLayer).Thickness < DataHeatBalance::ThinMaterialLayerThreshold) {
                             ShowContinueError(state,
                                               format("Material may be too thin to be modeled well, thickness = {:.5R} [m]",
@@ -253,8 +251,8 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
             }
         }
         if (state.dataMaterial->Material(CurrentLayer).Thickness > 3.0) {
-            ShowSevereError(state, "InitConductionTransferFunctions: Material too thick for CTF calculation");
-            ShowContinueError(state, "material name = " + state.dataMaterial->Material(CurrentLayer).Name);
+            ShowSevereError(state, "InitConductionTransferFunctions: Material too thick for CTF calculation",
+            				"material name = " + state.dataMaterial->Material(CurrentLayer).Name);
             ErrorsFound = true;
         }
 
@@ -278,8 +276,8 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
 
                 ShowSevereError(state,
                                 "InitConductionTransferFunctions: Material=" + state.dataMaterial->Material(CurrentLayer).Name +
-                                    "R Value below lowest allowed value");
-                ShowContinueError(state, format("Lowest allowed value=[{:.3R}], Material R Value=[{:.3R}].", RValueLowLimit, lr(Layer)));
+                                    "R Value below lowest allowed value",
+                				format("Lowest allowed value=[{:.3R}], Material R Value=[{:.3R}].", RValueLowLimit, lr(Layer)));
                 ErrorsFound = true;
 
             } else { // A valid user defined R-value is available.
@@ -931,9 +929,9 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                 // Thus, if the time step reaches a certain point, error out and let the
                 // user know that something needs to be checked in the input file.
                 if (this->CTFTimeStep >= MaxAllowedTimeStep) {
-                    ShowSevereError(state, "CTF calculation convergence problem for Construction=\"" + this->Name + "\".");
-                    ShowContinueError(state, "...with Materials (outside layer to inside)");
-                    ShowContinueError(state, "(outside)=\"" + state.dataMaterial->Material(this->LayerPoint(1)).Name + "\"");
+                    ShowSevereError(state, "CTF calculation convergence problem for Construction=\"" + this->Name + "\".",
+                    				"...with Materials (outside layer to inside)",
+                    				"(outside)=\"" + state.dataMaterial->Material(this->LayerPoint(1)).Name + "\"");
                     for (int Layer = 2; Layer <= this->TotLayers; ++Layer) {
                         if (Layer != this->TotLayers) {
                             ShowContinueError(state, "(next)=\"" + state.dataMaterial->Material(this->LayerPoint(Layer)).Name + "\"");

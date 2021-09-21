@@ -217,8 +217,8 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
     }
 
     if (this->availScheduleIndex == 0) {
-        ShowSevereError(state, std::string{routineName} + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
-        ShowContinueError(state, "...Availability Schedule Name=\"" + input_data.availability_schedule_name + "\".");
+        ShowSevereError(state, std::string{routineName} + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", invalid",
+        				"...Availability Schedule Name=\"" + input_data.availability_schedule_name + "\".");
         errorsFound = true;
     }
 

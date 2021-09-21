@@ -429,8 +429,8 @@ namespace HVACFan {
         } else {
             availSchedIndex = ScheduleManager::GetScheduleIndex(state, alphaArgs(2));
             if (availSchedIndex == 0) {
-                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + alphaFieldNames(2) + " = " + alphaArgs(2));
+                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.",
+                				"Invalid " + alphaFieldNames(2) + " = " + alphaArgs(2));
                 errorsFound = true;
             }
         }
@@ -467,8 +467,8 @@ namespace HVACFan {
         } else if (UtilityRoutines::SameString(alphaArgs(5), "Discrete")) {
             speedControl = SpeedControlMethod::Discrete;
         } else {
-            ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + alphaFieldNames(5) + " = " + alphaArgs(5));
+            ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.",
+            				"Invalid " + alphaFieldNames(5) + " = " + alphaArgs(5));
             errorsFound = true;
         }
 
@@ -494,8 +494,8 @@ namespace HVACFan {
             } else if (UtilityRoutines::SameString(alphaArgs(6), "TotalEfficiencyAndPressure")) {
                 m_powerSizingMethod = PowerSizingMethod::totalEfficiencyAndPressure;
             } else {
-                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + alphaFieldNames(6) + " = " + alphaArgs(6));
+                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.",
+                				"Invalid " + alphaFieldNames(6) + " = " + alphaArgs(6));
                 errorsFound = true;
             }
             m_elecPowerPerFlowRate = numericArgs(7);
@@ -564,8 +564,8 @@ namespace HVACFan {
                 }
             } else {
                 // field set input does not match number of speeds, throw warning
-                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Fan with Discrete speed control does not have input for speed data that matches the number of speeds.");
+                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.",
+                				"Fan with Discrete speed control does not have input for speed data that matches the number of speeds.");
                 errorsFound = true;
             }
             // check that flow fractions are increasing
@@ -576,9 +576,8 @@ namespace HVACFan {
                 }
             }
             if (increasingOrderError) {
-                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state,
-                                  "Fan with Discrete speed control and multiple speed levels does not have input with flow fractions arranged in "
+                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.",
+                				"Fan with Discrete speed control and multiple speed levels does not have input with flow fractions arranged in "
                                   "increasing order.");
                 errorsFound = true;
             }
@@ -594,10 +593,8 @@ namespace HVACFan {
             }
             if (foundMissingPowerFraction) {
                 // field set input does not match number of speeds, throw warning
-                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(
-                    state,
-                    "Fan with Discrete speed control does not have input for power fraction at all speed levels and does not have a power curve.");
+                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.",
+                				"Fan with Discrete speed control does not have input for power fraction at all speed levels and does not have a power curve.");
                 errorsFound = true;
             }
         }

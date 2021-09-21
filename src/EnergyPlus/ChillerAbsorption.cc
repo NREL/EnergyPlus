@@ -292,8 +292,8 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
             thisChiller.NomPumpPowerWasAutoSized = true;
         }
         if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
-            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ErrorsFound = true;
         }
         // Assign Node Numbers to specified nodes
@@ -355,9 +355,9 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                        state.dataIPShortCut->cAlphaArgs(9).empty()) {
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
             } else {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "...Generator heat source type must be Steam or Hot Water.");
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+                				"...Generator heat source type must be Steam or Hot Water.");
                 ErrorsFound = true;
             }
         } else {
@@ -420,10 +420,10 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
             }
         } else if ((state.dataIPShortCut->lAlphaFieldBlanks(6) && !state.dataIPShortCut->lAlphaFieldBlanks(7)) ||
                    (!state.dataIPShortCut->lAlphaFieldBlanks(6) && state.dataIPShortCut->lAlphaFieldBlanks(7))) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + ", Name=" + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "...Generator fluid nodes must both be entered (or both left blank).");
-            ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
-            ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + state.dataIPShortCut->cAlphaArgs(7));
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + ", Name=" + state.dataIPShortCut->cAlphaArgs(1),
+            				"...Generator fluid nodes must both be entered (or both left blank).",
+            				"..." + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6),
+            				"..." + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + state.dataIPShortCut->cAlphaArgs(7));
             ErrorsFound = true;
         } else {
             if (thisChiller.GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
@@ -466,10 +466,10 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\",");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
-                ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
-                ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
+                                    "\",",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8),
+                				"Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated",
+                				"Flow mode NotModulated is assumed and the simulation continues.");
                 thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
             }
         }
@@ -482,9 +482,9 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
         }
 
         if (thisChiller.GeneratorVolFlowRate == 0.0 && thisChiller.GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
-            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(16), state.dataIPShortCut->rNumericArgs(16)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "...Generator water flow rate must be greater than 0 when absorber generator fluid type is hot water.");
+            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(16), state.dataIPShortCut->rNumericArgs(16)),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+            				"...Generator water flow rate must be greater than 0 when absorber generator fluid type is hot water.");
             ErrorsFound = true;
         }
 
@@ -1089,8 +1089,8 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
         }
     } else {
         if (this->NomCapWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-            ShowSevereError(state, "Autosizing of Absorption Chiller nominal capacity requires a loop Sizing:Plant object");
-            ShowContinueError(state, "Occurs in Chiller:Absorption object=" + this->Name);
+            ShowSevereError(state, "Autosizing of Absorption Chiller nominal capacity requires a loop Sizing:Plant object",
+            				"Occurs in Chiller:Absorption object=" + this->Name);
             ErrorsFound = true;
         }
         if (!this->NomCapWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && this->NomCap > 0.0) {
@@ -1188,8 +1188,8 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
         }
     } else {
         if (this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-            ShowSevereError(state, "Autosizing of Absorption Chiller evap flow rate requires a loop Sizing:Plant object");
-            ShowContinueError(state, "Occurs in CHILLER:ABSORPTION object=" + this->Name);
+            ShowSevereError(state, "Autosizing of Absorption Chiller evap flow rate requires a loop Sizing:Plant object",
+            				"Occurs in CHILLER:ABSORPTION object=" + this->Name);
             ErrorsFound = true;
         }
         if (!this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && this->EvapVolFlowRate > 0.0) {
@@ -1264,9 +1264,9 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
         }
     } else {
         if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-            ShowSevereError(state, "Autosizing of Absorption Chiller condenser flow rate requires a condenser");
-            ShowContinueError(state, "loop Sizing:Plant object");
-            ShowContinueError(state, "Occurs in CHILLER:ABSORPTION object=" + this->Name);
+            ShowSevereError(state, "Autosizing of Absorption Chiller condenser flow rate requires a condenser",
+            				"loop Sizing:Plant object",
+            				"Occurs in CHILLER:ABSORPTION object=" + this->Name);
             ErrorsFound = true;
         }
         if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize && (this->CondVolFlowRate > 0.0)) {
@@ -1425,10 +1425,10 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
         }
     } else {
         if (this->GeneratorVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-            ShowSevereError(state, "Autosizing of Absorption Chiller generator flow rate requires a loop Sizing:Plant object.");
-            ShowContinueError(state, " For steam loops, use a steam Sizing:Plant object.");
-            ShowContinueError(state, " For hot water loops, use a heating Sizing:Plant object.");
-            ShowContinueError(state, "Occurs in Chiller:Absorption object=" + this->Name);
+            ShowSevereError(state, "Autosizing of Absorption Chiller generator flow rate requires a loop Sizing:Plant object.",
+            				" For steam loops, use a steam Sizing:Plant object.",
+            				" For hot water loops, use a heating Sizing:Plant object.",
+            				"Occurs in Chiller:Absorption object=" + this->Name);
             ErrorsFound = true;
         }
         if (!this->GeneratorVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->GeneratorVolFlowRate > 0.0)) {

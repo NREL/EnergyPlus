@@ -188,8 +188,8 @@ void ExhaustAbsorberSpecs::simulate(
         }
     } else {
         // Error, nodes do not match
-        ShowSevereError(state, "Invalid call to Exhaust Absorber Chiller " + this->Name);
-        ShowContinueError(state, "Node connections in branch are not consistent with object nodes.");
+        ShowSevereError(state, "Invalid call to Exhaust Absorber Chiller " + this->Name,
+        				"Node connections in branch are not consistent with object nodes.");
         ShowFatalError(state, "Preceding conditions cause termination.");
     }
 }
@@ -239,8 +239,8 @@ void ExhaustAbsorberSpecs::getDesignCapacities(
 
     if (!matchfound) {
         // Error, nodes do not match
-        ShowSevereError(state, "SimExhaustAbsorber: Invalid call to Exhaust Absorbtion Chiller-Heater " + this->Name);
-        ShowContinueError(state, "Node connections in branch are not consistent with object nodes.");
+        ShowSevereError(state, "SimExhaustAbsorber: Invalid call to Exhaust Absorbtion Chiller-Heater " + this->Name,
+        				"Node connections in branch are not consistent with object nodes.");
         ShowFatalError(state, "Preceding conditions cause termination.");
     } // Operate as Chiller or Heater
 }
@@ -472,8 +472,8 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
         }
         if (thisChiller.isWaterCooled) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid value");
-                ShowContinueError(state, "For WaterCooled chiller the condenser outlet node is required.");
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid value",
+                				"For WaterCooled chiller the condenser outlet node is required.");
                 Get_ErrorsFound = true;
             }
             thisChiller.CondReturnNodeNum = GetOnlySingleNode(state,
@@ -1203,9 +1203,9 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
     } else {
         if (this->NomCoolingCapWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + this->Name + "\", autosize error.");
-                ShowContinueError(state, "Autosizing of Exhaust Fired Absorption Chiller nominal cooling capacity requires");
-                ShowContinueError(state, "a cooling loop Sizing:Plant object.");
+                ShowSevereError(state, "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + this->Name + "\", autosize error.",
+                				"Autosizing of Exhaust Fired Absorption Chiller nominal cooling capacity requires",
+                				"a cooling loop Sizing:Plant object.");
                 ErrorsFound = true;
             }
         } else {
@@ -1274,9 +1274,9 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
     } else {
         if (this->EvapVolFlowRateWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + this->Name + "\", autosize error.");
-                ShowContinueError(state, "Autosizing of Exhaust Fired Absorption Chiller evap flow rate requires");
-                ShowContinueError(state, "a cooling loop Sizing:Plant object.");
+                ShowSevereError(state, "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + this->Name + "\", autosize error.",
+                				"Autosizing of Exhaust Fired Absorption Chiller evap flow rate requires",
+                				"a cooling loop Sizing:Plant object.");
                 ErrorsFound = true;
             }
         } else {
@@ -1351,9 +1351,9 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
     } else {
         if (this->HeatVolFlowRateWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + this->Name + "\", autosize error.");
-                ShowContinueError(state, "Autosizing of Exhaust Fired Absorption Chiller hot water flow rate requires");
-                ShowContinueError(state, "a heating loop Sizing:Plant object.");
+                ShowSevereError(state, "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + this->Name + "\", autosize error.",
+                				"Autosizing of Exhaust Fired Absorption Chiller hot water flow rate requires",
+                				"a heating loop Sizing:Plant object.");
                 ErrorsFound = true;
             }
         } else {
@@ -1439,8 +1439,8 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
         if (this->CondVolFlowRateWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, "SizeExhaustAbsorber: ChillerHeater:Absorption:DoubleEffect=\"" + this->Name + "\", autosize error.");
-                ShowSevereError(state, "Autosizing of Exhaust Fired Absorption Chiller condenser flow rate requires a condenser");
-                ShowContinueError(state, "loop Sizing:Plant object.");
+                ShowSevereError(state, "Autosizing of Exhaust Fired Absorption Chiller condenser flow rate requires a condenser",
+                				"loop Sizing:Plant object.");
                 ErrorsFound = true;
             }
         } else {

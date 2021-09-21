@@ -190,9 +190,9 @@ void SetupRootFinder(EnergyPlusData &state,
 
     // Load assumed action for underlying function F(X)
     if (SlopeType != DataRootFinder::Slope::Increasing && SlopeType != DataRootFinder::Slope::Decreasing) {
-        ShowSevereError(state, "SetupRootFinder: Invalid function slope specification. Valid choices are:");
-        ShowContinueError(state, format("SetupRootFinder: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
-        ShowContinueError(state, format("SetupRootFinder: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
+        ShowSevereError(state, "SetupRootFinder: Invalid function slope specification. Valid choices are:",
+        				format("SetupRootFinder: Slope::Increasing={}", DataRootFinder::Slope::Increasing),
+        				format("SetupRootFinder: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
         ShowFatalError(state, "SetupRootFinder: Preceding error causes program termination.");
     }
     RootFinderData.Controls.SlopeType = SlopeType;
@@ -200,11 +200,11 @@ void SetupRootFinder(EnergyPlusData &state,
     // Load solution method
     if (MethodType != iMethod::Bisection && MethodType != iMethod::FalsePosition && MethodType != iMethod::Secant && MethodType != iMethod::Brent) {
 
-        ShowSevereError(state, "SetupRootFinder: Invalid solution method specification. Valid choices are:");
-        ShowContinueError(state, format("SetupRootFinder: iMethodBisection={}", iMethod::Bisection));
-        ShowContinueError(state, format("SetupRootFinder: iMethodFalsePosition={}", iMethod::FalsePosition));
-        ShowContinueError(state, format("SetupRootFinder: iMethodSecant={}", iMethod::Secant));
-        ShowContinueError(state, format("SetupRootFinder: iMethodBrent={}", iMethod::Brent));
+        ShowSevereError(state, "SetupRootFinder: Invalid solution method specification. Valid choices are:",
+        				format("SetupRootFinder: iMethodBisection={}", iMethod::Bisection),
+        				format("SetupRootFinder: iMethodFalsePosition={}", iMethod::FalsePosition),
+        				format("SetupRootFinder: iMethodSecant={}", iMethod::Secant),
+        				format("SetupRootFinder: iMethodBrent={}", iMethod::Brent));
         ShowFatalError(state, "SetupRootFinder: Preceding error causes program termination.");
     }
     RootFinderData.Controls.MethodType = MethodType;
@@ -609,9 +609,9 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
 
             } else {
                 // Should never happen
-                ShowSevereError(state, "CheckInternalConsistency: Invalid function slope specification. Valid choices are:");
-                ShowContinueError(state, format("CheckInternalConsistency: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
-                ShowContinueError(state, format("CheckInternalConsistency: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
+                ShowSevereError(state, "CheckInternalConsistency: Invalid function slope specification. Valid choices are:",
+                				format("CheckInternalConsistency: Slope::Increasing={}", DataRootFinder::Slope::Increasing),
+                				format("CheckInternalConsistency: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
                 ShowFatalError(state, "CheckInternalConsistency: Preceding error causes program termination.");
             }
         }
@@ -644,9 +644,9 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
 
             } else {
                 // Should never happen
-                ShowSevereError(state, "CheckInternalConsistency: Invalid function slope specification. Valid choices are:");
-                ShowContinueError(state, format("CheckInternalConsistency: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
-                ShowContinueError(state, format("CheckInternalConsistency: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
+                ShowSevereError(state, "CheckInternalConsistency: Invalid function slope specification. Valid choices are:",
+                				format("CheckInternalConsistency: Slope::Increasing={}", DataRootFinder::Slope::Increasing),
+                				format("CheckInternalConsistency: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
                 ShowFatalError(state, "CheckInternalConsistency: Preceding error causes program termination.");
             }
         }
@@ -670,9 +670,9 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
 
             } else {
                 // Should never happen
-                ShowSevereError(state, "CheckInternalConsistency: Invalid function slope specification. Valid choices are:");
-                ShowContinueError(state, format("CheckInternalConsistency: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
-                ShowContinueError(state, format("CheckInternalConsistency: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
+                ShowSevereError(state, "CheckInternalConsistency: Invalid function slope specification. Valid choices are:",
+                				format("CheckInternalConsistency: Slope::Increasing={}", DataRootFinder::Slope::Increasing),
+                				format("CheckInternalConsistency: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
                 ShowFatalError(state, "CheckInternalConsistency: Preceding error causes program termination.");
             }
         }
@@ -826,9 +826,9 @@ bool CheckSlope(EnergyPlusData &state, RootFinderDataType const &RootFinderData)
 
         } else {
             // Should never happen
-            ShowSevereError(state, "CheckSlope: Invalid function slope specification. Valid choices are:");
-            ShowContinueError(state, format("CheckSlope: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
-            ShowContinueError(state, format("CheckSlope: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
+            ShowSevereError(state, "CheckSlope: Invalid function slope specification. Valid choices are:",
+            				format("CheckSlope: Slope::Increasing={}", DataRootFinder::Slope::Increasing),
+            				format("CheckSlope: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
             ShowFatalError(state, "CheckSlope: Preceding error causes program termination.");
         }
     }
@@ -924,9 +924,9 @@ bool CheckMinConstraint(EnergyPlusData &state, RootFinderDataType const &RootFin
 
         } else {
             // Should never happen
-            ShowSevereError(state, "CheckMinConstraint: Invalid function slope specification. Valid choices are:");
-            ShowContinueError(state, format("CheckMinConstraint: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
-            ShowContinueError(state, format("CheckMinConstraint: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
+            ShowSevereError(state, "CheckMinConstraint: Invalid function slope specification. Valid choices are:",
+            				format("CheckMinConstraint: Slope::Increasing={}", DataRootFinder::Slope::Increasing),
+            				format("CheckMinConstraint: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
             ShowFatalError(state, "CheckMinConstraint: Preceding error causes program termination.");
         }
     }
@@ -972,9 +972,9 @@ bool CheckMaxConstraint(EnergyPlusData &state, RootFinderDataType const &RootFin
 
         } else {
             // Should never happen
-            ShowSevereError(state, "CheckMaxConstraint: Invalid function slope specification. Valid choices are:");
-            ShowContinueError(state, format("CheckMaxConstraint: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
-            ShowContinueError(state, format("CheckMaxConstraint: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
+            ShowSevereError(state, "CheckMaxConstraint: Invalid function slope specification. Valid choices are:",
+            				format("CheckMaxConstraint: Slope::Increasing={}", DataRootFinder::Slope::Increasing),
+            				format("CheckMaxConstraint: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
             ShowFatalError(state, "CheckMaxConstraint: Preceding error causes program termination.");
         }
     }
@@ -1134,10 +1134,9 @@ void UpdateBracket(EnergyPlusData &state,
                         RootFinderData.LowerPoint.Y = Y;
                     } else {
                         // Should never happen if CheckLowerUpperBracket() is called before
-                        ShowSevereError(state, "UpdateBracket: Current iterate is smaller than the lower bracket.");
-                        ShowContinueError(state, format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y));
-                        ShowContinueError(
-                            state, format("UpdateBracket: XLower={:.15T}, YLower={:.15T}", RootFinderData.LowerPoint.X, RootFinderData.LowerPoint.Y));
+                        ShowSevereError(state, "UpdateBracket: Current iterate is smaller than the lower bracket.",
+                        				format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y),
+                        				format("UpdateBracket: XLower={:.15T}, YLower={:.15T}", RootFinderData.LowerPoint.X, RootFinderData.LowerPoint.Y));
                         ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
                     }
                 }
@@ -1160,10 +1159,9 @@ void UpdateBracket(EnergyPlusData &state,
                         RootFinderData.UpperPoint.Y = Y;
                     } else {
                         // Should never happen if CheckLowerUpperBracket() is called before
-                        ShowSevereError(state, "UpdateBracket: Current iterate is greater than the upper bracket.");
-                        ShowContinueError(state, format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y));
-                        ShowContinueError(
-                            state, format("UpdateBracket: XUpper={:.15T}, YUpper={:.15T}", RootFinderData.UpperPoint.X, RootFinderData.UpperPoint.Y));
+                        ShowSevereError(state, "UpdateBracket: Current iterate is greater than the upper bracket.",
+                        				format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y),
+                        				format("UpdateBracket: XUpper={:.15T}, YUpper={:.15T}", RootFinderData.UpperPoint.X, RootFinderData.UpperPoint.Y));
                         ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
                     }
                 }
@@ -1189,10 +1187,9 @@ void UpdateBracket(EnergyPlusData &state,
                         RootFinderData.LowerPoint.Y = Y;
                     } else {
                         // Should never happen if CheckLowerUpperBracket() is called before
-                        ShowSevereError(state, "UpdateBracket: Current iterate is smaller than the lower bracket.");
-                        ShowContinueError(state, format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y));
-                        ShowContinueError(
-                            state, format("UpdateBracket: XLower={:.15T}, YLower={:.15T}", RootFinderData.LowerPoint.X, RootFinderData.LowerPoint.Y));
+                        ShowSevereError(state, "UpdateBracket: Current iterate is smaller than the lower bracket.",
+                        				format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y),
+                        				format("UpdateBracket: XLower={:.15T}, YLower={:.15T}", RootFinderData.LowerPoint.X, RootFinderData.LowerPoint.Y));
                         ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
                     }
                 }
@@ -1215,10 +1212,9 @@ void UpdateBracket(EnergyPlusData &state,
                         RootFinderData.UpperPoint.Y = Y;
                     } else {
                         // Should never happen if CheckLowerUpperBracket() is called before
-                        ShowSevereError(state, "UpdateBracket: Current iterate is greater than the upper bracket.");
-                        ShowContinueError(state, format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y));
-                        ShowContinueError(
-                            state, format("UpdateBracket: XUpper={:.15T}, YUpper={:.15T}", RootFinderData.UpperPoint.X, RootFinderData.UpperPoint.Y));
+                        ShowSevereError(state, "UpdateBracket: Current iterate is greater than the upper bracket.",
+                        				format("UpdateBracket: X={:.15T}, Y={:.15T}", X, Y),
+                        				format("UpdateBracket: XUpper={:.15T}, YUpper={:.15T}", RootFinderData.UpperPoint.X, RootFinderData.UpperPoint.Y));
                         ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
                     }
                 }
@@ -1226,9 +1222,9 @@ void UpdateBracket(EnergyPlusData &state,
 
         } else {
             // Should never happen
-            ShowSevereError(state, "UpdateBracket: Invalid function slope specification. Valid choices are:");
-            ShowContinueError(state, format("UpdateBracket: Slope::Increasing={}", DataRootFinder::Slope::Increasing));
-            ShowContinueError(state, format("UpdateBracket: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
+            ShowSevereError(state, "UpdateBracket: Invalid function slope specification. Valid choices are:",
+            				format("UpdateBracket: Slope::Increasing={}", DataRootFinder::Slope::Increasing),
+            				format("UpdateBracket: Slope::Decreasing={}", DataRootFinder::Slope::Decreasing));
             ShowFatalError(state, "UpdateBracket: Preceding error causes program termination.");
         }
     }
@@ -1494,11 +1490,11 @@ void AdvanceRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData
                         // Brent method
                         RootFinderData.XCandidate = BrentMethod(RootFinderData);
                     } else {
-                        ShowSevereError(state, "AdvanceRootFinder: Invalid solution method specification. Valid choices are:");
-                        ShowContinueError(state, format("AdvanceRootFinder: iMethodBisection={}", iMethod::Bisection));
-                        ShowContinueError(state, format("AdvanceRootFinder: iMethodFalsePosition={}", iMethod::FalsePosition));
-                        ShowContinueError(state, format("AdvanceRootFinder: iMethodSecant={}", iMethod::Secant));
-                        ShowContinueError(state, format("AdvanceRootFinder: iMethodBrent={}", iMethod::Brent));
+                        ShowSevereError(state, "AdvanceRootFinder: Invalid solution method specification. Valid choices are:",
+                        				format("AdvanceRootFinder: iMethodBisection={}", iMethod::Bisection),
+                        				format("AdvanceRootFinder: iMethodFalsePosition={}", iMethod::FalsePosition),
+                        				format("AdvanceRootFinder: iMethodSecant={}", iMethod::Secant),
+                        				format("AdvanceRootFinder: iMethodBrent={}", iMethod::Brent));
                         ShowFatalError(state, "AdvanceRootFinder: Preceding error causes program termination.");
                     }
                 }

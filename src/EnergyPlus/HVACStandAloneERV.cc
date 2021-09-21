@@ -520,11 +520,10 @@ void GetStandAloneERV(EnergyPlusData &state)
 
         //   Check that supply air inlet node is an OA node
         if (!CheckOutAirNodeNumber(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode)) {
-            ShowSevereError(state, "For " + CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"");
-            ShowContinueError(state,
-                              " Node name of supply air inlet node not valid Outdoor Air Node = " +
-                                  state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode));
-            ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
+            ShowSevereError(state, "For " + CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"",
+            				" Node name of supply air inlet node not valid Outdoor Air Node = " +
+                                  state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirInletNode),
+            				"...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
             ErrorsFound = true;
         }
 
@@ -554,18 +553,16 @@ void GetStandAloneERV(EnergyPlusData &state)
             }
         }
         if (!ZoneInletNodeFound) {
-            ShowSevereError(state, "For " + CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"");
-            ShowContinueError(state, "... Node name of supply air outlet node does not appear in a ZoneHVAC:EquipmentConnections object.");
-            ShowContinueError(state,
-                              "... Supply air outlet node = " +
+            ShowSevereError(state, "For " + CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"",
+            				"... Node name of supply air outlet node does not appear in a ZoneHVAC:EquipmentConnections object.",
+            				"... Supply air outlet node = " +
                                   state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode));
             ErrorsFound = true;
         }
         if (!ZoneExhaustNodeFound) {
-            ShowSevereError(state, "For " + CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"");
-            ShowContinueError(state, "... Node name of exhaust air inlet node does not appear in a ZoneHVAC:EquipmentConnections object.");
-            ShowContinueError(state,
-                              "... Exhaust air inlet node = " +
+            ShowSevereError(state, "For " + CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"",
+            				"... Node name of exhaust air inlet node does not appear in a ZoneHVAC:EquipmentConnections object.",
+            				"... Exhaust air inlet node = " +
                                   state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode));
             ErrorsFound = true;
         }
@@ -573,20 +570,15 @@ void GetStandAloneERV(EnergyPlusData &state)
         if (ZoneInletNodeFound && ZoneExhaustNodeFound) {
             if (ZoneInletCZN != ZoneExhaustCZN) {
                 ShowSevereError(state,
-                                "For " + CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"");
-                ShowContinueError(state,
-                                  "... Node name of supply air outlet node and exhasut air inlet node must appear in the same "
-                                  "ZoneHVAC:EquipmentConnections object.");
-                ShowContinueError(state,
-                                  "... Supply air outlet node = " +
-                                      state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode));
-                ShowContinueError(state,
-                                  "... ZoneHVAC:EquipmentConnections Zone Name = " + state.dataZoneEquip->ZoneEquipConfig(ZoneInletCZN).ZoneName);
-                ShowContinueError(state,
-                                  "... Exhaust air inlet node = " +
-                                      state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode));
-                ShowContinueError(state,
-                                  "... ZoneHVAC:EquipmentConnections Zone Name = " + state.dataZoneEquip->ZoneEquipConfig(ZoneExhaustCZN).ZoneName);
+                                "For " + CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"",
+                				"... Node name of supply air outlet node and exhasut air inlet node must appear in the same "
+                                  "ZoneHVAC:EquipmentConnections object.",
+                				"... Supply air outlet node = " +
+                                      state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode),
+                				"... ZoneHVAC:EquipmentConnections Zone Name = " + state.dataZoneEquip->ZoneEquipConfig(ZoneInletCZN).ZoneName,
+                				"... Exhaust air inlet node = " +
+                                      state.dataLoopNodes->NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode),
+                				"... ZoneHVAC:EquipmentConnections Zone Name = " + state.dataZoneEquip->ZoneEquipConfig(ZoneExhaustCZN).ZoneName);
                 ErrorsFound = true;
             }
         }
@@ -630,31 +622,27 @@ void GetStandAloneERV(EnergyPlusData &state)
 
         if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow == AutoSize &&
             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate != AutoSize) {
-            ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"");
-            ShowContinueError(state,
-                              "... When autosizing ERV, supply air fan = " + cFanTypes(SAFanTypeNum) + " \"" +
+            ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"",
+            				"... When autosizing ERV, supply air fan = " + cFanTypes(SAFanTypeNum) + " \"" +
                                   state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName + "\" must also be autosized.");
         }
 
         if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow == AutoSize &&
             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate != AutoSize) {
-            ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"");
-            ShowContinueError(state,
-                              "... When autosizing ERV, exhaust air fan = " + cFanTypes(EAFanTypeNum) + " \"" +
+            ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"",
+            				"... When autosizing ERV, exhaust air fan = " + cFanTypes(EAFanTypeNum) + " \"" +
                                   state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanName + "\" must also be autosized.");
         }
 
         if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow == AutoSize && HXSupAirFlowRate != AutoSize) {
-            ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"");
-            ShowContinueError(state,
-                              "... When autosizing ERV " + cNumericFields(1) + ", nominal supply air flow rate for heat exchanger with name = " +
+            ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"",
+            				"... When autosizing ERV " + cNumericFields(1) + ", nominal supply air flow rate for heat exchanger with name = " +
                                   state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName + " must also be autosized.");
         }
 
         if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow == AutoSize && HXSupAirFlowRate != AutoSize) {
-            ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"");
-            ShowContinueError(state,
-                              "... When autosizing ERV " + cNumericFields(2) + ", nominal supply air flow rate for heat exchanger with name = " +
+            ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"",
+            				"... When autosizing ERV " + cNumericFields(2) + ", nominal supply air flow rate for heat exchanger with name = " +
                                   state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName + " must also be autosized.");
         }
 
@@ -681,24 +669,22 @@ void GetStandAloneERV(EnergyPlusData &state)
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow <= 0.0) {
                 ShowSevereError(state,
                                 CurrentModuleObject + " = " + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + " has a " +
-                                    cNumericFields(1) + " <= 0.0, it must be >0.0");
-                ShowContinueError(state,
-                                  format("... Entered value={:.2R}", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow));
+                                    cNumericFields(1) + " <= 0.0, it must be >0.0",
+                				format("... Entered value={:.2R}", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow));
                 ErrorsFound = true;
             }
         } else {
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AirVolFlowPerFloorArea == 0.0 &&
                 state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AirVolFlowPerOccupant == 0.0) {
-                ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"");
-                ShowContinueError(state,
-                                  "... Autosizing " + cNumericFields(1) + " requires at least one input for " + cNumericFields(3) + " or " +
+                ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"",
+                				"... Autosizing " + cNumericFields(1) + " requires at least one input for " + cNumericFields(3) + " or " +
                                       cNumericFields(4) + '.');
                 ErrorsFound = true;
             }
             // both inputs must be autosized
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"");
-                ShowContinueError(state, "... When autosizing, " + cNumericFields(1) + " and " + cNumericFields(2) + " must both be autosized.");
+                ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"",
+                				"... When autosizing, " + cNumericFields(1) + " and " + cNumericFields(2) + " must both be autosized.");
                 ErrorsFound = true;
             }
         }
@@ -727,23 +713,21 @@ void GetStandAloneERV(EnergyPlusData &state)
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow <= 0.0) {
                 ShowSevereError(state,
                                 CurrentModuleObject + " = " + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + " has an " +
-                                    cNumericFields(2) + " <= 0.0, it must be >0.0");
-                ShowContinueError(state,
-                                  format("... Entered value={:.2R}", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow));
+                                    cNumericFields(2) + " <= 0.0, it must be >0.0",
+                				format("... Entered value={:.2R}", state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow));
                 ErrorsFound = true;
             }
         } else {
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AirVolFlowPerFloorArea == 0.0 &&
                 state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AirVolFlowPerOccupant == 0.0) {
-                ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"");
-                ShowContinueError(state,
-                                  "... Autosizing " + cNumericFields(2) + " requires at least one input for " + cNumericFields(3) + " or " +
+                ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"",
+                				"... Autosizing " + cNumericFields(2) + " requires at least one input for " + cNumericFields(3) + " or " +
                                       cNumericFields(4) + '.');
                 ErrorsFound = true;
             }
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow != AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"");
-                ShowContinueError(state, "... When autosizing, " + cNumericFields(1) + " and " + cNumericFields(2) + " must both be autosized.");
+                ShowSevereError(state, CurrentModuleObject + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name + "\"",
+                				"... When autosizing, " + cNumericFields(1) + " and " + cNumericFields(2) + " must both be autosized.");
                 ErrorsFound = true;
             }
         }
@@ -912,8 +896,8 @@ void GetStandAloneERV(EnergyPlusData &state)
         if (!lAlphaBlanks(2)) {
             thisOAController.EnthalpyCurvePtr = GetCurveIndex(state, Alphas(2));
             if (GetCurveIndex(state, Alphas(2)) == 0) {
-                ShowSevereError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                ShowContinueError(state, "..." + cAlphaFields(2) + " not found:" + Alphas(2));
+                ShowSevereError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                				"..." + cAlphaFields(2) + " not found:" + Alphas(2));
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic and Cubic
@@ -1001,10 +985,10 @@ void GetStandAloneERV(EnergyPlusData &state)
                     break; // found zone node
                 }
                 if (!ZoneNodeFound) {
-                    ShowSevereError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                    ShowContinueError(state, "... Did not find Air Node (Zone with Humidistat)");
-                    ShowContinueError(state, "... Specified " + cAlphaFields(7) + " = " + Alphas(7));
-                    ShowContinueError(state, "... A ZoneHVAC:EquipmentConnections object must be specified for this zone.");
+                    ShowSevereError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                    				"... Did not find Air Node (Zone with Humidistat)",
+                    				"... Specified " + cAlphaFields(7) + " = " + Alphas(7),
+                    				"... A ZoneHVAC:EquipmentConnections object must be specified for this zone.");
                     ErrorsFound = true;
                 } else {
                     for (NumHstatZone = 1; NumHstatZone <= state.dataZoneCtrls->NumHumidityControlZones; ++NumHstatZone) {
@@ -1013,16 +997,16 @@ void GetStandAloneERV(EnergyPlusData &state)
                         break;
                     }
                     if (!HStatFound) {
-                        ShowSevereError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                        ShowContinueError(state, "... Did not find zone humidistat");
-                        ShowContinueError(state, "... A ZoneControl:Humidistat object must be specified for this zone.");
+                        ShowSevereError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                        				"... Did not find zone humidistat",
+                        				"... A ZoneControl:Humidistat object must be specified for this zone.");
                         ErrorsFound = true;
                     }
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                ShowContinueError(state, "... Did not find Air Node (Zone with Humidistat)");
-                ShowContinueError(state, "... A ZoneHVAC:EquipmentConnections object must be specified for this zone.");
+                ShowSevereError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                				"... Did not find Air Node (Zone with Humidistat)",
+                				"... A ZoneHVAC:EquipmentConnections object must be specified for this zone.");
                 ErrorsFound = true;
             }
 

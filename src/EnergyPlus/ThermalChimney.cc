@@ -200,16 +200,14 @@ namespace ThermalChimney {
             state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid Zone");
-                ShowContinueError(
-                    state, "invalid - not found " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid Zone",
+                				"invalid - not found " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             } else if (!state.dataHeatBal->Zone(state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr).HasWindow) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid Zone");
-                ShowContinueError(state,
-                                  "...invalid - no window(s) in " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
-                                      state.dataIPShortCut->cAlphaArgs(2) + "\".");
-                ShowContinueError(state, "...thermal chimney zones must have window(s).");
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid Zone",
+                				"...invalid - no window(s) in " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                      state.dataIPShortCut->cAlphaArgs(2) + "\".",
+                				"...thermal chimney zones must have window(s).");
                 ErrorsFound = true;
             }
             state.dataThermalChimneys->ThermalChimneySys(Loop).RealZoneName = state.dataIPShortCut->cAlphaArgs(2);
@@ -220,9 +218,8 @@ namespace ThermalChimney {
             } else {
                 state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr == 0) {
-                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
-                    ShowContinueError(state,
-                                      "Invalid-not found " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
+                    ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data",
+                    				"Invalid-not found " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) +
                                           "\".");
                     ErrorsFound = true;
                 }
@@ -297,9 +294,8 @@ namespace ThermalChimney {
                            state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid reference " +
-                                        state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state,
-                                      "...must not have same zone as reference= " + state.dataIPShortCut->cAlphaFieldNames(TCZoneNum + 3) + "=\"" +
+                                        state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2),
+                    				"...must not have same zone as reference= " + state.dataIPShortCut->cAlphaFieldNames(TCZoneNum + 3) + "=\"" +
                                           state.dataIPShortCut->cAlphaArgs(TCZoneNum + 3) + "\".");
                     ErrorsFound = true;
                 }

@@ -181,8 +181,8 @@ namespace HVACSingleDuctInduc {
                 SimFourPipeIndUnit(state, IUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
 
             } else {
-                ShowSevereError(state, "Illegal Induction Unit Type used=" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType);
-                ShowContinueError(state, "Occurs in Induction Unit=" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
+                ShowSevereError(state, "Illegal Induction Unit Type used=" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
+                				"Occurs in Induction Unit=" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
                 ShowFatalError(state, "Preceding condition causes termination.");
             }
         }
@@ -429,9 +429,8 @@ namespace HVACSingleDuctInduc {
                 ShowSevereError(state,
                                 std::string{RoutineName} + "No matching Air Distribution Unit, for Unit = [" +
                                     state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType + ',' +
-                                    state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name + "].");
-                ShowContinueError(
-                    state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode));
+                                    state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name + "].",
+                				"...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode));
                 ErrorsFound = true;
             } else {
                 // Fill the Zone Equipment data with the supply air inlet node number of this unit.
@@ -440,14 +439,12 @@ namespace HVACSingleDuctInduc {
                     for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
                         if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                             if (ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
-                                ShowSevereError(state, "Error in connecting a terminal unit to a zone");
-                                ShowContinueError(state,
-                                                  state.dataLoopNodes->NodeID(state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode) +
-                                                      " already connects to another zone");
-                                ShowContinueError(state,
-                                                  "Occurs for terminal unit " + state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType + " = " +
-                                                      state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
-                                ShowContinueError(state, "Check terminal unit node names for errors");
+                                ShowSevereError(state, "Error in connecting a terminal unit to a zone",
+                                				state.dataLoopNodes->NodeID(state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode) +
+                                                      " already connects to another zone",
+                                				"Occurs for terminal unit " + state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType + " = " +
+                                                      state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
+                                				"Check terminal unit node names for errors");
                                 ErrorsFound = true;
                             } else {
                                 ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode =
@@ -467,8 +464,8 @@ namespace HVACSingleDuctInduc {
                 }
                 if (!AirNodeFound) {
                     ShowSevereError(
-                        state, "The outlet air node from the " + CurrentModuleObject + " = " + state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
-                    ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas(3));
+                        state, "The outlet air node from the " + CurrentModuleObject + " = " + state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
+                    				"did not have a matching Zone Equipment Inlet Node, Node =" + Alphas(3));
                     ErrorsFound = true;
                 }
             }
@@ -636,9 +633,8 @@ namespace HVACSingleDuctInduc {
                 ShowSevereError(state,
                                 "InitIndUnit: ADU=[Air Distribution Unit," +
                                     state.dataDefineEquipment->AirDistUnit(state.dataHVACSingleDuctInduc->IndUnit(Loop).ADUNum).Name +
-                                    "] is not on any ZoneHVAC:EquipmentList.");
-                ShowContinueError(state,
-                                  "...Unit=[" + state.dataHVACSingleDuctInduc->IndUnit(Loop).UnitType + ',' +
+                                    "] is not on any ZoneHVAC:EquipmentList.",
+                				"...Unit=[" + state.dataHVACSingleDuctInduc->IndUnit(Loop).UnitType + ',' +
                                       state.dataHVACSingleDuctInduc->IndUnit(Loop).Name + "] will not be simulated.");
             }
         }
@@ -966,9 +962,8 @@ namespace HVACSingleDuctInduc {
                                 MaxVolHotWaterFlowDes = 0.0;
                             }
                         } else {
-                            ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object");
-                            ShowContinueError(state,
-                                              "Occurs in" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType +
+                            ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object",
+                            				"Occurs in" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType +
                                                   " Object=" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
                             ErrorsFound = true;
                         }
@@ -1099,9 +1094,8 @@ namespace HVACSingleDuctInduc {
                                 MaxVolColdWaterFlowDes = 0.0;
                             }
                         } else {
-                            ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object");
-                            ShowContinueError(state,
-                                              "Occurs in" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType +
+                            ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object",
+                            				"Occurs in" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType +
                                                   " Object=" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
                             ErrorsFound = true;
                         }

@@ -142,9 +142,9 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     // Check if IntGainComp_TypeOfNum and cComponentObject are consistent
     if (!UtilityRoutines::SameString(UpperCaseObjectType, ZoneIntGainDeviceTypes(IntGainComp_TypeOfNum))) {
         ShowSevereError(state,
-                        "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain");
-        ShowContinueError(state, "Object type character = " + cComponentObject);
-        ShowContinueError(state, "Type of Num object name = " + ZoneIntGainDeviceTypes(IntGainComp_TypeOfNum));
+                        "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain",
+        				"Object type character = " + cComponentObject,
+        				"Type of Num object name = " + ZoneIntGainDeviceTypes(IntGainComp_TypeOfNum));
         return;
     }
 
@@ -161,10 +161,10 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     }
 
     if (FoundDuplicate) {
-        ShowSevereError(state, "SetupZoneInternalGain: developer error, trapped duplicate internal gains sent to SetupZoneInternalGain");
-        ShowContinueError(state, "The duplicate object user name =" + cComponentName);
-        ShowContinueError(state, "The duplicate object type = " + cComponentObject);
-        ShowContinueError(state, "This internal gain will not be modeled, and the simulation continues");
+        ShowSevereError(state, "SetupZoneInternalGain: developer error, trapped duplicate internal gains sent to SetupZoneInternalGain",
+        				"The duplicate object user name =" + cComponentName,
+        				"The duplicate object type = " + cComponentObject,
+        				"This internal gain will not be modeled, and the simulation continues");
         return;
     }
 

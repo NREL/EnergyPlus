@@ -339,8 +339,8 @@ namespace FanCoilUnits {
             } else {
                 FanCoil(FanCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (FanCoil(FanCoilNum).SchedPtr == 0) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid");
-                    ShowContinueError(state, "invalid-not found: " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid",
+                    				"invalid-not found: " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -363,16 +363,16 @@ namespace FanCoilUnits {
                     FanCoil(FanCoilNum).FanOpMode = ContFanCycCoil;
                 }
             } else {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
-                ShowContinueError(state, "illegal value: " + cAlphaFields(3) + "=\"" + Alphas(3) + "\".");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid",
+                				"illegal value: " + cAlphaFields(3) + "=\"" + Alphas(3) + "\".");
                 ErrorsFound = true;
             }
 
             FanCoil(FanCoilNum).SchedOutAir = Alphas(4);
             FanCoil(FanCoilNum).SchedOutAirPtr = GetScheduleIndex(state, Alphas(4)); // convert schedule name to pointer
             if (FanCoil(FanCoilNum).SchedOutAirPtr == 0 && (!lAlphaBlanks(4))) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
-                ShowContinueError(state, "illegal value: " + cAlphaFields(4) + "=\"" + Alphas(4) + "\".");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid",
+                				"illegal value: " + cAlphaFields(4) + "=\"" + Alphas(4) + "\".");
                 ErrorsFound = true;
             }
             FanCoil(FanCoilNum).MaxAirVolFlow = Numbers(1);
@@ -473,11 +473,10 @@ namespace FanCoilUnits {
                     } else if (UtilityRoutines::SameString(FanCoil(FanCoilNum).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry")) {
                         FanCoil(FanCoilNum).CCoilPlantTypeOfNum = TypeOf_CoilWaterDetailedFlatCooling;
                     } else {
-                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "For: " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
-                        ShowContinueError(state,
-                                          "Invalid Coil Type=" + FanCoil(FanCoilNum).CCoilPlantType + ", Name=" + FanCoil(FanCoilNum).CCoilPlantName);
-                        ShowContinueError(state, "must be \"Coil:Cooling:Water\" or \"Coil:Cooling:Water:DetailedGeometry\"");
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid",
+                        				"For: " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".",
+                        				"Invalid Coil Type=" + FanCoil(FanCoilNum).CCoilPlantType + ", Name=" + FanCoil(FanCoilNum).CCoilPlantName,
+                        				"must be \"Coil:Cooling:Water\" or \"Coil:Cooling:Water:DetailedGeometry\"");
                         ErrorsFound = true;
                     }
                 }
@@ -510,8 +509,8 @@ namespace FanCoilUnits {
                     }
                 }
             } else {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
-                ShowContinueError(state, "illegal value: " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid",
+                				"illegal value: " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
                 ErrorsFound = true;
             }
 
@@ -556,8 +555,8 @@ namespace FanCoilUnits {
                     }
                 }
             } else {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
-                ShowContinueError(state, "illegal value: " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid",
+                				"illegal value: " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
                 ErrorsFound = true;
             }
 
@@ -572,8 +571,8 @@ namespace FanCoilUnits {
             if (!lAlphaBlanks(16)) {
                 FanCoil(FanCoilNum).HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(16), state.dataSize->ZoneHVACSizing);
                 if (FanCoil(FanCoilNum).HVACSizingIndex == 0) {
-                    ShowSevereError(state, cAlphaFields(16) + " = " + Alphas(16) + " not found.");
-                    ShowContinueError(state, "Occurs in " + state.dataFanCoilUnits->cMO_FanCoil + " = " + FanCoil(FanCoilNum).Name);
+                    ShowSevereError(state, cAlphaFields(16) + " = " + Alphas(16) + " not found.",
+                    				"Occurs in " + state.dataFanCoilUnits->cMO_FanCoil + " = " + FanCoil(FanCoilNum).Name);
                     ErrorsFound = true;
                 }
             }
@@ -624,20 +623,19 @@ namespace FanCoilUnits {
                                 (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM::VarFanVarFlow && FanCoil(FanCoilNum).FanType_Num != FanType_SimpleVAV) ||
                                 (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM::VarFanConsFlow &&
                                  FanCoil(FanCoilNum).FanType_Num != FanType_SimpleVAV)) {
-                                ShowSevereError(state, std::string{RoutineName} + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
-                                ShowContinueError(state,
-                                                  "...the fan type of the object : " + FanCoil(FanCoilNum).FanName +
+                                ShowSevereError(state, std::string{RoutineName} + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name,
+                                				"...the fan type of the object : " + FanCoil(FanCoilNum).FanName +
                                                       " does not match with the capacity control method selected : " +
-                                                      FanCoil(FanCoilNum).CapCtrlMeth + " please see I/O reference");
-                                ShowContinueError(state, "...for ConstantFanVariableFlow a Fan:OnOff or Fan:ConstantVolume is valid.");
-                                ShowContinueError(state, "...for CyclingFan a Fan:OnOff is valid.");
-                                ShowContinueError(state, "...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:VariableVolume is valid.");
+                                                      FanCoil(FanCoilNum).CapCtrlMeth + " please see I/O reference",
+                                				"...for ConstantFanVariableFlow a Fan:OnOff or Fan:ConstantVolume is valid.",
+                                				"...for CyclingFan a Fan:OnOff is valid.",
+                                				"...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:VariableVolume is valid.");
                                 ErrorsFound = true;
                             }
 
                         } else {
-                            ShowSevereError(state, CurrentModuleObject + " = \"" + Alphas(1) + "\"");
-                            ShowContinueError(state, "Fan Type must be Fan:OnOff, Fan:ConstantVolume or Fan:VariableVolume.");
+                            ShowSevereError(state, CurrentModuleObject + " = \"" + Alphas(1) + "\"",
+                            				"Fan Type must be Fan:OnOff, Fan:ConstantVolume or Fan:VariableVolume.");
                             ErrorsFound = true;
                         }
                     }
@@ -663,14 +661,11 @@ namespace FanCoilUnits {
                         FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM::ASHRAE) { // then expect continuous speed control fan
                         if (state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->speedControl !=
                             HVACFan::FanSystem::SpeedControlMethod::Continuous) {
-                            ShowSevereError(state, std::string{RoutineName} + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
-                            ShowContinueError(state,
-                                              "...the fan type of the object : " + FanCoil(FanCoilNum).FanName +
+                            ShowSevereError(state, std::string{RoutineName} + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name,
+                            				"...the fan type of the object : " + FanCoil(FanCoilNum).FanName +
                                                   " does not match with the capacity control method selected : " + FanCoil(FanCoilNum).CapCtrlMeth +
-                                                  " please see I/O reference");
-                            ShowContinueError(
-                                state,
-                                "...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:SystemModel should have Continuous speed control.");
+                                                  " please see I/O reference",
+                            				"...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:SystemModel should have Continuous speed control.");
                             ErrorsFound = true;
                         }
                     }
@@ -714,8 +709,8 @@ namespace FanCoilUnits {
             FanCoil(FanCoilNum).ControlZoneNum =
                 DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::FanCoil4Pipe_Num, FanCoil(FanCoilNum).Name);
             if (FanCoil(FanCoilNum).ControlZoneNum == 0) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
-                ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",",
+                				"... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
                 ErrorsFound = true;
             }
             if (state.dataFanCoilUnits->ATMixerType == ATMixer_InletSide) {
@@ -737,9 +732,9 @@ namespace FanCoilUnits {
                 if (FanCoil(FanCoilNum).AirInNode != state.dataFanCoilUnits->ATMixerOutNode) {
                     ShowSevereError(state,
                                     CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
-                                        "\". Fan coil unit air inlet node name must be the same as an air terminal mixer outlet node name.");
-                    ShowContinueError(state, "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object.");
-                    ShowContinueError(state, "..Fan coil unit air inlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirInNode));
+                                        "\". Fan coil unit air inlet node name must be the same as an air terminal mixer outlet node name.",
+                    				"..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object.",
+                    				"..Fan coil unit air inlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirInNode));
                     ErrorsFound = true;
                 }
                 // check for supply side air terminal mixer
@@ -763,10 +758,9 @@ namespace FanCoilUnits {
                     ShowSevereError(
                         state,
                         CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
-                            "\". Fan coil unit air outlet node name must be the same as the air terminal mixer secondary air inlet node name.");
-                    ShowContinueError(
-                        state, "..Air terminal mixer secondary inlet node name is specified in AirTerminal:SingleDuct:SupplySideMixer object.");
-                    ShowContinueError(state, "..Fan coil unit air outlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirOutNode));
+                            "\". Fan coil unit air outlet node name must be the same as the air terminal mixer secondary air inlet node name.",
+                    				"..Air terminal mixer secondary inlet node name is specified in AirTerminal:SingleDuct:SupplySideMixer object.",
+                    				"..Fan coil unit air outlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirOutNode));
                     ErrorsFound = true;
                 }
                 bool ZoneNodeNotFound = true;
@@ -787,13 +781,12 @@ namespace FanCoilUnits {
                                                             state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).ReturnNode);
                     }
                     if (!InletNodeFound) {
-                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\"");
-                        ShowContinueError(state,
-                                          "..FanCoil inlet node name must be the same as either a zone exhaust node name or an induced "
-                                          "air node in ZonePlenum.");
-                        ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                        ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
-                        ShowContinueError(state, "..FanCoil inlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirInNode));
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\"",
+                        				"..FanCoil inlet node name must be the same as either a zone exhaust node name or an induced "
+                                          "air node in ZonePlenum.",
+                        				"..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.",
+                        				"..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.",
+                        				"..FanCoil inlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirInNode));
                         ErrorsFound = true;
                     }
                 }
@@ -820,11 +813,10 @@ namespace FanCoilUnits {
                         ShowSevereError(state,
                                         CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
                                             "\". Fan coil unit air inlet node name must be the same either as a zone exhaust node name or an induce "
-                                            "air node in ZoePlenum.");
-                        ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                        ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
-                        ShowContinueError(state,
-                                          "..Fan coil unit air inlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirInNode));
+                                            "air node in ZoePlenum.",
+                        				"..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.",
+                        				"..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.",
+                        				"..Fan coil unit air inlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirInNode));
                         ErrorsFound = true;
                     }
                 }
@@ -838,9 +830,9 @@ namespace FanCoilUnits {
                 if (state.dataFanCoilUnits->ZoneInNodeNotFound) {
                     ShowSevereError(state,
                                     CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
-                                        "\". Fan coil unit air outlet node name must be the same as a zone inlet node name.");
-                    ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state, "..Fan coil unit air outlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirOutNode));
+                                        "\". Fan coil unit air outlet node name must be the same as a zone inlet node name.",
+                    				"..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.",
+                    				"..Fan coil unit air outlet node name = " + state.dataLoopNodes->NodeID(FanCoil(FanCoilNum).AirOutNode));
 
                     ErrorsFound = true;
                 }
@@ -850,15 +842,15 @@ namespace FanCoilUnits {
                     FanCoil(FanCoilNum).FanOpModeSchedPtr = GetScheduleIndex(state, Alphas(17));
                     if (FanCoil(FanCoilNum).FanType_Num != FanType_SimpleOnOff &&
                         FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + FanCoil(FanCoilNum).Name);
-                        ShowContinueError(state, "For " + cAlphaFields(17) + " = " + Alphas(17));
-                        ShowContinueError(state, "Illegal " + cAlphaFields(9) + " = " + Alphas(9));
-                        ShowContinueError(state, "...fan operating schedule is allowed for on off or system model fan type only )");
+                        ShowSevereError(state, CurrentModuleObject + " = " + FanCoil(FanCoilNum).Name,
+                        				"For " + cAlphaFields(17) + " = " + Alphas(17),
+                        				"Illegal " + cAlphaFields(9) + " = " + Alphas(9),
+                        				"...fan operating schedule is allowed for on off or system model fan type only )");
                         ErrorsFound = true;
                     } else {
                         if (FanCoil(FanCoilNum).FanOpModeSchedPtr == 0) {
-                            ShowSevereError(state, CurrentModuleObject + " = " + FanCoil(FanCoilNum).Name);
-                            ShowContinueError(state, "Illegal " + cAlphaFields(17) + " = " + Alphas(17));
+                            ShowSevereError(state, CurrentModuleObject + " = " + FanCoil(FanCoilNum).Name,
+                            				"Illegal " + cAlphaFields(17) + " = " + Alphas(17));
                             ErrorsFound = true;
                         }
                     }
@@ -1831,8 +1823,8 @@ namespace FanCoilUnits {
                             } else {
                                 DoWaterCoilSizing = false;
                                 // If there is no heating Plant Sizing object and autosizing was requested, issue fatal error message
-                                ShowSevereError(state, "Autosizing of water coil requires a heating loop Sizing:Plant object");
-                                ShowContinueError(state, "Occurs in " + FanCoil(FanCoilNum).UnitType + " Object=" + FanCoil(FanCoilNum).Name);
+                                ShowSevereError(state, "Autosizing of water coil requires a heating loop Sizing:Plant object",
+                                				"Occurs in " + FanCoil(FanCoilNum).UnitType + " Object=" + FanCoil(FanCoilNum).Name);
                                 ErrorsFound = true;
                             }
                         }
@@ -2026,8 +2018,8 @@ namespace FanCoilUnits {
                         } else {
                             DoWaterCoilSizing = false;
                             // If there is no cooling Plant Sizing object and autosizing was requested, issue fatal error message
-                            ShowSevereError(state, "Autosizing of water coil requires a cooling loop Sizing:Plant object");
-                            ShowContinueError(state, "Occurs in " + FanCoil(FanCoilNum).UnitType + " Object=" + FanCoil(FanCoilNum).Name);
+                            ShowSevereError(state, "Autosizing of water coil requires a cooling loop Sizing:Plant object",
+                            				"Occurs in " + FanCoil(FanCoilNum).UnitType + " Object=" + FanCoil(FanCoilNum).Name);
                             ErrorsFound = true;
                         }
                     }

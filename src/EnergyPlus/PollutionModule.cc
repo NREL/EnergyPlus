@@ -4377,8 +4377,8 @@ void CheckFFSchedule(EnergyPlusData &state,
         ShowSevereError(state, currentModuleObject + ": " + resourceType + ", invalid " + fieldName + "=\"" + ScheduleName + "\" not found.");
         ErrorsFound = true;
     } else if (!CheckScheduleValueMinMax(state, SchedulePtr, ">=", 0.0)) {
-        ShowSevereError(state, currentModuleObject + ": " + resourceType + ", invalid " + fieldName + "=\"" + ScheduleName + "\" invalid values.");
-        ShowContinueError(state, "Schedule values must be (>=0.).");
+        ShowSevereError(state, currentModuleObject + ": " + resourceType + ", invalid " + fieldName + "=\"" + ScheduleName + "\" invalid values.",
+        				"Schedule values must be (>=0.).");
         ErrorsFound = true;
     }
 }

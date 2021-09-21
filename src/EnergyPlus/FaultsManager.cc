@@ -1513,8 +1513,8 @@ namespace FaultsManager {
             state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve = cAlphaArgs(6);
             state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurvePtr = GetCurveIndex(state, cAlphaArgs(6));
             if (state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurvePtr == 0) {
-                ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\"");
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(6) + " = \"" + cAlphaArgs(6) + "\" not found.");
+                ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\"",
+                				"Invalid " + cAlphaFieldNames(6) + " = \"" + cAlphaArgs(6) + "\" not found.");
                 state.dataFaultsMgr->ErrorsFound = true;
             }
 
@@ -1831,9 +1831,8 @@ namespace FaultsManager {
                     } else {
                         ShowSevereError(state,
                                         cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + " = \"" +
-                                            cAlphaArgs(2) + "\".");
-                        ShowContinueError(
-                            state, R"(Coil was found but it is not one of the supported types ("Coil:Cooling:Water" or "Coil:Heating:Water").)");
+                                            cAlphaArgs(2) + "\".",
+                        				R"(Coil was found but it is not one of the supported types ("Coil:Cooling:Water" or "Coil:Heating:Water").)");
                         state.dataFaultsMgr->ErrorsFound = true;
                     }
                 }

@@ -568,8 +568,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         if (IsNotOK) {
             ShowSevereError(state,
                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", a duplicated object " +
-                                cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\" is found.");
-            ShowContinueError(state, "A zone can only have one " + cCurrentModuleObject + " object.");
+                                cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\" is found.",
+            				"A zone can only have one " + cCurrentModuleObject + " object.");
             ErrorsFound = true;
         }
 
@@ -615,8 +615,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         if (!CheckScheduleValueMinMax(state, state.dataHeatBal->ZoneAirBalance(Loop).InducedAirSchedPtr, ">=", 0.0, "<=", 1.0)) {
             ShowSevereError(state,
                             cCurrentModuleObject + " = " + state.dataHeatBal->ZoneAirBalance(Loop).Name + ":  Error found in " + cAlphaFieldNames(4) +
-                                " = " + cAlphaArgs(4));
-            ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
+                                " = " + cAlphaArgs(4),
+            				"Schedule values must be (>=0., <=1.)");
             ErrorsFound = true;
         }
 
@@ -792,8 +792,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     }
 
     if (errFlag) {
-        ShowSevereError(state, std::string{RoutineName} + "Errors with invalid names in " + cCurrentModuleObject + " objects.");
-        ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
+        ShowSevereError(state, std::string{RoutineName} + "Errors with invalid names in " + cCurrentModuleObject + " objects.",
+        				"...These will not be read in.  Other errors may occur.");
         state.dataHeatBal->TotDesignFlowInfiltration = 0;
     }
 
@@ -1445,8 +1445,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     }
 
     if (errFlag) {
-        ShowSevereError(state, std::string{RoutineName} + "Errors with invalid names in " + cCurrentModuleObject + " objects.");
-        ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
+        ShowSevereError(state, std::string{RoutineName} + "Errors with invalid names in " + cCurrentModuleObject + " objects.",
+        				"...These will not be read in.  Other errors may occur.");
         state.dataHeatBal->TotDesignFlowVentilation = 0;
     }
 
@@ -1720,8 +1720,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     if (Item1 == 1) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" must have " +
-                                            cNumericFieldNames(11) + " between -100C and 100C.");
-                        ShowContinueError(state, format("...value entered=[{:.2R}].", rNumericArgs(11)));
+                                            cNumericFieldNames(11) + " between -100C and 100C.",
+                        				format("...value entered=[{:.2R}].", rNumericArgs(11)));
                         ErrorsFound = true;
                     }
                 }
@@ -3765,9 +3765,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             continue;
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", and " +
-                                            state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorMixingObjectName(ConnectTest));
-                        ShowContinueError(state,
-                                          " Share same pair of zones: \"" + state.dataHeatBal->Zone(ZoneNumA).Name + "\" and \"" +
+                                            state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorMixingObjectName(ConnectTest),
+                        				" Share same pair of zones: \"" + state.dataHeatBal->Zone(ZoneNumA).Name + "\" and \"" +
                                               state.dataHeatBal->Zone(ZoneNumB).Name +
                                               "\". Only one RefrigerationDoorMixing object is allowed for any unique pair of zones.");
                         ErrorsFound = true;
@@ -4294,8 +4293,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::NoInfiltrationFlow)) {
                 if (state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr == 0) {
                     ShowSevereError(
-                        state, std::string{RoutineName} + ": Infiltration object is not defined for zone = " + state.dataHeatBal->Zone(ZoneNum).Name);
-                    ShowContinueError(state, "Zone air mass flow balance requires infiltration object for source zones of mixing objects");
+                        state, std::string{RoutineName} + ": Infiltration object is not defined for zone = " + state.dataHeatBal->Zone(ZoneNum).Name,
+                    				"Zone air mass flow balance requires infiltration object for source zones of mixing objects");
                 }
             }
         }
@@ -4425,16 +4424,14 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
         ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
         if (ZoneNum != 0) {
             if (!state.dataRoomAirMod->AirModel(ZoneNum).AirModelName.empty()) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Duplicate zone name, only one type of roomair model is allowed per zone");
-                ShowContinueError(state,
-                                  "Zone " + state.dataIPShortCut->cAlphaArgs(2) + " was already assigned a roomair model by " + cCurrentModuleObject +
-                                      " = " + state.dataRoomAirMod->AirModel(ZoneNum).AirModelName);
-                ShowContinueError(state,
-                                  format("Air Model Type for zone already set to {}",
-                                         DataRoomAirModel::ChAirModel[static_cast<int>(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType)]));
-                ShowContinueError(state, "Trying to overwrite with model type = " + state.dataIPShortCut->cAlphaArgs(3));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2),
+                				"Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                				"Duplicate zone name, only one type of roomair model is allowed per zone",
+                				"Zone " + state.dataIPShortCut->cAlphaArgs(2) + " was already assigned a roomair model by " + cCurrentModuleObject +
+                                      " = " + state.dataRoomAirMod->AirModel(ZoneNum).AirModelName,
+                				format("Air Model Type for zone already set to {}",
+                                         DataRoomAirModel::ChAirModel[static_cast<int>(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType)]),
+                				"Trying to overwrite with model type = " + state.dataIPShortCut->cAlphaArgs(3));
                 ErrorsFound = true;
             }
             state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = state.dataIPShortCut->cAlphaArgs(1);
@@ -4527,11 +4524,10 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                     if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirflowNetwork:SimulationControl") == 0) {
                         ShowSevereError(state,
                                         "In " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ": " +
-                                            state.dataIPShortCut->cAlphaFieldNames(3) + " = AIRFLOWNETWORK.");
-                        ShowContinueError(state,
-                                          "This model requires AirflowNetwork:* objects to form a complete network, including "
-                                          "AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage.");
-                        ShowContinueError(state, "AirflowNetwork:SimulationControl not found.");
+                                            state.dataIPShortCut->cAlphaFieldNames(3) + " = AIRFLOWNETWORK.",
+                        				"This model requires AirflowNetwork:* objects to form a complete network, including "
+                                          "AirflowNetwork:Intrazone:Node and AirflowNetwork:Intrazone:Linkage.",
+                        				"AirflowNetwork:SimulationControl not found.");
                         ErrorsFound = true;
                     }
                 } else {
@@ -4556,8 +4552,8 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 }
             }
         } else { // Zone Not Found
-            ShowSevereError(state, cCurrentModuleObject + ", Zone not found=" + state.dataIPShortCut->cAlphaArgs(2));
-            ShowContinueError(state, "occurs in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowSevereError(state, cCurrentModuleObject + ", Zone not found=" + state.dataIPShortCut->cAlphaArgs(2),
+            				"occurs in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ErrorsFound = true;
         }
     } // AirModel_Param_Loop

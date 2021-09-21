@@ -345,8 +345,8 @@ namespace PlantComponentTemperatureSources {
             }
         } else {
             if (this->DesVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "Autosizing of plant component temperature source flow rate requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in PlantComponent:TemperatureSource object=" + this->Name);
+                ShowSevereError(state, "Autosizing of plant component temperature source flow rate requires a loop Sizing:Plant object",
+                				"Occurs in PlantComponent:TemperatureSource object=" + this->Name);
                 ErrorsFound = true;
             }
             if (!this->DesVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport) {
@@ -558,16 +558,14 @@ namespace PlantComponentTemperatureSources {
                 state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleNum =
                     ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
                 if (state.dataPlantCompTempSrc->WaterSource(SourceNum).TempSpecScheduleNum == 0) {
-                    ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state,
-                                      "Invalid schedule name in field " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' +
+                    ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+                    				"Invalid schedule name in field " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' +
                                           state.dataIPShortCut->cAlphaArgs(5));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state,
-                                  R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered ")" +
+                ShowSevereError(state, "Input error for " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+                				R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered ")" +
                                       state.dataIPShortCut->cAlphaArgs(4) + "\"");
                 ErrorsFound = true;
             }

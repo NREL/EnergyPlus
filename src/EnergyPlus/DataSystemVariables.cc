@@ -207,8 +207,8 @@ namespace DataSystemVariables {
         }
 
         // If we get here, we didn't find the file
-        ShowSevereError(state, contextString + "\"" + originalInputFilePath.string() + "\" not found.");
-        ShowContinueError(state, "  Paths searched:");
+        ShowSevereError(state, contextString + "\"" + originalInputFilePath.string() + "\" not found.",
+        				"  Paths searched:");
         for (auto path : pathsChecked) {
             ShowContinueError(state, "    " + path.second + ": \"" + path.first.string() + "\"");
         }

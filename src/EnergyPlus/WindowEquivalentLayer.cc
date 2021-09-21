@@ -4749,10 +4749,10 @@ void ASHWAT_ThermalCalc(EnergyPlusData &state,
 
         if (FS.WEQLSolverErrorIndex < 1) {
             ++FS.WEQLSolverErrorIndex;
-            ShowSevereError(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
-            ShowContinueError(state, std::string{RoutineName} + "Net radiation analysis did not converge");
-            ShowContinueError(state, format("...Maximum error is = {:.6T}", MAXERR));
-            ShowContinueError(state, format("...Convergence tolerance is = {:.6T}", TOL));
+            ShowSevereError(state, "CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"",
+            				std::string{RoutineName} + "Net radiation analysis did not converge",
+            				format("...Maximum error is = {:.6T}", MAXERR),
+            				format("...Convergence tolerance is = {:.6T}", TOL));
             ShowContinueErrorTimeStamp(state, "");
         } else {
             ShowRecurringWarningErrorAtEnd(state,
@@ -7722,8 +7722,8 @@ void BuildGap(EnergyPlusData &state,
     Real64 TMan;
 
     if (TAS < GapThickMin) {
-        ShowSevereError(state, std::string{RoutineName} + G.Name);
-        ShowContinueError(state, "...specified gap thickness is < 0.0001 m.  Reset to 0.00001 m");
+        ShowSevereError(state, std::string{RoutineName} + G.Name,
+        				"...specified gap thickness is < 0.0001 m.  Reset to 0.00001 m");
         TAS = GapThickMin;
     }
     G.TAS = TAS;
@@ -7908,8 +7908,8 @@ void FillDefaultsSWP(EnergyPlusData &state,
     } else if (L.LTYPE == LayerType::NONE || L.LTYPE == LayerType::ROOM) {
         // none or room: do nothing
     } else {
-        ShowSevereError(state, std::string{RoutineName} + L.Name + '.');
-        ShowContinueError(state, "...invalid layer type specified.");
+        ShowSevereError(state, std::string{RoutineName} + L.Name + '.',
+        				"...invalid layer type specified.");
     }
 }
 
@@ -7942,8 +7942,8 @@ void FinalizeCFS(EnergyPlusData &state, CFSTY &FS)
         if (!IsVBLayer(FS.L(iL))) {
             LVBPREV = false;
         } else if (LVBPREV) {
-            ShowSevereError(state, CurrentModuleObject + "=\"" + FS.Name + "\", illegal.");
-            ShowContinueError(state, "...adjacent VB layers are specified.");
+            ShowSevereError(state, CurrentModuleObject + "=\"" + FS.Name + "\", illegal.",
+            				"...adjacent VB layers are specified.");
             ErrorsFound = true;
         } else {
             LVBPREV = true;
@@ -7953,14 +7953,14 @@ void FinalizeCFS(EnergyPlusData &state, CFSTY &FS)
         if (iL < FS.NL) {
             gType = FS.G(iL).GTYPE;
             if (gType == state.dataWindowEquivalentLayer->gtyOPENout && iL != 1) {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + FS.Name);
-                ShowContinueError(state, "...invalid EquivalentLayer window gap type specified =" + FS.G(iL).Name + '.');
-                ShowContinueError(state, "...VentedOutDoor gap is not outermost.");
+                ShowSevereError(state, CurrentModuleObject + "=\"" + FS.Name,
+                				"...invalid EquivalentLayer window gap type specified =" + FS.G(iL).Name + '.',
+                				"...VentedOutDoor gap is not outermost.");
             }
             if (gType == state.dataWindowEquivalentLayer->gtyOPENin && iL != FS.NL - 1) {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + FS.Name);
-                ShowContinueError(state, "...invalid EquivalentLayer window gap type specified =" + FS.G(iL).Name + '.');
-                ShowContinueError(state, "...VentedIndoor gap is not innermost.");
+                ShowSevereError(state, CurrentModuleObject + "=\"" + FS.Name,
+                				"...invalid EquivalentLayer window gap type specified =" + FS.G(iL).Name + '.',
+                				"...VentedIndoor gap is not innermost.");
             }
         }
     }

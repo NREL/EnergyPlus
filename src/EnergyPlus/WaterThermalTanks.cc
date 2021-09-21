@@ -696,8 +696,8 @@ bool getDesuperHtrInput(EnergyPlusData &state)
             state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr =
                 ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
         } else {
@@ -708,8 +708,8 @@ bool getDesuperHtrInput(EnergyPlusData &state)
         state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).SetPointTempSchedule =
             ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
         if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).SetPointTempSchedule == 0) {
-            ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ErrorsFound = true;
         }
 
@@ -804,8 +804,8 @@ bool getDesuperHtrInput(EnergyPlusData &state)
             !UtilityRoutines::SameString(state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).TankType, cStratifiedWHModuleObj)) {
 
             ShowSevereError(
-                state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataWaterThermalTanks->HPWaterHeater(DesuperheaterNum).Name + ":");
-            ShowContinueError(state, "Desuperheater can only be used with " + cMixedWHModuleObj + " or " + cStratifiedWHModuleObj + ".");
+                state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataWaterThermalTanks->HPWaterHeater(DesuperheaterNum).Name + ":",
+            				"Desuperheater can only be used with " + cMixedWHModuleObj + " or " + cStratifiedWHModuleObj + ".");
             ErrorsFound = true;
         }
 
@@ -1019,16 +1019,14 @@ bool getDesuperHtrInput(EnergyPlusData &state)
         } else {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " +
-                                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name + ':');
-            ShowContinueError(state, " desuperheater can only be used with Coil:Cooling:DX:SingleSpeed, ");
-            ShowContinueError(state,
-                              " Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode, "
+                                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name + ':',
+            				" desuperheater can only be used with Coil:Cooling:DX:SingleSpeed, ",
+            				" Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode, "
                               "Coil:Cooling:DX:VariableSpeed, "
-                              "Coil:Cooling:WaterToAirHeatPump:EquationFit, Refrigeration:CompressorRack,");
-            ShowContinueError(state, " Refrigeration:Condenser:AirCooled ,Refrigeration:Condenser:EvaporativeCooled, ");
-            ShowContinueError(state, " or Refrigeration:Condenser:WaterCooled.");
-            ShowContinueError(state,
-                              " Invalid desuperheater heat source object: " + state.dataIPShortCut->cAlphaArgs(9) + " \"" +
+                              "Coil:Cooling:WaterToAirHeatPump:EquationFit, Refrigeration:CompressorRack,",
+            				" Refrigeration:Condenser:AirCooled ,Refrigeration:Condenser:EvaporativeCooled, ",
+            				" or Refrigeration:Condenser:WaterCooled.",
+            				" Invalid desuperheater heat source object: " + state.dataIPShortCut->cAlphaArgs(9) + " \"" +
                                   state.dataIPShortCut->cAlphaArgs(10) + "\"");
             ErrorsFound = true;
         }
@@ -1227,8 +1225,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         if (!hpwhAlphaBlank[2]) {
             HPWH.AvailSchedPtr = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[2]);
             if (HPWH.AvailSchedPtr == 0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                ShowContinueError(state, hpwhAlphaFieldNames[2] + "=\"" + hpwhAlpha[2] + "\".");
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found",
+                				hpwhAlphaFieldNames[2] + "=\"" + hpwhAlpha[2] + "\".");
                 ErrorsFound = true;
             }
         } else {
@@ -1240,22 +1238,21 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         if (!hpwhAlphaBlank[3]) {
             HPWH.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[3]);
             if (HPWH.SetPointTempSchedule == 0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                ShowContinueError(state, hpwhAlphaFieldNames[3] + "=\"" + hpwhAlpha[3] + "\".");
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found",
+                				hpwhAlphaFieldNames[3] + "=\"" + hpwhAlpha[3] + "\".");
                 ErrorsFound = true;
             }
         } else {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-            ShowContinueError(state, "required " + hpwhAlphaFieldNames[3] + " is blank.");
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ",
+            				"required " + hpwhAlphaFieldNames[3] + " is blank.");
             ErrorsFound = true;
         }
 
         // Dead Band Temperature Difference
         HPWH.DeadBandTempDiff = hpwhNumeric[1 + nNumericOffset];
         if (HPWH.DeadBandTempDiff <= 0.0 || HPWH.DeadBandTempDiff > 20.0) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-            ShowContinueError(state,
-                              hpwhNumericFieldNames[1 + nNumericOffset] +
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ",
+            				hpwhNumericFieldNames[1 + nNumericOffset] +
                                   format(" difference must be > 0 and <= 20. Dead band = {:.1T}", hpwhNumeric[1 + nNumericOffset]));
             ErrorsFound = true;
         }
@@ -1287,9 +1284,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             // Condenser Water Flow Rate
             HPWH.OperatingWaterFlowRate = hpwhNumeric[2];
             if (HPWH.OperatingWaterFlowRate <= 0.0 && hpwhNumeric[2] != DataGlobalConstants::AutoCalculate) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                ShowContinueError(state,
-                                  format("{} must be greater than 0. Condenser water flow rate = {:.6T}", hpwhNumericFieldNames[2], hpwhNumeric[2]));
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ",
+                				format("{} must be greater than 0. Condenser water flow rate = {:.6T}", hpwhNumericFieldNames[2], hpwhNumeric[2]));
                 ErrorsFound = true;
             }
 
@@ -1300,18 +1296,16 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             HPWH.WrappedCondenserTopLocation = hpwhNumeric[3 + nNumericOffset];
 
             if (HPWH.WrappedCondenserBottomLocation < 0.0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                ShowContinueError(state,
-                                  format("{} must be greater than 0. Condenser bottom location = {:.6T}",
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ",
+                				format("{} must be greater than 0. Condenser bottom location = {:.6T}",
                                          hpwhNumericFieldNames[2],
                                          HPWH.WrappedCondenserBottomLocation));
                 ErrorsFound = true;
             }
 
             if (HPWH.WrappedCondenserBottomLocation >= HPWH.WrappedCondenserTopLocation) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                ShowContinueError(state,
-                                  format("{} ({:.6T}) must be greater than {} ({:.6T}).",
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ",
+                				format("{} ({:.6T}) must be greater than {} ({:.6T}).",
                                          HPWH.WrappedCondenserTopLocation,
                                          hpwhNumericFieldNames[2],
                                          hpwhNumericFieldNames[3],
@@ -1330,9 +1324,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         // Evaporator Air Flow Rate
         HPWH.OperatingAirFlowRate = hpwhNumeric[3 + nNumericOffset];
         if (HPWH.OperatingAirFlowRate <= 0.0 && hpwhNumeric[3 + nNumericOffset] != DataGlobalConstants::AutoCalculate) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-            ShowContinueError(state,
-                              hpwhNumericFieldNames[3 + nNumericOffset] +
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ",
+            				hpwhNumericFieldNames[3 + nNumericOffset] +
                                   format(" must be greater than 0. Evaporator air flow rate = {:.6T}", hpwhNumeric[3 + nNumericOffset]));
             ErrorsFound = true;
         }
@@ -1348,13 +1341,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 if (!hpwhAlphaBlank[11 + nAlphaOffset]) {
                     HPWH.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[11 + nAlphaOffset]);
                     if (HPWH.AmbientTempSchedule == 0) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                        ShowContinueError(state, hpwhAlphaFieldNames[11 + nAlphaOffset] + "=\"" + hpwhAlpha[11 + nAlphaOffset] + "\".");
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found",
+                        				hpwhAlphaFieldNames[11 + nAlphaOffset] + "=\"" + hpwhAlpha[11 + nAlphaOffset] + "\".");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                    ShowContinueError(state, "required " + hpwhAlphaFieldNames[11 + nAlphaOffset] + " is blank.");
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ",
+                    				"required " + hpwhAlphaFieldNames[11 + nAlphaOffset] + " is blank.");
                     ErrorsFound = true;
                 }
 
@@ -1362,21 +1355,20 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 if (!hpwhAlphaBlank[12 + nAlphaOffset]) {
                     HPWH.AmbientRHSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[12 + nAlphaOffset]);
                     if (HPWH.AmbientRHSchedule == 0) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                        ShowContinueError(state, hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] + "\".");
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found",
+                        				hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] + "\".");
                         ErrorsFound = true;
                     } else {
                         if (!ScheduleManager::CheckScheduleValueMinMax(state, HPWH.AmbientRHSchedule, ">=", 0.0, "<=", 1.0)) {
-                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid values");
-                            ShowContinueError(state,
-                                              hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] +
+                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid values",
+                            				hpwhAlphaFieldNames[12 + nAlphaOffset] + "=\"" + hpwhAlpha[12 + nAlphaOffset] +
                                                   "\", schedule values must be (>=0., <=1.)");
                             ErrorsFound = true;
                         }
                     }
                 } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                    ShowContinueError(state, "required " + hpwhAlphaFieldNames[12 + nAlphaOffset] + " is blank.");
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ",
+                    				"required " + hpwhAlphaFieldNames[12 + nAlphaOffset] + " is blank.");
                     ErrorsFound = true;
                 }
 
@@ -1387,13 +1379,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
                     HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], state.dataHeatBal->Zone);
                     if (HPWH.AmbientTempZone == 0) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                        ShowContinueError(state, hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found",
+                        				hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                    ShowContinueError(state, "required " + hpwhAlphaFieldNames[13 + nAlphaOffset] + " is blank.");
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ",
+                    				"required " + hpwhAlphaFieldNames[13 + nAlphaOffset] + " is blank.");
                     ErrorsFound = true;
                 }
 
@@ -1407,13 +1399,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
                     HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], state.dataHeatBal->Zone);
                     if (HPWH.AmbientTempZone == 0) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                        ShowContinueError(state, hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found",
+                        				hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                    ShowContinueError(state, "required " + hpwhAlphaFieldNames[13 + nAlphaOffset] + " is blank.");
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ",
+                    				"required " + hpwhAlphaFieldNames[13 + nAlphaOffset] + " is blank.");
                     ErrorsFound = true;
                 }
             }
@@ -1500,9 +1492,9 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             // this is a single speed coil
             DXCoils::DXCoilData &Coil = state.dataDXCoils->DXCoil(HPWH.DXCoilNum);
             if (!UtilityRoutines::SameString(HPWH.DXCoilType, Coil.DXCoilType)) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                ShowContinueError(state, "specifies the coil " + HPWH.DXCoilType + "=\"" + HPWH.DXCoilName + "\".");
-                ShowContinueError(state, "However, " + HPWH.DXCoilName + " is a coil of type " + Coil.DXCoilType + ".");
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ",
+                				"specifies the coil " + HPWH.DXCoilType + "=\"" + HPWH.DXCoilName + "\".",
+                				"However, " + HPWH.DXCoilName + " is a coil of type " + Coil.DXCoilType + ".");
                 ErrorsFound = true;
             }
             HPWH.DXCoilTypeNum = Coil.DXCoilType_Num;
@@ -1511,9 +1503,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         // Make sure that the coil and tank are compatible.
         if (bIsVScoil) {
             if (HPWH.TypeNum != DataPlant::TypeOf_HeatPumpWtrHeaterPumped) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                ShowContinueError(state,
-                                  "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed can only be used with a pumped condenser heat pump "
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+                				"Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed can only be used with a pumped condenser heat pump "
                                   "water heater.");
                 ErrorsFound = true;
             }
@@ -1591,13 +1582,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                     // Compressor Ambient Temperature Schedule
                     HPWH.CrankcaseTempSchedule = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[21 + nAlphaOffset]);
                     if (HPWH.CrankcaseTempSchedule == 0) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                        ShowContinueError(state, hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" + hpwhAlpha[21 + nAlphaOffset] + "\".");
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found",
+                        				hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" + hpwhAlpha[21 + nAlphaOffset] + "\".");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
-                    ShowContinueError(state, "required " + hpwhAlphaFieldNames[21 + nAlphaOffset] + " is blank.");
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", ",
+                    				"required " + hpwhAlphaFieldNames[21 + nAlphaOffset] + " is blank.");
                     ErrorsFound = true;
                 }
 
@@ -1606,8 +1597,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 if (HPWH.InletAirConfiguration == AmbientTempEnum::OutsideAir || HPWH.InletAirConfiguration == AmbientTempEnum::Schedule) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name +
-                                        "\":  Inlet Air Configuration must be Zone Air Only or Zone And");
-                    ShowContinueError(state, " Outdoor Air when compressor location equals ZONE.");
+                                        "\":  Inlet Air Configuration must be Zone Air Only or Zone And",
+                    				" Outdoor Air when compressor location equals ZONE.");
                     ErrorsFound = true;
                 }
 
@@ -1667,15 +1658,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         if (errFlag) {
             ErrorsFound = true;
         } else if (HPWH.FanType_Num != DataHVACGlobals::FanType_SimpleOnOff && HPWH.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\": illegal fan type specified.");
-            ShowContinueError(
-                state, " The fan object (" + HPWH.FanName + ") type must be Fan:SystemModel or Fan:OnOff when used with a heat pump water heater.");
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\": illegal fan type specified.",
+            				" The fan object (" + HPWH.FanName + ") type must be Fan:SystemModel or Fan:OnOff when used with a heat pump water heater.");
             ErrorsFound = true;
         } else if (!UtilityRoutines::SameString(HPWH.FanType, "Fan:OnOff") && !UtilityRoutines::SameString(HPWH.FanType, "Fan:SystemModel")) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\": illegal fan type specified.");
-            ShowContinueError(state, " The " + state.dataIPShortCut->cCurrentModuleObject + " must specify that the fan object");
-            ShowContinueError(state,
-                              " is of type FanSystemModel or Fan:OnOff in addition to the fan actually being of that type and defined elsewhere.");
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\": illegal fan type specified.",
+            				" The " + state.dataIPShortCut->cCurrentModuleObject + " must specify that the fan object",
+            				" is of type FanSystemModel or Fan:OnOff in addition to the fan actually being of that type and defined elsewhere.");
         }
 
         if (FanVolFlow != DataSizing::AutoSize && !errFlag) {
@@ -1684,9 +1673,9 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                 format("{} - air flow rate = {:.7T} in fan object {} is less than the  HPWHs evaporator air flow rate.",
                                        state.dataIPShortCut->cCurrentModuleObject,
                                        FanVolFlow,
-                                       HPWH.FanName));
-                ShowContinueError(state, " The fan flow rate must be >= to the HPWHs evaporator volumetric air flow rate.");
-                ShowContinueError(state, " Occurs in unit = " + HPWH.Name);
+                                       HPWH.FanName),
+                				" The fan flow rate must be >= to the HPWHs evaporator volumetric air flow rate.",
+                				" Occurs in unit = " + HPWH.Name);
                 ErrorsFound = true;
             }
         }
@@ -1699,8 +1688,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             HPWH.FanPlacement = DataHVACGlobals::DrawThru;
 
         } else {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid ");
-            ShowContinueError(state, hpwhAlphaFieldNames[24 + nAlphaOffset] + "=\"" + hpwhAlpha[24 + nAlphaOffset] + "\".");
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid ",
+            				hpwhAlphaFieldNames[24 + nAlphaOffset] + "=\"" + hpwhAlpha[24 + nAlphaOffset] + "\".");
             ErrorsFound = true;
         }
 
@@ -1749,9 +1738,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         // On Cycle Parasitic Electric Load
         HPWH.OnCycParaLoad = hpwhNumeric[6 + nNumericOffset];
         if (HPWH.OnCycParaLoad < 0.0) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
-            ShowContinueError(state,
-                              hpwhNumericFieldNames[6 + nNumericOffset] + " must be >= 0. " + hpwhNumericFieldNames[6 + nNumericOffset] +
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\",",
+            				hpwhNumericFieldNames[6 + nNumericOffset] + " must be >= 0. " + hpwhNumericFieldNames[6 + nNumericOffset] +
                                   format(" = {:.2T}", hpwhNumeric[6 + nNumericOffset]));
             ErrorsFound = true;
         }
@@ -1759,9 +1747,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         // Off Cycle Parasitic Electric Load
         HPWH.OffCycParaLoad = hpwhNumeric[7 + nNumericOffset];
         if (HPWH.OffCycParaLoad < 0.0) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
-            ShowContinueError(state,
-                              hpwhNumericFieldNames[7 + nNumericOffset] + " must be >= 0. " + hpwhNumericFieldNames[2 + nNumericOffset] +
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\",",
+            				hpwhNumericFieldNames[7 + nNumericOffset] + " must be >= 0. " + hpwhNumericFieldNames[2 + nNumericOffset] +
                                   format(" = {:.2T}", hpwhNumeric[7 + nNumericOffset]));
             ErrorsFound = true;
         }
@@ -1770,16 +1757,16 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         if (UtilityRoutines::SameString(hpwhAlpha[25 + nAlphaOffset], "Zone")) {
             HPWH.ParasiticTempIndicator = AmbientTempEnum::TempZone;
             if (HPWH.InletAirConfiguration == AmbientTempEnum::OutsideAir || HPWH.InletAirConfiguration == AmbientTempEnum::Schedule) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
-                ShowContinueError(state, hpwhAlphaFieldNames[25 + nAlphaOffset] + " must be ZoneAirOnly or ZoneAndOutdoorAir");
-                ShowContinueError(state, " when parasitic heat rejection location equals Zone.");
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\",",
+                				hpwhAlphaFieldNames[25 + nAlphaOffset] + " must be ZoneAirOnly or ZoneAndOutdoorAir",
+                				" when parasitic heat rejection location equals Zone.");
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(hpwhAlpha[25 + nAlphaOffset], "Outdoors")) {
             HPWH.ParasiticTempIndicator = AmbientTempEnum::OutsideAir;
         } else {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-            ShowContinueError(state, " parasitic heat rejection location must be either Zone or Outdoors.");
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+            				" parasitic heat rejection location must be either Zone or Outdoors.");
             ErrorsFound = true;
         }
 
@@ -1804,8 +1791,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                   "Zone and OutdoorAir. Node name disregarded and simulation continues.");
             }
         } else if (hpwhAlphaBlank[26 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-            ShowContinueError(state, "Inlet air mixer node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+            				"Inlet air mixer node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
             ErrorsFound = true;
         }
 
@@ -1829,8 +1816,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                   "ZoneAndOutdoorAir. Node name disregarded and simulation continues.");
             }
         } else if (hpwhAlphaBlank[27 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-            ShowContinueError(state, "Outlet air splitter node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+            				"Outlet air splitter node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
             ErrorsFound = true;
         }
 
@@ -1968,24 +1955,22 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         // check that required node names are present
         if (HPWH.InletAirConfiguration == AmbientTempEnum::Schedule || HPWH.InletAirConfiguration == AmbientTempEnum::TempZone) {
             if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                ShowContinueError(state, "When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
-                ShowContinueError(state,
-                                  hpwhAlphaFieldNames[7 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[8 + nAlphaOffset] + " must be specified.");
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+                				"When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".",
+                				hpwhAlphaFieldNames[7 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[8 + nAlphaOffset] + " must be specified.");
                 ErrorsFound = true;
             }
         } else if (HPWH.InletAirConfiguration == AmbientTempEnum::OutsideAir) {
             if (HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                ShowContinueError(state, "When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
-                ShowContinueError(state,
-                                  hpwhAlphaFieldNames[9 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[10 + nAlphaOffset] + " must be specified.");
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+                				"When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".",
+                				hpwhAlphaFieldNames[9 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[10 + nAlphaOffset] + " must be specified.");
                 ErrorsFound = true;
             }
         } else if (HPWH.InletAirMixerNode > 0 && HPWH.OutletAirSplitterNode > 0 && HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
             if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0 || HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                ShowContinueError(state, "When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+                				"When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
                 if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0) {
                     ShowContinueError(
                         state, hpwhAlphaFieldNames[7 + nAlphaOffset] + " and " + hpwhAlphaFieldNames[8 + nAlphaOffset] + " must be specified.");
@@ -2023,25 +2008,22 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                         FoundInletNode = true;
                     }
                     if (!FoundInletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                        ShowContinueError(state, "The HPWH's air inlet node name = " + hpwhAlpha[7 + nAlphaOffset] + " was not properly specified ");
-                        ShowContinueError(state,
-                                          "as an exhaust air node for zone = " + hpwhAlpha[13 + nAlphaOffset] +
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+                        				"The HPWH's air inlet node name = " + hpwhAlpha[7 + nAlphaOffset] + " was not properly specified ",
+                        				"as an exhaust air node for zone = " + hpwhAlpha[13 + nAlphaOffset] +
                                               " in a ZoneHVAC:EquipmentConnections object.");
                         ErrorsFound = true;
                     }
                     if (!FoundOutletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                        ShowContinueError(state, "The HPWH's air outlet node name = " + hpwhAlpha[8 + nAlphaOffset] + " was not properly specified ");
-                        ShowContinueError(
-                            state, "as an inlet air node for zone = " + hpwhAlpha[13 + nAlphaOffset] + " in a ZoneHVAC:EquipmentConnections object.");
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+                        				"The HPWH's air outlet node name = " + hpwhAlpha[8 + nAlphaOffset] + " was not properly specified ",
+                        				"as an inlet air node for zone = " + hpwhAlpha[13 + nAlphaOffset] + " in a ZoneHVAC:EquipmentConnections object.");
                         ErrorsFound = true;
                     }
                 }
             } else {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                ShowContinueError(state,
-                                  "Heat pump water heater air inlet node name and air outlet node name must be listed in a "
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+                				"Heat pump water heater air inlet node name and air outlet node name must be listed in a "
                                   "ZoneHVAC:EquipmentConnections object when Inlet Air Configuration is equal to ZoneAirOnly or "
                                   "ZoneAndOutdoorAir.");
                 ErrorsFound = true;
@@ -2052,15 +2034,14 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         if (!hpwhAlphaBlank[28 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
             HPWH.InletAirMixerSchPtr = ScheduleManager::GetScheduleIndex(state, hpwhAlpha[28 + nAlphaOffset]);
             if (HPWH.InletAirMixerSchPtr == 0) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                ShowContinueError(state, hpwhAlphaFieldNames[28 + nAlphaOffset] + "=\"" + hpwhAlpha[28 + nAlphaOffset] + "\",");
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found",
+                				hpwhAlphaFieldNames[28 + nAlphaOffset] + "=\"" + hpwhAlpha[28 + nAlphaOffset] + "\",");
                 ErrorsFound = true;
             } else {
                 bool ValidScheduleValue = ScheduleManager::CheckScheduleValueMinMax(state, HPWH.InletAirMixerSchPtr, ">=", 0.0, "<=", 1.0);
                 if (!ValidScheduleValue) {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
-                    ShowContinueError(state,
-                                      hpwhAlphaFieldNames[28 + nAlphaOffset] + " values out of range of 0 to 1, Schedule=\"" +
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found",
+                    				hpwhAlphaFieldNames[28 + nAlphaOffset] + " values out of range of 0 to 1, Schedule=\"" +
                                           hpwhAlpha[28 + nAlphaOffset] + "\".");
                     ErrorsFound = true;
                 }
@@ -2107,8 +2088,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             }
         }
         if (FanOutletNodeNum != HPWH.FanOutletNode) {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-            ShowContinueError(state, "Heat pump water heater fan outlet node name does not match next connected component.");
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+            				"Heat pump water heater fan outlet node name does not match next connected component.");
             if (FanOutletNodeNum != 0) {
                 ShowContinueError(state, "Fan outlet node name = " + state.dataLoopNodes->NodeID(FanOutletNodeNum));
             }
@@ -2140,8 +2121,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
         if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
             if (FanInletNodeNum != HPWHFanInletNodeNum) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                ShowContinueError(state, "Heat pump water heater fan inlet node name does not match previous connected component.");
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+                				"Heat pump water heater fan inlet node name does not match previous connected component.");
                 if (FanOutletNodeNum != 0) {
                     ShowContinueError(state, "Fan inlet node name = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
                 }
@@ -2165,8 +2146,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
         if (HPWH.FanPlacement == DataHVACGlobals::DrawThru) {
             if (FanInletNodeNum != DXCoilAirOutletNodeNum) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                ShowContinueError(state, "Heat pump water heater fan inlet node name does not match previous connected component.");
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+                				"Heat pump water heater fan inlet node name does not match previous connected component.");
                 if (FanInletNodeNum != 0) {
                     ShowContinueError(state, "Fan inlet node name = " + state.dataLoopNodes->NodeID(FanInletNodeNum));
                 }
@@ -2187,8 +2168,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 }
             }
             if (DXCoilAirOutletNodeNum != HPWHCoilOutletNodeNum) {
-                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-                ShowContinueError(state, "Heat pump water heater coil outlet node name does not match next connected component.");
+                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+                				"Heat pump water heater coil outlet node name does not match next connected component.");
                 if (DXCoilAirOutletNodeNum != 0) {
                     ShowContinueError(state, "Coil outlet node name = " + state.dataLoopNodes->NodeID(DXCoilAirOutletNodeNum));
                 }
@@ -2274,8 +2255,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(CtrlLogicFlag, "MUTUALLYEXCLUSIVE")) {
             HPWH.AllowHeatingElementAndHeatPumpToRunAtSameTime = false;
         } else {
-            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
-            ShowContinueError(state, CtrlLogicFlag + " is not a valid value for field Tank Element Control Logic.");
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + "=\"" + HPWH.Name + "\":",
+            				CtrlLogicFlag + " is not a valid value for field Tank Element Control Logic.");
             ErrorsFound = true;
         }
 
@@ -2360,8 +2341,8 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             ShowSevereError(state,
                             std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", missing data.");
-            ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(2) + " is required");
+                                "\", missing data.",
+            				"blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(2) + " is required");
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule == 0) {
             ShowSevereError(state,
@@ -2554,21 +2535,21 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                     if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
                         ShowSevereError(state,
                                         state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                            ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
-                        ShowContinueError(state, "...Referenced Node Name=" + state.dataIPShortCut->cAlphaArgs(11));
+                                            ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node",
+                        				"...Referenced Node Name=" + state.dataIPShortCut->cAlphaArgs(11));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                    				"An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
                     ErrorsFound = true;
                 }
 
             } else {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(8));
-                ShowContinueError(state, " Valid entries are SCHEDULE, ZONE, and OUTDOORS.");
+                                    ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(8),
+                				" Valid entries are SCHEDULE, ZONE, and OUTDOORS.");
                 ErrorsFound = true;
             }
         }
@@ -2873,8 +2854,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
             ShowSevereError(state,
                             std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", missing data.");
-            ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(5) + " is required");
+                                "\", missing data.",
+            				"blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(5) + " is required");
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule == 0) {
             ShowSevereError(state,
@@ -2909,9 +2890,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         if ((!Tank.HeightWasAutoSized) && (Tank.HeaterHeight1 > tankHeightForTesting)) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Heater 1 is located higher than overall tank height.");
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(7), state.dataIPShortCut->rNumericArgs(7)));
+                                ": Heater 1 is located higher than overall tank height.",
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)),
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(7), state.dataIPShortCut->rNumericArgs(7)));
             ErrorsFound = true;
         }
 
@@ -2919,8 +2900,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
             ShowSevereError(state,
                             std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", missing data.");
-            ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(6) + " is required");
+                                "\", missing data.",
+            				"blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(6) + " is required");
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule2 == 0) {
             ShowSevereError(state,
@@ -2943,9 +2924,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         if ((!Tank.HeightWasAutoSized) && (Tank.HeaterHeight2 > tankHeightForTesting)) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Heater 2 is located higher than overall tank height.");
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
+                                ": Heater 2 is located higher than overall tank height.",
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)),
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
             ErrorsFound = true;
         }
 
@@ -3067,21 +3048,21 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                     if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
                         ShowSevereError(state,
                                         state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                            ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
-                        ShowContinueError(state, "...Referenced Node Name=" + state.dataIPShortCut->cAlphaArgs(13));
+                                            ": Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node",
+                        				"...Referenced Node Name=" + state.dataIPShortCut->cAlphaArgs(13));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                    				"An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
                     ErrorsFound = true;
                 }
 
             } else {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(10));
-                ShowContinueError(state, " Valid entries are Schedule, Zone, and Outdoors.");
+                                    ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(10),
+                				" Valid entries are Schedule, Zone, and Outdoors.");
                 ErrorsFound = true;
             }
         }
@@ -3132,9 +3113,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         if ((!Tank.HeightWasAutoSized) && (Tank.UseInletHeight > Tank.Height)) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Use inlet is located higher than overall tank height.");
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(24), state.dataIPShortCut->rNumericArgs(24)));
+                                ": Use inlet is located higher than overall tank height.",
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)),
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(24), state.dataIPShortCut->rNumericArgs(24)));
             ErrorsFound = true;
         }
 
@@ -3150,9 +3131,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         if ((!Tank.HeightWasAutoSized) && (Tank.UseOutletHeight > Tank.Height)) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Use outlet is located higher than overall tank height.");
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(25), state.dataIPShortCut->rNumericArgs(25)));
+                                ": Use outlet is located higher than overall tank height.",
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)),
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(25), state.dataIPShortCut->rNumericArgs(25)));
             ErrorsFound = true;
         }
 
@@ -3180,9 +3161,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         if ((!Tank.HeightWasAutoSized) && (Tank.SourceInletHeight > Tank.Height)) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Source inlet is located higher than overall tank height.");
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(27), state.dataIPShortCut->rNumericArgs(27)));
+                                ": Source inlet is located higher than overall tank height.",
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)),
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(27), state.dataIPShortCut->rNumericArgs(27)));
             ErrorsFound = true;
         }
 
@@ -3195,9 +3176,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         if ((!Tank.HeightWasAutoSized) && (Tank.SourceOutletHeight > Tank.Height)) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Source outlet is located higher than overall tank height.");
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(28), state.dataIPShortCut->rNumericArgs(28)));
+                                ": Source outlet is located higher than overall tank height.",
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)),
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(28), state.dataIPShortCut->rNumericArgs(28)));
             ErrorsFound = true;
         }
 
@@ -3425,8 +3406,8 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
 
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
         if (Tank.SetPointTempSchedule == 0) {
-            ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
 
             ErrorsFound = true;
         }
@@ -3471,10 +3452,9 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
                 Tank.AmbientTempIndicator = AmbientTempEnum::Schedule;
                 Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
                 if (Tank.AmbientTempSchedule == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
-                    ShowContinueError(state,
-                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "Schedule was not found.");
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4),
+                    				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                    				"Schedule was not found.");
                     ErrorsFound = true;
                 }
 
@@ -3482,10 +3462,9 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
                 Tank.AmbientTempIndicator = AmbientTempEnum::TempZone;
                 Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataHeatBal->Zone);
                 if (Tank.AmbientTempZone == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
-                    ShowContinueError(state,
-                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "Zone was not found.");
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5),
+                    				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                    				"Zone was not found.");
                     ErrorsFound = true;
                 }
 
@@ -3502,23 +3481,22 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
                                                                                      DataLoopNode::ObjectIsNotParent);
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                     if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
-                        ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state, "Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
+                        ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6),
+                        				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                        				"Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                    				"An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
                     ErrorsFound = true;
                 }
 
             } else {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(3));
-                ShowContinueError(state, " Valid entries are Schedule, Zone, and Outdoors.");
+                                    ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(3),
+                				" Valid entries are Schedule, Zone, and Outdoors.");
                 ErrorsFound = true;
             }
         }
@@ -3569,9 +3547,9 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         } else {
             Tank.UseSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
             if (Tank.UseSideAvailSchedNum == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + state.dataIPShortCut->cAlphaArgs(9));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Schedule was not found.");
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + state.dataIPShortCut->cAlphaArgs(9),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                				"Schedule was not found.");
                 ErrorsFound = true;
             }
         }
@@ -3592,9 +3570,9 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         } else {
             Tank.SourceSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(12));
             if (Tank.SourceSideAvailSchedNum == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(12) + " = " + state.dataIPShortCut->cAlphaArgs(12));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Schedule was not found.");
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(12) + " = " + state.dataIPShortCut->cAlphaArgs(12),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                				"Schedule was not found.");
                 ErrorsFound = true;
             }
         }
@@ -3752,9 +3730,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
 
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
         if (Tank.SetPointTempSchedule == 0) {
-            ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-            ShowContinueError(state, "Schedule was not found.");
+            ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+            				"Schedule was not found.");
             ErrorsFound = true;
         }
 
@@ -3792,10 +3770,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
                 Tank.AmbientTempIndicator = AmbientTempEnum::Schedule;
                 Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
                 if (Tank.AmbientTempSchedule == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
-                    ShowContinueError(state,
-                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "Schedule was not found.");
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5),
+                    				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                    				"Schedule was not found.");
                     ErrorsFound = true;
                 }
 
@@ -3803,10 +3780,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
                 Tank.AmbientTempIndicator = AmbientTempEnum::TempZone;
                 Tank.AmbientTempZone = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6), state.dataHeatBal->Zone);
                 if (Tank.AmbientTempZone == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
-                    ShowContinueError(state,
-                                      "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "Zone was not found.");
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6),
+                    				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                    				"Zone was not found.");
                     ErrorsFound = true;
                 }
                 Tank.OffCycLossFracToZone = 1.0;
@@ -3824,23 +3800,22 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
                                                                                      DataLoopNode::ObjectIsNotParent);
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                     if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Tank.AmbientTempOutsideAirNode)) {
-                        ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + state.dataIPShortCut->cAlphaArgs(7));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state, "Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
+                        ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + state.dataIPShortCut->cAlphaArgs(7),
+                        				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                        				"Outdoor Air Node not on OutdoorAir:NodeList or OutdoorAir:Node");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                    				"An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors.");
                     ErrorsFound = true;
                 }
 
             } else {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                    ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(4));
-                ShowContinueError(state, "  Valid entries are Schedule, Zone, and Outdoors.");
+                                    ":  Invalid Ambient Temperature Indicator entered=" + state.dataIPShortCut->cAlphaArgs(4),
+                				"  Valid entries are Schedule, Zone, and Outdoors.");
                 ErrorsFound = true;
             }
         }
@@ -3866,9 +3841,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         if (Tank.UseInletHeight > Tank.Height) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Use inlet is located higher than overall tank height.");
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
+                                ": Use inlet is located higher than overall tank height.",
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)),
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(10), state.dataIPShortCut->rNumericArgs(10)));
             ErrorsFound = true;
         }
 
@@ -3876,9 +3851,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         if (Tank.UseOutletHeight > Tank.Height) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Use outlet is located higher than overall tank height.");
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(11), state.dataIPShortCut->rNumericArgs(11)));
+                                ": Use outlet is located higher than overall tank height.",
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)),
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(11), state.dataIPShortCut->rNumericArgs(11)));
             ErrorsFound = true;
         }
 
@@ -3894,9 +3869,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         if (Tank.SourceInletHeight > Tank.Height) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Source inlet is located higher than overall tank height.");
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(14), state.dataIPShortCut->rNumericArgs(14)));
+                                ": Source inlet is located higher than overall tank height.",
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)),
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(14), state.dataIPShortCut->rNumericArgs(14)));
             ErrorsFound = true;
         }
 
@@ -3907,9 +3882,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         if (Tank.SourceOutletHeight > Tank.Height) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                ": Source outlet is located higher than overall tank height.");
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-            ShowContinueError(state, format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(15), state.dataIPShortCut->rNumericArgs(15)));
+                                ": Source outlet is located higher than overall tank height.",
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)),
+            				format("{} = {:.4R}", state.dataIPShortCut->cNumericFieldNames(15), state.dataIPShortCut->rNumericArgs(15)));
             ErrorsFound = true;
         }
 
@@ -3990,9 +3965,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         } else {
             Tank.UseSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(10));
             if (Tank.UseSideAvailSchedNum == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(10) + " = " + state.dataIPShortCut->cAlphaArgs(10));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Schedule was not found.");
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(10) + " = " + state.dataIPShortCut->cAlphaArgs(10),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                				"Schedule was not found.");
                 ErrorsFound = true;
             }
         }
@@ -4006,9 +3981,9 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         } else {
             Tank.SourceSideAvailSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(13));
             if (Tank.SourceSideAvailSchedNum == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(13) + " = " + state.dataIPShortCut->cAlphaArgs(13));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Schedule was not found.");
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(13) + " = " + state.dataIPShortCut->cAlphaArgs(13),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                				"Schedule was not found.");
                 ErrorsFound = true;
             }
         }
@@ -4171,33 +4146,29 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                     //         verify Desuperheater/tank source node connections
                     if (DesuperHtr.WaterInletNode != Tank.SourceOutletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + DesuperHtr.Name + ':');
-                        ShowContinueError(state, "Desuperheater inlet node name does not match thermal tank source outlet node name.");
-                        ShowContinueError(state,
-                                          "Desuperheater water inlet and outlet node names = " + DesuperHtr.InletNodeName1 + " and " +
-                                              DesuperHtr.OutletNodeName1);
-                        ShowContinueError(state,
-                                          "Thermal tank source side inlet and outlet node names      = " + Tank.InletNodeName2 + " and " +
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + DesuperHtr.Name + ':',
+                        				"Desuperheater inlet node name does not match thermal tank source outlet node name.",
+                        				"Desuperheater water inlet and outlet node names = " + DesuperHtr.InletNodeName1 + " and " +
+                                              DesuperHtr.OutletNodeName1,
+                        				"Thermal tank source side inlet and outlet node names      = " + Tank.InletNodeName2 + " and " +
                                               Tank.OutletNodeName2);
                         ErrorsFound = true;
                     }
 
                     if (DesuperHtr.WaterOutletNode != Tank.SourceInletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + DesuperHtr.Name + ':');
-                        ShowContinueError(state, "Desuperheater water outlet node name does not match thermal tank source inlet node name.");
-                        ShowContinueError(state,
-                                          "Desuperheater water inlet and outlet node names = " + DesuperHtr.InletNodeName1 + " and " +
-                                              DesuperHtr.OutletNodeName1);
-                        ShowContinueError(state,
-                                          "Thermal tank source side inlet and outlet node names      = " + Tank.InletNodeName2 + " and " +
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + DesuperHtr.Name + ':',
+                        				"Desuperheater water outlet node name does not match thermal tank source inlet node name.",
+                        				"Desuperheater water inlet and outlet node names = " + DesuperHtr.InletNodeName1 + " and " +
+                                              DesuperHtr.OutletNodeName1,
+                        				"Thermal tank source side inlet and outlet node names      = " + Tank.InletNodeName2 + " and " +
                                               Tank.OutletNodeName2);
                         ErrorsFound = true;
                     }
                 }
 
                 if (DesuperHtr.WaterHeaterTankNum == 0) {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + DesuperHtr.Name + ':');
-                    ShowContinueError(state, " Water heater tank = " + DesuperHtr.TankName + " not found.");
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + DesuperHtr.Name + ':',
+                    				" Water heater tank = " + DesuperHtr.TankName + " not found.");
                     ErrorsFound = true;
                 }
             }
@@ -4241,8 +4212,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         HPWH.TankType = Tank.Type;
                         HPWH.TankTypeNum = Tank.TypeNum;
                     } else {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                        ShowContinueError(state, "Invalid water heater tank type = " + Tank.Type);
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':',
+                        				"Invalid water heater tank type = " + Tank.Type);
                         ErrorsFound = true;
                     }
 
@@ -4265,8 +4236,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                     // If WaterHeaterMixed: do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
                     if ((Tank.TypeNum == DataPlant::TypeOf_WtrHeaterMixed) && (Tank.ControlType == ControlTypeEnum::Modulate)) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                        ShowContinueError(state, "Heater Control Type for " + Tank.Type + " = " + Tank.Name + " must be CYCLE.");
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':',
+                        				"Heater Control Type for " + Tank.Type + " = " + Tank.Name + " must be CYCLE.");
                         ErrorsFound = true;
                     }
 
@@ -4287,18 +4258,17 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                                         format("{} = {}:  Invalid source side effectiveness for heat pump water heater = {:.3T}",
                                                state.dataIPShortCut->cCurrentModuleObject,
                                                HPWH.Name,
-                                               Tank.SourceEffectiveness));
-                        ShowContinueError(state, " water heater source effectiveness will default to 1.0 and simulation continues.");
+                                               Tank.SourceEffectiveness),
+                        				" water heater source effectiveness will default to 1.0 and simulation continues.");
                         Tank.SourceEffectiveness = 1.0;
                     }
 
                     // Set up the source side nodes for wrapped condensers
                     if (HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
                         if (Tank.SourceInletNode > 0 || Tank.SourceOutletNode > 0) {
-                            ShowSevereError(state, Tank.Type + " = " + Tank.Name + " has a source inlet or outlet node specified,");
-                            ShowContinueError(
-                                state, "but it is attached to " + HPWH.Type + " = " + HPWH.Name + ", which doesn't permit source side connections.");
-                            ShowContinueError(state, "Please leave the source side inlet and outlet fields blank.");
+                            ShowSevereError(state, Tank.Type + " = " + Tank.Name + " has a source inlet or outlet node specified,",
+                            				"but it is attached to " + HPWH.Type + " = " + HPWH.Name + ", which doesn't permit source side connections.",
+                            				"Please leave the source side inlet and outlet fields blank.");
                             ErrorsFound = true;
                         } else {
                             Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(state,
@@ -4331,16 +4301,13 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     if (Tank.UseInletNode == 0 && Tank.UseOutletNode == 0) HPWH.StandAlone = true;
 
                     if (HPWH.WHUseInletNode != Tank.UseInletNode || HPWH.WHUseOutletNode != Tank.UseOutletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                        ShowContinueError(state,
-                                          "Heat pump water heater tank use side inlet and outlet node names must match the use side inlet and "
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':',
+                        				"Heat pump water heater tank use side inlet and outlet node names must match the use side inlet and "
                                           "outlet node names for water heater tank = " +
-                                              HPWH.TankType + ": " + HPWH.TankName);
-                        ShowContinueError(state,
-                                          "Heat pump water heater use side inlet and outlet node names = " + HPWH.InletNodeName2 + " and " +
-                                              HPWH.OutletNodeName2);
-                        ShowContinueError(state,
-                                          "Water heater tank use side inlet and outlet node names      = " + Tank.InletNodeName1 + " and " +
+                                              HPWH.TankType + ": " + HPWH.TankName,
+                        				"Heat pump water heater use side inlet and outlet node names = " + HPWH.InletNodeName2 + " and " +
+                                              HPWH.OutletNodeName2,
+                        				"Water heater tank use side inlet and outlet node names      = " + Tank.InletNodeName1 + " and " +
                                               Tank.OutletNodeName1);
                         ErrorsFound = true;
                     } else {
@@ -4351,25 +4318,19 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                     // verify HP/tank source node connections
                     if (HPWH.CondWaterInletNode != Tank.SourceOutletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                        ShowContinueError(state,
-                                          "Heat Pump condenser water inlet node name does not match water heater tank source outlet node name.");
-                        ShowContinueError(
-                            state, "Heat pump condenser water inlet and outlet node names = " + HPWH.InletNodeName1 + " and " + HPWH.OutletNodeName1);
-                        ShowContinueError(state,
-                                          "Water heater tank source side inlet and outlet node names      = " + Tank.InletNodeName2 + " and " +
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':',
+                        				"Heat Pump condenser water inlet node name does not match water heater tank source outlet node name.",
+                        				"Heat pump condenser water inlet and outlet node names = " + HPWH.InletNodeName1 + " and " + HPWH.OutletNodeName1,
+                        				"Water heater tank source side inlet and outlet node names      = " + Tank.InletNodeName2 + " and " +
                                               Tank.OutletNodeName2);
                         ErrorsFound = true;
                     }
 
                     if (HPWH.CondWaterOutletNode != Tank.SourceInletNode) {
-                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                        ShowContinueError(state,
-                                          "Heat Pump condenser water outlet node name does not match water heater tank source inlet node name.");
-                        ShowContinueError(
-                            state, "Heat pump condenser water inlet and outlet node names = " + HPWH.InletNodeName1 + " and " + HPWH.OutletNodeName1);
-                        ShowContinueError(state,
-                                          "Water heater tank source side inlet and outlet node names      = " + Tank.InletNodeName2 + " and " +
+                        ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':',
+                        				"Heat Pump condenser water outlet node name does not match water heater tank source inlet node name.",
+                        				"Heat pump condenser water inlet and outlet node names = " + HPWH.InletNodeName1 + " and " + HPWH.OutletNodeName1,
+                        				"Water heater tank source side inlet and outlet node names      = " + Tank.InletNodeName2 + " and " +
                                               Tank.OutletNodeName2);
                         ErrorsFound = true;
                     }
@@ -4378,8 +4339,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                     if (HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
                         // make sure the top of the condenser is not above the tank height.
                         if (HPWH.WrappedCondenserTopLocation > Tank.Height) {
-                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                            ShowContinueError(state, "The height of the top of the wrapped condenser is greater than the height of the tank.");
+                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':',
+                            				"The height of the top of the wrapped condenser is greater than the height of the tank.");
                             ErrorsFound = true;
                         }
                     }
@@ -4412,9 +4373,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                                                 break;
                                             } // EquipmentTypeNum
                                             if (!FoundTankInList) {
-                                                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                                                ShowContinueError(state,
-                                                                  "Heat pump water heater type and name must be listed in the correct "
+                                                ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':',
+                                                				"Heat pump water heater type and name must be listed in the correct "
                                                                   "ZoneHVAC:EquipmentList object when Inlet Air Configuration is equal to "
                                                                   "ZoneAirOnly or ZoneAndOutdoorAir.");
                                                 ErrorsFound = true;
@@ -4451,9 +4411,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                                 } // ZoneEquipConfigNum .LE. NumOfZones
                             }     // ZoneEquipConfigNum
                         } else {
-                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                            ShowContinueError(state,
-                                              "ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections objects are required when Inlet Air "
+                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':',
+                            				"ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections objects are required when Inlet Air "
                                               "Configuration is either ZoneAirOnly or ZoneAndOutdoorAir.");
                             ErrorsFound = true;
                         } // ALLOCATED
@@ -4533,13 +4492,13 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                         // Make sure the control sensor locations are in the tank
                         if (HPWH.ControlSensor1Height < 0.0 || HPWH.ControlSensor1Height > TankHeight) {
-                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                            ShowContinueError(state, "Control Sensor 1 is located outside the tank.");
+                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':',
+                            				"Control Sensor 1 is located outside the tank.");
                             ErrorsFound = true;
                         }
                         if (HPWH.ControlSensor2Height < 0.0 || HPWH.ControlSensor2Height > TankHeight) {
-                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                            ShowContinueError(state, "Control Sensor 2 is located outside the tank.");
+                            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':',
+                            				"Control Sensor 2 is located outside the tank.");
                             ErrorsFound = true;
                         }
 
@@ -4571,8 +4530,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                 } // DO CheckWaterHeaterNum = 1, NumWaterHeater
 
                 if (!HPWH.FoundTank) {
-                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':');
-                    ShowContinueError(state, "Water heater tank object not found = " + HPWH.TankType + ", " + HPWH.TankName);
+                    ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + HPWH.Name + ':',
+                    				"Water heater tank object not found = " + HPWH.TankType + ", " + HPWH.TankName);
                     ErrorsFound = true;
                 }
 
@@ -6076,14 +6035,13 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                 if (MaxSideVolFlow > 0.0) { // protect div by zero
                     Real64 TankChangeRateScale = this->Volume / MaxSideVolFlow;
                     if (TankChangeRateScale < 60.0) { // nominal change over in less than one minute
-                        ShowSevereError(state, "InitWaterThermalTank: Detected problem for stratified tank model.  Model cannot be applied.");
-                        ShowContinueError(state, "Occurs for stratified tank name = " + this->Name);
-                        ShowContinueError(state, format("Tank volume = {:.4R} [m3]", this->Volume));
-                        ShowContinueError(state, format("Tank use side volume flow rate = {:.4R} [m3/s]", this->UseDesignVolFlowRate));
-                        ShowContinueError(state, format("Tank source side volume flow rate = {:.4R} [m3/s]", this->SourceDesignVolFlowRate));
-                        ShowContinueError(state, format("Nominal tank change over rate = {:.2R} [s]", TankChangeRateScale));
-                        ShowContinueError(
-                            state, "Change over rate is too fast, increase tank volume, decrease connection flow rates or use mixed tank model");
+                        ShowSevereError(state, "InitWaterThermalTank: Detected problem for stratified tank model.  Model cannot be applied.",
+                        				"Occurs for stratified tank name = " + this->Name,
+                        				format("Tank volume = {:.4R} [m3]", this->Volume),
+                        				format("Tank use side volume flow rate = {:.4R} [m3/s]", this->UseDesignVolFlowRate),
+                        				format("Tank source side volume flow rate = {:.4R} [m3/s]", this->SourceDesignVolFlowRate),
+                        				format("Nominal tank change over rate = {:.2R} [s]", TankChangeRateScale),
+                        				"Change over rate is too fast, increase tank volume, decrease connection flow rates or use mixed tank model");
 
                         ShowFatalError(state, "InitWaterThermalTank: Simulation halted because of sizing problem in stratified tank model.");
                     }
@@ -11539,14 +11497,14 @@ void WaterThermalTankData::SizeDemandSidePlantConnections(EnergyPlusData &state)
                             // plant sizing object design temperature is set too low throw warning.
                             ShowSevereError(state,
                                             "Autosizing of Use side water heater design flow rate requires Sizing:Plant object to have an exit "
-                                            "temperature >= 58C");
-                            ShowContinueError(state, "Occurs for water heater object=" + this->Name);
+                                            "temperature >= 58C",
+                            				"Occurs for water heater object=" + this->Name);
                         } else {
                             // plant sizing object design temperature is set too hi throw warning.
                             ShowSevereError(state,
                                             "Autosizing of Use side chilled water tank design flow rate requires Sizing:Plant object to have an "
-                                            "exit temperature <= 8C");
-                            ShowContinueError(state, "Occurs for chilled water storage tank object=" + this->Name);
+                                            "exit temperature <= 8C",
+                            				"Occurs for chilled water storage tank object=" + this->Name);
                         }
                         ErrorsFound = true;
                     }
@@ -11626,14 +11584,14 @@ void WaterThermalTankData::SizeDemandSidePlantConnections(EnergyPlusData &state)
                             // plant sizing object design temperature is set too low throw warning.
                             ShowSevereError(state,
                                             "Autosizing of Source side water heater design flow rate requires Sizing:Plant object to have an "
-                                            "exit temperature >= 58C");
-                            ShowContinueError(state, "Occurs for WaterHeater:Mixed object=" + this->Name);
+                                            "exit temperature >= 58C",
+                            				"Occurs for WaterHeater:Mixed object=" + this->Name);
                         } else {
                             // plant sizing object design temperature is set too hi throw warning.
                             ShowSevereError(state,
                                             "Autosizing of Source side chilled water tank design flow rate requires Sizing:Plant object to have "
-                                            "an exit temperature <= 8C");
-                            ShowContinueError(state, "Occurs for chilled water storage tank object=" + this->Name);
+                                            "an exit temperature <= 8C",
+                            				"Occurs for chilled water storage tank object=" + this->Name);
                         }
                         ErrorsFound = true;
                     }

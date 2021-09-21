@@ -448,8 +448,8 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
                 ErrorsFound = true;
             }
         } else {
-            ShowSevereError(state, std::string{RoutineName} + PlantLoopObject + '=' + state.dataPlnt->PlantLoop(LoopNum).Name + " is expecting");
-            ShowContinueError(state, CurrentModuleObject + '=' + PlantOpSchemeName + ", but not found.");
+            ShowSevereError(state, std::string{RoutineName} + PlantLoopObject + '=' + state.dataPlnt->PlantLoop(LoopNum).Name + " is expecting",
+            				CurrentModuleObject + '=' + PlantOpSchemeName + ", but not found.");
             ErrorsFound = true;
         }
     }
@@ -1120,8 +1120,8 @@ void LoadEquipList(EnergyPlusData &state,
                             if (state.dataIPShortCut->lAlphaFieldBlanks(MachineNum)) {
                                 ShowSevereError(state,
                                                 CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                                    "\", invalid component specification.");
-                                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(MachineNum) + " is blank.");
+                                                    "\", invalid component specification.",
+                                				state.dataIPShortCut->cAlphaFieldNames(MachineNum) + " is blank.");
                                 firstblank = true;
                                 ErrorsFound = true;
                             }
@@ -1175,8 +1175,8 @@ void LoadEquipList(EnergyPlusData &state,
                             if (state.dataIPShortCut->lAlphaFieldBlanks(MachineNum)) {
                                 ShowSevereError(state,
                                                 CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                                    "\", invalid component specification.");
-                                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(MachineNum) + " is blank.");
+                                                    "\", invalid component specification.",
+                                				state.dataIPShortCut->cAlphaFieldNames(MachineNum) + " is blank.");
                                 firstblank = true;
                                 ErrorsFound = true;
                             }
@@ -1501,10 +1501,8 @@ void FindCompSPInput(EnergyPlusData &state,
                                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                     ShowSevereError(state,
                                                     "Missing temperature setpoint for " + CurrentModuleObject + " named " +
-                                                        state.dataIPShortCut->cAlphaArgs(1));
-                                    ShowContinueError(
-                                        state,
-                                        "A temperature setpoint is needed at the node named " +
+                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                    				"A temperature setpoint is needed at the node named " +
                                             state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                         ShowContinueError(state,
@@ -1526,10 +1524,8 @@ void FindCompSPInput(EnergyPlusData &state,
                                     if (NodeEMSSetPointMissing) {
                                         ShowSevereError(state,
                                                         "Missing temperature setpoint for " + CurrentModuleObject + " named " +
-                                                            state.dataIPShortCut->cAlphaArgs(1));
-                                        ShowContinueError(
-                                            state,
-                                            "A temperature setpoint is needed at the node named " +
+                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                        				"A temperature setpoint is needed at the node named " +
                                                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                         if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                             ShowContinueError(state,
@@ -1553,10 +1549,8 @@ void FindCompSPInput(EnergyPlusData &state,
                                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                         ShowSevereError(state,
                                                         "Missing temperature high setpoint for " + CurrentModuleObject + " named " +
-                                                            state.dataIPShortCut->cAlphaArgs(1));
-                                        ShowContinueError(
-                                            state,
-                                            "A temperature high setpoint is needed at the node named " +
+                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                        				"A temperature high setpoint is needed at the node named " +
                                                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                         if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                             ShowContinueError(state,
@@ -1578,9 +1572,8 @@ void FindCompSPInput(EnergyPlusData &state,
                                         if (NodeEMSSetPointMissing) {
                                             ShowSevereError(state,
                                                             "Missing high temperature setpoint for " + CurrentModuleObject + " named " +
-                                                                state.dataIPShortCut->cAlphaArgs(1));
-                                            ShowContinueError(state,
-                                                              "A high temperature setpoint is needed at the node named " +
+                                                                state.dataIPShortCut->cAlphaArgs(1),
+                                            				"A high temperature setpoint is needed at the node named " +
                                                                   state.dataPlnt->PlantLoop(LoopNum)
                                                                       .OpScheme(SchemeNum)
                                                                       .EquipList(1)
@@ -1608,10 +1601,8 @@ void FindCompSPInput(EnergyPlusData &state,
                                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                         ShowSevereError(state,
                                                         "Missing temperature low setpoint for " + CurrentModuleObject + " named " +
-                                                            state.dataIPShortCut->cAlphaArgs(1));
-                                        ShowContinueError(
-                                            state,
-                                            "A temperature low setpoint is needed at the node named " +
+                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                        				"A temperature low setpoint is needed at the node named " +
                                                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                         if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                             ShowContinueError(state,
@@ -1638,9 +1629,8 @@ void FindCompSPInput(EnergyPlusData &state,
                                         if (NodeEMSSetPointMissing) {
                                             ShowSevereError(state,
                                                             "Missing low temperature setpoint for " + CurrentModuleObject + " named " +
-                                                                state.dataIPShortCut->cAlphaArgs(1));
-                                            ShowContinueError(state,
-                                                              "A low temperature setpoint is needed at the node named " +
+                                                                state.dataIPShortCut->cAlphaArgs(1),
+                                            				"A low temperature setpoint is needed at the node named " +
                                                                   state.dataPlnt->PlantLoop(LoopNum)
                                                                       .OpScheme(SchemeNum)
                                                                       .EquipList(1)
@@ -1670,10 +1660,8 @@ void FindCompSPInput(EnergyPlusData &state,
                                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                         ShowSevereError(state,
                                                         "Missing temperature dual setpoints for " + CurrentModuleObject + " named " +
-                                                            state.dataIPShortCut->cAlphaArgs(1));
-                                        ShowContinueError(
-                                            state,
-                                            "A dual temperaturesetpoint is needed at the node named " +
+                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                        				"A dual temperaturesetpoint is needed at the node named " +
                                                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                         if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                             ShowContinueError(state,
@@ -1695,9 +1683,8 @@ void FindCompSPInput(EnergyPlusData &state,
                                         if (NodeEMSSetPointMissing) {
                                             ShowSevereError(state,
                                                             "Missing dual temperature setpoint for " + CurrentModuleObject + " named " +
-                                                                state.dataIPShortCut->cAlphaArgs(1));
-                                            ShowContinueError(state,
-                                                              "A dual temperature setpoint is needed at the node named " +
+                                                                state.dataIPShortCut->cAlphaArgs(1),
+                                            				"A dual temperature setpoint is needed at the node named " +
                                                                   state.dataPlnt->PlantLoop(LoopNum)
                                                                       .OpScheme(SchemeNum)
                                                                       .EquipList(1)
@@ -1838,9 +1825,9 @@ void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).simPluginLocation =
                     state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).simPluginLocation == -1) {
-                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                    ShowContinueError(state, "Entered in " + CurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(state, "Not found as either an EMS Program Manager or a Python Plugin instance.");
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2),
+                    				"Entered in " + CurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+                    				"Not found as either an EMS Program Manager or a Python Plugin instance.");
                     ErrorsFound = true;
                 }
             }
@@ -1852,9 +1839,9 @@ void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).initPluginLocation =
                         state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, state.dataIPShortCut->cAlphaArgs(3));
                     if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).initPluginLocation == -1) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
-                        ShowContinueError(state, "Entered in " + CurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state, "Not found as either an EMS Program Manager or a Python Plugin instance.");
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3),
+                        				"Entered in " + CurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1),
+                        				"Not found as either an EMS Program Manager or a Python Plugin instance.");
                         ErrorsFound = true;
                     }
                 }
@@ -1977,10 +1964,10 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                                                 LoopNum);
 
                         if (errFlag1) {
-                            ShowSevereError(state, "InitLoadDistribution: Equipment specified for operation scheme not found on correct loop");
-                            ShowContinueError(state, "Operation Scheme name = " + this_op_scheme.Name);
-                            ShowContinueError(state, "Loop name = " + this_plant_loop.Name);
-                            ShowContinueError(state, "Component name = " + this_equip.Name);
+                            ShowSevereError(state, "InitLoadDistribution: Equipment specified for operation scheme not found on correct loop",
+                            				"Operation Scheme name = " + this_op_scheme.Name,
+                            				"Loop name = " + this_plant_loop.Name,
+                            				"Component name = " + this_equip.Name);
                             ShowFatalError(state, "InitLoadDistribution: Simulation terminated because of error in operation scheme.");
                         }
 
@@ -1992,25 +1979,21 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         if (ValidLoopEquipTypes(ThisTypeOfNum) == LoopType::Plant && this_plant_loop.TypeOfLoop == LoopType::Condenser) {
                             ShowSevereError(state,
                                             "InitLoadDistribution: CondenserLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
-                                                this_plant_loop.OperationScheme + "\",");
-                            ShowContinueError(state,
-                                              "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
-                                                  "\" includes equipment that is not valid on a Condenser Loop");
-                            ShowContinueError(
-                                state, "Component " + ccSimPlantEquipTypes(ThisTypeOfNum) + " not allowed as supply equipment on this type of loop.");
-                            ShowContinueError(state, "Component name = " + this_equip.Name);
+                                                this_plant_loop.OperationScheme + "\",",
+                            				"Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
+                                                  "\" includes equipment that is not valid on a Condenser Loop",
+                            				"Component " + ccSimPlantEquipTypes(ThisTypeOfNum) + " not allowed as supply equipment on this type of loop.",
+                            				"Component name = " + this_equip.Name);
                             errFlag2 = true;
                         }
                         if (ValidLoopEquipTypes(ThisTypeOfNum) == LoopType::Condenser && this_plant_loop.TypeOfLoop == LoopType::Plant) {
                             ShowSevereError(state,
                                             "InitLoadDistribution: PlantLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
-                                                this_plant_loop.OperationScheme + "\",");
-                            ShowContinueError(state,
-                                              "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
-                                                  "\" includes equipment that is not valid on a Plant Loop");
-                            ShowContinueError(
-                                state, "Component " + ccSimPlantEquipTypes(ThisTypeOfNum) + " not allowed as supply equipment on this type of loop.");
-                            ShowContinueError(state, "Component name = " + this_equip.Name);
+                                                this_plant_loop.OperationScheme + "\",",
+                            				"Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
+                                                  "\" includes equipment that is not valid on a Plant Loop",
+                            				"Component " + ccSimPlantEquipTypes(ThisTypeOfNum) + " not allowed as supply equipment on this type of loop.",
+                            				"Component name = " + this_equip.Name);
                             errFlag2 = true;
                         }
 
@@ -2098,8 +2081,8 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                 if (OpSchemePtr == 0) {
                                     ShowSevereError(state,
                                                     "InitLoadDistribution: no operation scheme index found for component on PlantLoop=" +
-                                                        this_plant_loop.Name);
-                                    ShowContinueError(state, "Component name = " + this_component.Name);
+                                                        this_plant_loop.Name,
+                                    				"Component name = " + this_component.Name);
                                     errFlag2 = true;
                                 }
                                 if (Index == 1) {
@@ -2218,9 +2201,9 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                 this_loop_component.CurOpSchemeType = this_op_scheme.OpSchemeType;
                             } else {
                                 ShowSevereError(state,
-                                                "Invalid [pump] component found on equipment list.  Pumps are not allowed on equipment lists.");
-                                ShowContinueError(state, "Problem component name = " + this_op_scheme.EquipList(ListNum).Comp(CompNum).Name);
-                                ShowContinueError(state, "Remove pump component and place other plant equipment on the list to correct.");
+                                                "Invalid [pump] component found on equipment list.  Pumps are not allowed on equipment lists.",
+                                				"Problem component name = " + this_op_scheme.EquipList(ListNum).Comp(CompNum).Name,
+                                				"Remove pump component and place other plant equipment on the list to correct.");
                                 errFlag2 = true;
                             }
 

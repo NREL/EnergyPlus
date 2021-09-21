@@ -351,10 +351,10 @@ namespace WaterToAirHeatPump {
 
             if ((state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideOutsideUACoeff < DataGlobalConstants::rTinyValue) ||
                 (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue)) {
-                ShowSevereError(state, "Input problem for " + CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
-                ShowContinueError(state, " One or both load side UA values entered are below tolerance, likely zero or blank.");
-                ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
-                ShowContinueError(state, "  the release of EnergyPlus version 5.");
+                ShowSevereError(state, "Input problem for " + CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
+                				" One or both load side UA values entered are below tolerance, likely zero or blank.",
+                				" Verify inputs, as the parameter syntax for this object went through a change with",
+                				"  the release of EnergyPlus version 5.");
                 ErrorsFound = true;
             }
 
@@ -538,10 +538,10 @@ namespace WaterToAirHeatPump {
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff = NumArray(5);
             if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoadSideTotalUACoeff < DataGlobalConstants::rTinyValue) {
-                ShowSevereError(state, "Input problem for " + CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
-                ShowContinueError(state, " Load side UA value is less than tolerance, likely zero or blank.");
-                ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
-                ShowContinueError(state, "  the release of EnergyPlus version 5.");
+                ShowSevereError(state, "Input problem for " + CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
+                				" Load side UA value is less than tolerance, likely zero or blank.",
+                				" Verify inputs, as the parameter syntax for this object went through a change with",
+                				"  the release of EnergyPlus version 5.");
                 ErrorsFound = true;
             }
 
@@ -956,20 +956,20 @@ namespace WaterToAirHeatPump {
             if (state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName == "WATER") {
                 if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideUACoeff < DataGlobalConstants::rTinyValue) {
                     ShowSevereError(state,
-                                    "Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".");
-                    ShowContinueError(state, " Source side UA value is less than tolerance, likely zero or blank.");
-                    ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
-                    ShowContinueError(state, "  the release of EnergyPlus version 5.");
+                                    "Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".",
+                    				" Source side UA value is less than tolerance, likely zero or blank.",
+                    				" Verify inputs, as the parameter syntax for this object went through a change with",
+                    				"  the release of EnergyPlus version 5.");
                     errFlag = true;
                 }
             } else {
                 if ((state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR1 < DataGlobalConstants::rTinyValue) ||
                     (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideHTR2 < DataGlobalConstants::rTinyValue)) {
                     ShowSevereError(state,
-                                    "Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".");
-                    ShowContinueError(state, " A source side heat transfer resistance value is less than tolerance, likely zero or blank.");
-                    ShowContinueError(state, " Verify inputs, as the parameter syntax for this object went through a change with");
-                    ShowContinueError(state, "  the release of EnergyPlus version 5.");
+                                    "Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".",
+                    				" A source side heat transfer resistance value is less than tolerance, likely zero or blank.",
+                    				" Verify inputs, as the parameter syntax for this object went through a change with",
+                    				"  the release of EnergyPlus version 5.");
                     errFlag = true;
                 }
             }

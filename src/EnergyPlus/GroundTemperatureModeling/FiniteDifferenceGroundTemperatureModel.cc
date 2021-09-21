@@ -206,9 +206,8 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     bool EndHourFlag_reset = state.dataGlobal->EndHourFlag;
 
     if (!state.dataWeatherManager->WeatherFileExists) {
-        ShowSevereError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.");
-        ShowContinueError(state,
-                          "Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
+        ShowSevereError(state, "Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.",
+        				"Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
         ShowFatalError(state, "Simulation halted due to input error in ground temperature model.");
     }
 

@@ -197,8 +197,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             }
         }
         if (found > 0) {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
-            ShowContinueError(state, "...Duplicate name. Name has already been used.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data",
+            				"...Duplicate name. Name has already been used.");
             ErrorsFound = true;
         }
         // name of the report meter
@@ -454,9 +454,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             tariff(iInObj).periodSchIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4)); // index to the period schedule
             if (tariff(iInObj).periodSchIndex == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
-                ShowContinueError(state,
-                                  " not found " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data",
+                				" not found " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
                 ErrorsFound = true;
             }
         } else {
@@ -468,9 +467,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             tariff(iInObj).seasonSchIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5)); // index to the season schedule
             if (tariff(iInObj).seasonSchIndex == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
-                ShowContinueError(state,
-                                  " not found " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\".");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data",
+                				" not found " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\".");
                 ErrorsFound = true;
             }
         } else {
@@ -482,9 +480,8 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             tariff(iInObj).monthSchIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6)); // index to the month schedule
             if (tariff(iInObj).monthSchIndex == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
-                ShowContinueError(state,
-                                  " not found " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + state.dataIPShortCut->cAlphaArgs(6) + "\".");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data",
+                				" not found " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" + state.dataIPShortCut->cAlphaArgs(6) + "\".");
                 ErrorsFound = true;
             }
         } else {
@@ -708,8 +705,8 @@ void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true 
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "Maximum")) {
             qualify(iInObj).isMaximum = true;
         } else {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
-            ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data",
+            				state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
             ErrorsFound = true;
             qualify(iInObj).isMaximum = true;
         }
@@ -1145,8 +1142,8 @@ void GetInputEconomicsVariable(EnergyPlusData &state, bool &ErrorsFound) // true
             econVar(variablePt).varUnitType = varUnitTypeCurrency;
         } else {
             econVar(variablePt).varUnitType = varUnitTypeDimensionless;
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data");
-            ShowContinueError(state, "invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data",
+            				"invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
             ErrorsFound = true;
         }
         // move number inputs into econVar
@@ -1230,16 +1227,15 @@ void GetInputEconomicsComputation(EnergyPlusData &state, bool &ErrorsFound) // t
                 computation(tariffPt).lastStep = -1;
                 computation(tariffPt).isUserDef = false;
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
-                ShowContinueError(state, "... No lines in the computation can be interpreted ");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.",
+                				"... No lines in the computation can be interpreted ");
                 ErrorsFound = true;
             } else {
                 computation(tariffPt).isUserDef = true;
             }
         } else {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
-            ShowContinueError(state,
-                              "... not found " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.",
+            				"... not found " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
             ErrorsFound = true;
         }
     }
@@ -1288,8 +1284,8 @@ void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound) // 
             }
         }
         if (state.dataCostEstimateManager->selectedMonetaryUnit == 0) {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.");
-            ShowContinueError(state, "... invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + '.');
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid data.",
+            				"... invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + '.');
             ErrorsFound = true;
         }
     } else if (NumCurrencyType > 1) {
@@ -1817,8 +1813,8 @@ int FindTariffIndex(
     if (found > 0) {
         FindTariffIndex = found;
     } else {
-        ShowSevereError(state, nameOfCurObj + "=\"" + nameOfReferingObj + "\" invalid tariff referenced");
-        ShowContinueError(state, "not found UtilityCost:Tariff=\"" + nameOfTariff + "\".");
+        ShowSevereError(state, nameOfCurObj + "=\"" + nameOfReferingObj + "\" invalid tariff referenced",
+        				"not found UtilityCost:Tariff=\"" + nameOfTariff + "\".");
         ErrorsFound = true;
         FindTariffIndex = 0;
     }
@@ -1886,8 +1882,8 @@ void warnIfNativeVarname(
     if (throwError) {
         ErrorsFound = true;
         if (curTariffIndex >= 1 && curTariffIndex <= state.dataEconTariff->numTariff) {
-            ShowSevereError(state, "UtilityCost:Tariff=\"" + state.dataEconTariff->tariff(curTariffIndex).tariffName + "\" invalid referenced name");
-            ShowContinueError(state, curobjName + "=\"" + objName + "\" You cannot name an object using the same name as a native variable.");
+            ShowSevereError(state, "UtilityCost:Tariff=\"" + state.dataEconTariff->tariff(curTariffIndex).tariffName + "\" invalid referenced name",
+            				curobjName + "=\"" + objName + "\" You cannot name an object using the same name as a native variable.");
         } else {
             ShowSevereError(state, curobjName + "=\"" + objName + "\" You cannot name an object using the same name as a native variable.");
         }

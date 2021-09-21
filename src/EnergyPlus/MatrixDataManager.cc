@@ -162,16 +162,14 @@ namespace MatrixDataManager {
 
             // test
             if (NumElements < 1) {
-                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state,
-                                  "Check " + state.dataIPShortCut->cNumericFieldNames(1) + " and " + state.dataIPShortCut->cNumericFieldNames(2) +
+                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1),
+                				"Check " + state.dataIPShortCut->cNumericFieldNames(1) + " and " + state.dataIPShortCut->cNumericFieldNames(2) +
                                       " total number of elements in matrix must be 1 or more");
                 ErrorsFound = true;
             }
             if ((NumNumbers - 2) < NumElements) {
-                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state,
-                                  "Check input, total number of elements does not agree with " + state.dataIPShortCut->cNumericFieldNames(1) +
+                ShowSevereError(state, "GetMatrixInput: for " + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaArgs(1),
+                				"Check input, total number of elements does not agree with " + state.dataIPShortCut->cNumericFieldNames(1) +
                                       " and " + state.dataIPShortCut->cNumericFieldNames(2));
                 ErrorsFound = true;
             }

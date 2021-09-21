@@ -237,31 +237,31 @@ void GetSwimmingPool(EnergyPlusData &state)
             ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has an average depth that is too small.");
             ShowContinueError(state, "The pool average depth has been reset to the minimum allowed depth.");
         } else if (state.dataSwimmingPools->Pool(Item).AvgDepth > MaxDepth) {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has an average depth that is too large.");
-            ShowContinueError(state, "The pool depth must be less than the maximum average depth of 10 meters.");
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + " has an average depth that is too large.",
+            				"The pool depth must be less than the maximum average depth of 10 meters.");
             ErrorsFound = true;
         }
 
         state.dataSwimmingPools->Pool(Item).ActivityFactorSchedName = Alphas(3);
         state.dataSwimmingPools->Pool(Item).ActivityFactorSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(3));
         if ((state.dataSwimmingPools->Pool(Item).ActivityFactorSchedPtr == 0) && (!lAlphaBlanks(3))) {
-            ShowSevereError(state, cAlphaFields(3) + " not found: " + Alphas(3));
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state, cAlphaFields(3) + " not found: " + Alphas(3),
+            				"Occurs in " + CurrentModuleObject + " = " + Alphas(1));
             ErrorsFound = true;
         }
 
         state.dataSwimmingPools->Pool(Item).MakeupWaterSupplySchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(4));
         if ((state.dataSwimmingPools->Pool(Item).MakeupWaterSupplySchedPtr == 0) && (!lAlphaBlanks(4))) {
-            ShowSevereError(state, cAlphaFields(4) + " not found: " + Alphas(4));
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state, cAlphaFields(4) + " not found: " + Alphas(4),
+            				"Occurs in " + CurrentModuleObject + " = " + Alphas(1));
             ErrorsFound = true;
         }
 
         state.dataSwimmingPools->Pool(Item).CoverSchedName = Alphas(5);
         state.dataSwimmingPools->Pool(Item).CoverSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(5));
         if ((state.dataSwimmingPools->Pool(Item).CoverSchedPtr == 0) && (!lAlphaBlanks(5))) {
-            ShowSevereError(state, cAlphaFields(5) + " not found: " + Alphas(5));
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state, cAlphaFields(5) + " not found: " + Alphas(5),
+            				"Occurs in " + CurrentModuleObject + " = " + Alphas(1));
             ErrorsFound = true;
         }
 
@@ -355,13 +355,13 @@ void GetSwimmingPool(EnergyPlusData &state)
 
         state.dataSwimmingPools->Pool(Item).SetPtTempSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(8));
         if ((state.dataSwimmingPools->Pool(Item).SetPtTempSchedPtr == 0) && (!lAlphaBlanks(8))) {
-            ShowSevereError(state, cAlphaFields(8) + " not found: " + Alphas(8));
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state, cAlphaFields(8) + " not found: " + Alphas(8),
+            				"Occurs in " + CurrentModuleObject + " = " + Alphas(1));
             ErrorsFound = true;
         }
         if (lAlphaBlanks(8)) {
-            ShowSevereError(state, cAlphaFields(8) + " left blank.  This is NOT allowed as there must be a pool water setpoint temperature.");
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state, cAlphaFields(8) + " left blank.  This is NOT allowed as there must be a pool water setpoint temperature.",
+            				"Occurs in " + CurrentModuleObject + " = " + Alphas(1));
             ErrorsFound = true;
         }
 
@@ -377,16 +377,16 @@ void GetSwimmingPool(EnergyPlusData &state)
         state.dataSwimmingPools->Pool(Item).PeopleSchedName = Alphas(9);
         state.dataSwimmingPools->Pool(Item).PeopleSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(9));
         if ((state.dataSwimmingPools->Pool(Item).PeopleSchedPtr == 0) && (!lAlphaBlanks(9))) {
-            ShowSevereError(state, cAlphaFields(9) + " not found: " + Alphas(9));
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state, cAlphaFields(9) + " not found: " + Alphas(9),
+            				"Occurs in " + CurrentModuleObject + " = " + Alphas(1));
             ErrorsFound = true;
         }
 
         state.dataSwimmingPools->Pool(Item).PeopleHeatGainSchedName = Alphas(10);
         state.dataSwimmingPools->Pool(Item).PeopleHeatGainSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(10));
         if ((state.dataSwimmingPools->Pool(Item).PeopleHeatGainSchedPtr == 0) && (!lAlphaBlanks(10))) {
-            ShowSevereError(state, cAlphaFields(10) + " not found: " + Alphas(10));
-            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+            ShowSevereError(state, cAlphaFields(10) + " not found: " + Alphas(10),
+            				"Occurs in " + CurrentModuleObject + " = " + Alphas(1));
             ErrorsFound = true;
         }
     }
@@ -411,15 +411,13 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
     static constexpr std::string_view CurrentModuleObject("SwimmingPool:Indoor");
 
     if (this->SurfacePtr <= 0) {
-        ShowSevereError(state, std::string{RoutineName} + "Invalid " + std::string{cAlphaField2} + " = " + std::string{Alpha2});
-        ShowContinueError(state, "Occurs in " + std::string{CurrentModuleObject} + " = " + std::string{Alpha1});
+        ShowSevereError(state, std::string{RoutineName} + "Invalid " + std::string{cAlphaField2} + " = " + std::string{Alpha2},
+        				"Occurs in " + std::string{CurrentModuleObject} + " = " + std::string{Alpha1});
         ErrorsFound = true;
     } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(this->SurfacePtr)) {
-        ShowSevereError(state, std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + std::string{Alpha1} + "\", Invalid Surface");
-        ShowContinueError(
-            state, std::string{cAlphaField2} + "=\"" + std::string{Alpha2} + "\" has been used in another radiant system, ventilated slab, or pool.");
-        ShowContinueError(state,
-                          "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
+        ShowSevereError(state, std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + std::string{Alpha1} + "\", Invalid Surface",
+        				std::string{cAlphaField2} + "=\"" + std::string{Alpha2} + "\" has been used in another radiant system, ventilated slab, or pool.",
+        				"A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
         ErrorsFound = true;
         // Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
     } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) {
@@ -453,9 +451,8 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
         if (state.dataSurface->Surface(this->SurfacePtr).Class != DataSurfaces::SurfaceClass::Floor) {
             ShowSevereError(state,
                             std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + std::string{Alpha1} +
-                                " contains a surface name that is NOT a floor.");
-            ShowContinueError(
-                state, "A swimming pool must be associated with a surface that is a FLOOR.  Association with other surface types is not permitted.");
+                                " contains a surface name that is NOT a floor.",
+            				"A swimming pool must be associated with a surface that is a FLOOR.  Association with other surface types is not permitted.");
             ErrorsFound = true;
         }
     }

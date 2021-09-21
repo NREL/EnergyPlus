@@ -188,8 +188,8 @@ namespace HeatingCoils {
                 }
             }
         } else {
-            ShowSevereError(state, "SimulateHeatingCoilComponents: CompIndex argument not used.");
-            ShowContinueError(state, "..CompName = " + std::string{CompName});
+            ShowSevereError(state, "SimulateHeatingCoilComponents: CompIndex argument not used.",
+            				"..CompName = " + std::string{CompName});
             ShowFatalError(state, "Preceding conditions cause termination.");
         }
 
@@ -1054,9 +1054,9 @@ namespace HeatingCoils {
             //       check availability schedule for values between 0 and 1
             if (HeatingCoil(CoilNum).SchedPtr > 0) {
                 if (!CheckScheduleValueMinMax(state, HeatingCoil(CoilNum).SchedPtr, ">=", 0.0, "<=", 1.0)) {
-                    ShowSevereError(state, CurrentModuleObject + " = \"" + HeatingCoil(CoilNum).Name + "\"");
-                    ShowContinueError(state, "Error found in " + cAlphaFields(2) + " = " + Alphas(2));
-                    ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
+                    ShowSevereError(state, CurrentModuleObject + " = \"" + HeatingCoil(CoilNum).Name + "\"",
+                    				"Error found in " + cAlphaFields(2) + " = " + Alphas(2),
+                    				"Schedule values must be (>=0., <=1.)");
                     state.dataHeatingCoils->InputErrorsFound = true;
                 }
             }
@@ -1277,10 +1277,9 @@ namespace HeatingCoils {
             } else {
                 ShowSevereError(state,
                                 CurrentModuleObject + ", \"" + HeatingCoil(CoilNum).Name +
-                                    "\" valid desuperheater heat source object type not found: " + Alphas(5));
-                ShowContinueError(state, "Valid desuperheater heat source objects are:");
-                ShowContinueError(state,
-                                  "Refrigeration:CompressorRack, Coil:Cooling:DX:SingleSpeed, Refrigeration:Condenser:AirCooled, "
+                                    "\" valid desuperheater heat source object type not found: " + Alphas(5),
+                				"Valid desuperheater heat source objects are:",
+                				"Refrigeration:CompressorRack, Coil:Cooling:DX:SingleSpeed, Refrigeration:Condenser:AirCooled, "
                                   "Refrigeration:Condenser:EvaporativeCooled, Refrigeration:Condenser:WaterCooled,Coil:Cooling:DX:TwoSpeed, and "
                                   "Coil:Cooling:DX:TwoStageWithHumidityControlMode");
                 state.dataHeatingCoils->InputErrorsFound = true;
@@ -1462,27 +1461,27 @@ namespace HeatingCoils {
                 //     3) TempSetPointNodeNum .GT. 0 and TempSetPoint == SensedNodeFlagValue, this is not correct, missing temperature setpoint
                 //     test 2) here (fatal message)
                 if (ControlNode == 0) {
-                    ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"");
-                    ShowContinueError(state, "... Missing control node for heating coil.");
-                    ShowContinueError(state, "... enter a control node name in the coil temperature setpoint node field for this heating coil.");
-                    ShowContinueError(state, "... use a Setpoint Manager to establish a setpoint at the coil temperature setpoint node.");
+                    ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"",
+                    				"... Missing control node for heating coil.",
+                    				"... enter a control node name in the coil temperature setpoint node field for this heating coil.",
+                    				"... use a Setpoint Manager to establish a setpoint at the coil temperature setpoint node.");
                     state.dataHeatingCoils->HeatingCoilFatalError = true;
                     //     test 3) here (fatal message)
                 } else { // IF(ControlNode .GT. 0)THEN
                     if (state.dataLoopNodes->Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                            ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"");
-                            ShowContinueError(state, "... Missing temperature setpoint for heating coil.");
-                            ShowContinueError(state, "... use a Setpoint Manager to establish a setpoint at the coil temperature setpoint node.");
+                            ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"",
+                            				"... Missing temperature setpoint for heating coil.",
+                            				"... use a Setpoint Manager to establish a setpoint at the coil temperature setpoint node.");
                             state.dataHeatingCoils->HeatingCoilFatalError = true;
                         } else {
                             CheckIfNodeSetPointManagedByEMS(
                                 state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHeatingCoils->HeatingCoilFatalError);
                             if (state.dataHeatingCoils->HeatingCoilFatalError) {
-                                ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"");
-                                ShowContinueError(state, "... Missing temperature setpoint for heating coil.");
-                                ShowContinueError(state, "... use a Setpoint Manager to establish a setpoint at the coil temperature setpoint node.");
-                                ShowContinueError(state, "... or use an EMS Actuator to establish a setpoint at the coil temperature setpoint node.");
+                                ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"",
+                                				"... Missing temperature setpoint for heating coil.",
+                                				"... use a Setpoint Manager to establish a setpoint at the coil temperature setpoint node.",
+                                				"... or use an EMS Actuator to establish a setpoint at the coil temperature setpoint node.");
                             }
                         }
                     }
@@ -3155,9 +3154,8 @@ namespace HeatingCoils {
                 ShowFatalError(state, "CheckHeatingCoilSchedule: Coil not found=\"" + std::string{CompName} + "\".");
             }
             if (!UtilityRoutines::SameString(CompType, cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num))) {
-                ShowSevereError(state, "CheckHeatingCoilSchedule: Coil=\"" + std::string{CompName} + "\"");
-                ShowContinueError(state,
-                                  "...expected type=\"" + CompType + "\", actual type=\"" +
+                ShowSevereError(state, "CheckHeatingCoilSchedule: Coil=\"" + std::string{CompName} + "\"",
+                				"...expected type=\"" + CompType + "\", actual type=\"" +
                                       cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num) + "\".");
                 ShowFatalError(state, "Program terminates due to preceding conditions.");
             }
@@ -3177,9 +3175,8 @@ namespace HeatingCoils {
                                 format("CheckHeatingCoilSchedule: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
                                        CoilNum,
                                        CompName,
-                                       state.dataHeatingCoils->HeatingCoil(CoilNum).Name));
-                ShowContinueError(state,
-                                  "...expected type=\"" + CompType + "\", actual type=\"" +
+                                       state.dataHeatingCoils->HeatingCoil(CoilNum).Name),
+                				"...expected type=\"" + CompType + "\", actual type=\"" +
                                       cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num) + "\".");
                 ShowFatalError(state, "Program terminates due to preceding conditions.");
             }
@@ -3238,9 +3235,8 @@ namespace HeatingCoils {
             if (FoundType == 0) {
                 ShowSevereError(state, "GetCoilCapacity: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
             } else if (FoundType > 0) {
-                ShowSevereError(state, "GetCoilCapacity: Invalid coil type for capacity, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
-                ShowContinueError(state,
-                                  "...only " + cAllCoilTypes(Coil_HeatingElectric) + ", " + cAllCoilTypes(Coil_HeatingGasOrOtherFuel) + " or " +
+                ShowSevereError(state, "GetCoilCapacity: Invalid coil type for capacity, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"",
+                				"...only " + cAllCoilTypes(Coil_HeatingElectric) + ", " + cAllCoilTypes(Coil_HeatingGasOrOtherFuel) + " or " +
                                       cAllCoilTypes(Coil_HeatingDesuperheater) + " are valid in this context.");
             }
             ShowContinueError(state, "... returning Coil Capacity as -1000.");

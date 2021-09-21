@@ -271,20 +271,17 @@ namespace ElectricBaseboardRadiator {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                     ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
                     if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0 && ElecBaseboard(BaseboardNum).ScaledHeatingCapacity != AutoSize) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
-                        ShowContinueError(state,
-                                          format("Illegal {} = {:.7T}",
+                        ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName,
+                        				format("Illegal {} = {:.7T}",
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum),
                                                  state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
-                    ShowContinueError(state,
-                                      "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                    ShowContinueError(state,
-                                      "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName,
+                    				"Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                    				"Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
@@ -292,31 +289,25 @@ namespace ElectricBaseboardRadiator {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
                     if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity <= 0.0) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
-                        ShowContinueError(state,
-                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state,
-                                          format("Illegal {} = {:.7T}",
+                        ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName,
+                        				"Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                        				format("Illegal {} = {:.7T}",
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
                                                  state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                     } else if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
-                        ShowContinueError(state,
-                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state,
-                                          "Illegal " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
+                        ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName,
+                        				"Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                        				"Illegal " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
-                    ShowContinueError(state,
-                                      "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                    ShowContinueError(state,
-                                      "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName,
+                    				"Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                    				"Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
@@ -324,26 +315,22 @@ namespace ElectricBaseboardRadiator {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                     ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                     if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
-                        ShowContinueError(state,
-                                          format("Illegal {} = {:.7T}",
+                        ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName,
+                        				format("Illegal {} = {:.7T}",
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
                                                  state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
-                    ShowContinueError(state,
-                                      "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                    ShowContinueError(
-                        state, "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName,
+                    				"Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                    				"Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName);
-                ShowContinueError(state,
-                                  "Illegal " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                ShowSevereError(state, cCurrentModuleObject + " = " + ElecBaseboard(BaseboardNum).EquipName,
+                				"Illegal " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
                                       state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
                 ErrorsFound = true;
             }
@@ -404,8 +391,8 @@ namespace ElectricBaseboardRadiator {
             if ((ElecBaseboard(BaseboardNum).TotSurfToDistrib < MinDistribSurfaces) && (ElecBaseboard(BaseboardNum).FracRadiant > MinFraction)) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", the number of surface/radiant fraction groups entered was less than the allowable minimum.");
-                ShowContinueError(state, format("...the minimum that must be entered=[{}].", MinDistribSurfaces));
+                                    "\", the number of surface/radiant fraction groups entered was less than the allowable minimum.",
+                				format("...the minimum that must be entered=[{}].", MinDistribSurfaces));
                 ErrorsFound = true;
                 ElecBaseboard(BaseboardNum).TotSurfToDistrib = 0; // error
             }
@@ -1090,26 +1077,22 @@ namespace ElectricBaseboardRadiator {
                         state.dataHeatBalFanSys->SurfQElecBaseboard(SurfNum) += ThisSurfIntensity;
                         state.dataHeatBalSurf->AnyRadiantSystems = true;
                         if (ThisSurfIntensity > MaxRadHeatFlux) {
-                            ShowSevereError(state, "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected");
-                            ShowContinueError(state, "Surface = " + state.dataSurface->Surface(SurfNum).Name);
-                            ShowContinueError(state, format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area));
-                            ShowContinueError(state,
-                                              "Occurs in " + state.dataElectBaseboardRad->cCMO_BBRadiator_Electric + " = " +
-                                                  ElecBaseboard(BaseboardNum).EquipName);
-                            ShowContinueError(state, format("Radiation intensity = {:.2R} [W/m2]", ThisSurfIntensity));
-                            ShowContinueError(
-                                state, "Assign a larger surface area or more surfaces in " + state.dataElectBaseboardRad->cCMO_BBRadiator_Electric);
+                            ShowSevereError(state, "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected",
+                            				"Surface = " + state.dataSurface->Surface(SurfNum).Name,
+                            				format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area),
+                            				"Occurs in " + state.dataElectBaseboardRad->cCMO_BBRadiator_Electric + " = " +
+                                                  ElecBaseboard(BaseboardNum).EquipName,
+                            				format("Radiation intensity = {:.2R} [W/m2]", ThisSurfIntensity),
+                            				"Assign a larger surface area or more surfaces in " + state.dataElectBaseboardRad->cCMO_BBRadiator_Electric);
                             ShowFatalError(state, "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected");
                         }
                     } else {
-                        ShowSevereError(state, "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux");
-                        ShowContinueError(state, "Surface = " + state.dataSurface->Surface(SurfNum).Name);
-                        ShowContinueError(state, format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area));
-                        ShowContinueError(state,
-                                          "Occurs in " + state.dataElectBaseboardRad->cCMO_BBRadiator_Electric + " = " +
-                                              ElecBaseboard(BaseboardNum).EquipName);
-                        ShowContinueError(
-                            state, "Assign a larger surface area or more surfaces in " + state.dataElectBaseboardRad->cCMO_BBRadiator_Electric);
+                        ShowSevereError(state, "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux",
+                        				"Surface = " + state.dataSurface->Surface(SurfNum).Name,
+                        				format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area),
+                        				"Occurs in " + state.dataElectBaseboardRad->cCMO_BBRadiator_Electric + " = " +
+                                              ElecBaseboard(BaseboardNum).EquipName,
+                        				"Assign a larger surface area or more surfaces in " + state.dataElectBaseboardRad->cCMO_BBRadiator_Electric);
                         ShowFatalError(state, "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux");
                     }
                 }

@@ -275,8 +275,8 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
             thisChiller.NomPumpPowerWasAutoSized = true;
         }
         if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
-            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-            ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+            ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)),
+            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ErrorsFound = true;
         }
         // Assign Node Numbers to specified nodes
@@ -454,10 +454,10 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\",");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
-                ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
-                ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
+                                    "\",",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6),
+                				"Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated",
+                				"Flow mode NotModulated is assumed and the simulation continues.");
                 thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
             }
         }
@@ -1186,8 +1186,8 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     } else {
         if (this->NomCapWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "Autosizing of Absorption Chiller nominal capacity requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Chiller:Absorption:Indirect object=" + this->Name);
+                ShowSevereError(state, "Autosizing of Absorption Chiller nominal capacity requires a loop Sizing:Plant object",
+                				"Occurs in Chiller:Absorption:Indirect object=" + this->Name);
                 ErrorsFound = true;
             }
         } else {
@@ -1292,8 +1292,8 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     } else {
         if (this->EvapVolFlowRateWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "Autosizing of Absorption Chiller evap flow rate requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Chiller:Absorption:Indirect object=" + this->Name);
+                ShowSevereError(state, "Autosizing of Absorption Chiller evap flow rate requires a loop Sizing:Plant object",
+                				"Occurs in Chiller:Absorption:Indirect object=" + this->Name);
                 ErrorsFound = true;
             }
         } else {
@@ -1381,9 +1381,9 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     } else {
         if (this->CondVolFlowRateWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "Autosizing of Absorption Chiller condenser flow rate requires a condenser");
-                ShowContinueError(state, "loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Chiller:Absorption:Indirect object=" + this->Name);
+                ShowSevereError(state, "Autosizing of Absorption Chiller condenser flow rate requires a condenser",
+                				"loop Sizing:Plant object",
+                				"Occurs in Chiller:Absorption:Indirect object=" + this->Name);
                 ErrorsFound = true;
             }
         } else {
@@ -1566,10 +1566,10 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     } else {
         if (this->GeneratorVolFlowRateWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "Autosizing of Absorption Chiller generator flow rate requires a loop Sizing:Plant object.");
-                ShowContinueError(state, " For steam loops, use a steam Sizing:Plant object.");
-                ShowContinueError(state, " For hot water loops, use a heating Sizing:Plant object.");
-                ShowContinueError(state, "Occurs in Chiller:Absorption:Indirect object=" + this->Name);
+                ShowSevereError(state, "Autosizing of Absorption Chiller generator flow rate requires a loop Sizing:Plant object.",
+                				" For steam loops, use a steam Sizing:Plant object.",
+                				" For hot water loops, use a heating Sizing:Plant object.",
+                				"Occurs in Chiller:Absorption:Indirect object=" + this->Name);
                 ErrorsFound = true;
             }
         } else {

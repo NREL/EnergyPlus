@@ -190,8 +190,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).PlantFlowControl = false;
             }
             if ((!(UtilityRoutines::SameString(AlphArray(4), "InternalControl"))) && (!(UtilityRoutines::SameString(AlphArray(4), "PlantControl")))) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
             if (state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).InternalFlowControl) { // get the curve
@@ -211,16 +211,16 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).RadiativeFraction = NumArray(9); // N9 radiative fraction for skin losses
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).MCeng = NumArray(10);            // N10 Aggregated Thermal Mass of Generator MC_eng
             if (state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).MCeng <= 0.0) {
-                ShowSevereError(state, format("Invalid, {} = {:.5R}", state.dataIPShortCut->cNumericFieldNames(10), NumArray(10)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Thermal mass must be greater than zero");
+                ShowSevereError(state, format("Invalid, {} = {:.5R}", state.dataIPShortCut->cNumericFieldNames(10), NumArray(10)),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1),
+                				"Thermal mass must be greater than zero");
                 ErrorsFound = true;
             }
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).MCcw = NumArray(11); // Aggregated Thermal Mass of Heat Recovery MC_cw
             if (state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).MCcw <= 0.0) {
-                ShowSevereError(state, format("Invalid, {} = {:.5R}", state.dataIPShortCut->cNumericFieldNames(11), NumArray(11)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
-                ShowContinueError(state, "Thermal mass must be greater than zero");
+                ShowSevereError(state, format("Invalid, {} = {:.5R}", state.dataIPShortCut->cNumericFieldNames(11), NumArray(11)),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1),
+                				"Thermal mass must be greater than zero");
                 ErrorsFound = true;
             }
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).Pstandby = NumArray(12); // N12 Standby Power [W]
@@ -231,8 +231,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             }
             if ((!(UtilityRoutines::SameString(AlphArray(7), "NominalEngineTemperature"))) &&
                 (!(UtilityRoutines::SameString(AlphArray(7), "TimeDelay")))) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + AlphArray(7));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + AlphArray(7),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
             state.dataCHPElectGen->MicroCHPParamInput(CHPParamNum).kf = NumArray(13);          // N13 Warmup Fuel Flow Rate Coefficient k_f
@@ -251,8 +251,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             }
             if ((!(UtilityRoutines::SameString(AlphArray(8), "MandatoryCoolDown"))) &&
                 (!(UtilityRoutines::SameString(AlphArray(8), "OptionalCoolDown")))) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphArray(8));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphArray(8),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
         }
@@ -297,8 +297,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model =
                     state.dataCHPElectGen->MicroCHPParamInput(thisParamID); // entire structure of input data assigned here!
             } else {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + AlphArray(2));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + AlphArray(2),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -307,8 +307,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                 state.dataCHPElectGen->MicroCHP(GeneratorNum).ZoneID =
                     UtilityRoutines::FindItemInList(state.dataCHPElectGen->MicroCHP(GeneratorNum).ZoneName, state.dataHeatBal->Zone);
                 if (state.dataCHPElectGen->MicroCHP(GeneratorNum).ZoneID == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + AlphArray(3));
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + AlphArray(3),
+                    				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
             } else {
@@ -368,8 +368,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             state.dataCHPElectGen->MicroCHP(GeneratorNum).FuelSupplyID =
                 UtilityRoutines::FindItemInList(AlphArray(8), state.dataGenerator->FuelSupply); // Fuel Supply ID
             if (state.dataCHPElectGen->MicroCHP(GeneratorNum).FuelSupplyID == 0) {
-                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphArray(8));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphArray(8),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -378,8 +378,8 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
             } else {
                 state.dataCHPElectGen->MicroCHP(GeneratorNum).AvailabilitySchedID = ScheduleManager::GetScheduleIndex(state, AlphArray(9));
                 if (state.dataCHPElectGen->MicroCHP(GeneratorNum).AvailabilitySchedID == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + AlphArray(9));
-                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + AlphArray(9),
+                    				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
             }

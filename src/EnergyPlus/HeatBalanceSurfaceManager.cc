@@ -329,8 +329,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                 }
                 // Check if the sum of all defined view factors > 1.0
                 if (SrdSurfsViewFactor > 1.0) {
-                    ShowSevereError(state, "Illegal surrounding surfaces view factors for " + Surface(SurfNum).Name + ".");
-                    ShowContinueError(state, " The sum of sky, ground, and all surrounding surfaces view factors should be less than 1.0.");
+                    ShowSevereError(state, "Illegal surrounding surfaces view factors for " + Surface(SurfNum).Name + ".",
+                    				" The sum of sky, ground, and all surrounding surfaces view factors should be less than 1.0.");
                 }
                 if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0 &&
                     state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor >= 0) {
@@ -4659,17 +4659,13 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                         if (state.dataConstruction->Construct(Surface(SurfNum).Construction).SourceSinkPresent) {
                             if (!state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).SourceSinkPresent) {
                                 // thow warning, and do not allow
-                                ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
-                                ShowContinueError(state,
-                                                  "Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
-                                                      " has internal source/sink");
-                                ShowContinueError(
-                                    state,
-                                    "While construction named = " +
+                                ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.",
+                                				"Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
+                                                      " has internal source/sink",
+                                				"While construction named = " +
                                         state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).Name +
-                                        " is not an internal source/sink construction");
-                                ShowContinueError(state,
-                                                  "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
+                                        " is not an internal source/sink construction",
+                                				"This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                                       ", and the simulation continues without the override");
 
                                 state.dataRuntimeLang->EMSConstructActuatorIsOkay(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum),
@@ -4690,19 +4686,15 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                         if (state.dataHeatBalFiniteDiffMgr->ConstructFD(Surface(SurfNum).Construction).TotNodes !=
                             state.dataHeatBalFiniteDiffMgr->ConstructFD(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).TotNodes) {
                             // thow warning, and do not allow
-                            ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
-                            ShowContinueError(state,
-                                              format("Construction named = {} has number of finite difference nodes ={}",
+                            ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.",
+                            				format("Construction named = {} has number of finite difference nodes ={}",
                                                      state.dataConstruction->Construct(Surface(SurfNum).Construction).Name,
-                                                     state.dataHeatBalFiniteDiffMgr->ConstructFD(Surface(SurfNum).Construction).TotNodes));
-                            ShowContinueError(
-                                state,
-                                format("While construction named = {}has number of finite difference nodes ={}",
+                                                     state.dataHeatBalFiniteDiffMgr->ConstructFD(Surface(SurfNum).Construction).TotNodes),
+                            				format("While construction named = {}has number of finite difference nodes ={}",
                                        state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).Name,
                                        state.dataHeatBalFiniteDiffMgr->ConstructFD(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum))
-                                           .TotNodes));
-                            ShowContinueError(state,
-                                              "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
+                                           .TotNodes),
+                            				"This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                                   ", and the simulation continues without the override");
 
                             state.dataRuntimeLang->EMSConstructActuatorIsOkay(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) =
@@ -4712,17 +4704,13 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                         if (state.dataConstruction->Construct(Surface(SurfNum).Construction).SourceSinkPresent) {
                             if (!state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).SourceSinkPresent) {
                                 // thow warning, and do not allow
-                                ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.");
-                                ShowContinueError(state,
-                                                  "Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
-                                                      " has internal source/sink");
-                                ShowContinueError(
-                                    state,
-                                    "While construction named = " +
+                                ShowSevereError(state, "InitEMSControlledConstructions: EMS Construction State Actuator not valid.",
+                                				"Construction named = " + state.dataConstruction->Construct(Surface(SurfNum).Construction).Name +
+                                                      " has internal source/sink",
+                                				"While construction named = " +
                                         state.dataConstruction->Construct(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum)).Name +
-                                        " is not an internal source/sink construction");
-                                ShowContinueError(state,
-                                                  "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
+                                        " is not an internal source/sink construction",
+                                				"This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                                       ", and the simulation continues without the override");
 
                                 state.dataRuntimeLang->EMSConstructActuatorIsOkay(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum),
@@ -4738,9 +4726,8 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                     } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) { // don't allow
                         ShowSevereError(state,
                                         "InitEMSControlledConstructions: EMS Construction State Actuator not available with Heat transfer "
-                                        "algorithm CombinedHeatAndMoistureFiniteElement.");
-                        ShowContinueError(state,
-                                          "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
+                                        "algorithm CombinedHeatAndMoistureFiniteElement.",
+                        				"This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                               ", and the simulation continues without the override");
                         state.dataRuntimeLang->EMSConstructActuatorChecked(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) =
                             true;
@@ -4750,9 +4737,8 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                     } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::Kiva) { // don't allow
                         ShowSevereError(state,
                                         "InitEMSControlledConstructions: EMS Construction State Actuator not available for Surfaces with "
-                                        "Foundation Outside Boundary Condition.");
-                        ShowContinueError(state,
-                                          "This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
+                                        "Foundation Outside Boundary Condition.",
+                        				"This actuator is not allowed for surface name = " + Surface(SurfNum).Name +
                                               ", and the simulation continues without the override");
                         state.dataRuntimeLang->EMSConstructActuatorChecked(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum) =
                             true;
@@ -7129,14 +7115,12 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     Real64 HMovInsul = state.dataHeatBalSurf->SurfMovInsulHInt(SurfNum);
                     if (construct.SourceSinkPresent) {
 
-                        ShowSevereError(state, "Interior movable insulation is not valid with embedded sources/sinks");
-                        ShowContinueError(state, "Construction " + construct.Name + " contains an internal source or sink but also uses");
-                        ShowContinueError(state,
-                                          "interior movable insulation " +
+                        ShowSevereError(state, "Interior movable insulation is not valid with embedded sources/sinks",
+                        				"Construction " + construct.Name + " contains an internal source or sink but also uses",
+                        				"interior movable insulation " +
                                               state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum)).Name +
-                                              " for a surface with that construction.");
-                        ShowContinueError(state,
-                                          "This is not currently allowed because the heat balance equations do not currently accommodate "
+                                              " for a surface with that construction.",
+                        				"This is not currently allowed because the heat balance equations do not currently accommodate "
                                           "this combination.");
                         ShowFatalError(state, "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
                     }
@@ -8161,8 +8145,8 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, i
             }
             if (zone.EnforcedReciprocity) {
                 if (WarmupSurfTemp > 3) {
-                    ShowSevereError(state, "CalcHeatBalanceInsideSurf: Zone=\"" + zone.Name + "\" has view factor enforced reciprocity");
-                    ShowContinueError(state, " and is having temperature out of bounds errors. Please correct zone geometry and rerun.");
+                    ShowSevereError(state, "CalcHeatBalanceInsideSurf: Zone=\"" + zone.Name + "\" has view factor enforced reciprocity",
+                    				" and is having temperature out of bounds errors. Please correct zone geometry and rerun.");
                     ShowFatalError(state, "CalcHeatBalanceInsideSurf: Program terminates due to preceding conditions.");
                 }
             } else if (WarmupSurfTemp > 10) {
@@ -8227,8 +8211,8 @@ void TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, i
             if (TH12 < -10000. || TH12 > 10000.) {
                 ShowSevereError(
                     state,
-                    format("CalcHeatBalanceInsideSurf: The temperature of {:.2R} C for zone=\"{}\", for surface=\"{}\"", TH12, zone.Name, surfName));
-                ShowContinueError(state, "..is very far out of bounds during warmup. This may be an indication of a malformed zone.");
+                    format("CalcHeatBalanceInsideSurf: The temperature of {:.2R} C for zone=\"{}\", for surface=\"{}\"", TH12, zone.Name, surfName),
+                				"..is very far out of bounds during warmup. This may be an indication of a malformed zone.");
                 ShowContinueErrorTimeStamp(state, "");
                 ShowFatalError(state, "Program terminates due to preceding condition.");
             }
@@ -8516,14 +8500,12 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
 
         if (MovInsulPresent) {
             // Note: if movable insulation is ever added back in correctly, the heat balance equations above must be fixed
-            ShowSevereError(state, "Exterior movable insulation is not valid with embedded sources/sinks");
-            ShowContinueError(state, "Construction " + construct.Name + " contains an internal source or sink but also uses");
-            ShowContinueError(state,
-                              "exterior movable insulation " +
+            ShowSevereError(state, "Exterior movable insulation is not valid with embedded sources/sinks",
+            				"Construction " + construct.Name + " contains an internal source or sink but also uses",
+            				"exterior movable insulation " +
                                   state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulExt(SurfNum)).Name +
-                                  " for a surface with that construction.");
-            ShowContinueError(state,
-                              "This is not currently allowed because the heat balance equations do not currently accommodate this combination.");
+                                  " for a surface with that construction.",
+            				"This is not currently allowed because the heat balance equations do not currently accommodate this combination.");
             ErrorFlag = true;
             return;
 

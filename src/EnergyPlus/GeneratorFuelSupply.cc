@@ -158,8 +158,8 @@ namespace GeneratorFuelSupply {
                 } else if (UtilityRoutines::SameString("Scheduled", AlphArray(2))) {
                     state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode = DataGenerators::FuelTemperatureMode::FuelInTempSchedule;
                 } else {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + AlphArray(2));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + AlphArray(2),
+                    				"Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
 
@@ -177,17 +177,17 @@ namespace GeneratorFuelSupply {
                 state.dataGenerator->FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
                 if ((state.dataGenerator->FuelSupply(FuelSupNum).SchedNum == 0) &&
                     (state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode == DataGenerators::FuelTemperatureMode::FuelInTempSchedule)) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowContinueError(state, "Schedule named was not found");
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4),
+                    				"Entered in " + cCurrentModuleObject + '=' + AlphArray(1),
+                    				"Schedule named was not found");
                     ErrorsFound = true;
                 }
 
                 state.dataGenerator->FuelSupply(FuelSupNum).CompPowerCurveID = GetCurveIndex(state, AlphArray(5));
                 if (state.dataGenerator->FuelSupply(FuelSupNum).CompPowerCurveID == 0) {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + AlphArray(5));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
-                    ShowContinueError(state, "Curve named was not found ");
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + AlphArray(5),
+                    				"Entered in " + cCurrentModuleObject + '=' + AlphArray(1),
+                    				"Curve named was not found ");
                     ErrorsFound = true;
                 }
 
@@ -199,8 +199,8 @@ namespace GeneratorFuelSupply {
                 } else if (UtilityRoutines::SameString(AlphArray(6), "LiquidGeneric")) {
                     state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::fuelModeGenericLiquid;
                 } else {
-                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + AlphArray(6));
-                    ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + AlphArray(6),
+                    				"Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
 
@@ -229,9 +229,9 @@ namespace GeneratorFuelSupply {
 
                     // check for molar fractions summing to 1.0.
                     if (std::abs(sum(state.dataGenerator->FuelSupply(FuelSupNum).ConstitMolalFract) - 1.0) > 0.0001) {
-                        ShowSevereError(state, cCurrentModuleObject + " molar fractions do not sum to 1.0");
-                        ShowContinueError(state, format("Sum was={:.5R}", sum(state.dataGenerator->FuelSupply(FuelSupNum).ConstitMolalFract)));
-                        ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + AlphArray(1));
+                        ShowSevereError(state, cCurrentModuleObject + " molar fractions do not sum to 1.0",
+                        				format("Sum was={:.5R}", sum(state.dataGenerator->FuelSupply(FuelSupNum).ConstitMolalFract)),
+                        				"Entered in " + cCurrentModuleObject + " = " + AlphArray(1));
                         ErrorsFound = true;
                     }
                 }

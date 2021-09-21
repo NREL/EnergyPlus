@@ -288,8 +288,8 @@ void GetEvapInput(EnergyPlusData &state)
         } else {
             EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (EvapCond(EvapCoolNum).SchedPtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2),
+                				"Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
         }
@@ -387,8 +387,8 @@ void GetEvapInput(EnergyPlusData &state)
         } else {
             EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (EvapCond(EvapCoolNum).SchedPtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2),
+                				"Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
         }
@@ -475,8 +475,8 @@ void GetEvapInput(EnergyPlusData &state)
                                                                          NodeInputManager::compFluidStream::Primary,
                                                                          ObjectIsNotParent);
             if (!CheckOutAirNodeNumber(state, EvapCond(EvapCoolNum).SecondaryInletNode)) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7),
+                				"Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 // TODO rename point
                 ShowContinueError(state, "Node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                 ErrorsFound = true;
@@ -518,8 +518,8 @@ void GetEvapInput(EnergyPlusData &state)
         } else {
             EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (EvapCond(EvapCoolNum).SchedPtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2),
+                				"Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
         }
@@ -598,8 +598,8 @@ void GetEvapInput(EnergyPlusData &state)
                                                                          NodeInputManager::compFluidStream::Primary,
                                                                          ObjectIsNotParent);
             if (!CheckOutAirNodeNumber(state, EvapCond(EvapCoolNum).SecondaryInletNode)) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7),
+                				"Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 // TODO rename point
                 ShowContinueError(state, "Node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                 ErrorsFound = true;
@@ -639,8 +639,8 @@ void GetEvapInput(EnergyPlusData &state)
         } else {
             EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (EvapCond(EvapCoolNum).SchedPtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2),
+                				"Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
         }
@@ -840,8 +840,8 @@ void GetEvapInput(EnergyPlusData &state)
         } else {
             EvapCond(EvapCoolNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
             if (EvapCond(EvapCoolNum).SchedPtr == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
-                ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2),
+                				"Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
         }
@@ -1083,17 +1083,17 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
             if (ControlNode > 0) {
                 if (state.dataLoopNodes->Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        ShowSevereError(state, "Missing temperature setpoint for Evap Cooler unit " + EvapCond(EvapCoolNum).EvapCoolerName);
-                        ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
+                        ShowSevereError(state, "Missing temperature setpoint for Evap Cooler unit " + EvapCond(EvapCoolNum).EvapCoolerName,
+                        				" use a Setpoint Manager to establish a setpoint at the unit control node.");
                     } else {
                         localSetPointCheck = false;
                         CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, localSetPointCheck);
                         state.dataLoopNodes->NodeSetpointCheck(ControlNode).needsSetpointChecking = false;
                         // Let it slide apparently
                         if (localSetPointCheck) {
-                            ShowSevereError(state, "Missing temperature setpoint for Evap Cooler unit " + EvapCond(EvapCoolNum).EvapCoolerName);
-                            ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
-                            ShowContinueError(state, " or use an EMS actuator to establish a setpoint at the unit control node.");
+                            ShowSevereError(state, "Missing temperature setpoint for Evap Cooler unit " + EvapCond(EvapCoolNum).EvapCoolerName,
+                            				" use a Setpoint Manager to establish a setpoint at the unit control node.",
+                            				" or use an EMS actuator to establish a setpoint at the unit control node.");
                         }
                     }
                 }
@@ -1827,10 +1827,10 @@ void CalcDirectEvapCooler(EnergyPlusData &state, int &EvapCoolNum, Real64 const 
 
         if (SatEff >= 1.0) SatEff = 1.0;
         if (SatEff < 0.0) { // we have a serious problem.  Pad Area and/or depth not suitable for system air flow rates
-            ShowSevereError(state, "EVAPCOOLER:DIRECT:CELDEKPAD: " + EvapCond(EvapCoolNum).EvapCoolerName + " has a problem");
-            ShowContinueError(state, "Check size of Pad Area and/or Pad Depth in input");
-            ShowContinueError(state, format("Cooler Effectiveness calculated as: {:.2R}", SatEff));
-            ShowContinueError(state, format("Air velocity (m/s) through pads calculated as: {:.2R}", AirVel));
+            ShowSevereError(state, "EVAPCOOLER:DIRECT:CELDEKPAD: " + EvapCond(EvapCoolNum).EvapCoolerName + " has a problem",
+            				"Check size of Pad Area and/or Pad Depth in input",
+            				format("Cooler Effectiveness calculated as: {:.2R}", SatEff),
+            				format("Air velocity (m/s) through pads calculated as: {:.2R}", AirVel));
             ShowFatalError(state, "Program Terminates due to previous error condition");
         }
         EvapCond(EvapCoolNum).SatEff = SatEff;
@@ -3747,8 +3747,8 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             } else {
                 ZoneEvapUnit(UnitLoop).AvailSchedIndex = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer (index number)
                 if (ZoneEvapUnit(UnitLoop).AvailSchedIndex == 0) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
-                    ShowContinueError(state, "invalid-not found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.",
+                    				"invalid-not found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -3843,8 +3843,8 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                 } else if (SELECT_CASE_var == "DRAWTHROUGH") {
                     ZoneEvapUnit(UnitLoop).FanLocation = FanPlacement::DrawThruFan;
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
-                    ShowContinueError(state, "invalid choice found " + cAlphaFields(9) + "=\"" + Alphas(9) + "\".");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.",
+                    				"invalid choice found " + cAlphaFields(9) + "=\"" + Alphas(9) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -3869,8 +3869,8 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                 } else if (SELECT_CASE_var == "ZONECOOLINGLOADVARIABLESPEEDFAN") {
                     ZoneEvapUnit(UnitLoop).ControlSchemeType = ControlType::ZoneCoolingLoadVariableSpeedFan;
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
-                    ShowContinueError(state, "invalid choice found " + cAlphaFields(10) + "=\"" + Alphas(10) + "\".");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.",
+                    				"invalid choice found " + cAlphaFields(10) + "=\"" + Alphas(10) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -3897,8 +3897,8 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                     ZoneEvapUnit(UnitLoop).EvapCooler_1_ObjectClassName = "EvaporativeCooler:Indirect:ResearchSpecial";
                     ZoneEvapUnit(UnitLoop).EvapCooler_1_Type_Num = EvapCoolerType::IndirectRDDSpecial;
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
-                    ShowContinueError(state, "invalid choice found " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.",
+                    				"invalid choice found " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -3907,8 +3907,8 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             ZoneEvapUnit(UnitLoop).EvapCooler_1_Index =
                 UtilityRoutines::FindItemInList(Alphas(12), state.dataEvapCoolers->EvapCond, &EvapConditions::EvapCoolerName);
             if (ZoneEvapUnit(UnitLoop).EvapCooler_1_Index == 0) {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
-                ShowContinueError(state, "invalid, not found " + cAlphaFields(12) + "=\"" + Alphas(12) + "\".");
+                ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.",
+                				"invalid, not found " + cAlphaFields(12) + "=\"" + Alphas(12) + "\".");
                 ErrorsFound = true;
             }
 
@@ -3932,8 +3932,8 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                         ZoneEvapUnit(UnitLoop).EvapCooler_2_ObjectClassName = "EvaporativeCooler:Indirect:ResearchSpecial";
                         ZoneEvapUnit(UnitLoop).EvapCooler_2_Type_Num = EvapCoolerType::IndirectRDDSpecial;
                     } else {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
-                        ShowContinueError(state, "invalid choice found " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
+                        ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.",
+                        				"invalid choice found " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
                         ErrorsFound = true;
                     }
                 }
@@ -3942,13 +3942,13 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                     ZoneEvapUnit(UnitLoop).EvapCooler_2_Index =
                         UtilityRoutines::FindItemInList(Alphas(14), state.dataEvapCoolers->EvapCond, &EvapConditions::EvapCoolerName);
                     if (ZoneEvapUnit(UnitLoop).EvapCooler_2_Index == 0) {
-                        ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
-                        ShowContinueError(state, "invalid, not found " + cAlphaFields(14) + "=\"" + Alphas(14) + "\".");
+                        ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.",
+                        				"invalid, not found " + cAlphaFields(14) + "=\"" + Alphas(14) + "\".");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
-                    ShowContinueError(state, "missing input for " + cAlphaFields(14));
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.",
+                    				"missing input for " + cAlphaFields(14));
                     ErrorsFound = true;
                 }
             }
@@ -3957,8 +3957,8 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             if (!lAlphaBlanks(15)) {
                 ZoneEvapUnit(UnitLoop).HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(15), state.dataSize->ZoneHVACSizing);
                 if (ZoneEvapUnit(UnitLoop).HVACSizingIndex == 0) {
-                    ShowSevereError(state, cAlphaFields(15) + " = " + Alphas(15) + " not found.");
-                    ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + ZoneEvapUnit(UnitLoop).Name);
+                    ShowSevereError(state, cAlphaFields(15) + " = " + Alphas(15) + " not found.",
+                    				"Occurs in " + CurrentModuleObject + " = " + ZoneEvapUnit(UnitLoop).Name);
                     ErrorsFound = true;
                 }
             }
@@ -3995,14 +3995,14 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             // check that fan type is consistent with control method
             if (ZoneEvapUnit(UnitLoop).ControlSchemeType == ControlType::ZoneCoolingLoadVariableSpeedFan) { // must have a VS fan type
                 if (ZoneEvapUnit(UnitLoop).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
-                    ShowContinueError(state, "Fan:ConstantVolume is not consistent with control method ZoneCoolingLoadVariableSpeedFan.");
-                    ShowContinueError(state, "Change to a variable speed fan object type");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.",
+                    				"Fan:ConstantVolume is not consistent with control method ZoneCoolingLoadVariableSpeedFan.",
+                    				"Change to a variable speed fan object type");
                     ErrorsFound = true;
                 } else if (ZoneEvapUnit(UnitLoop).FanType_Num == DataHVACGlobals::FanType_SimpleOnOff) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
-                    ShowContinueError(state, "Fan:OnOff is not consistent with control method ZoneCoolingLoadVariableSpeedFan.");
-                    ShowContinueError(state, "Change to a variable speed fan object type");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.",
+                    				"Fan:OnOff is not consistent with control method ZoneCoolingLoadVariableSpeedFan.",
+                    				"Change to a variable speed fan object type");
                     ErrorsFound = true;
                 }
             }
@@ -4172,11 +4172,10 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
         if (ZoneEvapUnit(UnitNum).ActualFanVolFlowRate != AutoSize) {
 
             if (ZoneEvapUnit(UnitNum).ActualFanVolFlowRate < ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate) {
-                ShowSevereError(state, "InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = " + ZoneEvapUnit(UnitNum).Name);
-                ShowContinueError(state, "...unit fan volumetric flow rate less than evaporative cooler unit design supply air flow rate.");
-                ShowContinueError(state, format("...fan volumetric flow rate = {:.5T} m3/s.", ZoneEvapUnit(UnitNum).ActualFanVolFlowRate));
-                ShowContinueError(state,
-                                  format("...evap cooler unit volumetric flow rate = {:.5T} m3/s.", ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate));
+                ShowSevereError(state, "InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = " + ZoneEvapUnit(UnitNum).Name,
+                				"...unit fan volumetric flow rate less than evaporative cooler unit design supply air flow rate.",
+                				format("...fan volumetric flow rate = {:.5T} m3/s.", ZoneEvapUnit(UnitNum).ActualFanVolFlowRate),
+                				format("...evap cooler unit volumetric flow rate = {:.5T} m3/s.", ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate));
                 ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = ZoneEvapUnit(UnitNum).ActualFanVolFlowRate;
                 ShowContinueError(state, "...evaporative cooler unit design supply air flow rate will match fan flow rate and simulation continues.");
                 ZoneEvapUnit(UnitNum).MyEnvrn = true; // re-initialize to set mass flow rate and max mass flow rate

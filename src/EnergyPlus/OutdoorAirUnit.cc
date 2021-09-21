@@ -417,8 +417,8 @@ namespace OutdoorAirUnit {
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "BlowThrough")) OutAirUnit(OAUnitNum).FanPlace = BlowThru;
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "DrawThrough")) OutAirUnit(OAUnitNum).FanPlace = DrawThru;
             if (OutAirUnit(OAUnitNum).FanPlace == 0) {
-                ShowSevereError(state, "Invalid " + cAlphaFields(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
-                ShowContinueError(state, "Occurs in " + std::string{CurrentModuleObject} + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                ShowSevereError(state, "Invalid " + cAlphaFields(6) + " = " + state.dataIPShortCut->cAlphaArgs(6),
+                				"Occurs in " + std::string{CurrentModuleObject} + " = " + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
 
@@ -532,8 +532,8 @@ namespace OutdoorAirUnit {
             } else {
                 ShowSevereError(state,
                                 std::string{CurrentModuleObject} + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(9) +
-                                    "=\"" + state.dataIPShortCut->cAlphaArgs(9) + "\".");
-                ShowContinueError(state, "Control reset to Unconditioned Control.");
+                                    "=\"" + state.dataIPShortCut->cAlphaArgs(9) + "\".",
+                				"Control reset to Unconditioned Control.");
                 OutAirUnit(OAUnitNum).ControlType = Control::Neutral;
             }
 

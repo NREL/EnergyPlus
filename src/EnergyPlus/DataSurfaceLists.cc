@@ -205,13 +205,11 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                 if (SurfList(Item).SurfFlowFrac(SurfNum) < SurfListMinFlowFrac) {
                     ShowSevereError(state,
                                     "The Flow Fraction for Surface " + SurfList(Item).SurfName(SurfNum) + " in Surface Group " + SurfList(Item).Name +
-                                        " is too low");
-                    ShowContinueError(state,
-                                      format("Flow fraction of {:.6R} is less than minimum criteria = {:.6R}",
+                                        " is too low",
+                    				format("Flow fraction of {:.6R} is less than minimum criteria = {:.6R}",
                                              SurfList(Item).SurfFlowFrac(SurfNum),
-                                             SurfListMinFlowFrac));
-                    ShowContinueError(state,
-                                      "Zero or extremely low flow fractions are not allowed. Remove this surface from the surface group or "
+                                             SurfListMinFlowFrac),
+                    				"Zero or extremely low flow fractions are not allowed. Remove this surface from the surface group or "
                                       "combine small surfaces together.");
                     ErrorsFound = true;
                 }
@@ -308,10 +306,10 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                     NameConflict = UtilityRoutines::FindItemInList(
                         SlabList(Item).SurfName(SurfNum), SurfList(SrfList).SurfName, SurfList(SrfList).NumOfSurfaces);
                     if (NameConflict > 0) { // A slab list includes a surface on a surface list--not allowed
-                        ShowSevereError(state, format("{}{}", CurrentModuleObject2, "=\"" + SlabList(Item).Name + "\", invalid surface specified."));
-                        ShowContinueError(state, "Surface=\"" + SlabList(Item).SurfName(SurfNum) + "\" is also on a Surface List.");
-                        ShowContinueError(state, format("{}{}", CurrentModuleObject1, "=\"" + SurfList(SrfList).Name + "\" has this surface also."));
-                        ShowContinueError(state, "A surface cannot be on both lists. The models cannot operate correctly.");
+                        ShowSevereError(state, format("{}{}", CurrentModuleObject2, "=\"" + SlabList(Item).Name + "\", invalid surface specified."),
+                        				"Surface=\"" + SlabList(Item).SurfName(SurfNum) + "\" is also on a Surface List.",
+                        				format("{}{}", CurrentModuleObject1, "=\"" + SurfList(SrfList).Name + "\" has this surface also."),
+                        				"A surface cannot be on both lists. The models cannot operate correctly.");
                         ErrorsFound = true;
                     }
                 }

@@ -556,9 +556,9 @@ void GetPlantLoopData(EnergyPlusData &state)
             } else if (UtilityRoutines::SameString(Alpha(17), "None") || state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                 this_loop.CommonPipeType = DataPlant::iCommonPipeType::No;
             } else {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(17) + "=\"" + Alpha(17) + "\".");
-                ShowContinueError(state, "Refer to I/O reference document for more details.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(17) + "=\"" + Alpha(17) + "\".",
+                				"Refer to I/O reference document for more details.");
                 ErrorsFound = true;
             }
         } else if (this_loop.TypeOfLoop == LoopType::Condenser) {
@@ -567,18 +567,17 @@ void GetPlantLoopData(EnergyPlusData &state)
 
         if (this_loop.CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
             if (this_demand_side.InletNodeSetPt && this_supply_side.InletNodeSetPt) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-                ShowContinueError(state,
-                                  "While using a two way common pipe there can be setpoint on only one node other than Plant Supply Outlet node.");
-                ShowContinueError(state, "Currently both Plant Demand inlet and plant supply inlet have setpoints.");
-                ShowContinueError(state, "Select one of the two nodes and rerun the simulation.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.",
+                				"While using a two way common pipe there can be setpoint on only one node other than Plant Supply Outlet node.",
+                				"Currently both Plant Demand inlet and plant supply inlet have setpoints.",
+                				"Select one of the two nodes and rerun the simulation.");
                 ErrorsFound = true;
             }
             if (!this_demand_side.InletNodeSetPt && !this_supply_side.InletNodeSetPt) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-                ShowContinueError(state, "While using a two way common pipe there must be a setpoint in addition to the Plant Supply Outlet node.");
-                ShowContinueError(state, "Currently neither plant demand inlet nor plant supply inlet have setpoints.");
-                ShowContinueError(state, "Select one of the two nodes and rerun the simulation.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.",
+                				"While using a two way common pipe there must be a setpoint in addition to the Plant Supply Outlet node.",
+                				"Currently neither plant demand inlet nor plant supply inlet have setpoints.",
+                				"Select one of the two nodes and rerun the simulation.");
                 ErrorsFound = true;
             }
         }
@@ -622,13 +621,12 @@ void GetPlantLoopData(EnergyPlusData &state)
                     // We are OK here, move on
                 } else {
                     // We have an erroneous input, alert user
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
-                    ShowContinueError(
-                        state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(PressSimAlphaIndex) + "=\"" + Alpha(PressSimAlphaIndex) + "\".");
-                    ShowContinueError(state, "Currently only options are: ");
-                    ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::NoPressure)));
-                    ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::PumpPowerCorrection)));
-                    ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::FlowCorrection)));
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.",
+                    				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(PressSimAlphaIndex) + "=\"" + Alpha(PressSimAlphaIndex) + "\".",
+                    				"Currently only options are: ",
+                    				"  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::NoPressure)),
+                    				"  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::PumpPowerCorrection)),
+                    				"  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::FlowCorrection)));
                     ErrorsFound = true;
                 }
             }
@@ -643,9 +641,8 @@ void GetPlantLoopData(EnergyPlusData &state)
 
             // if we made it this far, there was no match, and it wasn't blank
             if (!MatchedPressureString) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-                ShowContinueError(
-                    state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(PressSimAlphaIndex) + "=\"" + Alpha(PressSimAlphaIndex) + "\".");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(PressSimAlphaIndex) + "=\"" + Alpha(PressSimAlphaIndex) + "\".");
                 ErrorsFound = true;
             }
         }
@@ -662,9 +659,8 @@ void GetPlantLoopData(EnergyPlusData &state)
         }
 
         if (GetFirstBranchInletNodeName(state, this_demand_side.BranchList) != this_demand_side.NodeNameIn) {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-            ShowContinueError(state,
-                              "The inlet node of the first branch in the " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' +
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.",
+            				"The inlet node of the first branch in the " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' +
                                   Alpha(12)); //"Plant Demand Side Branch List"
             ShowContinueError(state,
                               "is not the same as the " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' +
@@ -681,8 +677,8 @@ void GetPlantLoopData(EnergyPlusData &state)
 
         if (GetLastBranchOutletNodeName(state, this_demand_side.BranchList) != this_demand_side.NodeNameOut) {
             //"Plant Demand Side Branch List"
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-            ShowContinueError(state, "The outlet node of the last branch in the " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + Alpha(12));
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.",
+            				"The outlet node of the last branch in the " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + Alpha(12));
             //"Plant Demand Side Outlet Node Name"
             ShowContinueError(state, "is not the same as the " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + Alpha(11));
             ShowContinueError(state,
@@ -695,8 +691,8 @@ void GetPlantLoopData(EnergyPlusData &state)
 
         if (GetFirstBranchInletNodeName(state, this_supply_side.BranchList) != this_supply_side.NodeNameIn) {
             //"Plant Supply Side Branch List"
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-            ShowContinueError(state, "The inlet node of the first branch in the " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + Alpha(8));
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.",
+            				"The inlet node of the first branch in the " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + Alpha(8));
             //"Plant Supply Side Inlet Node Name
             ShowContinueError(state, "is not the same as the " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + Alpha(6));
             ShowContinueError(state,
@@ -709,8 +705,8 @@ void GetPlantLoopData(EnergyPlusData &state)
 
         if (GetLastBranchOutletNodeName(state, this_supply_side.BranchList) != this_supply_side.NodeNameOut) {
             //"Plant Supply Side Branch List"
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
-            ShowContinueError(state, "The outlet node of the last branch in the " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + Alpha(8));
+            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.",
+            				"The outlet node of the last branch in the " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + Alpha(8));
             //"Plant Supply Side Outlet Node Name"
             ShowContinueError(state, "is not the same as the " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + Alpha(7));
             ShowContinueError(state,
@@ -917,8 +913,8 @@ void GetPlantInput(EnergyPlusData &state)
                             this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                         } else {
                             // discover unsupported equipment on branches.
-                            ShowSevereError(state, "GetPlantInput: trying to process a pump type that is not supported, dev note");
-                            ShowContinueError(state, "Component Type =" + this_comp_type);
+                            ShowSevereError(state, "GetPlantInput: trying to process a pump type that is not supported, dev note",
+                            				"Component Type =" + this_comp_type);
                         }
                         this_comp.CurOpSchemeType = PumpOpSchemeType;
                         if (BranchNum == 1 || BranchNum == state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches) {
@@ -1386,8 +1382,8 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else {
                         // discover unsupported equipment on branches.
-                        ShowSevereError(state, "GetPlantInput: Branch=\"" + BranchNames(BranchNum) + "\", invalid component on branch.");
-                        ShowContinueError(state, "...invalid component type=\"" + this_comp_type + "\", name=\"" + CompNames(CompNum) + "\".");
+                        ShowSevereError(state, "GetPlantInput: Branch=\"" + BranchNames(BranchNum) + "\", invalid component on branch.",
+                        				"...invalid component type=\"" + this_comp_type + "\", name=\"" + CompNames(CompNum) + "\".");
                         //            ErrorsFound=.TRUE.
                     }
 
@@ -1416,8 +1412,8 @@ void GetPlantInput(EnergyPlusData &state)
             BranchNames.deallocate();
 
             if (ASeriesBranchHasPump && AParallelBranchHasPump) {
-                ShowSevereError(state, "Current version does not support Loop pumps and branch pumps together");
-                ShowContinueError(state, "Occurs in loop " + state.dataPlnt->PlantLoop(LoopNum).Name);
+                ShowSevereError(state, "Current version does not support Loop pumps and branch pumps together",
+                				"Occurs in loop " + state.dataPlnt->PlantLoop(LoopNum).Name);
                 ErrorsFound = true;
             }
 
@@ -1488,9 +1484,9 @@ void GetPlantInput(EnergyPlusData &state)
                         }
                     }
                     if (!SplitInBranch) {
-                        ShowSevereError(state, "Splitter Inlet Branch not found, Splitter=" + loopSide.Splitter.Name);
-                        ShowContinueError(state, "Splitter Branch Inlet name=" + loopSide.Splitter.NodeNameIn);
-                        ShowContinueError(state, "In Loop=" + plantLoop.Name);
+                        ShowSevereError(state, "Splitter Inlet Branch not found, Splitter=" + loopSide.Splitter.Name,
+                        				"Splitter Branch Inlet name=" + loopSide.Splitter.NodeNameIn,
+                        				"In Loop=" + plantLoop.Name);
                         ErrorsFound = true;
                     }
 
@@ -1516,11 +1512,11 @@ void GetPlantInput(EnergyPlusData &state)
 
                     for (Outlet = 1; Outlet <= loopSide.Splitter.TotalOutletNodes; ++Outlet) {
                         if (SplitOutBranch(Outlet)) continue;
-                        ShowSevereError(state, "Splitter Outlet Branch not found, Splitter=" + loopSide.Splitter.Name);
-                        ShowContinueError(state, "Splitter Branch Outlet node name=" + loopSide.Splitter.NodeNameOut(Outlet));
-                        ShowContinueError(state, "In Loop=" + plantLoop.Name);
-                        ShowContinueError(state, "Loop BranchList=" + loopSide.BranchList);
-                        ShowContinueError(state, "Loop ConnectorList=" + loopSide.ConnectList);
+                        ShowSevereError(state, "Splitter Outlet Branch not found, Splitter=" + loopSide.Splitter.Name,
+                        				"Splitter Branch Outlet node name=" + loopSide.Splitter.NodeNameOut(Outlet),
+                        				"In Loop=" + plantLoop.Name,
+                        				"Loop BranchList=" + loopSide.BranchList,
+                        				"Loop ConnectorList=" + loopSide.ConnectList);
                         ErrorsFound = true;
                     }
 
@@ -1595,11 +1591,11 @@ void GetPlantInput(EnergyPlusData &state)
 
                     for (Inlet = 1; Inlet <= loopSide.Mixer.TotalInletNodes; ++Inlet) {
                         if (MixerInBranch(Inlet)) continue;
-                        ShowSevereError(state, "Mixer Inlet Branch not found, Mixer=" + loopSide.Mixer.Name);
-                        ShowContinueError(state, "Mixer Branch Inlet name=" + loopSide.Mixer.NodeNameIn(Inlet));
-                        ShowContinueError(state, "In Loop=" + plantLoop.Name);
-                        ShowContinueError(state, "Loop BranchList=" + loopSide.BranchList);
-                        ShowContinueError(state, "Loop ConnectorList=" + loopSide.ConnectList);
+                        ShowSevereError(state, "Mixer Inlet Branch not found, Mixer=" + loopSide.Mixer.Name,
+                        				"Mixer Branch Inlet name=" + loopSide.Mixer.NodeNameIn(Inlet),
+                        				"In Loop=" + plantLoop.Name,
+                        				"Loop BranchList=" + loopSide.BranchList,
+                        				"Loop ConnectorList=" + loopSide.ConnectList);
                         ErrorsFound = true;
                     }
 
@@ -1625,19 +1621,19 @@ void GetPlantInput(EnergyPlusData &state)
         bool const ThisSideHasPumps = (plantLoop.LoopSide(1).TotalPumps > 0);
         bool const OtherSideHasPumps = (plantLoop.LoopSide(2).TotalPumps > 0);
         if ((plantLoop.CommonPipeType != DataPlant::iCommonPipeType::No) && (!ThisSideHasPumps || !OtherSideHasPumps)) {
-            ShowSevereError(state, "Input Error: Common Pipe configurations must have pumps on both sides of loop");
-            ShowContinueError(state, "Occurs on plant loop name =\"" + plantLoop.Name + "\"");
-            ShowContinueError(state, "Make sure both demand and supply sides have a pump");
+            ShowSevereError(state, "Input Error: Common Pipe configurations must have pumps on both sides of loop",
+            				"Occurs on plant loop name =\"" + plantLoop.Name + "\"",
+            				"Make sure both demand and supply sides have a pump");
             ErrorsFound = true;
         } else if ((plantLoop.CommonPipeType == DataPlant::iCommonPipeType::No) && ThisSideHasPumps && OtherSideHasPumps) {
-            ShowSevereError(state, "Input Error: Pumps on both loop sides must utilize a common pipe");
-            ShowContinueError(state, "Occurs on plant loop name =\"" + plantLoop.Name + "\"");
-            ShowContinueError(state, "Add common pipe or remove one loop side pump");
+            ShowSevereError(state, "Input Error: Pumps on both loop sides must utilize a common pipe",
+            				"Occurs on plant loop name =\"" + plantLoop.Name + "\"",
+            				"Add common pipe or remove one loop side pump");
             ErrorsFound = true;
         } else if (!ThisSideHasPumps && !OtherSideHasPumps) {
-            ShowSevereError(state, "SetupLoopFlowRequest: Problem in plant topology, no pumps specified on the loop");
-            ShowContinueError(state, "Occurs on plant loop name =\"" + plantLoop.Name + "\"");
-            ShowContinueError(state, "All plant loops require at least one pump");
+            ShowSevereError(state, "SetupLoopFlowRequest: Problem in plant topology, no pumps specified on the loop",
+            				"Occurs on plant loop name =\"" + plantLoop.Name + "\"",
+            				"All plant loops require at least one pump");
             ErrorsFound = true;
         }
 
@@ -2148,8 +2144,8 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowSevereError(state,
                                         "PlantManager: No Setpoint Manager Defined for Node=" + state.dataLoopNodes->NodeID(SensedNode) +
-                                            " in PlantLoop=" + state.dataPlnt->PlantLoop(LoopNum).Name);
-                        ShowContinueError(state, "Add Temperature Setpoint Manager with Control Variable = \"Temperature\" for this PlantLoop.");
+                                            " in PlantLoop=" + state.dataPlnt->PlantLoop(LoopNum).Name,
+                        				"Add Temperature Setpoint Manager with Control Variable = \"Temperature\" for this PlantLoop.");
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
                         // need call to EMS to check node
@@ -2158,9 +2154,9 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
                                             "PlantManager: No Setpoint Manager Defined for Node=" + state.dataLoopNodes->NodeID(SensedNode) +
-                                                " in PlantLoop=" + state.dataPlnt->PlantLoop(LoopNum).Name);
-                            ShowContinueError(state, "Add Temperature Setpoint Manager with Control Variable = \"Temperature\" for this PlantLoop.");
-                            ShowContinueError(state, "Or add EMS Actuator to provide temperature setpoint at this node");
+                                                " in PlantLoop=" + state.dataPlnt->PlantLoop(LoopNum).Name,
+                            				"Add Temperature Setpoint Manager with Control Variable = \"Temperature\" for this PlantLoop.",
+                            				"Or add EMS Actuator to provide temperature setpoint at this node");
                         }
                     }
                 }
@@ -2331,10 +2327,9 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                 if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                     if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi == SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                            ShowSevereError(state, "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
-                            ShowContinueError(
-                                state, "Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
-                            ShowContinueError(state, "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
+                            ShowSevereError(state, "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme",
+                            				"Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum),
+                            				"Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
                             state.dataHVACGlobal->SetPointErrorFlag = true;
                         } else {
                             CheckIfNodeSetPointManagedByEMS(state,
@@ -2342,21 +2337,19 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                                                             EMSManager::SPControlType::iTemperatureMaxSetPoint,
                                                             state.dataHVACGlobal->SetPointErrorFlag);
                             if (state.dataHVACGlobal->SetPointErrorFlag) {
-                                ShowSevereError(state, "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
-                                ShowContinueError(
-                                    state, "Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
-                                ShowContinueError(state, "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
-                                ShowContinueError(state, "Or add EMS Actuator for Temperature Maximum Setpoint");
+                                ShowSevereError(state, "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme",
+                                				"Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum),
+                                				"Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints",
+                                				"Or add EMS Actuator for Temperature Maximum Setpoint");
 
                             } // SetPointErrorFlag
                         }     // Not EMS
                     }         // Node TSPhi = Sensed
                     if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo == SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                            ShowSevereError(state, "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");
-                            ShowContinueError(
-                                state, "Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
-                            ShowContinueError(state, "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
+                            ShowSevereError(state, "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme",
+                            				"Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum),
+                            				"Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
                             state.dataHVACGlobal->SetPointErrorFlag = true;
                         } else {
                             CheckIfNodeSetPointManagedByEMS(state,
@@ -2364,11 +2357,10 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                                                             EMSManager::SPControlType::iTemperatureMinSetPoint,
                                                             state.dataHVACGlobal->SetPointErrorFlag);
                             if (state.dataHVACGlobal->SetPointErrorFlag) {
-                                ShowSevereError(state, "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");
-                                ShowContinueError(
-                                    state, "Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
-                                ShowContinueError(state, "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
-                                ShowContinueError(state, "Or add EMS Actuator for Temperature Minimum Setpoint");
+                                ShowSevereError(state, "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme",
+                                				"Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum),
+                                				"Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints",
+                                				"Or add EMS Actuator for Temperature Minimum Setpoint");
 
                             } // SetPointErrorFlag
                         }     // NOT EMS
@@ -4183,11 +4175,10 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                             }
 
                             if (BypassCount > 0) {
-                                ShowSevereError(state, "An active component is on the same branch as a pipe situated between splitter/mixer");
-                                ShowContinueError(
-                                    state, "Occurs in Branch=" + state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Name);
-                                ShowContinueError(state, "Occurs in Plant Loop=" + state.dataPlnt->PlantLoop(LoopCtr).Name);
-                                ShowContinueError(state, "SetupBranchControlTypes: and the simulation continues");
+                                ShowSevereError(state, "An active component is on the same branch as a pipe situated between splitter/mixer",
+                                				"Occurs in Branch=" + state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Name,
+                                				"Occurs in Plant Loop=" + state.dataPlnt->PlantLoop(LoopCtr).Name,
+                                				"SetupBranchControlTypes: and the simulation continues");
                                 //  note not sure why this is so bad.  heat transfer pipe might be a good reason to allow this?
                                 //   this used to fatal in older PlantFlowResolver.
                             }
@@ -4202,10 +4193,9 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                             state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).BypassExists = true;
 
                             if (CompCtr > 1) {
-                                ShowSevereError(state, "A pipe used as a bypass should not be in series with another component");
-                                ShowContinueError(
-                                    state, "Occurs in Branch = " + state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Name);
-                                ShowContinueError(state, "Occurs in PlantLoop = " + state.dataPlnt->PlantLoop(LoopCtr).Name);
+                                ShowSevereError(state, "A pipe used as a bypass should not be in series with another component",
+                                				"Occurs in Branch = " + state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Name,
+                                				"Occurs in PlantLoop = " + state.dataPlnt->PlantLoop(LoopCtr).Name);
                                 ShowFatalError(state, "SetupBranchControlTypes: preceding condition causes termination.");
                             }
 

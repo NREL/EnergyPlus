@@ -2087,9 +2087,9 @@ void InitializePredefinedMonthlyTitles(EnergyPlusData &state)
         for (xcount = 1; xcount <= numNamedMonthly; ++xcount) {
             if (!UtilityRoutines::SameString(MonthlyNamedReports(xcount), ort->namedMonthly(xcount).title)) {
                 ShowSevereError(state,
-                                "InitializePredefinedMonthlyTitles: Monthly Report Titles in OutputReportTabular do not match titles in DataOutput.");
-                ShowContinueError(state, format("first mismatch at ORT [{}] =\"{}\".", numNamedMonthly, ort->namedMonthly(xcount).title));
-                ShowContinueError(state, "same location in DO =\"" + MonthlyNamedReports(xcount) + "\".");
+                                "InitializePredefinedMonthlyTitles: Monthly Report Titles in OutputReportTabular do not match titles in DataOutput.",
+                				format("first mismatch at ORT [{}] =\"{}\".", numNamedMonthly, ort->namedMonthly(xcount).title),
+                				"same location in DO =\"" + MonthlyNamedReports(xcount) + "\".");
                 ShowFatalError(state, "Preceding condition causes termination.");
             }
         }

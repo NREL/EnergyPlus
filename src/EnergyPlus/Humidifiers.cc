@@ -185,8 +185,8 @@ namespace Humidifiers {
                 thisHum.CalcGasSteamHumidifier(state, WaterAddNeeded);
 
             } else {
-                ShowSevereError(state, format("SimHumidifier: Invalid Humidifier Type Code={}", thisHum.HumType));
-                ShowContinueError(state, "...Component Name=[" + std::string{CompName} + "].");
+                ShowSevereError(state, format("SimHumidifier: Invalid Humidifier Type Code={}", thisHum.HumType),
+                				"...Component Name=[" + std::string{CompName} + "].");
                 ShowFatalError(state, "Preceding Condition causes termination.");
             }
         }
@@ -410,8 +410,8 @@ namespace Humidifiers {
                                                             Humidifier(HumNum).Name,               // Object Name
                                                             cAlphaFields(3));                      // Field Name
             } else if (!lAlphaBlanks(3)) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\",");
-                ShowContinueError(state, "Invalid " + cAlphaFields(3) + '=' + Alphas(3));
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\",",
+                				"Invalid " + cAlphaFields(3) + '=' + Alphas(3));
                 ShowSevereError(state, "..." + cAlphaFields(3) + " not found.");
                 ErrorsFound = true;
             }
@@ -663,11 +663,10 @@ namespace Humidifiers {
                 if (state.dataLoopNodes->Node(AirOutNode).HumRatMin == SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowSevereError(
-                            state, "Humidifiers: Missing humidity setpoint for " + format(HumidifierType[static_cast<int>(HumType)]) + " = " + Name);
-                        ShowContinueError(state,
-                                          "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at the "
-                                          "humidifier outlet node.");
-                        ShowContinueError(state, "  expecting it on Node=\"" + state.dataLoopNodes->NodeID(AirOutNode) + "\".");
+                            state, "Humidifiers: Missing humidity setpoint for " + format(HumidifierType[static_cast<int>(HumType)]) + " = " + Name,
+                        				"  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at the "
+                                          "humidifier outlet node.",
+                        				"  expecting it on Node=\"" + state.dataLoopNodes->NodeID(AirOutNode) + "\".");
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
                         CheckIfNodeSetPointManagedByEMS(
@@ -675,14 +674,11 @@ namespace Humidifiers {
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
                                             "Humidifiers: Missing humidity setpoint for " + format(HumidifierType[static_cast<int>(HumType)]) +
-                                                " = " + Name);
-                            ShowContinueError(state,
-                                              "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at "
-                                              "the humidifier outlet node.");
-                            ShowContinueError(state, "  expecting it on Node=\"" + state.dataLoopNodes->NodeID(AirOutNode) + "\".");
-                            ShowContinueError(
-                                state,
-                                "  or use an EMS actuator to control minimum humidity ratio to establish a setpoint at the humidifier outlet node.");
+                                                " = " + Name,
+                            				"  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at "
+                                              "the humidifier outlet node.",
+                            				"  expecting it on Node=\"" + state.dataLoopNodes->NodeID(AirOutNode) + "\".",
+                            				"  or use an EMS actuator to control minimum humidity ratio to establish a setpoint at the humidifier outlet node.");
                         }
                     }
                 }

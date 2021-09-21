@@ -1205,8 +1205,8 @@ void GshpSpecs::sizeCoolingWaterToWaterHP(EnergyPlusData &state)
             }
         } else { // no companion heatpump, no plant sizing object
             if ((this->ratedLoadVolFlowCoolWasAutoSized || this->ratedCapCoolWasAutoSized) && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.");
-                ShowContinueError(state, "Occurs in HeatPump:WaterToWater:EquationFit:Cooling object = " + this->Name);
+                ShowSevereError(state, "Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.",
+                				"Occurs in HeatPump:WaterToWater:EquationFit:Cooling object = " + this->Name);
                 errorsFound = true;
             }
         }
@@ -1560,8 +1560,8 @@ void GshpSpecs::sizeHeatingWaterToWaterHP(EnergyPlusData &state)
 
         } else { // no companion heatpump, no plant sizing object
             if ((this->ratedLoadVolFlowHeatWasAutoSized || this->ratedCapHeatWasAutoSized) && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.");
-                ShowContinueError(state, "Occurs in HeatPump:WaterToWater:EquationFit:Heating object = " + this->Name);
+                ShowSevereError(state, "Autosizing of Water to Water Heat Pump requires a loop Sizing:Plant object.",
+                				"Occurs in HeatPump:WaterToWater:EquationFit:Heating object = " + this->Name);
                 errorsFound = true;
             }
         }

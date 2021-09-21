@@ -371,20 +371,17 @@ namespace BaseboardRadiator {
                         baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
                         if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity < 0.0 &&
                             baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity != AutoSize) {
-                            ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID);
-                            ShowContinueError(state,
-                                              format("Illegal {} = {:.7T}",
-                                                     state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum),
-                                                     state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum)));
+                            ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID,
+                                            format("Illegal {} = {:.7T}",
+                                                   state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum),
+                                                   state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum)));
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state,
-                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state,
-                                          "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum));
+                        ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID,
+                                        "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                        state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                                        "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
@@ -393,31 +390,25 @@ namespace BaseboardRadiator {
                         baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity =
                             state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
                         if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity <= 0.0) {
-                            ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID);
-                            ShowContinueError(state,
-                                              "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                                  state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                            ShowContinueError(state,
-                                              format("Illegal {} = {:.7T}",
-                                                     state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
-                                                     state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
+                            ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID,
+                                            "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                            state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                                            format("Illegal {} = {:.7T}",
+                                                   state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
+                                                   state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                             ErrorsFound = true;
                         } else if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                            ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID);
-                            ShowContinueError(state,
-                                              "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                                  state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                            ShowContinueError(
-                                state, "Illegal " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
+                            ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID,
+                                            "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                            state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                                            "Illegal " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state,
-                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(
-                            state, "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
+                        ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID,
+                                        "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                        state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                                        "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
@@ -426,27 +417,23 @@ namespace BaseboardRadiator {
                         baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity =
                             state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                         if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity < 0.0) {
-                            ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID);
-                            ShowContinueError(state,
-                                              format("Illegal {} = {:.7T}",
-                                                     state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
-                                                     state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
+                            ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID,
+                                            format("Illegal {} = {:.7T}",
+                                                   state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
+                                                   state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state,
-                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(
-                            state, "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
+                        ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID,
+                                        "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                        state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                                        "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID);
-                    ShowContinueError(state,
-                                      "Illegal " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
+                    ShowSevereError(state, cCMO_BBRadiator_Water + " = " + baseboard->Baseboard(BaseboardNum).EquipID,
+                                    "Illegal " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                    state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
                     ErrorsFound = true;
                 }
 
@@ -958,8 +945,8 @@ namespace BaseboardRadiator {
                                 if (SolFla == -1) {
                                     ShowSevereError(state,
                                                     "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" +
-                                                        baseboard->Baseboard(BaseboardNum).EquipID + "\"");
-                                    ShowContinueError(state, "Iteration limit exceeded in calculating coil UA");
+                                                        baseboard->Baseboard(BaseboardNum).EquipID + "\"",
+                                                    "Iteration limit exceeded in calculating coil UA");
                                     if (UAAutoSize) {
                                         ErrorsFound = true;
                                     } else {
@@ -970,8 +957,8 @@ namespace BaseboardRadiator {
                                 } else if (SolFla == -2) {
                                     ShowSevereError(state,
                                                     "SizeBaseboard: Autosizing of HW baseboard UA failed for " + cCMO_BBRadiator_Water + "=\"" +
-                                                        baseboard->Baseboard(BaseboardNum).EquipID + "\"");
-                                    ShowContinueError(state, "Bad starting values for UA");
+                                                        baseboard->Baseboard(BaseboardNum).EquipID + "\"",
+                                                    "Bad starting values for UA");
                                     if (UAAutoSize) {
                                         ErrorsFound = true;
                                     } else {
@@ -1052,8 +1039,8 @@ namespace BaseboardRadiator {
         } else {
             // if there is no heating Sizing:Plant object and autosizng was requested, issue an error message
             if (FlowAutoSize || UAAutoSize) {
-                ShowSevereError(state, "SizeBaseboard: " + cCMO_BBRadiator_Water + "=\"" + baseboard->Baseboard(BaseboardNum).EquipID + "\"");
-                ShowContinueError(state, "...Autosizing of hot water baseboard requires a heating loop Sizing:Plant object");
+                ShowSevereError(state, "SizeBaseboard: " + cCMO_BBRadiator_Water + "=\"" + baseboard->Baseboard(BaseboardNum).EquipID + "\"",
+                                "...Autosizing of hot water baseboard requires a heating loop Sizing:Plant object");
                 ErrorsFound = true;
             }
         }

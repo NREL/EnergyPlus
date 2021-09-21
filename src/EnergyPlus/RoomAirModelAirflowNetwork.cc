@@ -454,17 +454,15 @@ namespace RoomAirModelAirflowNetwork {
                     if (ISum != state.dataZoneEquip->ZoneEquipConfig(LoopZone).NumInletNodes) {
                         if (ISum > state.dataZoneEquip->ZoneEquipConfig(LoopZone).NumInletNodes) {
                             ShowSevereError(
-                                state, "GetRoomAirflowNetworkData: The number of equipment listed in RoomAirflowNetwork:Node:HVACEquipment objects");
-                            ShowContinueError(
-                                state, "is greater than the number of zone configuration inlet nodes in " + state.dataHeatBal->Zone(LoopZone).Name);
-                            ShowContinueError(state, "Please check inputs of both objects.");
+                                state, "GetRoomAirflowNetworkData: The number of equipment listed in RoomAirflowNetwork:Node:HVACEquipment objects",
+                            				"is greater than the number of zone configuration inlet nodes in " + state.dataHeatBal->Zone(LoopZone).Name,
+                            				"Please check inputs of both objects.");
                             ErrorsFound = true;
                         } else {
                             ShowSevereError(
-                                state, "GetRoomAirflowNetworkData: The number of equipment listed in RoomAirflowNetwork:Node:HVACEquipment objects");
-                            ShowContinueError(
-                                state, "is less than the number of zone configuration inlet nodes in " + state.dataHeatBal->Zone(LoopZone).Name);
-                            ShowContinueError(state, "Please check inputs of both objects.");
+                                state, "GetRoomAirflowNetworkData: The number of equipment listed in RoomAirflowNetwork:Node:HVACEquipment objects",
+                            				"is less than the number of zone configuration inlet nodes in " + state.dataHeatBal->Zone(LoopZone).Name,
+                            				"Please check inputs of both objects.");
                             ErrorsFound = true;
                         }
                     }
@@ -474,9 +472,8 @@ namespace RoomAirModelAirflowNetwork {
                         if (!EquipFound(I)) {
                             ShowSevereError(state,
                                             "GetRoomAirflowNetworkData: The equipment listed in ZoneEquipList is not found in the lsit of "
-                                            "RoomAir:Node:AirflowNetwork:HVACEquipment objects =");
-                            ShowContinueError(state,
-                                              state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I) + ". Please check inputs of both objects.");
+                                            "RoomAir:Node:AirflowNetwork:HVACEquipment objects =",
+                            				state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I) + ". Please check inputs of both objects.");
                             ErrorsFound = true;
                         }
                     }
@@ -484,23 +481,19 @@ namespace RoomAirModelAirflowNetwork {
                     // Check fraction to ensure sum = 1.0 for every equipment
                     for (I = 1; I <= state.dataZoneEquip->ZoneEquipList(LoopZone).NumOfEquipTypes; ++I) { // loop over all equip types
                         if (std::abs(SupplyFrac(I) - 1.0) > 0.001) {
-                            ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid, zone supply fractions do not sum to 1.0");
-                            ShowContinueError(state,
-                                              "Entered in " + state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I) +
-                                                  " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");
-                            ShowContinueError(state,
-                                              "The Fraction of supply fraction values across all the roomair nodes in a zone needs to sum to 1.0.");
-                            ShowContinueError(state, format("The sum of fractions entered = {:.3R}", SupplyFrac(I)));
+                            ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid, zone supply fractions do not sum to 1.0",
+                            				"Entered in " + state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I) +
+                                                  " defined in RoomAir:Node:AirflowNetwork:HVACEquipment",
+                            				"The Fraction of supply fraction values across all the roomair nodes in a zone needs to sum to 1.0.",
+                            				format("The sum of fractions entered = {:.3R}", SupplyFrac(I)));
                             ErrorsFound = true;
                         }
                         if (std::abs(ReturnFrac(I) - 1.0) > 0.001) {
-                            ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid, zone return fractions do not sum to 1.0");
-                            ShowContinueError(state,
-                                              "Entered in " + state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I) +
-                                                  " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");
-                            ShowContinueError(state,
-                                              "The Fraction of return fraction values across all the roomair nodes in a zone needs to sum to 1.0.");
-                            ShowContinueError(state, format("The sum of fractions entered = {:.3R}", ReturnFrac(I)));
+                            ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid, zone return fractions do not sum to 1.0",
+                            				"Entered in " + state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I) +
+                                                  " defined in RoomAir:Node:AirflowNetwork:HVACEquipment",
+                            				"The Fraction of return fraction values across all the roomair nodes in a zone needs to sum to 1.0.",
+                            				format("The sum of fractions entered = {:.3R}", ReturnFrac(I)));
                             ErrorsFound = true;
                         }
                     }

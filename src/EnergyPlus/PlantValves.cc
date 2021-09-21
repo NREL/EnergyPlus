@@ -401,8 +401,8 @@ namespace PlantValves {
                 }
 
                 if (!Stream2NodeOkay) {
-                    ShowSevereError(state, "TemperingValve object stream 2 source node not valid.");
-                    ShowContinueError(state, "Check that node is a component outlet, enters a mixer, and on the other branch");
+                    ShowSevereError(state, "TemperingValve object stream 2 source node not valid.",
+                    				"Check that node is a component outlet, enters a mixer, and on the other branch");
                     ErrorsFound = true;
                 }
                 if (ErrorsFound) {

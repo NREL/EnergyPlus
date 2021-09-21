@@ -180,18 +180,16 @@ namespace ExteriorEnergyUse {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                             " minimum, is < 0.0 for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                            state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state,
-                                          format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(2), SchMin));
+                                            state.dataIPShortCut->cAlphaArgs(1),
+                        				format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(2), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                             " maximum, is < 0.0 for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                            state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state,
-                                          format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(2), SchMax));
+                                            state.dataIPShortCut->cAlphaArgs(1),
+                        				format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(2), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -389,18 +387,16 @@ namespace ExteriorEnergyUse {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                             " minimum, is < 0.0 for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                            state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state,
-                                          format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMin));
+                                            state.dataIPShortCut->cAlphaArgs(1),
+                        				format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                             " maximum, is < 0.0 for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                            state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state,
-                                          format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMax));
+                                            state.dataIPShortCut->cAlphaArgs(1),
+                        				format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -462,18 +458,16 @@ namespace ExteriorEnergyUse {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                             " minimum, is < 0.0 for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                            state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state,
-                                          format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMin));
+                                            state.dataIPShortCut->cAlphaArgs(1),
+                        				format("{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                             " maximum, is < 0.0 for " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
-                                            state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state,
-                                          format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMax));
+                                            state.dataIPShortCut->cAlphaArgs(1),
+                        				format("{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMax));
                         ErrorsFound = true;
                     }
                 }

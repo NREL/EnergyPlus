@@ -389,9 +389,8 @@ namespace HVACHXAssistedCoolingCoil {
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                    state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
-                ShowContinueError(
-                    state, "Invalid " + cAlphaFields(4) + "=\"" + state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType + "\"");
+                                    state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"",
+                				"Invalid " + cAlphaFields(4) + "=\"" + state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType + "\"");
                 ErrorsFound = true;
             }
 
@@ -442,19 +441,16 @@ namespace HVACHXAssistedCoolingCoil {
                 if (SupplyAirOutletNode != CoolingCoilInletNodeNum) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
-                    ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
-                    ShowContinueError(state,
-                                      "The supply air outlet node name in heat exchanger = " +
+                                        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"",
+                    				"Node names are inconsistent in heat exchanger and cooling coil object.",
+                    				"The supply air outlet node name in heat exchanger = " +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType + "=\"" +
-                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName + "\"");
-                    ShowContinueError(state,
-                                      "must match the cooling coil inlet node name in = " +
+                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName + "\"",
+                    				"must match the cooling coil inlet node name in = " +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType + "=\"" +
-                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName + "\"");
-                    ShowContinueError(state,
-                                      "Heat exchanger supply air outlet node name=\"" + state.dataLoopNodes->NodeID(SupplyAirOutletNode) + "\"");
-                    ShowContinueError(state, "Cooling coil air inlet node name=\"" + state.dataLoopNodes->NodeID(CoolingCoilInletNodeNum) + "\"");
+                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName + "\"",
+                    				"Heat exchanger supply air outlet node name=\"" + state.dataLoopNodes->NodeID(SupplyAirOutletNode) + "\"",
+                    				"Cooling coil air inlet node name=\"" + state.dataLoopNodes->NodeID(CoolingCoilInletNodeNum) + "\"");
                     ErrorsFound = true;
                 }
                 CoolingCoilErrFlag = false;
@@ -470,19 +466,16 @@ namespace HVACHXAssistedCoolingCoil {
                 if (SecondaryAirInletNode != CoolingCoilOutletNodeNum) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
-                    ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
-                    ShowContinueError(state,
-                                      "The secondary air inlet node name in heat exchanger =" +
+                                        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"",
+                    				"Node names are inconsistent in heat exchanger and cooling coil object.",
+                    				"The secondary air inlet node name in heat exchanger =" +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType + "=\"" +
-                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName + "\"");
-                    ShowContinueError(state,
-                                      "must match the cooling coil air outlet node name in = " +
+                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName + "\"",
+                    				"must match the cooling coil air outlet node name in = " +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType + "=\"" +
-                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName + "\".");
-                    ShowContinueError(
-                        state, "Heat exchanger secondary air inlet node name =\"" + state.dataLoopNodes->NodeID(SecondaryAirInletNode) + "\".");
-                    ShowContinueError(state, "Cooling coil air outlet node name =\"" + state.dataLoopNodes->NodeID(CoolingCoilOutletNodeNum) + "\".");
+                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName + "\".",
+                    				"Heat exchanger secondary air inlet node name =\"" + state.dataLoopNodes->NodeID(SecondaryAirInletNode) + "\".",
+                    				"Cooling coil air outlet node name =\"" + state.dataLoopNodes->NodeID(CoolingCoilOutletNodeNum) + "\".");
                     ErrorsFound = true;
                 }
 
@@ -503,19 +496,16 @@ namespace HVACHXAssistedCoolingCoil {
                 if (SupplyAirOutletNode != CoolingCoilInletNodeNum) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
-                    ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
-                    ShowContinueError(state,
-                                      "The supply air outlet node name in heat exchanger = " +
+                                        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"",
+                    				"Node names are inconsistent in heat exchanger and cooling coil object.",
+                    				"The supply air outlet node name in heat exchanger = " +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType + "=\"" +
-                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName + "\"");
-                    ShowContinueError(state,
-                                      "must match the cooling coil inlet node name in = " +
+                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName + "\"",
+                    				"must match the cooling coil inlet node name in = " +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType + "=\"" +
-                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName + "\"");
-                    ShowContinueError(state,
-                                      "Heat exchanger supply air outlet node name=\"" + state.dataLoopNodes->NodeID(SupplyAirOutletNode) + "\"");
-                    ShowContinueError(state, "Cooling coil air inlet node name=\"" + state.dataLoopNodes->NodeID(CoolingCoilInletNodeNum) + "\"");
+                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName + "\"",
+                    				"Heat exchanger supply air outlet node name=\"" + state.dataLoopNodes->NodeID(SupplyAirOutletNode) + "\"",
+                    				"Cooling coil air inlet node name=\"" + state.dataLoopNodes->NodeID(CoolingCoilInletNodeNum) + "\"");
                     ErrorsFound = true;
                 }
                 CoolingCoilErrFlag = false;
@@ -532,19 +522,16 @@ namespace HVACHXAssistedCoolingCoil {
                 if (SecondaryAirInletNode != CoolingCoilOutletNodeNum) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
-                    ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
-                    ShowContinueError(state,
-                                      "The secondary air inlet node name in heat exchanger =" +
+                                        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"",
+                    				"Node names are inconsistent in heat exchanger and cooling coil object.",
+                    				"The secondary air inlet node name in heat exchanger =" +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType + "=\"" +
-                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName + "\"");
-                    ShowContinueError(state,
-                                      "must match the cooling coil air outlet node name in = " +
+                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName + "\"",
+                    				"must match the cooling coil air outlet node name in = " +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType + "=\"" +
-                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName + "\".");
-                    ShowContinueError(
-                        state, "Heat exchanger secondary air inlet node name =\"" + state.dataLoopNodes->NodeID(SecondaryAirInletNode) + "\".");
-                    ShowContinueError(state, "Cooling coil air outlet node name =\"" + state.dataLoopNodes->NodeID(CoolingCoilOutletNodeNum) + "\".");
+                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName + "\".",
+                    				"Heat exchanger secondary air inlet node name =\"" + state.dataLoopNodes->NodeID(SecondaryAirInletNode) + "\".",
+                    				"Cooling coil air outlet node name =\"" + state.dataLoopNodes->NodeID(CoolingCoilOutletNodeNum) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -740,19 +727,16 @@ namespace HVACHXAssistedCoolingCoil {
                 if (SupplyAirOutletNode != CoolingCoilInletNodeNum) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
-                    ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
-                    ShowContinueError(state,
-                                      "The supply air outlet node name in heat exchanger = " +
+                                        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"",
+                    				"Node names are inconsistent in heat exchanger and cooling coil object.",
+                    				"The supply air outlet node name in heat exchanger = " +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType + "=\"" +
-                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName + "\"");
-                    ShowContinueError(state,
-                                      "must match the cooling coil inlet node name in = " +
+                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName + "\"",
+                    				"must match the cooling coil inlet node name in = " +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType + "=\"" +
-                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName + "\"");
-                    ShowContinueError(state,
-                                      "Heat exchanger supply air outlet node name =\"" + state.dataLoopNodes->NodeID(SupplyAirOutletNode) + "\"");
-                    ShowContinueError(state, "Cooling coil air inlet node name = \"" + state.dataLoopNodes->NodeID(CoolingCoilInletNodeNum) + "\"");
+                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName + "\"",
+                    				"Heat exchanger supply air outlet node name =\"" + state.dataLoopNodes->NodeID(SupplyAirOutletNode) + "\"",
+                    				"Cooling coil air inlet node name = \"" + state.dataLoopNodes->NodeID(CoolingCoilInletNodeNum) + "\"");
                     ErrorsFound = true;
                 }
                 CoolingCoilErrFlag = false;
@@ -767,20 +751,16 @@ namespace HVACHXAssistedCoolingCoil {
                 if (SecondaryAirInletNode != CoolingCoilOutletNodeNum) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
-                    ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
-                    ShowContinueError(state,
-                                      "The secondary air inlet node name in heat exchanger = " +
+                                        state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"",
+                    				"Node names are inconsistent in heat exchanger and cooling coil object.",
+                    				"The secondary air inlet node name in heat exchanger = " +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerType + "=\"" +
-                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName + "\"");
-                    ShowContinueError(state,
-                                      "must match the cooling coil air outlet node name in = " +
+                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName + "\"",
+                    				"must match the cooling coil air outlet node name in = " +
                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType + "=\"" +
-                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName + "\".");
-                    ShowContinueError(
-                        state, "Heat exchanger secondary air inlet node name = \"" + state.dataLoopNodes->NodeID(SecondaryAirInletNode) + "\".");
-                    ShowContinueError(state,
-                                      "Cooling coil air outlet node name = \"" + state.dataLoopNodes->NodeID(CoolingCoilOutletNodeNum) + "\".");
+                                          state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName + "\".",
+                    				"Heat exchanger secondary air inlet node name = \"" + state.dataLoopNodes->NodeID(SecondaryAirInletNode) + "\".",
+                    				"Cooling coil air outlet node name = \"" + state.dataLoopNodes->NodeID(CoolingCoilOutletNodeNum) + "\".");
                     ErrorsFound = true;
                 }
 
@@ -1266,8 +1246,8 @@ namespace HVACHXAssistedCoolingCoil {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError(state, "GetCoilCapacity: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
-            ShowContinueError(state, "... Coil Capacity returned as -1000.");
+            ShowSevereError(state, "GetCoilCapacity: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"",
+            				"... Coil Capacity returned as -1000.");
             ErrorsFound = true;
             CoilCapacity = -1000.0;
         }

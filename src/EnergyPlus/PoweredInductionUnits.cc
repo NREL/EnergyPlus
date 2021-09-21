@@ -201,8 +201,8 @@ void SimPIU(EnergyPlusData &state,
             CalcParallelPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
 
         } else {
-            ShowSevereError(state, "Illegal PI Unit Type used=" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType);
-            ShowContinueError(state, "Occurs in PI Unit=" + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+            ShowSevereError(state, "Illegal PI Unit Type used=" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
+            				"Occurs in PI Unit=" + state.dataPowerInductionUnits->PIU(PIUNum).Name);
             ShowFatalError(state, "Preceding condition causes termination.");
         }
     }
@@ -336,8 +336,8 @@ void GetPIUs(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::Electric;
         } else {
-            ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + state.dataIPShortCut->cAlphaArgs(9));
-            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+            ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + state.dataIPShortCut->cAlphaArgs(9),
+            				"Occurs in " + cCurrentModuleObject + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
             ErrorsFound = true;
         }
 
@@ -476,9 +476,8 @@ void GetPIUs(EnergyPlusData &state)
         if (state.dataPowerInductionUnits->PIU(PIUNum).ADUNum == 0) {
             ShowSevereError(state,
                             std::string{RoutineName} + "No matching Air Distribution Unit, for PIU = [" +
-                                state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].");
-            ShowContinueError(state,
-                              "...should have outlet node = " + state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
+                                state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].",
+            				"...should have outlet node = " + state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
             ErrorsFound = true;
         } else {
 
@@ -503,8 +502,8 @@ void GetPIUs(EnergyPlusData &state)
             }
             if (!AirNodeFound) {
                 ShowSevereError(
-                    state, "The outlet air node from the " + cCurrentModuleObject + " Unit = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
-                ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node = " + state.dataIPShortCut->cAlphaArgs(5));
+                    state, "The outlet air node from the " + cCurrentModuleObject + " Unit = " + state.dataPowerInductionUnits->PIU(PIUNum).Name,
+                				"did not have a matching Zone Equipment Inlet Node, Node = " + state.dataIPShortCut->cAlphaArgs(5));
                 ErrorsFound = true;
             }
         }
@@ -574,8 +573,8 @@ void GetPIUs(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
             state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = iHCoilType::Electric;
         } else {
-            ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + state.dataIPShortCut->cAlphaArgs(9));
-            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
+            ShowSevereError(state, "Illegal " + state.dataIPShortCut->cAlphaFieldNames(9) + " = " + state.dataIPShortCut->cAlphaArgs(9),
+            				"Occurs in " + cCurrentModuleObject + " = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
             ErrorsFound = true;
         }
 
@@ -729,9 +728,8 @@ void GetPIUs(EnergyPlusData &state)
         if (state.dataPowerInductionUnits->PIU(PIUNum).ADUNum == 0) {
             ShowSevereError(state,
                             std::string{RoutineName} + "No matching Air Distribution Unit, for PIU = [" +
-                                state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].");
-            ShowContinueError(state,
-                              "...should have outlet node = " + state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
+                                state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].",
+            				"...should have outlet node = " + state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
             ErrorsFound = true;
         } else {
 
@@ -756,8 +754,8 @@ void GetPIUs(EnergyPlusData &state)
             }
             if (!AirNodeFound) {
                 ShowSevereError(
-                    state, "The outlet air node from the " + cCurrentModuleObject + " Unit = " + state.dataPowerInductionUnits->PIU(PIUNum).Name);
-                ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node = " + state.dataIPShortCut->cAlphaArgs(5));
+                    state, "The outlet air node from the " + cCurrentModuleObject + " Unit = " + state.dataPowerInductionUnits->PIU(PIUNum).Name,
+                				"did not have a matching Zone Equipment Inlet Node, Node = " + state.dataIPShortCut->cAlphaArgs(5));
                 ErrorsFound = true;
             }
         }
@@ -912,9 +910,8 @@ void InitPIU(EnergyPlusData &state,
             ShowSevereError(state,
                             "InitPIU: ADU=[Air Distribution Unit," +
                                 state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(Loop).ADUNum).Name +
-                                "] is not on any ZoneHVAC:EquipmentList.");
-            ShowContinueError(state,
-                              "...PIU=[" + state.dataPowerInductionUnits->PIU(Loop).UnitType + ',' + state.dataPowerInductionUnits->PIU(Loop).Name +
+                                "] is not on any ZoneHVAC:EquipmentList.",
+            				"...PIU=[" + state.dataPowerInductionUnits->PIU(Loop).UnitType + ',' + state.dataPowerInductionUnits->PIU(Loop).Name +
                                   "] will not be simulated.");
         }
     }
@@ -1550,9 +1547,8 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                             MaxVolHotWaterFlowDes = 0.0;
                         }
                     } else {
-                        ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object");
-                        ShowContinueError(state,
-                                          "Occurs in" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
+                        ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object",
+                        				"Occurs in" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
                                               " Object=" + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                         ErrorsFound = true;
                     }
@@ -1661,9 +1657,8 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                             MaxVolHotSteamFlowDes = 0.0;
                         }
                     } else {
-                        ShowSevereError(state, "Autosizing of Steam flow requires a heating loop Sizing:Plant object");
-                        ShowContinueError(state,
-                                          "Occurs in" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
+                        ShowSevereError(state, "Autosizing of Steam flow requires a heating loop Sizing:Plant object",
+                        				"Occurs in" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
                                               " Object=" + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                         ErrorsFound = true;
                     }

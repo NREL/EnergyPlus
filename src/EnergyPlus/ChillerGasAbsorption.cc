@@ -188,8 +188,8 @@ void GasAbsorberSpecs::simulate(
         }
     } else {
         // Error, nodes do not match
-        ShowSevereError(state, "Invalid call to Gas Absorber Chiller " + this->Name);
-        ShowContinueError(state, "Node connections in branch are not consistent with object nodes.");
+        ShowSevereError(state, "Invalid call to Gas Absorber Chiller " + this->Name,
+        				"Node connections in branch are not consistent with object nodes.");
         ShowFatalError(state, "Preceding conditions cause termination.");
     }
 }
@@ -238,8 +238,8 @@ void GasAbsorberSpecs::getDesignCapacities(
 
     if (!matchfound) {
         // Error, nodes do not match
-        ShowSevereError(state, "SimGasAbsorber: Invalid call to Gas Absorbtion Chiller-Heater " + this->Name);
-        ShowContinueError(state, "Node connections in branch are not consistent with object nodes.");
+        ShowSevereError(state, "SimGasAbsorber: Invalid call to Gas Absorbtion Chiller-Heater " + this->Name,
+        				"Node connections in branch are not consistent with object nodes.");
         ShowFatalError(state, "Preceding conditions cause termination.");
     } // Operate as Chiller or Heater
 }
@@ -264,8 +264,8 @@ void GasAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocatio
     } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
                                                                 // don't do anything here
     } else {                                                    // Error, nodes do not match
-        ShowSevereError(state, "SimGasAbsorber: Invalid call to Gas Absorbtion Chiller-Heater " + this->Name);
-        ShowContinueError(state, "Node connections in branch are not consistent with object nodes.");
+        ShowSevereError(state, "SimGasAbsorber: Invalid call to Gas Absorbtion Chiller-Heater " + this->Name,
+        				"Node connections in branch are not consistent with object nodes.");
         ShowFatalError(state, "Preceding conditions cause termination.");
     } // Operate as Chiller or Heater
 }
@@ -468,8 +468,8 @@ void GetGasAbsorberInput(EnergyPlusData &state)
         }
         if (thisChiller.isWaterCooled) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid value");
-                ShowContinueError(state, "For WaterCooled chiller the condenser outlet node is required.");
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid value",
+                				"For WaterCooled chiller the condenser outlet node is required.");
                 Get_ErrorsFound = true;
             }
             thisChiller.CondReturnNodeNum = GetOnlySingleNode(state,
@@ -521,10 +521,9 @@ void GetGasAbsorberInput(EnergyPlusData &state)
         bool FuelTypeError(false);
         UtilityRoutines::ValidateFuelType(state, state.dataIPShortCut->cAlphaArgs(17), thisChiller.FuelType, FuelTypeError);
         if (FuelTypeError) {
-            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid value");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(17) + '=' + state.dataIPShortCut->cAlphaArgs(17));
-            ShowContinueError(
-                state, "Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
+            ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid value",
+            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(17) + '=' + state.dataIPShortCut->cAlphaArgs(17),
+            				"Valid choices are Electricity, NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2,OtherFuel1 or OtherFuel2");
             Get_ErrorsFound = true;
             FuelTypeError = false;
         }
@@ -1200,9 +1199,9 @@ void GasAbsorberSpecs::size(EnergyPlusData &state)
     } else {
         if (this->NomCoolingCapWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + this->Name + "\", autosize error.");
-                ShowContinueError(state, "Autosizing of Direct Fired Absorption Chiller nominal cooling capacity requires");
-                ShowContinueError(state, "a cooling loop Sizing:Plant object.");
+                ShowSevereError(state, "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + this->Name + "\", autosize error.",
+                				"Autosizing of Direct Fired Absorption Chiller nominal cooling capacity requires",
+                				"a cooling loop Sizing:Plant object.");
                 ErrorsFound = true;
             }
         } else {
@@ -1270,9 +1269,9 @@ void GasAbsorberSpecs::size(EnergyPlusData &state)
     } else {
         if (this->EvapVolFlowRateWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + this->Name + "\", autosize error.");
-                ShowContinueError(state, "Autosizing of Direct Fired Absorption Chiller evap flow rate requires");
-                ShowContinueError(state, "a cooling loop Sizing:Plant object.");
+                ShowSevereError(state, "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + this->Name + "\", autosize error.",
+                				"Autosizing of Direct Fired Absorption Chiller evap flow rate requires",
+                				"a cooling loop Sizing:Plant object.");
                 ErrorsFound = true;
             }
         } else {
@@ -1346,9 +1345,9 @@ void GasAbsorberSpecs::size(EnergyPlusData &state)
     } else {
         if (this->HeatVolFlowRateWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + this->Name + "\", autosize error.");
-                ShowContinueError(state, "Autosizing of Direct Fired Absorption Chiller hot water flow rate requires");
-                ShowContinueError(state, "a heating loop Sizing:Plant object.");
+                ShowSevereError(state, "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + this->Name + "\", autosize error.",
+                				"Autosizing of Direct Fired Absorption Chiller hot water flow rate requires",
+                				"a heating loop Sizing:Plant object.");
                 ErrorsFound = true;
             }
         } else {
@@ -1434,9 +1433,9 @@ void GasAbsorberSpecs::size(EnergyPlusData &state)
     } else {
         if (this->CondVolFlowRateWasAutoSized) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + this->Name + "\", autosize error.");
-                ShowContinueError(state, "Autosizing of Direct Fired Absorption Chiller condenser flow rate requires a condenser");
-                ShowContinueError(state, "loop Sizing:Plant object.");
+                ShowSevereError(state, "SizeGasAbsorber: ChillerHeater:Absorption:DirectFired=\"" + this->Name + "\", autosize error.",
+                				"Autosizing of Direct Fired Absorption Chiller condenser flow rate requires a condenser",
+                				"loop Sizing:Plant object.");
                 ErrorsFound = true;
             }
         } else {

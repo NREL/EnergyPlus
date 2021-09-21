@@ -188,8 +188,8 @@ void SetComponentFlowRate(EnergyPlusData &state,
             if (!state.dataLoopNodes->Node(InletNode).plantNodeErrorMsgIssued) {
                 ShowSevereError(state,
                                 "SetComponentFlowRate: check component model implementation for component with inlet node named=" +
-                                    state.dataLoopNodes->NodeID(InletNode));
-                ShowContinueError(state, format("Inlet node MassFlowRatMax = {:.8R}", state.dataLoopNodes->Node(InletNode).MassFlowRateMax));
+                                    state.dataLoopNodes->NodeID(InletNode),
+                				format("Inlet node MassFlowRatMax = {:.8R}", state.dataLoopNodes->Node(InletNode).MassFlowRateMax));
                 state.dataLoopNodes->Node(InletNode).plantNodeErrorMsgIssued = true;
             }
         }
@@ -1756,8 +1756,8 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
             }
             errFlag = true;
         } else {
-            ShowSevereError(state, format("ScanPlantLoopsForObject: Invalid CompType passed [{}], Name={}", CompType, CompName));
-            ShowContinueError(state, format("Valid CompTypes are in the range [1 - {}].", DataPlant::NumSimPlantEquipTypes));
+            ShowSevereError(state, format("ScanPlantLoopsForObject: Invalid CompType passed [{}], Name={}", CompType, CompName),
+            				format("Valid CompTypes are in the range [1 - {}].", DataPlant::NumSimPlantEquipTypes));
             ShowFatalError(state, "Previous error causes program termination");
         }
     }
@@ -1835,8 +1835,8 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
     }
 
     if (!FoundNode) {
-        ShowSevereError(state, "ScanPlantLoopsForNodeNum: Plant Node was not found as inlet node (for component) on any plant loops");
-        ShowContinueError(state, "Node Name=\"" + state.dataLoopNodes->NodeID(NodeNum) + "\"");
+        ShowSevereError(state, "ScanPlantLoopsForNodeNum: Plant Node was not found as inlet node (for component) on any plant loops",
+        				"Node Name=\"" + state.dataLoopNodes->NodeID(NodeNum) + "\"");
         if (!state.dataGlobal->DoingSizing) {
             ShowContinueError(state, format("called by {}", CallerName));
         } else {
@@ -2005,8 +2005,8 @@ int MyPlantSizingIndex(EnergyPlusData &state,
         if (MyPltSizNum == 0) {
             if (PrintErrorFlag) {
                 ShowSevereError(state,
-                                "MyPlantSizingIndex: Could not find " + state.dataPlnt->PlantLoop(MyPltLoopNum).Name + " in Sizing:Plant objects.");
-                ShowContinueError(state, "...reference Component Type=\"" + CompType + "\", Name=\"" + std::string{CompName} + "\".");
+                                "MyPlantSizingIndex: Could not find " + state.dataPlnt->PlantLoop(MyPltLoopNum).Name + " in Sizing:Plant objects.",
+                				"...reference Component Type=\"" + CompType + "\", Name=\"" + std::string{CompName} + "\".");
             }
             ErrorsFound = true;
         }

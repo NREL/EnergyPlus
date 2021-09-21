@@ -148,8 +148,8 @@ OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::s
     pattern = std::make_shared<RE2>(KeyValue);
     case_insensitive_pattern = std::make_shared<RE2>("(?i)" + KeyValue);
     if (!pattern->ok()) {
-        ShowSevereError(state, "Regular expression \"" + KeyValue + "\" for variable name \"" + VariableName + "\" in input file is incorrect");
-        ShowContinueError(state, pattern->error());
+        ShowSevereError(state, "Regular expression \"" + KeyValue + "\" for variable name \"" + VariableName + "\" in input file is incorrect",
+        				pattern->error());
         ShowFatalError(state, "Error found in regular expression. Previous error(s) cause program termination.");
     }
 }

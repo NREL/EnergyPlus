@@ -1202,8 +1202,8 @@ namespace OutputProcessor {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(fldIndex + 1)) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", blank " +
-                                        state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + '.');
-                    ShowContinueError(state, "...cannot create custom meter.");
+                                        state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + '.',
+                    				"...cannot create custom meter.");
                     BigErrorsFound = true;
                     continue;
                 }
@@ -1435,8 +1435,8 @@ namespace OutputProcessor {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(fldIndex + 1)) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", blank " +
-                                        state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + '.');
-                    ShowContinueError(state, "...cannot create custom meter.");
+                                        state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + '.',
+                    				"...cannot create custom meter.");
                     BigErrorsFound = true;
                     continue;
                 }
@@ -5348,8 +5348,8 @@ void SetupOutputVariable(EnergyPlusData &state,
         if (Loop == 1) {
             if (OnMeter) {
                 if (VariableType == StoreType::Averaged) {
-                    ShowSevereError(state, "Meters can only be \"Summed\" variables");
-                    ShowContinueError(state, "..reference variable=" + KeyedValue + ':' + VariableName);
+                    ShowSevereError(state, "Meters can only be \"Summed\" variables",
+                    				"..reference variable=" + KeyedValue + ':' + VariableName);
                 } else {
                     Unit mtrUnits = op->RVariableTypes(CV).units;
                     bool ErrorsFound = false;

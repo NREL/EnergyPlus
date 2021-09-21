@@ -223,9 +223,8 @@ namespace HybridModel {
                         }
                         if (TemperatureSchPtr == 0 && HumidityRatioSchPtr == 0 && CO2ConcentrationSchPtr == 0) {
                             // Show fatal error if no measurement schedule is provided
-                            ShowSevereError(state, "No measured envrionmental parameter is provided for: " + CurrentModuleObject);
-                            ShowContinueError(state,
-                                              "One of the field \"" + cAlphaFieldNames(6) + "\", \"" + cAlphaFieldNames(7) + "\", or " +
+                            ShowSevereError(state, "No measured envrionmental parameter is provided for: " + CurrentModuleObject,
+                            				"One of the field \"" + cAlphaFieldNames(6) + "\", \"" + cAlphaFieldNames(7) + "\", or " +
                                                   cAlphaFieldNames(8) + "\" must be provided for the HybridModel:Zone.");
                             ErrorsFound = true;
                         } else {
@@ -260,9 +259,8 @@ namespace HybridModel {
                     if (state.dataHybridModel->FlagHybridModel_PC) {
                         if (TemperatureSchPtr == 0 && HumidityRatioSchPtr == 0 && CO2ConcentrationSchPtr == 0) {
                             // Show fatal error if no measurement schedule is provided
-                            ShowSevereError(state, "No measured envrionmental parameter is provided for: " + CurrentModuleObject);
-                            ShowContinueError(state,
-                                              "One of the field \"" + cAlphaFieldNames(6) + "\", \"" + cAlphaFieldNames(7) + "\", or " +
+                            ShowSevereError(state, "No measured envrionmental parameter is provided for: " + CurrentModuleObject,
+                            				"One of the field \"" + cAlphaFieldNames(6) + "\", \"" + cAlphaFieldNames(7) + "\", or " +
                                                   cAlphaFieldNames(8) + "\" must be provided for the HybridModel:Zone.");
                             ErrorsFound = true;
                         } else {

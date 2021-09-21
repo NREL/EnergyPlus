@@ -892,9 +892,9 @@ namespace WeatherManager {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} +
                                                         "Actual weather runperiod has been entered but weatherfile DATA PERIOD "
-                                                        "does not have year included in start/end date.");
-                                    ShowContinueError(state, "...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both, or");
-                                    ShowContinueError(state, R"(...set "Treat Weather as Actual" to "No".)");
+                                                        "does not have year included in start/end date.",
+                                    				"...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both, or",
+                                    				R"(...set "Treat Weather as Actual" to "No".)");
                                 }
                                 if (!General::BetweenDates(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartDate,
                                                            runStartJulian,
@@ -3422,9 +3422,9 @@ namespace WeatherManager {
                                        std::string_view SaveLine,
                                        std::string_view Line)
     {
-        ShowSevereError(state, fmt::format("Invalid Weather Line at date={:4}/{:2}/{:2} Hour#={:2} Min#={:2}", WYear, WMonth, WDay, WHour, WMinute));
-        ShowContinueError(state, fmt::format("Full Data Line={}", SaveLine));
-        ShowContinueError(state, fmt::format("Remainder of line={}", Line));
+        ShowSevereError(state, fmt::format("Invalid Weather Line at date={:4}/{:2}/{:2} Hour#={:2} Min#={:2}", WYear, WMonth, WDay, WHour, WMinute),
+        				fmt::format("Full Data Line={}", SaveLine),
+        				fmt::format("Remainder of line={}", Line));
         ShowFatalError(state, "Error in Reading Weather Data");
     }
 
@@ -3496,8 +3496,8 @@ namespace WeatherManager {
             auto nth_pos = nth_occurrence(current_line, ',', 5);
             const bool succeeded = readList(current_line.substr(pos, nth_pos), WYear, WMonth, WDay, WHour, WMinute);
             if (!succeeded) {
-                ShowSevereError(state, "Invalid Date info in Weather Line");
-                ShowContinueError(state, fmt::format("Entire Data Line={}", Line));
+                ShowSevereError(state, "Invalid Date info in Weather Line",
+                				fmt::format("Entire Data Line={}", Line));
                 ShowFatalError(state, "Error in Reading Weather Data");
             }
         }
@@ -3524,8 +3524,8 @@ namespace WeatherManager {
         pos = index(Line, ','); // WYear
         if (pos == std::string::npos) {
             ShowSevereError(
-                state, format("Invalid Weather Line (no commas) at date={:4}/{:2}/{:2} Hour#={:2} Min#={:2}", WYear, WMonth, WDay, WHour, WMinute));
-            ShowContinueError(state, fmt::format("Full Data Line={}", Line));
+                state, format("Invalid Weather Line (no commas) at date={:4}/{:2}/{:2} Hour#={:2} Min#={:2}", WYear, WMonth, WDay, WHour, WMinute),
+            				fmt::format("Full Data Line={}", Line));
             ShowFatalError(state, "Error in Reading Weather Data");
         }
         current_line.remove_prefix(nth_occurrence(Line, ',', 6)); // remove WYear,WMonth,WDay,WHour,WMinute,Data Source/Integrity
@@ -3993,8 +3993,8 @@ namespace WeatherManager {
             ConstantHumidityRatio = false;
             break;
         default:
-            ShowSevereError(state, "SetUpDesignDay: Invalid Humidity Indicator type");
-            ShowContinueError(state, "Occurred in Design Day=" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
+            ShowSevereError(state, "SetUpDesignDay: Invalid Humidity Indicator type",
+            				"Occurred in Design Day=" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
             break;
         }
 
@@ -4777,8 +4777,8 @@ namespace WeatherManager {
                     if (int(Line.data[endcol - 1]) == state.dataSysVars->iUnicode_end) {
                         ShowSevereError(state,
                                         "OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.",
-                                        OptionalOutputFileRef(state.files.eso));
-                        ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
+                                        OptionalOutputFileRef(state.files.eso),
+                        				"...This file cannot be read by this program. Please save as PC or Unix file and try again");
                         ShowFatalError(state, "Program terminates due to previous condition.");
                     }
                 }
@@ -4930,8 +4930,8 @@ namespace WeatherManager {
                                          format("Standard Time Meridian and Time Zone differ by more than 1, Difference=\"{:.1R}\"", DiffCalc));
                         ShowContinueError(state, "Solar Positions may be incorrect");
                     } else {
-                        ShowSevereError(state, format("Standard Time Meridian and Time Zone differ by more than 2, Difference=\"{:.1R}\"", DiffCalc));
-                        ShowContinueError(state, "Solar Positions will be incorrect");
+                        ShowSevereError(state, format("Standard Time Meridian and Time Zone differ by more than 2, Difference=\"{:.1R}\"", DiffCalc),
+                        				"Solar Positions will be incorrect");
                         //          LocationError=.TRUE.
                     }
                 }
@@ -6560,9 +6560,8 @@ namespace WeatherManager {
             } else {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                    "\", invalid data.");
-                ShowContinueError(
-                    state, "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
+                                    "\", invalid data.",
+                				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
                 ErrorsFound = true;
                 state.dataIPShortCut->cAlphaArgs(3) = "invalid field";
                 state.dataWeatherManager->DesDayInput(EnvrnNum).DBTempRangeType = DDDBRangeType::Default;
@@ -6572,10 +6571,9 @@ namespace WeatherManager {
                 state.dataIPShortCut->cAlphaArgs(3) != "invalid field") {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                    "\", invalid data.");
-                ShowContinueError(state, "..invalid blank field: " + state.dataIPShortCut->cNumericFieldNames(3));
-                ShowContinueError(state,
-                                  "..this field is required when " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
+                                    "\", invalid data.",
+                				"..invalid blank field: " + state.dataIPShortCut->cNumericFieldNames(3),
+                				"..this field is required when " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
                                       state.dataIPShortCut->cAlphaArgs(3) + "\".");
                 ErrorsFound = true;
             }
@@ -6610,9 +6608,8 @@ namespace WeatherManager {
                     if (state.dataWeatherManager->DesDayInput(EnvrnNum).TempRangeSchPtr == 0) {
                         ShowSevereError(state,
                                         state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                            "\", invalid data.");
-                        ShowContinueError(state,
-                                          "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" +
+                                            "\", invalid data.",
+                        				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" +
                                               state.dataIPShortCut->cAlphaArgs(4) + "\".");
                         ErrorsFound = true;
                     } else {
@@ -6640,11 +6637,10 @@ namespace WeatherManager {
                                     state, state.dataWeatherManager->DesDayInput(EnvrnNum).TempRangeSchPtr, 0.0, ">=", 1.0, "<=")) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                                    state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
-                                ShowContinueError(state,
-                                                  "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" +
-                                                      state.dataIPShortCut->cAlphaArgs(4) + "\".");
-                                ShowContinueError(state, "..Specified [Schedule] Dry-bulb Range Multiplier Values are not within [0.0, 1.0]");
+                                                    state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.",
+                                				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" +
+                                                      state.dataIPShortCut->cAlphaArgs(4) + "\".",
+                                				"..Specified [Schedule] Dry-bulb Range Multiplier Values are not within [0.0, 1.0]");
                                 ErrorsFound = true;
                             }
                         } else if (state.dataIPShortCut->cAlphaArgs(3) == "DifferenceSchedule") { // delta, must be > 0.0
@@ -6652,9 +6648,8 @@ namespace WeatherManager {
                                     state, state.dataWeatherManager->DesDayInput(EnvrnNum).TempRangeSchPtr, 0.0, ">=")) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                                    state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
-                                ShowContinueError(state,
-                                                  "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" +
+                                                    state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.",
+                                				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" +
                                                       state.dataIPShortCut->cAlphaArgs(4) + "\".");
                                 ShowSevereError(state, "Some [Schedule] Dry-bulb Range Difference Values are < 0.0 [would make max larger].");
                                 ErrorsFound = true;
@@ -6697,9 +6692,9 @@ namespace WeatherManager {
                 } else {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state, "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(4) + " is blank.");
-                    ShowContinueError(state, "..required when " + state.dataIPShortCut->cAlphaFieldNames(3) + " indicates \"SCHEDULE\".");
+                                        "\", invalid data.",
+                    				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(4) + " is blank.",
+                    				"..required when " + state.dataIPShortCut->cAlphaFieldNames(3) + " indicates \"SCHEDULE\".");
                     ErrorsFound = true;
                 }
             } else {
@@ -6725,10 +6720,9 @@ namespace WeatherManager {
                 } else {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state, "..invalid field: " + state.dataIPShortCut->cNumericFieldNames(5) + " is blank.");
-                    ShowContinueError(state,
-                                      "..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
+                                        "\", invalid data.",
+                    				"..invalid field: " + state.dataIPShortCut->cNumericFieldNames(5) + " is blank.",
+                    				"..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
                                           state.dataIPShortCut->cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
@@ -6758,10 +6752,9 @@ namespace WeatherManager {
                 } else {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state, "..invalid field: " + state.dataIPShortCut->cNumericFieldNames(5) + " is blank.");
-                    ShowContinueError(state,
-                                      "..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
+                                        "\", invalid data.",
+                    				"..invalid field: " + state.dataIPShortCut->cNumericFieldNames(5) + " is blank.",
+                    				"..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
                                           state.dataIPShortCut->cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
@@ -6790,10 +6783,9 @@ namespace WeatherManager {
                 } else {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state, "..invalid field: " + state.dataIPShortCut->cNumericFieldNames(6) + " is blank.");
-                    ShowContinueError(state,
-                                      "..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
+                                        "\", invalid data.",
+                    				"..invalid field: " + state.dataIPShortCut->cNumericFieldNames(6) + " is blank.",
+                    				"..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
                                           state.dataIPShortCut->cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
@@ -6822,10 +6814,9 @@ namespace WeatherManager {
                 } else {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state, "..invalid field: " + state.dataIPShortCut->cNumericFieldNames(7) + " is blank.");
-                    ShowContinueError(state,
-                                      "..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
+                                        "\", invalid data.",
+                    				"..invalid field: " + state.dataIPShortCut->cNumericFieldNames(7) + " is blank.",
+                    				"..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
                                           state.dataIPShortCut->cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
@@ -6861,10 +6852,9 @@ namespace WeatherManager {
                 } else {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state, "..invalid field: " + state.dataIPShortCut->cNumericFieldNames(5) + " is blank.");
-                    ShowContinueError(state,
-                                      "..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
+                                        "\", invalid data.",
+                    				"..invalid field: " + state.dataIPShortCut->cNumericFieldNames(5) + " is blank.",
+                    				"..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
                                           state.dataIPShortCut->cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
@@ -6879,10 +6869,9 @@ namespace WeatherManager {
                 } else {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state, "..invalid field: " + state.dataIPShortCut->cNumericFieldNames(5) + " is blank.");
-                    ShowContinueError(state,
-                                      "..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
+                                        "\", invalid data.",
+                    				"..invalid field: " + state.dataIPShortCut->cNumericFieldNames(5) + " is blank.",
+                    				"..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
                                           state.dataIPShortCut->cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
@@ -6895,10 +6884,9 @@ namespace WeatherManager {
                 } else {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state, "..invalid field: " + state.dataIPShortCut->cNumericFieldNames(5) + " is blank.");
-                    ShowContinueError(state,
-                                      "..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
+                                        "\", invalid data.",
+                    				"..invalid field: " + state.dataIPShortCut->cNumericFieldNames(5) + " is blank.",
+                    				"..field is required when " + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" +
                                           state.dataIPShortCut->cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
@@ -6922,10 +6910,9 @@ namespace WeatherManager {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state, "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(6) + " is blank.");
-                    ShowContinueError(state,
-                                      "..field is required when " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
+                                        "\", invalid data.",
+                    				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(6) + " is blank.",
+                    				"..field is required when " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" +
                                           state.dataIPShortCut->cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 } else {
@@ -6969,11 +6956,10 @@ namespace WeatherManager {
                                     state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, ">=", 100.0, "<=")) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                                    state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
-                                ShowContinueError(state,
-                                                  "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" +
-                                                      state.dataIPShortCut->cAlphaArgs(6) + "\".");
-                                ShowContinueError(state, "Specified [Scheduled] Relative Humidity Values are not within [0.0, 100.0]");
+                                                    state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.",
+                                				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" +
+                                                      state.dataIPShortCut->cAlphaArgs(6) + "\".",
+                                				"Specified [Scheduled] Relative Humidity Values are not within [0.0, 100.0]");
                                 ErrorsFound = true;
                             }
                             break;
@@ -6983,11 +6969,10 @@ namespace WeatherManager {
                                     state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, ">=", 1.0, "<=")) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                                    state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
-                                ShowContinueError(state,
-                                                  "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" +
-                                                      state.dataIPShortCut->cAlphaArgs(6) + "\".");
-                                ShowContinueError(state, "..Specified [Schedule] Wet-bulb Profile Range Multiplier Values are not within [0.0, 1.0]");
+                                                    state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.",
+                                				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" +
+                                                      state.dataIPShortCut->cAlphaArgs(6) + "\".",
+                                				"..Specified [Schedule] Wet-bulb Profile Range Multiplier Values are not within [0.0, 1.0]");
                                 ErrorsFound = true;
                             }
                             break;
@@ -6996,9 +6981,8 @@ namespace WeatherManager {
                                     state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, ">=")) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                                    state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
-                                ShowContinueError(state,
-                                                  "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" +
+                                                    state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.",
+                                				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(6) + "=\"" +
                                                       state.dataIPShortCut->cAlphaArgs(6) + "\".");
                                 ShowSevereError(state, "Some [Schedule] Wet-bulb Profile Difference Values are < 0.0 [would make max larger].");
                                 ErrorsFound = true;
@@ -7077,11 +7061,10 @@ namespace WeatherManager {
                     if (state.dataWeatherManager->DesDayInput(EnvrnNum).BeamSolarSchPtr == 0) {
                         ShowSevereError(state,
                                         state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                            "\", invalid data.");
-                        ShowContinueError(state,
-                                          "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(11) + "=\"" +
-                                              state.dataIPShortCut->cAlphaArgs(11) + "\".");
-                        ShowContinueError(state, "..Required when " + state.dataIPShortCut->cAlphaFieldNames(10) + " indicates \"Schedule\".");
+                                            "\", invalid data.",
+                        				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(11) + "=\"" +
+                                              state.dataIPShortCut->cAlphaArgs(11) + "\".",
+                        				"..Required when " + state.dataIPShortCut->cAlphaFieldNames(10) + " indicates \"Schedule\".");
                         ErrorsFound = true;
                     } else {
                         ScheduleManager::GetSingleDayScheduleValues(state,
@@ -7109,19 +7092,18 @@ namespace WeatherManager {
                                 state, state.dataWeatherManager->DesDayInput(EnvrnNum).BeamSolarSchPtr, 0.0, ">=")) {
                             ShowSevereError(state,
                                             state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                                state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
-                            ShowContinueError(state,
-                                              "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(11) + "=\"" +
-                                                  state.dataIPShortCut->cAlphaArgs(11) + "\".");
-                            ShowContinueError(state, "..Specified [Schedule] Values are not >= 0.0");
+                                                state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.",
+                            				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(11) + "=\"" +
+                                                  state.dataIPShortCut->cAlphaArgs(11) + "\".",
+                            				"..Specified [Schedule] Values are not >= 0.0");
                             ErrorsFound = true;
                         }
                     }
                 } else { // should have entered beam schedule
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state, "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(11) + " is blank.");
+                                        "\", invalid data.",
+                    				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(11) + " is blank.");
                     ErrorsFound = true;
                 }
                 //   A12, \field Diffuse Solar Day Schedule Name
@@ -7131,11 +7113,10 @@ namespace WeatherManager {
                     if (state.dataWeatherManager->DesDayInput(EnvrnNum).DiffuseSolarSchPtr == 0) {
                         ShowSevereError(state,
                                         state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                            "\", invalid data.");
-                        ShowContinueError(state,
-                                          "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(12) + "=\"" +
-                                              state.dataIPShortCut->cAlphaArgs(12) + "\".");
-                        ShowContinueError(state, "..Required when " + state.dataIPShortCut->cAlphaFieldNames(10) + " indicates \"Schedule\".");
+                                            "\", invalid data.",
+                        				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(12) + "=\"" +
+                                              state.dataIPShortCut->cAlphaArgs(12) + "\".",
+                        				"..Required when " + state.dataIPShortCut->cAlphaFieldNames(10) + " indicates \"Schedule\".");
                         ErrorsFound = true;
                     } else {
                         ScheduleManager::GetSingleDayScheduleValues(state,
@@ -7163,19 +7144,18 @@ namespace WeatherManager {
                                 state, state.dataWeatherManager->DesDayInput(EnvrnNum).DiffuseSolarSchPtr, 0.0, ">=")) {
                             ShowSevereError(state,
                                             state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                                state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
-                            ShowContinueError(state,
-                                              "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(12) + "=\"" +
-                                                  state.dataIPShortCut->cAlphaArgs(12) + "\".");
-                            ShowContinueError(state, "..Specified [Schedule] Values are not >= 0.0");
+                                                state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.",
+                            				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(12) + "=\"" +
+                                                  state.dataIPShortCut->cAlphaArgs(12) + "\".",
+                            				"..Specified [Schedule] Values are not >= 0.0");
                             ErrorsFound = true;
                         }
                     }
                 } else { // should have entered diffuse schedule
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state, "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(12) + " is blank.");
+                                        "\", invalid data.",
+                    				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(12) + " is blank.");
                     ErrorsFound = true;
                 }
             }
@@ -7203,9 +7183,8 @@ namespace WeatherManager {
                 if (state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth > 31) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state,
-                                      format(".. invalid field: {}=[{}], Month=[{}].",
+                                        "\", invalid data.",
+                    				format(".. invalid field: {}=[{}], Month=[{}].",
                                              state.dataIPShortCut->cNumericFieldNames(2),
                                              state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth,
                                              state.dataWeatherManager->DesDayInput(EnvrnNum).Month));
@@ -7219,9 +7198,8 @@ namespace WeatherManager {
                 if (state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth > 30) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state,
-                                      format(".. invalid {}=[{}], Month=[{}].",
+                                        "\", invalid data.",
+                    				format(".. invalid {}=[{}], Month=[{}].",
                                              state.dataIPShortCut->cNumericFieldNames(2),
                                              state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth,
                                              state.dataWeatherManager->DesDayInput(EnvrnNum).Month));
@@ -7232,9 +7210,8 @@ namespace WeatherManager {
                 if (state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth > 28) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                        "\", invalid data.");
-                    ShowContinueError(state,
-                                      format(".. invalid {}=[{}], Month=[{}].",
+                                        "\", invalid data.",
+                    				format(".. invalid {}=[{}], Month=[{}].",
                                              state.dataIPShortCut->cNumericFieldNames(2),
                                              state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth,
                                              state.dataWeatherManager->DesDayInput(EnvrnNum).Month));
@@ -7244,9 +7221,8 @@ namespace WeatherManager {
             default:
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                    "\", invalid data.");
-                ShowContinueError(state,
-                                  format(".. invalid {} invalid (Month) [{}].",
+                                    "\", invalid data.",
+                				format(".. invalid {} invalid (Month) [{}].",
                                          state.dataIPShortCut->cNumericFieldNames(1),
                                          state.dataWeatherManager->DesDayInput(EnvrnNum).Month));
                 ErrorsFound = true;
@@ -7274,11 +7250,9 @@ namespace WeatherManager {
             if (state.dataWeatherManager->DesDayInput(EnvrnNum).DayType == 0) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataWeatherManager->DesDayInput(EnvrnNum).Title +
-                                    "\", invalid data.");
-                ShowContinueError(
-                    state, "..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
-                ShowContinueError(state,
-                                  "Valid values are "
+                                    "\", invalid data.",
+                				"..invalid field: " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".",
+                				"Valid values are "
                                   "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Holiday,SummerDesignDay,WinterDesignDay,CustomDay1,"
                                   "CustomDay2.");
                 ErrorsFound = true;
@@ -7461,17 +7435,16 @@ namespace WeatherManager {
                 if (Found == 0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid Environment Name referenced.");
-                    ShowContinueError(state, "...remainder of object not processed.");
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid Environment Name referenced.",
+                    				"...remainder of object not processed.");
                     ErrorsFound = true;
                     continue;
                 } else {
                     if (state.dataWeatherManager->Environment(Found).WP_Type1 != 0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                            state.dataIPShortCut->cAlphaArgs(1) + "\", indicated Environment Name already assigned.");
-                        ShowContinueError(state,
-                                          "...Environment=\"" + state.dataWeatherManager->Environment(Found).Title + "\", already using " +
+                                            state.dataIPShortCut->cAlphaArgs(1) + "\", indicated Environment Name already assigned.",
+                        				"...Environment=\"" + state.dataWeatherManager->Environment(Found).Title + "\", already using " +
                                               state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                               state.dataWeatherManager->WPSkyTemperature(state.dataWeatherManager->Environment(Found).WP_Type1).Name +
                                               "\".");
@@ -7521,9 +7494,8 @@ namespace WeatherManager {
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '.');
-                ShowContinueError(state,
-                                  "...entered value=\"" + state.dataIPShortCut->cAlphaArgs(2) +
+                                    "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '.',
+                				"...entered value=\"" + state.dataIPShortCut->cAlphaArgs(2) +
                                       "\", should be one of: ScheduleValue, DifferenceScheduleDryBulbValue, DifferenceScheduleDewPointValue.");
                 ErrorsFound = true;
             }
@@ -7538,10 +7510,9 @@ namespace WeatherManager {
                     if (Found == 0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                            state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.');
-                        ShowContinueError(state, "...Entered name=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
-                        ShowContinueError(state,
-                                          "...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\", \"Schedule:File\", or "
+                                            state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.',
+                        				"...Entered name=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".",
+                        				"...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\", \"Schedule:File\", or "
                                           "\"Schedule:Constant\" objects.");
                         ErrorsFound = true;
                     } else {
@@ -7553,11 +7524,9 @@ namespace WeatherManager {
                     if (Found == 0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                            state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.');
-                        ShowContinueError(state, "...Entered name=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
-                        ShowContinueError(
-                            state,
-                            R"(...Should be a single day schedule ("Schedule:Day:Hourly", "Schedule:Day:Interval", or "Schedule:Day:List" objects.)");
+                                            state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.',
+                        				"...Entered name=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".",
+                        				R"(...Should be a single day schedule ("Schedule:Day:Hourly", "Schedule:Day:Interval", or "Schedule:Day:List" objects.)");
                         ErrorsFound = true;
                     } else {
                         if (envFound != 0) {
@@ -7590,8 +7559,8 @@ namespace WeatherManager {
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '.');
-                    ShowContinueError(state, "...entered value=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\", should be Yes or No.");
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '.',
+                    				"...entered value=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\", should be Yes or No.");
                     ErrorsFound = true;
                 }
             } else {
@@ -8212,8 +8181,8 @@ namespace WeatherManager {
         // Strip off Header value from Line
         std::string::size_type Pos = index(Line, ',');
         if ((Pos == std::string::npos) && (!has_prefixi(HeaderString, "COMMENTS"))) {
-            ShowSevereError(state, "Invalid Header line in in.epw -- no commas");
-            ShowContinueError(state, "Line=" + Line);
+            ShowSevereError(state, "Invalid Header line in in.epw -- no commas",
+            				"Line=" + Line);
             ShowFatalError(state, "Previous conditions cause termination.");
         }
         if (Pos != std::string::npos) Line.erase(0, Pos + 1);
@@ -8416,8 +8385,8 @@ namespace WeatherManager {
                             }
                         } else {
                             ShowSevereError(state,
-                                            "ProcessEPWHeader: Invalid Typical/Extreme Periods Start Date Field(WeatherFile)=" + Line.substr(0, Pos));
-                            ShowContinueError(state, format("...on processing Typical/Extreme period #{}", i));
+                                            "ProcessEPWHeader: Invalid Typical/Extreme Periods Start Date Field(WeatherFile)=" + Line.substr(0, Pos),
+                            				format("...on processing Typical/Extreme period #{}", i));
                             ErrorsFound = true;
                         }
                         Line.erase(0, Pos + 1);
@@ -8432,8 +8401,8 @@ namespace WeatherManager {
                             }
                         } else {
                             ShowSevereError(state,
-                                            "ProcessEPWHeader: Invalid Typical/Extreme Periods End Date Field(WeatherFile)=" + Line.substr(0, Pos));
-                            ShowContinueError(state, format("...on processing Typical/Extreme period #{}", i));
+                                            "ProcessEPWHeader: Invalid Typical/Extreme Periods End Date Field(WeatherFile)=" + Line.substr(0, Pos),
+                            				format("...on processing Typical/Extreme period #{}", i));
                             ErrorsFound = true;
                         }
                         Line.erase(0, Pos + 1);
@@ -9428,8 +9397,8 @@ namespace WeatherManager {
                 if (!statFile.good()) {
                     ShowSevereError(state,
                                     "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + state.files.inputWeatherFilePath.filePath.string() +
-                                        " for input (read).");
-                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
+                                        " for input (read).",
+                    				"Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }
 
@@ -9461,8 +9430,8 @@ namespace WeatherManager {
                 bool epwHasLeapYear(false);
                 if (!epwFile.good()) {
                     ShowSevereError(state,
-                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + epwFile.filePath.string() + " for input (read).");
-                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + epwFile.filePath.string() + " for input (read).",
+                    				"Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }
                 for (int i = 1; i <= 8; ++i) { // Headers
@@ -9519,11 +9488,11 @@ namespace WeatherManager {
                 this->MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
                 this->OADryBulbWeatherDataProcessed = true;
             } else {
-                ShowSevereError(state, "CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exist.");
-                ShowContinueError(state, "Weather file: " + state.files.inputWeatherFilePath.filePath.string() + ".");
-                ShowContinueError(state, "Stat file: " + state.files.inStatFilePath.filePath.string() + ".");
-                ShowContinueError(state, "Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
-                ShowContinueError(state, "Instead a fixed default value of 10.0 C will be used.");
+                ShowSevereError(state, "CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exist.",
+                				"Weather file: " + state.files.inputWeatherFilePath.filePath.string() + ".",
+                				"Stat file: " + state.files.inStatFilePath.filePath.string() + ".",
+                				"Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.",
+                				"Instead a fixed default value of 10.0 C will be used.");
             }
         }
     }

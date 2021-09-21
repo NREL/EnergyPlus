@@ -264,9 +264,9 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
                     state.dataPlantPressureSys->FullParallelBranchSetFound(LoopSideNum) = true;
                 } else {
                     // we aren't ok
-                    ShowSevereError(state, "Pressure drop component configuration error detected on loop: " + loop.Name);
-                    ShowContinueError(state, "Pressure drop components must be on ALL or NONE of the parallel branches.");
-                    ShowContinueError(state, "Partial distribution is not allowed.");
+                    ShowSevereError(state, "Pressure drop component configuration error detected on loop: " + loop.Name,
+                    				"Pressure drop components must be on ALL or NONE of the parallel branches.",
+                    				"Partial distribution is not allowed.");
                     ErrorsFound = true;
                 }
                 if (loop_side.Branch(1).HasPressureComponents || loop_side.Branch(NumBranches).HasPressureComponents) {
@@ -280,10 +280,10 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
                 state.dataPlantPressureSys->FullParallelBranchSetFound(SupplySide) || SeriesPressureComponentFound) {
                 // we are fine, either way we will always have a path with at least one pressure component hit
             } else {
-                ShowSevereError(state, "Pressure drop component configuration error detected on loop: " + loop.Name);
-                ShowContinueError(state, "The loop has at least one fluid path which does not encounter a pressure component.");
-                ShowContinueError(state, "Either use at least one serial component for pressure drop OR all possible parallel paths");
-                ShowContinueError(state, "must be pressure drop components.");
+                ShowSevereError(state, "Pressure drop component configuration error detected on loop: " + loop.Name,
+                				"The loop has at least one fluid path which does not encounter a pressure component.",
+                				"Either use at least one serial component for pressure drop OR all possible parallel paths",
+                				"must be pressure drop components.");
                 ErrorsFound = true;
             } // valid pressure path
 
@@ -342,12 +342,12 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
         if (loop.CommonPipeType != DataPlant::iCommonPipeType::No) {
             // There is a common pipe!
             if (!state.dataPlantPressureSys->CommonPipeErrorEncountered) {
-                ShowSevereError(state, "Invalid pressure simulation configuration for Plant Loop=" + loop.Name);
-                ShowContinueError(state, "Currently pressure simulations cannot be performed for loops with common pipes.");
-                ShowContinueError(state, "To repair, either remove the common pipe simulation, or remove the pressure simulation.");
-                ShowContinueError(state, "The simulation will continue, but the pump power is not updated with pressure drop data.");
-                ShowContinueError(state, "Check all results including node pressures to ensure proper simulation.");
-                ShowContinueError(state, "This message is reported once, but may have been encountered in multiple loops.");
+                ShowSevereError(state, "Invalid pressure simulation configuration for Plant Loop=" + loop.Name,
+                				"Currently pressure simulations cannot be performed for loops with common pipes.",
+                				"To repair, either remove the common pipe simulation, or remove the pressure simulation.",
+                				"The simulation will continue, but the pump power is not updated with pressure drop data.",
+                				"Check all results including node pressures to ensure proper simulation.",
+                				"This message is reported once, but may have been encountered in multiple loops.");
                 state.dataPlantPressureSys->CommonPipeErrorEncountered = true;
             }
             loop.UsePressureForPumpCalcs = false;
@@ -426,11 +426,11 @@ void BranchPressureDrop(EnergyPlusData &state,
             // Shouldn't end up here, but just in case
             ++state.dataPlantPressureSys->ErrorCounter;
             if (state.dataPlantPressureSys->ErrorCounter == 1) {
-                ShowSevereError(state, "Plant pressure simulation encountered a branch which contains invalid branch pressure curve type.");
-                ShowContinueError(state, "Occurs for branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
-                ShowContinueError(state, "This error will be issued only once, although other branches may encounter the same problem");
-                ShowContinueError(state, "For now, pressure drop on this branch will be set to zero.");
-                ShowContinueError(state, "Verify all pressure inputs and pressure drop output variables to ensure proper simulation");
+                ShowSevereError(state, "Plant pressure simulation encountered a branch which contains invalid branch pressure curve type.",
+                				"Occurs for branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name,
+                				"This error will be issued only once, although other branches may encounter the same problem",
+                				"For now, pressure drop on this branch will be set to zero.",
+                				"Verify all pressure inputs and pressure drop output variables to ensure proper simulation");
             }
         }
     }
@@ -550,9 +550,9 @@ void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
             // If we are on the demand side, we have a common pipe situation and should issue a warning
             if (FoundAPumpOnBranch) {
                 if (LoopSideNum == DemandSide) {
-                    ShowSevereError(state, "Pressure system information was found in a demand pump (common pipe) simulation");
-                    ShowContinueError(state, "Currently the pressure simulation is not set up to handle common pipe simulations");
-                    ShowContinueError(state, "Either modify simulation to avoid common pipe, or remove pressure curve information");
+                    ShowSevereError(state, "Pressure system information was found in a demand pump (common pipe) simulation",
+                    				"Currently the pressure simulation is not set up to handle common pipe simulations",
+                    				"Either modify simulation to avoid common pipe, or remove pressure curve information");
                     ShowFatalError(state, "Pressure configuration mismatch causes program termination");
                 }
                 // If we are on the supply side, we simply hit the branch pump, so we exit the IF statement as

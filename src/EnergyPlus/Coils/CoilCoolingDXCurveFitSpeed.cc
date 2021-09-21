@@ -218,8 +218,8 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(EnergyPlus::EnergyPlusData &state,
     } else {
         curveIndex = CurveManager::GetCurveIndex(state, curveName);
         if (curveIndex == 0) {
-            ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
-            ShowContinueError(state, "...not found " + fieldName + "=\"" + curveName + "\".");
+            ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid",
+            				"...not found " + fieldName + "=\"" + curveName + "\".");
             return true;
         } else {
             // Verify Curve Object dimensions
@@ -641,16 +641,16 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
     Real64 slopeAtConds = 0.0;
     if (deltaT > 0.0) slopeAtConds = deltaHumRat / deltaT;
     if (slopeAtConds <= 0.0) {
-        ShowSevereError(state, this->object_name + " \"" + this->name + "\"");
-        ShowContinueError(state, "...Invalid slope or outlet air condition when calculating cooling coil bypass factor.");
-        ShowContinueError(state, format("...Slope = {:.8R}", slopeAtConds));
-        ShowContinueError(state, format("...Inlet Air Temperature     = {:.2R} C", tdb));
-        ShowContinueError(state, format("...Outlet Air Temperature    = {:.2R} C", outtdb));
-        ShowContinueError(state, format("...Inlet Air Humidity Ratio  = {:.6R} kgWater/kgDryAir", w));
-        ShowContinueError(state, format("...Outlet Air Humidity Ratio = {:.6R} kgWater/kgDryAir", outw));
-        ShowContinueError(state, format("...Total Cooling Capacity used in calculation = {:.2R} W", q));
-        ShowContinueError(state, format("...Air Mass Flow Rate used in calculation     = {:.6R} kg/s", airMassFlowRate));
-        ShowContinueError(state, format("...Air Volume Flow Rate used in calculation   = {:.6R} m3/s", this->evap_air_flow_rate));
+        ShowSevereError(state, this->object_name + " \"" + this->name + "\"",
+        				"...Invalid slope or outlet air condition when calculating cooling coil bypass factor.",
+        				format("...Slope = {:.8R}", slopeAtConds),
+        				format("...Inlet Air Temperature     = {:.2R} C", tdb),
+        				format("...Outlet Air Temperature    = {:.2R} C", outtdb),
+        				format("...Inlet Air Humidity Ratio  = {:.6R} kgWater/kgDryAir", w),
+        				format("...Outlet Air Humidity Ratio = {:.6R} kgWater/kgDryAir", outw),
+        				format("...Total Cooling Capacity used in calculation = {:.2R} W", q),
+        				format("...Air Mass Flow Rate used in calculation     = {:.6R} kg/s", airMassFlowRate),
+        				format("...Air Volume Flow Rate used in calculation   = {:.6R} m3/s", this->evap_air_flow_rate));
         if (q > 0.0) {
             if (((this->minRatedVolFlowPerRatedTotCap - this->evap_air_flow_rate / q) > SmallDifferenceTest) ||
                 ((this->evap_air_flow_rate / q - this->maxRatedVolFlowPerRatedTotCap) > SmallDifferenceTest)) {
@@ -698,16 +698,16 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
     if (iter > maxIter) {
         ShowSevereError(state,
                         std::string{RoutineName} + object_name + " \"" + name +
-                            "\" -- coil bypass factor calculation did not converge after max iterations.");
-        ShowContinueError(state, format("The RatedSHR of [{:.3R}], entered by the user or autosized (see *.eio file),", this->grossRatedSHR));
-        ShowContinueError(state, "may be causing this. The line defined by the coil rated inlet air conditions");
-        ShowContinueError(state, "(26.7C drybulb and 19.4C wetbulb) and the RatedSHR (i.e., slope of the line) must intersect");
-        ShowContinueError(state, "the saturation curve of the psychrometric chart. If the RatedSHR is too low, then this");
-        ShowContinueError(state, "intersection may not occur and the coil bypass factor calculation will not converge.");
-        ShowContinueError(state, "If autosizing the SHR, recheck the design supply air humidity ratio and design supply air");
-        ShowContinueError(state, "temperature values in the Sizing:System and Sizing:Zone objects. In general, the temperatures");
-        ShowContinueError(state, "and humidity ratios specified in these two objects should be the same for each system");
-        ShowContinueError(state, "and the zones that it serves.");
+                            "\" -- coil bypass factor calculation did not converge after max iterations.",
+        				format("The RatedSHR of [{:.3R}], entered by the user or autosized (see *.eio file),", this->grossRatedSHR),
+        				"may be causing this. The line defined by the coil rated inlet air conditions",
+        				"(26.7C drybulb and 19.4C wetbulb) and the RatedSHR (i.e., slope of the line) must intersect",
+        				"the saturation curve of the psychrometric chart. If the RatedSHR is too low, then this",
+        				"intersection may not occur and the coil bypass factor calculation will not converge.",
+        				"If autosizing the SHR, recheck the design supply air humidity ratio and design supply air",
+        				"temperature values in the Sizing:System and Sizing:Zone objects. In general, the temperatures",
+        				"and humidity ratios specified in these two objects should be the same for each system",
+        				"and the zones that it serves.");
         ShowContinueErrorTimeStamp(state, "");
         cbfErrors = true; // Didn't converge within MaxIter iterations
     }

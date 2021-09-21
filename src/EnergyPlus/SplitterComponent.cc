@@ -281,9 +281,9 @@ namespace SplitterComponent {
                 if (NodeNum != state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(OutNodeNum1)) continue;
                 ShowSevereError(state,
                                 CurrentModuleObject + " = " + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName +
-                                    " specifies an outlet node name the same as the inlet node.");
-                ShowContinueError(state, ".." + cAlphaFields(2) + '=' + state.dataLoopNodes->NodeID(NodeNum));
-                ShowContinueError(state, format("..Outlet Node #{} is duplicate.", OutNodeNum1));
+                                    " specifies an outlet node name the same as the inlet node.",
+                				".." + cAlphaFields(2) + '=' + state.dataLoopNodes->NodeID(NodeNum),
+                				format("..Outlet Node #{} is duplicate.", OutNodeNum1));
                 ErrorsFound = true;
             }
             for (OutNodeNum1 = 1; OutNodeNum1 <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes; ++OutNodeNum1) {
@@ -294,9 +294,9 @@ namespace SplitterComponent {
                         continue;
                     ShowSevereError(state,
                                     CurrentModuleObject + " = " + state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName +
-                                        " specifies duplicate outlet nodes in its outlet node list.");
-                    ShowContinueError(state, format("..Outlet Node #{} Name={}", OutNodeNum1, state.dataLoopNodes->NodeID(OutNodeNum1)));
-                    ShowContinueError(state, format("..Outlet Node #{} is duplicate.", OutNodeNum2));
+                                        " specifies duplicate outlet nodes in its outlet node list.",
+                    				format("..Outlet Node #{} Name={}", OutNodeNum1, state.dataLoopNodes->NodeID(OutNodeNum1)),
+                    				format("..Outlet Node #{} is duplicate.", OutNodeNum2));
                     ErrorsFound = true;
                 }
             }

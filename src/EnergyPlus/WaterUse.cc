@@ -324,9 +324,8 @@ namespace WaterUse {
                     // If no FlowRateFracSchedule, fraction defaults to 1.0
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).FlowRateFracSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3),
+                        				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
@@ -336,9 +335,8 @@ namespace WaterUse {
                         ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).TargetTempSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4),
+                        				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
@@ -350,9 +348,8 @@ namespace WaterUse {
                     // HotTempSchedule is ignored if connected to a plant loop via WATER USE CONNECTIONS
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).HotTempSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5),
+                        				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
@@ -363,9 +360,8 @@ namespace WaterUse {
                     // If no ColdTempSchedule, temperatures will be calculated by WATER MAINS TEMPERATURES object
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).ColdTempSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6),
+                        				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
@@ -375,9 +371,8 @@ namespace WaterUse {
                         UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(7), state.dataHeatBal->Zone);
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).Zone == 0) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7),
+                        				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
@@ -387,9 +382,8 @@ namespace WaterUse {
                         ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).SensibleFracSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8),
+                        				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
@@ -399,9 +393,8 @@ namespace WaterUse {
                         ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).LatentFracSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9),
+                        				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
@@ -495,9 +488,8 @@ namespace WaterUse {
                     // HotTempSchedule is ignored if connected to a plant loop via WATER USE CONNECTIONS
 
                     if (state.dataWaterUse->WaterConnections(WaterConnNum).HotTempSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6),
+                        				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
@@ -508,9 +500,8 @@ namespace WaterUse {
                     // If no ColdTempSchedule, temperatures will be calculated by WATER MAINS TEMPERATURES object
 
                     if (state.dataWaterUse->WaterConnections(WaterConnNum).ColdTempSchedule == 0) {
-                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7),
+                        				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
@@ -528,9 +519,8 @@ namespace WaterUse {
                             state.dataWaterUse->WaterConnections(WaterConnNum).HeatRecoveryHX = HeatRecoveryHXEnum::CrossFlow;
                         } else {
                             ShowSevereError(state,
-                                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
-                            ShowContinueError(state,
-                                              "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8),
+                            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                             ErrorsFound = true;
                         }
                     }
@@ -545,9 +535,8 @@ namespace WaterUse {
                             state.dataWaterUse->WaterConnections(WaterConnNum).HeatRecoveryConfig = HeatRecoveryConfigEnum::PlantAndEquip;
                         } else {
                             ShowSevereError(state,
-                                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
-                            ShowContinueError(state,
-                                              "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9),
+                            				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                             ErrorsFound = true;
                         }
                     }
@@ -563,9 +552,8 @@ namespace WaterUse {
 
                     if (WaterEquipNum == 0) {
                         ShowSevereError(
-                            state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(AlphaNum) + '=' + state.dataIPShortCut->cAlphaArgs(AlphaNum));
-                        ShowContinueError(state,
-                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
+                            state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(AlphaNum) + '=' + state.dataIPShortCut->cAlphaArgs(AlphaNum),
+                        				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                         ErrorsFound = true;
                     } else {
                         if (state.dataWaterUse->WaterEquipment(WaterEquipNum).Connections > 0) {

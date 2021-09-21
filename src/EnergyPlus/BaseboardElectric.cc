@@ -259,20 +259,17 @@ namespace BaseboardElectric {
                     if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                         thisBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
                         if (thisBaseboard.ScaledHeatingCapacity < 0.0 && thisBaseboard.ScaledHeatingCapacity != AutoSize) {
-                            ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                            ShowContinueError(state,
-                                              format("Illegal {} = {:.7T}",
-                                                     state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum),
-                                                     state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum)));
+                            ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName,
+                                            format("Illegal {} = {:.7T}",
+                                                   state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum),
+                                                   state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum)));
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                        ShowContinueError(state,
-                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state,
-                                          "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName,
+                                        "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                        state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                                        "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
@@ -280,31 +277,25 @@ namespace BaseboardElectric {
                     if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                         thisBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
                         if (thisBaseboard.ScaledHeatingCapacity <= 0.0) {
-                            ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                            ShowContinueError(state,
-                                              "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                                  state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                            ShowContinueError(state,
-                                              format("Illegal {} = {:.7T}",
-                                                     state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
-                                                     state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
+                            ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName,
+                                            "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                            state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                                            format("Illegal {} = {:.7T}",
+                                                   state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
+                                                   state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                             ErrorsFound = true;
                         } else if (thisBaseboard.ScaledHeatingCapacity == AutoSize) {
-                            ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                            ShowContinueError(state,
-                                              "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                                  state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                            ShowContinueError(
-                                state, "Illegal " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
+                            ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName,
+                                            "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                            state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                                            "Illegal " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                        ShowContinueError(state,
-                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(
-                            state, "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName,
+                                        "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                        state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                                        "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
                         ErrorsFound = true;
                     }
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
@@ -312,27 +303,23 @@ namespace BaseboardElectric {
                     if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                         thisBaseboard.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                         if (thisBaseboard.ScaledHeatingCapacity < 0.0) {
-                            ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                            ShowContinueError(state,
-                                              format("Illegal {} = {:.7T}",
-                                                     state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
-                                                     state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
+                            ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName,
+                                            format("Illegal {} = {:.7T}",
+                                                   state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
+                                                   state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
                             ErrorsFound = true;
                         }
                     } else {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                        ShowContinueError(state,
-                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(
-                            state, "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
+                        ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName,
+                                        "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                        state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                                        "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName);
-                    ShowContinueError(state,
-                                      "Illegal " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisBaseboard.EquipName,
+                                    "Illegal " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                    state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
                     ErrorsFound = true;
                 }
 

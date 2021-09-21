@@ -266,9 +266,8 @@ namespace ZoneDehumidifier {
                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr =
                     GetScheduleIndex(state, Alphas(2)); // Convert schedule name to pointer
                 if (state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr == 0) {
-                    ShowSevereError(state, cAlphaFields(2) + " not found = " + Alphas(2));
-                    ShowContinueError(state,
-                                      "Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
+                    ShowSevereError(state, cAlphaFields(2) + " not found = " + Alphas(2),
+                    				"Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                     ErrorsFound = true;
                 }
             }
@@ -298,27 +297,27 @@ namespace ZoneDehumidifier {
             // N1,  \field Rated Water Removal
             state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).RatedWaterRemoval = Numbers(1);
             if (state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).RatedWaterRemoval <= 0.0) {
-                ShowSevereError(state, cNumericFields(1) + " must be greater than zero.");
-                ShowContinueError(state, format("Value specified = {:.5T}", Numbers(1)));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
+                ShowSevereError(state, cNumericFields(1) + " must be greater than zero.",
+                				format("Value specified = {:.5T}", Numbers(1)),
+                				"Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 ErrorsFound = true;
             }
 
             // N2,  \field Rated Energy Factor
             state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).RatedEnergyFactor = Numbers(2);
             if (state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).RatedEnergyFactor <= 0.0) {
-                ShowSevereError(state, cNumericFields(2) + " must be greater than zero.");
-                ShowContinueError(state, format("Value specified = {:.5T}", Numbers(2)));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
+                ShowSevereError(state, cNumericFields(2) + " must be greater than zero.",
+                				format("Value specified = {:.5T}", Numbers(2)),
+                				"Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 ErrorsFound = true;
             }
 
             // N3,  \field Rated Air Flow Rate
             state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).RatedAirVolFlow = Numbers(3);
             if (state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).RatedAirVolFlow <= 0.0) {
-                ShowSevereError(state, cNumericFields(3) + " must be greater than zero.");
-                ShowContinueError(state, format("Value specified = {:.5T}", Numbers(3)));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
+                ShowSevereError(state, cNumericFields(3) + " must be greater than zero.",
+                				format("Value specified = {:.5T}", Numbers(3)),
+                				"Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 ErrorsFound = true;
             }
 
@@ -331,9 +330,8 @@ namespace ZoneDehumidifier {
                                     std::string{RoutineName} + ':' + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\" is required, missing for " +
                                         cAlphaFields(1) + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 } else {
-                    ShowSevereError(state, cAlphaFields(5) + " not found = " + Alphas(5));
-                    ShowContinueError(state,
-                                      "Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
+                    ShowSevereError(state, cAlphaFields(5) + " not found = " + Alphas(5),
+                    				"Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 }
                 ErrorsFound = true;
             } else {
@@ -367,9 +365,8 @@ namespace ZoneDehumidifier {
                                     std::string{RoutineName} + ':' + CurrentModuleObject + "=\"" + cAlphaFields(6) + "\" is required, missing for " +
                                         cAlphaFields(1) + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 } else {
-                    ShowSevereError(state, cAlphaFields(6) + " not found = " + Alphas(6));
-                    ShowContinueError(state,
-                                      "Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
+                    ShowSevereError(state, cAlphaFields(6) + " not found = " + Alphas(6),
+                    				"Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 }
                 ErrorsFound = true;
             } else {
@@ -403,9 +400,8 @@ namespace ZoneDehumidifier {
                                     std::string{RoutineName} + ':' + CurrentModuleObject + "=\"" + cAlphaFields(7) + "\" is required, missing for " +
                                         cAlphaFields(1) + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 } else {
-                    ShowSevereError(state, cAlphaFields(7) + " not found = " + Alphas(7));
-                    ShowContinueError(state,
-                                      "Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
+                    ShowSevereError(state, cAlphaFields(7) + " not found = " + Alphas(7),
+                    				"Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 }
                 ErrorsFound = true;
             } else {
@@ -427,10 +423,10 @@ namespace ZoneDehumidifier {
 
             if (state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).MinInletAirTemp >=
                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).MaxInletAirTemp) {
-                ShowSevereError(state, cNumericFields(5) + " must be greater than " + cNumericFields(4));
-                ShowContinueError(state, format("{} specified = {:.1T}", cNumericFields(5), Numbers(5)));
-                ShowContinueError(state, format("{} specified = {:.1T}", cNumericFields(4), Numbers(4)));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
+                ShowSevereError(state, cNumericFields(5) + " must be greater than " + cNumericFields(4),
+                				format("{} specified = {:.1T}", cNumericFields(5), Numbers(5)),
+                				format("{} specified = {:.1T}", cNumericFields(4), Numbers(4)),
+                				"Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 ErrorsFound = true;
             }
 
@@ -438,9 +434,9 @@ namespace ZoneDehumidifier {
             state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticLoad = Numbers(6); // Off Cycle Parasitic Load [W]
 
             if (state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticLoad < 0.0) {
-                ShowSevereError(state, cNumericFields(6) + " must be >= zero.");
-                ShowContinueError(state, format("Value specified = {:.2T}", Numbers(6)));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
+                ShowSevereError(state, cNumericFields(6) + " must be >= zero.",
+                				format("Value specified = {:.2T}", Numbers(6)),
+                				"Occurs in " + CurrentModuleObject + " = " + state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).Name);
                 ErrorsFound = true;
             }
 

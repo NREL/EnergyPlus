@@ -746,8 +746,8 @@ namespace FluidProperties {
                 ++state.dataFluidProps->NumOfGlycols;
                 FluidNames(FluidNum).IsGlycol = true;
             } else {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid type");
-                ShowContinueError(state, "...entered value=\"" + Alphas(2) + ", Only REFRIGERANT or GLYCOL allowed as " + cAlphaFieldNames(2));
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid type",
+                				"...entered value=\"" + Alphas(2) + ", Only REFRIGERANT or GLYCOL allowed as " + cAlphaFieldNames(2));
                 ErrorsFound = true;
             }
         }
@@ -856,9 +856,8 @@ namespace FluidProperties {
                 if (FluidTemps(Loop).Temps(TempLoop) <= FluidTemps(Loop).Temps(TempLoop - 1)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + " name=" + FluidTemps(Loop).Name +
-                                        ", lists must have data in ascending order");
-                    ShowContinueError(state,
-                                      format("First out of order occurrence at Temperature #({}) {{{:.R3}}} >= Temp({}) {{{:.R3}}}",
+                                        ", lists must have data in ascending order",
+                    				format("First out of order occurrence at Temperature #({}) {{{:.R3}}} >= Temp({}) {{{:.R3}}}",
                                              TempLoop - 1,
                                              FluidTemps(Loop).Temps(TempLoop - 1),
                                              TempLoop,
@@ -914,12 +913,10 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumPsPoints) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowContinueError(state,
-                                                  "Temperature Name=" + TempsName +
-                                                      ", Temperature array and fluid saturation pressure array must have the same number of points");
-                                ShowContinueError(state,
-                                                  format("Temperature # points={} whereas {} # pressure points={}",
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                                				"Temperature Name=" + TempsName +
+                                                      ", Temperature array and fluid saturation pressure array must have the same number of points",
+                                				format("Temperature # points={} whereas {} # pressure points={}",
                                                          NumNumbers,
                                                          state.dataFluidProps->RefrigData(Loop).Name,
                                                          state.dataFluidProps->RefrigData(Loop).NumPsPoints));
@@ -937,9 +934,9 @@ namespace FluidProperties {
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                            ShowContinueError(state, "Found saturated fluid gas/fluid pressure input but no matching temperature array");
-                            ShowContinueError(state, "Entered Temperature Name=" + TempsName);
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                            				"Found saturated fluid gas/fluid pressure input but no matching temperature array",
+                            				"Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
                         }
 
@@ -951,9 +948,8 @@ namespace FluidProperties {
                 // If it made it all the way to the last input occurrence and didn't find a match,
                 // then no sat press data found
                 if (InData == NumOfSatFluidPropArrays) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state,
-                                      "No Gas/Fluid Saturation Pressure found. Need properties with " + cAlphaFieldNames(2) + "=\"Pressure\" and " +
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                    				"No Gas/Fluid Saturation Pressure found. Need properties with " + cAlphaFieldNames(2) + "=\"Pressure\" and " +
                                           cAlphaFieldNames(3) + "=\"FluidGas\".");
                     ErrorsFound = true;
                 }
@@ -997,9 +993,8 @@ namespace FluidProperties {
                                     state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                                 ShowSevereError(state,
                                                 "Temperature Name=" + TempsName +
-                                                    ", Temperature array and saturated fluid enthalpy array must have the same number of points");
-                                ShowContinueError(state,
-                                                  format("Temperature # points={} whereas {} # points={}",
+                                                    ", Temperature array and saturated fluid enthalpy array must have the same number of points",
+                                				format("Temperature # points={} whereas {} # points={}",
                                                          NumNumbers,
                                                          state.dataFluidProps->RefrigData(Loop).Name,
                                                          state.dataFluidProps->RefrigData(Loop).NumHPoints));
@@ -1017,9 +1012,9 @@ namespace FluidProperties {
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                            ShowContinueError(state, "Found saturated fluid enthalpy input but no matching temperature array");
-                            ShowContinueError(state, "Entered Temperature Name=" + TempsName);
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                            				"Found saturated fluid enthalpy input but no matching temperature array",
+                            				"Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
                         }
 
@@ -1030,9 +1025,8 @@ namespace FluidProperties {
 
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat fluid enthalpy data found
                 if (InData == NumOfSatFluidPropArrays) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state,
-                                      "No Saturated Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                    				"No Saturated Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
                                           "=\"Enthalpy\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
                     ErrorsFound = true;
                 }
@@ -1064,9 +1058,9 @@ namespace FluidProperties {
                         if (UtilityRoutines::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
                             if (!UtilityRoutines::SameString(FluidTemps(TempLoop).Name, TempsName)) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowContinueError(state, "Temperatures for enthalpy fluid and gas/fluid points are not the same");
-                                ShowContinueError(state, "Name=" + Alphas(4) + " => " + FluidTemps(TempLoop).Name + " /= " + TempsName);
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                                				"Temperatures for enthalpy fluid and gas/fluid points are not the same",
+                                				"Name=" + Alphas(4) + " => " + FluidTemps(TempLoop).Name + " /= " + TempsName);
                                 ErrorsFound = true;
                                 break;
                             }
@@ -1077,13 +1071,10 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumHPoints) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowContinueError(
-                                    state,
-                                    "Temperature Name=" + TempsName +
-                                        ", Temperature array and saturated gas/fluid enthalpy array must have the same number of points");
-                                ShowContinueError(state,
-                                                  format("Temperature # points={} whereas {} # points={}",
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                                				"Temperature Name=" + TempsName +
+                                        ", Temperature array and saturated gas/fluid enthalpy array must have the same number of points",
+                                				format("Temperature # points={} whereas {} # points={}",
                                                          NumNumbers,
                                                          state.dataFluidProps->RefrigData(Loop).Name,
                                                          state.dataFluidProps->RefrigData(Loop).NumHPoints));
@@ -1100,9 +1091,9 @@ namespace FluidProperties {
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                            ShowContinueError(state, "Found saturated gas/fluid enthalpy input but no matching temperature array");
-                            ShowContinueError(state, "Entered Temperature Name=" + TempsName);
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                            				"Found saturated gas/fluid enthalpy input but no matching temperature array",
+                            				"Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
                         }
 
@@ -1113,9 +1104,8 @@ namespace FluidProperties {
 
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat f/g enthalpy data found
                 if (InData == NumOfSatFluidPropArrays) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state,
-                                      "No Saturated Gas/Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                    				"No Saturated Gas/Fluid Enthalpy found. Need properties to be entered with " + cAlphaFieldNames(2) +
                                           "=\"Enthalpy\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
                     ErrorsFound = true;
                 }
@@ -1159,9 +1149,8 @@ namespace FluidProperties {
                                     state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                                 ShowSevereError(state,
                                                 "Temperature Name=" + TempsName +
-                                                    ", Temperature array and saturated fluid Cp array must have the same number of points");
-                                ShowContinueError(state,
-                                                  format("Temperature # points={} whereas {} # Cp points={}",
+                                                    ", Temperature array and saturated fluid Cp array must have the same number of points",
+                                				format("Temperature # points={} whereas {} # Cp points={}",
                                                          NumNumbers,
                                                          state.dataFluidProps->RefrigData(Loop).Name,
                                                          state.dataFluidProps->RefrigData(Loop).NumCpPoints));
@@ -1179,9 +1168,9 @@ namespace FluidProperties {
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                            ShowContinueError(state, "Found saturated fluid specific heat (Cp) input but no matching temperature array");
-                            ShowContinueError(state, "Entered Temperature Name=" + TempsName);
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                            				"Found saturated fluid specific heat (Cp) input but no matching temperature array",
+                            				"Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
                         }
 
@@ -1192,9 +1181,8 @@ namespace FluidProperties {
 
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat fluid Cp data found
                 if (InData == NumOfSatFluidPropArrays) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state,
-                                      "No Saturated Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                    				"No Saturated Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
                                           "=\"SpecificHeat\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
                     ErrorsFound = true;
                 }
@@ -1226,9 +1214,9 @@ namespace FluidProperties {
                         if (UtilityRoutines::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
                             if (!UtilityRoutines::SameString(FluidTemps(TempLoop).Name, TempsName)) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowContinueError(state, "Temperatures for specific heat fluid and gas/fluid points are not the same");
-                                ShowContinueError(state, "Name=" + Alphas(4) + " => " + FluidTemps(TempLoop).Name + " /= " + TempsName);
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                                				"Temperatures for specific heat fluid and gas/fluid points are not the same",
+                                				"Name=" + Alphas(4) + " => " + FluidTemps(TempLoop).Name + " /= " + TempsName);
                                 ErrorsFound = true;
                                 break;
                             }
@@ -1239,12 +1227,10 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumCpPoints) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowContinueError(state,
-                                                  "Temperature Name=" + TempsName +
-                                                      ", Temperature array and saturated gas/fluid Cp array must have the same number of points");
-                                ShowContinueError(state,
-                                                  format("Temperature # points={} whereas {} # Cp points={}",
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                                				"Temperature Name=" + TempsName +
+                                                      ", Temperature array and saturated gas/fluid Cp array must have the same number of points",
+                                				format("Temperature # points={} whereas {} # Cp points={}",
                                                          NumNumbers,
                                                          state.dataFluidProps->RefrigData(Loop).Name,
                                                          state.dataFluidProps->RefrigData(Loop).NumCpPoints));
@@ -1261,9 +1247,9 @@ namespace FluidProperties {
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                            ShowContinueError(state, "Found saturated gas/fluid specific heat (Cp) input but no matching temperature array");
-                            ShowContinueError(state, "Entered Temperature Name=" + TempsName);
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                            				"Found saturated gas/fluid specific heat (Cp) input but no matching temperature array",
+                            				"Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
                         }
 
@@ -1274,9 +1260,8 @@ namespace FluidProperties {
 
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat f/g Cp data found
                 if (InData == NumOfSatFluidPropArrays) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state,
-                                      "No Saturated Gas/Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                    				"No Saturated Gas/Fluid Specific Heat found. Need properties to be entered with " + cAlphaFieldNames(2) +
                                           "=\"SpecificHeat\" and " + cAlphaFieldNames(3) + "=\"FluidGas\".");
                     ErrorsFound = true;
                 }
@@ -1317,12 +1302,10 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumRhoPoints) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowContinueError(state,
-                                                  "Temperature Name=" + TempsName +
-                                                      ", Temperature array and saturated fluid density array must have the same number of points");
-                                ShowContinueError(state,
-                                                  format("Temperature # points={} whereas {} # Density points={}",
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                                				"Temperature Name=" + TempsName +
+                                                      ", Temperature array and saturated fluid density array must have the same number of points",
+                                				format("Temperature # points={} whereas {} # Density points={}",
                                                          NumNumbers,
                                                          state.dataFluidProps->RefrigData(Loop).Name,
                                                          state.dataFluidProps->RefrigData(Loop).NumRhoPoints));
@@ -1340,9 +1323,9 @@ namespace FluidProperties {
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                            ShowContinueError(state, "Found saturated fluid density input but no matching temperature array");
-                            ShowContinueError(state, "Entered Temperature Name=" + TempsName);
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                            				"Found saturated fluid density input but no matching temperature array",
+                            				"Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
                         }
 
@@ -1353,9 +1336,8 @@ namespace FluidProperties {
 
                 // If it made it all the way to the last input occurrence and didn't find a match, then no sat fluid density data found
                 if (InData == NumOfSatFluidPropArrays) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state,
-                                      "No Saturated Fluid Density found. Need properties to be entered with " + cAlphaFieldNames(2) +
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                    				"No Saturated Fluid Density found. Need properties to be entered with " + cAlphaFieldNames(2) +
                                           "=\"Density\" and " + cAlphaFieldNames(3) + "=\"Fluid\".");
                     ErrorsFound = true;
                 }
@@ -1387,9 +1369,9 @@ namespace FluidProperties {
                         if (UtilityRoutines::SameString(Alphas(4), FluidTemps(TempLoop).Name)) {
                             if (!UtilityRoutines::SameString(FluidTemps(TempLoop).Name, TempsName)) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowContinueError(state, "Temperatures for density fluid and gas/fluid points are not the same");
-                                ShowContinueError(state, "Name=" + Alphas(4) + " => " + FluidTemps(TempLoop).Name + " /= " + TempsName);
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                                				"Temperatures for density fluid and gas/fluid points are not the same",
+                                				"Name=" + Alphas(4) + " => " + FluidTemps(TempLoop).Name + " /= " + TempsName);
                                 ErrorsFound = true;
                                 break;
                             }
@@ -1400,13 +1382,10 @@ namespace FluidProperties {
                             // Make sure the number of points in the two arrays (temps and values) are the same
                             if (NumNumbers != state.dataFluidProps->RefrigData(Loop).NumRhoPoints) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                                ShowContinueError(
-                                    state,
-                                    "Temperature Name=" + TempsName +
-                                        ", Temperature array and saturated gas/fluid density array must have the same number of points");
-                                ShowContinueError(state,
-                                                  format("Temperature # points={} whereas {} # density points={}",
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                                				"Temperature Name=" + TempsName +
+                                        ", Temperature array and saturated gas/fluid density array must have the same number of points",
+                                				format("Temperature # points={} whereas {} # density points={}",
                                                          NumNumbers,
                                                          state.dataFluidProps->RefrigData(Loop).Name,
                                                          state.dataFluidProps->RefrigData(Loop).NumRhoPoints));
@@ -1423,9 +1402,9 @@ namespace FluidProperties {
                         // If it made it all the way to the last temperature array and didn't find a match, then no match was found
                         if (TempLoop == NumOfFluidTempArrays) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                            ShowContinueError(state, "Found saturated gas/fluid density input but no matching temperature array");
-                            ShowContinueError(state, "Entered Temperature Name=" + TempsName);
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                            				"Found saturated gas/fluid density input but no matching temperature array",
+                            				"Entered Temperature Name=" + TempsName);
                             ErrorsFound = true;
                         }
 
@@ -1564,17 +1543,17 @@ namespace FluidProperties {
                     } else {
                         if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                            ShowContinueError(state, "All superheated data for the same property must use the same temperature list");
-                            ShowContinueError(state, "Expected name=" + TempsName + ", Entered name=" + Alphas(3));
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                            				"All superheated data for the same property must use the same temperature list",
+                            				"Expected name=" + TempsName + ", Entered name=" + Alphas(3));
                             ErrorsFound = true;
                         }
                     }
                 }
             }
             if (NumOfPressPts == 0) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                ShowContinueError(state, "No pressure data found for superheated enthalpy");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                				"No pressure data found for superheated enthalpy");
                 ErrorsFound = true;
             }
 
@@ -1588,9 +1567,9 @@ namespace FluidProperties {
                     break; // the TempLoop DO loop
                 }
                 if (TempLoop == NumOfFluidTempArrays) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state, "No match for temperature array name found with superheated enthalpy data");
-                    ShowContinueError(state, "Entered Temperature Name=" + TempsName);
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                    				"No match for temperature array name found with superheated enthalpy data",
+                    				"Entered Temperature Name=" + TempsName);
                     ErrorsFound = true;
                 }
             }
@@ -1624,8 +1603,8 @@ namespace FluidProperties {
                     ++NumOfPressPts;
                     if (Numbers(1) <= 0.0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                        ShowContinueError(state, format("Negative pressures not allowed in fluid property input data, Value =[{:.3R}].", Numbers(1)));
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                        				format("Negative pressures not allowed in fluid property input data, Value =[{:.3R}].", Numbers(1)));
                         ErrorsFound = true;
                     }
                     PressurePtr(NumOfPressPts).Pressure = Numbers(1);
@@ -1667,10 +1646,9 @@ namespace FluidProperties {
                 if (InData > 1) {
                     if (state.dataFluidProps->RefrigData(Loop).SHPress(InData) <= state.dataFluidProps->RefrigData(Loop).SHPress(InData - 1)) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                        ShowContinueError(state, "Pressures must be entered in ascending order for fluid property data");
-                        ShowContinueError(state,
-                                          format("First Occurrence at Pressure({}) {{{:.3R}}} >= Pressure({}) {{{:.3R}}}",
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                        				"Pressures must be entered in ascending order for fluid property data",
+                        				format("First Occurrence at Pressure({}) {{{:.3R}}} >= Pressure({}) {{{:.3R}}}",
                                                  InData - 1,
                                                  state.dataFluidProps->RefrigData(Loop).SHPress(InData - 1),
                                                  InData,
@@ -1683,8 +1661,8 @@ namespace FluidProperties {
                     state.dataFluidProps->RefrigData(Loop).HshValues(InData, {1, state.dataFluidProps->RefrigData(Loop).NumSuperTempPts}) =
                         Numbers({2, NumNumbers});
                 } else {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state, "Number of superheated enthalpy data points not equal to number of temperature points");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                    				"Number of superheated enthalpy data points not equal to number of temperature points");
                     ErrorsFound = true;
                 }
             }
@@ -1718,8 +1696,8 @@ namespace FluidProperties {
                     ++NumOfPressPts;
                     if (Numbers(1) <= 0.0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                        ShowContinueError(state, format("Negative pressures not allowed in fluid property input data, Value =[{:.3R}].", Numbers(1)));
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                        				format("Negative pressures not allowed in fluid property input data, Value =[{:.3R}].", Numbers(1)));
                         ErrorsFound = true;
                     }
                     PressurePtr(NumOfPressPts).Pressure = Numbers(1);
@@ -1757,21 +1735,21 @@ namespace FluidProperties {
                                                                          cAlphaFieldNames,
                                                                          cNumericFieldNames);
                 if (std::abs(Numbers(1) - state.dataFluidProps->RefrigData(Loop).SHPress(InData)) > PressToler) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state, "All superheated data for the same refrigerant must use the same pressure data");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                    				"All superheated data for the same refrigerant must use the same pressure data");
                     ErrorsFound = true;
                 }
                 if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state, "All superheated data for the same property must use the same temperature list");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                    				"All superheated data for the same property must use the same temperature list");
                     ErrorsFound = true;
                 }
                 if ((NumNumbers - 1) == state.dataFluidProps->RefrigData(Loop).NumSuperTempPts) {
                     state.dataFluidProps->RefrigData(Loop).RhoshValues(InData, {1, state.dataFluidProps->RefrigData(Loop).NumSuperTempPts}) =
                         Numbers({2, NumNumbers});
                 } else {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
-                    ShowContinueError(state, "Number of superheated density data points not equal to number of temperature points");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name,
+                    				"Number of superheated density data points not equal to number of temperature points");
                     ErrorsFound = true;
                 }
             }
@@ -1861,9 +1839,9 @@ namespace FluidProperties {
                     } else {
                         if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                            ShowContinueError(state, "All glycol specific heat data for the same glycol must use the same temperature list");
-                            ShowContinueError(state, "Expected name=" + TempsName + ", Entered name=" + Alphas(3));
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                            				"All glycol specific heat data for the same glycol must use the same temperature list",
+                            				"Expected name=" + TempsName + ", Entered name=" + Alphas(3));
                             ErrorsFound = true;
                         }
                     }
@@ -1882,8 +1860,8 @@ namespace FluidProperties {
                     }
                     if (TempLoop == NumOfFluidTempArrays) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                        ShowContinueError(state, "No match for temperature array name found with glycol data");
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                        				"No match for temperature array name found with glycol data");
                         ErrorsFound = true;
                     }
                 }
@@ -1918,16 +1896,16 @@ namespace FluidProperties {
                         if (NumOfConcPts == 1) {
                             if (state.dataFluidProps->GlyRawData(Loop).CpConcs(NumOfConcPts) < 0.0) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                                ShowContinueError(state, "Negative concentrations not allowed in fluid property input data");
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                                				"Negative concentrations not allowed in fluid property input data");
                                 ErrorsFound = true;
                             }
                         } else {
                             if (state.dataFluidProps->GlyRawData(Loop).CpConcs(NumOfConcPts) <=
                                 state.dataFluidProps->GlyRawData(Loop).CpConcs(NumOfConcPts - 1)) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                                ShowContinueError(state, "Concentrations must be entered in ascending order for fluid property data");
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                                				"Concentrations must be entered in ascending order for fluid property data");
                                 ErrorsFound = true;
                             }
                         }
@@ -1936,8 +1914,8 @@ namespace FluidProperties {
                                 Numbers({2, NumNumbers});
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                            ShowContinueError(state, "Number of specific heat data points not equal to number of temperature points");
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                            				"Number of specific heat data points not equal to number of temperature points");
                             ErrorsFound = true;
                         }
                     }
@@ -1973,9 +1951,9 @@ namespace FluidProperties {
                     } else {
                         if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                            ShowContinueError(state, "All glycol density data for the same glycol must use the same temperature list");
-                            ShowContinueError(state, "Expected name=" + TempsName + ", Entered name=" + Alphas(3));
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                            				"All glycol density data for the same glycol must use the same temperature list",
+                            				"Expected name=" + TempsName + ", Entered name=" + Alphas(3));
                             ErrorsFound = true;
                         }
                     }
@@ -1994,8 +1972,8 @@ namespace FluidProperties {
                     }
                     if (TempLoop == NumOfFluidTempArrays) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                        ShowContinueError(state, "No match for temperature array name found with glycol data");
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                        				"No match for temperature array name found with glycol data");
                         ErrorsFound = true;
                     }
                 }
@@ -2030,16 +2008,16 @@ namespace FluidProperties {
                         if (NumOfConcPts == 1) {
                             if (state.dataFluidProps->GlyRawData(Loop).RhoConcs(NumOfConcPts) < 0.0) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                                ShowContinueError(state, "Negative concentrations not allowed in fluid property input data");
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                                				"Negative concentrations not allowed in fluid property input data");
                                 ErrorsFound = true;
                             }
                         } else {
                             if (state.dataFluidProps->GlyRawData(Loop).RhoConcs(NumOfConcPts) <=
                                 state.dataFluidProps->GlyRawData(Loop).RhoConcs(NumOfConcPts - 1)) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                                ShowContinueError(state, "Concentrations must be entered in ascending order for fluid property data");
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                                				"Concentrations must be entered in ascending order for fluid property data");
                                 ErrorsFound = true;
                             }
                         }
@@ -2048,8 +2026,8 @@ namespace FluidProperties {
                                 NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumRhoTempPts}) = Numbers({2, NumNumbers});
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                            ShowContinueError(state, "Number of density data points not equal to number of temperature points");
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                            				"Number of density data points not equal to number of temperature points");
                             ErrorsFound = true;
                         }
                     }
@@ -2085,9 +2063,9 @@ namespace FluidProperties {
                     } else {
                         if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                            ShowContinueError(state, "All glycol conductivity data for the same glycol must use the same temperature list");
-                            ShowContinueError(state, "Expected name=" + TempsName + ", Entered name=" + Alphas(3));
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                            				"All glycol conductivity data for the same glycol must use the same temperature list",
+                            				"Expected name=" + TempsName + ", Entered name=" + Alphas(3));
                             ErrorsFound = true;
                         }
                     }
@@ -2106,8 +2084,8 @@ namespace FluidProperties {
                     }
                     if (TempLoop == NumOfFluidTempArrays) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                        ShowContinueError(state, "No match for temperature array name found with glycol data");
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                        				"No match for temperature array name found with glycol data");
                         ErrorsFound = true;
                     }
                 }
@@ -2142,16 +2120,16 @@ namespace FluidProperties {
                         if (NumOfConcPts == 1) {
                             if (state.dataFluidProps->GlyRawData(Loop).CondConcs(NumOfConcPts) < 0.0) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                                ShowContinueError(state, "Negative concentrations not allowed in fluid property input data");
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                                				"Negative concentrations not allowed in fluid property input data");
                                 ErrorsFound = true;
                             }
                         } else {
                             if (state.dataFluidProps->GlyRawData(Loop).CondConcs(NumOfConcPts) <=
                                 state.dataFluidProps->GlyRawData(Loop).CondConcs(NumOfConcPts - 1)) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                                ShowContinueError(state, "Concentrations must be entered in ascending order for fluid property data");
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                                				"Concentrations must be entered in ascending order for fluid property data");
                                 ErrorsFound = true;
                             }
                         }
@@ -2160,8 +2138,8 @@ namespace FluidProperties {
                                 NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumCondTempPts}) = Numbers({2, NumNumbers});
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                            ShowContinueError(state, "Number of conductivity data points not equal to number of temperature points");
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                            				"Number of conductivity data points not equal to number of temperature points");
                             ErrorsFound = true;
                         }
                     }
@@ -2197,9 +2175,9 @@ namespace FluidProperties {
                     } else {
                         if (!UtilityRoutines::SameString(TempsName, Alphas(3))) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                            ShowContinueError(state, "All glycol viscosity data for the same glycol must use the same temperature list");
-                            ShowContinueError(state, "Expected name=" + TempsName + ", Entered name=" + Alphas(3));
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                            				"All glycol viscosity data for the same glycol must use the same temperature list",
+                            				"Expected name=" + TempsName + ", Entered name=" + Alphas(3));
                             ErrorsFound = true;
                         }
                     }
@@ -2218,8 +2196,8 @@ namespace FluidProperties {
                     }
                     if (TempLoop == NumOfFluidTempArrays) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                        ShowContinueError(state, "No match for temperature array name found with glycol data");
+                                        std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                        				"No match for temperature array name found with glycol data");
                         ErrorsFound = true;
                     }
                 }
@@ -2254,16 +2232,16 @@ namespace FluidProperties {
                         if (NumOfConcPts == 1) {
                             if (state.dataFluidProps->GlyRawData(Loop).ViscConcs(NumOfConcPts) < 0.0) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                                ShowContinueError(state, "Negative concentrations not allowed in fluid property input data");
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                                				"Negative concentrations not allowed in fluid property input data");
                                 ErrorsFound = true;
                             }
                         } else {
                             if (state.dataFluidProps->GlyRawData(Loop).ViscConcs(NumOfConcPts) <=
                                 state.dataFluidProps->GlyRawData(Loop).ViscConcs(NumOfConcPts - 1)) {
                                 ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                                ShowContinueError(state, "Concentrations must be entered in ascending order for fluid property data");
+                                    state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                                				"Concentrations must be entered in ascending order for fluid property data");
                                 ErrorsFound = true;
                             }
                         }
@@ -2272,8 +2250,8 @@ namespace FluidProperties {
                                 NumOfConcPts, {1, state.dataFluidProps->GlyRawData(Loop).NumViscTempPts}) = Numbers({2, NumNumbers});
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name);
-                            ShowContinueError(state, "Number of viscosity data points not equal to number of temperature points");
+                                            std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->GlyRawData(Loop).Name,
+                            				"Number of viscosity data points not equal to number of temperature points");
                             ErrorsFound = true;
                         }
                     }
@@ -2389,14 +2367,14 @@ namespace FluidProperties {
                     state.dataFluidProps->GlycolData(NumOfGlyConcs).Name = Alphas(1);
                     state.dataFluidProps->GlycolData(NumOfGlyConcs).GlycolName = Alphas(3);
                 } else {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid reference");
-                    ShowContinueError(state, "... not found in the FluidProperties:Name list: \"" + Alphas(3) + "\".");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid reference",
+                    				"... not found in the FluidProperties:Name list: \"" + Alphas(3) + "\".");
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid field");
-                ShowContinueError(state, "..." + cAlphaFieldNames(2) + "=\"" + Alphas(2) + "\".");
-                ShowContinueError(state, "... Legal values are PropyleneGlycol, EthyleneGlycol or UserDefinedGlycolType.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid field",
+                				"..." + cAlphaFieldNames(2) + "=\"" + Alphas(2) + "\".",
+                				"... Legal values are PropyleneGlycol, EthyleneGlycol or UserDefinedGlycolType.");
                 ErrorsFound = true;
             }
             if (!GlycolFound) continue;
@@ -2508,10 +2486,10 @@ namespace FluidProperties {
                                               state.dataFluidProps->GlycolData(Loop).Concentration,
                                               state.dataFluidProps->GlycolData(Loop).CpValues);
                 } else {
-                    ShowSevereError(state, std::string{RoutineName} + "Specific heat data not entered for a " + CurrentModuleObject);
-                    ShowContinueError(state, "ALL data must be entered for user-defined glycols");
-                    ShowContinueError(state, "Glycol mixture name = " + state.dataFluidProps->GlycolData(Loop).Name);
-                    ShowContinueError(state, "Glycol fluid name = " + state.dataFluidProps->GlycolData(Loop).GlycolName);
+                    ShowSevereError(state, std::string{RoutineName} + "Specific heat data not entered for a " + CurrentModuleObject,
+                    				"ALL data must be entered for user-defined glycols",
+                    				"Glycol mixture name = " + state.dataFluidProps->GlycolData(Loop).Name,
+                    				"Glycol fluid name = " + state.dataFluidProps->GlycolData(Loop).GlycolName);
                     ErrorsFound = true;
                 }
 
@@ -2530,10 +2508,10 @@ namespace FluidProperties {
                                               state.dataFluidProps->GlycolData(Loop).Concentration,
                                               state.dataFluidProps->GlycolData(Loop).RhoValues);
                 } else {
-                    ShowSevereError(state, std::string{RoutineName} + "Density data not entered for a " + CurrentModuleObject);
-                    ShowContinueError(state, "ALL data must be entered for user-defined glycols");
-                    ShowContinueError(state, "Glycol mixture name = " + state.dataFluidProps->GlycolData(Loop).Name);
-                    ShowContinueError(state, "Glycol fluid name = " + state.dataFluidProps->GlycolData(Loop).GlycolName);
+                    ShowSevereError(state, std::string{RoutineName} + "Density data not entered for a " + CurrentModuleObject,
+                    				"ALL data must be entered for user-defined glycols",
+                    				"Glycol mixture name = " + state.dataFluidProps->GlycolData(Loop).Name,
+                    				"Glycol fluid name = " + state.dataFluidProps->GlycolData(Loop).GlycolName);
                     ErrorsFound = true;
                 }
 
@@ -2552,10 +2530,10 @@ namespace FluidProperties {
                                               state.dataFluidProps->GlycolData(Loop).Concentration,
                                               state.dataFluidProps->GlycolData(Loop).CondValues);
                 } else {
-                    ShowSevereError(state, std::string{RoutineName} + "Conductivity data not entered for a " + CurrentModuleObject);
-                    ShowContinueError(state, "ALL data must be entered for user-defined glycols");
-                    ShowContinueError(state, "Glycol mixture name = " + state.dataFluidProps->GlycolData(Loop).Name);
-                    ShowContinueError(state, "Glycol fluid name = " + state.dataFluidProps->GlycolData(Loop).GlycolName);
+                    ShowSevereError(state, std::string{RoutineName} + "Conductivity data not entered for a " + CurrentModuleObject,
+                    				"ALL data must be entered for user-defined glycols",
+                    				"Glycol mixture name = " + state.dataFluidProps->GlycolData(Loop).Name,
+                    				"Glycol fluid name = " + state.dataFluidProps->GlycolData(Loop).GlycolName);
                     ErrorsFound = true;
                 }
 
@@ -2574,10 +2552,10 @@ namespace FluidProperties {
                                               state.dataFluidProps->GlycolData(Loop).Concentration,
                                               state.dataFluidProps->GlycolData(Loop).ViscValues);
                 } else {
-                    ShowSevereError(state, std::string{RoutineName} + "Viscosity data not entered for a " + CurrentModuleObject);
-                    ShowContinueError(state, "ALL data must be entered for user-defined glycols");
-                    ShowContinueError(state, "Glycol mixture name = " + state.dataFluidProps->GlycolData(Loop).Name);
-                    ShowContinueError(state, "Glycol fluid name = " + state.dataFluidProps->GlycolData(Loop).GlycolName);
+                    ShowSevereError(state, std::string{RoutineName} + "Viscosity data not entered for a " + CurrentModuleObject,
+                    				"ALL data must be entered for user-defined glycols",
+                    				"Glycol mixture name = " + state.dataFluidProps->GlycolData(Loop).Name,
+                    				"Glycol fluid name = " + state.dataFluidProps->GlycolData(Loop).GlycolName);
                     ErrorsFound = true;
                 }
             }
@@ -6163,8 +6141,8 @@ namespace FluidProperties {
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
-            ShowSevereError(state, fmt::format("{}: Refrigerant \"{}\", invalid quality, called from {}", RoutineName, Refrigerant, CalledFrom));
-            ShowContinueError(state, format("Saturated refrigerant quality must be between 0 and 1, entered value=[{:.4R}].", Quality));
+            ShowSevereError(state, fmt::format("{}: Refrigerant \"{}\", invalid quality, called from {}", RoutineName, Refrigerant, CalledFrom),
+            				format("Saturated refrigerant quality must be between 0 and 1, entered value=[{:.4R}].", Quality));
             ShowFatalError(state, "Program terminates due to preceding condition.");
         }
 
@@ -6257,8 +6235,8 @@ namespace FluidProperties {
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
-            ShowSevereError(state, fmt::format("{}Refrigerant \"{}\", invalid quality, called from {}", RoutineName, Refrigerant, CalledFrom));
-            ShowContinueError(state, format("Saturated density quality must be between 0 and 1, entered value=[{:.4R}].", Quality));
+            ShowSevereError(state, fmt::format("{}Refrigerant \"{}\", invalid quality, called from {}", RoutineName, Refrigerant, CalledFrom),
+            				format("Saturated density quality must be between 0 and 1, entered value=[{:.4R}].", Quality));
             ShowFatalError(state, "Program terminates due to preceding condition.");
         }
 
@@ -6409,8 +6387,8 @@ namespace FluidProperties {
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
-            ShowSevereError(state, fmt::format("{}Refrigerant \"{}\", invalid quality, called from {}", RoutineName, Refrigerant, CalledFrom));
-            ShowContinueError(state, format("Saturated density quality must be between 0 and 1, entered value=[{:.4R}].", Quality));
+            ShowSevereError(state, fmt::format("{}Refrigerant \"{}\", invalid quality, called from {}", RoutineName, Refrigerant, CalledFrom),
+            				format("Saturated density quality must be between 0 and 1, entered value=[{:.4R}].", Quality));
             ShowFatalError(state, "Program terminates due to preceding condition.");
         }
 

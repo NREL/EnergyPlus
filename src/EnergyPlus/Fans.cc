@@ -455,8 +455,8 @@ void GetFanInput(EnergyPlusData &state)
         } else if (UtilityRoutines::SameString(cAlphaArgs(3), "FixedFlowRate")) {
             Fan(FanNum).FanMinAirFracMethod = FixedMin;
         } else {
-            ShowSevereError(state, cAlphaFieldNames(3) + " should be either Fraction or FixedFlowRate.");
-            ShowContinueError(state, "Occurs in " + Fan(FanNum).FanName + " object.");
+            ShowSevereError(state, cAlphaFieldNames(3) + " should be either Fraction or FixedFlowRate.",
+            				"Occurs in " + Fan(FanNum).FanName + " object.");
             ErrorsFound = true;
         }
         //        Fan(FanNum)%MinAirFlowRate= rNumericArgs(4)
@@ -598,9 +598,9 @@ void GetFanInput(EnergyPlusData &state)
                 if (!CheckScheduleValueMinMax(state, Fan(FanNum).FlowFractSchedNum, ">=", 0.0, "<=", 1.0)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(6) + " for " +
-                                        cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                    ShowContinueError(state, "Error found in " + cAlphaFieldNames(6) + " = " + cAlphaArgs(6));
-                    ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
+                                        cAlphaFieldNames(1) + '=' + cAlphaArgs(1),
+                    				"Error found in " + cAlphaFieldNames(6) + " = " + cAlphaArgs(6),
+                    				"Schedule values must be (>=0., <=1.)");
                     ErrorsFound = true;
                 }
             }
@@ -659,9 +659,9 @@ void GetFanInput(EnergyPlusData &state)
                     if (!CheckScheduleValueMinMax(state, Fan(FanNum).BalancedFractSchedNum, ">=", 0.0, "<=", 1.0)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(9) + " for " +
-                                            cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
-                        ShowContinueError(state, "Error found in " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9));
-                        ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
+                                            cAlphaFieldNames(1) + '=' + cAlphaArgs(1),
+                        				"Error found in " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9),
+                        				"Schedule values must be (>=0., <=1.)");
                         ErrorsFound = true;
                     }
                 }
@@ -936,19 +936,17 @@ void GetFanInput(EnergyPlusData &state)
         for (checkNum = FanNum + 1; checkNum <= state.dataFans->NumFans; ++checkNum) {
             if (Fan(FanNum).InletNodeNum == Fan(checkNum).InletNodeNum) {
                 ErrorsFound = true;
-                ShowSevereError(state, "GetFanInput, duplicate fan inlet node names, must be unique for fans.");
-                ShowContinueError(state,
-                                  "Fan=" + Fan(FanNum).FanType + ':' + Fan(FanNum).FanName + " and Fan=" + Fan(checkNum).FanType + ':' +
-                                      Fan(checkNum).FanName + '.');
-                ShowContinueError(state, "Inlet Node Name=\"" + state.dataLoopNodes->NodeID(Fan(FanNum).InletNodeNum) + "\".");
+                ShowSevereError(state, "GetFanInput, duplicate fan inlet node names, must be unique for fans.",
+                				"Fan=" + Fan(FanNum).FanType + ':' + Fan(FanNum).FanName + " and Fan=" + Fan(checkNum).FanType + ':' +
+                                      Fan(checkNum).FanName + '.',
+                				"Inlet Node Name=\"" + state.dataLoopNodes->NodeID(Fan(FanNum).InletNodeNum) + "\".");
             }
             if (Fan(FanNum).OutletNodeNum == Fan(checkNum).OutletNodeNum) {
                 ErrorsFound = true;
-                ShowSevereError(state, "GetFanInput, duplicate fan outlet node names, must be unique for fans.");
-                ShowContinueError(state,
-                                  "Fan=" + Fan(FanNum).FanType + ':' + Fan(FanNum).FanName + " and Fan=" + Fan(checkNum).FanType + ':' +
-                                      Fan(checkNum).FanName + '.');
-                ShowContinueError(state, "Outlet Node Name=\"" + state.dataLoopNodes->NodeID(Fan(FanNum).OutletNodeNum) + "\".");
+                ShowSevereError(state, "GetFanInput, duplicate fan outlet node names, must be unique for fans.",
+                				"Fan=" + Fan(FanNum).FanType + ':' + Fan(FanNum).FanName + " and Fan=" + Fan(checkNum).FanType + ':' +
+                                      Fan(checkNum).FanName + '.',
+                				"Outlet Node Name=\"" + state.dataLoopNodes->NodeID(Fan(FanNum).OutletNodeNum) + "\".");
             }
         }
     }
@@ -1540,11 +1538,10 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         // Check fault availability schedules
         if (!state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve(state)) {
-            ShowSevereError(state, "FaultModel:Fouling:AirFilter = \"" + state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).Name + "\"");
-            ShowContinueError(state,
-                              "Invalid Fan Curve Name = \"" + state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve +
-                                  "\" does not cover ");
-            ShowContinueError(state, "the operational point of Fan " + Fan(FanNum).FanName);
+            ShowSevereError(state, "FaultModel:Fouling:AirFilter = \"" + state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).Name + "\"",
+            				"Invalid Fan Curve Name = \"" + state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve +
+                                  "\" does not cover ",
+            				"the operational point of Fan " + Fan(FanNum).FanName);
             ShowFatalError(state,
                            "SizeFan: Invalid FaultModel:Fouling:AirFilter=" + state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).Name);
         }
@@ -1993,11 +1990,11 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const>
                 SpeedRaisedToPower = CurveValue(state, Fan(FanNum).FanPowerRatAtSpeedRatCurveIndex, SpeedRatio);
                 if (SpeedRaisedToPower < 0.0) {
                     if (Fan(FanNum).OneTimePowerRatioCheck && !state.dataGlobal->WarmupFlag) {
-                        ShowSevereError(state, cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"");
-                        ShowContinueError(state, "Error in Fan Power Ratio curve. Curve output less than 0.0.");
-                        ShowContinueError(state, format("Curve output = {:.5T}, fan speed ratio = {:.5T}", SpeedRaisedToPower, SpeedRatio));
-                        ShowContinueError(state, "Check curve coefficients to ensure proper power ratio as a function of fan speed ratio.");
-                        ShowContinueError(state, "Resetting Fan Power Ratio curve output to 0.0 and the simulation continues.");
+                        ShowSevereError(state, cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"",
+                        				"Error in Fan Power Ratio curve. Curve output less than 0.0.",
+                        				format("Curve output = {:.5T}, fan speed ratio = {:.5T}", SpeedRaisedToPower, SpeedRatio),
+                        				"Check curve coefficients to ensure proper power ratio as a function of fan speed ratio.",
+                        				"Resetting Fan Power Ratio curve output to 0.0 and the simulation continues.");
                         ShowContinueErrorTimeStamp(state, "Occurrence info:");
                         Fan(FanNum).OneTimePowerRatioCheck = false;
                     }
@@ -2007,11 +2004,11 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const>
                     EffRatioAtSpeedRatio = CurveValue(state, Fan(FanNum).FanEffRatioCurveIndex, SpeedRatio);
                     if (EffRatioAtSpeedRatio < 0.01) {
                         if (Fan(FanNum).OneTimeEffRatioCheck && !state.dataGlobal->WarmupFlag) {
-                            ShowSevereError(state, cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"");
-                            ShowContinueError(state, "Error in Fan Efficiency Ratio curve. Curve output less than 0.01.");
-                            ShowContinueError(state, format("Curve output = {:.5T}, fan speed ratio = {:.5T}", EffRatioAtSpeedRatio, SpeedRatio));
-                            ShowContinueError(state, "Check curve coefficients to ensure proper efficiency ratio as a function of fan speed ratio.");
-                            ShowContinueError(state, "Resetting Fan Efficiency Ratio curve output to 0.01 and the simulation continues.");
+                            ShowSevereError(state, cFanTypes(Fan(FanNum).FanType_Num) + " = " + Fan(FanNum).FanName + "\"",
+                            				"Error in Fan Efficiency Ratio curve. Curve output less than 0.01.",
+                            				format("Curve output = {:.5T}, fan speed ratio = {:.5T}", EffRatioAtSpeedRatio, SpeedRatio),
+                            				"Check curve coefficients to ensure proper efficiency ratio as a function of fan speed ratio.",
+                            				"Resetting Fan Efficiency Ratio curve output to 0.01 and the simulation continues.");
                             ShowContinueErrorTimeStamp(state, "Occurrence info:");
                             Fan(FanNum).OneTimeEffRatioCheck = false;
                         }
@@ -2641,8 +2638,8 @@ Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
             DesignVolumeFlowRate = Fan(WhichFan).MaxAirFlowRate;
         } else {
             ShowSevereError(
-                state, "GetFanDesignVolumeFlowRate: Could not find Fan, Type=\"" + std::string{FanType} + "\" Name=\"" + std::string{FanName} + "\"");
-            ShowContinueError(state, "... Design Volume Flow rate returned as -1000.");
+                state, "GetFanDesignVolumeFlowRate: Could not find Fan, Type=\"" + std::string{FanType} + "\" Name=\"" + std::string{FanName} + "\"",
+            				"... Design Volume Flow rate returned as -1000.");
             ErrorsFound = true;
             DesignVolumeFlowRate = -1000.0;
         }

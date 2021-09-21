@@ -206,8 +206,8 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
                                    state.dataIPShortCut->cAlphaFieldNames(1),
                                    state.dataIPShortCut->cAlphaArgs(1),
                                    EarthTubeTempLimit,
-                                   EarthTubeTempLimit));
-            ShowContinueError(state, format("Entered value={:.0R}", state.dataEarthTube->EarthTubeSys(Loop).MinTemperature));
+                                   EarthTubeTempLimit),
+            				format("Entered value={:.0R}", state.dataEarthTube->EarthTubeSys(Loop).MinTemperature));
             ErrorsFound = true;
         }
 
@@ -220,8 +220,8 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
                                    state.dataIPShortCut->cAlphaFieldNames(1),
                                    state.dataIPShortCut->cAlphaArgs(1),
                                    EarthTubeTempLimit,
-                                   EarthTubeTempLimit));
-            ShowContinueError(state, format("Entered value={:.0R}", state.dataEarthTube->EarthTubeSys(Loop).MaxTemperature));
+                                   EarthTubeTempLimit),
+            				format("Entered value={:.0R}", state.dataEarthTube->EarthTubeSys(Loop).MaxTemperature));
             ErrorsFound = true;
         }
 
@@ -529,10 +529,9 @@ void CheckEarthTubesInZones(EnergyPlusData &state,
     for (int Loop = 1; Loop <= state.dataEarthTube->TotEarthTube - 1; ++Loop) {
         for (int Loop1 = Loop + 1; Loop1 <= state.dataEarthTube->TotEarthTube; ++Loop1) {
             if (state.dataEarthTube->EarthTubeSys(Loop).ZonePtr == state.dataEarthTube->EarthTubeSys(Loop1).ZonePtr) {
-                ShowSevereError(state, ZoneName + " has more than one " + std::string{FieldName} + " associated with it.");
-                ShowContinueError(state,
-                                  "Only one " + std::string{FieldName} + " is allowed per zone.  Check the definitions of " + std::string{FieldName});
-                ShowContinueError(state, "in your input file and make sure that there is only one defined for each zone.");
+                ShowSevereError(state, ZoneName + " has more than one " + std::string{FieldName} + " associated with it.",
+                				"Only one " + std::string{FieldName} + " is allowed per zone.  Check the definitions of " + std::string{FieldName},
+                				"in your input file and make sure that there is only one defined for each zone.");
                 ErrorsFound = true;
             }
         }

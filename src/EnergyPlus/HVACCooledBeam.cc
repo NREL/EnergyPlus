@@ -280,8 +280,8 @@ namespace HVACCooledBeam {
             } else if (UtilityRoutines::SameString(CoolBeam(CBNum).CBTypeString, "Active")) {
                 CoolBeam(CBNum).CBType = CooledBeamType::Active;
             } else {
-                ShowSevereError(state, "Illegal " + cAlphaFields(3) + " = " + CoolBeam(CBNum).CBTypeString + '.');
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + CoolBeam(CBNum).Name);
+                ShowSevereError(state, "Illegal " + cAlphaFields(3) + " = " + CoolBeam(CBNum).CBTypeString + '.',
+                				"Occurs in " + CurrentModuleObject + " = " + CoolBeam(CBNum).Name);
                 ErrorsFound = true;
             }
             CoolBeam(CBNum).Sched = Alphas(2);
@@ -447,8 +447,8 @@ namespace HVACCooledBeam {
             if (CoolBeam(CBNum).ADUNum == 0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + "No matching Air Distribution Unit, for Unit = [" + CurrentModuleObject + ',' +
-                                    CoolBeam(CBNum).Name + "].");
-                ShowContinueError(state, "...should have outlet node=" + state.dataLoopNodes->NodeID(CoolBeam(CBNum).AirOutNode));
+                                    CoolBeam(CBNum).Name + "].",
+                				"...should have outlet node=" + state.dataLoopNodes->NodeID(CoolBeam(CBNum).AirOutNode));
                 ErrorsFound = true;
             } else {
 
@@ -472,8 +472,8 @@ namespace HVACCooledBeam {
                 }
             }
             if (!AirNodeFound) {
-                ShowSevereError(state, "The outlet air node from the " + CurrentModuleObject + " = " + CoolBeam(CBNum).Name);
-                ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node =" + Alphas(5));
+                ShowSevereError(state, "The outlet air node from the " + CurrentModuleObject + " = " + CoolBeam(CBNum).Name,
+                				"did not have a matching Zone Equipment Inlet Node, Node =" + Alphas(5));
                 ErrorsFound = true;
             }
         }
@@ -565,8 +565,8 @@ namespace HVACCooledBeam {
                     continue;
                 ShowSevereError(state,
                                 "InitCoolBeam: ADU=[Air Distribution Unit," + state.dataDefineEquipment->AirDistUnit(CoolBeam(Loop).ADUNum).Name +
-                                    "] is not on any ZoneHVAC:EquipmentList.");
-                ShowContinueError(state, "...Unit=[" + CurrentModuleObject + ',' + CoolBeam(Loop).Name + "] will not be simulated.");
+                                    "] is not on any ZoneHVAC:EquipmentList.",
+                				"...Unit=[" + CurrentModuleObject + ',' + CoolBeam(Loop).Name + "] will not be simulated.");
             }
         }
 
@@ -803,8 +803,8 @@ namespace HVACCooledBeam {
                                                  "Maximum Total Chilled Water Flow Rate [m3/s]",
                                                  CoolBeam(CBNum).MaxCoolWaterVolFlow);
                 } else {
-                    ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object");
-                    ShowContinueError(state, "Occurs in" + CoolBeam(CBNum).UnitType + " Object=" + CoolBeam(CBNum).Name);
+                    ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object",
+                    				"Occurs in" + CoolBeam(CBNum).UnitType + " Object=" + CoolBeam(CBNum).Name);
                     ErrorsFound = true;
                 }
             }
@@ -886,8 +886,8 @@ namespace HVACCooledBeam {
                     BaseSizer::reportSizerOutput(
                         state, CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name, "Beam Length [m]", CoolBeam(CBNum).BeamLength);
                 } else {
-                    ShowSevereError(state, "Autosizing of cooled beam length requires a cooling loop Sizing:Plant object");
-                    ShowContinueError(state, "Occurs in" + CoolBeam(CBNum).UnitType + " Object=" + CoolBeam(CBNum).Name);
+                    ShowSevereError(state, "Autosizing of cooled beam length requires a cooling loop Sizing:Plant object",
+                    				"Occurs in" + CoolBeam(CBNum).UnitType + " Object=" + CoolBeam(CBNum).Name);
                     ErrorsFound = true;
                 }
             }

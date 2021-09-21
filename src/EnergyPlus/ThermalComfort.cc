@@ -1969,9 +1969,8 @@ namespace ThermalComfort {
             thisAngFacList.ZoneName = state.dataIPShortCut->cAlphaArgs(2);
             thisAngFacList.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (thisAngFacList.ZonePtr == 0) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid - not found");
-                ShowContinueError(state,
-                                  "...invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid - not found",
+                				"...invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             }
 
@@ -1989,9 +1988,8 @@ namespace ThermalComfort {
                 if (thisAngFacList.SurfacePtr(SurfNum) == 0) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(SurfNum + 2) +
-                                        ", entered value=" + state.dataIPShortCut->cAlphaArgs(SurfNum + 2));
-                    ShowContinueError(state,
-                                      "ref " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
+                                        ", entered value=" + state.dataIPShortCut->cAlphaArgs(SurfNum + 2),
+                    				"ref " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' + state.dataIPShortCut->cAlphaArgs(1) +
                                           " not found in " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
                     ErrorsFound = true;
                 } else if (thisAngFacList.ZonePtr != 0) { // don't look at invalid zones
@@ -1999,10 +1997,8 @@ namespace ThermalComfort {
                     if (thisAngFacList.ZonePtr != state.dataSurface->Surface(thisAngFacList.SurfacePtr(SurfNum)).Zone) {
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid - mismatch " +
-                                            state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\"");
-                        ShowContinueError(
-                            state,
-                            "... does not match " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
+                                            state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\"",
+                        				"... does not match " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                 state.dataHeatBal
                                     ->Zone(state.dataSurface->Surface(state.dataThermalComforts->AngleFactorList(Item).SurfacePtr(SurfNum)).Zone)
                                     .Name +
@@ -2016,9 +2012,8 @@ namespace ThermalComfort {
             }
 
             if (std::abs(AllAngleFacSummed - 1.0) > AngleFacLimit) {
-                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid - Sum[AngleFactors]");
-                ShowContinueError(state,
-                                  format("...Sum of Angle Factors [{:.3R}] should not deviate from expected sum [1.0] by more than limit [{:.3R}].",
+                ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid - Sum[AngleFactors]",
+                				format("...Sum of Angle Factors [{:.3R}] should not deviate from expected sum [1.0] by more than limit [{:.3R}].",
                                          AllAngleFacSummed,
                                          AngleFacLimit));
                 ErrorsFound = true;
@@ -2042,9 +2037,8 @@ namespace ThermalComfort {
             } else if (state.dataHeatBal->People(Item).ZonePtr != state.dataThermalComforts->AngleFactorList(WhichAFList).ZonePtr &&
                        (state.dataHeatBal->People(Item).Fanger || state.dataHeatBal->People(Item).Pierce || state.dataHeatBal->People(Item).KSU)) {
                 ShowSevereError(state,
-                                cCurrentModuleObject + "=\"" + state.dataThermalComforts->AngleFactorList(WhichAFList).Name + " mismatch Zone Name");
-                ShowContinueError(state,
-                                  "...Zone=\"" + state.dataThermalComforts->AngleFactorList(WhichAFList).ZoneName + " does not match Zone=\"" +
+                                cCurrentModuleObject + "=\"" + state.dataThermalComforts->AngleFactorList(WhichAFList).Name + " mismatch Zone Name",
+                				"...Zone=\"" + state.dataThermalComforts->AngleFactorList(WhichAFList).ZoneName + " does not match Zone=\"" +
                                       state.dataHeatBal->Zone(state.dataHeatBal->People(Item).ZonePtr).Name + "\" in PEOPLE=\"" +
                                       state.dataHeatBal->People(Item).Name + "\".");
                 ErrorsFound = true;

@@ -1543,8 +1543,8 @@ namespace SimulationManager {
                 if (NumZoneSizing > 0 && NumSizingDays == 0) {
                     ErrorsFound = true;
                     ShowSevereError(
-                        state, "CheckEnvironmentSpecifications: Sizing for Zones has been requested but there are no design environments specified.");
-                    ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
+                        state, "CheckEnvironmentSpecifications: Sizing for Zones has been requested but there are no design environments specified.",
+                    				"...Add appropriate SizingPeriod:* objects for your simulation.");
                 }
                 if (NumZoneSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
                     ErrorsFound = true;
@@ -1558,8 +1558,8 @@ namespace SimulationManager {
                     ErrorsFound = true;
                     ShowSevereError(
                         state,
-                        "CheckEnvironmentSpecifications: Sizing for Systems has been requested but there are no design environments specified.");
-                    ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
+                        "CheckEnvironmentSpecifications: Sizing for Systems has been requested but there are no design environments specified.",
+                    				"...Add appropriate SizingPeriod:* objects for your simulation.");
                 }
                 if (NumSystemSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
                     ErrorsFound = true;
@@ -1573,8 +1573,8 @@ namespace SimulationManager {
                     ErrorsFound = true;
                     ShowSevereError(state,
                                     "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested but there are no design "
-                                    "environments specified.");
-                    ShowContinueError(state, "...Add appropriate SizingPeriod:* objects for your simulation.");
+                                    "environments specified.",
+                    				"...Add appropriate SizingPeriod:* objects for your simulation.");
                 }
                 if (NumPlantSizing > 0 && NumRunPeriodDesign > 0 && !WeatherFileAttached) {
                     ErrorsFound = true;

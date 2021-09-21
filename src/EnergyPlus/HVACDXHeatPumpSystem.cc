@@ -343,8 +343,8 @@ namespace HVACDXHeatPumpSystem {
                 DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName = Alphas(4);
 
             } else {
-                ShowSevereError(state, "Invalid entry for " + cAlphaFields(3) + " :" + Alphas(3));
-                ShowContinueError(state, "In " + CurrentModuleObject + "=\"" + DXHeatPumpSystem(DXHeatSysNum).Name + "\".");
+                ShowSevereError(state, "Invalid entry for " + cAlphaFields(3) + " :" + Alphas(3),
+                				"In " + CurrentModuleObject + "=\"" + DXHeatPumpSystem(DXHeatSysNum).Name + "\".");
                 state.dataHVACDXHeatPumpSys->ErrorsFound = true;
             }
 
@@ -492,8 +492,8 @@ namespace HVACDXHeatPumpSystem {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state,
                                                 DXHeatPumpSystem(DXSysIndex).DXHeatPumpSystemType +
-                                                    ": Missing temperature setpoint for DX unit= " + DXHeatPumpSystem(DXSysIndex).Name);
-                                ShowContinueError(state, "  use a Set Point Manager to establish a setpoint at the unit control node.");
+                                                    ": Missing temperature setpoint for DX unit= " + DXHeatPumpSystem(DXSysIndex).Name,
+                                				"  use a Set Point Manager to establish a setpoint at the unit control node.");
                                 state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
                                 CheckIfNodeSetPointManagedByEMS(
@@ -501,10 +501,9 @@ namespace HVACDXHeatPumpSystem {
                                 if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state,
                                                     DXHeatPumpSystem(DXSysIndex).DXHeatPumpSystemType +
-                                                        ": Missing temperature setpoint for DX unit= " + DXHeatPumpSystem(DXSysIndex).Name);
-                                    ShowContinueError(state, "  use a Set Point Manager to establish a setpoint at the unit control node.");
-                                    ShowContinueError(state,
-                                                      "  or use an EMS actuator to establish a temperature setpoint at the unit control node.");
+                                                        ": Missing temperature setpoint for DX unit= " + DXHeatPumpSystem(DXSysIndex).Name,
+                                    				"  use a Set Point Manager to establish a setpoint at the unit control node.",
+                                    				"  or use an EMS actuator to establish a temperature setpoint at the unit control node.");
                                 }
                             }
                         }

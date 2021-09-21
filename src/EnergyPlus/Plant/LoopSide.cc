@@ -237,9 +237,9 @@ namespace DataPlant {
                 if ((SELECT_CASE_var >= DataPlant::LoadRangeBasedMin) && (SELECT_CASE_var <= DataPlant::LoadRangeBasedMax)) { //~ load range based
                     if (EncounteredNonLRBAfterLRB) {
                         // We must have already encountered a LRB, then a non-LRB, and now another LRB, this is bad
-                        ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"");
-                        ShowContinueError(state, "PlaLoad range based components are separated by other control type components.");
-                        ShowContinueError(state, "Load Range Based should be grouped together on each flow path.");
+                        ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"",
+                        				"PlaLoad range based components are separated by other control type components.",
+                        				"Load Range Based should be grouped together on each flow path.");
                         ShowFatalError(state, "Plant topology issue causes program termination");
                     } else {
                         EncounteredLRB = true;
@@ -300,9 +300,9 @@ namespace DataPlant {
                             (SELECT_CASE_var <= DataPlant::LoadRangeBasedMax)) { //~ load range based
                             if (EncounteredNonLRBAfterLRB) {
                                 // We must have already encountered a LRB, then a non-LRB, and now another LRB, this is bad
-                                ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"");
-                                ShowContinueError(state, "Load range based components are separated by other control type components.");
-                                ShowContinueError(state, "Load Range Based should be grouped together on each flow path.");
+                                ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"",
+                                				"Load range based components are separated by other control type components.",
+                                				"Load Range Based should be grouped together on each flow path.");
                                 ShowFatalError(state, "Plant topology issue causes program termination");
                             } else {
                                 EncounteredLRB = true;
@@ -742,16 +742,13 @@ namespace DataPlant {
                         if (LoadToHeatingSetPoint > LoadToCoolingSetPoint) {
                             ShowSevereError(state,
                                             "Plant Loop: the Plant Loop Demand Calculation Scheme is set to DualSetPointDeadBand, but the "
-                                            "heating-related low setpoint appears to be above the cooling-related high setpoint.");
-                            ShowContinueError(state,
-                                              "For example, if using SetpointManager:Scheduled:DualSetpoint, then check that the low setpoint is "
-                                              "below the high setpoint.");
-                            ShowContinueError(state, "Occurs in PlantLoop=" + thisPlantLoop.Name);
-                            ShowContinueError(
-                                state,
-                                format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
-                            ShowContinueError(state, format("Loop Heating Low Setpoint={:.2R}", LoopSetPointTemperatureLo));
-                            ShowContinueError(state, format("Loop Cooling High Setpoint={:.2R}", LoopSetPointTemperatureHi));
+                                            "heating-related low setpoint appears to be above the cooling-related high setpoint.",
+                            				"For example, if using SetpointManager:Scheduled:DualSetpoint, then check that the low setpoint is "
+                                              "below the high setpoint.",
+                            				"Occurs in PlantLoop=" + thisPlantLoop.Name,
+                            				format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint),
+                            				format("Loop Heating Low Setpoint={:.2R}", LoopSetPointTemperatureLo),
+                            				format("Loop Cooling High Setpoint={:.2R}", LoopSetPointTemperatureHi));
 
                             ShowFatalError(state, "Program terminates due to above conditions.");
                         }
@@ -764,13 +761,11 @@ namespace DataPlant {
                         } else {
                             ShowSevereError(state,
                                             "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - report to EnergyPlus "
-                                            "Development Team");
-                            ShowContinueError(state, "occurs in PlantLoop=" + thisPlantLoop.Name);
-                            ShowContinueError(
-                                state,
-                                format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
-                            ShowContinueError(state, format("Loop Heating Setpoint={:.2R}", LoopSetPointTemperatureLo));
-                            ShowContinueError(state, format("Loop Cooling Setpoint={:.2R}", LoopSetPointTemperatureHi));
+                                            "Development Team",
+                            				"occurs in PlantLoop=" + thisPlantLoop.Name,
+                            				format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint),
+                            				format("Loop Heating Setpoint={:.2R}", LoopSetPointTemperatureLo),
+                            				format("Loop Cooling Setpoint={:.2R}", LoopSetPointTemperatureHi));
                             ShowFatalError(state, "Program terminates due to above conditions.");
                         }
                     } else {
@@ -1320,9 +1315,9 @@ namespace DataPlant {
                 // now with flow locked, this single branch will just ran at the specified flow rate, so we are done
                 return;
             } else {
-                ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"");
-                ShowContinueError(state, "There are multiple branches, yet no splitter.  This is an invalid configuration.");
-                ShowContinueError(state, "Add a set of connectors, use put components on a single branch.");
+                ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"",
+                				"There are multiple branches, yet no splitter.  This is an invalid configuration.",
+                				"Add a set of connectors, use put components on a single branch.");
                 ShowFatalError(state, "Invalid plant topology causes program termination.");
                 return;
             }
@@ -1335,9 +1330,9 @@ namespace DataPlant {
             TotParallelBranchFlowReq = 0.0;
             NumSplitOutlets = this->Splitter.TotalOutletNodes;
             if (NumSplitOutlets < 1) {
-                ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"");
-                ShowContinueError(state, "Diagnostic error in PlantLoopSolver::ResolveParallelFlows.");
-                ShowContinueError(state, "Splitter improperly specified, no splitter outlets.");
+                ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"",
+                				"Diagnostic error in PlantLoopSolver::ResolveParallelFlows.",
+                				"Splitter improperly specified, no splitter outlets.");
                 ShowFatalError(state, "Invalid plant topology causes program termination.");
             }
 

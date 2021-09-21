@@ -394,8 +394,8 @@ bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
         }
     }
     if (objectFound) {
-        ShowSevereError(state, "HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.");
-        ShowContinueError(state, "You must run the ExpandObjects program on this input.");
+        ShowSevereError(state, "HVACTemplate:* objects found. These objects are not supported directly by EnergyPlus.",
+        				"You must run the ExpandObjects program on this input.");
         errorsFound = true;
     }
 
@@ -436,8 +436,8 @@ bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
         }
     }
     if (objectFound) {
-        ShowSevereError(state, "GroundHeatTransfer:* objects found. These objects are not supported directly by EnergyPlus.");
-        ShowContinueError(state, "You must run the ExpandObjects program on this input.");
+        ShowSevereError(state, "GroundHeatTransfer:* objects found. These objects are not supported directly by EnergyPlus.",
+        				"You must run the ExpandObjects program on this input.");
         errorsFound = true;
     }
 
@@ -454,8 +454,8 @@ bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
         }
     }
     if (objectFound) {
-        ShowSevereError(state, "Parametric:* objects found. These objects are not supported directly by EnergyPlus.");
-        ShowContinueError(state, "You must run the ParametricPreprocesor program on this input.");
+        ShowSevereError(state, "Parametric:* objects found. These objects are not supported directly by EnergyPlus.",
+        				"You must run the ParametricPreprocesor program on this input.");
         errorsFound = true;
     }
     return errorsFound;
@@ -1310,18 +1310,18 @@ void InputProcessor::rangeCheck(EnergyPlusData &state,
                 ShowContinueError(state, Message2);
 
             } else if ((errorCheck == 'S') || (errorCheck == 's')) {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
+                ShowSevereError(state, Message1,
+                				Message2);
                 ErrorsFound = true;
 
             } else if ((errorCheck == 'F') || (errorCheck == 'f')) {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
+                ShowSevereError(state, Message1,
+                				Message2);
                 ShowFatalError(state, "Program terminates due to preceding condition(s).");
 
             } else {
-                ShowSevereError(state, Message1);
-                ShowContinueError(state, Message2);
+                ShowSevereError(state, Message1,
+                				Message2);
                 ErrorsFound = true;
             }
         }
@@ -1666,9 +1666,9 @@ void InputProcessor::reportOrphanRecordObjects(EnergyPlusData &state)
         // there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and
         // !DisplayAllWarnings
         if (has_prefix(object_type, "ZoneHVAC:")) {
-            ShowSevereError(state, "Orphaned ZoneHVAC object found.  This was object never referenced in the input, and was not used.");
-            ShowContinueError(state, " -- Object type: " + object_type);
-            ShowContinueError(state, " -- Object name: " + name);
+            ShowSevereError(state, "Orphaned ZoneHVAC object found.  This was object never referenced in the input, and was not used.",
+            				" -- Object type: " + object_type,
+            				" -- Object name: " + name);
         }
 
         if (!state.dataGlobal->DisplayUnusedObjects) continue;

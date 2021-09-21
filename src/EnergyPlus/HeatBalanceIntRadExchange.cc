@@ -1138,8 +1138,8 @@ namespace HeatBalanceIntRadExchange {
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             if (NumNums < 3 * pow_2(N)) {
-                ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values.");
-                ShowContinueError(state, format("...Number of input values [{}] is less than the required number=[{}].", NumNums, 3 * pow_2(N)));
+                ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values.",
+                				format("...Number of input values [{}] is less than the required number=[{}].", NumNums, 3 * pow_2(N)));
                 ErrorsFound = true;
                 NumNums = 0;
             }
@@ -1343,14 +1343,13 @@ namespace HeatBalanceIntRadExchange {
                 inx1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index), enclosureSurfaceNames, N);
                 inx2 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), enclosureSurfaceNames, N);
                 if (inx1 == 0) {
-                    ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                    ShowContinueError(state, "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
+                    ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.",
+                    				"...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index) + "\", not in this zone or enclosure.");
                     ErrorsFound = true;
                 }
                 if (inx2 == 0) {
-                    ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
-                    ShowContinueError(state,
-                                      "...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
+                    ShowSevereError(state, "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.",
+                    				"...Surface name=\"" + state.dataIPShortCut->cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
                     ErrorsFound = true;
                 }
                 ++numinx1;
@@ -2079,8 +2078,8 @@ namespace HeatBalanceIntRadExchange {
 
         // Trap for surfaces that do not exist
         if (surfNum == 0) {
-            ShowSevereError(state, std::string{routineName} + "Invalid Surface name = " + SurfaceName);
-            ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);
+            ShowSevereError(state, std::string{routineName} + "Invalid Surface name = " + SurfaceName,
+            				"Occurs for " + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
             return surfNum;
         }
@@ -2105,10 +2104,10 @@ namespace HeatBalanceIntRadExchange {
                                 " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
             ErrorsFound = true;                                   // LCOV_EXCL_LINE
         } else if (surfZoneNum != RadSysZoneNum) {
-            ShowSevereError(state, std::string(routineName) + "Surface = " + SurfaceName + " is not in the same zone  as the radiant equipment.");
-            ShowContinueError(state, "Surface zone or enclosure = " + state.dataHeatBal->Zone(surfZoneNum).Name);
-            ShowContinueError(state, "Radiant equipment zone or enclosure = " + state.dataHeatBal->Zone(RadSysZoneNum).Name);
-            ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);
+            ShowSevereError(state, std::string(routineName) + "Surface = " + SurfaceName + " is not in the same zone  as the radiant equipment.",
+            				"Surface zone or enclosure = " + state.dataHeatBal->Zone(surfZoneNum).Name,
+            				"Radiant equipment zone or enclosure = " + state.dataHeatBal->Zone(RadSysZoneNum).Name,
+            				"Occurs for " + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
         }
         return surfNum;

@@ -2538,19 +2538,19 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
         // for
         if (CosIncAngBeamOnSurface > 1.0) {
             if (CosIncAngBeamOnSurface > (1.0 + cosine_tolerance)) {
-                ShowSevereError(state, "Cosine of incident angle of beam solar on surface out of range...too high");
-                ShowContinueError(state, "This is a diagnostic error that should not be encountered under normal circumstances");
-                ShowContinueError(state, "Occurs on surface: " + state.dataSurface->Surface(SurfNum).Name);
-                ShowContinueError(state, format("Current value = {} ... should be within [-1, +1]", CosIncAngBeamOnSurface));
+                ShowSevereError(state, "Cosine of incident angle of beam solar on surface out of range...too high",
+                				"This is a diagnostic error that should not be encountered under normal circumstances",
+                				"Occurs on surface: " + state.dataSurface->Surface(SurfNum).Name,
+                				format("Current value = {} ... should be within [-1, +1]", CosIncAngBeamOnSurface));
                 ShowFatalError(state, "Anisotropic solar calculation causes fatal error");
             }
             CosIncAngBeamOnSurface = 1.0;
         } else if (CosIncAngBeamOnSurface < -1.0) {
             if (CosIncAngBeamOnSurface < (-1.0 - cosine_tolerance)) {
-                ShowSevereError(state, "Cosine of incident angle of beam solar on surface out of range...too low");
-                ShowContinueError(state, "This is a diagnostic error that should not be encountered under normal circumstances");
-                ShowContinueError(state, "Occurs on surface: " + state.dataSurface->Surface(SurfNum).Name);
-                ShowContinueError(state, format("Current value = {} ... should be within [-1, +1]", CosIncAngBeamOnSurface));
+                ShowSevereError(state, "Cosine of incident angle of beam solar on surface out of range...too low",
+                				"This is a diagnostic error that should not be encountered under normal circumstances",
+                				"Occurs on surface: " + state.dataSurface->Surface(SurfNum).Name,
+                				format("Current value = {} ... should be within [-1, +1]", CosIncAngBeamOnSurface));
                 ShowFatalError(state, "Anisotropic solar calculation causes fatal error");
             }
             CosIncAngBeamOnSurface = -1.0;
@@ -2645,17 +2645,14 @@ void CHKBKS(EnergyPlusData &state,
         DVec = state.dataSurface->Surface(NBS).Vertex(N) - state.dataSurface->Surface(NRS).Vertex(1);
         DOTP = dot(CVec, DVec);
         if (DOTP > 0.0009) {
-            ShowSevereError(state, "Problem in interior solar distribution calculation (CHKBKS)");
-            ShowContinueError(state,
-                              "   Solar Distribution = FullInteriorExterior will not work in Zone=" + state.dataSurface->Surface(NRS).ZoneName);
-            ShowContinueError(state,
-                              format("   because one or more of vertices, such as Vertex {} of back surface={}, is in front of receiving surface={}",
+            ShowSevereError(state, "Problem in interior solar distribution calculation (CHKBKS)",
+            				"   Solar Distribution = FullInteriorExterior will not work in Zone=" + state.dataSurface->Surface(NRS).ZoneName,
+            				format("   because one or more of vertices, such as Vertex {} of back surface={}, is in front of receiving surface={}",
                                      N,
                                      state.dataSurface->Surface(NBS).Name,
-                                     state.dataSurface->Surface(NRS).Name));
-            ShowContinueError(state, format("   (Dot Product indicator={:20.4F})", DOTP));
-            ShowContinueError(state,
-                              "   Check surface geometry; if OK, use Solar Distribution = FullExterior instead. Use Output:Diagnostics, "
+                                     state.dataSurface->Surface(NRS).Name),
+            				format("   (Dot Product indicator={:20.4F})", DOTP),
+            				"   Check surface geometry; if OK, use Solar Distribution = FullExterior instead. Use Output:Diagnostics, "
                               "DisplayExtraWarnings; for more details.");
             if (!state.dataGlobal->DisplayExtraWarnings) break;
         }
@@ -3196,14 +3193,14 @@ void ComputeIntSolarAbsorpFactors(EnergyPlusData &state)
         if (TestFractSum <= 0.0) {
             if (thisEnclosure.ExtWindowArea > 0.0) { // we have a problem, the sun has no floor to go to
                 if (thisEnclosure.FloorArea <= 0.0) {
-                    ShowSevereError(state, "ComputeIntSolarAbsorpFactors: Solar distribution model is set to place solar gains on the zone floor,");
-                    ShowContinueError(state, "but Zone or Enclosure =\"" + thisEnclosure.Name + "\" does not appear to have any floor surfaces.");
-                    ShowContinueError(state, "Solar gains will be spread evenly on all surfaces in the zone, and the simulation continues...");
+                    ShowSevereError(state, "ComputeIntSolarAbsorpFactors: Solar distribution model is set to place solar gains on the zone floor,",
+                    				"but Zone or Enclosure =\"" + thisEnclosure.Name + "\" does not appear to have any floor surfaces.",
+                    				"Solar gains will be spread evenly on all surfaces in the zone, and the simulation continues...");
                 } else { // Floor Area > 0 but still can't absorb
-                    ShowSevereError(state, "ComputeIntSolarAbsorpFactors: Solar distribution model is set to place solar gains on the zone floor,");
-                    ShowContinueError(state, "but Zone or Enclosure =\"" + thisEnclosure.Name + "\" floor cannot absorb any solar gains. ");
-                    ShowContinueError(state, "Check the solar absorptance of the inside layer of the floor surface construction/material.");
-                    ShowContinueError(state, "Solar gains will be spread evenly on all surfaces in the zone, and the simulation continues...");
+                    ShowSevereError(state, "ComputeIntSolarAbsorpFactors: Solar distribution model is set to place solar gains on the zone floor,",
+                    				"but Zone or Enclosure =\"" + thisEnclosure.Name + "\" floor cannot absorb any solar gains. ",
+                    				"Check the solar absorptance of the inside layer of the floor surface construction/material.",
+                    				"Solar gains will be spread evenly on all surfaces in the zone, and the simulation continues...");
                 }
 
                 // try again but use an even spread across all the surfaces in the zone, regardless of horizontal
@@ -5520,8 +5517,8 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowSevereError(state,
                                     "DetermineShadowingCombinations: Surface=\"" + state.dataSurface->Surface(HTS).Name +
-                                        "\" is a casting surface and is non-convex.");
-                    ShowContinueError(state, "...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
+                                        "\" is a casting surface and is non-convex.",
+                    				"...Shadowing values may be inaccurate. Check .shd report file for more surface shading details");
                 } else {
                     ++state.dataErrTracking->TotalCastingNonConvexSurfaces;
                 }

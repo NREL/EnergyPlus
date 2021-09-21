@@ -1051,8 +1051,8 @@ namespace Furnaces {
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, "Illegal " + cAlphaFields(2) + " = " + Alphas(2));
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"Illegal " + cAlphaFields(2) + " = " + Alphas(2));
                     ErrorsFound = true;
                 }
             }
@@ -1080,8 +1080,8 @@ namespace Furnaces {
 
             state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr = GetScheduleIndex(state, Alphas(5));
             if (!lAlphaBlanks(5) && state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr == 0) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(5) + " = " + Alphas(5));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(5) + " = " + Alphas(5));
                 ErrorsFound = true;
             } else if (lAlphaBlanks(5)) {
                 state.dataFurnaces->Furnace(FurnaceNum).OpMode = CycFanCycCoil;
@@ -1091,8 +1091,8 @@ namespace Furnaces {
 
             state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(6), state.dataHeatBal->Zone);
             if (state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum == 0) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(6) + " = " + Alphas(6));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(6) + " = " + Alphas(6));
                 ErrorsFound = true;
             }
 
@@ -1148,16 +1148,15 @@ namespace Furnaces {
                 }
                 if (!AirNodeFound) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowSevereError(state, "Did not find Air Node (Zone with Thermostat).");
-                    ShowContinueError(state, "Specified " + cAlphaFields(6) + " = " + Alphas(6));
-                    ShowContinueError(
-                        state, "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone.");
+                    ShowSevereError(state, "Did not find Air Node (Zone with Thermostat).",
+                    				"Specified " + cAlphaFields(6) + " = " + Alphas(6),
+                    				"Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone.");
                     ErrorsFound = true;
                 }
                 if (!AirLoopFound) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowSevereError(state, "Did not find correct Primary Air Loop.");
-                    ShowContinueError(state, "Specified " + cAlphaFields(6) + " = " + Alphas(6) + " is not served by this AirLoopHVAC equipment.");
+                    ShowSevereError(state, "Did not find correct Primary Air Loop.",
+                    				"Specified " + cAlphaFields(6) + " = " + Alphas(6) + " is not served by this AirLoopHVAC equipment.");
                     ErrorsFound = true;
                 }
             }
@@ -1226,33 +1225,33 @@ namespace Furnaces {
                     if (state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr > 0 &&
                         state.dataFurnaces->Furnace(FurnaceNum).FanType_Num == FanType_SimpleConstVolume) {
                         if (!CheckScheduleValueMinMax(state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
-                            ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                            ShowContinueError(state, "For " + cAlphaFields(7) + " = " + Alphas(7));
-                            ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
-                            ShowContinueError(state, "Error found in " + cAlphaFields(5) + " = " + Alphas(5));
-                            ShowContinueError(state, "...schedule values must be (>0., <=1.)");
+                            ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                            				"For " + cAlphaFields(7) + " = " + Alphas(7),
+                            				"Fan operating mode must be continuous (fan operating mode schedule values > 0).",
+                            				"Error found in " + cAlphaFields(5) + " = " + Alphas(5),
+                            				"...schedule values must be (>0., <=1.)");
                             ErrorsFound = true;
                         }
                     } else if (lAlphaBlanks(5) && state.dataFurnaces->Furnace(FurnaceNum).FanType_Num != FanType_SimpleOnOff) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
-                        ShowContinueError(state, cAlphaFields(7) + " = " + Alphas(7));
-                        ShowContinueError(state, "Fan type must be Fan:OnOff when " + cAlphaFields(5) + " = Blank.");
+                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name,
+                        				cAlphaFields(7) + " = " + Alphas(7),
+                        				"Fan type must be Fan:OnOff when " + cAlphaFields(5) + " = Blank.");
                         ErrorsFound = true;
                     }
 
                 } // IF (IsNotOK) THEN
 
             } else { // wrong fan type
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(7) + " = " + Alphas(7));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(7) + " = " + Alphas(7));
                 ErrorsFound = true;
             } // IF (state.dataFurnaces->Furnace(FurnaceNum)%FanType_Num == FanType_SimpleOnOff .OR. &
 
             if (UtilityRoutines::SameString(Alphas(9), "BlowThrough")) state.dataFurnaces->Furnace(FurnaceNum).FanPlace = BlowThru;
             if (UtilityRoutines::SameString(Alphas(9), "DrawThrough")) state.dataFurnaces->Furnace(FurnaceNum).FanPlace = DrawThru;
             if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == 0) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(9) + " = " + Alphas(9));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(9) + " = " + Alphas(9));
                 ErrorsFound = true;
             }
 
@@ -1363,9 +1362,9 @@ namespace Furnaces {
                     if (!errFlag) { // then did find a controller so that is bad
                         ShowSevereError(state,
                                         CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name +
-                                            " has a conflicting Controller:WaterCoil object");
-                        ShowContinueError(state, "Hot water coils are controlled directly by unitary and furnace systems.");
-                        ShowContinueError(state, "No water coil controller should be input for the coil.");
+                                            " has a conflicting Controller:WaterCoil object",
+                        				"Hot water coils are controlled directly by unitary and furnace systems.",
+                        				"No water coil controller should be input for the coil.");
                         ErrorsFound = true;
                     }
                 }
@@ -1382,8 +1381,8 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex =
                         GetSteamCoilIndex(state, "COIL:HEATING:STEAM", HeatingCoilName, errFlag);
                     if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex == 0) {
-                        ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(11) + " = " + HeatingCoilName);
-                        ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
+                        ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(11) + " = " + HeatingCoilName,
+                        				"Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
                         ErrorsFound = true;
                     }
 
@@ -1428,8 +1427,8 @@ namespace Furnaces {
                 }
 
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(11) + " = " + Alphas(11));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(11) + " = " + Alphas(11));
                 ErrorsFound = true;
             } // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
@@ -1462,12 +1461,10 @@ namespace Furnaces {
                 }
                 // Fan outlet node name must be the same as the heating coil inlet node name
                 if (FanOutletNode != HeatingCoilInletNode) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(
-                        state,
-                        "When a blow through fan is specified, the fan outlet node name must be the same as the heating coil inlet node name.");
-                    ShowContinueError(state, "...Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                    ShowContinueError(state, "...Heating coil inlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"When a blow through fan is specified, the fan outlet node name must be the same as the heating coil inlet node name.",
+                    				"...Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                    				"...Heating coil inlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
                     ErrorsFound = true;
                 }
                 // Heating coil outlet node name must be the same as the furnace outlet node name
@@ -1521,12 +1518,10 @@ namespace Furnaces {
                 }
                 // Heating coil outlet node name must be the same as the fan inlet node name
                 if (HeatingCoilOutletNode != FanInletNode) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(
-                        state,
-                        "When a draw through fan is specified, the heating coil outlet node name must be the same as the fan inlet node name.");
-                    ShowContinueError(state, "...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
-                    ShowContinueError(state, "...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode));
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"When a draw through fan is specified, the heating coil outlet node name must be the same as the fan inlet node name.",
+                    				"...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode),
+                    				"...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode));
                     ErrorsFound = true;
                 }
                 // Fan coil outlet node name must be the same as the furnace outlet node name
@@ -1589,9 +1584,9 @@ namespace Furnaces {
             }
             if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate != DataSizing::AutoSize) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate <= 0.0) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, "... The " + cNumericFields(2) + " <= 0.0, it must be > 0.0.");
-                    ShowContinueError(state, format("... Entered value = {:.2R}", state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate));
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"... The " + cNumericFields(2) + " <= 0.0, it must be > 0.0.",
+                    				format("... Entered value = {:.2R}", state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate));
                     ErrorsFound = true;
                 }
             }
@@ -1671,8 +1666,8 @@ namespace Furnaces {
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, "Illegal " + cAlphaFields(2) + " = " + Alphas(2));
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"Illegal " + cAlphaFields(2) + " = " + Alphas(2));
                     ErrorsFound = true;
                 }
             }
@@ -1700,8 +1695,8 @@ namespace Furnaces {
 
             state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr = GetScheduleIndex(state, Alphas(5));
             if (!lAlphaBlanks(5) && state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr == 0) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(5) + " = " + Alphas(5));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(5) + " = " + Alphas(5));
                 ErrorsFound = true;
             } else if (lAlphaBlanks(5)) {
                 state.dataFurnaces->Furnace(FurnaceNum).OpMode = CycFanCycCoil;
@@ -1710,8 +1705,8 @@ namespace Furnaces {
             // Get the Controlling Zone or Location of the Furnace Thermostat
             state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(6), state.dataHeatBal->Zone);
             if (state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum == 0) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(6) + " = " + Alphas(6));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(6) + " = " + Alphas(6));
                 ErrorsFound = true;
             }
 
@@ -1766,17 +1761,16 @@ namespace Furnaces {
                     if (AirLoopFound) break;
                 }
                 if (!AirNodeFound) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, "Did not find air node (zone with thermostat).");
-                    ShowContinueError(state, "Specified " + cAlphaFields(6) + " = " + Alphas(6));
-                    ShowContinueError(
-                        state, "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone.");
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"Did not find air node (zone with thermostat).",
+                    				"Specified " + cAlphaFields(6) + " = " + Alphas(6),
+                    				"Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone.");
                     ErrorsFound = true;
                 }
                 if (!AirLoopFound) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowSevereError(state, "Did not find correct AirLoopHVAC.");
-                    ShowContinueError(state, "Specified " + cAlphaFields(6) + " = " + Alphas(6));
+                    ShowSevereError(state, "Did not find correct AirLoopHVAC.",
+                    				"Specified " + cAlphaFields(6) + " = " + Alphas(6));
                     ErrorsFound = true;
                 }
             }
@@ -1845,33 +1839,33 @@ namespace Furnaces {
                     if (state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr > 0 &&
                         state.dataFurnaces->Furnace(FurnaceNum).FanType_Num == FanType_SimpleConstVolume) {
                         if (!CheckScheduleValueMinMax(state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
-                            ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                            ShowContinueError(state, "For " + cAlphaFields(7) + " = " + Alphas(7));
-                            ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
-                            ShowContinueError(state, "Error found in " + cAlphaFields(5) + " = " + Alphas(5));
-                            ShowContinueError(state, "...schedule values must be (>0., <=1.)");
+                            ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                            				"For " + cAlphaFields(7) + " = " + Alphas(7),
+                            				"Fan operating mode must be continuous (fan operating mode schedule values > 0).",
+                            				"Error found in " + cAlphaFields(5) + " = " + Alphas(5),
+                            				"...schedule values must be (>0., <=1.)");
                             ErrorsFound = true;
                         }
                     } else if (lAlphaBlanks(5) && state.dataFurnaces->Furnace(FurnaceNum).FanType_Num != FanType_SimpleOnOff) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
-                        ShowContinueError(state, cAlphaFields(7) + " = " + Alphas(7));
-                        ShowContinueError(state, "Fan type must be Fan:OnOff when " + cAlphaFields(5) + " = Blank.");
+                        ShowSevereError(state, CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name,
+                        				cAlphaFields(7) + " = " + Alphas(7),
+                        				"Fan type must be Fan:OnOff when " + cAlphaFields(5) + " = Blank.");
                         ErrorsFound = true;
                     }
 
                 } // IF (IsNotOK) THEN
 
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(7) + " = " + Alphas(7));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(7) + " = " + Alphas(7));
                 ErrorsFound = true;
             } //  IF (TFurnace(FurnaceNum)%FanType_Num == FanType_SimpleOnOff .OR. &, etc.
 
             if (UtilityRoutines::SameString(Alphas(9), "BlowThrough")) state.dataFurnaces->Furnace(FurnaceNum).FanPlace = BlowThru;
             if (UtilityRoutines::SameString(Alphas(9), "DrawThrough")) state.dataFurnaces->Furnace(FurnaceNum).FanPlace = DrawThru;
             if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == 0) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(9) + " = " + Alphas(9));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(9) + " = " + Alphas(9));
                 ErrorsFound = true;
             }
 
@@ -1991,9 +1985,9 @@ namespace Furnaces {
                     if (!errFlag) { // then did find a controller so that is bad
                         ShowSevereError(state,
                                         CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name +
-                                            " has a conflicting Controller:WaterCoil object");
-                        ShowContinueError(state, "Hot water coils are controlled directly by unitary and furnace systems.");
-                        ShowContinueError(state, "No water coil controller should be input for the coil.");
+                                            " has a conflicting Controller:WaterCoil object",
+                        				"Hot water coils are controlled directly by unitary and furnace systems.",
+                        				"No water coil controller should be input for the coil.");
                         ErrorsFound = true;
                     }
                 }
@@ -2010,8 +2004,8 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex =
                         GetSteamCoilIndex(state, "COIL:HEATING:STEAM", HeatingCoilName, errFlag);
                     if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex == 0) {
-                        ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(11) + " = " + HeatingCoilName);
-                        ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
+                        ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(11) + " = " + HeatingCoilName,
+                        				"Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
                         ErrorsFound = true;
                     }
 
@@ -2056,8 +2050,8 @@ namespace Furnaces {
                 }
 
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(11) + " = " + Alphas(11));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(11) + " = " + Alphas(11));
                 ErrorsFound = true;
             } // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
@@ -2260,8 +2254,8 @@ namespace Furnaces {
                     }
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(12) + " = " + Alphas(12));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(12) + " = " + Alphas(12));
                 ErrorsFound = true;
             }
 
@@ -2272,9 +2266,9 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_Multimode;
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = true;
                     if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num != CoilDX_CoolingHXAssisted) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(state, "Illegal " + cAlphaFields(14) + " = " + Alphas(14));
-                        ShowContinueError(state, "Multimode control must be used with a Heat Exchanger Assisted Cooling Coil.");
+                        ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                        				"Illegal " + cAlphaFields(14) + " = " + Alphas(14),
+                        				"Multimode control must be used with a Heat Exchanger Assisted Cooling Coil.");
                         if (lAlphaBlanks(15)) {
                             ShowContinueError(state,
                                               "Dehumidification control type is assumed to be None since a reheat coil has not been specified and "
@@ -2311,15 +2305,15 @@ namespace Furnaces {
                         AirNodeFound = true;
                     }
                     if (!AirNodeFound) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(state, "Did not find Air Node (Zone with Humidistat).");
-                        ShowContinueError(state, "Specified " + cAlphaFields(6) + " = " + Alphas(6));
+                        ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                        				"Did not find Air Node (Zone with Humidistat).",
+                        				"Specified " + cAlphaFields(6) + " = " + Alphas(6));
                         ErrorsFound = true;
                     }
                 }
             } else { // invalid input
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(14) + " = " + Alphas(14));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(14) + " = " + Alphas(14));
                 state.dataFurnaces->Furnace(FurnaceNum).Humidistat = false;
                 ErrorsFound = true;
             }
@@ -2447,9 +2441,9 @@ namespace Furnaces {
                         if (!errFlag) { // then did find a controller so that is bad
                             ShowSevereError(state,
                                             CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name +
-                                                " has a conflicting Controller:WaterCoil object");
-                            ShowContinueError(state, "Hot water coils are controlled directly by unitary and furnace systems.");
-                            ShowContinueError(state, "No water coil controller should be input for the coil.");
+                                                " has a conflicting Controller:WaterCoil object",
+                            				"Hot water coils are controlled directly by unitary and furnace systems.",
+                            				"No water coil controller should be input for the coil.");
                             ErrorsFound = true;
                         }
                     }
@@ -2466,8 +2460,8 @@ namespace Furnaces {
                         state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex =
                             GetSteamCoilIndex(state, "COIL:HEATING:STEAM", ReheatingCoilName, errFlag);
                         if (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex == 0) {
-                            ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(11) + " = " + ReheatingCoilName);
-                            ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
+                            ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(11) + " = " + ReheatingCoilName,
+                            				"Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
                             ErrorsFound = true;
                         }
 
@@ -2513,8 +2507,8 @@ namespace Furnaces {
                     }
 
                 } else { // Illeagal heating coil
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, "Illegal " + cAlphaFields(15) + " = " + Alphas(15));
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"Illegal " + cAlphaFields(15) + " = " + Alphas(15));
                     ErrorsFound = true;
                 } // IF (Furnace(FurnaceNum)%SuppHeatCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
@@ -2544,31 +2538,28 @@ namespace Furnaces {
                 }
                 if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilUpstream) {
                     if (FanOutletNode != CoolingCoilInletNode) {
-                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(
-                            state,
-                            "When a blow through fan is specified, the fan outlet node name must be the same as the cooling coil inlet node name.");
-                        ShowContinueError(state, "...Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                        ShowContinueError(state, "...Cooling coil inlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
+                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1),
+                        				"When a blow through fan is specified, the fan outlet node name must be the same as the cooling coil inlet node name.",
+                        				"...Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                        				"...Cooling coil inlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
                         ErrorsFound = true;
                     }
                     if (CoolingCoilOutletNode != HeatingCoilInletNode) {
-                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(state, "The cooling coil outlet node name must be the same as the heating coil inlet node name.");
-                        ShowContinueError(state, "...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode));
-                        ShowContinueError(state, "...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
+                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1),
+                        				"The cooling coil outlet node name must be the same as the heating coil inlet node name.",
+                        				"...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode),
+                        				"...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
                         ErrorsFound = true;
                     }
                     if ((state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
                          state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat) ||
                         ReheatCoilInletNode > 0) {
                         if (HeatingCoilOutletNode != ReheatCoilInletNode) {
-                            ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
-                            ShowContinueError(state,
-                                              "When a blow through fan is specified, the heating coil outlet node name must be the same as the "
-                                              "reheat coil inlet node name.");
-                            ShowContinueError(state, "...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
-                            ShowContinueError(state, "...Reheat coil inlet node name   = " + state.dataLoopNodes->NodeID(ReheatCoilInletNode));
+                            ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1),
+                            				"When a blow through fan is specified, the heating coil outlet node name must be the same as the "
+                                              "reheat coil inlet node name.",
+                            				"...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode),
+                            				"...Reheat coil inlet node name   = " + state.dataLoopNodes->NodeID(ReheatCoilInletNode));
                             ErrorsFound = true;
                         }
                         if (ReheatCoilOutletNode != state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum) {
@@ -2614,19 +2605,17 @@ namespace Furnaces {
                     }
                 } else { // IF(Furnace(FurnaceNum)%CoolingCoilUpstream)THEN
                     if (FanOutletNode != HeatingCoilInletNode) {
-                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(
-                            state,
-                            "When a blow through fan is specified, the fan outlet node name must be the same as the heating coil inlet node name.");
-                        ShowContinueError(state, "...Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                        ShowContinueError(state, "...Heating coil inlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
+                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1),
+                        				"When a blow through fan is specified, the fan outlet node name must be the same as the heating coil inlet node name.",
+                        				"...Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                        				"...Heating coil inlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
                         ErrorsFound = true;
                     }
                     if (HeatingCoilOutletNode != CoolingCoilInletNode) {
-                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(state, "The heating coil outlet node name must be the same as the cooling coil inlet node name.");
-                        ShowContinueError(state, "...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
-                        ShowContinueError(state, "...Cooling coil inlet node name  = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
+                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1),
+                        				"The heating coil outlet node name must be the same as the cooling coil inlet node name.",
+                        				"...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode),
+                        				"...Cooling coil inlet node name  = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
                         ErrorsFound = true;
                     }
                     if (CoolingCoilOutletNode != state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum) {
@@ -2677,31 +2666,28 @@ namespace Furnaces {
                         ErrorsFound = true;
                     }
                     if (CoolingCoilOutletNode != HeatingCoilInletNode) {
-                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(state, "The cooling coil outlet node name must be the same as the heating coil inlet node name.");
-                        ShowContinueError(state, "...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode));
-                        ShowContinueError(state, "...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
+                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1),
+                        				"The cooling coil outlet node name must be the same as the heating coil inlet node name.",
+                        				"...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode),
+                        				"...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
                         ErrorsFound = true;
                     }
                     if (HeatingCoilOutletNode != FanInletNode) {
-                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(
-                            state,
-                            "When a draw through fan is specified, the heating coil outlet node name must be the same as the fan inlet node name.");
-                        ShowContinueError(state, "...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
-                        ShowContinueError(state, "...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode));
+                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1),
+                        				"When a draw through fan is specified, the heating coil outlet node name must be the same as the fan inlet node name.",
+                        				"...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode),
+                        				"...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode));
                         ErrorsFound = true;
                     }
                     if ((state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
                          state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat) ||
                         ReheatCoilInletNode > 0) {
                         if (FanOutletNode != ReheatCoilInletNode) {
-                            ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
-                            ShowContinueError(state,
-                                              "When a draw through fan is specified, the fan outlet node name must be the same as the reheat coil "
-                                              "inlet node name.");
-                            ShowContinueError(state, "...Fan outlet node name        = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                            ShowContinueError(state, "...Reheat coil inlet node name = " + state.dataLoopNodes->NodeID(ReheatCoilInletNode));
+                            ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1),
+                            				"When a draw through fan is specified, the fan outlet node name must be the same as the reheat coil "
+                                              "inlet node name.",
+                            				"...Fan outlet node name        = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                            				"...Reheat coil inlet node name = " + state.dataLoopNodes->NodeID(ReheatCoilInletNode));
                             ErrorsFound = true;
                         }
                         if (ReheatCoilOutletNode != state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum) {
@@ -2723,13 +2709,11 @@ namespace Furnaces {
                         }
                     } else {
                         if (FanOutletNode != state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum) {
-                            ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
-                            ShowContinueError(state,
-                                              "When a draw through fan is specified, the fan outlet node name must be the same as the unitary system "
-                                              "outlet node name.");
-                            ShowContinueError(state, "...Fan outlet node name        = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                            ShowContinueError(state,
-                                              "...Unitary system outlet node name = " +
+                            ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1),
+                            				"When a draw through fan is specified, the fan outlet node name must be the same as the unitary system "
+                                              "outlet node name.",
+                            				"...Fan outlet node name        = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                            				"...Unitary system outlet node name = " +
                                                   state.dataLoopNodes->NodeID(state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum));
                             ErrorsFound = true;
                         }
@@ -2757,19 +2741,17 @@ namespace Furnaces {
                         ErrorsFound = true;
                     }
                     if (HeatingCoilOutletNode != CoolingCoilInletNode) {
-                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(state, "The heating coil outlet node name must be the same as the cooling coil inlet node name.");
-                        ShowContinueError(state, "...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
-                        ShowContinueError(state, "...Cooling coil inlet node name  = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
+                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1),
+                        				"The heating coil outlet node name must be the same as the cooling coil inlet node name.",
+                        				"...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode),
+                        				"...Cooling coil inlet node name  = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
                         ErrorsFound = true;
                     }
                     if (CoolingCoilOutletNode != FanInletNode) {
-                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(
-                            state,
-                            "When a draw through fan is specified, the cooling coil outlet node name must be the same as the fan inlet node name.");
-                        ShowContinueError(state, "...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode));
-                        ShowContinueError(state, "...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode));
+                        ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1),
+                        				"When a draw through fan is specified, the cooling coil outlet node name must be the same as the fan inlet node name.",
+                        				"...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode),
+                        				"...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode));
                         ErrorsFound = true;
                     }
                     if (FanOutletNode != state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum) {
@@ -2861,24 +2843,24 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow = Numbers(2);
             if (state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow <= 0 &&
                 state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(2), Numbers(2)));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				format("Illegal {} = {:.7T}", cNumericFields(2), Numbers(2)));
                 ErrorsFound = true;
             }
 
             state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow = Numbers(3);
             if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow <= 0 &&
                 state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != DataSizing::AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(3), Numbers(3)));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				format("Illegal {} = {:.7T}", cNumericFields(3), Numbers(3)));
                 ErrorsFound = true;
             }
 
             state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = Numbers(4);
             if (state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow < 0 &&
                 state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(4), Numbers(4)));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				format("Illegal {} = {:.7T}", cNumericFields(4), Numbers(4)));
                 ErrorsFound = true;
             }
 
@@ -2919,25 +2901,21 @@ namespace Furnaces {
             if (FanVolFlowRate != DataSizing::AutoSize) {
                 if (FanVolFlowRate < state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow &&
                     state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(
-                        state,
-                        format("... air flow rate = {:.7T} in fan object {} is less than the maximum HVAC system air flow rate in cooling mode.",
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				format("... air flow rate = {:.7T} in fan object {} is less than the maximum HVAC system air flow rate in cooling mode.",
                                FanVolFlowRate,
-                               FanName));
-                    ShowContinueError(state, " The " + cNumericFields(2) + " is reset to the fan flow rate and the simulation continues.");
+                               FanName),
+                    				" The " + cNumericFields(2) + " is reset to the fan flow rate and the simulation continues.");
                     state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow = FanVolFlowRate;
                     state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = FanVolFlowRate;
                 }
                 if (FanVolFlowRate < state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow &&
                     state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != DataSizing::AutoSize) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(
-                        state,
-                        format("... air flow rate = {:.7T} in fan object {} is less than the maximum HVAC system air flow rate in heating mode.",
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				format("... air flow rate = {:.7T} in fan object {} is less than the maximum HVAC system air flow rate in heating mode.",
                                FanVolFlowRate,
-                               FanName));
-                    ShowContinueError(state, " The " + cNumericFields(3) + " is reset to the fan flow rate and the simulation continues.");
+                               FanName),
+                    				" The " + cNumericFields(3) + " is reset to the fan flow rate and the simulation continues.");
                     state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow = FanVolFlowRate;
                     state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = FanVolFlowRate;
                 }
@@ -3035,8 +3013,8 @@ namespace Furnaces {
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, "Illegal " + cAlphaFields(2) + " = " + Alphas(2));
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"Illegal " + cAlphaFields(2) + " = " + Alphas(2));
                     ErrorsFound = true;
                 }
             }
@@ -3066,8 +3044,8 @@ namespace Furnaces {
             // Get the Controlling Zone or Location of the Furnace Thermostat
             state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(5), state.dataHeatBal->Zone);
             if (state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum == 0) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(5) + " = " + Alphas(5));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(5) + " = " + Alphas(5));
                 ErrorsFound = true;
             }
 
@@ -3122,17 +3100,16 @@ namespace Furnaces {
                     if (AirLoopFound) break;
                 }
                 if (!AirNodeFound) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, "Did not find air node (zone with thermostat).");
-                    ShowContinueError(state, "Specified " + cAlphaFields(5) + " = " + Alphas(5));
-                    ShowContinueError(
-                        state, "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone.");
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"Did not find air node (zone with thermostat).",
+                    				"Specified " + cAlphaFields(5) + " = " + Alphas(5),
+                    				"Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone.");
                     ErrorsFound = true;
                 }
                 if (!AirLoopFound) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowSevereError(state, "Did not find correct AirLoopHVAC.");
-                    ShowContinueError(state, "Specified " + cAlphaFields(5) + " = " + Alphas(5));
+                    ShowSevereError(state, "Did not find correct AirLoopHVAC.",
+                    				"Specified " + cAlphaFields(5) + " = " + Alphas(5));
                     ErrorsFound = true;
                 }
             }
@@ -3200,8 +3177,8 @@ namespace Furnaces {
                 } // IF (IsNotOK) THEN
 
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(6) + " = " + Alphas(6));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(6) + " = " + Alphas(6));
                 ErrorsFound = true;
             }
 
@@ -3283,8 +3260,8 @@ namespace Furnaces {
                     }
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(8) + " = " + Alphas(8));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(8) + " = " + Alphas(8));
                 ErrorsFound = true;
             }
 
@@ -3416,8 +3393,8 @@ namespace Furnaces {
                         }
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, "Illegal " + cAlphaFields(10) + " = " + Alphas(10));
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"Illegal " + cAlphaFields(10) + " = " + Alphas(10));
                     ErrorsFound = true;
                 }
             }
@@ -3546,9 +3523,9 @@ namespace Furnaces {
                     if (!errFlag) { // then did find a controller so that is bad
                         ShowSevereError(state,
                                         CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name +
-                                            " has a conflicting Controller:WaterCoil object");
-                        ShowContinueError(state, "Hot water coils are controlled directly by unitary and furnace systems.");
-                        ShowContinueError(state, "No water coil controller should be input for the coil.");
+                                            " has a conflicting Controller:WaterCoil object",
+                        				"Hot water coils are controlled directly by unitary and furnace systems.",
+                        				"No water coil controller should be input for the coil.");
                         ErrorsFound = true;
                     }
                 }
@@ -3565,8 +3542,8 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex =
                         GetSteamCoilIndex(state, "COIL:HEATING:STEAM", SuppHeatCoilName, errFlag);
                     if (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex == 0) {
-                        ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(12) + " = " + SuppHeatCoilName);
-                        ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
+                        ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(12) + " = " + SuppHeatCoilName,
+                        				"Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
                         ErrorsFound = true;
                     }
 
@@ -3612,30 +3589,30 @@ namespace Furnaces {
                 }
 
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(12) + " = " + Alphas(12));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(12) + " = " + Alphas(12));
                 ErrorsFound = true;
             } // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
             if (UtilityRoutines::SameString(Alphas(14), "BlowThrough")) state.dataFurnaces->Furnace(FurnaceNum).FanPlace = BlowThru;
             if (UtilityRoutines::SameString(Alphas(14), "DrawThrough")) state.dataFurnaces->Furnace(FurnaceNum).FanPlace = DrawThru;
             if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == 0) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(14) + " = " + Alphas(14));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(14) + " = " + Alphas(14));
                 ErrorsFound = true;
             }
 
             state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr = GetScheduleIndex(state, Alphas(15));
             if (!lAlphaBlanks(15) && state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr == 0) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(15) + " = " + Alphas(15));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(15) + " = " + Alphas(15));
                 ErrorsFound = true;
             } else if (lAlphaBlanks(15)) {
                 state.dataFurnaces->Furnace(FurnaceNum).OpMode = CycFanCycCoil;
                 if (state.dataFurnaces->Furnace(FurnaceNum).FanType_Num != FanType_SimpleOnOff) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
-                    ShowContinueError(state, cAlphaFields(6) + " = " + Alphas(6));
-                    ShowContinueError(state, "Fan type must be Fan:OnOff when " + cAlphaFields(15) + " = Blank.");
+                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name,
+                    				cAlphaFields(6) + " = " + Alphas(6),
+                    				"Fan type must be Fan:OnOff when " + cAlphaFields(15) + " = Blank.");
                     ErrorsFound = true;
                 }
             }
@@ -3643,11 +3620,11 @@ namespace Furnaces {
             if (state.dataFurnaces->Furnace(FurnaceNum).FanType_Num == FanType_SimpleConstVolume) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr > 0) {
                     if (!CheckScheduleValueMinMax(state, state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(state, "For " + cAlphaFields(7) + " = " + Alphas(7));
-                        ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
-                        ShowContinueError(state, "Error found in " + cAlphaFields(15) + " = " + Alphas(15));
-                        ShowContinueError(state, "...schedule values must be (>0., <=1.)");
+                        ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                        				"For " + cAlphaFields(7) + " = " + Alphas(7),
+                        				"Fan operating mode must be continuous (fan operating mode schedule values > 0).",
+                        				"Error found in " + cAlphaFields(15) + " = " + Alphas(15),
+                        				"...schedule values must be (>0., <=1.)");
                         ErrorsFound = true;
                     }
                 }
@@ -3661,9 +3638,9 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_Multimode;
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = true;
                     if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num != CoilDX_CoolingHXAssisted) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(state, "Illegal " + cAlphaFields(16) + " = " + Alphas(16));
-                        ShowContinueError(state, "Multimode control must be used with a Heat Exchanger Assisted Cooling Coil.");
+                        ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                        				"Illegal " + cAlphaFields(16) + " = " + Alphas(16),
+                        				"Multimode control must be used with a Heat Exchanger Assisted Cooling Coil.");
                         ErrorsFound = true;
                     }
                 }
@@ -3683,16 +3660,16 @@ namespace Furnaces {
                         AirNodeFound = true;
                     }
                     if (!AirNodeFound) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(state, "Did not find Air Node (Zone with Humidistat).");
-                        ShowContinueError(state, "Specified " + cAlphaFields(5) + " = " + Alphas(5));
+                        ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                        				"Did not find Air Node (Zone with Humidistat).",
+                        				"Specified " + cAlphaFields(5) + " = " + Alphas(5));
                         ErrorsFound = true;
                     }
                 }
             } else { // invalid input or blank
                 if (!lAlphaBlanks(16)) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, "Illegal " + cAlphaFields(16) + " = " + Alphas(16));
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"Illegal " + cAlphaFields(16) + " = " + Alphas(16));
                     ErrorsFound = true;
                 } else {
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = false;
@@ -3703,95 +3680,80 @@ namespace Furnaces {
             // Check node names for child components
             if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == BlowThru) {
                 if (FanInletNode != state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum) {
-                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                    ShowContinueError(
-                        state,
-                        "When a blow through fan is specified, the fan inlet node name must be the same as the unitary system inlet node name.");
-                    ShowContinueError(state, "...Fan inlet node name            = " + state.dataLoopNodes->NodeID(FanInletNode));
-                    ShowContinueError(state,
-                                      "...Unitary system inlet node name = " +
+                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                    				"When a blow through fan is specified, the fan inlet node name must be the same as the unitary system inlet node name.",
+                    				"...Fan inlet node name            = " + state.dataLoopNodes->NodeID(FanInletNode),
+                    				"...Unitary system inlet node name = " +
                                           state.dataLoopNodes->NodeID(state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (FanOutletNode != CoolingCoilInletNode) {
-                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                    ShowContinueError(
-                        state,
-                        "When a blow through fan is specified, the fan outlet node name must be the same as the cooling coil inlet node name.");
-                    ShowContinueError(state, "...Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                    ShowContinueError(state, "...Cooling coil inlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
+                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                    				"When a blow through fan is specified, the fan outlet node name must be the same as the cooling coil inlet node name.",
+                    				"...Fan outlet node name         = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                    				"...Cooling coil inlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
                     ErrorsFound = true;
                 }
                 if (CoolingCoilOutletNode != HeatingCoilInletNode) {
-                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                    ShowContinueError(state, "The cooling coil outlet node name must be the same as the heating coil inlet node name.");
-                    ShowContinueError(state, "...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode));
-                    ShowContinueError(state, "...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
+                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                    				"The cooling coil outlet node name must be the same as the heating coil inlet node name.",
+                    				"...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode),
+                    				"...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
                     ErrorsFound = true;
                 }
                 if (HeatingCoilOutletNode != SupHeatCoilInletNode) {
-                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                    ShowContinueError(state,
-                                      "When a blow through fan is specified, the heating coil outlet node name must be the same as the supplemental "
-                                      "heating coil inlet node name.");
-                    ShowContinueError(state, "...Heating coil outlet node name              = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
-                    ShowContinueError(state, "...Supplemental heating coil inlet node name  = " + state.dataLoopNodes->NodeID(SupHeatCoilInletNode));
+                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                    				"When a blow through fan is specified, the heating coil outlet node name must be the same as the supplemental "
+                                      "heating coil inlet node name.",
+                    				"...Heating coil outlet node name              = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode),
+                    				"...Supplemental heating coil inlet node name  = " + state.dataLoopNodes->NodeID(SupHeatCoilInletNode));
                     ErrorsFound = true;
                 }
                 if (SupHeatCoilOutletNode != state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum) {
-                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                    ShowContinueError(state,
-                                      "The supplemental heating coil outlet node name must be the same as the unitary system outlet node name.");
-                    ShowContinueError(state, "...Supplemental heating coil outlet node name = " + state.dataLoopNodes->NodeID(SupHeatCoilOutletNode));
-                    ShowContinueError(state,
-                                      "...Unitary system outlet node name            = " +
+                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                    				"The supplemental heating coil outlet node name must be the same as the unitary system outlet node name.",
+                    				"...Supplemental heating coil outlet node name = " + state.dataLoopNodes->NodeID(SupHeatCoilOutletNode),
+                    				"...Unitary system outlet node name            = " +
                                           state.dataLoopNodes->NodeID(state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum));
                     ErrorsFound = true;
                 }
             } else {
                 if (CoolingCoilInletNode != state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum) {
-                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                    ShowContinueError(state,
-                                      "When a draw through fan is specified, the cooling coil inlet node name must be the same as the unitary system "
-                                      "inlet node name.");
-                    ShowContinueError(state, "...Cooling coil inlet node name   = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
-                    ShowContinueError(state,
-                                      "...Unitary system inlet node name = " +
+                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                    				"When a draw through fan is specified, the cooling coil inlet node name must be the same as the unitary system "
+                                      "inlet node name.",
+                    				"...Cooling coil inlet node name   = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode),
+                    				"...Unitary system inlet node name = " +
                                           state.dataLoopNodes->NodeID(state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum));
                     ErrorsFound = true;
                 }
                 if (CoolingCoilOutletNode != HeatingCoilInletNode) {
-                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                    ShowContinueError(state, "The cooling coil outlet node name must be the same as the heating coil inlet node name.");
-                    ShowContinueError(state, "...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode));
-                    ShowContinueError(state, "...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
+                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                    				"The cooling coil outlet node name must be the same as the heating coil inlet node name.",
+                    				"...Cooling coil outlet node name = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode),
+                    				"...Heating coil inlet node name  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
                     ErrorsFound = true;
                 }
                 if (HeatingCoilOutletNode != FanInletNode) {
-                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                    ShowContinueError(
-                        state,
-                        "When a draw through fan is specified, the heating coil outlet node name must be the same as the fan inlet node name.");
-                    ShowContinueError(state, "...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
-                    ShowContinueError(state, "...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode));
+                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                    				"When a draw through fan is specified, the heating coil outlet node name must be the same as the fan inlet node name.",
+                    				"...Heating coil outlet node name = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode),
+                    				"...Fan inlet node name           = " + state.dataLoopNodes->NodeID(FanInletNode));
                     ErrorsFound = true;
                 }
                 if (FanOutletNode != SupHeatCoilInletNode) {
-                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                    ShowContinueError(state,
-                                      "When a draw through fan is specified, the fan outlet node name must be the same as the supplemental heating "
-                                      "coil inlet node name.");
-                    ShowContinueError(state, "...Fan outlet node name                       = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                    ShowContinueError(state, "...Supplemental heating coil inlet node name  = " + state.dataLoopNodes->NodeID(SupHeatCoilInletNode));
+                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                    				"When a draw through fan is specified, the fan outlet node name must be the same as the supplemental heating "
+                                      "coil inlet node name.",
+                    				"...Fan outlet node name                       = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                    				"...Supplemental heating coil inlet node name  = " + state.dataLoopNodes->NodeID(SupHeatCoilInletNode));
                     ErrorsFound = true;
                 }
                 if (SupHeatCoilOutletNode != state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum) {
-                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
-                    ShowContinueError(state,
-                                      "The supplemental heating coil outlet node name must be the same as the unitary system outlet node name.");
-                    ShowContinueError(state, "...Supplemental heating coil outlet node name = " + state.dataLoopNodes->NodeID(SupHeatCoilOutletNode));
-                    ShowContinueError(state,
-                                      "...Unitary system outlet node name            = " +
+                    ShowSevereError(state, "For " + CurrentModuleObject + " \"" + Alphas(1) + "\"",
+                    				"The supplemental heating coil outlet node name must be the same as the unitary system outlet node name.",
+                    				"...Supplemental heating coil outlet node name = " + state.dataLoopNodes->NodeID(SupHeatCoilOutletNode),
+                    				"...Unitary system outlet node name            = " +
                                           state.dataLoopNodes->NodeID(state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum));
                     ErrorsFound = true;
                 }
@@ -3826,24 +3788,24 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow = Numbers(1);
             if (state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow <= 0 &&
                 state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(1), Numbers(1)));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				format("Illegal {} = {:.7T}", cNumericFields(1), Numbers(1)));
                 ErrorsFound = true;
             }
 
             state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow = Numbers(2);
             if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow <= 0 &&
                 state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != DataSizing::AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(2), Numbers(2)));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				format("Illegal {} = {:.7T}", cNumericFields(2), Numbers(2)));
                 ErrorsFound = true;
             }
 
             state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = Numbers(3);
             if (state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow < 0 &&
                 state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(3), Numbers(3)));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				format("Illegal {} = {:.7T}", cNumericFields(3), Numbers(3)));
                 ErrorsFound = true;
             }
 
@@ -3904,25 +3866,21 @@ namespace Furnaces {
             if (FanVolFlowRate != DataSizing::AutoSize) {
                 if (FanVolFlowRate < state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow &&
                     state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(
-                        state,
-                        format("... air flow rate = {:.7T} in fan object {} is less than the maximum HVAC system air flow rate in cooling mode.",
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				format("... air flow rate = {:.7T} in fan object {} is less than the maximum HVAC system air flow rate in cooling mode.",
                                FanVolFlowRate,
-                               FanName));
-                    ShowContinueError(state, " The " + cNumericFields(1) + " is reset to the fan flow rate and the simulation continues.");
+                               FanName),
+                    				" The " + cNumericFields(1) + " is reset to the fan flow rate and the simulation continues.");
                     state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow = FanVolFlowRate;
                     state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = FanVolFlowRate;
                 }
                 if (FanVolFlowRate < state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow &&
                     state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != DataSizing::AutoSize) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(
-                        state,
-                        format("... air flow rate = {:.7T} in fan object {} is less than the maximum HVAC system air flow rate in heating mode.",
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				format("... air flow rate = {:.7T} in fan object {} is less than the maximum HVAC system air flow rate in heating mode.",
                                FanVolFlowRate,
-                               FanName));
-                    ShowContinueError(state, " The " + cNumericFields(2) + " is reset to the fan flow rate and the simulation continues.");
+                               FanName),
+                    				" The " + cNumericFields(2) + " is reset to the fan flow rate and the simulation continues.");
                     state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow = FanVolFlowRate;
                     state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = FanVolFlowRate;
                 }
@@ -4049,8 +4007,8 @@ namespace Furnaces {
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataFurnaces->Furnace(FurnaceNum).SchedPtr == 0) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, "Illegal " + cAlphaFields(2) + " = " + Alphas(2));
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"Illegal " + cAlphaFields(2) + " = " + Alphas(2));
                     ErrorsFound = true;
                 }
             }
@@ -4080,8 +4038,8 @@ namespace Furnaces {
             // Get the Controlling Zone or Location of the Furnace Thermostat
             state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(5), state.dataHeatBal->Zone);
             if (state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum == 0) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(5) + " = " + Alphas(5));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(5) + " = " + Alphas(5));
                 ErrorsFound = true;
             }
 
@@ -4136,17 +4094,16 @@ namespace Furnaces {
                     if (AirLoopFound) break;
                 }
                 if (!AirNodeFound) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, "Did not find air node (zone with thermostat).");
-                    ShowContinueError(state, "Specified " + cAlphaFields(5) + " = " + Alphas(5));
-                    ShowContinueError(
-                        state, "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone.");
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"Did not find air node (zone with thermostat).",
+                    				"Specified " + cAlphaFields(5) + " = " + Alphas(5),
+                    				"Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Thermostat object must be specified for this zone.");
                     ErrorsFound = true;
                 }
                 if (!AirLoopFound) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowSevereError(state, "Did not find correct AirLoopHVAC.");
-                    ShowContinueError(state, "Specified " + cAlphaFields(5) + " = " + Alphas(5));
+                    ShowSevereError(state, "Did not find correct AirLoopHVAC.",
+                    				"Specified " + cAlphaFields(5) + " = " + Alphas(5));
                     ErrorsFound = true;
                 }
             }
@@ -4192,8 +4149,8 @@ namespace Furnaces {
                     }
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(6) + " = " + Alphas(6));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(6) + " = " + Alphas(6));
                 ErrorsFound = true;
             }
 
@@ -4240,8 +4197,8 @@ namespace Furnaces {
                     HeatingCoilOutletNode = GetCoilOutletNodeVariableSpeed(state, HeatingCoilType, HeatingCoilName, errFlag);
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(8) + " = " + Alphas(8));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(8) + " = " + Alphas(8));
                 ErrorsFound = true;
             }
 
@@ -4288,8 +4245,8 @@ namespace Furnaces {
                     CoolingCoilOutletNode = GetCoilOutletNodeVariableSpeed(state, CoolingCoilType, CoolingCoilName, errFlag);
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(10) + " = " + Alphas(10));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(10) + " = " + Alphas(10));
                 ErrorsFound = true;
             }
 
@@ -4305,8 +4262,8 @@ namespace Furnaces {
                 state.dataFurnaces->Furnace(FurnaceNum).WaterCyclingMode = WaterCycling;
             }
             if (state.dataFurnaces->Furnace(FurnaceNum).WaterCyclingMode == 0) {
-                ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(18) + " = " + Alphas(18));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
+                ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(18) + " = " + Alphas(18),
+                				"Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
                 ErrorsFound = true;
             }
 
@@ -4442,9 +4399,9 @@ namespace Furnaces {
                     if (!errFlag) { // then did find a controller so that is bad
                         ShowSevereError(state,
                                         CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name +
-                                            " has a conflicting Controller:WaterCoil object");
-                        ShowContinueError(state, "Hot water coils are controlled directly by unitary and furnace systems.");
-                        ShowContinueError(state, "No water coil controller should be input for the coil.");
+                                            " has a conflicting Controller:WaterCoil object",
+                        				"Hot water coils are controlled directly by unitary and furnace systems.",
+                        				"No water coil controller should be input for the coil.");
                         ErrorsFound = true;
                     }
                 }
@@ -4460,8 +4417,8 @@ namespace Furnaces {
                     errFlag = false;
                     state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex = GetSteamCoilIndex(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
                     if (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex == 0) {
-                        ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(12) + " = " + SuppHeatCoilName);
-                        ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
+                        ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(12) + " = " + SuppHeatCoilName,
+                        				"Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
                         ErrorsFound = true;
                     }
 
@@ -4507,8 +4464,8 @@ namespace Furnaces {
                 }
 
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(12) + " = " + Alphas(12));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(12) + " = " + Alphas(12));
                 ErrorsFound = true;
             } // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
@@ -4526,9 +4483,9 @@ namespace Furnaces {
                                                                                              ObjectIsNotParent);
                 // need better verification.
                 if (!CheckOutAirNodeNumber(state, state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum)) {
-                    ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, " Node name of outdoor dry-bulb temperature sensor not valid outdoor air node= " + Alphas(14));
-                    ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
+                    ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1),
+                    				" Node name of outdoor dry-bulb temperature sensor not valid outdoor air node= " + Alphas(14),
+                    				"...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                     ErrorsFound = true;
                 }
             }
@@ -4536,22 +4493,22 @@ namespace Furnaces {
             if (UtilityRoutines::SameString(Alphas(15), "BlowThrough")) state.dataFurnaces->Furnace(FurnaceNum).FanPlace = BlowThru;
             if (UtilityRoutines::SameString(Alphas(15), "DrawThrough")) state.dataFurnaces->Furnace(FurnaceNum).FanPlace = DrawThru;
             if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == 0) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(15) + " = " + Alphas(15));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(15) + " = " + Alphas(15));
                 ErrorsFound = true;
             }
 
             state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr = GetScheduleIndex(state, Alphas(16));
             if (!lAlphaBlanks(16) && state.dataFurnaces->Furnace(FurnaceNum).FanSchedPtr == 0) {
-                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                ShowContinueError(state, "Illegal " + cAlphaFields(16) + " = " + Alphas(16));
+                ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                				"Illegal " + cAlphaFields(16) + " = " + Alphas(16));
                 ErrorsFound = true;
             } else if (lAlphaBlanks(16)) {
                 state.dataFurnaces->Furnace(FurnaceNum).OpMode = CycFanCycCoil;
                 if (state.dataFurnaces->Furnace(FurnaceNum).FanType_Num != FanType_SimpleOnOff) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
-                    ShowContinueError(state, cAlphaFields(6) + " = " + Alphas(6));
-                    ShowContinueError(state, "Fan type must be Fan:OnOff when " + cAlphaFields(16) + " = Blank.");
+                    ShowSevereError(state, CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name,
+                    				cAlphaFields(6) + " = " + Alphas(6),
+                    				"Fan type must be Fan:OnOff when " + cAlphaFields(16) + " = Blank.");
                     ErrorsFound = true;
                 }
             }
@@ -4583,16 +4540,16 @@ namespace Furnaces {
                         AirNodeFound = true;
                     }
                     if (!AirNodeFound) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(state, "Did not find Air Node (Zone with Humidistat).");
-                        ShowContinueError(state, "Specified " + cAlphaFields(5) + " = " + Alphas(5));
+                        ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                        				"Did not find Air Node (Zone with Humidistat).",
+                        				"Specified " + cAlphaFields(5) + " = " + Alphas(5));
                         ErrorsFound = true;
                     }
                 }
             } else { // invalid input or blank
                 if (!lAlphaBlanks(17)) {
-                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
-                    ShowContinueError(state, "Illegal " + cAlphaFields(17) + " = " + Alphas(17));
+                    ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1),
+                    				"Illegal " + cAlphaFields(17) + " = " + Alphas(17));
                     ErrorsFound = true;
                 } else {
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = false;
@@ -4607,49 +4564,45 @@ namespace Furnaces {
                 CompSetCoolInlet = "UNDEFINED";
                 if (FanInletNode != state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum) {
                     ShowSevereError(
-                        state, "For " + CurrentModuleObject + " = " + Alphas(1) + ", Mismatch between unitary system inlet node and fan inlet node.");
-                    ShowContinueError(state, "..For \"BlowThrough\" fan, the inlet node name for the HeatPump should match the fan inlet node name.");
-                    ShowContinueError(
-                        state, "..HeatPump Inlet Node = " + state.dataLoopNodes->NodeID(state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum));
-                    ShowContinueError(state, "..Fan Inlet Node      = " + state.dataLoopNodes->NodeID(FanInletNode));
+                        state, "For " + CurrentModuleObject + " = " + Alphas(1) + ", Mismatch between unitary system inlet node and fan inlet node.",
+                    				"..For \"BlowThrough\" fan, the inlet node name for the HeatPump should match the fan inlet node name.",
+                    				"..HeatPump Inlet Node = " + state.dataLoopNodes->NodeID(state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum),
+                    				"..Fan Inlet Node      = " + state.dataLoopNodes->NodeID(FanInletNode));
                     ErrorsFound = true;
                 }
                 if (FanOutletNode != CoolingCoilInletNode) {
                     ShowSevereError(
-                        state, "For " + CurrentModuleObject + " = " + Alphas(1) + ", Mismatch between fan outlet node and cooling coil inlet node.");
-                    ShowContinueError(state, "..For \"BlowThrough\" fan, the fan outlet node name must match the cooling coil inlet node name.");
-                    ShowContinueError(state, "..Fan outlet node         = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                    ShowContinueError(state, "..Cooling coil inlet node = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
+                        state, "For " + CurrentModuleObject + " = " + Alphas(1) + ", Mismatch between fan outlet node and cooling coil inlet node.",
+                    				"..For \"BlowThrough\" fan, the fan outlet node name must match the cooling coil inlet node name.",
+                    				"..Fan outlet node         = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                    				"..Cooling coil inlet node = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
                     ErrorsFound = true;
                 }
                 if (CoolingCoilOutletNode != HeatingCoilInletNode) {
                     ShowSevereError(state,
                                     "For " + CurrentModuleObject + " = " + Alphas(1) +
-                                        ", Mismatch between cooling coil outlet node and heating coil inlet node.");
-                    ShowContinueError(state, "..The cooling coil outlet node name must match the heating coil inlet node name.");
-                    ShowContinueError(state, "..Cooling coil outlet node = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode));
-                    ShowContinueError(state, "..Heating coil inlet node  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
+                                        ", Mismatch between cooling coil outlet node and heating coil inlet node.",
+                    				"..The cooling coil outlet node name must match the heating coil inlet node name.",
+                    				"..Cooling coil outlet node = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode),
+                    				"..Heating coil inlet node  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
                     ErrorsFound = true;
                 }
                 if (HeatingCoilOutletNode != SupHeatCoilInletNode) {
                     ShowSevereError(state,
                                     "For " + CurrentModuleObject + " = " + Alphas(1) +
-                                        ", Mismatch between heating coil outlet node and supplemental heating coil inlet node.");
-                    ShowContinueError(
-                        state,
-                        "..For \"BlowThrough\" fan, the heating coil outlet node name must match the supplemental heating coil inlet node name.");
-                    ShowContinueError(state, "..Heating coil outlet node             = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
-                    ShowContinueError(state, "..Supplemental heating coil inlet node = " + state.dataLoopNodes->NodeID(SupHeatCoilInletNode));
+                                        ", Mismatch between heating coil outlet node and supplemental heating coil inlet node.",
+                    				"..For \"BlowThrough\" fan, the heating coil outlet node name must match the supplemental heating coil inlet node name.",
+                    				"..Heating coil outlet node             = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode),
+                    				"..Supplemental heating coil inlet node = " + state.dataLoopNodes->NodeID(SupHeatCoilInletNode));
                     ErrorsFound = true;
                 }
                 if (SupHeatCoilOutletNode != state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum) {
                     ShowSevereError(state,
                                     "For " + CurrentModuleObject + " = " + Alphas(1) +
-                                        ", Mismatch between supplemental heating coil outlet node and HeatPump outlet node.");
-                    ShowContinueError(state, "..The supplemental heating coil outlet node name must match the HeatPump outlet node name.");
-                    ShowContinueError(state, "..Supplemental heating coil outlet node = " + state.dataLoopNodes->NodeID(SupHeatCoilOutletNode));
-                    ShowContinueError(state,
-                                      "..HeatPump outlet node                  = " +
+                                        ", Mismatch between supplemental heating coil outlet node and HeatPump outlet node.",
+                    				"..The supplemental heating coil outlet node name must match the HeatPump outlet node name.",
+                    				"..Supplemental heating coil outlet node = " + state.dataLoopNodes->NodeID(SupHeatCoilOutletNode),
+                    				"..HeatPump outlet node                  = " +
                                           state.dataLoopNodes->NodeID(state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum));
                     ErrorsFound = true;
                 }
@@ -4659,52 +4612,46 @@ namespace Furnaces {
                 if (CoolingCoilInletNode != state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum) {
                     ShowSevereError(state,
                                     "For " + CurrentModuleObject + " = " + Alphas(1) +
-                                        ", Mismatch between unitary system inlet node and cooling coil inlet node.");
-                    ShowContinueError(
-                        state, "..For \"DrawThrough\" fan, the inlet node name for the HeatPump should match the cooling coil inlet node name.");
-                    ShowContinueError(state,
-                                      "..HeatPump inlet node     = " +
-                                          state.dataLoopNodes->NodeID(state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum));
-                    ShowContinueError(state, "..Cooling coil inlet node = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
+                                        ", Mismatch between unitary system inlet node and cooling coil inlet node.",
+                    				"..For \"DrawThrough\" fan, the inlet node name for the HeatPump should match the cooling coil inlet node name.",
+                    				"..HeatPump inlet node     = " +
+                                          state.dataLoopNodes->NodeID(state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum),
+                    				"..Cooling coil inlet node = " + state.dataLoopNodes->NodeID(CoolingCoilInletNode));
                     ErrorsFound = true;
                 }
                 if (CoolingCoilOutletNode != HeatingCoilInletNode) {
                     ShowSevereError(state,
                                     "For " + CurrentModuleObject + " = " + Alphas(1) +
-                                        ", Mismatch between cooling coil outlet node and heating coil inlet node.");
-                    ShowContinueError(state, "..The outlet node name for the cooling coil should match the heating coil inlet node name.");
-                    ShowContinueError(state, "..Cooling coil outlet node = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode));
-                    ShowContinueError(state, "..Heating coil inlet node  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
+                                        ", Mismatch between cooling coil outlet node and heating coil inlet node.",
+                    				"..The outlet node name for the cooling coil should match the heating coil inlet node name.",
+                    				"..Cooling coil outlet node = " + state.dataLoopNodes->NodeID(CoolingCoilOutletNode),
+                    				"..Heating coil inlet node  = " + state.dataLoopNodes->NodeID(HeatingCoilInletNode));
                     ErrorsFound = true;
                 }
                 if (HeatingCoilOutletNode != FanInletNode) {
                     ShowSevereError(
-                        state, "For " + CurrentModuleObject + " = " + Alphas(1) + ", Mismatch between heating coil outlet node and fan inlet node.");
-                    ShowContinueError(state,
-                                      "..For \"DrawThrough\" fan, the outlet node name for the heating coil should match the fan inlet node name.");
-                    ShowContinueError(state, "..Heating coil outlet node = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode));
-                    ShowContinueError(state, "..Fan inlet node           = " + state.dataLoopNodes->NodeID(FanInletNode));
+                        state, "For " + CurrentModuleObject + " = " + Alphas(1) + ", Mismatch between heating coil outlet node and fan inlet node.",
+                    				"..For \"DrawThrough\" fan, the outlet node name for the heating coil should match the fan inlet node name.",
+                    				"..Heating coil outlet node = " + state.dataLoopNodes->NodeID(HeatingCoilOutletNode),
+                    				"..Fan inlet node           = " + state.dataLoopNodes->NodeID(FanInletNode));
                     ErrorsFound = true;
                 }
                 if (FanOutletNode != SupHeatCoilInletNode) {
                     ShowSevereError(state,
                                     "For " + CurrentModuleObject + " = " + Alphas(1) +
-                                        ", Mismatch between fan outlet node and supplemental heating coil inlet node.");
-                    ShowContinueError(
-                        state,
-                        "..For \"DrawThrough\" fan, the outlet node name for the fan should match the supplemental heating coil inlet node name.");
-                    ShowContinueError(state, "..Fan outlet node                      = " + state.dataLoopNodes->NodeID(FanOutletNode));
-                    ShowContinueError(state, "..Supplemental heating coil inlet node = " + state.dataLoopNodes->NodeID(SupHeatCoilInletNode));
+                                        ", Mismatch between fan outlet node and supplemental heating coil inlet node.",
+                    				"..For \"DrawThrough\" fan, the outlet node name for the fan should match the supplemental heating coil inlet node name.",
+                    				"..Fan outlet node                      = " + state.dataLoopNodes->NodeID(FanOutletNode),
+                    				"..Supplemental heating coil inlet node = " + state.dataLoopNodes->NodeID(SupHeatCoilInletNode));
                     ErrorsFound = true;
                 }
                 if (SupHeatCoilOutletNode != state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum) {
                     ShowSevereError(state,
                                     "For " + CurrentModuleObject + " = " + Alphas(1) +
-                                        ", Mismatch between supplemental heating coil outlet node and HeatPump outlet node.");
-                    ShowContinueError(state, "..The supplemental heating coil outlet node name must match the HeatPump outlet node name.");
-                    ShowContinueError(state, "..Supplemental heating coil outlet node = " + state.dataLoopNodes->NodeID(SupHeatCoilOutletNode));
-                    ShowContinueError(state,
-                                      "..HeatPump outlet node                  = " +
+                                        ", Mismatch between supplemental heating coil outlet node and HeatPump outlet node.",
+                    				"..The supplemental heating coil outlet node name must match the HeatPump outlet node name.",
+                    				"..Supplemental heating coil outlet node = " + state.dataLoopNodes->NodeID(SupHeatCoilOutletNode),
+                    				"..HeatPump outlet node                  = " +
                                           state.dataLoopNodes->NodeID(state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum));
                     ErrorsFound = true;
                 }
@@ -5367,8 +5314,8 @@ namespace Furnaces {
                 if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate <= 0.0) {
                     ShowSevereError(state,
                                     cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + '=' +
-                                        state.dataFurnaces->Furnace(FurnaceNum).Name + " has a Design Fan Volume Flow Rate <= 0.0, it must be >0.0");
-                    ShowContinueError(state, format("... Entered value={:.2R}", state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate));
+                                        state.dataFurnaces->Furnace(FurnaceNum).Name + " has a Design Fan Volume Flow Rate <= 0.0, it must be >0.0",
+                    				format("... Entered value={:.2R}", state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate));
                 }
 
                 state.dataFurnaces->MySecondOneTimeFlag(FurnaceNum) = false;
@@ -5750,8 +5697,8 @@ namespace Furnaces {
                     } else {
                         ShowSevereError(state,
                                         cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + " = " +
-                                            state.dataFurnaces->Furnace(FurnaceNum).Name);
-                        ShowContinueError(state, " The Fraction of Supply Air Flow That Goes Through the Controlling Zone is set to 1.");
+                                            state.dataFurnaces->Furnace(FurnaceNum).Name,
+                        				" The Fraction of Supply Air Flow That Goes Through the Controlling Zone is set to 1.");
                     }
                     BaseSizer::reportSizerOutput(state,
                                                  cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),

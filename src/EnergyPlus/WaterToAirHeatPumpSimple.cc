@@ -2083,10 +2083,9 @@ namespace WaterToAirHeatPumpSimple {
                     RatedWaterVolFlowRateDes = SystemCapacity / (state.dataSize->PlantSizData(PltSizNum).DeltaT * Cp * rho);
                 }
             } else {
-                ShowSevereError(state, "Autosizing of water flow requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
-                ShowContinueError(state,
-                                  "Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
+                ShowSevereError(state, "Autosizing of water flow requires a loop Sizing:Plant object",
+                				"Autosizing also requires physical connection to a plant or condenser loop.",
+                				"Occurs in COIL:" + simpleWatertoAirHP.WatertoAirHPType +
                                       ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + simpleWatertoAirHP.Name);
                 ErrorsFound = true;
             }

@@ -318,8 +318,8 @@ namespace WindowAC {
             } else {
                 state.dataWindowAC->WindAC(WindACNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataWindowAC->WindAC(WindACNum).SchedPtr == 0) {
-                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataWindowAC->WindAC(WindACNum).Name + "\" invalid data.");
-                    ShowContinueError(state, "invalid-not found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
+                    ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataWindowAC->WindAC(WindACNum).Name + "\" invalid data.",
+                    				"invalid-not found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
                     ErrorsFound = true;
                 }
             }
@@ -448,8 +448,8 @@ namespace WindowAC {
                                 }
                             }
                         } else {
-                            ShowSevereError(state, CurrentModuleObject + " = \"" + Alphas(1) + "\".");
-                            ShowContinueError(state, "Fan Type must be Fan:OnOff, or Fan:ConstantVolume.");
+                            ShowSevereError(state, CurrentModuleObject + " = \"" + Alphas(1) + "\".",
+                            				"Fan Type must be Fan:OnOff, or Fan:ConstantVolume.");
                             ErrorsFound = true;
                         }
                     }
@@ -511,8 +511,8 @@ namespace WindowAC {
             if (UtilityRoutines::SameString(Alphas(12), "BlowThrough")) state.dataWindowAC->WindAC(WindACNum).FanPlace = BlowThru;
             if (UtilityRoutines::SameString(Alphas(12), "DrawThrough")) state.dataWindowAC->WindAC(WindACNum).FanPlace = DrawThru;
             if (state.dataWindowAC->WindAC(WindACNum).FanPlace == 0) {
-                ShowSevereError(state, "Invalid " + cAlphaFields(12) + " = " + Alphas(12));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
+                ShowSevereError(state, "Invalid " + cAlphaFields(12) + " = " + Alphas(12),
+                				"Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
                 ErrorsFound = true;
             }
 
@@ -526,8 +526,8 @@ namespace WindowAC {
             if (!lAlphaBlanks(14)) {
                 state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(14), state.dataSize->ZoneHVACSizing);
                 if (state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex == 0) {
-                    ShowSevereError(state, cAlphaFields(14) + " = " + Alphas(14) + " not found.");
-                    ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
+                    ShowSevereError(state, cAlphaFields(14) + " = " + Alphas(14) + " not found.",
+                    				"Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
                     ErrorsFound = true;
                 }
             }
@@ -550,10 +550,9 @@ namespace WindowAC {
                 if (ZoneNodeNotFound) {
                     ShowSevereError(state,
                                     CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name +
-                                        "\". Window AC air inlet node name must be the same as a zone exhaust node name.");
-                    ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(
-                        state, "..Window AC air inlet node name = " + state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirInNode));
+                                        "\". Window AC air inlet node name must be the same as a zone exhaust node name.",
+                    				"..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.",
+                    				"..Window AC air inlet node name = " + state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirInNode));
                     ErrorsFound = true;
                 }
                 // check that Window AC air outlet node is a zone inlet node.
@@ -571,10 +570,9 @@ namespace WindowAC {
                 if (ZoneNodeNotFound) {
                     ShowSevereError(state,
                                     CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name +
-                                        "\". Window AC air outlet node name must be the same as a zone inlet node name.");
-                    ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(
-                        state, "..Window AC air outlet node name = " + state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirOutNode));
+                                        "\". Window AC air outlet node name must be the same as a zone inlet node name.",
+                    				"..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.",
+                    				"..Window AC air outlet node name = " + state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirOutNode));
                     ErrorsFound = true;
                 }
                 CompSetFanInlet = state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).MixedAirNode);
@@ -597,10 +595,9 @@ namespace WindowAC {
                     ShowSevereError(state,
                                     CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name +
                                         "\"."
-                                        " Window AC air inlet node name must be the same as a zone exhaust node name.");
-                    ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(
-                        state, "..Window AC inlet node name = " + state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirInNode));
+                                        " Window AC air inlet node name must be the same as a zone exhaust node name.",
+                    				"..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.",
+                    				"..Window AC inlet node name = " + state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirInNode));
                     ErrorsFound = true;
                 }
                 // check that Window AC air outlet node is the same as a zone inlet node.
@@ -618,10 +615,9 @@ namespace WindowAC {
                 if (ZoneNodeNotFound) {
                     ShowSevereError(state,
                                     CurrentModuleObject + " = \"" + state.dataWindowAC->WindAC(WindACNum).Name +
-                                        "\". Window AC air outlet node name must be the same as a zone inlet node name.");
-                    ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(
-                        state, "..Window AC outlet node name = " + state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirOutNode));
+                                        "\". Window AC air outlet node name must be the same as a zone inlet node name.",
+                    				"..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.",
+                    				"..Window AC outlet node name = " + state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).AirOutNode));
                     ErrorsFound = true;
                 }
                 CompSetFanInlet = state.dataLoopNodes->NodeID(state.dataWindowAC->WindAC(WindACNum).CoilOutletNodeNum);

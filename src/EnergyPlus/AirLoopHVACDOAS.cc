@@ -388,8 +388,8 @@ namespace AirLoopHVACDOAS {
                         ShowSevereError(state,
                                         "When " + CurrentModuleObject + " = " +
                                             state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ControllerName(InListNum) +
-                                            " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,");
-                        ShowContinueError(state, "The Controller:OutdoorAir can not be used as a controller. Please remove it");
+                                            " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,", 
+                                            "The Controller:OutdoorAir can not be used as a controller. Please remove it");
                         errorsFound = true;
                     }
                 }
@@ -409,27 +409,25 @@ namespace AirLoopHVACDOAS {
                         ShowSevereError(state,
                                         "When " + CurrentModuleObject + " = " +
                                             state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum) +
-                                            " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,");
-                        ShowContinueError(state, " the OUTDOORAIR:MIXER can not be used as a component. Please remove it");
+                                            " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,",
+                                            " the OUTDOORAIR:MIXER can not be used as a component. Please remove it");
                         errorsFound = true;
 
                     } else if (SELECT_CASE_var == "FAN:CONSTANTVOLUME") {
                         ShowSevereError(state,
                                         "When " + CurrentModuleObject + " = " +
                                             state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum) +
-                                            " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,");
-                        ShowContinueError(state,
-                                          " the FAN:CONSTANTVOLUME can not be used as a component. The alllowed fan types are FAN:SYSTEMMODEL and "
-                                          "FAN:COMPONENTMODEL. Please change it");
+                                            " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,",
+                                            " the FAN:CONSTANTVOLUME can not be used as a component. The alllowed fan types are FAN:SYSTEMMODEL and "
+                                            "FAN:COMPONENTMODEL. Please change it");
                         errorsFound = true;
                     } else if (SELECT_CASE_var == "FAN:VARIABLEVOLUME") {
                         ShowSevereError(state,
                                         "When " + CurrentModuleObject + " = " +
                                             state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum) +
-                                            " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,");
-                        ShowContinueError(state,
-                                          " the FAN:VARIABLEVOLUME can not be used as a component. The alllowed fan types are FAN:SYSTEMMODEL and "
-                                          "FAN:COMPONENTMODEL. Please change it");
+                                            " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,",
+                                            " the FAN:VARIABLEVOLUME can not be used as a component. The alllowed fan types are FAN:SYSTEMMODEL and "
+                                            "FAN:COMPONENTMODEL. Please change it");
                         errorsFound = true;
                     } else if (SELECT_CASE_var == "FAN:SYSTEMMODEL") {
                         thisDOAS.FanName = CompName;
@@ -453,8 +451,8 @@ namespace AirLoopHVACDOAS {
                         if (!(CompNum == 1 || CompNum == state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents)) {
                             ShowSevereError(state,
                                             "The fan placement is either first as blow through or last as draw through in" + CurrentModuleObject +
-                                                " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
-                            ShowContinueError(state, format("The current position is number {}", CompNum));
+                                                " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum),
+                                            format("The current position is number {}", CompNum));
                             errorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {
@@ -479,8 +477,8 @@ namespace AirLoopHVACDOAS {
                         if (!(CompNum == 1 || CompNum == state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents)) {
                             ShowSevereError(state,
                                             "The fan placement is either first as blow through or last as draw through in" + CurrentModuleObject +
-                                                " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
-                            ShowContinueError(state, format("The current position is number {}", CompNum));
+                                                " = " + state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum),
+                                                format("The current position is number {}", CompNum));
                             errorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "COIL:COOLING:WATER") {
@@ -651,8 +649,8 @@ namespace AirLoopHVACDOAS {
                         ShowSevereError(state,
                                         "When " + CurrentModuleObject + " = " +
                                             state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum) +
-                                            " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,");
-                        ShowContinueError(state, " the COIL:USERDEFINED can not be used as a component.");
+                                            " is used in AirLoopHVAC:DedicatedOutdoorAirSystem,",
+                                            " the COIL:USERDEFINED can not be used as a component.");
                         errorsFound = true;
                         // Heat recovery
                     } else if (SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE") {
@@ -821,8 +819,8 @@ namespace AirLoopHVACDOAS {
                 if (thisDOAS.NumOfAirLoops < 1) {
                     cFieldName = "Number of AirLoopHVAC";
                     ShowSevereError(state,
-                                    fmt::format("{}, \"{}\" {} = {}", cCurrentModuleObject, thisDOAS.Name, cFieldName, thisDOAS.NumOfAirLoops));
-                    ShowContinueError(state, " The minimum value should be 1.");
+                                    fmt::format("{}, \"{}\" {} = {}", cCurrentModuleObject, thisDOAS.Name, cFieldName, thisDOAS.NumOfAirLoops),
+                                    " The minimum value should be 1.");
                     errorsFound = true;
                 }
 

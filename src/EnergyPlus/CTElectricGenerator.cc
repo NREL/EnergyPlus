@@ -189,8 +189,8 @@ namespace CTElectricGenerator {
 
             state.dataCTElectricGenerator->CTGenerator(genNum).RatedPowerOutput = NumArray(1);
             if (NumArray(1) == 0.0) {
-                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), NumArray(1)));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), NumArray(1)),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -215,48 +215,48 @@ namespace CTElectricGenerator {
             state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedFuelInputCurve =
                 CurveManager::GetCurveIndex(state, AlphArray(3)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedFuelInputCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + AlphArray(3));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + AlphArray(3),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedFuelInputCurve =
                 CurveManager::GetCurveIndex(state, AlphArray(4)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedFuelInputCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + AlphArray(4));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + AlphArray(4),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).ExhaustFlowCurve =
                 CurveManager::GetCurveIndex(state, AlphArray(5)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).ExhaustFlowCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + AlphArray(5));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + AlphArray(5),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedExhaustTempCurve =
                 CurveManager::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).PLBasedExhaustTempCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + AlphArray(6));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + AlphArray(6),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedExhaustTempCurve =
                 CurveManager::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).TempBasedExhaustTempCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphArray(7));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphArray(7),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             state.dataCTElectricGenerator->CTGenerator(genNum).QLubeOilRecoveredCurve =
                 CurveManager::GetCurveIndex(state, AlphArray(8)); // convert curve name to number
             if (state.dataCTElectricGenerator->CTGenerator(genNum).QLubeOilRecoveredCurve == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -322,8 +322,8 @@ namespace CTElectricGenerator {
             bool FuelTypeError(false);
             UtilityRoutines::ValidateFuelType(state, AlphArray(11), state.dataCTElectricGenerator->CTGenerator(genNum).FuelType, FuelTypeError);
             if (FuelTypeError) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphArray(11));
-                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphArray(11),
+                				"Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
                 FuelTypeError = false;
             }
@@ -347,8 +347,8 @@ namespace CTElectricGenerator {
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataCTElectricGenerator->CTGenerator(genNum).OAInletNode)) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + ", \"" + state.dataCTElectricGenerator->CTGenerator(genNum).Name +
-                                        "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray(12));
-                    ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
+                                        "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray(12),
+                    				"...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                     ErrorsFound = true;
                 }
             }

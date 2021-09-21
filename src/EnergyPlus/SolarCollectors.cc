@@ -457,18 +457,16 @@ namespace SolarCollectors {
                 // NOTE:  This collector gross area is used in all the calculations.
                 state.dataSolarCollectors->Parameters(ParametersNum).Area = state.dataIPShortCut->rNumericArgs(1);
                 if (state.dataIPShortCut->rNumericArgs(1) <= 0.0) {
-                    ShowSevereError(state, CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(
-                        state, format("Illegal {} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-                    ShowContinueError(state, " Collector gross area must be always gretaer than zero.");
+                    ShowSevereError(state, CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                    				format("Illegal {} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)),
+                    				" Collector gross area must be always gretaer than zero.");
                     ErrorsFound = true;
                 }
                 state.dataSolarCollectors->Parameters(ParametersNum).Volume = state.dataIPShortCut->rNumericArgs(2);
                 if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) {
-                    ShowSevereError(state, CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(
-                        state, format("Illegal {} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
-                    ShowContinueError(state, " Collector water volume must be always gretaer than zero.");
+                    ShowSevereError(state, CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                    				format("Illegal {} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)),
+                    				" Collector water volume must be always gretaer than zero.");
                     ErrorsFound = true;
                 }
                 // Note: this value is used to calculate the heat loss through the bottom and side of the collector
@@ -494,8 +492,8 @@ namespace SolarCollectors {
                         state.dataSolarCollectors->Parameters(ParametersNum).ExtCoefTimesThickness(2) = state.dataIPShortCut->rNumericArgs(14);
                         state.dataSolarCollectors->Parameters(ParametersNum).EmissOfCover(2) = state.dataIPShortCut->rNumericArgs(15);
                     } else {
-                        ShowSevereError(state, CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                        ShowContinueError(state, "Illegal input for one of the three inputs of the inner cover optical properties");
+                        ShowSevereError(state, CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                        				"Illegal input for one of the three inputs of the inner cover optical properties");
                         ErrorsFound = true;
                     }
                 } else if (state.dataSolarCollectors->Parameters(ParametersNum).NumOfCovers == 1) {
@@ -506,9 +504,8 @@ namespace SolarCollectors {
                     // Outer cover emissivity
                     state.dataSolarCollectors->Parameters(ParametersNum).EmissOfCover(1) = state.dataIPShortCut->rNumericArgs(12);
                 } else {
-                    ShowSevereError(state, CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
-                    ShowContinueError(
-                        state, format("Illegal {} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(8), state.dataIPShortCut->rNumericArgs(8)));
+                    ShowSevereError(state, CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1),
+                    				format("Illegal {} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(8), state.dataIPShortCut->rNumericArgs(8)));
                     ErrorsFound = true;
                 }
                 // Solar absorptance of the absorber plate
@@ -1342,11 +1339,11 @@ namespace SolarCollectors {
             if (IAM > 10.0) { // Greater than 10 is probably not a possibility
                 ShowSevereError(state,
                                 "IAM Function: SolarCollectorPerformance:FlatPlate = " + this->Name +
-                                    ":  Incident Angle Modifier is out of bounds due to bad coefficients.");
-                ShowContinueError(state, format("Coefficient 2 of Incident Angle Modifier = {}", this->iam1));
-                ShowContinueError(state, format("Coefficient 3 of Incident Angle Modifier = {}", this->iam2));
-                ShowContinueError(state, format("Calculated Incident Angle Modifier = {}", IAM));
-                ShowContinueError(state, "Expected Incident Angle Modifier should be approximately 1.5 or less.");
+                                    ":  Incident Angle Modifier is out of bounds due to bad coefficients.",
+                				format("Coefficient 2 of Incident Angle Modifier = {}", this->iam1),
+                				format("Coefficient 3 of Incident Angle Modifier = {}", this->iam2),
+                				format("Calculated Incident Angle Modifier = {}", IAM),
+                				"Expected Incident Angle Modifier should be approximately 1.5 or less.");
                 ShowFatalError(state, "Errors in SolarCollectorPerformance:FlatPlate input.");
             }
 

@@ -729,12 +729,11 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
             }
 
             if (std::abs(ZInfSurf - ZSupSurf) < 1.e-10) {
-                ShowSevereError(state, "RoomAirModelUFAD:HcUCSDUF: Surface values will cause divide by zero.");
-                ShowContinueError(state,
-                                  "Zone=\"" + state.dataHeatBal->Zone(state.dataSurface->Surface(SurfNum).Zone).Name + "\", Surface=\"" +
-                                      state.dataSurface->Surface(SurfNum).Name + "\".");
-                ShowContinueError(state, format("ZInfSurf=[{:.4R}], LayH=[{:.4R}].", ZInfSurf, LayH));
-                ShowContinueError(state, format("ZSupSurf=[{:.4R}], LayH=[{:.4R}].", ZSupSurf, LayH));
+                ShowSevereError(state, "RoomAirModelUFAD:HcUCSDUF: Surface values will cause divide by zero.",
+                				"Zone=\"" + state.dataHeatBal->Zone(state.dataSurface->Surface(SurfNum).Zone).Name + "\", Surface=\"" +
+                                      state.dataSurface->Surface(SurfNum).Name + "\".",
+                				format("ZInfSurf=[{:.4R}], LayH=[{:.4R}].", ZInfSurf, LayH),
+                				format("ZSupSurf=[{:.4R}], LayH=[{:.4R}].", ZSupSurf, LayH));
                 ShowFatalError(state, "...Previous condition causes termination.");
             }
 

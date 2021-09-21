@@ -259,9 +259,8 @@ namespace HeatBalFiniteDiffManager {
                 MaterialFD(MaterNum).tk1 = MaterialProps(1);
                 MaterialFD(MaterNum).numTempEnth = (MaterialNumProp - 1) / 2;
                 if (MaterialFD(MaterNum).numTempEnth * 2 != (MaterialNumProp - 1)) {
-                    ShowSevereError(state, "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames(1) + "\", mismatched pairs");
-                    ShowContinueError(
-                        state, format("...expected {} pairs, but only entered {} numbers.", MaterialFD(MaterNum).numTempEnth, MaterialNumProp - 1));
+                    ShowSevereError(state, "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames(1) + "\", mismatched pairs",
+                    				format("...expected {} pairs, but only entered {} numbers.", MaterialFD(MaterNum).numTempEnth, MaterialNumProp - 1));
                     ErrorsFound = true;
                 }
                 MaterialFD(MaterNum).TempEnth.dimension(2, MaterialFD(MaterNum).numTempEnth, 0.0);
@@ -288,10 +287,8 @@ namespace HeatBalFiniteDiffManager {
                 if (nonInc) {
                     ShowSevereError(state,
                                     "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames(1) +
-                                        "\", non increasing Temperatures. Temperatures must be strictly increasing.");
-                    ShowContinueError(
-                        state,
-                        format("...occurs first at item=[{}], value=[{:.2R}].", fmt::to_string(inegptr), MaterialFD(MaterNum).TempEnth(1, inegptr)));
+                                        "\", non increasing Temperatures. Temperatures must be strictly increasing.",
+                    				format("...occurs first at item=[{}], value=[{:.2R}].", fmt::to_string(inegptr), MaterialFD(MaterNum).TempEnth(1, inegptr)));
                     ErrorsFound = true;
                 }
                 nonInc = false;
@@ -303,10 +300,9 @@ namespace HeatBalFiniteDiffManager {
                     break;
                 }
                 if (nonInc) {
-                    ShowSevereError(state, "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames(1) + "\", non increasing Enthalpy.");
-                    ShowContinueError(state,
-                                      format("...occurs first at item=[{}], value=[{:.2R}].", inegptr, MaterialFD(MaterNum).TempEnth(2, inegptr)));
-                    ShowContinueError(state, "...These values may be Cp (Specific Heat) rather than Enthalpy.  Please correct.");
+                    ShowSevereError(state, "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames(1) + "\", non increasing Enthalpy.",
+                    				format("...occurs first at item=[{}], value=[{:.2R}].", inegptr, MaterialFD(MaterNum).TempEnth(2, inegptr)),
+                    				"...These values may be Cp (Specific Heat) rather than Enthalpy.  Please correct.");
                     ErrorsFound = true;
                 }
             }
@@ -353,9 +349,8 @@ namespace HeatBalFiniteDiffManager {
                 //   Some or all may be zero (default).  They will be checked when calculating node temperatures
                 MaterialFD(MaterNum).numTempCond = MaterialNumProp / 2;
                 if (MaterialFD(MaterNum).numTempCond * 2 != MaterialNumProp) {
-                    ShowSevereError(state, "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames(1) + "\", mismatched pairs");
-                    ShowContinueError(
-                        state, format("...expected {} pairs, but only entered {} numbers.", MaterialFD(MaterNum).numTempCond, MaterialNumProp));
+                    ShowSevereError(state, "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames(1) + "\", mismatched pairs",
+                    				format("...expected {} pairs, but only entered {} numbers.", MaterialFD(MaterNum).numTempCond, MaterialNumProp));
                     ErrorsFound = true;
                 }
                 MaterialFD(MaterNum).TempCond.dimension(2, MaterialFD(MaterNum).numTempCond, 0.0);
@@ -382,9 +377,8 @@ namespace HeatBalFiniteDiffManager {
                 if (nonInc) {
                     ShowSevereError(state,
                                     "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames(1) +
-                                        "\", non increasing Temperatures. Temperatures must be strictly increasing.");
-                    ShowContinueError(state,
-                                      format("...occurs first at item=[{}], value=[{:.2R}].", inegptr, MaterialFD(MaterNum).TempCond(1, inegptr)));
+                                        "\", non increasing Temperatures. Temperatures must be strictly increasing.",
+                    				format("...occurs first at item=[{}], value=[{:.2R}].", inegptr, MaterialFD(MaterNum).TempCond(1, inegptr)));
                     ErrorsFound = true;
                 }
             }
@@ -715,14 +709,12 @@ namespace HeatBalFiniteDiffManager {
                             ShowSevereError(
                                 state,
                                 "InitialInitHeatBalFiniteDiff: Found Material that is too thin and/or too highly conductive, material name = " +
-                                    state.dataMaterial->Material(CurrentLayer).Name);
-                            ShowContinueError(state,
-                                              format("High conductivity Material layers are not well supported by Conduction Finite Difference, "
+                                    state.dataMaterial->Material(CurrentLayer).Name,
+                            				format("High conductivity Material layers are not well supported by Conduction Finite Difference, "
                                                      "material conductivity = {:.3R} [W/m-K]",
-                                                     state.dataMaterial->Material(CurrentLayer).Conductivity));
-                            ShowContinueError(state, format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha));
-                            ShowContinueError(
-                                state, format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
+                                                     state.dataMaterial->Material(CurrentLayer).Conductivity),
+                            				format("Material thermal diffusivity = {:.3R} [m2/s]", Alpha),
+                            				format("Material with this thermal diffusivity should have thickness > {:.5R} [m]", ThicknessThreshold));
                             if (state.dataMaterial->Material(CurrentLayer).Thickness < ThinMaterialLayerThreshold) {
                                 ShowContinueError(state,
                                                   format("Material may be too thin to be modeled well, thickness = {:.5R} [m]",

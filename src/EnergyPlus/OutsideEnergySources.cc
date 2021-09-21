@@ -242,9 +242,8 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
             if (state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum == 0) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name +
-                                    "\", is not valid");
-                ShowContinueError(state,
-                                  state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\" was not found.");
+                                    "\", is not valid",
+                				state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\" was not found.");
                 ErrorsFound = true;
             }
             if (!ScheduleManager::CheckScheduleValueMinMax(
@@ -388,8 +387,8 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
         }
     } else {
         if (this->NomCapWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-            ShowSevereError(state, "Autosizing of District " + typeName + " nominal capacity requires a loop Sizing:Plant object");
-            ShowContinueError(state, "Occurs in District" + typeName + " object=" + this->Name);
+            ShowSevereError(state, "Autosizing of District " + typeName + " nominal capacity requires a loop Sizing:Plant object",
+            				"Occurs in District" + typeName + " object=" + this->Name);
             ErrorsFound = true;
         }
         if (!this->NomCapWasAutoSized && this->NomCap > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport) {

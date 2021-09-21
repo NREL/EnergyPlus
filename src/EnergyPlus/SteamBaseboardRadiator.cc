@@ -223,9 +223,8 @@ namespace SteamBaseboardRadiator {
                     } else {
                         ShowSevereError(state,
                                         "SimSteamBaseboard: Errors in Baseboard=" +
-                                            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state,
-                                          format("Invalid or unimplemented equipment type={}",
+                                            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
+                        				format("Invalid or unimplemented equipment type={}",
                                                  state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType));
                         ShowFatalError(state, "Preceding condition causes termination.");
                     }
@@ -373,35 +372,29 @@ namespace SteamBaseboardRadiator {
                     if (state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).DesignScaledHeatingCapacity <= 0.0) {
                         ShowSevereError(state,
                                         state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " = " +
-                                            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName);
-                        ShowContinueError(state,
-                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state,
-                                          format("Illegal {} = {:.7T}",
+                                            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName,
+                        				"Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                        				format("Illegal {} = {:.7T}",
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
                                                  state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
                     } else if (state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).DesignScaledHeatingCapacity == AutoSize) {
                         ShowSevereError(state,
                                         state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " = " +
-                                            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName);
-                        ShowContinueError(state,
-                                          "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state,
-                                          "Illegal " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
+                                            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName,
+                        				"Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                              state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                        				"Illegal " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
                         ErrorsFound = true;
                     }
                 } else {
                     ShowSevereError(state,
                                     state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " = " +
-                                        state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName);
-                    ShowContinueError(state,
-                                      "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                    ShowContinueError(state,
-                                      "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
+                                        state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName,
+                    				"Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                    				"Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
@@ -412,9 +405,8 @@ namespace SteamBaseboardRadiator {
                     if (state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).DesignScaledHeatingCapacity < 0.0) {
                         ShowSevereError(state,
                                         state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " = " +
-                                            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName);
-                        ShowContinueError(state,
-                                          format("Illegal {} = {:.7T}",
+                                            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName,
+                        				format("Illegal {} = {:.7T}",
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
                                                  state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
                         ErrorsFound = true;
@@ -422,20 +414,17 @@ namespace SteamBaseboardRadiator {
                 } else {
                     ShowSevereError(state,
                                     state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " = " +
-                                        state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName);
-                    ShowContinueError(state,
-                                      "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                    ShowContinueError(
-                        state, "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
+                                        state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName,
+                    				"Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                    				"Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
                     ErrorsFound = true;
                 }
             } else {
                 ShowSevereError(state,
                                 state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " = " +
-                                    state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName);
-                ShowContinueError(state,
-                                  "Illegal " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                    state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName,
+                				"Illegal " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
                                       state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
                 ErrorsFound = true;
             }
@@ -585,9 +574,8 @@ namespace SteamBaseboardRadiator {
                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity != AutoSize) {
                         ShowSevereError(state,
                                         state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " +
-                                            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state,
-                                          format("Illegal {} = {:.7T}",
+                                            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
+                        				format("Illegal {} = {:.7T}",
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum),
                                                  state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum)));
                         ErrorsFound = true;
@@ -595,12 +583,10 @@ namespace SteamBaseboardRadiator {
                 } else {
                     ShowSevereError(state,
                                     state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " +
-                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                    ShowContinueError(state,
-                                      "Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
-                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum));
-                    ShowContinueError(state,
-                                      "Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum));
+                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
+                    				"Input for " + state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " +
+                                          state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum),
+                    				"Blank field not allowed for " + state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum));
                     ErrorsFound = true;
                 }
             } else if (SteamBaseboardDesignDataObject.HeatingCapMethod == CapacityPerFloorArea) {
@@ -656,8 +642,8 @@ namespace SteamBaseboardRadiator {
                 ShowSevereError(state,
                                 std::string{RoutineName} + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" +
                                     state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", the number of surface/radiant fraction groups entered was less than the allowable minimum.");
-                ShowContinueError(state, format("...the minimum that must be entered=[{}].", MinDistribSurfaces));
+                                    "\", the number of surface/radiant fraction groups entered was less than the allowable minimum.",
+                				format("...the minimum that must be entered=[{}].", MinDistribSurfaces));
                 ErrorsFound = true;
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib = 0;
             }
@@ -730,8 +716,8 @@ namespace SteamBaseboardRadiator {
 
             if (AllFracsSummed > (MaxFraction + 0.01)) {
                 ShowSevereError(state,
-                                "Fraction of radiation distributed to surfaces sums up to greater than 1 for " + state.dataIPShortCut->cAlphaArgs(1));
-                ShowContinueError(state, "Occurs in Baseboard Heater=" + state.dataIPShortCut->cAlphaArgs(1));
+                                "Fraction of radiation distributed to surfaces sums up to greater than 1 for " + state.dataIPShortCut->cAlphaArgs(1),
+                				"Occurs in Baseboard Heater=" + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
             if ((AllFracsSummed < (MaxFraction - 0.01)) &&
@@ -1260,8 +1246,8 @@ namespace SteamBaseboardRadiator {
             if (IsAutoSize) {
                 // if there is no heating Sizing:Plant object and autosizng was requested, issue an error message
                 // first error will be issued by MyPlantSizingIndex
-                ShowSevereError(state, "Autosizing of steam baseboard requires a heating loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in Baseboard Heater=" + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
+                ShowSevereError(state, "Autosizing of steam baseboard requires a heating loop Sizing:Plant object",
+                				"Occurs in Baseboard Heater=" + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
                 ErrorsFound = true;
             }
         }
@@ -1540,26 +1526,22 @@ namespace SteamBaseboardRadiator {
                     state.dataHeatBalSurf->AnyRadiantSystems = true;
 
                     if (ThisSurfIntensity > MaxRadHeatFlux) { // CR 8074, trap for excessive intensity (throws off surface balance )
-                        ShowSevereError(state, "DistributeBBSteamRadGains:  excessive thermal radiation heat flux intensity detected");
-                        ShowContinueError(state, "Surface = " + state.dataSurface->Surface(SurfNum).Name);
-                        ShowContinueError(state, format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area));
-                        ShowContinueError(state,
-                                          "Occurs in " + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " +
-                                              state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state, format("Radiation intensity = {:.2R} [W/m2]", ThisSurfIntensity));
-                        ShowContinueError(
-                            state, "Assign a larger surface area or more surfaces in " + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam);
+                        ShowSevereError(state, "DistributeBBSteamRadGains:  excessive thermal radiation heat flux intensity detected",
+                        				"Surface = " + state.dataSurface->Surface(SurfNum).Name,
+                        				format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area),
+                        				"Occurs in " + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " +
+                                              state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
+                        				format("Radiation intensity = {:.2R} [W/m2]", ThisSurfIntensity),
+                        				"Assign a larger surface area or more surfaces in " + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam);
                         ShowFatalError(state, "DistributeBBSteamRadGains:  excessive thermal radiation heat flux intensity detected");
                     }
                 } else { // small surface
-                    ShowSevereError(state, "DistributeBBSteamRadGains:  surface not large enough to receive thermal radiation heat flux");
-                    ShowContinueError(state, "Surface = " + state.dataSurface->Surface(SurfNum).Name);
-                    ShowContinueError(state, format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area));
-                    ShowContinueError(state,
-                                      "Occurs in " + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " +
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                    ShowContinueError(state,
-                                      "Assign a larger surface area or more surfaces in " + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam);
+                    ShowSevereError(state, "DistributeBBSteamRadGains:  surface not large enough to receive thermal radiation heat flux",
+                    				"Surface = " + state.dataSurface->Surface(SurfNum).Name,
+                    				format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area),
+                    				"Occurs in " + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " +
+                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
+                    				"Assign a larger surface area or more surfaces in " + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam);
                     ShowFatalError(state, "DistributeBBSteamRadGains:  surface not large enough to receive thermal radiation heat flux");
                 }
             }

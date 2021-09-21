@@ -882,8 +882,8 @@ namespace TranspiredCollector {
                         if (state.dataLoopNodes->Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state,
-                                                "Missing temperature setpoint for UTSC " + state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name);
-                                ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
+                                                "Missing temperature setpoint for UTSC " + state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name,
+                                				" use a Setpoint Manager to establish a setpoint at the unit control node.");
                                 SetPointErrorFlag = true;
                             } else {
                                 // need call to EMS to check node
@@ -891,9 +891,9 @@ namespace TranspiredCollector {
                                     state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                                 if (SetPointErrorFlag) {
                                     ShowSevereError(state,
-                                                    "Missing temperature setpoint for UTSC " + state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name);
-                                    ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
-                                    ShowContinueError(state, "Or add EMS Actuator to provide temperature setpoint at this node");
+                                                    "Missing temperature setpoint for UTSC " + state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name,
+                                    				" use a Setpoint Manager to establish a setpoint at the unit control node.",
+                                    				"Or add EMS Actuator to provide temperature setpoint at this node");
                                 }
                             }
                         }

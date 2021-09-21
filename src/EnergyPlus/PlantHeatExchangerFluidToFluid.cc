@@ -231,9 +231,9 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
             } else {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum <= 0) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
-                    ShowContinueError(state, "Schedule was not found ");
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.",
+                    				"Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2),
+                    				"Schedule was not found ");
                     ErrorsFound = true;
                 }
             }
@@ -307,8 +307,8 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "Ideal")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::Ideal;
             } else {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(7) + " = " + cAlphaArgs(7));
+                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.",
+                				"Invalid " + cAlphaFieldNames(7) + " = " + cAlphaArgs(7));
                 ErrorsFound = true;
             }
 
@@ -319,8 +319,8 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                 }
             } else {
                 if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType != iFluidHXType::Ideal) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Missing entry for " + cNumericFieldNames(3));
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.",
+                    				"Missing entry for " + cNumericFieldNames(3));
                     ErrorsFound = true;
                 }
             }
@@ -350,8 +350,8 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
             } else if (UtilityRoutines::SameString(cAlphaArgs(8), "TrackComponentOnOff")) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode = iCtrlType::TrackComponentOnOff;
             } else {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + cAlphaFieldNames(8) + " = " + cAlphaArgs(8));
+                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.",
+                				"Invalid " + cAlphaFieldNames(8) + " = " + cAlphaArgs(8));
                 ErrorsFound = true;
             }
 
@@ -376,9 +376,9 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                         DataLoopNode::SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + " Missing temperature setpoint for DataLoopNode::Node = " + cAlphaArgs(9));
-                            ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                            ShowContinueError(state, " Use a setpoint manager to place a single temperature setpoint on the node");
+                                            std::string{RoutineName} + " Missing temperature setpoint for DataLoopNode::Node = " + cAlphaArgs(9),
+                            				"Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1),
+                            				" Use a setpoint manager to place a single temperature setpoint on the node");
                             ErrorsFound = true;
                         } else {
                             // need call to EMS to check node
@@ -388,9 +388,9 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                                                                         EMSManager::SPControlType::iTemperatureSetPoint,
                                                                         NodeEMSSetPointMissing);
                             if (NodeEMSSetPointMissing) {
-                                ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for node = " + cAlphaArgs(9));
-                                ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                                ShowContinueError(state, "Use a setpoint manager or EMS actuator to place a single temperature setpoint on the node");
+                                ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for node = " + cAlphaArgs(9),
+                                				"Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1),
+                                				"Use a setpoint manager or EMS actuator to place a single temperature setpoint on the node");
                                 ErrorsFound = true;
                             }
                         }
@@ -402,9 +402,9 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                         (state.dataLoopNodes->Node(state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum).TempSetPointLo ==
                          DataLoopNode::SensedNodeFlagValue)) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                            ShowSevereError(state, std::string{RoutineName} + " Missing dual temperature setpoints for node = " + cAlphaArgs(9));
-                            ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                            ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
+                            ShowSevereError(state, std::string{RoutineName} + " Missing dual temperature setpoints for node = " + cAlphaArgs(9),
+                            				"Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1),
+                            				" Use a setpoint manager to place a dual temperature setpoint on the node");
                             ErrorsFound = true;
                         } else {
                             // need call to EMS to check node
@@ -418,9 +418,9 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                                                                         EMSManager::SPControlType::iTemperatureMaxSetPoint,
                                                                         NodeEMSSetPointMissing);
                             if (NodeEMSSetPointMissing) {
-                                ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for node = " + cAlphaArgs(9));
-                                ShowContinueError(state, "Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1));
-                                ShowContinueError(state, "Use a setpoint manager or EMS actuators to place a dual temperature setpoints on the node");
+                                ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for node = " + cAlphaArgs(9),
+                                				"Occurs for " + cCurrentModuleObject + "=\"" + cAlphaArgs(1),
+                                				"Use a setpoint manager or EMS actuators to place a dual temperature setpoints on the node");
                                 ErrorsFound = true;
                             }
                         }
@@ -436,8 +436,8 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                     (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::DualDeadBandSetPointModulated) ||
                     (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::DualDeadBandSetPointOnOff) ||
                     (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride)) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(9));
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.",
+                    				"Missing entry for " + cAlphaFieldNames(9));
                     ErrorsFound = true;
                 }
             }
@@ -463,8 +463,8 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                                                         DataLoopNode::ObjectIsNotParent);
             } else {
                 if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(11));
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.",
+                    				"Missing entry for " + cAlphaFieldNames(11));
                     ErrorsFound = true;
                 }
             }
@@ -482,8 +482,8 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                                                         DataLoopNode::ObjectIsNotParent);
             } else {
                 if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(12));
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.",
+                    				"Missing entry for " + cAlphaFieldNames(12));
                     ErrorsFound = true;
                 }
             }
@@ -498,8 +498,8 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                 }
             } else {
                 if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Missing entry for " + cAlphaFieldNames(13));
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.",
+                    				"Missing entry for " + cAlphaFieldNames(13));
                     ErrorsFound = true;
                 }
             }
@@ -736,8 +736,8 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
             }
         } else {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "SizeFluidHeatExchanger: Autosizing of requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in heat exchanger object=" + this->Name);
+                ShowSevereError(state, "SizeFluidHeatExchanger: Autosizing of requires a loop Sizing:Plant object",
+                				"Occurs in heat exchanger object=" + this->Name);
             }
         }
     }
@@ -834,8 +834,8 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
             }
         } else {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                ShowSevereError(state, "SizeFluidHeatExchanger: Autosizing of heat Exchanger UA requires a loop Sizing:Plant objects for both loops");
-                ShowContinueError(state, "Occurs in heat exchanger object=" + this->Name);
+                ShowSevereError(state, "SizeFluidHeatExchanger: Autosizing of heat Exchanger UA requires a loop Sizing:Plant objects for both loops",
+                				"Occurs in heat exchanger object=" + this->Name);
             }
         }
     }
@@ -2283,8 +2283,8 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
                                    DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
-                                   this->Name));
-            ShowContinueError(state, "The \"Loop Demand Side\" connections are not on the Demand Side of a plant loop");
+                                   this->Name),
+            				"The \"Loop Demand Side\" connections are not on the Demand Side of a plant loop");
             errFlag = true;
         }
 
@@ -2307,8 +2307,8 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
                                    DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
-                                   this->Name));
-            ShowContinueError(state, "The \"Loop Supply Side\" connections are not on the Supply Side of a plant loop");
+                                   this->Name),
+            				"The \"Loop Supply Side\" connections are not on the Supply Side of a plant loop");
             errFlag = true;
         }
 
@@ -2318,8 +2318,8 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
                                    DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
-                                   this->Name));
-            ShowContinueError(state, R"(The "Loop Supply Side" and "Loop Demand Side" need to be on different loops.)");
+                                   this->Name),
+            				R"(The "Loop Supply Side" and "Loop Demand Side" need to be on different loops.)");
             errFlag = true;
         } else {
 

@@ -596,9 +596,8 @@ namespace DaylightingDevices {
                                         cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Diffuser " +
                                             state.dataIPShortCut->cAlphaArgs(3) + " construction (" +
                                             state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).Name +
-                                            ") invalid value.");
-                        ShowContinueError(state,
-                                          format("Diffuse solar transmittance of construction [{:.4R}] too small for calculations.",
+                                            ") invalid value.",
+                        				format("Diffuse solar transmittance of construction [{:.4R}] too small for calculations.",
                                                  state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TransDiff));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
                     }
@@ -612,9 +611,8 @@ namespace DaylightingDevices {
                             0.1) { // greater than 10%
                             ShowSevereError(state,
                                             cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                                ":  Dome and diffuser areas are significantly different (>10%).");
-                            ShowContinueError(state,
-                                              format("...Diffuser Area=[{:.4R}]; Dome Area=[{:.4R}].",
+                                                ":  Dome and diffuser areas are significantly different (>10%).",
+                            				format("...Diffuser Area=[{:.4R}]; Dome Area=[{:.4R}].",
                                                      state.dataSurface->Surface(SurfNum).Area,
                                                      state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area));
                             state.dataDaylightingDevices->GetTDDInputErrorsFound = true;
@@ -685,9 +683,8 @@ namespace DaylightingDevices {
                         0.1) { // greater than 10%
                         ShowSevereError(state,
                                         cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
-                                            ":  Pipe and dome/diffuser areas are significantly different (>10%).");
-                        ShowContinueError(state,
-                                          format("...Pipe Area=[{:.4R}]; Dome/Diffuser Area=[{:.4R}].",
+                                            ":  Pipe and dome/diffuser areas are significantly different (>10%).",
+                        				format("...Pipe Area=[{:.4R}]; Dome/Diffuser Area=[{:.4R}].",
                                                  PipeArea,
                                                  state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area));
                         state.dataDaylightingDevices->GetTDDInputErrorsFound = true;

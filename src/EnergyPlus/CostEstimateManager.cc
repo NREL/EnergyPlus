@@ -446,8 +446,8 @@ namespace CostEstimateManager {
                         } else {
                             ShowSevereError(state,
                                             "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
-                                                "\", Daylighting:Controls, need to specify a valid zone name");
-                            ShowContinueError(state, "Zone specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
+                                                "\", Daylighting:Controls, need to specify a valid zone name",
+                            				"Zone specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
                             ErrorsFound = true;
                         }
                     }
@@ -461,16 +461,15 @@ namespace CostEstimateManager {
                             if (ThisZoneID == 0) {
                                 ShowSevereError(state,
                                                 "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
-                                                    "\", Shading:Zone:Detailed, need to specify a valid zone name");
-                                ShowContinueError(state, "Zone specified=\"" + state.dataSurface->Surface(ThisSurfID).ZoneName + "\".");
+                                                    "\", Shading:Zone:Detailed, need to specify a valid zone name",
+                                				"Zone specified=\"" + state.dataSurface->Surface(ThisSurfID).ZoneName + "\".");
                                 ErrorsFound = true;
                             }
                         } else {
                             ShowSevereError(state,
                                             "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
-                                                "\", Shading:Zone:Detailed, need to specify a valid surface name");
-                            ShowContinueError(state,
-                                              "Surface specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
+                                                "\", Shading:Zone:Detailed, need to specify a valid surface name",
+                            				"Surface specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
                             ErrorsFound = true;
                         }
                     } else {
@@ -496,9 +495,8 @@ namespace CostEstimateManager {
                             if (ThisZoneID == 0) {
                                 ShowSevereError(state,
                                                 "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
-                                                    "\", Lights, need to specify a valid zone name");
-                                ShowContinueError(state,
-                                                  "Zone specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
+                                                    "\", Lights, need to specify a valid zone name",
+                                				"Zone specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
                                 ErrorsFound = true;
                             }
                         } else {
@@ -525,9 +523,8 @@ namespace CostEstimateManager {
                             } else {
                                 ShowSevereError(state,
                                                 "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
-                                                    "\", Generator:Photovoltaic, need to specify a valid PV array");
-                                ShowContinueError(state,
-                                                  "PV Array specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
+                                                    "\", Generator:Photovoltaic, need to specify a valid PV array",
+                                				"PV Array specified=\"" + state.dataCostEstimateManager->CostLineItem(Item).ParentObjName + "\".");
                                 ErrorsFound = true;
                             }
                         } else {

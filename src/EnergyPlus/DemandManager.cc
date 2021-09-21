@@ -368,8 +368,8 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             DemandManagerList(ListNum).Meter = GetMeterIndex(state, AlphArray(2));
 
             if (DemandManagerList(ListNum).Meter == 0) {
-                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + AlphArray(2));
-                ShowContinueError(state, "Entered in " + CurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + AlphArray(2),
+                				"Entered in " + CurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
 
             } else {
@@ -381,8 +381,8 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                     } else {
                         ShowSevereError(state,
                                         CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value " +
-                                            state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\".");
-                        ShowContinueError(state, "Only Electricity and ElectricityNet meters are currently allowed.");
+                                            state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphArray(2) + "\".",
+                        				"Only Electricity and ElectricityNet meters are currently allowed.");
                         ErrorsFound = true;
                     }
                 }
@@ -730,8 +730,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
-                    ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".",
+                    				"...value must be one of Off, Fixed, or Variable.");
                     ErrorsFound = true;
                 }
             }
@@ -758,8 +758,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
-                    ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".",
+                    				"...value must be one of All, RotateOne, or RotateMany.");
                     ErrorsFound = true;
                 }
             }
@@ -788,8 +788,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     }
                 } // LoadNum
             } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
-                ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.",
+                				"Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                 ErrorsFound = true;
             }
 
@@ -853,8 +853,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
-                    ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".",
+                    				"...value must be one of Off, Fixed, or Variable.");
                     ErrorsFound = true;
                 }
             }
@@ -881,8 +881,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
-                    ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".",
+                    				"...value must be one of All, RotateOne, or RotateMany.");
                     ErrorsFound = true;
                 }
             }
@@ -932,8 +932,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     }
                 } // LoadNum
             } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
-                ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.",
+                				"Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                 ErrorsFound = true;
             }
 
@@ -997,8 +997,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
-                    ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".",
+                    				"...value must be one of Off, Fixed, or Variable.");
                     ErrorsFound = true;
                 }
             }
@@ -1025,8 +1025,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
-                    ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".",
+                    				"...value must be one of All, RotateOne, or RotateMany.");
                     ErrorsFound = true;
                 }
             }
@@ -1076,8 +1076,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     }
                 } // LoadNum
             } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
-                ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.",
+                				"Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                 ErrorsFound = true;
             }
 
@@ -1142,8 +1142,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
-                    ShowContinueError(state, "...value must be one of Off, Fixed, or Variable.");
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".",
+                    				"...value must be one of Off, Fixed, or Variable.");
                     ErrorsFound = true;
                 }
             }
@@ -1157,15 +1157,13 @@ void GetDemandManagerInput(EnergyPlusData &state)
             DemandMgr(MgrNum).UpperLimit = NumArray(3);
 
             if (DemandMgr(MgrNum).LowerLimit > DemandMgr(MgrNum).UpperLimit) {
-                ShowSevereError(state, "Invalid input for " + CurrentModuleObject + " = " + AlphArray(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "Invalid input for " + CurrentModuleObject + " = " + AlphArray(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(2),
                                          NumArray(2),
                                          state.dataIPShortCut->cNumericFieldNames(3),
-                                         NumArray(3)));
-                ShowContinueError(
-                    state, state.dataIPShortCut->cNumericFieldNames(2) + " cannot be greater than " + state.dataIPShortCut->cNumericFieldNames(3));
+                                         NumArray(3)),
+                				state.dataIPShortCut->cNumericFieldNames(2) + " cannot be greater than " + state.dataIPShortCut->cNumericFieldNames(3));
                 ErrorsFound = true;
             }
 
@@ -1184,8 +1182,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
-                    ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".",
+                    				"...value must be one of All, RotateOne, or RotateMany.");
                     ErrorsFound = true;
                 }
             }
@@ -1233,8 +1231,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     }
                 } // LoadNum
             } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
-                ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.",
+                				"Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                 ErrorsFound = true;
             }
 
@@ -1299,8 +1297,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".");
-                    ShowContinueError(state, "...value must be one of Off, FixedRate, or ReductionRatio.");
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphArray(3) + "\".",
+                    				"...value must be one of Off, FixedRate, or ReductionRatio.");
                     ErrorsFound = true;
                 }
             }
@@ -1330,8 +1328,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value" +
-                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".");
-                    ShowContinueError(state, "...value must be one of All, RotateOne, or RotateMany.");
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + AlphArray(4) + "\".",
+                    				"...value must be one of All, RotateOne, or RotateMany.");
                     ErrorsFound = true;
                 }
             }
@@ -1369,8 +1367,8 @@ void GetDemandManagerInput(EnergyPlusData &state)
                     }
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.");
-                ShowContinueError(state, "Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
+                ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid value for number of loads.",
+                				"Number of loads is calculated to be less than one. Demand manager must have at least one load assigned.");
                 ErrorsFound = true;
             }
         } // MgrNum

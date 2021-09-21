@@ -593,8 +593,8 @@ void ElectricPowerServiceManager::checkLoadCenters(EnergyPlusData &state)
             if (storageNames[i] == storageNames[j] && i != j) {
                 ShowSevereError(state,
                                 "ElectricPowerServiceManager::checkLoadCenters, the electrical storage device named = " + storageNames[i] +
-                                    " is used in more than one ElectricLoadCenter:Distribution input object.");
-                ShowContinueError(state, "Electric Load Centers cannot share the same storage device.");
+                                    " is used in more than one ElectricLoadCenter:Distribution input object.",
+                				"Electric Load Centers cannot share the same storage device.");
                 errorsFound = true;
                 break;
             }
@@ -609,8 +609,8 @@ void ElectricPowerServiceManager::checkLoadCenters(EnergyPlusData &state)
             if (genListNames[i] == genListNames[j] && i != j) {
                 ShowSevereError(state,
                                 "ElectricPowerServiceManager::checkLoadCenters, the generator list named = " + genListNames[i] +
-                                    " is used in more than one ElectricLoadCenter:Distribution input object.");
-                ShowContinueError(state, "Electric Load Centers cannot share the same generator list (ElectricLoadCenter:Generators).");
+                                    " is used in more than one ElectricLoadCenter:Distribution input object.",
+                				"Electric Load Centers cannot share the same generator list (ElectricLoadCenter:Generators).");
                 errorsFound = true;
                 break;
             }
@@ -625,8 +625,8 @@ void ElectricPowerServiceManager::checkLoadCenters(EnergyPlusData &state)
             if (inverterNames[i] == inverterNames[j] && i != j) {
                 ShowSevereError(state,
                                 "ElectricPowerServiceManager::checkLoadCenters, the inverter device named = " + inverterNames[i] +
-                                    " is used in more than one ElectricLoadCenter:Distribution input object.");
-                ShowContinueError(state, "Electric Load Centers cannot share the same inverter device.");
+                                    " is used in more than one ElectricLoadCenter:Distribution input object.",
+                				"Electric Load Centers cannot share the same inverter device.");
                 errorsFound = true;
                 break;
             }
@@ -641,8 +641,8 @@ void ElectricPowerServiceManager::checkLoadCenters(EnergyPlusData &state)
             if (converterNames[i] == converterNames[j] && i != j) {
                 ShowSevereError(state,
                                 "ElectricPowerServiceManager::checkLoadCenters, the converter device named = " + converterNames[i] +
-                                    " is used in more than one ElectricLoadCenter:Distribution input object.");
-                ShowContinueError(state, "Electric Load Centers cannot share the same converter device.");
+                                    " is used in more than one ElectricLoadCenter:Distribution input object.",
+                				"Electric Load Centers cannot share the same converter device.");
                 errorsFound = true;
                 break;
             }
@@ -657,8 +657,8 @@ void ElectricPowerServiceManager::checkLoadCenters(EnergyPlusData &state)
             if (transformerNames[i] == transformerNames[j] && i != j) {
                 ShowSevereError(state,
                                 "ElectricPowerServiceManager::checkLoadCenters, the transformer device named = " + transformerNames[i] +
-                                    " is used in more than one ElectricLoadCenter:Distribution input object.");
-                ShowContinueError(state, "Electric Load Centers cannot share the same transformer device.");
+                                    " is used in more than one ElectricLoadCenter:Distribution input object.",
+                				"Electric Load Centers cannot share the same transformer device.");
                 errorsFound = true;
                 break;
             }
@@ -722,8 +722,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             if (testIndex == 0) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                 errorsFound = true;
             }
         }
@@ -747,8 +747,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             } else {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
                 errorsFound = true;
             }
         }
@@ -760,13 +760,13 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
             } else {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = blank field.");
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = blank field.");
             }
             ShowContinueError(state, "Schedule not found; Must be entered and valid when Generator Operation Scheme=TrackSchedule");
             errorsFound = true;
@@ -802,8 +802,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         } else {
             ShowSevereError(state,
                             std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
+                                "\", invalid entry.",
+            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
             errorsFound = true;
         }
 
@@ -813,8 +813,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             } else {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(7) + " is blank, but buss type requires inverter.");
+                                    "\", invalid entry.",
+                				state.dataIPShortCut->cAlphaFieldNames(7) + " is blank, but buss type requires inverter.");
                 errorsFound = true;
             }
         }
@@ -825,8 +825,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             } else {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(8) + " is blank, but buss type requires storage.");
+                                    "\", invalid entry.",
+                				state.dataIPShortCut->cAlphaFieldNames(8) + " is blank, but buss type requires storage.");
                 errorsFound = true;
             }
         }
@@ -853,8 +853,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             } else {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + " = " + state.dataIPShortCut->cAlphaArgs(10));
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + " = " + state.dataIPShortCut->cAlphaArgs(10));
                 errorsFound = true;
             }
         } else { // blank (preserve legacy behavior for short files)
@@ -868,9 +868,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             if (storageScheme_ == StorageOpScheme::meterDemandStoreExcessOnSite) { // throw error
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state,
-                                  "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) +
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) +
                                       ", cannot be blank when storage operation scheme is TrackMeterDemandStoreExcessOnSite");
                 errorsFound = true;
             }
@@ -883,9 +882,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             if (storageScheme_ == StorageOpScheme::chargeDischargeSchedules || storageScheme_ == StorageOpScheme::facilityDemandLeveling) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state,
-                                  "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + ", cannot be blank when storage scheme is " +
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + ", cannot be blank when storage scheme is " +
                                       state.dataIPShortCut->cAlphaArgs(10));
                 errorsFound = true;
             }
@@ -918,8 +916,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             if (storageScheme_ == StorageOpScheme::facilityDemandLeveling) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cNumericFieldNames(6) + " = blank field.");
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cNumericFieldNames(6) + " = blank field.");
                 errorsFound = true;
             }
         } else {
@@ -930,13 +928,13 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + " = " + state.dataIPShortCut->cAlphaArgs(13));
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + " = " + state.dataIPShortCut->cAlphaArgs(13));
             } else {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + " = blank field.");
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + " = blank field.");
             }
             ShowContinueError(state, "Schedule not found; Must be entered and valid when Storage Operation Scheme = TrackChargeDischargeSchedules");
             errorsFound = true;
@@ -947,13 +945,13 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + " = " + state.dataIPShortCut->cAlphaArgs(14));
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + " = " + state.dataIPShortCut->cAlphaArgs(14));
             } else {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + " = blank field.");
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + " = blank field.");
             }
             ShowContinueError(state, "Schedule not found; Must be entered and valid when Storage Operation Scheme = TrackChargeDischargeSchedules");
             errorsFound = true;
@@ -964,13 +962,13 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + " = " + state.dataIPShortCut->cAlphaArgs(15));
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + " = " + state.dataIPShortCut->cAlphaArgs(15));
             } else {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + " = blank field.");
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + " = blank field.");
             }
             ShowContinueError(state, "Schedule not found; Must be entered and valid when Storage Operation Scheme = FacilityDemandLeveling");
             errorsFound = true;
@@ -1041,9 +1039,9 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             for (const auto &generatorController : elecGenCntrlObj) {
                 if (generatorController->generatorType != GeneratorType::PVWatts) {
                     errorsFound = true;
-                    ShowSevereError(state, std::string{routineName} + "ElectricLoadCenter:Distribution=\"" + name_ + "\",");
-                    ShowContinueError(state, "ElectricLoadCenter:Inverter:PVWatts can only be used with Generator:PVWatts");
-                    ShowContinueError(state, "\"" + generatorController->name + "\" is of type " + generatorController->typeOfName);
+                    ShowSevereError(state, std::string{routineName} + "ElectricLoadCenter:Distribution=\"" + name_ + "\",",
+                    				"ElectricLoadCenter:Inverter:PVWatts can only be used with Generator:PVWatts",
+                    				"\"" + generatorController->name + "\" is of type " + generatorController->typeOfName);
                 } else {
                     totalDCCapacity += generatorController->pvwattsGenerator->getDCSystemCapacity();
 
@@ -2205,8 +2203,8 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         compGenTypeOf_Num = GeneratorType::WindTurbine;
         compPlantTypeOf_Num = DataPlant::TypeOf_Other;
     } else {
-        ShowSevereError(state, std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + " invalid entry.");
-        ShowContinueError(state, "Invalid " + objectType + " associated with generator = " + objectName);
+        ShowSevereError(state, std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + " invalid entry.",
+        				"Invalid " + objectType + " associated with generator = " + objectName);
     }
 
     availSched = availSchedName;
@@ -2215,9 +2213,9 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     } else {
         availSchedPtr = ScheduleManager::GetScheduleIndex(state, availSchedName);
         if (availSchedPtr <= 0) {
-            ShowSevereError(state, std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + ", invalid entry.");
-            ShowContinueError(state, "Invalid availability schedule = " + availSchedName);
-            ShowContinueError(state, "Schedule was not found ");
+            ShowSevereError(state, std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + ", invalid entry.",
+            				"Invalid availability schedule = " + availSchedName,
+            				"Schedule was not found ");
         } else {
             if (generatorType == GeneratorType::PVWatts) {
                 ShowWarningError(state,
@@ -2501,8 +2499,8 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                 if (availSchedPtr_ == 0) {
                     ShowSevereError(state,
                                     std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.",
+                    				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                     errorsFound = true;
                 }
             }
@@ -2545,9 +2543,9 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
             if (curveNum_ == 0) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
-                ShowContinueError(state, "Curve was not found");
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4),
+                				"Curve was not found");
                 errorsFound = true;
             }
 
@@ -2973,8 +2971,8 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
             if (availSchedPtr_ == 0) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                 errorsFound = true;
             }
         }
@@ -2986,8 +2984,8 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
         } else {
             ShowSevereError(state,
                             std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
+                                "\", invalid entry.",
+            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
             errorsFound = true;
         }
 
@@ -3003,9 +3001,9 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
             if (curveNum_ == 0) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4));
-                ShowContinueError(state, "Curve was not found");
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + state.dataIPShortCut->cAlphaArgs(4),
+                				"Curve was not found");
                 errorsFound = true;
             }
             break;
@@ -3317,8 +3315,8 @@ ElectricStorage::ElectricStorage( // main constructor
             if (availSchedPtr_ == 0) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                 errorsFound = true;
             }
         }
@@ -3364,14 +3362,14 @@ ElectricStorage::ElectricStorage( // main constructor
             if (chargeCurveNum_ == 0 && !state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
                 errorsFound = true;
             } else if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " cannot be blank. But no entry found.");
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + " cannot be blank. But no entry found.");
                 errorsFound = true;
             } else {
                 errorsFound |= CurveManager::CheckCurveDims(state,
@@ -3386,14 +3384,14 @@ ElectricStorage::ElectricStorage( // main constructor
             if (dischargeCurveNum_ == 0 && !state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + state.dataIPShortCut->cAlphaArgs(5));
                 errorsFound = true;
             } else if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " cannot be blank. But no entry found.");
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " cannot be blank. But no entry found.");
                 errorsFound = true;
             } else {
                 errorsFound |= CurveManager::CheckCurveDims(state,
@@ -3423,15 +3421,14 @@ ElectricStorage::ElectricStorage( // main constructor
                 if (lifeCurveNum_ == 0 && !state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                     ShowSevereError(state,
                                     std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.",
+                    				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
                     errorsFound = true;
                 } else if (state.dataIPShortCut->lAlphaFieldBlanks(7)) {
                     ShowSevereError(state,
                                     std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
-                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.");
-                    ShowContinueError(state,
-                                      "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + " cannot be blank when " +
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid entry.",
+                    				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + " cannot be blank when " +
                                           state.dataIPShortCut->cAlphaArgs(6) + " = Yes. But no entry found.");
                     errorsFound = true;
                 } else {
@@ -3491,11 +3488,10 @@ ElectricStorage::ElectricStorage( // main constructor
             if (liIon_Vfull_ < liIon_Vexp_ || liIon_Vexp_ < liIon_Vnom_) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state,
-                                  state.dataIPShortCut->cNumericFieldNames(10) + " must be greater than " +
-                                      state.dataIPShortCut->cNumericFieldNames(11) + ",");
-                ShowContinueError(state, "which must be greater than " + state.dataIPShortCut->cNumericFieldNames(12) + ".");
+                                    "\", invalid entry.",
+                				state.dataIPShortCut->cNumericFieldNames(10) + " must be greater than " +
+                                      state.dataIPShortCut->cNumericFieldNames(11) + ",",
+                				"which must be greater than " + state.dataIPShortCut->cNumericFieldNames(12) + ".");
                 for (int i = 10; i <= 12; ++i) {
                     ShowContinueError(state,
                                       format("{} = {:.3R}", state.dataIPShortCut->cNumericFieldNames(i), state.dataIPShortCut->rNumericArgs(i)));
@@ -3511,9 +3507,8 @@ ElectricStorage::ElectricStorage( // main constructor
             if (liIon_Qexp_ >= liIon_Qnom_) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state,
-                                  state.dataIPShortCut->cNumericFieldNames(16) + " must be greater than " +
+                                    "\", invalid entry.",
+                				state.dataIPShortCut->cNumericFieldNames(16) + " must be greater than " +
                                       state.dataIPShortCut->cNumericFieldNames(15) + ".");
                 for (int i = 15; i <= 16; ++i) {
                     ShowContinueError(state,
@@ -3769,8 +3764,8 @@ Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, st
     if (UtilityRoutines::SameString(whichType, "CHARGING")) {
         if (userInputValue < minChargeEfficiency) {
             ShowSevereError(state,
-                            format("ElectricStorage charge efficiency was too low.  This occurred for electric storage unit named " + deviceName));
-            ShowContinueError(state, format("Please check your input value  for this electric storage unit and fix the charge efficiency."));
+                            format("ElectricStorage charge efficiency was too low.  This occurred for electric storage unit named " + deviceName),
+            				format("Please check your input value  for this electric storage unit and fix the charge efficiency."));
             errorsFound = true;
             return minChargeEfficiency;
         } else {
@@ -3779,8 +3774,8 @@ Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, st
     } else if (UtilityRoutines::SameString(whichType, "DISCHARGING")) {
         if (userInputValue < minDischargeEfficiency) {
             ShowSevereError(state,
-                            format("ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named " + deviceName));
-            ShowContinueError(state, format("Please check your input value  for this electric storage unit and fix the discharge efficiency."));
+                            format("ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named " + deviceName),
+            				format("Please check your input value  for this electric storage unit and fix the discharge efficiency."));
             errorsFound = true;
             return minDischargeEfficiency;
         } else {
@@ -4637,8 +4632,8 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
             if (availSchedPtr_ == 0) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                 errorsFound = true;
             }
         }
@@ -4686,8 +4681,8 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         } else {
             ShowSevereError(state,
                             std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
+                                "\", invalid entry.",
+            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + " = " + state.dataIPShortCut->cAlphaArgs(5));
             errorsFound = true;
         }
         tempRise_ = state.dataIPShortCut->rNumericArgs(4);
@@ -4700,8 +4695,8 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         } else {
             ShowSevereError(state,
                             std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                "\", invalid entry.");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
+                                "\", invalid entry.",
+            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + state.dataIPShortCut->cAlphaArgs(6));
             errorsFound = true;
         }
         if (ratedCapacity_ == 0) {
@@ -4728,10 +4723,9 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
             } else if (maxPUL_ <= 0 || maxPUL_ > 1) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(
-                    state, format("Invalid {}=[{:.3R}].", state.dataIPShortCut->cNumericFieldNames(11), state.dataIPShortCut->rNumericArgs(11)));
-                ShowContinueError(state, "Entered value must be > 0 and <= 1.");
+                                    "\", invalid entry.",
+                				format("Invalid {}=[{:.3R}].", state.dataIPShortCut->cNumericFieldNames(11), state.dataIPShortCut->rNumericArgs(11)),
+                				"Entered value must be > 0 and <= 1.");
                 errorsFound = true;
             }
         }
@@ -4743,8 +4737,8 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
             if (usageMode_ == TransformerUse::powerInFromGrid) {
                 ShowSevereError(state,
                                 std::string{routineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                    "\", invalid entry.");
-                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + state.dataIPShortCut->cAlphaArgs(7));
+                                    "\", invalid entry.",
+                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + " = " + state.dataIPShortCut->cAlphaArgs(7));
                 errorsFound = true;
             }
         }
@@ -5015,8 +5009,8 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
         // by GetCurrentMeterValue() is used here to check overload issue.
         if ((pastElecLoad / ratedCapacity_) > 1.0) {
             if (overloadErrorIndex_ == 0) {
-                ShowSevereError(state, "Transformer Overloaded");
-                ShowContinueError(state, "Entered in ElectricLoadCenter:Transformer =" + name_);
+                ShowSevereError(state, "Transformer Overloaded",
+                				"Entered in ElectricLoadCenter:Transformer =" + name_);
             }
             ShowRecurringSevereErrorAtEnd(state, "Transformer Overloaded: Entered in ElectricLoadCenter:Transformer =" + name_, overloadErrorIndex_);
         }

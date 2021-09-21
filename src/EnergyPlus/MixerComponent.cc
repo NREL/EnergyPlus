@@ -280,9 +280,9 @@ void GetMixerInput(EnergyPlusData &state)
             if (NodeNum != state.dataMixerComponent->MixerCond(MixerNum).InletNode(InNodeNum1)) continue;
             ShowSevereError(state,
                             CurrentModuleObject + " = " + state.dataMixerComponent->MixerCond(MixerNum).MixerName +
-                                " specifies an inlet node name the same as the outlet node.");
-            ShowContinueError(state, ".." + cAlphaFields(2) + " = " + state.dataLoopNodes->NodeID(NodeNum));
-            ShowContinueError(state, format("..Inlet Node #{} is duplicate.", InNodeNum1));
+                                " specifies an inlet node name the same as the outlet node.",
+            				".." + cAlphaFields(2) + " = " + state.dataLoopNodes->NodeID(NodeNum),
+            				format("..Inlet Node #{} is duplicate.", InNodeNum1));
             ErrorsFound = true;
         }
         for (InNodeNum1 = 1; InNodeNum1 <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InNodeNum1) {
@@ -292,9 +292,9 @@ void GetMixerInput(EnergyPlusData &state)
                     continue;
                 ShowSevereError(state,
                                 CurrentModuleObject + " = " + state.dataMixerComponent->MixerCond(MixerNum).MixerName +
-                                    " specifies duplicate inlet nodes in its inlet node list.");
-                ShowContinueError(state, format("..Inlet Node #{} Name={}", InNodeNum1, state.dataLoopNodes->NodeID(InNodeNum1)));
-                ShowContinueError(state, format("..Inlet Node #{} is duplicate.", InNodeNum2));
+                                    " specifies duplicate inlet nodes in its inlet node list.",
+                				format("..Inlet Node #{} Name={}", InNodeNum1, state.dataLoopNodes->NodeID(InNodeNum1)),
+                				format("..Inlet Node #{} is duplicate.", InNodeNum2));
                 ErrorsFound = true;
             }
         }

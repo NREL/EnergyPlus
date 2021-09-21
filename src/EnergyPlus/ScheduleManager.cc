@@ -635,8 +635,8 @@ namespace ScheduleManager {
                                                cNumericFields(1),
                                                state.dataScheduleMgr->ScheduleType(LoopIndex).Minimum,
                                                cNumericFields(2),
-                                               state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum));
-                        ShowContinueError(state, "  Other warning/severes about schedule values may appear.");
+                                               state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum),
+                        				"  Other warning/severes about schedule values may appear.");
                     } else {
                         ShowSevereError(state,
                                         format("{}=\"{}\", {} [{:.0R}] > {} [{:.0R}].",
@@ -646,8 +646,8 @@ namespace ScheduleManager {
                                                cNumericFields(1),
                                                state.dataScheduleMgr->ScheduleType(LoopIndex).Minimum,
                                                cNumericFields(2),
-                                               state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum));
-                        ShowContinueError(state, "  Other warning/severes about schedule values may appear.");
+                                               state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum),
+                        				"  Other warning/severes about schedule values may appear.");
                     }
                 }
             }
@@ -772,8 +772,8 @@ namespace ScheduleManager {
             if (NumFields == 0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
-                                    "\", Insufficient data entered for a full schedule day.");
-                ShowContinueError(state, format("...Number of interval fields = = [{}].", NumFields));
+                                    "\", Insufficient data entered for a full schedule day.",
+                				format("...Number of interval fields = = [{}].", NumFields));
                 ErrorsFound = true;
             }
 
@@ -899,17 +899,16 @@ namespace ScheduleManager {
             if (Numbers(1) <= 0.0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
-                                    "\", Insufficient data entered for a full schedule day.");
-                ShowContinueError(state, format("...Minutes per Item field = [{}].", Numbers(1)));
+                                    "\", Insufficient data entered for a full schedule day.",
+                				format("...Minutes per Item field = [{}].", Numbers(1)));
                 ErrorsFound = true;
                 continue;
             }
             if (NumNumbers < 25) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
-                                    "\", Insufficient data entered for a full schedule day.");
-                ShowContinueError(state,
-                                  format("...Minutes per Item field = [{}] and only [{}] to apply to list fields.", Numbers(1), NumNumbers - 1));
+                                    "\", Insufficient data entered for a full schedule day.",
+                				format("...Minutes per Item field = [{}] and only [{}] to apply to list fields.", Numbers(1), NumNumbers - 1));
                 ErrorsFound = true;
                 continue;
             }
@@ -918,15 +917,15 @@ namespace ScheduleManager {
             if ((NumNumbers - 1) != NumExpectedItems) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + ", Number of Entered Items=" +
-                                    format("{} not equal number of expected items={}", NumNumbers - 1, NumExpectedItems));
-                ShowContinueError(state, format("based on {} field value={}", cNumericFields(1), MinutesPerItem));
+                                    format("{} not equal number of expected items={}", NumNumbers - 1, NumExpectedItems),
+                				format("based on {} field value={}", cNumericFields(1), MinutesPerItem));
                 ErrorsFound = true;
                 continue;
             }
 
             if (mod(60, MinutesPerItem) != 0) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1));
-                ShowContinueError(state, format("Requested {} field value ({}) not evenly divisible into 60", cNumericFields(1), MinutesPerItem));
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1),
+                				format("Requested {} field value ({}) not evenly divisible into 60", cNumericFields(1), MinutesPerItem));
                 ErrorsFound = true;
                 continue;
             }
@@ -1061,8 +1060,8 @@ namespace ScheduleManager {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex + 1) +
                                         " \"" + Alphas(InLoopIndex + 1) + "\" not Found",
-                                    OptionalOutputFileRef{state.files.audit});
-                    ShowContinueError(state, "ref: " + cAlphaFields(InLoopIndex) + " \"" + Alphas(InLoopIndex) + "\"");
+                                    OptionalOutputFileRef{state.files.audit},
+                    				"ref: " + cAlphaFields(InLoopIndex) + " \"" + Alphas(InLoopIndex) + "\"");
                     ErrorsFound = true;
                 } else {
                     TheseDays = false;
@@ -1270,8 +1269,8 @@ namespace ScheduleManager {
                 if (!has_prefix(Alphas(NumField), "THROUGH:") && !has_prefix(Alphas(NumField), "THROUGH")) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name +
-                                        "\", Expecting \"Through:\" date");
-                    ShowContinueError(state, "Instead, found entry=" + Alphas(NumField));
+                                        "\", Expecting \"Through:\" date",
+                    				"Instead, found entry=" + Alphas(NumField));
                     ErrorsFound = true;
                     goto Through_exit;
                 } else {
@@ -1289,15 +1288,15 @@ namespace ScheduleManager {
                 if (PDateType == WeatherManager::DateType::NthDayInMonth || PDateType == WeatherManager::DateType::LastDayInMonth) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name +
-                                        "\", Invalid \"Through:\" date");
-                    ShowContinueError(state, "Found entry=" + Alphas(NumField));
+                                        "\", Invalid \"Through:\" date",
+                    				"Found entry=" + Alphas(NumField));
                     ErrorsFound = true;
                     goto Through_exit;
                 } else if (ErrorHere) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name +
-                                        "\", Invalid \"Through:\" date");
-                    ShowContinueError(state, "Found entry=" + Alphas(NumField));
+                                        "\", Invalid \"Through:\" date",
+                    				"Found entry=" + Alphas(NumField));
                     ErrorsFound = true;
                     goto Through_exit;
                 } else {
@@ -1306,8 +1305,8 @@ namespace ScheduleManager {
                         if (FullYearSet) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name +
-                                                "\", New \"Through\" entry when \"full year\" already set");
-                            ShowContinueError(state, "\"Through\" field=" + CurrentThrough);
+                                                "\", New \"Through\" entry when \"full year\" already set",
+                            				"\"Through\" field=" + CurrentThrough);
                             ErrorsFound = true;
                         }
                         FullYearSet = true;
@@ -1405,9 +1404,8 @@ namespace ScheduleManager {
                             ++NumNumbers;
                             Numbers(NumNumbers) = UtilityRoutines::ProcessNumber(Alphas(NumField), ErrorHere);
                             if (ErrorHere) {
-                                ShowSevereError(state, CurrentModuleObject + "=\"" + Alphas(1) + "\"");
-                                ShowContinueError(state,
-                                                  "Until field=[" + Alphas(NumField - 1) + "] has illegal value field=[" + Alphas(NumField) + "].");
+                                ShowSevereError(state, CurrentModuleObject + "=\"" + Alphas(1) + "\"",
+                                				"Until field=[" + Alphas(NumField - 1) + "] has illegal value field=[" + Alphas(NumField) + "].");
                                 ErrorsFound = true;
                             }
                             ++NumField;
@@ -1611,8 +1609,8 @@ namespace ScheduleManager {
             if (Numbers(3) != 8760 && Numbers(3) != 8784) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cNumericFields(3) +
-                                    " must = 8760 or 8784 (for a leap year)");
-                ShowContinueError(state, format("..Value for field = {:.0T}, Schedule not processed.", Numbers(3)));
+                                    " must = 8760 or 8784 (for a leap year)",
+                				format("..Value for field = {:.0T}, Schedule not processed.", Numbers(3)));
                 ErrorsFound = true;
                 continue;
             }
@@ -1629,8 +1627,8 @@ namespace ScheduleManager {
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(4) + " illegal value=\"" +
-                                    Alphas(4) + "\".");
-                ShowContinueError(state, "..must be Comma, Semicolon, Tab, or Space.");
+                                    Alphas(4) + "\".",
+                				"..must be Comma, Semicolon, Tab, or Space.");
                 ErrorsFound = true;
                 continue;
             }
@@ -1655,8 +1653,8 @@ namespace ScheduleManager {
                 MinutesPerItem = int(Numbers(4));
                 NumExpectedItems = 1440 / MinutesPerItem;
                 if (mod(60, MinutesPerItem) != 0) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1));
-                    ShowContinueError(state, format("Requested {} field value ({}) not evenly divisible into 60", cNumericFields(4), MinutesPerItem));
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1),
+                    				format("Requested {} field value ({}) not evenly divisible into 60", cNumericFields(4), MinutesPerItem));
                     ErrorsFound = true;
                     continue;
                 }
@@ -2167,9 +2165,8 @@ namespace ScheduleManager {
                             format("{}Schedule=\"{}\" has values outside its Schedule Type ({}) range",
                                    RoutineName,
                                    state.dataScheduleMgr->Schedule(SchNum).Name,
-                                   state.dataScheduleMgr->ScheduleType(NumPointer).Name));
-            ShowContinueError(state,
-                              format("  Minimum should be >={:.3R} and Maximum should be <={:.3R}",
+                                   state.dataScheduleMgr->ScheduleType(NumPointer).Name),
+            				format("  Minimum should be >={:.3R} and Maximum should be <={:.3R}",
                                      state.dataScheduleMgr->ScheduleType(NumPointer).Minimum,
                                      state.dataScheduleMgr->ScheduleType(NumPointer).Maximum));
             ErrorsFound = true;
@@ -3203,15 +3200,15 @@ namespace ScheduleManager {
             } else if (Pos == std::string::npos) {
                 DecodeHHMMField(state, Untils(Count), HHField, MMField, ErrorsFound, DayScheduleName, Untils(Count), interpolationKind);
             } else { // Until found but wasn't first field
-                ShowSevereError(state, "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils(Count));
-                ShowContinueError(state, "Occurred in Day Schedule=" + DayScheduleName);
+                ShowSevereError(state, "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils(Count),
+                				"Occurred in Day Schedule=" + DayScheduleName);
                 ErrorsFound = true;
                 continue;
             }
             // Field decoded
             if (HHField < 0 || HHField > 24 || MMField < 0 || MMField > 60) {
-                ShowSevereError(state, "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils(Count));
-                ShowContinueError(state, "Occurred in Day Schedule=" + DayScheduleName);
+                ShowSevereError(state, "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils(Count),
+                				"Occurred in Day Schedule=" + DayScheduleName);
                 ErrorsFound = true;
                 continue;
             }
@@ -3379,8 +3376,8 @@ namespace ScheduleManager {
         if (Pos == std::string::npos) {
             ShowSevereError(state,
                             "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (no : separator in hh:mm)=" +
-                                stripped(FullFieldValue));
-            ShowContinueError(state, "Occurred in Day Schedule=" + DayScheduleName);
+                                stripped(FullFieldValue),
+            				"Occurred in Day Schedule=" + DayScheduleName);
             ErrorsFound = true;
             return;
         } else if (Pos == 0) {
@@ -3399,8 +3396,8 @@ namespace ScheduleManager {
                 } else {
                     ShowSevereError(state,
                                     "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (invalid numeric in HH)=" +
-                                        stripped(FullFieldValue));
-                    ShowContinueError(state, "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName);
+                                        stripped(FullFieldValue),
+                    				"Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName);
                     ErrorsFound = true;
                     return;
                 }
@@ -3421,8 +3418,8 @@ namespace ScheduleManager {
             } else {
                 ShowSevereError(state,
                                 "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (invalid numeric in MM)=" +
-                                    stripped(FullFieldValue));
-                ShowContinueError(state, "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName);
+                                    stripped(FullFieldValue),
+                				"Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName);
                 ErrorsFound = true;
                 return;
             }

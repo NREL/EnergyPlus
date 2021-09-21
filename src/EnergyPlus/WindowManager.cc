@@ -639,9 +639,8 @@ namespace WindowManager {
                 ShowSevereError(state,
                                 format("WindowManage::InitGlassOpticalCalculations = {}, Invalid maximum value of common incidet angles = {}.",
                                        state.dataConstruction->Construct(ConstrNum).Name,
-                                       TotalIPhi));
-                ShowContinueError(state,
-                                  format("The maximum number of incident angles for each construct is {}. Please rearrange the dataset.",
+                                       TotalIPhi),
+                				format("The maximum number of incident angles for each construct is {}. Please rearrange the dataset.",
                                          state.dataWindowManager->MaxNumOfIncidentAngles));
                 ShowFatalError(state, "Errors found getting inputs. Previous error(s) cause program termination.");
             }
@@ -2526,8 +2525,8 @@ namespace WindowManager {
                             if (state.dataMaterial->Material(ShadeLayPtr).Group == DataHeatBalance::MaterialGroup::WindowBlind) {
                                 ShowSevereError(state,
                                                 "CalcWindowHeatBalance: ShadeFlag indicates Shade but Blind=\"" +
-                                                    state.dataMaterial->Material(ShadeLayPtr).Name + "\" is being used.");
-                                ShowContinueError(state, "This is most likely a fault of the EMS values for shading control.");
+                                                    state.dataMaterial->Material(ShadeLayPtr).Name + "\" is being used.",
+                                				"This is most likely a fault of the EMS values for shading control.");
                                 ShowFatalError(state, "Preceding condition terminates program.");
                             }
                         }
@@ -2558,8 +2557,8 @@ namespace WindowManager {
                                 state.dataMaterial->Material(ShadeLayPtr).Group == DataHeatBalance::MaterialGroup::Screen) {
                                 ShowSevereError(state,
                                                 "CalcWindowHeatBalance: ShadeFlag indicates Blind but Shade/Screen=\"" +
-                                                    state.dataMaterial->Material(ShadeLayPtr).Name + "\" is being used.");
-                                ShowContinueError(state, "This is most likely a fault of the EMS values for shading control.");
+                                                    state.dataMaterial->Material(ShadeLayPtr).Name + "\" is being used.",
+                                				"This is most likely a fault of the EMS values for shading control.");
                                 ShowFatalError(state, "Preceding condition terminates program.");
                             }
                         }

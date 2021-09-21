@@ -215,8 +215,8 @@ void GetBoilerInput(EnergyPlusData &state)
             state.dataIPShortCut->cAlphaArgs(2), thisBoiler.BoilerFuelTypeForOutputVariable, thisBoiler.FuelType, FuelTypeError);
         if (FuelTypeError) {
             ShowSevereError(
-                state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
+                state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)),
+                "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
             // Set to Electric to avoid errors when setting up output variables
             thisBoiler.BoilerFuelTypeForOutputVariable = "Electricity";
             thisBoiler.FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
@@ -227,9 +227,9 @@ void GetBoilerInput(EnergyPlusData &state)
         thisBoiler.NomCap = state.dataIPShortCut->rNumericArgs(1);
         if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
             ShowSevereError(
-                state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
-            ShowContinueError(state, "..." + state.dataIPShortCut->cNumericFieldNames(1) + " must be greater than 0.0");
+                state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)),
+                format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)),
+                "..." + state.dataIPShortCut->cNumericFieldNames(1) + " must be greater than 0.0");
             ErrorsFound = true;
         }
         if (thisBoiler.NomCap == DataSizing::AutoSize) {
@@ -239,8 +239,8 @@ void GetBoilerInput(EnergyPlusData &state)
         thisBoiler.NomEffic = state.dataIPShortCut->rNumericArgs(2);
         if (state.dataIPShortCut->rNumericArgs(2) == 0.0) {
             ShowSevereError(
-                state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, format("Invalid {}={:.3R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
+                state, fmt::format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)),
+                format("Invalid {}={:.3R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowSevereError(state, "..." + state.dataIPShortCut->cNumericFieldNames(2) + " must be greater than 0.0");
             ErrorsFound = true;
         }
@@ -269,20 +269,18 @@ void GetBoilerInput(EnergyPlusData &state)
                     if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                         ShowSevereError(
                             state,
-                            fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                        ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
-                        ShowContinueError(state,
-                                          "boilers.Boiler using curve type of " +
+                            fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)),
+                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3),
+                            "boilers.Boiler using curve type of " +
                                               state.dataCurveManager->PerfCurve(thisBoiler.EfficiencyCurvePtr).ObjectType + " must specify " +
-                                              state.dataIPShortCut->cAlphaFieldNames(3));
-                        ShowContinueError(state, "Available choices are EnteringBoiler or LeavingBoiler");
+                                              state.dataIPShortCut->cAlphaFieldNames(3),
+                            "Available choices are EnteringBoiler or LeavingBoiler");
                     } else {
                         ShowSevereError(
                             state,
-                            fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                        ShowContinueError(state, "Field " + state.dataIPShortCut->cAlphaFieldNames(3) + " is blank");
-                        ShowContinueError(state,
-                                          "boilers.Boiler using curve type of " +
+                            fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)),
+                            "Field " + state.dataIPShortCut->cAlphaFieldNames(3) + " is blank",
+                            "boilers.Boiler using curve type of " +
                                               state.dataCurveManager->PerfCurve(thisBoiler.EfficiencyCurvePtr).ObjectType +
                                               " must specify either EnteringBoiler or LeavingBoiler");
                     }
@@ -292,8 +290,8 @@ void GetBoilerInput(EnergyPlusData &state)
 
         } else if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
             ShowSevereError(state,
-                            fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
+                            fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)),
+                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
             ShowSevereError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(4) + " not found.");
             ErrorsFound = true;
         }
@@ -348,10 +346,10 @@ void GetBoilerInput(EnergyPlusData &state)
             thisBoiler.FlowMode = DataPlant::FlowMode::NotModulated;
         } else {
             ShowSevereError(state,
-                            fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
-            ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
-            ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
+                            fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)),
+                            "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7),
+                            "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated",
+                            "Flow mode NotModulated is assumed and the simulation continues.");
             // We will assume variable flow if not specified
             thisBoiler.FlowMode = DataPlant::FlowMode::NotModulated;
         }
@@ -677,8 +675,8 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
         }
     } else {
         if (this->NomCapWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-            ShowSevereError(state, "Autosizing of Boiler nominal capacity requires a loop Sizing:Plant object");
-            ShowContinueError(state, "Occurs in Boiler object=" + this->Name);
+            ShowSevereError(state, "Autosizing of Boiler nominal capacity requires a loop Sizing:Plant object",
+                            "Occurs in Boiler object=" + this->Name);
             ErrorsFound = true;
         }
         if (!this->NomCapWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->NomCap > 0.0)) { // Hard-sized with no sizing data
@@ -731,8 +729,8 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
         }
     } else {
         if (this->VolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-            ShowSevereError(state, "Autosizing of Boiler design flow rate requires a loop Sizing:Plant object");
-            ShowContinueError(state, "Occurs in Boiler object=" + this->Name);
+            ShowSevereError(state, "Autosizing of Boiler design flow rate requires a loop Sizing:Plant object",
+                            "Occurs in Boiler object=" + this->Name);
             ErrorsFound = true;
         }
         if (!this->VolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport &&

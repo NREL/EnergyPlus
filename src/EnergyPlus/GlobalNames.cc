@@ -152,8 +152,8 @@ void VerifyUniqueChillerName(
 
     auto const iter = state.dataGlobalNames->ChillerNames.find(NameToVerify);
     if (iter != state.dataGlobalNames->ChillerNames.end()) {
-        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + iter->second + "\".");
-        ShowContinueError(state, "...Current entry is Chiller Type=\"" + TypeToVerify + "\".");
+        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + iter->second + "\".",
+        				"...Current entry is Chiller Type=\"" + TypeToVerify + "\".");
         ErrorsFound = true;
     } else {
         state.dataGlobalNames->ChillerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
@@ -177,8 +177,8 @@ void VerifyUniqueBaseboardName(
 
     auto const iter = state.dataGlobalNames->BaseboardNames.find(NameToVerify);
     if (iter != state.dataGlobalNames->BaseboardNames.end()) {
-        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + iter->second + "\".");
-        ShowContinueError(state, "...Current entry is Baseboard Type=\"" + TypeToVerify + "\".");
+        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + iter->second + "\".",
+        				"...Current entry is Baseboard Type=\"" + TypeToVerify + "\".");
         ErrorsFound = true;
     } else {
         state.dataGlobalNames->BaseboardNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
@@ -202,8 +202,8 @@ void VerifyUniqueBoilerName(
 
     auto const iter = state.dataGlobalNames->BoilerNames.find(NameToVerify);
     if (iter != state.dataGlobalNames->BoilerNames.end()) {
-        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + iter->second + "\".");
-        ShowContinueError(state, "...Current entry is Boiler Type=\"" + TypeToVerify + "\".");
+        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + iter->second + "\".",
+        				"...Current entry is Boiler Type=\"" + TypeToVerify + "\".");
         ErrorsFound = true;
     } else {
         state.dataGlobalNames->BoilerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
@@ -234,8 +234,8 @@ void VerifyUniqueCoilName(
 
     auto const iter = state.dataGlobalNames->CoilNames.find(NameToVerify);
     if (iter != state.dataGlobalNames->CoilNames.end()) {
-        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + iter->second + "\".");
-        ShowContinueError(state, "...Current entry is Coil Type=\"" + TypeToVerify + "\".");
+        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + iter->second + "\".",
+        				"...Current entry is Coil Type=\"" + TypeToVerify + "\".");
         ErrorsFound = true;
     } else {
         state.dataGlobalNames->CoilNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
@@ -248,8 +248,8 @@ void VerifyUniqueADUName(
 {
     auto const iter = state.dataGlobalNames->aDUNames.find(NameToVerify);
     if (iter != state.dataGlobalNames->aDUNames.end()) {
-        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + iter->second + "\".");
-        ShowContinueError(state, "...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\".");
+        ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + iter->second + "\".",
+        				"...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\".");
         ErrorsFound = true;
     } else {
         state.dataGlobalNames->aDUNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));

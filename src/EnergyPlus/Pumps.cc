@@ -445,8 +445,8 @@ void GetPumpInput(EnergyPlusData &state)
                 if (state.dataPumps->PumpEquip(PumpNum).VFD.ManualRPMSchedIndex <= 0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
-                                        "\", At least one scheduled VFD schedule input was invalid.");
-                    ShowContinueError(state, "Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
+                                        "\", At least one scheduled VFD schedule input was invalid.",
+                    				"Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
                     ErrorsFound = true;
                 } else if (!CheckScheduleValueMinMax(state, state.dataPumps->PumpEquip(PumpNum).VFD.ManualRPMSchedIndex, ">", 0.0) ||
                            !CheckScheduleValueMinMax(state, state.dataPumps->PumpEquip(PumpNum).VFD.ManualRPMSchedIndex, ">", 0.0)) {
@@ -471,8 +471,8 @@ void GetPumpInput(EnergyPlusData &state)
                         state.dataPumps->PumpEquip(PumpNum).VFD.MaxRPMSchedIndex) <= 0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
-                                        "\", At least one scheduled VFD schedule input was invalid.");
-                    ShowContinueError(state, "Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
+                                        "\", At least one scheduled VFD schedule input was invalid.",
+                    				"Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
                     ErrorsFound = true;
                 } else if (!CheckScheduleValueMinMax(state, state.dataPumps->PumpEquip(PumpNum).VFD.MinRPMSchedIndex, ">", 0.0) ||
                            !CheckScheduleValueMinMax(state, state.dataPumps->PumpEquip(PumpNum).VFD.MaxRPMSchedIndex, ">", 0.0)) {
@@ -1490,19 +1490,15 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
                 state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut != OutletNode) {
                 ShowSevereError(state,
                                 "InitializePumps: " + cPumpTypes[state.dataPumps->PumpEquip(PumpNum).pumpType] + "=\"" +
-                                    state.dataPumps->PumpEquip(PumpNum).Name + "\", non-matching nodes.");
-                ShowContinueError(state,
-                                  "...in Branch=\"" + state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Name +
-                                      "\", Component referenced with:");
-                ShowContinueError(state,
-                                  "...Inlet Node=\"" + state.dataLoopNodes->NodeID(
-                                                           state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn));
-                ShowContinueError(
-                    state,
-                    "...Outlet Node=\"" +
-                        state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut));
-                ShowContinueError(state, "...Pump Inlet Node=\"" + state.dataLoopNodes->NodeID(InletNode));
-                ShowContinueError(state, "...Pump Outlet Node=\"" + state.dataLoopNodes->NodeID(OutletNode));
+                                    state.dataPumps->PumpEquip(PumpNum).Name + "\", non-matching nodes.",
+                				"...in Branch=\"" + state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Name +
+                                      "\", Component referenced with:",
+                				"...Inlet Node=\"" + state.dataLoopNodes->NodeID(
+                                                           state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn),
+                				"...Outlet Node=\"" +
+                        state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut),
+                				"...Pump Inlet Node=\"" + state.dataLoopNodes->NodeID(InletNode),
+                				"...Pump Outlet Node=\"" + state.dataLoopNodes->NodeID(OutletNode));
                 errFlag = true;
             }
         } else { // CR9292
@@ -1564,14 +1560,11 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
                 ShowSevereError(state,
                                 format("Check input.  Calculated Pump Efficiency={:.3R}% which is bigger than 100%, for pump={}",
                                        state.dataPumps->PumpEquip(PumpNum).PumpEffic * 100.0,
-                                       state.dataPumps->PumpEquip(PumpNum).Name));
-                ShowContinueError(state,
-                                  format("Calculated Pump_Efficiency % =Total_Efficiency % [{:.1R}] / Motor_Efficiency % [{:.1R}]",
+                                       state.dataPumps->PumpEquip(PumpNum).Name),
+                				format("Calculated Pump_Efficiency % =Total_Efficiency % [{:.1R}] / Motor_Efficiency % [{:.1R}]",
                                          TotalEffic * 100.0,
-                                         state.dataPumps->PumpEquip(PumpNum).MotorEffic * 100.0));
-                ShowContinueError(
-                    state,
-                    format("Total_Efficiency % =(Rated_Volume_Flow_Rate [{:.1R}] * Rated_Pump_Head [{:.1R}] / Rated_Power_Use [{:.1R}]) * 100.",
+                                         state.dataPumps->PumpEquip(PumpNum).MotorEffic * 100.0),
+                				format("Total_Efficiency % =(Rated_Volume_Flow_Rate [{:.1R}] * Rated_Pump_Head [{:.1R}] / Rated_Power_Use [{:.1R}]) * 100.",
                            state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate,
                            state.dataPumps->PumpEquip(PumpNum).NomPumpHead,
                            state.dataPumps->PumpEquip(PumpNum).NomPowerUse));
@@ -2117,8 +2110,8 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
             if (TotalEffic == 0.0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + " Plant pressure simulation encountered a pump with zero efficiency: " +
-                                    state.dataPumps->PumpEquip(PumpNum).Name);
-                ShowContinueError(state, "Check efficiency inputs for this pump component.");
+                                    state.dataPumps->PumpEquip(PumpNum).Name,
+                				"Check efficiency inputs for this pump component.");
                 ShowFatalError(state, "Errors in plant calculation would result in divide-by-zero cause program termination.");
             }
             state.dataPumps->Power = VolFlowRate * state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).PressureDrop / TotalEffic;
@@ -2132,8 +2125,8 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
         if (TotalEffic == 0.0) {
             ShowSevereError(state,
                             std::string{RoutineName} +
-                                " Plant pump simulation encountered a pump with zero efficiency: " + state.dataPumps->PumpEquip(PumpNum).Name);
-            ShowContinueError(state, "Check efficiency inputs for this pump component.");
+                                " Plant pump simulation encountered a pump with zero efficiency: " + state.dataPumps->PumpEquip(PumpNum).Name,
+            				"Check efficiency inputs for this pump component.");
             ShowFatalError(state, "Errors in plant calculation would result in divide-by-zero cause program termination.");
         }
         state.dataPumps->Power = VolFlowRate * state.dataPumps->PumpEquip(PumpNum).EMSPressureOverrideValue / TotalEffic;
@@ -2320,8 +2313,8 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
             }
         } else {
             if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                ShowSevereError(state, "Autosizing of plant loop pump flow rate requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Occurs in plant pump object=" + state.dataPumps->PumpEquip(PumpNum).Name);
+                ShowSevereError(state, "Autosizing of plant loop pump flow rate requires a loop Sizing:Plant object",
+                				"Occurs in plant pump object=" + state.dataPumps->PumpEquip(PumpNum).Name);
                 ErrorsFound = true;
             }
         }

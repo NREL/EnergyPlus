@@ -430,8 +430,8 @@ namespace VariableSpeedCoils {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds < 1) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be >= 1. entered number is {:.0T}", cNumericFields(1), NumArray(1)));
+                                    "\", invalid",
+                				format("...{} must be >= 1. entered number is {:.0T}", cNumericFields(1), NumArray(1)));
                 ErrorsFound = true;
             }
 
@@ -446,8 +446,8 @@ namespace VariableSpeedCoils {
                 (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel <= 0)) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be valid speed level entered number is {:.0T}", cNumericFields(2), NumArray(2)));
+                                    "\", invalid",
+                				format("...{} must be valid speed level entered number is {:.0T}", cNumericFields(2), NumArray(2)));
                 ErrorsFound = true;
             }
 
@@ -457,13 +457,13 @@ namespace VariableSpeedCoils {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                    ShowContinueError(state, "...required " + cAlphaFields(6) + " is blank.");
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                    				"...required " + cAlphaFields(6) + " is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                    ShowContinueError(state, "...not found " + cAlphaFields(6) + "=\"" + AlphArray(6) + "\".");
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                    				"...not found " + cAlphaFields(6) + "=\"" + AlphArray(6) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -492,13 +492,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -534,13 +534,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -574,13 +574,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -614,13 +614,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -656,13 +656,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -695,13 +695,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -736,13 +736,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -925,8 +925,8 @@ namespace VariableSpeedCoils {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds < 1) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be >= 1. entered number is {:.0T}", cNumericFields(1), NumArray(1)));
+                                    "\", invalid",
+                				format("...{} must be >= 1. entered number is {:.0T}", cNumericFields(1), NumArray(1)));
                 ErrorsFound = true;
             }
 
@@ -941,8 +941,8 @@ namespace VariableSpeedCoils {
                 (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel <= 0)) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be valid speed level entered number is {:.0T}", cNumericFields(2), NumArray(2)));
+                                    "\", invalid",
+                				format("...{} must be valid speed level entered number is {:.0T}", cNumericFields(2), NumArray(2)));
                 ErrorsFound = true;
             }
 
@@ -952,13 +952,13 @@ namespace VariableSpeedCoils {
                 if (lAlphaBlanks(4)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                    ShowContinueError(state, "...required " + cAlphaFields(6) + " is blank.");
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                    				"...required " + cAlphaFields(6) + " is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                    ShowContinueError(state, "...not found " + cAlphaFields(4) + "=\"" + AlphArray(4) + "\".");
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                    				"...not found " + cAlphaFields(4) + "=\"" + AlphArray(4) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1007,9 +1007,9 @@ namespace VariableSpeedCoils {
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + cAlphaFields(6) + "=\"" + AlphArray(6) + "\":");
-                ShowContinueError(state, "...must be AirCooled or EvaporativelyCooled.");
+                                    "\", invalid",
+                				"..." + cAlphaFields(6) + "=\"" + AlphArray(6) + "\":",
+                				"...must be AirCooled or EvaporativelyCooled.");
                 ErrorsFound = true;
             }
 
@@ -1018,9 +1018,9 @@ namespace VariableSpeedCoils {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower < 0.0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + cNumericFields(7) + " cannot be < 0.0.");
-                ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(7)));
+                                    "\", invalid",
+                				"..." + cNumericFields(7) + " cannot be < 0.0.",
+                				format("...entered value=[{:.2T}].", NumArray(7)));
                 ErrorsFound = true;
             }
 
@@ -1029,9 +1029,9 @@ namespace VariableSpeedCoils {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity < 0.0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + cNumericFields(8) + " cannot be < 0.0.");
-                ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(8)));
+                                    "\", invalid",
+                				"..." + cNumericFields(8) + " cannot be < 0.0.",
+                				format("...entered value=[{:.2T}].", NumArray(8)));
                 ErrorsFound = true;
             }
 
@@ -1077,9 +1077,9 @@ namespace VariableSpeedCoils {
             if (NumArray(11) < 0.0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + cNumericFields(11) + " must be >= 0.0.");
-                ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(11)));
+                                    "\", invalid",
+                				"..." + cNumericFields(11) + " must be >= 0.0.",
+                				format("...entered value=[{:.2T}].", NumArray(11)));
                 ErrorsFound = true;
             }
 
@@ -1117,9 +1117,9 @@ namespace VariableSpeedCoils {
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondEffect(I) > 1.0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                    ShowContinueError(state, "..." + cNumericFields(18 + (I - 1) * 6) + " cannot be < 0.0 or > 1.0.");
-                    ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(18 + (I - 1) * 6)));
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                    				"..." + cNumericFields(18 + (I - 1) * 6) + " cannot be < 0.0 or > 1.0.",
+                    				format("...entered value=[{:.2T}].", NumArray(18 + (I - 1) * 6)));
                     ErrorsFound = true;
                 }
 
@@ -1130,13 +1130,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -1172,13 +1172,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -1212,13 +1212,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -1254,13 +1254,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -1445,8 +1445,8 @@ namespace VariableSpeedCoils {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds < 1) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be >= 1. entered number is {:.0T}", cNumericFields(1), NumArray(1)));
+                                    "\", invalid",
+                				format("...{} must be >= 1. entered number is {:.0T}", cNumericFields(1), NumArray(1)));
                 ErrorsFound = true;
             }
 
@@ -1461,8 +1461,8 @@ namespace VariableSpeedCoils {
                 (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel <= 0)) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be valid speed level entered number is {:.0T}", cNumericFields(2), NumArray(2)));
+                                    "\", invalid",
+                				format("...{} must be valid speed level entered number is {:.0T}", cNumericFields(2), NumArray(2)));
                 ErrorsFound = true;
             }
 
@@ -1472,13 +1472,13 @@ namespace VariableSpeedCoils {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                    ShowContinueError(state, "...required " + cAlphaFields(6) + " is blank.");
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                    				"...required " + cAlphaFields(6) + " is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                    ShowContinueError(state, "...not found " + cAlphaFields(6) + "=\"" + AlphArray(6) + "\".");
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                    				"...not found " + cAlphaFields(6) + "=\"" + AlphArray(6) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1506,13 +1506,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -1548,13 +1548,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -1588,13 +1588,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(14 + (I - 1) * 6) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(14 + (I - 1) * 6) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -1628,13 +1628,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -1670,13 +1670,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(16 + (I - 1) * 6) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(16 + (I - 1) * 6) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -1709,13 +1709,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -1750,13 +1750,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -1909,8 +1909,8 @@ namespace VariableSpeedCoils {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds < 1) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be >= 1. entered number is {:.0T}", cNumericFields(1), NumArray(1)));
+                                    "\", invalid",
+                				format("...{} must be >= 1. entered number is {:.0T}", cNumericFields(1), NumArray(1)));
                 ErrorsFound = true;
             }
 
@@ -1925,8 +1925,8 @@ namespace VariableSpeedCoils {
                 (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel <= 0)) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be valid speed level entered number is {:.0T}", cNumericFields(2), NumArray(2)));
+                                    "\", invalid",
+                				format("...{} must be valid speed level entered number is {:.0T}", cNumericFields(2), NumArray(2)));
                 ErrorsFound = true;
             }
 
@@ -1936,13 +1936,13 @@ namespace VariableSpeedCoils {
                 if (lAlphaBlanks(4)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                    ShowContinueError(state, "...required " + cAlphaFields(4) + " is blank.");
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                    				"...required " + cAlphaFields(4) + " is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                    ShowContinueError(state, "...not found " + cAlphaFields(4) + "=\"" + AlphArray(4) + "\".");
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                    				"...not found " + cAlphaFields(4) + "=\"" + AlphArray(4) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1963,14 +1963,14 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(5)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(5) + " is blank.");
-                        ShowContinueError(state, "...field is required because " + cAlphaFields(6) + " is \"ReverseCycle\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(5) + " is blank.",
+                        				"...field is required because " + cAlphaFields(6) + " is \"ReverseCycle\".");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(5) + "=\"" + AlphArray(5) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(5) + "=\"" + AlphArray(5) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -1992,9 +1992,9 @@ namespace VariableSpeedCoils {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostStrategy == 0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "...illegal " + cAlphaFields(6) + "=\"" + AlphArray(6) + "\".");
-                ShowContinueError(state, "...valid values for this field are ReverseCycle or Resistive.");
+                                    "\", invalid",
+                				"...illegal " + cAlphaFields(6) + "=\"" + AlphArray(6) + "\".",
+                				"...valid values for this field are ReverseCycle or Resistive.");
                 ErrorsFound = true;
             }
 
@@ -2005,9 +2005,9 @@ namespace VariableSpeedCoils {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostControl == 0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "...illegal " + cAlphaFields(7) + "=\"" + AlphArray(7) + "\".");
-                ShowContinueError(state, "...valid values for this field are Timed or OnDemand.");
+                                    "\", invalid",
+                				"...illegal " + cAlphaFields(7) + "=\"" + AlphArray(7) + "\".",
+                				"...valid values for this field are Timed or OnDemand.");
                 ErrorsFound = true;
             }
 
@@ -2025,9 +2025,9 @@ namespace VariableSpeedCoils {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity < 0.0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + cNumericFields(9) + " cannot be < 0.0.");
-                ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(9)));
+                                    "\", invalid",
+                				"..." + cNumericFields(9) + " cannot be < 0.0.",
+                				format("...entered value=[{:.2T}].", NumArray(9)));
                 ErrorsFound = true;
             }
 
@@ -2062,9 +2062,8 @@ namespace VariableSpeedCoils {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) < 1.e-10) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid value");
-                    ShowContinueError(state,
-                                      format("...too small {}=[{:.2R}].",
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid value",
+                    				format("...too small {}=[{:.2R}].",
                                              cNumericFields(12 + (I - 1) * 3),
                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I)));
                     ErrorsFound = true;
@@ -2077,13 +2076,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -2119,13 +2118,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -2159,13 +2158,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -2201,13 +2200,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -2331,8 +2330,8 @@ namespace VariableSpeedCoils {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds < 1) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be >= 1. entered number is {:.0T}", cNumericFields(1), NumArray(1)));
+                                    "\", invalid",
+                				format("...{} must be >= 1. entered number is {:.0T}", cNumericFields(1), NumArray(1)));
                 ErrorsFound = true;
             }
 
@@ -2347,8 +2346,8 @@ namespace VariableSpeedCoils {
                 (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel <= 0)) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be valid speed level entered number is {:.0T}", cNumericFields(2), NumArray(2)));
+                                    "\", invalid",
+                				format("...{} must be valid speed level entered number is {:.0T}", cNumericFields(2), NumArray(2)));
                 ErrorsFound = true;
             }
 
@@ -2356,8 +2355,8 @@ namespace VariableSpeedCoils {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapWH <= 0.0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be > 0.0, entered value=[{:.2T}].", cNumericFields(3), NumArray(3)));
+                                    "\", invalid",
+                				format("...{} must be > 0.0, entered value=[{:.2T}].", cNumericFields(3), NumArray(3)));
                 ErrorsFound = true;
             }
 
@@ -2372,8 +2371,8 @@ namespace VariableSpeedCoils {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate <= 0.0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                    ShowContinueError(state, format("...{} must be > 0.0.  entered value=[{:.3T}].", cNumericFields(7), NumArray(7)));
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                    				format("...{} must be > 0.0.  entered value=[{:.3T}].", cNumericFields(7), NumArray(7)));
                     ErrorsFound = true;
                 }
             }
@@ -2382,8 +2381,8 @@ namespace VariableSpeedCoils {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate <= 0.0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                    ShowContinueError(state, format("...{} must be > 0.0  entered value=[{:.3T}].", cNumericFields(8), NumArray(8)));
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                    				format("...{} must be > 0.0  entered value=[{:.3T}].", cNumericFields(8), NumArray(8)));
                     ErrorsFound = true;
                 }
             }
@@ -2397,9 +2396,9 @@ namespace VariableSpeedCoils {
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, ",,,invalid choice for " + cAlphaFields(2) + ".  Entered choice = " + AlphArray(2));
-                ShowContinueError(state, "Valid choices are Yes or No.");
+                                    "\", invalid",
+                				",,,invalid choice for " + cAlphaFields(2) + ".  Entered choice = " + AlphArray(2),
+                				"Valid choices are Yes or No.");
                 ErrorsFound = true;
             }
 
@@ -2412,9 +2411,9 @@ namespace VariableSpeedCoils {
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, ",,,invalid choice for " + cAlphaFields(3) + ".  Entered choice = " + AlphArray(3));
-                ShowContinueError(state, "Valid choices are Yes or No.");
+                                    "\", invalid",
+                				",,,invalid choice for " + cAlphaFields(3) + ".  Entered choice = " + AlphArray(3),
+                				"Valid choices are Yes or No.");
                 ErrorsFound = true;
             }
 
@@ -2427,9 +2426,9 @@ namespace VariableSpeedCoils {
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, ",,,invalid choice for " + cAlphaFields(4) + ".  Entered choice = " + AlphArray(4));
-                ShowContinueError(state, "Valid choices are Yes or No.");
+                                    "\", invalid",
+                				",,,invalid choice for " + cAlphaFields(4) + ".  Entered choice = " + AlphArray(4),
+                				"Valid choices are Yes or No.");
                 ErrorsFound = true;
             }
 
@@ -2438,8 +2437,8 @@ namespace VariableSpeedCoils {
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater > 1.0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be >= 0 and <= 1.  entered value=[{:.3T}].", cNumericFields(10), NumArray(9)));
+                                    "\", invalid",
+                				format("...{} must be >= 0 and <= 1.  entered value=[{:.3T}].", cNumericFields(10), NumArray(9)));
                 ErrorsFound = true;
             }
 
@@ -2501,8 +2500,8 @@ namespace VariableSpeedCoils {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity < 0.0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be >= 0.0  entered value=[{:.1T}].", cNumericFields(10), NumArray(10)));
+                                    "\", invalid",
+                				format("...{} must be >= 0.0  entered value=[{:.1T}].", cNumericFields(10), NumArray(10)));
                 ErrorsFound = true;
             }
 
@@ -2510,8 +2509,8 @@ namespace VariableSpeedCoils {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater < 0.0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, format("...{} must be >= 0 {{C}}.  entered value=[{:.1T}].", cNumericFields(11), NumArray(11)));
+                                    "\", invalid",
+                				format("...{} must be >= 0 {{C}}.  entered value=[{:.1T}].", cNumericFields(11), NumArray(11)));
                 ErrorsFound = true;
             }
 
@@ -2523,9 +2522,9 @@ namespace VariableSpeedCoils {
                 //   wrong temperature type selection
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + cAlphaFields(9) + " must be DryBulbTemperature or WetBulbTemperature.");
-                ShowContinueError(state, "...entered value=\"" + AlphArray(9) + "\".");
+                                    "\", invalid",
+                				"..." + cAlphaFields(9) + " must be DryBulbTemperature or WetBulbTemperature.",
+                				"...entered value=\"" + AlphArray(9) + "\".");
                 ErrorsFound = true;
             }
 
@@ -2544,13 +2543,13 @@ namespace VariableSpeedCoils {
                 if (lAlphaBlanks(10)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                    ShowContinueError(state, "...required " + cAlphaFields(10) + " is blank.");
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                    				"...required " + cAlphaFields(10) + " is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                    ShowContinueError(state, "...not found " + cAlphaFields(10) + "=\"" + AlphArray(10) + "\".");
+                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                    				"...not found " + cAlphaFields(10) + "=\"" + AlphArray(10) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -2582,13 +2581,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -2624,13 +2623,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -2666,13 +2665,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -2708,13 +2707,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -2750,13 +2749,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -2791,13 +2790,13 @@ namespace VariableSpeedCoils {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing");
-                        ShowContinueError(state, "...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", missing",
+                        				"...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
                     } else {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
-                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                        ShowContinueError(state, "...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
+                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name + "\", invalid",
+                        				"...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
                     }
                     ErrorsFound = true;
                 } else {
@@ -5387,10 +5386,9 @@ namespace VariableSpeedCoils {
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                     state.dataSize->PlantSizData(PltSizNum).DeltaT); // TRACE 3D Plus coil selection report
             } else {
-                ShowSevereError(state, "Autosizing of water flow requires a loop Sizing:Plant object");
-                ShowContinueError(state, "Autosizing also requires physical connection to a plant or condenser loop.");
-                ShowContinueError(state,
-                                  "Occurs in COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix +
+                ShowSevereError(state, "Autosizing of water flow requires a loop Sizing:Plant object",
+                				"Autosizing also requires physical connection to a plant or condenser loop.",
+                				"Occurs in COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix +
                                       " Object=" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                 ErrorsFound = true;
             }
@@ -8293,8 +8291,8 @@ namespace VariableSpeedCoils {
 
         if (CoilIndex == 0) {
 
-            ShowSevereError(state, "GetVSCoilMinOATCompressorUsingIndex: Index passed = 0");
-            ShowContinueError(state, "... returning Min OAT as -1000.");
+            ShowSevereError(state, "GetVSCoilMinOATCompressorUsingIndex: Index passed = 0",
+            				"... returning Min OAT as -1000.");
             ErrorsFound = true;
             MinOAT = -1000.0;
 

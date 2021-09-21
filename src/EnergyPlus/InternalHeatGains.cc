@@ -338,9 +338,8 @@ namespace InternalHeatGains {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
-                                    ShowContinueError(state,
-                                                      format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0",
+                                    				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                                     ErrorsFound = true;
                                 }
                             }
@@ -348,9 +347,8 @@ namespace InternalHeatGains {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
-                                    ShowContinueError(state,
-                                                      format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0",
+                                    				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                                     ErrorsFound = true;
                                 }
                             }
@@ -369,9 +367,8 @@ namespace InternalHeatGains {
                                     spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
                                 } else {
                                     ShowSevereError(state,
-                                                    std::string(RoutineName) + "Zone floor area is zero when allocating People loads to Spaces.");
-                                    ShowContinueError(state,
-                                                      "Occurs for People object =" + thisPeopleInput.Name +
+                                                    std::string(RoutineName) + "Zone floor area is zero when allocating People loads to Spaces.",
+                                    				"Occurs for People object =" + thisPeopleInput.Name +
                                                           " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
                                     ErrorsFound = true;
                                 }
@@ -444,8 +441,8 @@ namespace InternalHeatGains {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
-                                ShowContinueError(state, "...Valid values are \"People\", \"People/Area\", \"Area/Person\".");
+                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4),
+                                				"...Valid values are \"People\", \"People/Area\", \"Area/Person\".");
                                 ErrorsFound = true;
                             }
                         }
@@ -527,9 +524,8 @@ namespace InternalHeatGains {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(5) + " minimum is < 0.0");
-                                    ShowContinueError(state,
-                                                      format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMin));
+                                                        state.dataIPShortCut->cAlphaFieldNames(5) + " minimum is < 0.0",
+                                    				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMin));
                                     ErrorsFound = true;
                                 }
                             }
@@ -537,9 +533,8 @@ namespace InternalHeatGains {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(5) + " maximum is < 0.0");
-                                    ShowContinueError(state,
-                                                      format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMax));
+                                                        state.dataIPShortCut->cAlphaFieldNames(5) + " maximum is < 0.0",
+                                    				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMax));
                                     ErrorsFound = true;
                                 }
                             }
@@ -563,8 +558,8 @@ namespace InternalHeatGains {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(6) + " field should be Yes or No");
-                                ShowContinueError(state, "...Field value=\"" + AlphaName(6) + "\" is invalid.");
+                                                    state.dataIPShortCut->cAlphaFieldNames(6) + " field should be Yes or No",
+                                				"...Field value=\"" + AlphaName(6) + "\" is invalid.");
                                 ErrorsFound = true;
                             }
                         }
@@ -689,9 +684,8 @@ namespace InternalHeatGains {
                                         ShowSevereError(state,
                                                         std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
                                                             "\", Surface referenced in " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' +
-                                                            AlphaName(7) + " in different zone.");
-                                        ShowContinueError(state,
-                                                          "Surface is in Zone=" +
+                                                            AlphaName(7) + " in different zone.",
+                                        				"Surface is in Zone=" +
                                                               state.dataHeatBal->Zone(state.dataSurface->Surface(thisPeople.SurfacePtr).Zone).Name +
                                                               " and " + peopleModuleObject + " is in Zone=" + AlphaName(2));
                                         ErrorsFound = true;
@@ -734,10 +728,8 @@ namespace InternalHeatGains {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state,
                                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                                    state.dataIPShortCut->cAlphaFieldNames(9) + ", minimum is < 0.0");
-                                                ShowContinueError(
-                                                    state,
-                                                    format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(9), SchMin));
+                                                                    state.dataIPShortCut->cAlphaFieldNames(9) + ", minimum is < 0.0",
+                                                				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(9), SchMin));
                                                 ErrorsFound = true;
                                             }
                                         }
@@ -745,10 +737,8 @@ namespace InternalHeatGains {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state,
                                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                                    state.dataIPShortCut->cAlphaFieldNames(9) + ", maximum is < 0.0");
-                                                ShowContinueError(
-                                                    state,
-                                                    format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(9), SchMax));
+                                                                    state.dataIPShortCut->cAlphaFieldNames(9) + ", maximum is < 0.0",
+                                                				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(9), SchMax));
                                                 ErrorsFound = true;
                                             }
                                         }
@@ -800,9 +790,8 @@ namespace InternalHeatGains {
                                                         ShowSevereError(state,
                                                                         std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
                                                                             "\", " + state.dataIPShortCut->cAlphaFieldNames(12) +
-                                                                            ", minimum is < 0.0");
-                                                        ShowContinueError(state,
-                                                                          format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.",
+                                                                            ", minimum is < 0.0",
+                                                        				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.",
                                                                                  AlphaName(12),
                                                                                  SchMin));
                                                         ErrorsFound = true;
@@ -813,9 +802,8 @@ namespace InternalHeatGains {
                                                         ShowSevereError(state,
                                                                         std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) +
                                                                             "\", " + state.dataIPShortCut->cAlphaFieldNames(12) +
-                                                                            ", maximum is < 0.0");
-                                                        ShowContinueError(state,
-                                                                          format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.",
+                                                                            ", maximum is < 0.0",
+                                                        				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.",
                                                                                  AlphaName(12),
                                                                                  SchMax));
                                                         ErrorsFound = true;
@@ -867,9 +855,8 @@ namespace InternalHeatGains {
                                     } else {
                                         ShowSevereError(state,
                                                         std::string{RoutineName} + peopleModuleObject + "=\"" + thisPeople.Name + "\", invalid " +
-                                                            state.dataIPShortCut->cAlphaFieldNames(10) + ", value  =" + AlphaName(10));
-                                        ShowContinueError(state,
-                                                          "...Valid values are \"ClothingInsulationSchedule\",\"DynamicClothingModelASHRAE55a\", "
+                                                            state.dataIPShortCut->cAlphaFieldNames(10) + ", value  =" + AlphaName(10),
+                                        				"...Valid values are \"ClothingInsulationSchedule\",\"DynamicClothingModelASHRAE55a\", "
                                                           "\"CalculationMethodSchedule\".");
                                         ErrorsFound = true;
                                     }
@@ -893,10 +880,8 @@ namespace InternalHeatGains {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state,
                                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                                    state.dataIPShortCut->cAlphaFieldNames(13) + ", minimum is < 0.0");
-                                                ShowContinueError(
-                                                    state,
-                                                    format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(13), SchMin));
+                                                                    state.dataIPShortCut->cAlphaFieldNames(13) + ", minimum is < 0.0",
+                                                				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(13), SchMin));
                                                 ErrorsFound = true;
                                             }
                                         }
@@ -904,10 +889,8 @@ namespace InternalHeatGains {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state,
                                                                 std::string{RoutineName} + peopleModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                                    state.dataIPShortCut->cAlphaFieldNames(13) + ", maximum is < 0.0");
-                                                ShowContinueError(
-                                                    state,
-                                                    format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(13), SchMax));
+                                                                    state.dataIPShortCut->cAlphaFieldNames(13) + ", maximum is < 0.0",
+                                                				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(13), SchMax));
                                                 ErrorsFound = true;
                                             }
                                         }
@@ -1114,9 +1097,8 @@ namespace InternalHeatGains {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + lightsModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
-                                    ShowContinueError(state,
-                                                      format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0",
+                                    				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1124,9 +1106,8 @@ namespace InternalHeatGains {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + lightsModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
-                                    ShowContinueError(state,
-                                                      format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0",
+                                    				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1145,9 +1126,8 @@ namespace InternalHeatGains {
                                     spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
                                 } else {
                                     ShowSevereError(state,
-                                                    std::string(RoutineName) + "Zone floor area is zero when allocating Lights loads to Spaces.");
-                                    ShowContinueError(
-                                        state, "Occurs for Lights object =" + AlphaName(1) + " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
+                                                    std::string(RoutineName) + "Zone floor area is zero when allocating Lights loads to Spaces.",
+                                    				"Occurs for Lights object =" + AlphaName(1) + " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
                                     ErrorsFound = true;
                                 }
                             }
@@ -1217,8 +1197,8 @@ namespace InternalHeatGains {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + lightsModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
-                                ShowContinueError(state, "...Valid values are \"LightingLevel\", \"Watts/Area\", \"Watts/Person\".");
+                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4),
+                                				"...Valid values are \"LightingLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
                             }
                         }
@@ -1296,8 +1276,8 @@ namespace InternalHeatGains {
                     if ((thisLights.ZoneReturnNum == 0) && (thisLights.FractionReturnAir > 0.0) && (!state.dataIPShortCut->lAlphaFieldBlanks(7))) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + lightsModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                            state.dataIPShortCut->cAlphaFieldNames(7) + " =" + AlphaName(7));
-                        ShowContinueError(state, "No matching Zone Return Air Node found.");
+                                            state.dataIPShortCut->cAlphaFieldNames(7) + " =" + AlphaName(7),
+                        				"No matching Zone Return Air Node found.");
                         ErrorsFound = true;
                     }
                     // Set exhaust air node number
@@ -1326,8 +1306,8 @@ namespace InternalHeatGains {
                             if (exhaustNodeError) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + lightsModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphaName(8));
-                                ShowContinueError(state, "No matching Zone Exhaust Air Node found.");
+                                                    state.dataIPShortCut->cAlphaFieldNames(8) + " = " + AlphaName(8),
+                                				"No matching Zone Exhaust Air Node found.");
                                 ErrorsFound = true;
                             } else {
                                 if (thisLights.ZoneReturnNum > 0) {
@@ -1337,9 +1317,8 @@ namespace InternalHeatGains {
                                 } else {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + lightsModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(8) + " =" + AlphaName(8) + " is not used");
-                                    ShowContinueError(
-                                        state, "No matching Zone Return Air Node found. The Exhaust Node requires Return Node to work together");
+                                                        state.dataIPShortCut->cAlphaFieldNames(8) + " =" + AlphaName(8) + " is not used",
+                                    				"No matching Zone Return Air Node found. The Exhaust Node requires Return Node to work together");
                                     ErrorsFound = true;
                                 }
                             }
@@ -1433,9 +1412,8 @@ namespace InternalHeatGains {
                             ExhaustNodeNum != state.dataHeatBal->Lights(Loop1).ZoneExhaustNodeNum) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + lightsModuleObject +
-                                                ": Duplicated Return Air Node = " + state.dataHeatBal->Lights(Loop1).RetNodeName + " is found, ");
-                            ShowContinueError(state,
-                                              " in both Lights objects = " + state.dataHeatBal->Lights(Loop).Name + " and " +
+                                                ": Duplicated Return Air Node = " + state.dataHeatBal->Lights(Loop1).RetNodeName + " is found, ",
+                            				" in both Lights objects = " + state.dataHeatBal->Lights(Loop).Name + " and " +
                                                   state.dataHeatBal->Lights(Loop1).Name + ".");
                             ErrorsFound = true;
                             ReturnNodeShared(Loop1) = true;
@@ -1514,17 +1492,15 @@ namespace InternalHeatGains {
                             if (SchMin < 0.0) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + elecEqModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
-                                ShowContinueError(state,
-                                                  format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0",
+                                				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                                 ErrorsFound = true;
                             }
                             if (SchMax < 0.0) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + elecEqModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
-                                ShowContinueError(state,
-                                                  format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0",
+                                				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                                 ErrorsFound = true;
                             }
                         }
@@ -1542,9 +1518,8 @@ namespace InternalHeatGains {
                                 } else {
                                     ShowSevereError(state,
                                                     std::string(RoutineName) +
-                                                        "Zone floor area is zero when allocating ElectricEquipment loads to Spaces.");
-                                    ShowContinueError(state,
-                                                      "Occurs for ElectricEquipment object =" + thisElecEqInput.Name +
+                                                        "Zone floor area is zero when allocating ElectricEquipment loads to Spaces.",
+                                    				"Occurs for ElectricEquipment object =" + thisElecEqInput.Name +
                                                           " in Zone=" + state.dataHeatBal->Zone(thisZoneElectric.ZonePtr).Name);
                                     ErrorsFound = true;
                                 }
@@ -1616,8 +1591,8 @@ namespace InternalHeatGains {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + elecEqModuleObject + "=\"" + thisElecEqInput.Name + "\", invalid " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
-                                ShowContinueError(state, "...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
+                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4),
+                                				"...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
                             }
                         }
@@ -1731,9 +1706,8 @@ namespace InternalHeatGains {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + gasEqModuleObject + "=\"" + thisGasEqInput.Name + "\", " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
-                                    ShowContinueError(state,
-                                                      format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0",
+                                    				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1741,9 +1715,8 @@ namespace InternalHeatGains {
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + gasEqModuleObject + "=\"" + thisGasEqInput.Name + "\", " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
-                                    ShowContinueError(state,
-                                                      format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0",
+                                    				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                                     ErrorsFound = true;
                                 }
                             }
@@ -1761,9 +1734,8 @@ namespace InternalHeatGains {
                                     spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
                                 } else {
                                     ShowSevereError(
-                                        state, std::string(RoutineName) + "Zone floor area is zero when allocating GasEquipment loads to Spaces.");
-                                    ShowContinueError(state,
-                                                      "Occurs for GasEquipment object =" + thisGasEqInput.Name +
+                                        state, std::string(RoutineName) + "Zone floor area is zero when allocating GasEquipment loads to Spaces.",
+                                    				"Occurs for GasEquipment object =" + thisGasEqInput.Name +
                                                           " in Zone=" + state.dataHeatBal->Zone(thisZoneGas.ZonePtr).Name);
                                     ErrorsFound = true;
                                 }
@@ -1835,8 +1807,8 @@ namespace InternalHeatGains {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + gasEqModuleObject + "=\"" + thisGasEqInput.Name + "\", invalid " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
-                                ShowContinueError(state, "...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
+                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4),
+                                				"...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
                             }
                         }
@@ -1975,17 +1947,15 @@ namespace InternalHeatGains {
                             if (SchMin < 0.0) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + hwEqModuleObject + "=\"" + thisHWEqInput.Name + "\", " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
-                                ShowContinueError(state,
-                                                  format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0",
+                                				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                                 ErrorsFound = true;
                             }
                             if (SchMax < 0.0) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + hwEqModuleObject + "=\"" + thisHWEqInput.Name + "\", " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
-                                ShowContinueError(state,
-                                                  format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0",
+                                				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                                 ErrorsFound = true;
                             }
                         }
@@ -2003,9 +1973,8 @@ namespace InternalHeatGains {
                                 } else {
                                     ShowSevereError(state,
                                                     std::string(RoutineName) +
-                                                        "Zone floor area is zero when allocating HotWaterEquipment loads to Spaces.");
-                                    ShowContinueError(state,
-                                                      "Occurs for HotWaterEquipment object =" + thisHWEqInput.Name +
+                                                        "Zone floor area is zero when allocating HotWaterEquipment loads to Spaces.",
+                                    				"Occurs for HotWaterEquipment object =" + thisHWEqInput.Name +
                                                           " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
                                     ErrorsFound = true;
                                 }
@@ -2077,8 +2046,8 @@ namespace InternalHeatGains {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + hwEqModuleObject + "=\"" + thisHWEqInput.Name + "\", invalid " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
-                                ShowContinueError(state, "...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
+                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4),
+                                				"...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
                             }
                         }
@@ -2188,17 +2157,15 @@ namespace InternalHeatGains {
                             if (SchMin < 0.0) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + stmEqModuleObject + "=\"" + thisStmEqInput.Name + "\", " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
-                                ShowContinueError(state,
-                                                  format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0",
+                                				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                                 ErrorsFound = true;
                             }
                             if (SchMax < 0.0) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + stmEqModuleObject + "=\"" + thisStmEqInput.Name + "\", " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
-                                ShowContinueError(state,
-                                                  format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0",
+                                				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                                 ErrorsFound = true;
                             }
                         }
@@ -2215,9 +2182,8 @@ namespace InternalHeatGains {
                                     spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
                                 } else {
                                     ShowSevereError(
-                                        state, std::string(RoutineName) + "Zone floor area is zero when allocating SteamEquipment loads to Spaces.");
-                                    ShowContinueError(state,
-                                                      "Occurs for SteamEquipment object =" + thisStmEqInput.Name +
+                                        state, std::string(RoutineName) + "Zone floor area is zero when allocating SteamEquipment loads to Spaces.",
+                                    				"Occurs for SteamEquipment object =" + thisStmEqInput.Name +
                                                           " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
                                     ErrorsFound = true;
                                 }
@@ -2289,8 +2255,8 @@ namespace InternalHeatGains {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + stmEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
-                                ShowContinueError(state, "...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
+                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4),
+                                				"...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
                             }
                         }
@@ -2440,9 +2406,8 @@ namespace InternalHeatGains {
                                     spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
                                 } else {
                                     ShowSevereError(
-                                        state, std::string(RoutineName) + "Zone floor area is zero when allocating OtherEquipment loads to Spaces.");
-                                    ShowContinueError(state,
-                                                      "Occurs for OtherEquipment object =" + thisOthEqInput.Name +
+                                        state, std::string(RoutineName) + "Zone floor area is zero when allocating OtherEquipment loads to Spaces.",
+                                    				"Occurs for OtherEquipment object =" + thisOthEqInput.Name +
                                                           " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
                                     ErrorsFound = true;
                                 }
@@ -2495,8 +2460,8 @@ namespace InternalHeatGains {
                             if (Item1 == 1) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + othEqModuleObject + "=\"" + thisOthEqInput.Name + "\", invalid " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(5) + ", value  =" + AlphaName(5));
-                                ShowContinueError(state, "...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
+                                                    state.dataIPShortCut->cAlphaFieldNames(5) + ", value  =" + AlphaName(5),
+                                				"...Valid values are \"EquipmentLevel\", \"Watts/Area\", \"Watts/Person\".");
                                 ErrorsFound = true;
                             }
                         }
@@ -2506,8 +2471,8 @@ namespace InternalHeatGains {
                     if (thisZoneOthEq.DesignLevel < 0.0 && thisZoneOthEq.OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + othEqModuleObject + "=\"" + thisOthEqInput.Name + "\", " +
-                                            state.dataIPShortCut->cNumericFieldNames(DesignLevelFieldNumber) + " is not allowed to be negative");
-                        ShowContinueError(state, "... when a fuel type of " + FuelTypeString + " is specified.");
+                                            state.dataIPShortCut->cNumericFieldNames(DesignLevelFieldNumber) + " is not allowed to be negative",
+                        				"... when a fuel type of " + FuelTypeString + " is specified.");
                         ErrorsFound = true;
                     }
 
@@ -2653,9 +2618,8 @@ namespace InternalHeatGains {
                                 } else {
                                     ShowSevereError(state,
                                                     std::string(RoutineName) +
-                                                        "Zone floor area is zero when allocating ElectricEquipment:ITE:AirCooled loads to Spaces.");
-                                    ShowContinueError(state,
-                                                      "Occurs for ElectricEquipment:ITE:AirCooled object =" + thisITEqInput.Name +
+                                                        "Zone floor area is zero when allocating ElectricEquipment:ITE:AirCooled loads to Spaces.",
+                                    				"Occurs for ElectricEquipment:ITE:AirCooled object =" + thisITEqInput.Name +
                                                           " in Zone=" + state.dataHeatBal->Zone(zoneNum).Name);
                                     ErrorsFound = true;
                                 }
@@ -2706,8 +2670,8 @@ namespace InternalHeatGains {
                             } else {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4));
-                                ShowContinueError(state, "...Valid values are \"Watts/Unit\" or \"Watts/Area\".");
+                                                    state.dataIPShortCut->cAlphaFieldNames(4) + ", value  =" + AlphaName(4),
+                                				"...Valid values are \"Watts/Unit\" or \"Watts/Area\".");
                                 ErrorsFound = true;
                             }
                         }
@@ -2731,17 +2695,15 @@ namespace InternalHeatGains {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(5) + ", minimum is < 0.0");
-                                    ShowContinueError(state,
-                                                      format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMin));
+                                                        state.dataIPShortCut->cAlphaFieldNames(5) + ", minimum is < 0.0",
+                                    				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMin));
                                     ErrorsFound = true;
                                 }
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(5) + ", maximum is < 0.0");
-                                    ShowContinueError(state,
-                                                      format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMax));
+                                                        state.dataIPShortCut->cAlphaFieldNames(5) + ", maximum is < 0.0",
+                                    				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(5), SchMax));
                                     ErrorsFound = true;
                                 }
                             }
@@ -2766,17 +2728,15 @@ namespace InternalHeatGains {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(6) + ", minimum is < 0.0");
-                                    ShowContinueError(state,
-                                                      format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(6), SchMin));
+                                                        state.dataIPShortCut->cAlphaFieldNames(6) + ", minimum is < 0.0",
+                                    				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(6), SchMin));
                                     ErrorsFound = true;
                                 }
                                 if (SchMax < 0.0) {
                                     ShowSevereError(state,
                                                     std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                        state.dataIPShortCut->cAlphaFieldNames(6) + ", maximum is < 0.0");
-                                    ShowContinueError(state,
-                                                      format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(6), SchMax));
+                                                        state.dataIPShortCut->cAlphaFieldNames(6) + ", maximum is < 0.0",
+                                    				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(6), SchMax));
                                     ErrorsFound = true;
                                 }
                             }
@@ -2803,22 +2763,22 @@ namespace InternalHeatGains {
                         // Performance curves
                         thisZoneITEq.CPUPowerFLTCurve = GetCurveIndex(state, AlphaName(7));
                         if (thisZoneITEq.CPUPowerFLTCurve == 0) {
-                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphaName(7));
+                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"",
+                            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphaName(7));
                             ErrorsFound = true;
                         }
 
                         thisZoneITEq.AirFlowFLTCurve = GetCurveIndex(state, AlphaName(8));
                         if (thisZoneITEq.AirFlowFLTCurve == 0) {
-                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphaName(8));
+                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"",
+                            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphaName(8));
                             ErrorsFound = true;
                         }
 
                         thisZoneITEq.FanPowerFFCurve = GetCurveIndex(state, AlphaName(9));
                         if (thisZoneITEq.FanPowerFFCurve == 0) {
-                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphaName(9));
+                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"",
+                            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphaName(9));
                             ErrorsFound = true;
                         }
 
@@ -2826,8 +2786,8 @@ namespace InternalHeatGains {
                             // If this field isn't blank, it must point to a valid curve
                             thisZoneITEq.RecircFLTCurve = GetCurveIndex(state, AlphaName(15));
                             if (thisZoneITEq.RecircFLTCurve == 0) {
-                                ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + '=' + AlphaName(15));
+                                ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"",
+                                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + '=' + AlphaName(15));
                                 ErrorsFound = true;
                             }
                         } else {
@@ -2839,8 +2799,8 @@ namespace InternalHeatGains {
                             // If this field isn't blank, it must point to a valid curve
                             thisZoneITEq.UPSEfficFPLRCurve = GetCurveIndex(state, AlphaName(16));
                             if (thisZoneITEq.UPSEfficFPLRCurve == 0) {
-                                ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                                ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(16) + '=' + AlphaName(16));
+                                ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"",
+                                				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(16) + '=' + AlphaName(16));
                                 ErrorsFound = true;
                             }
                         } else {
@@ -2864,9 +2824,9 @@ namespace InternalHeatGains {
                         } else if (UtilityRoutines::SameString(AlphaName(10), "C")) {
                             thisZoneITEq.Class = ITEClassC;
                         } else {
-                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
-                            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphaName(10));
-                            ShowContinueError(state, "Valid entries are None, A1, A2, A3, A4, B or C.");
+                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1),
+                            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphaName(10),
+                            				"Valid entries are None, A1, A2, A3, A4, B or C.");
                             ErrorsFound = true;
                         }
 
@@ -2882,22 +2842,20 @@ namespace InternalHeatGains {
                                                  "Air Inlet Connection Type = RoomAirModel is not implemented yet, using ZoneAirNode");
                             thisZoneITEq.AirConnectionType = ITEInletZoneAirNode;
                         } else {
-                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
-                            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphaName(11));
-                            ShowContinueError(state, "Valid entries are AdjustedSupply, ZoneAirNode, or RoomAirModel.");
+                            ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1),
+                            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + AlphaName(11),
+                            				"Valid entries are AdjustedSupply, ZoneAirNode, or RoomAirModel.");
                             ErrorsFound = true;
                         }
                         if (state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                             if (thisZoneITEq.AirConnectionType == ITEInletAdjustedSupply) {
-                                ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
-                                ShowContinueError(state,
-                                                  "For " + state.dataIPShortCut->cAlphaFieldNames(11) + "= AdjustedSupply, " +
+                                ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1),
+                                				"For " + state.dataIPShortCut->cAlphaFieldNames(11) + "= AdjustedSupply, " +
                                                       state.dataIPShortCut->cAlphaFieldNames(14) + " is required, but this field is blank.");
                                 ErrorsFound = true;
                             } else if (thisZoneITEq.FlowControlWithApproachTemps) {
-                                ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1));
-                                ShowContinueError(state,
-                                                  "For " + state.dataIPShortCut->cAlphaFieldNames(3) + "= FlowControlWithApproachTemperatures, " +
+                                ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + ": " + AlphaName(1),
+                                				"For " + state.dataIPShortCut->cAlphaFieldNames(3) + "= FlowControlWithApproachTemperatures, " +
                                                       state.dataIPShortCut->cAlphaFieldNames(14) + " is required, but this field is blank.");
                                 ErrorsFound = true;
                             }
@@ -2927,13 +2885,13 @@ namespace InternalHeatGains {
 
                             if (thisZoneITEq.AirConnectionType == ITEInletAdjustedSupply && !supplyNodeFound) {
                                 // supply air node must match zone equipment supply air node for these conditions
-                                ShowSevereError(state, std::string{RoutineName} + ": ElectricEquipment:ITE:AirCooled " + thisZoneITEq.Name);
-                                ShowContinueError(state, "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
+                                ShowSevereError(state, std::string{RoutineName} + ": ElectricEquipment:ITE:AirCooled " + thisZoneITEq.Name,
+                                				"Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
                                 ErrorsFound = true;
                             } else if (thisZoneITEq.FlowControlWithApproachTemps && !supplyNodeFound) {
                                 // supply air node must match zone equipment supply air node for these conditions
-                                ShowSevereError(state, std::string{RoutineName} + ": ElectricEquipment:ITE:AirCooled " + thisZoneITEq.Name);
-                                ShowContinueError(state, "Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
+                                ShowSevereError(state, std::string{RoutineName} + ": ElectricEquipment:ITE:AirCooled " + thisZoneITEq.Name,
+                                				"Air Inlet Connection Type = AdjustedSupply but no Supply Air Node is specified.");
                                 ErrorsFound = true;
                             } else if (thisZoneITEq.SupplyAirNodeNum != 0 && !supplyNodeFound) {
                                 // the given supply air node does not match any zone equipment supply air nodes
@@ -2973,9 +2931,8 @@ namespace InternalHeatGains {
                                 }
                             } else {
                                 if (!hasSupplyApproachTemp) {
-                                    ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                                    ShowContinueError(state,
-                                                      "For " + state.dataIPShortCut->cAlphaFieldNames(3) +
+                                    ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"",
+                                    				"For " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                                           "= FlowControlWithApproachTemperatures, either " +
                                                           state.dataIPShortCut->cNumericFieldNames(10) + " or " +
                                                           state.dataIPShortCut->cAlphaFieldNames(20) + " is required, but both are left blank.");
@@ -2993,9 +2950,8 @@ namespace InternalHeatGains {
                                 }
                             } else {
                                 if (!hasReturnApproachTemp) {
-                                    ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"");
-                                    ShowContinueError(state,
-                                                      "For " + state.dataIPShortCut->cAlphaFieldNames(3) +
+                                    ShowSevereError(state, std::string{RoutineName} + itEqModuleObject + " \"" + AlphaName(1) + "\"",
+                                    				"For " + state.dataIPShortCut->cAlphaFieldNames(3) +
                                                           "= FlowControlWithApproachTemperatures, either " +
                                                           state.dataIPShortCut->cNumericFieldNames(11) + " or " +
                                                           state.dataIPShortCut->cAlphaFieldNames(21) + " is required, but both are left blank.");
@@ -3040,8 +2996,8 @@ namespace InternalHeatGains {
                     (!state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + itEqModuleObject + "=\"" + AlphaName(1) + "\": invalid calculation method " +
-                                        AlphaName(3) + " for Zone: " + AlphaName(2));
-                    ShowContinueError(state, "...Multiple flow control methods apply to one zone. ");
+                                        AlphaName(3) + " for Zone: " + AlphaName(2),
+                    				"...Multiple flow control methods apply to one zone. ");
                     ErrorsFound = true;
                 }
             }
@@ -3100,17 +3056,15 @@ namespace InternalHeatGains {
                             if (SchMin < 0.0) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + bbModuleObject + "=\"" + thisBBHeatInput.Name + "\", " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
-                                ShowContinueError(state,
-                                                  format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0",
+                                				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                                 ErrorsFound = true;
                             }
                             if (SchMax < 0.0) {
                                 ShowSevereError(state,
                                                 std::string{RoutineName} + bbModuleObject + "=\"" + thisBBHeatInput.Name + "\", " +
-                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
-                                ShowContinueError(state,
-                                                  format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                                                    state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0",
+                                				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                                 ErrorsFound = true;
                             }
                         }
@@ -3218,15 +3172,15 @@ namespace InternalHeatGains {
                     if (SchMin < 0.0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + contamSSModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                            state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
+                                            state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0",
+                        				format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + contamSSModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                            state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
-                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
+                                            state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0",
+                        				format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                         ErrorsFound = true;
                     }
                 }
@@ -3910,8 +3864,8 @@ namespace InternalHeatGains {
                 localErrFlag = true;
             }
             if (localErrFlag) {
-                ShowSevereError(state, std::string{routineName} + "Errors with invalid names in " + objectType + " objects.");
-                ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
+                ShowSevereError(state, std::string{routineName} + "Errors with invalid names in " + objectType + " objects.",
+                				"...These will not be read in.  Other errors may occur.");
                 numGainInstances = 0;
             }
         }

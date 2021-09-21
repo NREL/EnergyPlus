@@ -246,8 +246,8 @@ void GetTESCoilInput(EnergyPlusData &state)
             if (state.dataPackagedThermalStorageCoil->TESCoil(item).AvailSchedNum == 0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
+                                    "\", invalid",
+                				"..." + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             }
         }
@@ -260,9 +260,9 @@ void GetTESCoilInput(EnergyPlusData &state)
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
-                ShowContinueError(state, "Available choices are ScheduledModes or EMSControlled");
+                                    "\", invalid",
+                				"..." + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".",
+                				"Available choices are ScheduledModes or EMSControlled");
                 ErrorsFound = true;
             }
         }
@@ -270,8 +270,8 @@ void GetTESCoilInput(EnergyPlusData &state)
             if (state.dataPackagedThermalStorageCoil->TESCoil(item).ModeControlType == iModeCtrlType::ScheduledOpModes) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + " is blank but a schedule is needed");
+                                    "\", invalid",
+                				state.dataIPShortCut->cAlphaFieldNames(4) + " is blank but a schedule is needed");
                 ErrorsFound = true;
             }
         } else {
@@ -280,8 +280,8 @@ void GetTESCoilInput(EnergyPlusData &state)
                 state.dataPackagedThermalStorageCoil->TESCoil(item).ModeControlType == iModeCtrlType::ScheduledOpModes) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
+                                    "\", invalid",
+                				"..." + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
                 ErrorsFound = true;
             }
         }
@@ -298,9 +298,9 @@ void GetTESCoilInput(EnergyPlusData &state)
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\".");
-                ShowContinueError(state, "Available choices are Ice, Water, or UserDefindedFluidType");
+                                    "\", invalid",
+                				"..." + state.dataIPShortCut->cAlphaFieldNames(5) + "=\"" + state.dataIPShortCut->cAlphaArgs(5) + "\".",
+                				"Available choices are Ice, Water, or UserDefindedFluidType");
                 ErrorsFound = true;
             }
         }
@@ -311,18 +311,16 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (CheckFluidPropertyName(state, state.dataIPShortCut->cAlphaArgs(6)) == 0) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", missing fluid data");
-                    ShowContinueError(state,
-                                      "Check that fluid property data have been input for fluid name = " + state.dataIPShortCut->cAlphaArgs(6));
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", missing fluid data",
+                    				"Check that fluid property data have been input for fluid name = " + state.dataIPShortCut->cAlphaArgs(6));
                     ErrorsFound = true;
                 } else {
                     state.dataPackagedThermalStorageCoil->TESCoil(item).StorageFluidIndex = FindGlycol(state, state.dataIPShortCut->cAlphaArgs(6));
                     if (state.dataPackagedThermalStorageCoil->TESCoil(item).StorageFluidIndex == 0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                            state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid fluid data");
-                        ShowContinueError(
-                            state, "Check that correct fluid property data have been input for fluid name = " + state.dataIPShortCut->cAlphaArgs(6));
+                                            state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid fluid data",
+                        				"Check that correct fluid property data have been input for fluid name = " + state.dataIPShortCut->cAlphaArgs(6));
                         ErrorsFound = true;
                     }
                 }
@@ -330,8 +328,8 @@ void GetTESCoilInput(EnergyPlusData &state)
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "Storage Type is set to UserDefinedFluidType but no name of fluid was entered.");
+                                    "\", invalid",
+                				"Storage Type is set to UserDefinedFluidType but no name of fluid was entered.");
                 ErrorsFound = true;
             }
         }
@@ -343,9 +341,9 @@ void GetTESCoilInput(EnergyPlusData &state)
                    (state.dataIPShortCut->lNumericFieldBlanks(1))) {
             ShowSevereError(state,
                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                "\", invalid");
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(1) + " cannot be blank for Water storage type");
-            ShowContinueError(state, "Enter fluid storage tank volume in m3/s.");
+                                "\", invalid",
+            				state.dataIPShortCut->cNumericFieldNames(1) + " cannot be blank for Water storage type",
+            				"Enter fluid storage tank volume in m3/s.");
             ErrorsFound = true;
         }
 
@@ -361,9 +359,9 @@ void GetTESCoilInput(EnergyPlusData &state)
                    (state.dataIPShortCut->lNumericFieldBlanks(2))) {
             ShowSevereError(state,
                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                "\", invalid");
-            ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(2) + " cannot be blank for Ice storage type");
-            ShowContinueError(state, "Enter ice storage tank capacity in GJ.");
+                                "\", invalid",
+            				state.dataIPShortCut->cNumericFieldNames(2) + " cannot be blank for Ice storage type",
+            				"Enter ice storage tank capacity in GJ.");
             ErrorsFound = true;
         }
 
@@ -429,9 +427,9 @@ void GetTESCoilInput(EnergyPlusData &state)
                 state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingOnlyModeIsAvailable = false;
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(10) + "=\"" + state.dataIPShortCut->cAlphaArgs(10) + "\".");
-                ShowContinueError(state, "Available choices are Yes or No.");
+                                    "\", invalid",
+                				"..." + state.dataIPShortCut->cAlphaFieldNames(10) + "=\"" + state.dataIPShortCut->cAlphaArgs(10) + "\".",
+                				"Available choices are Yes or No.");
                 ErrorsFound = true;
             }
         }
@@ -447,14 +445,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(11)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(11) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(11) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(11) + "=\"" + state.dataIPShortCut->cAlphaArgs(11) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(11) + "=\"" + state.dataIPShortCut->cAlphaArgs(11) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -474,14 +471,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(12) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(12) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(12) + "=\"" + state.dataIPShortCut->cAlphaArgs(12) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(12) + "=\"" + state.dataIPShortCut->cAlphaArgs(12) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -501,14 +497,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(13) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(13) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(13) + "=\"" + state.dataIPShortCut->cAlphaArgs(13) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(13) + "=\"" + state.dataIPShortCut->cAlphaArgs(13) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -528,14 +523,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(14)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(14) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(14) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(14) + "=\"" + state.dataIPShortCut->cAlphaArgs(14) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(14) + "=\"" + state.dataIPShortCut->cAlphaArgs(14) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -555,14 +549,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(15)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(15) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(15) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(15) + "=\"" + state.dataIPShortCut->cAlphaArgs(15) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(15) + "=\"" + state.dataIPShortCut->cAlphaArgs(15) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -582,14 +575,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(16)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(16) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(16) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(16) + "=\"" + state.dataIPShortCut->cAlphaArgs(16) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(16) + "=\"" + state.dataIPShortCut->cAlphaArgs(16) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -609,14 +601,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(17) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(17) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(17) + "=\"" + state.dataIPShortCut->cAlphaArgs(17) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(17) + "=\"" + state.dataIPShortCut->cAlphaArgs(17) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -642,9 +633,9 @@ void GetTESCoilInput(EnergyPlusData &state)
                 state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndChargeModeAvailable = false;
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(18) + "=\"" + state.dataIPShortCut->cAlphaArgs(18) + "\".");
-                ShowContinueError(state, "Available choices are Yes or No.");
+                                    "\", invalid",
+                				"..." + state.dataIPShortCut->cAlphaFieldNames(18) + "=\"" + state.dataIPShortCut->cAlphaArgs(18) + "\".",
+                				"Available choices are Yes or No.");
                 ErrorsFound = true;
             }
         }
@@ -672,14 +663,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(19)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(19) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(19) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(19) + "=\"" + state.dataIPShortCut->cAlphaArgs(19) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(19) + "=\"" + state.dataIPShortCut->cAlphaArgs(19) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -700,14 +690,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(20)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(20) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(20) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(20) + "=\"" + state.dataIPShortCut->cAlphaArgs(20) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(20) + "=\"" + state.dataIPShortCut->cAlphaArgs(20) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -727,14 +716,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(21)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(21) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(21) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(21) + "=\"" + state.dataIPShortCut->cAlphaArgs(21) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(21) + "=\"" + state.dataIPShortCut->cAlphaArgs(21) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -755,14 +743,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(22)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(22) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(22) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(22) + "=\"" + state.dataIPShortCut->cAlphaArgs(22) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(22) + "=\"" + state.dataIPShortCut->cAlphaArgs(22) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -783,14 +770,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(23)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(23) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(23) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(23) + "=\"" + state.dataIPShortCut->cAlphaArgs(23) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(23) + "=\"" + state.dataIPShortCut->cAlphaArgs(23) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -811,14 +797,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(24)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(24) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(24) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(24) + "=\"" + state.dataIPShortCut->cAlphaArgs(24) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(24) + "=\"" + state.dataIPShortCut->cAlphaArgs(24) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -839,14 +824,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(25)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(25) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(25) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(25) + "=\"" + state.dataIPShortCut->cAlphaArgs(25) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(25) + "=\"" + state.dataIPShortCut->cAlphaArgs(25) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -867,14 +851,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(26)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(26) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(26) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(26) + "=\"" + state.dataIPShortCut->cAlphaArgs(26) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(26) + "=\"" + state.dataIPShortCut->cAlphaArgs(26) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -895,14 +878,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(27)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(27) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(27) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(27) + "=\"" + state.dataIPShortCut->cAlphaArgs(27) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(27) + "=\"" + state.dataIPShortCut->cAlphaArgs(27) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -923,14 +905,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(28)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(28) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(28) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(28) + "=\"" + state.dataIPShortCut->cAlphaArgs(28) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(28) + "=\"" + state.dataIPShortCut->cAlphaArgs(28) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -951,14 +932,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(29)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(29) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(29) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(29) + "=\"" + state.dataIPShortCut->cAlphaArgs(29) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(29) + "=\"" + state.dataIPShortCut->cAlphaArgs(29) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -979,14 +959,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(30)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(30) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(30) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(30) + "=\"" + state.dataIPShortCut->cAlphaArgs(30) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(30) + "=\"" + state.dataIPShortCut->cAlphaArgs(30) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1013,9 +992,9 @@ void GetTESCoilInput(EnergyPlusData &state)
                 state.dataPackagedThermalStorageCoil->TESCoil(item).CoolingAndDischargeModeAvailable = false;
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(31) + "=\"" + state.dataIPShortCut->cAlphaArgs(31) + "\".");
-                ShowContinueError(state, "Available choices are Yes or No.");
+                                    "\", invalid",
+                				"..." + state.dataIPShortCut->cAlphaFieldNames(31) + "=\"" + state.dataIPShortCut->cAlphaArgs(31) + "\".",
+                				"Available choices are Yes or No.");
                 ErrorsFound = true;
             }
         }
@@ -1043,14 +1022,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(32)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(32) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(32) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(32) + "=\"" + state.dataIPShortCut->cAlphaArgs(32) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(32) + "=\"" + state.dataIPShortCut->cAlphaArgs(32) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1071,14 +1049,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(33)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(33) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(33) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(33) + "=\"" + state.dataIPShortCut->cAlphaArgs(33) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(33) + "=\"" + state.dataIPShortCut->cAlphaArgs(33) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1099,14 +1076,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(34)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(34) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(34) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(34) + "=\"" + state.dataIPShortCut->cAlphaArgs(34) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(34) + "=\"" + state.dataIPShortCut->cAlphaArgs(34) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1127,14 +1103,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(35)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(35) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(35) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(35) + "=\"" + state.dataIPShortCut->cAlphaArgs(35) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(35) + "=\"" + state.dataIPShortCut->cAlphaArgs(35) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1155,14 +1130,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(36)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(36) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(36) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(36) + "=\"" + state.dataIPShortCut->cAlphaArgs(36) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(36) + "=\"" + state.dataIPShortCut->cAlphaArgs(36) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1183,14 +1157,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(37)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(37) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(37) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(37) + "=\"" + state.dataIPShortCut->cAlphaArgs(37) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(37) + "=\"" + state.dataIPShortCut->cAlphaArgs(37) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1211,14 +1184,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(38)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(38) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(38) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(38) + "=\"" + state.dataIPShortCut->cAlphaArgs(38) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(38) + "=\"" + state.dataIPShortCut->cAlphaArgs(38) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1239,14 +1211,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(39)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(39) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(39) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(39) + "=\"" + state.dataIPShortCut->cAlphaArgs(39) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(39) + "=\"" + state.dataIPShortCut->cAlphaArgs(39) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1267,14 +1238,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(40)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(40) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(40) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(40) + "=\"" + state.dataIPShortCut->cAlphaArgs(40) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(40) + "=\"" + state.dataIPShortCut->cAlphaArgs(40) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1295,14 +1265,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(41)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(41) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(41) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(41) + "=\"" + state.dataIPShortCut->cAlphaArgs(41) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(41) + "=\"" + state.dataIPShortCut->cAlphaArgs(41) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1323,14 +1292,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(42)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(42) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(42) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(42) + "=\"" + state.dataIPShortCut->cAlphaArgs(42) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(42) + "=\"" + state.dataIPShortCut->cAlphaArgs(42) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1351,14 +1319,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(43)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(43) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(43) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(43) + "=\"" + state.dataIPShortCut->cAlphaArgs(43) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(43) + "=\"" + state.dataIPShortCut->cAlphaArgs(43) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1379,14 +1346,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(44)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(44) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(44) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(44) + "=\"" + state.dataIPShortCut->cAlphaArgs(44) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(44) + "=\"" + state.dataIPShortCut->cAlphaArgs(44) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1413,9 +1379,9 @@ void GetTESCoilInput(EnergyPlusData &state)
                 state.dataPackagedThermalStorageCoil->TESCoil(item).ChargeOnlyModeAvailable = false;
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(45) + "=\"" + state.dataIPShortCut->cAlphaArgs(45) + "\".");
-                ShowContinueError(state, "Available choices are Yes or No.");
+                                    "\", invalid",
+                				"..." + state.dataIPShortCut->cAlphaFieldNames(45) + "=\"" + state.dataIPShortCut->cAlphaArgs(45) + "\".",
+                				"Available choices are Yes or No.");
                 ErrorsFound = true;
             }
         }
@@ -1435,14 +1401,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(46)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(46) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(46) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(46) + "=\"" + state.dataIPShortCut->cAlphaArgs(46) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(46) + "=\"" + state.dataIPShortCut->cAlphaArgs(46) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1463,14 +1428,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(47)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(47) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(47) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(47) + "=\"" + state.dataIPShortCut->cAlphaArgs(47) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(47) + "=\"" + state.dataIPShortCut->cAlphaArgs(47) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1497,9 +1461,9 @@ void GetTESCoilInput(EnergyPlusData &state)
                 state.dataPackagedThermalStorageCoil->TESCoil(item).DischargeOnlyModeAvailable = false;
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(48) + "=\"" + state.dataIPShortCut->cAlphaArgs(48) + "\".");
-                ShowContinueError(state, "Available choices are Yes or No.");
+                                    "\", invalid",
+                				"..." + state.dataIPShortCut->cAlphaFieldNames(48) + "=\"" + state.dataIPShortCut->cAlphaArgs(48) + "\".",
+                				"Available choices are Yes or No.");
                 ErrorsFound = true;
             }
         }
@@ -1520,14 +1484,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(49)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(49) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(49) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(49) + "=\"" + state.dataIPShortCut->cAlphaArgs(49) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(49) + "=\"" + state.dataIPShortCut->cAlphaArgs(49) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1548,14 +1511,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(50)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(50) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(50) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(50) + "=\"" + state.dataIPShortCut->cAlphaArgs(50) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(50) + "=\"" + state.dataIPShortCut->cAlphaArgs(50) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1576,14 +1538,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(51)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(51) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(51) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(51) + "=\"" + state.dataIPShortCut->cAlphaArgs(51) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(51) + "=\"" + state.dataIPShortCut->cAlphaArgs(51) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1604,14 +1565,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(52)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(52) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(52) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(52) + "=\"" + state.dataIPShortCut->cAlphaArgs(52) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(52) + "=\"" + state.dataIPShortCut->cAlphaArgs(52) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1632,14 +1592,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(53)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(53) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(53) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(53) + "=\"" + state.dataIPShortCut->cAlphaArgs(53) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(53) + "=\"" + state.dataIPShortCut->cAlphaArgs(53) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1660,14 +1619,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(54)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(54) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(54) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(54) + "=\"" + state.dataIPShortCut->cAlphaArgs(54) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(54) + "=\"" + state.dataIPShortCut->cAlphaArgs(54) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1688,14 +1646,13 @@ void GetTESCoilInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lAlphaFieldBlanks(55)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(state, "Required " + state.dataIPShortCut->cAlphaFieldNames(55) + "is blank.");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Required " + state.dataIPShortCut->cAlphaFieldNames(55) + "is blank.");
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + "=\"" +
-                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
-                    ShowContinueError(
-                        state, "Not found " + state.dataIPShortCut->cAlphaFieldNames(55) + "=\"" + state.dataIPShortCut->cAlphaArgs(55) + "\".");
+                                        state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid",
+                    				"Not found " + state.dataIPShortCut->cAlphaFieldNames(55) + "=\"" + state.dataIPShortCut->cAlphaArgs(55) + "\".");
                 }
                 ErrorsFound = true;
             } else {
@@ -1748,9 +1705,9 @@ void GetTESCoilInput(EnergyPlusData &state)
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(58) + "=\"" + state.dataIPShortCut->cAlphaArgs(58) + "\".");
-                ShowContinueError(state, "Available choices are AirCooled or EvaporativelyCooled.");
+                                    "\", invalid",
+                				state.dataIPShortCut->cAlphaFieldNames(58) + "=\"" + state.dataIPShortCut->cAlphaArgs(58) + "\".",
+                				"Available choices are AirCooled or EvaporativelyCooled.");
                 ErrorsFound = true;
             }
         }
@@ -1767,8 +1724,8 @@ void GetTESCoilInput(EnergyPlusData &state)
             if (state.dataPackagedThermalStorageCoil->TESCoil(item).BasinHeaterAvailSchedNum == 0) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(59) + "=\"" + state.dataIPShortCut->cAlphaArgs(59) + "\".");
+                                    "\", invalid",
+                				"..." + state.dataIPShortCut->cAlphaFieldNames(59) + "=\"" + state.dataIPShortCut->cAlphaArgs(59) + "\".");
                 ErrorsFound = true;
             }
         }
@@ -1831,8 +1788,8 @@ void GetTESCoilInput(EnergyPlusData &state)
             if (state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantConnectionAvailable) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
-                                    "\", invalid");
-                ShowContinueError(state, "..." + state.dataIPShortCut->cAlphaFieldNames(63) + " cannot be blank.");
+                                    "\", invalid",
+                				"..." + state.dataIPShortCut->cAlphaFieldNames(63) + " cannot be blank.");
                 ErrorsFound = true;
             }
         }
@@ -2245,26 +2202,20 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
                  state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantOutletNodeNum)) {
                 ShowSevereError(state,
                                 "InitTESCoil: Coil:Cooling:DX:SingleSpeed:ThermalStorage =\"" +
-                                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name + "\", non-matching plant nodes.");
-                ShowContinueError(state,
-                                  "...in Branch=\"" +
+                                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name + "\", non-matching plant nodes.",
+                				"...in Branch=\"" +
                                       state.dataPlnt->PlantLoop(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantLoopNum)
                                           .LoopSide(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantLoopSideNum)
                                           .Branch(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantBranchNum)
                                           .Name +
-                                      "\", Component referenced with:");
-                ShowContinueError(state,
-                                  "...Inlet Node=\"" + state.dataLoopNodes->NodeID(
-                                                           state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn));
-                ShowContinueError(
-                    state,
-                    "...Outlet Node=\"" +
-                        state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut));
-                ShowContinueError(state,
-                                  "...TES Inlet Node=\"" +
-                                      state.dataLoopNodes->NodeID(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantInletNodeNum));
-                ShowContinueError(state,
-                                  "...TES Outlet Node=\"" +
+                                      "\", Component referenced with:",
+                				"...Inlet Node=\"" + state.dataLoopNodes->NodeID(
+                                                           state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn),
+                				"...Outlet Node=\"" +
+                        state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut),
+                				"...TES Inlet Node=\"" +
+                                      state.dataLoopNodes->NodeID(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantInletNodeNum),
+                				"...TES Outlet Node=\"" +
                                       state.dataLoopNodes->NodeID(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantOutletNodeNum));
                 errFlag = true;
             }

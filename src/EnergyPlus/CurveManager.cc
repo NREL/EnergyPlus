@@ -384,9 +384,8 @@ namespace CurveManager {
             }
 
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(7),
                                          Numbers(7),
                                          state.dataIPShortCut->cNumericFieldNames(8),
@@ -394,9 +393,8 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(9),
                                          Numbers(9),
                                          state.dataIPShortCut->cNumericFieldNames(10),
@@ -543,9 +541,8 @@ namespace CurveManager {
             }
 
             if (Numbers(5) > Numbers(6)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{}[{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(5),
                                          Numbers(5),
                                          state.dataIPShortCut->cNumericFieldNames(6),
@@ -608,9 +605,8 @@ namespace CurveManager {
             }
 
             if (Numbers(6) > Numbers(7)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{}[{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(6),
                                          Numbers(6),
                                          state.dataIPShortCut->cNumericFieldNames(7),
@@ -671,9 +667,8 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(4),
                                          Numbers(4),
                                          state.dataIPShortCut->cNumericFieldNames(5),
@@ -739,9 +734,8 @@ namespace CurveManager {
             }
 
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(7),
                                          Numbers(7),
                                          state.dataIPShortCut->cNumericFieldNames(8),
@@ -749,9 +743,8 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(9),
                                          Numbers(9),
                                          state.dataIPShortCut->cNumericFieldNames(10),
@@ -822,9 +815,8 @@ namespace CurveManager {
             }
 
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(7),
                                          Numbers(7),
                                          state.dataIPShortCut->cNumericFieldNames(8),
@@ -832,9 +824,8 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(9) > Numbers(10)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(9),
                                          Numbers(9),
                                          state.dataIPShortCut->cNumericFieldNames(10),
@@ -899,9 +890,8 @@ namespace CurveManager {
             }
 
             if (Numbers(3) > Numbers(4)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(3),
                                          Numbers(3),
                                          state.dataIPShortCut->cNumericFieldNames(4),
@@ -971,9 +961,8 @@ namespace CurveManager {
             }
 
             if (Numbers(11) > Numbers(12)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(11),
                                          Numbers(11),
                                          state.dataIPShortCut->cNumericFieldNames(12),
@@ -981,9 +970,8 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(13) > Numbers(14)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(13),
                                          Numbers(13),
                                          state.dataIPShortCut->cNumericFieldNames(14),
@@ -1080,9 +1068,8 @@ namespace CurveManager {
             }
 
             if (Numbers(28) > Numbers(29)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(28),
                                          Numbers(28),
                                          state.dataIPShortCut->cNumericFieldNames(29),
@@ -1090,9 +1077,8 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(30) > Numbers(31)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(30),
                                          Numbers(30),
                                          state.dataIPShortCut->cNumericFieldNames(31),
@@ -1100,9 +1086,8 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(32) > Numbers(33)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{} [{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(32),
                                          Numbers(32),
                                          state.dataIPShortCut->cNumericFieldNames(33),
@@ -1187,9 +1172,8 @@ namespace CurveManager {
                 int MinIndex = 2 * i + 4;
                 int MaxIndex = MinIndex + 1;
                 if (Numbers(MinIndex) > Numbers(MaxIndex)) { // error
-                    ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                    ShowContinueError(state,
-                                      format("{} [{:.R2}] > {} [{.R2}]",
+                    ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                    				format("{} [{:.R2}] > {} [{.R2}]",
                                              state.dataIPShortCut->cNumericFieldNames(MinIndex),
                                              Numbers(MinIndex),
                                              state.dataIPShortCut->cNumericFieldNames(MaxIndex),
@@ -1269,9 +1253,8 @@ namespace CurveManager {
                 int MinIndex = 2 * i + 5;
                 int MaxIndex = MinIndex + 1;
                 if (Numbers(MinIndex) > Numbers(MaxIndex)) { // error
-                    ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                    ShowContinueError(state,
-                                      format("{} [{:.R2}] > {} [{.R2}]",
+                    ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                    				format("{} [{:.R2}] > {} [{.R2}]",
                                              state.dataIPShortCut->cNumericFieldNames(MinIndex),
                                              Numbers(MinIndex),
                                              state.dataIPShortCut->cNumericFieldNames(MaxIndex),
@@ -1391,9 +1374,8 @@ namespace CurveManager {
             }
 
             if (Numbers(5) > Numbers(6)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{}[{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(5),
                                          Numbers(5),
                                          state.dataIPShortCut->cNumericFieldNames(6),
@@ -1401,9 +1383,8 @@ namespace CurveManager {
                 ErrorsFound = true;
             }
             if (Numbers(7) > Numbers(8)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{}[{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(7),
                                          Numbers(7),
                                          state.dataIPShortCut->cNumericFieldNames(8),
@@ -1457,9 +1438,8 @@ namespace CurveManager {
             }
 
             if (Numbers(5) > Numbers(6)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{}[{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(5),
                                          Numbers(5),
                                          state.dataIPShortCut->cNumericFieldNames(6),
@@ -1524,9 +1504,8 @@ namespace CurveManager {
             }
 
             if (Numbers(6) > Numbers(7)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{}[{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(6),
                                          Numbers(6),
                                          state.dataIPShortCut->cNumericFieldNames(7),
@@ -1589,9 +1568,8 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{}[{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(4),
                                          Numbers(4),
                                          state.dataIPShortCut->cNumericFieldNames(5),
@@ -1654,9 +1632,8 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{}[{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(4),
                                          Numbers(4),
                                          state.dataIPShortCut->cNumericFieldNames(5),
@@ -1719,9 +1696,8 @@ namespace CurveManager {
             }
 
             if (Numbers(4) > Numbers(5)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{}[{:.R2}] > {} [{.R2}]",
+                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                				format("{}[{:.R2}] > {} [{.R2}]",
                                          state.dataIPShortCut->cNumericFieldNames(4),
                                          Numbers(4),
                                          state.dataIPShortCut->cNumericFieldNames(5),
@@ -1834,13 +1810,11 @@ namespace CurveManager {
                     dirMax = std::max(dirMax, Numbers(j));
                     if (j > 1) {
                         if (windDirs[j - 2] >= windDirs[j - 1]) {
-                            ShowSevereError(state, "GetCurveInput: An " + CurrentModuleObject + " object ");
-                            ShowContinueError(state,
-                                              "has either the same values for two consecutive wind directions, or a lower wind direction value after "
-                                              "a higher wind direction value.");
-                            ShowContinueError(state, "Wind direction values must be entered in ascending order.");
-                            ShowContinueError(state,
-                                              format("{} = {:.2R} {} = {:.2R}",
+                            ShowSevereError(state, "GetCurveInput: An " + CurrentModuleObject + " object ",
+                            				"has either the same values for two consecutive wind directions, or a lower wind direction value after "
+                                              "a higher wind direction value.",
+                            				"Wind direction values must be entered in ascending order.",
+                            				format("{} = {:.2R} {} = {:.2R}",
                                                      state.dataIPShortCut->cNumericFieldNames(j),
                                                      windDirs[j - 2],
                                                      state.dataIPShortCut->cNumericFieldNames[j + 1],
@@ -1851,9 +1825,9 @@ namespace CurveManager {
                 }
                 // Check that the first table value is zero
                 if (dirMin != 0.0) {
-                    ShowSevereError(state, "GetCurveInput: An " + CurrentModuleObject + " object ");
-                    ShowContinueError(state, format("has a nonzero minimum value of {:.2R}", dirMin));
-                    ShowContinueError(state, "Wind direction values must begin at zero.");
+                    ShowSevereError(state, "GetCurveInput: An " + CurrentModuleObject + " object ",
+                    				format("has a nonzero minimum value of {:.2R}", dirMin),
+                    				"Wind direction values must begin at zero.");
                     ErrorsFound = true;
                 }
 
@@ -1884,8 +1858,8 @@ namespace CurveManager {
                     if (!UtilityRoutines::SameString(Alphas(2), wpcName)) {
                         ShowSevereError(state,
                                         "GetCurveInput: Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + Alphas(2) + " in " +
-                                            CurrentModuleObject + " = " + Alphas(1));
-                        ShowContinueError(state, "The valid name is " + wpcName);
+                                            CurrentModuleObject + " = " + Alphas(1),
+                        				"The valid name is " + wpcName);
                         ErrorsFound = true;
                     }
 
@@ -1912,9 +1886,8 @@ namespace CurveManager {
 
                     MaxTableNums = NumNumbers;
                     if (NumNumbers != numWindDir) {
-                        ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                        ShowContinueError(state,
-                                          format("The number of data entries must match the number of wind directions given in the wind pressure "
+                        ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1),
+                        				format("The number of data entries must match the number of wind directions given in the wind pressure "
                                                  "coefficient array. Number of data entries = {}",
                                                  NumNumbers));
                         ErrorsFound = true;
@@ -2250,10 +2223,10 @@ namespace CurveManager {
                     if (pointsSpecified && pointsUnspecified) {
                         ShowSevereError(state,
                                         contextString + ": Table is to be normalized using AutomaticWithDivisor, but not all independent variables "
-                                                        "define a normalization reference value. Make sure either:");
-                        ShowContinueError(state, "  Make sure either:");
-                        ShowContinueError(state, "    a) a normalization reference value is defined for each independent variable, or");
-                        ShowContinueError(state, "    b) no normalization reference values are defined.");
+                                                        "define a normalization reference value. Make sure either:",
+                        				"  Make sure either:",
+                        				"    a) a normalization reference value is defined for each independent variable, or",
+                        				"    b) no normalization reference values are defined.");
                         ErrorsFound = true;
                     } else if (pointsSpecified) {
                         // normalizeGridValues normalizes curve values to 1.0 at the normalization target, and returns the scalar needed to perform
@@ -2815,8 +2788,8 @@ namespace CurveManager {
             return false;
         } else {
             // Not compatible
-            ShowSevereError(state, fmt::format("{}{}=\"{}\"", routineName, objectType, objectName));
-            ShowContinueError(state, "...Invalid curve for " + std::string{curveFieldText} + ".");
+            ShowSevereError(state, fmt::format("{}{}=\"{}\"", routineName, objectType, objectName),
+            				"...Invalid curve for " + std::string{curveFieldText} + ".");
             std::string validString = fmt::to_string(validDims[0]);
             for (std::size_t i = 1; i < validDims.size(); i++) {
                 validString += format(" or {}", validDims[i]);
@@ -3116,10 +3089,10 @@ namespace CurveManager {
                     PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Generic;
                     PressureCurveIndex = TempCurveIndex;
                 } else {
-                    ShowSevereError(state, "Plant Pressure Simulation: Found error for curve: " + PressureCurveName);
-                    ShowContinueError(state, "Curve type detected: " + GenericCurveType);
-                    ShowContinueError(state, "Generic curves should be single independent variable such that DeltaP = f(mdot)");
-                    ShowContinueError(state, " Therefore they should be of type: Linear, Quadratic, Cubic, Quartic, or Exponent");
+                    ShowSevereError(state, "Plant Pressure Simulation: Found error for curve: " + PressureCurveName,
+                    				"Curve type detected: " + GenericCurveType,
+                    				"Generic curves should be single independent variable such that DeltaP = f(mdot)",
+                    				" Therefore they should be of type: Linear, Quadratic, Cubic, Quartic, or Exponent");
                     ShowFatalError(state, "Errors in pressure simulation input cause program termination");
                 }
             }
@@ -3284,8 +3257,8 @@ namespace CurveManager {
             if (!state.dataCurveManager->FrictionFactorErrorHasOccurred) {
                 RR = format("{:.7R}", RoughnessRatio);
                 Re = format("{:.1R}", ReynoldsNumber);
-                ShowSevereError(state, "Plant Pressure System: Error in moody friction factor calculation");
-                ShowContinueError(state, "Current Conditions: Roughness Ratio=" + RR + "; Reynolds Number=" + Re);
+                ShowSevereError(state, "Plant Pressure System: Error in moody friction factor calculation",
+                				"Current Conditions: Roughness Ratio=" + RR + "; Reynolds Number=" + Re);
                 ShowContinueError(state, "These conditions resulted in an unhandled numeric issue.");
                 ShowContinueError(state, "Please contact EnergyPlus support/development team to raise an alert about this issue");
                 ShowContinueError(state, "This issue will occur only one time.  The friction factor has been reset to 0.04 for calculations");

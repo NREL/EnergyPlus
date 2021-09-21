@@ -1762,8 +1762,8 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
     int FoundItem = UtilityRoutines::FindItemInList(ResultName, ItemNames, NumItems);
 
     if (FoundItem != 0) {
-        ShowSevereError(state, fmt::format("{}{}=\"{}\", Duplicate Generated name encountered.", calledFrom, CurrentObject, ItemName));
-        ShowContinueError(state, format("name=\"{}\" has already been generated or entered as {} item=[{}].", ResultName, CurrentObject, FoundItem));
+        ShowSevereError(state, fmt::format("{}{}=\"{}\", Duplicate Generated name encountered.", calledFrom, CurrentObject, ItemName),
+        				format("name=\"{}\" has already been generated or entered as {} item=[{}].", ResultName, CurrentObject, FoundItem));
         if (TooLong) ShowContinueError(state, "Duplicate name likely caused by the previous \"too long\" warning.");
         ResultName = "xxxxxxx";
         errFlag = true;

@@ -101,9 +101,9 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     } else if (UtilityRoutines::SameString(input_data.condenser_type, "EvaporativelyCooled")) {
         this->condenserType = CondenserType::EVAPCOOLED;
     } else {
-        ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
-        ShowContinueError(state, "...Condenser Type=\"" + input_data.condenser_type + "\":");
-        ShowContinueError(state, "...must be AirCooled or EvaporativelyCooled.");
+        ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid",
+        				"...Condenser Type=\"" + input_data.condenser_type + "\":",
+        				"...must be AirCooled or EvaporativelyCooled.");
         errorsFound = true;
     }
     for (auto &speed_name : input_data.speed_data_names) {

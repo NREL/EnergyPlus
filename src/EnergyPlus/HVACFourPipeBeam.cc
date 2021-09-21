@@ -309,20 +309,20 @@ namespace FourPipeBeam {
 
         thisBeam->modCoolingQdotDeltaTFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11));
         if (thisBeam->modCoolingQdotDeltaTFuncNum == 0 && thisBeam->beamCoolingPresent) {
-            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + state.dataIPShortCut->cAlphaArgs(11));
+            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"",
+            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + state.dataIPShortCut->cAlphaArgs(11));
             ErrorsFound = true;
         }
         thisBeam->modCoolingQdotAirFlowFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(12));
         if (thisBeam->modCoolingQdotAirFlowFuncNum == 0 && thisBeam->beamCoolingPresent) {
-            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + state.dataIPShortCut->cAlphaArgs(12));
+            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"",
+            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(12) + '=' + state.dataIPShortCut->cAlphaArgs(12));
             ErrorsFound = true;
         }
         thisBeam->modCoolingQdotCWFlowFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(13));
         if (thisBeam->modCoolingQdotCWFlowFuncNum == 0 && thisBeam->beamCoolingPresent) {
-            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + '=' + state.dataIPShortCut->cAlphaArgs(13));
+            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"",
+            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + '=' + state.dataIPShortCut->cAlphaArgs(13));
             ErrorsFound = true;
         }
         thisBeam->qDotNormRatedHeating = state.dataIPShortCut->rNumericArgs(9);
@@ -330,20 +330,20 @@ namespace FourPipeBeam {
         thisBeam->vDotNormRatedHW = state.dataIPShortCut->rNumericArgs(11);
         thisBeam->modHeatingQdotDeltaTFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(14));
         if (thisBeam->modHeatingQdotDeltaTFuncNum == 0 && thisBeam->beamHeatingPresent) {
-            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + '=' + state.dataIPShortCut->cAlphaArgs(14));
+            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"",
+            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + '=' + state.dataIPShortCut->cAlphaArgs(14));
             ErrorsFound = true;
         }
         thisBeam->modHeatingQdotAirFlowFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(15));
         if (thisBeam->modHeatingQdotAirFlowFuncNum == 0 && thisBeam->beamHeatingPresent) {
-            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + '=' + state.dataIPShortCut->cAlphaArgs(15));
+            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"",
+            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + '=' + state.dataIPShortCut->cAlphaArgs(15));
             ErrorsFound = true;
         }
         thisBeam->modHeatingQdotHWFlowFuncNum = GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(16));
         if (thisBeam->modHeatingQdotHWFlowFuncNum == 0 && thisBeam->beamHeatingPresent) {
-            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
-            ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(16) + '=' + state.dataIPShortCut->cAlphaArgs(16));
+            ShowSevereError(state, std::string{routineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"",
+            				"Invalid " + state.dataIPShortCut->cAlphaFieldNames(16) + '=' + state.dataIPShortCut->cAlphaArgs(16));
             ErrorsFound = true;
         }
         // Register component set data
@@ -468,8 +468,8 @@ namespace FourPipeBeam {
         if (thisBeam->aDUNum == 0) {
             ShowSevereError(state,
                             std::string{routineName} + "No matching Air Distribution Unit, for Unit = [" + cCurrentModuleObject + ',' +
-                                thisBeam->name + "].");
-            ShowContinueError(state, "...should have outlet node=" + state.dataLoopNodes->NodeID(thisBeam->airOutNodeNum));
+                                thisBeam->name + "].",
+            				"...should have outlet node=" + state.dataLoopNodes->NodeID(thisBeam->airOutNodeNum));
             ErrorsFound = true;
         } else {
 
@@ -498,8 +498,8 @@ namespace FourPipeBeam {
             }
         }
         if (!airNodeFound) {
-            ShowSevereError(state, "The outlet air node from the " + cCurrentModuleObject + " = " + thisBeam->name);
-            ShowContinueError(state, "did not have a matching Zone Equipment Inlet Node, Node =" + state.dataIPShortCut->cAlphaArgs(5));
+            ShowSevereError(state, "The outlet air node from the " + cCurrentModuleObject + " = " + thisBeam->name,
+            				"did not have a matching Zone Equipment Inlet Node, Node =" + state.dataIPShortCut->cAlphaArgs(5));
             ErrorsFound = true;
         }
 
@@ -617,8 +617,8 @@ namespace FourPipeBeam {
                 if (!CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", state.dataDefineEquipment->AirDistUnit(this->aDUNum).Name)) {
                     ShowSevereError(state,
                                     std::string{routineName} + ": ADU=[Air Distribution Unit," +
-                                        state.dataDefineEquipment->AirDistUnit(this->aDUNum).Name + "] is not on any ZoneHVAC:EquipmentList.");
-                    ShowContinueError(state, "...Unit=[" + this->unitType + ',' + this->name + "] will not be simulated.");
+                                        state.dataDefineEquipment->AirDistUnit(this->aDUNum).Name + "] is not on any ZoneHVAC:EquipmentList.",
+                    				"...Unit=[" + this->unitType + ',' + this->name + "] will not be simulated.");
                 }
                 this->zoneEquipmentListChecked = true;
             }
@@ -877,8 +877,8 @@ namespace FourPipeBeam {
 
                 int pltSizCoolNum = MyPlantSizingIndex(state, "four pipe beam unit", this->name, this->cWInNodeNum, this->cWOutNodeNum, ErrorsFound);
                 if (pltSizCoolNum == 0) {
-                    ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object");
-                    ShowContinueError(state, "Occurs in " + this->unitType + " Object=" + this->name);
+                    ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object",
+                    				"Occurs in " + this->unitType + " Object=" + this->name);
                     ErrorsFound = true;
                 } else {
                     this->cWTempIn = state.dataSize->PlantSizData(pltSizCoolNum).ExitTemp;
@@ -920,8 +920,8 @@ namespace FourPipeBeam {
 
                 int pltSizHeatNum = MyPlantSizingIndex(state, "four pipe beam unit", this->name, this->hWInNodeNum, this->hWOutNodeNum, ErrorsFound);
                 if (pltSizHeatNum == 0) {
-                    ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object");
-                    ShowContinueError(state, "Occurs in " + this->unitType + " Object=" + this->name);
+                    ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object",
+                    				"Occurs in " + this->unitType + " Object=" + this->name);
                     ErrorsFound = true;
                 } else {
                     this->hWTempIn = state.dataSize->PlantSizData(pltSizHeatNum).ExitTemp;
