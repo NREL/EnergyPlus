@@ -1,10 +1,8 @@
 \section{HVACTemplate Processing}\label{hvactemplate-processing}
 
-\textbf{Unlike other EnergyPlus objects, the HVACTemplate objects are not handled by EnergyPlus directly.} Instead, they are preprocessed by a program called ExpandObjects or pyExpandObjects. If you use EP-Launch or RunEPlus.bat, this preprocessor step is performed automatically using the following sequence:
+\subsection{IDF File Overview}
 
-\subsection{Overview}
-
-\subsubsection*{IDF Files}
+\textbf{Unlike other EnergyPlus objects, the HVACTemplate objects are not handled by EnergyPlus directly.} Instead, they are preprocessed by a program called ExpandObjects. If you use EP-Launch or RunEPlus.bat, this preprocessor step is performed automatically using the following sequence:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
@@ -18,7 +16,8 @@
   If there are error messages from EnergyPlus, they will refer to the contents of the expidf file. Specific objects referred to in error messages may exist in the original idf, but they may be objects created by ExpandObjects and only exist in the expidf. Remember that the expidf will be overwritten everytime the original idf is run using EP-Launch or RunEPlus.bat.
 \end{enumerate}
 
-\subsubsection*{epJSON Files}
+\subsection{epJSON File Overview}
+\textbf{The HVACTemplate objects for this filetype are handled by a standalone application called pyExpandObjects.}  Preprocessing epJSON files must be done manually from the command line.  This may be done by directly calling the program (src/main.py) from the application source directory (src/pyExpandObjects), or from a built executable (see the documentation README for more details: \url{https://github.com/john-grando/pyExpandObjects#build-instructions})
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
@@ -35,7 +34,7 @@
     Optional - A file with the name "<original-file-name>\_base.epJSON" which has all the HVACTemplate objects removed.
   \end{enumerate}
   \item
-    The EnergyPlus simulation proceeds using the expanded file as the input stream.
+    The EnergyPlus simulation may now be run with the "expanded" file as the target.
   \item
     If there are error messages from EnergyPlus, they will refer to the contents of the expanded file. Specific objects referred to in error messages may exist in the original epJSON, but they may be objects created by pyExpandObjects and only exist in the expanded file. Remember that the "<original-file-name>\_expanded.epJSON", "<original-file-name>\_hvac\_templates.epJSON", and "<original-file-name>\_base.epJSON" files will be overwritten everytime the original epJSON is run using EP-Launch or RunEPlus.bat.  Also note, the "<original-file-name>\_hvac\_templates.epJSON" and "<original-file-name>\_base.epJSON" files can be merged to recreate the original epJSON file.
 \end{enumerate}
@@ -59,51 +58,119 @@ There are some exceptions to this rule:
 
 \subsubsection{Simulation Tool}
 
-The command line interface located in the EnergyPlus root directory (energyplus.exe) provides optional arguments to enable various features of the simulation package.  Below are the options relating to the ExpandObjects and pyExpandObjects processes.
+The command line interface located in the EnergyPlus root directory (energyplus.exe) provides optional arguments to enable various features of the simulation package.
+
+\begin{itemize}
+
+\item
+  -a, --annual : Force annual simulation
+
+\item
+  -c, --convert : Output IDF->epJSON or epJSON->IDF, dependent on input file type
+
+\item
+  -d, --output-directory ARG : Output directory path (default: current directory)
+  
+\item
+  -D, --design-day : Force design-day-only simulation
+
+\item
+  -h, --help : Display help information
+  
+\item
+  -i, --idd ARG : Input data dictionary path (default: Energy+.idd in executable directory)
+
+\item
+  -j, --jobs ARG : Multi-thread with N threads; 1 thread with no arg. (Currently only for G-Function generation)
+  
+\item
+  -m, --epmacro : Run EPMacro prior to simulation
+
+\item
+  -p, --output-prefix ARG : Prefix for output file names (default: eplus)
+
+\item
+  -r, --readvars : Run ReadVarsESO after simulation
+
+\item
+  -s, --output-suffix ARG : Suffix style for output file names (default: L)
+  L: Legacy (e.g., eplustbl.csv)
+  C: Capital (e.g., eplusTable.csv)
+  D: Dash (e.g., eplus-table.csv)
+  
+\item
+  -v, --version : Display version information
+  
+\item
+  -w, --weather ARG : Weather file path (default: in.epw in current directory)
+
+\item
+  -x, --expandobjects : Run ExpandObjects prior to simulation
+  
+\item
+  --convert-only : Only convert IDF->epJSON or epJSON->IDF, dependent on input file type. No simulation
+  
+\end{itemize}
 
 \subsubsection*{IDF Options}
 
+In order to simulate an IDF file that contains HVACTemplate objects, the input must be run through ExpandObjects.  By specifying this process to run, the simulation is run with a fully expanded file.  Any errors that occur during simulation will refer to the \*.expidf file, not the original \*.idf file.
+
 \begin{itemize}
+  
 \item
   -x --expandobjects : Run ExpandObjects prior to simulation
-\end{itemize}
-
-\subsubsection*{epJSON Options}\label{pyexpandobjects-cli-epjson-options}
-
-\begin{itemize}
-\item
-  -nb --no\_backup : Do no create backup files
-  
-  It is not possible to comment sections of code in JSON formatted files.  Therefore, the output expanded files do not have the ability to retain the HVACTemplate objects used to create the current document.  If the original file were to be overwritten, then all template data would be lost.  In an attempt to provide and additional layer of backups, the -nb option is set to False by default which means two files will be created: one with HVACTemplate objects, and one with all other objects.  With these files, the original input file can be created, or specific objects can be copied and pasted.
-  
-\item
-  -o --output\_directory : Specify output directory.  If not provided, then input file directory is used.
-
-\item
-  -ns --no\_schema : Skip schema validation checks for pyExpandObjects.  Note, this does not skip other schema validation operations within EnergyPlus itself.
-  
-  One benefit of the JSON file format is that files can be validated before simulation.  This means that erroneous inputs can be found before simulation, which saves time debugging output files and reading through logs, unsure of the error source.  This includes syntax errors, values that are out of range, and missing required inputs.  However, situations may occur when the user wishes to skip schema validation, in which case this flag should be used.  By default, schema validation is enabled.
-  
-\item
-  -l --logger\_level : Set logging output level 
-  
-  Various levels of logging output are available for debugging, and other, purposes.  A valid level, consistent with Python logging naming structure (i.e. DEBUG, INFO, WARNING, ERROR, CRITICAL), must be provided.
 
 \end{itemize}
+
+\subsubsection*{epJSON Options}
+
+Expansion of HVACTemplate objects for epJSON filetypes is not integrated into the EnergyPlus command line interface at this time.  Please see the next section on how to operate the pyExpandObjects expansion tool.
 
 \subsubsection{HVACTemplate Expansion Tools}
 
 \subsubsection*{IDF - ExpandObjects}
 
-No command line options are available for this tool.
+No command line arguments are available for this tool.
 
 \subsubsection*{epJSON - pyExpandObjects}
 
-The command line options noted above in section~\ref{pyexpandobjects-cli-epjson-options} for epJSON files are available in this tool (e.g. -nb, -ns).  Additionally, the following arugment can be used to specify the file.  Values passed to the program with no arguments will be assumed to be a file name.
+The following command line arguments may be provided to control the prorgram outputs.
 
 \begin{itemize}
 
 \item
-  -f --file FILE\_NAME : Specify file to expand
+  -f, --file FILE\_NAME : Specify file to expand
+  
+  This argument may be omitted.  A value passed to the program with no argument will be assumed to be a file name.
+  
+\item
+  -h, --help : Display help information
+
+\item
+  -nb, --no\_backup : Do no create backup files
+  
+  It is not possible to comment sections of code in JSON formatted files.  Therefore, the output expanded files do not have the ability to retain the HVACTemplate objects used to create the current document.  If the original file were to be overwritten, then all template data would be lost.  In an attempt to provide and additional layer of backups, the -nb option is set to False by default which means two files will be created: one with HVACTemplate objects, and one with all other objects.  With these files, the original input file can be created, or specific objects can be copied and pasted.
+
+\item
+  -ns, --no\_schema : Skip schema validation checks for pyExpandObjects.  Note, this does not skip other schema validation operations within EnergyPlus itself.
+  
+  One benefit of the JSON file format is that files can be validated before simulation.  This means that erroneous inputs can be found before simulation, which saves time debugging output files and reading through logs, unsure of the error source.  This includes syntax errors, values that are out of range, and missing required inputs.  However, situations may occur when the user wishes to skip schema validation, in which case this flag should be used.  By default, schema validation is enabled.
+
+\item
+  -o, --output\_directory : Specify output directory.  If not provided, then input file directory is used.
+  
+\item
+  -l, --logger\_level LOGGER\_LEVEL: Set logging output level 
+  
+  Various levels of logging output are available for debugging, and other, purposes.  A valid level, consistent with Python logging naming structure (i.e. DEBUG, INFO, WARNING, ERROR, CRITICAL), must be provided.
+  
+\item
+  -v, --version : Display version information  
+
+\item
+  -wl, --write-logs : Write logs to file
+  
+  When this expansion tool is run from its source directory, the output can be written to a file, which is located in the logs directory (logs/base.log).
   
 \end{itemize}
