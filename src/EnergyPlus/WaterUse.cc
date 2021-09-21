@@ -1116,13 +1116,14 @@ namespace WaterUse {
                 // There is no hot water
                 this->HotMassFlowRate = 0.0;
 
-            } else if ((this->ColdTemp - this->HotTemp) > EPSILON) {
+            } else if (((this->ColdTemp - this->HotTemp) > EPSILON) && (!state.dataGlobal->WarmupFlag)) {
                 // Special case for HotTemp < ColdTemp, due to bad user input (could happen in a plant loop accidentally)
                 this->HotMassFlowRate = 0;
                 // print error for variables of hot water temperature
-                ++this->HWTempErrorCount;
-                if (this->HWTempErrorCount < 2) {
-                    ShowWarningError(state, "TESTCalcEquipmentFlowRates: Hot water temperature is less than the cold water temperature");
+                ++this->CWHWTempErrorCount;
+                if (this->CWHWTempErrorCount < 2) {
+                    ShowWarningError(state,
+                                     "CalcEquipmentFlowRates: " + this->Name + " - Hot water temperature is less than the cold water temperature");
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, format("...hot water temperature       = {:.3R} C", this->HotTemp));
                     ShowContinueError(state, format("...cold water temperature       = {:.3R} C", this->ColdTemp));
@@ -1134,17 +1135,18 @@ namespace WaterUse {
                     ShowRecurringWarningErrorAtEnd(
                         state,
                         this->Name + "\" - Hot water temperature should be greater than or equal to the cold water temperature error continues...",
-                        this->HWTempErrIndex,
+                        this->CWHWTempErrIndex,
                         this->HotTemp,
                         this->HotTemp);
                 }
-            } else if ((this->TargetTemp - this->HotTemp) > EPSILON) {
+            } else if (((this->TargetTemp - this->HotTemp) > EPSILON) && (!state.dataGlobal->WarmupFlag)) {
                 // Target temp is hotter than the hot water temp; can't meet target temperature
                 this->HotMassFlowRate = this->TotalMassFlowRate;
                 // print error for variables of target water temperature
-                ++this->TargetTempErrorCount;
-                if (this->TargetTempErrorCount < 2) {
-                    ShowWarningError(state, "TESTCalcEquipmentFlowRates: Target water temperature is greater than the hot water temperature");
+                ++this->TargetHWTempErrorCount;
+                if (this->TargetHWTempErrorCount < 2) {
+                    ShowWarningError(
+                        state, "CalcEquipmentFlowRates: " + this->Name + " - Target water temperature is greater than the hot water temperature");
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, format("...target water temperature       = {:.3R} C", this->TargetTemp));
                     ShowContinueError(state, format("...hot water temperature       = {:.3R} C", this->HotTemp));
@@ -1156,7 +1158,7 @@ namespace WaterUse {
                     ShowRecurringWarningErrorAtEnd(
                         state,
                         this->Name + "\" - Target water temperature should be less than or equal to the hot water temperature error continues...",
-                        this->TargetTempErrIndex,
+                        this->TargetHWTempErrIndex,
                         this->HotTemp,
                         this->ColdTemp);
                 }
@@ -1164,13 +1166,14 @@ namespace WaterUse {
                 this->HotMassFlowRate = this->TotalMassFlowRate * (this->TargetTemp - this->ColdTemp) / (this->HotTemp - this->ColdTemp);
             }
 
-            if (this->HotMassFlowRate < 0.0) {
+            if ((this->HotMassFlowRate < 0.0 && (!state.dataGlobal->WarmupFlag))) {
                 // Target temp is colder than the cold water temp; don't allow colder
                 this->HotMassFlowRate = 0.0;
                 // print error for variables of target water temperature
-                ++this->TargetTempErrorCount;
-                if (this->TargetTempErrorCount < 2) {
-                    ShowWarningError(state, "TESTCalcEquipmentFlowRates: Target water temperature is less than the cold water temperature");
+                ++this->TargetCWTempErrorCount;
+                if (this->TargetCWTempErrorCount < 2) {
+                    ShowWarningError(state,
+                                     "CalcEquipmentFlowRates: " + this->Name + " - Target water temperature is less than the cold water temperature");
                     ShowContinueErrorTimeStamp(state, "");
                     ShowContinueError(state, format("...target water temperature       = {:.3R} C", this->TargetTemp));
                     ShowContinueError(state, format("...cold water temperature       = {:.3R} C", this->ColdTemp));
@@ -1182,7 +1185,7 @@ namespace WaterUse {
                     ShowRecurringWarningErrorAtEnd(
                         state,
                         this->Name + "\" - Target water temperature should be greater than or equal to the cold water temperature error continues...",
-                        this->TargetTempErrIndex,
+                        this->TargetCWTempErrIndex,
                         this->HotTemp,
                         this->ColdTemp);
                 }

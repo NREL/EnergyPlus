@@ -446,7 +446,7 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
     state->dataWaterUse->WaterEquipment(WaterEquipNum).WaterEquipmentType::CalcEquipmentFlowRates(*state);
 
     std::string const error_string1 = delimited_string({
-        "   ** Warning ** CalcEquipmentFlowRates: Hot water temperature is less than the cold water temperature",
+        "   ** Warning ** CalcEquipmentFlowRates: CORE_ZN WATER EQUIPMENT - Hot water temperature is less than the cold water temperature",
         "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
         "   **   ~~~   ** ...hot water temperature       = 10.000 C",
         "   **   ~~~   ** ...cold water temperature       = 15.000 C",
@@ -467,7 +467,7 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
     state->dataWaterUse->WaterEquipment(WaterEquipNum).WaterEquipmentType::CalcEquipmentFlowRates(*state);
 
     std::string const error_string2 = delimited_string({
-        "   ** Warning ** CalcEquipmentFlowRates: Target water temperature is greater than the hot water temperature",
+        "   ** Warning ** CalcEquipmentFlowRates: CORE_ZN WATER EQUIPMENT - Target water temperature is greater than the hot water temperature",
         "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
         "   **   ~~~   ** ...target water temperature       = 50.000 C",
         "   **   ~~~   ** ...hot water temperature       = 43.300 C",
@@ -481,11 +481,10 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
     // Set target temperature to 0C, below cold water temperature to trigger warning
     state->dataScheduleMgr->Schedule(4).CurrentValue = 0;
     WaterEquipNum = 1;
-    state->dataWaterUse->WaterEquipment(WaterEquipNum).TargetTempErrorCount = 0;
     state->dataWaterUse->WaterEquipment(WaterEquipNum).WaterEquipmentType::CalcEquipmentFlowRates(*state);
 
     std::string const error_string3 = delimited_string({
-        "   ** Warning ** CalcEquipmentFlowRates: Target water temperature is less than the cold water temperature",
+        "   ** Warning ** CalcEquipmentFlowRates: CORE_ZN WATER EQUIPMENT - Target water temperature is less than the cold water temperature",
         "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
         "   **   ~~~   ** ...target water temperature       = 0.000 C",
         "   **   ~~~   ** ...cold water temperature       = 15.000 C",
