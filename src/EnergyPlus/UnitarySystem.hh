@@ -113,6 +113,7 @@ namespace UnitarySystems {
         Real64 maximum_supply_air_temperature = 80.0;
         Real64 maximum_outdoor_dry_bulb_temperature_for_supplemental_heater_operation = 21.0;
         std::string outdoor_dry_bulb_temperature_sensor_node_name;
+        std::string heat_pump_coil_water_flow_mode;
         Real64 maximum_cycling_rate = 2.5;
         Real64 heat_pump_time_constant = 60.0;
         Real64 fraction_of_on_cycle_power_use = 0.01;

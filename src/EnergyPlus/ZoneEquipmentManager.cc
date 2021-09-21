@@ -3192,10 +3192,11 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                 state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).EquipIndex(EquipPtr));
 
                 } else if (SELECT_CASE_var == ZoneUnitarySys_Num || SELECT_CASE_var == PkgTermACAirToAir_Num ||
-                           SELECT_CASE_var == PkgTermHPAirToAir_Num) { // 'AirloopHVAC:UnitarySystem'
+                           SELECT_CASE_var == PkgTermHPAirToAir_Num || SELECT_CASE_var == PkgTermHPWaterToAir_Num) { // 'AirloopHVAC:UnitarySystem'
                     // AirloopHVAC:UnitarySystem
                     // ZoneHVAC:PackagedTerminalAirConditioner
                     // ZoneHVAC:PackagedTerminalHeatPump
+                    // ZoneHVAC:WaterToAirHeatPump
                     int AirLoopNum = 0;
                     bool HeatingActive = false;
                     bool CoolingActive = false;

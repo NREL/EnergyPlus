@@ -523,13 +523,15 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                         thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = WindowAC_Num;
 
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM" || SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER" ||
-                               SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALHEATPUMP") {
+                               SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALHEATPUMP" || SELECT_CASE_var == "ZONEHVAC:WATERTOAIRHEATPUMP") {
                         if (SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER") {
                             thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = PkgTermACAirToAir_Num;
                         } else if (SELECT_CASE_var == "ZONEHVAC:PACKAGEDTERMINALHEATPUMP") {
                             thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = PkgTermHPAirToAir_Num;
                         } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
                             thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySys_Num;
+                        } else if (SELECT_CASE_var == "ZONEHVAC:WATERTOAIRHEATPUMP") {
+                            thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = PkgTermHPWaterToAir_Num;
                         } else {
                             ShowFatalError(state, "Developer Error in GetZoneEquipmentData");
                         }
@@ -541,9 +543,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
                     } else if (SELECT_CASE_var == "ZONEHVAC:DEHUMIDIFIER:DX") { // Zone dehumidifier
                         thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = ZoneDXDehumidifier_Num;
-
-                    } else if (SELECT_CASE_var == "ZONEHVAC:WATERTOAIRHEATPUMP") { // Zone Water to Air Heat Pump
-                        thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = PkgTermHPWaterToAir_Num;
 
                     } else if (SELECT_CASE_var == "ZONEHVAC:FOURPIPEFANCOIL") { // 4-Pipe Fan Coil
                         thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = FanCoil4Pipe_Num;

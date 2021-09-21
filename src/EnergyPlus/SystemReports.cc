@@ -4600,65 +4600,26 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
 
                 } else if ((SELECT_CASE_var == PkgTermHPAirToAir_Num) || (SELECT_CASE_var == PkgTermACAirToAir_Num) ||
                            (SELECT_CASE_var == PkgTermHPWaterToAir_Num)) {
-                    if (SELECT_CASE_var == PkgTermACAirToAir_Num || SELECT_CASE_var == PkgTermHPAirToAir_Num) {
-                        OutAirNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
-                                         .compPointer[thisZoneEquipNum]
-                                         ->getMixerOANode();
-                        if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
-                        ZoneInletAirNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
-                                               .compPointer[thisZoneEquipNum]
-                                               ->getAirOutletNode();
-                        if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                        MixedAirNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
+                    OutAirNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
+                                     .compPointer[thisZoneEquipNum]
+                                     ->getMixerOANode();
+                    if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
+                    ZoneInletAirNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
                                            .compPointer[thisZoneEquipNum]
-                                           ->getMixerMixNode();
-                        ReturnAirNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
-                                            .compPointer[thisZoneEquipNum]
-                                            ->getMixerRetNode();
-                        if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                            ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                            ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
-                            // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                            ZFAUZoneVentLoad +=
-                                (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
-                        }
-                    } else {
-                        OutAirNode =
-                            GetPTUnitOutAirNode(state,
-                                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
-                                                    .EquipIndex(thisZoneEquipNum),
-                                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
-                                                    .EquipType_Num(thisZoneEquipNum));
-                        if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
-
-                        ZoneInletAirNode = GetPTUnitZoneInletAirNode(
-                            state,
-                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
-                                .EquipIndex(thisZoneEquipNum),
-                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
-                                .EquipType_Num(thisZoneEquipNum));
-                        if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                        MixedAirNode =
-                            GetPTUnitMixedAirNode(state,
-                                                  state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
-                                                      .EquipIndex(thisZoneEquipNum),
-                                                  state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
-                                                      .EquipType_Num(thisZoneEquipNum));
-                        ReturnAirNode = GetPTUnitReturnAirNode(
-                            state,
-                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
-                                .EquipIndex(thisZoneEquipNum),
-                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
-                                .EquipType_Num(thisZoneEquipNum));
-                        if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
-                            ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
-                            ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
-                            // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
-                            ZFAUZoneVentLoad +=
-                                (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
-                        } else {
-                            ZFAUZoneVentLoad += 0.0;
-                        }
+                                           ->getAirOutletNode();
+                    if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
+                    MixedAirNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
+                                       .compPointer[thisZoneEquipNum]
+                                       ->getMixerMixNode();
+                    ReturnAirNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex)
+                                        .compPointer[thisZoneEquipNum]
+                                        ->getMixerRetNode();
+                    if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
+                        ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
+                        ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
+                        // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
+                        ZFAUZoneVentLoad +=
+                            (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSys * DataGlobalConstants::SecInHour; //*KJperJ
                     }
                 } else if (SELECT_CASE_var == FanCoil4Pipe_Num) {
                     OutAirNode =
