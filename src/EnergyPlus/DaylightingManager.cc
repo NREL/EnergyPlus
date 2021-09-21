@@ -565,53 +565,50 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                 // Write the bare-window four sky daylight factors at noon time to the eio file; this is done only
                 // for first time that daylight factors are calculated and so is insensitive to possible variation
                 // due to change in ground reflectance from month to month, or change in storm window status.
-                // TODO MJW: Post-release change to enclosure name and remove zone loop (which is here to preserve order for now)
-                static constexpr std::string_view Format_700(
-                    "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor\n");
+                static constexpr std::string_view Format_700("! <Sky Daylight Factors>, MonthAndDay, Daylighting Control Name, Enclosure Name, "
+                                                             "Window Name, Reference Point, Daylight Factor\n");
                 print(state.files.eio, Format_700);
-                for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                    for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
-                        auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
-                        if (thisDaylightControl.zoneIndex != zoneNum) continue;
-                        int enclNum = thisDaylightControl.enclIndex;
-                        auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
+                for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
+                    auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
+                    int enclNum = thisDaylightControl.enclIndex;
+                    auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
 
-                        if (thisEnclDaylight.NumOfDayltgExtWins == 0 || !thisEnclDaylight.hasSplitFluxDaylighting) continue;
-                        for (int windowCounter = 1; windowCounter <= thisEnclDaylight.NumOfDayltgExtWins; ++windowCounter) {
-                            int windowSurfNum = thisEnclDaylight.DayltgExtWinSurfNums(windowCounter);
-                            // For this report, do not include ext wins in zone adjacent to ZoneNum since the inter-reflected
-                            // component will not be calculated for these windows until the time-step loop.
-                            if (state.dataSurface->Surface(windowSurfNum).SolarEnclIndex == enclNum) {
-                                // Output for each reference point, for each sky. Group by sky type first
-                                for (const DataDaylighting::SkyType &skyType : {DataDaylighting::SkyType::Clear,
-                                                                                DataDaylighting::SkyType::ClearTurbid,
-                                                                                DataDaylighting::SkyType::Intermediate,
-                                                                                DataDaylighting::SkyType::Overcast}) {
-                                    std::string skyTypeString;
-                                    if (skyType == DataDaylighting::SkyType::Clear) {
-                                        skyTypeString = "Clear Sky";
-                                    } else if (skyType == DataDaylighting::SkyType::ClearTurbid) {
-                                        skyTypeString = "Clear Turbid Sky";
-                                    } else if (skyType == DataDaylighting::SkyType::Intermediate) {
-                                        skyTypeString = "Intermediate Sky";
-                                    } else if (skyType == DataDaylighting::SkyType::Overcast) {
-                                        skyTypeString = "Overcast Sky";
-                                        //} else {
-                                        //    // Should never happen
-                                        //    skyTypeString = "ERROR_SKY_TYPE_NOT_HANDLED";
-                                    }
+                    if (thisEnclDaylight.NumOfDayltgExtWins == 0 || !thisEnclDaylight.hasSplitFluxDaylighting) continue;
+                    for (int windowCounter = 1; windowCounter <= thisEnclDaylight.NumOfDayltgExtWins; ++windowCounter) {
+                        int windowSurfNum = thisEnclDaylight.DayltgExtWinSurfNums(windowCounter);
+                        // For this report, do not include ext wins in zone adjacent to ZoneNum since the inter-reflected
+                        // component will not be calculated for these windows until the time-step loop.
+                        if (state.dataSurface->Surface(windowSurfNum).SolarEnclIndex == enclNum) {
+                            // Output for each reference point, for each sky. Group by sky type first
+                            for (const DataDaylighting::SkyType &skyType : {DataDaylighting::SkyType::Clear,
+                                                                            DataDaylighting::SkyType::ClearTurbid,
+                                                                            DataDaylighting::SkyType::Intermediate,
+                                                                            DataDaylighting::SkyType::Overcast}) {
+                                std::string skyTypeString;
+                                if (skyType == DataDaylighting::SkyType::Clear) {
+                                    skyTypeString = "Clear Sky";
+                                } else if (skyType == DataDaylighting::SkyType::ClearTurbid) {
+                                    skyTypeString = "Clear Turbid Sky";
+                                } else if (skyType == DataDaylighting::SkyType::Intermediate) {
+                                    skyTypeString = "Intermediate Sky";
+                                } else if (skyType == DataDaylighting::SkyType::Overcast) {
+                                    skyTypeString = "Overcast Sky";
+                                    //} else {
+                                    //    // Should never happen
+                                    //    skyTypeString = "ERROR_SKY_TYPE_NOT_HANDLED";
+                                }
 
-                                    for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
-                                        DaylFac = thisDaylightControl.DaylIllFacSky(12, 1, static_cast<int>(skyType), refPtNum, windowCounter);
-                                        print(state.files.eio,
-                                              " Sky Daylight Factors,{},{},{},{},{},{:.4R}\n",
-                                              skyTypeString,
-                                              state.dataEnvrn->CurMnDy,
-                                              state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
-                                              state.dataSurface->Surface(windowSurfNum).Name,
-                                              state.dataDaylightingData->DaylRefPt(thisDaylightControl.DaylRefPtNum(refPtNum)).Name,
-                                              DaylFac);
-                                    }
+                                for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
+                                    DaylFac = thisDaylightControl.DaylIllFacSky(12, 1, static_cast<int>(skyType), refPtNum, windowCounter);
+                                    print(state.files.eio,
+                                          " Sky Daylight Factors,{},{},{},{},{},{},{:.4R}\n",
+                                          skyTypeString,
+                                          state.dataEnvrn->CurMnDy,
+                                          thisDaylightControl.Name,
+                                          state.dataViewFactor->EnclSolInfo(thisDaylightControl.enclIndex).Name,
+                                          state.dataSurface->Surface(windowSurfNum).Name,
+                                          state.dataDaylightingData->DaylRefPt(thisDaylightControl.DaylRefPtNum(refPtNum)).Name,
+                                          DaylFac);
                                 }
                             }
                         }
@@ -656,88 +653,84 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
         state.dataDaylightingManager->CreateDFSReportFile = false;
     }
 
-    // TODO MJW: For now preserve order by zone
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
-            auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
-            if (thisDaylightControl.zoneIndex != zoneNum) continue;
-            int enclNum = thisDaylightControl.enclIndex;
-            auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
-            if (thisEnclDaylight.NumOfDayltgExtWins == 0) continue;
+    for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
+        auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
+        int enclNum = thisDaylightControl.enclIndex;
+        auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
+        if (thisEnclDaylight.NumOfDayltgExtWins == 0) continue;
 
-            for (int windowCounter = 1; windowCounter <= thisEnclDaylight.NumOfDayltgExtWins; ++windowCounter) {
-                int windowSurfNum = thisEnclDaylight.DayltgExtWinSurfNums(windowCounter);
+        for (int windowCounter = 1; windowCounter <= thisEnclDaylight.NumOfDayltgExtWins; ++windowCounter) {
+            int windowSurfNum = thisEnclDaylight.DayltgExtWinSurfNums(windowCounter);
 
-                // For this report, do not include ext wins in zone/enclosure adjacent to ZoneNum since the inter-reflected
-                // component will not be calculated for these windows until the time-step loop.
-                if (state.dataSurface->Surface(windowSurfNum).SolarEnclIndex == enclNum) {
+            // For this report, do not include ext wins in zone/enclosure adjacent to ZoneNum since the inter-reflected
+            // component will not be calculated for these windows until the time-step loop.
+            if (state.dataSurface->Surface(windowSurfNum).SolarEnclIndex == enclNum) {
 
-                    if (state.dataSurface->SurfWinMovableSlats(windowSurfNum)) {
-                        // variable slat angle - MaxSlatangle sets
-                        ISA = MaxSlatAngs + 1;
-                    } else if (state.dataSurface->Surface(windowSurfNum).HasShadeControl) {
+                if (state.dataSurface->SurfWinMovableSlats(windowSurfNum)) {
+                    // variable slat angle - MaxSlatangle sets
+                    ISA = MaxSlatAngs + 1;
+                } else if (state.dataSurface->Surface(windowSurfNum).HasShadeControl) {
+                    // window shade or blind with fixed slat angle
+                    ISA = 2;
+                } else {
+                    // base window
+                    ISA = 1;
+                }
+
+                // loop over each slat angle
+                for (ISlatAngle = 1; ISlatAngle <= ISA; ++ISlatAngle) {
+                    if (ISlatAngle == 1) {
+                        // base window without shades, screens, or blinds
+                        print(state.files.dfs,
+                              "{},{},{},Base Window\n",
+                              state.dataEnvrn->CurMnDy,
+                              state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
+                              state.dataSurface->Surface(windowSurfNum).Name);
+                    } else if (ISlatAngle == 2 && ISA == 2) {
                         // window shade or blind with fixed slat angle
-                        ISA = 2;
+                        print(state.files.dfs,
+                              "{},{},{},Blind or Slat Applied\n",
+                              state.dataEnvrn->CurMnDy,
+                              state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
+                              state.dataSurface->Surface(windowSurfNum).Name);
                     } else {
-                        // base window
-                        ISA = 1;
+                        // blind with variable slat angle
+                        SlatAngle = 180.0 / double(MaxSlatAngs - 1) * double(ISlatAngle - 2);
+                        print(state.files.dfs,
+                              "{},{},{},{:.1R}\n",
+                              state.dataEnvrn->CurMnDy,
+                              state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
+                              state.dataSurface->Surface(windowSurfNum).Name,
+                              SlatAngle);
                     }
 
-                    // loop over each slat angle
-                    for (ISlatAngle = 1; ISlatAngle <= ISA; ++ISlatAngle) {
-                        if (ISlatAngle == 1) {
-                            // base window without shades, screens, or blinds
-                            print(state.files.dfs,
-                                  "{},{},{},Base Window\n",
-                                  state.dataEnvrn->CurMnDy,
-                                  state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
-                                  state.dataSurface->Surface(windowSurfNum).Name);
-                        } else if (ISlatAngle == 2 && ISA == 2) {
-                            // window shade or blind with fixed slat angle
-                            print(state.files.dfs,
-                                  "{},{},{},Blind or Slat Applied\n",
-                                  state.dataEnvrn->CurMnDy,
-                                  state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
-                                  state.dataSurface->Surface(windowSurfNum).Name);
-                        } else {
-                            // blind with variable slat angle
-                            SlatAngle = 180.0 / double(MaxSlatAngs - 1) * double(ISlatAngle - 2);
-                            print(state.files.dfs,
-                                  "{},{},{},{:.1R}\n",
-                                  state.dataEnvrn->CurMnDy,
-                                  state.dataHeatBal->Zone(thisDaylightControl.zoneIndex).Name,
-                                  state.dataSurface->Surface(windowSurfNum).Name,
-                                  SlatAngle);
-                        }
+                    for (int IHR = 1; IHR <= 24; ++IHR) {
+                        // For each Daylight Reference Point
+                        for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
+                            DFClrSky = thisDaylightControl.DaylIllFacSky(
+                                IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Clear), refPtNum, windowCounter);
+                            DFClrTbSky = thisDaylightControl.DaylIllFacSky(
+                                IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::ClearTurbid), refPtNum, windowCounter);
+                            DFIntSky = thisDaylightControl.DaylIllFacSky(
+                                IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Intermediate), refPtNum, windowCounter);
+                            DFOcSky = thisDaylightControl.DaylIllFacSky(
+                                IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Overcast), refPtNum, windowCounter);
 
-                        for (int IHR = 1; IHR <= 24; ++IHR) {
-                            // For each Daylight Reference Point
-                            for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
-                                DFClrSky = thisDaylightControl.DaylIllFacSky(
-                                    IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Clear), refPtNum, windowCounter);
-                                DFClrTbSky = thisDaylightControl.DaylIllFacSky(
-                                    IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::ClearTurbid), refPtNum, windowCounter);
-                                DFIntSky = thisDaylightControl.DaylIllFacSky(
-                                    IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Intermediate), refPtNum, windowCounter);
-                                DFOcSky = thisDaylightControl.DaylIllFacSky(
-                                    IHR, ISlatAngle, static_cast<int>(DataDaylighting::SkyType::Overcast), refPtNum, windowCounter);
-
-                                // write daylight factors - 4 sky types for each daylight ref point
-                                print(state.files.dfs,
-                                      "{},{},{:.5R},{:.5R},{:.5R},{:.5R}\n",
-                                      IHR,
-                                      state.dataDaylightingData->DaylRefPt(thisDaylightControl.DaylRefPtNum(refPtNum)).Name,
-                                      DFClrSky,
-                                      DFClrTbSky,
-                                      DFIntSky,
-                                      DFOcSky);
-                            } // Reference Point loop
-                        }     // hour loop
-                    }         // slat angle loop
-                }
-            } // exterior windows in enclosure loop
-        }     // daylighting control loop
-    }         // zone loop
+                            // write daylight factors - 4 sky types for each daylight ref point
+                            print(state.files.dfs,
+                                  "{},{},{:.5R},{:.5R},{:.5R},{:.5R}\n",
+                                  IHR,
+                                  state.dataDaylightingData->DaylRefPt(thisDaylightControl.DaylRefPtNum(refPtNum)).Name,
+                                  DFClrSky,
+                                  DFClrTbSky,
+                                  DFIntSky,
+                                  DFOcSky);
+                        } // for (refPtNum) Reference Point
+                    }     // for (IHR) hour
+                }         // for (ISlatAngle) slat angle
+            }             // if (SolarEnclIndex == enclNum)
+        }                 // for (windowCounter) exterior windows in enclosure
+    }                     // for (controlNum) daylighting control
 }
 
 void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
@@ -5261,128 +5254,123 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
     NewAspectRatio = 1.0;
 
     CheckForGeometricTransform(state, doTransform, OldAspectRatio, NewAspectRatio);
-    // TODO MJW: For now preserve order by zone
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
-            auto &daylCntrl = state.dataDaylightingData->daylightControl(controlNum);
-            if (daylCntrl.zoneIndex != zoneNum) continue;
-            auto &zone(state.dataHeatBal->Zone(daylCntrl.zoneIndex));
+    for (int controlNum = 1; controlNum <= state.dataDaylightingData->totDaylightingControls; ++controlNum) {
+        auto &daylCntrl = state.dataDaylightingData->daylightControl(controlNum);
+        auto &zone(state.dataHeatBal->Zone(daylCntrl.zoneIndex));
 
-            // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-            CosZoneRelNorth = std::cos(-zone.RelNorth * DataGlobalConstants::DegToRadians);
-            SinZoneRelNorth = std::sin(-zone.RelNorth * DataGlobalConstants::DegToRadians);
+        // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
+        CosZoneRelNorth = std::cos(-zone.RelNorth * DataGlobalConstants::DegToRadians);
+        SinZoneRelNorth = std::sin(-zone.RelNorth * DataGlobalConstants::DegToRadians);
 
-            rLightLevel = GetDesignLightingLevelForZone(state, daylCntrl.zoneIndex);
-            CheckLightsReplaceableMinMaxForZone(state, daylCntrl.zoneIndex);
+        rLightLevel = GetDesignLightingLevelForZone(state, daylCntrl.zoneIndex);
+        CheckLightsReplaceableMinMaxForZone(state, daylCntrl.zoneIndex);
 
-            for (refPtNum = 1; refPtNum <= daylCntrl.TotalDaylRefPoints; ++refPtNum) {
-                auto &curRefPt(state.dataDaylightingData->DaylRefPt(daylCntrl.DaylRefPtNum(refPtNum))); // get the active daylighting:referencepoint
-                curRefPt.indexToFracAndIllum =
-                    refPtNum; // back reference to the index to the ZoneDaylight structure arrays related to reference points
-                if (state.dataSurface->DaylRefWorldCoordSystem) {
-                    // transform only by appendix G rotation
-                    daylCntrl.DaylRefPtAbsCoord(1, refPtNum) = curRefPt.x * CosBldgRotAppGonly - curRefPt.y * SinBldgRotAppGonly;
-                    daylCntrl.DaylRefPtAbsCoord(2, refPtNum) = curRefPt.x * SinBldgRotAppGonly + curRefPt.y * CosBldgRotAppGonly;
-                    daylCntrl.DaylRefPtAbsCoord(3, refPtNum) = curRefPt.z;
+        for (refPtNum = 1; refPtNum <= daylCntrl.TotalDaylRefPoints; ++refPtNum) {
+            auto &curRefPt(state.dataDaylightingData->DaylRefPt(daylCntrl.DaylRefPtNum(refPtNum))); // get the active daylighting:referencepoint
+            curRefPt.indexToFracAndIllum = refPtNum; // back reference to the index to the ZoneDaylight structure arrays related to reference points
+            if (state.dataSurface->DaylRefWorldCoordSystem) {
+                // transform only by appendix G rotation
+                daylCntrl.DaylRefPtAbsCoord(1, refPtNum) = curRefPt.x * CosBldgRotAppGonly - curRefPt.y * SinBldgRotAppGonly;
+                daylCntrl.DaylRefPtAbsCoord(2, refPtNum) = curRefPt.x * SinBldgRotAppGonly + curRefPt.y * CosBldgRotAppGonly;
+                daylCntrl.DaylRefPtAbsCoord(3, refPtNum) = curRefPt.z;
+            } else {
+                // Transform reference point coordinates into building coordinate system
+                Xb = curRefPt.x * CosZoneRelNorth - curRefPt.y * SinZoneRelNorth + zone.OriginX;
+                Yb = curRefPt.x * SinZoneRelNorth + curRefPt.y * CosZoneRelNorth + zone.OriginY;
+                // Transform into World Coordinate System
+                daylCntrl.DaylRefPtAbsCoord(1, refPtNum) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
+                daylCntrl.DaylRefPtAbsCoord(2, refPtNum) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
+                daylCntrl.DaylRefPtAbsCoord(3, refPtNum) = curRefPt.z + zone.OriginZ;
+                if (doTransform) {
+                    Xo = daylCntrl.DaylRefPtAbsCoord(1, refPtNum); // world coordinates.... shifted by relative north angle...
+                    Yo = daylCntrl.DaylRefPtAbsCoord(2, refPtNum);
+                    // next derotate the building
+                    XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
+                    YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
+                    // translate
+                    Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
+                    Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
+                    // rerotate
+                    daylCntrl.DaylRefPtAbsCoord(1, refPtNum) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
+                    daylCntrl.DaylRefPtAbsCoord(2, refPtNum) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
+                }
+            }
+            refName = curRefPt.Name;
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtZone, refName, daylCntrl.ZoneName);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlName, refName, daylCntrl.Name);
+            if (daylCntrl.DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "SplitFlux");
+            } else {
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "DElight");
+            }
+            // ( 1=continuous, 2=stepped, 3=continuous/off )
+            if (daylCntrl.LightControlType == DataDaylighting::LtgCtrlType::Continuous) {
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous");
+            } else if (daylCntrl.LightControlType == DataDaylighting::LtgCtrlType::Stepped) {
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Stepped");
+            } else if (daylCntrl.LightControlType == DataDaylighting::LtgCtrlType::ContinuousOff) {
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous/Off");
+            }
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit(refPtNum));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtWInst, refName, rLightLevel);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtWCtrl, refName, rLightLevel * daylCntrl.FracZoneDaylit(refPtNum));
+
+            if (daylCntrl.DaylRefPtAbsCoord(1, refPtNum) < zone.MinimumX || daylCntrl.DaylRefPtAbsCoord(1, refPtNum) > zone.MaximumX) {
+                daylCntrl.DaylRefPtInBounds(refPtNum) = false;
+                ShowWarningError(state, "GeometryTransformForDaylighting: Reference point X Value outside Zone Min/Max X, Zone=" + zone.Name);
+                ShowContinueError(state,
+                                  format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
+                                         daylCntrl.DaylRefPtAbsCoord(1, refPtNum),
+                                         zone.MinimumX,
+                                         zone.MaximumX));
+                if (daylCntrl.DaylRefPtAbsCoord(1, refPtNum) < zone.MinimumX) {
+                    ShowContinueError(
+                        state,
+                        format("...X Reference Distance Outside MinimumX= {:.4R} m.", zone.MinimumX - daylCntrl.DaylRefPtAbsCoord(1, refPtNum)));
                 } else {
-                    // Transform reference point coordinates into building coordinate system
-                    Xb = curRefPt.x * CosZoneRelNorth - curRefPt.y * SinZoneRelNorth + zone.OriginX;
-                    Yb = curRefPt.x * SinZoneRelNorth + curRefPt.y * CosZoneRelNorth + zone.OriginY;
-                    // Transform into World Coordinate System
-                    daylCntrl.DaylRefPtAbsCoord(1, refPtNum) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
-                    daylCntrl.DaylRefPtAbsCoord(2, refPtNum) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-                    daylCntrl.DaylRefPtAbsCoord(3, refPtNum) = curRefPt.z + zone.OriginZ;
-                    if (doTransform) {
-                        Xo = daylCntrl.DaylRefPtAbsCoord(1, refPtNum); // world coordinates.... shifted by relative north angle...
-                        Yo = daylCntrl.DaylRefPtAbsCoord(2, refPtNum);
-                        // next derotate the building
-                        XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
-                        YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
-                        // translate
-                        Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
-                        Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
-                        // rerotate
-                        daylCntrl.DaylRefPtAbsCoord(1, refPtNum) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
-                        daylCntrl.DaylRefPtAbsCoord(2, refPtNum) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
-                    }
+                    ShowContinueError(
+                        state,
+                        format("...X Reference Distance Outside MaximumX= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(1, refPtNum) - zone.MaximumX));
                 }
-                refName = curRefPt.Name;
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtZone, refName, daylCntrl.ZoneName);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlName, refName, daylCntrl.Name);
-                if (daylCntrl.DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "SplitFlux");
+            }
+            if (daylCntrl.DaylRefPtAbsCoord(2, refPtNum) < zone.MinimumY || daylCntrl.DaylRefPtAbsCoord(2, refPtNum) > zone.MaximumY) {
+                daylCntrl.DaylRefPtInBounds(refPtNum) = false;
+                ShowWarningError(state, "GeometryTransformForDaylighting: Reference point Y Value outside Zone Min/Max Y, Zone=" + zone.Name);
+                ShowContinueError(state,
+                                  format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
+                                         daylCntrl.DaylRefPtAbsCoord(2, refPtNum),
+                                         zone.MinimumY,
+                                         zone.MaximumY));
+                if (daylCntrl.DaylRefPtAbsCoord(2, refPtNum) < zone.MinimumY) {
+                    ShowContinueError(
+                        state,
+                        format("...Y Reference Distance Outside MinimumY= {:.4R} m.", zone.MinimumY - daylCntrl.DaylRefPtAbsCoord(2, refPtNum)));
                 } else {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "DElight");
+                    ShowContinueError(
+                        state,
+                        format("...Y Reference Distance Outside MaximumY= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(2, refPtNum) - zone.MaximumY));
                 }
-                // ( 1=continuous, 2=stepped, 3=continuous/off )
-                if (daylCntrl.LightControlType == DataDaylighting::LtgCtrlType::Continuous) {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous");
-                } else if (daylCntrl.LightControlType == DataDaylighting::LtgCtrlType::Stepped) {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Stepped");
-                } else if (daylCntrl.LightControlType == DataDaylighting::LtgCtrlType::ContinuousOff) {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlType, refName, "Continuous/Off");
+            }
+            if (daylCntrl.DaylRefPtAbsCoord(3, refPtNum) < zone.MinimumZ || daylCntrl.DaylRefPtAbsCoord(3, refPtNum) > zone.MaximumZ) {
+                daylCntrl.DaylRefPtInBounds(refPtNum) = false;
+                ShowWarningError(state, "GeometryTransformForDaylighting: Reference point Z Value outside Zone Min/Max Z, Zone=" + zone.Name);
+                ShowContinueError(state,
+                                  format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
+                                         daylCntrl.DaylRefPtAbsCoord(3, refPtNum),
+                                         zone.MinimumZ,
+                                         zone.MaximumZ));
+                if (daylCntrl.DaylRefPtAbsCoord(3, refPtNum) < zone.MinimumZ) {
+                    ShowContinueError(
+                        state,
+                        format("...Z Reference Distance Outside MinimumZ= {:.4R} m.", zone.MinimumZ - daylCntrl.DaylRefPtAbsCoord(3, refPtNum)));
+                } else {
+                    ShowContinueError(
+                        state,
+                        format("...Z Reference Distance Outside MaximumZ= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(3, refPtNum) - zone.MaximumZ));
                 }
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtFrac, refName, daylCntrl.FracZoneDaylit(refPtNum));
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtWInst, refName, rLightLevel);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtWCtrl, refName, rLightLevel * daylCntrl.FracZoneDaylit(refPtNum));
-
-                if (daylCntrl.DaylRefPtAbsCoord(1, refPtNum) < zone.MinimumX || daylCntrl.DaylRefPtAbsCoord(1, refPtNum) > zone.MaximumX) {
-                    daylCntrl.DaylRefPtInBounds(refPtNum) = false;
-                    ShowWarningError(state, "GeometryTransformForDaylighting: Reference point X Value outside Zone Min/Max X, Zone=" + zone.Name);
-                    ShowContinueError(state,
-                                      format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
-                                             daylCntrl.DaylRefPtAbsCoord(1, refPtNum),
-                                             zone.MinimumX,
-                                             zone.MaximumX));
-                    if (daylCntrl.DaylRefPtAbsCoord(1, refPtNum) < zone.MinimumX) {
-                        ShowContinueError(
-                            state,
-                            format("...X Reference Distance Outside MinimumX= {:.4R} m.", zone.MinimumX - daylCntrl.DaylRefPtAbsCoord(1, refPtNum)));
-                    } else {
-                        ShowContinueError(
-                            state,
-                            format("...X Reference Distance Outside MaximumX= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(1, refPtNum) - zone.MaximumX));
-                    }
-                }
-                if (daylCntrl.DaylRefPtAbsCoord(2, refPtNum) < zone.MinimumY || daylCntrl.DaylRefPtAbsCoord(2, refPtNum) > zone.MaximumY) {
-                    daylCntrl.DaylRefPtInBounds(refPtNum) = false;
-                    ShowWarningError(state, "GeometryTransformForDaylighting: Reference point Y Value outside Zone Min/Max Y, Zone=" + zone.Name);
-                    ShowContinueError(state,
-                                      format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
-                                             daylCntrl.DaylRefPtAbsCoord(2, refPtNum),
-                                             zone.MinimumY,
-                                             zone.MaximumY));
-                    if (daylCntrl.DaylRefPtAbsCoord(2, refPtNum) < zone.MinimumY) {
-                        ShowContinueError(
-                            state,
-                            format("...Y Reference Distance Outside MinimumY= {:.4R} m.", zone.MinimumY - daylCntrl.DaylRefPtAbsCoord(2, refPtNum)));
-                    } else {
-                        ShowContinueError(
-                            state,
-                            format("...Y Reference Distance Outside MaximumY= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(2, refPtNum) - zone.MaximumY));
-                    }
-                }
-                if (daylCntrl.DaylRefPtAbsCoord(3, refPtNum) < zone.MinimumZ || daylCntrl.DaylRefPtAbsCoord(3, refPtNum) > zone.MaximumZ) {
-                    daylCntrl.DaylRefPtInBounds(refPtNum) = false;
-                    ShowWarningError(state, "GeometryTransformForDaylighting: Reference point Z Value outside Zone Min/Max Z, Zone=" + zone.Name);
-                    ShowContinueError(state,
-                                      format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
-                                             daylCntrl.DaylRefPtAbsCoord(3, refPtNum),
-                                             zone.MinimumZ,
-                                             zone.MaximumZ));
-                    if (daylCntrl.DaylRefPtAbsCoord(3, refPtNum) < zone.MinimumZ) {
-                        ShowContinueError(
-                            state,
-                            format("...Z Reference Distance Outside MinimumZ= {:.4R} m.", zone.MinimumZ - daylCntrl.DaylRefPtAbsCoord(3, refPtNum)));
-                    } else {
-                        ShowContinueError(
-                            state,
-                            format("...Z Reference Distance Outside MaximumZ= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(3, refPtNum) - zone.MaximumZ));
-                    }
-                }
-            } // refPtNum
-        }     // daylighting control loop
-    }         // zone loop
+            }
+        } // for (refPtNum) reference point
+    }     // for (controlNum) daylighting control
 }
 
 void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
@@ -10429,43 +10417,34 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
     state.dataDaylightingManager->FLCWSK.dimension(state.dataSurface->actualMaxSlatAngs + 1, 4);
     state.dataDaylightingManager->FLFWSK.dimension(state.dataSurface->actualMaxSlatAngs + 1, 4);
 
-    // TODO MJW: These eio outputs need to change from zone to enclosure
-    static constexpr std::string_view Format_700(
-        "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones\n");
+    static constexpr std::string_view Format_700("! <Enclosure/Window Adjacency Daylighting Counts>, Enclosure Name, Number of Exterior Windows, "
+                                                 "Number of Exterior Windows in Adjacent Enclosures\n");
     print(state.files.eio, Format_700);
-    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-            int enclNum = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
-            auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
-            if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
-            if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
-            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
-            static constexpr std::string_view Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
-            print(state.files.eio,
-                  Format_701,
-                  state.dataHeatBal->Zone(ZoneNum).Name,
-                  thisEnclDaylight.TotalExtWindows,
-                  (thisEnclDaylight.NumOfDayltgExtWins - thisEnclDaylight.TotalExtWindows));
-        }
+    for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+        auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
+        if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
+        if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
+        static constexpr std::string_view Format_701("Enclosure/Window Adjacency Daylighting Counts, {},{},{}\n");
+        print(state.files.eio,
+              Format_701,
+              state.dataViewFactor->EnclSolInfo(enclNum).Name,
+              thisEnclDaylight.TotalExtWindows,
+              (thisEnclDaylight.NumOfDayltgExtWins - thisEnclDaylight.TotalExtWindows));
     }
     static constexpr std::string_view Format_702(
-        "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent "
-        "Zone Names - 1st 100 (max)\n");
+        "! <Enclosure/Window Adjacency Daylighting Matrix>, Enclosure Name, Number of Adjacent Enclosures with Windows,Adjacent "
+        "Enclosure Names - 1st 100 (max)\n");
     print(state.files.eio, Format_702);
-    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-            int enclNum = state.dataHeatBal->space(spaceNum).solarEnclosureNum;
-            auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
-            if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
-            if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
-            if (state.dataDaylightingData->ZoneDaylight(ZoneNum).totRefPts == 0) continue;
-            static constexpr std::string_view Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
-            print(state.files.eio, Format_703, state.dataHeatBal->Zone(ZoneNum).Name, thisEnclDaylight.NumOfIntWinAdjEncls);
-            for (int loop = 1, loop_end = min(thisEnclDaylight.NumOfIntWinAdjEncls, 100); loop <= loop_end; ++loop) {
-                print(state.files.eio, ",{}", state.dataViewFactor->EnclSolInfo(thisEnclDaylight.AdjIntWinEnclNums(loop)).Name);
-            }
-            print(state.files.eio, "\n");
+    for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+        auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(enclNum);
+        if (!thisEnclDaylight.hasSplitFluxDaylighting) continue;
+        if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints == 0) continue;
+        static constexpr std::string_view Format_703("Enclosure/Window Adjacency Daylighting Matrix, {},{}");
+        print(state.files.eio, Format_703, state.dataViewFactor->EnclSolInfo(enclNum).Name, thisEnclDaylight.NumOfIntWinAdjEncls);
+        for (int loop = 1, loop_end = min(thisEnclDaylight.NumOfIntWinAdjEncls, 100); loop <= loop_end; ++loop) {
+            print(state.files.eio, ",{}", state.dataViewFactor->EnclSolInfo(thisEnclDaylight.AdjIntWinEnclNums(loop)).Name);
         }
+        print(state.files.eio, "\n");
     }
 
     enclExtWin.deallocate();
