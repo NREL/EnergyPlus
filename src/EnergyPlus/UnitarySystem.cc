@@ -150,7 +150,7 @@ namespace UnitarySystems {
     {
         int CompOn = 0;
 
-        // Obtains and Allocates unitary system related parameters from input file
+        // Obtains and Allocates system related parameters from input file
         if (this->m_ThisSysInputShouldBeGotten) {
             // Get the unitary system input
             getUnitarySystemInput(state, Name, ZoneEquipment, ZoneOAUnitNum);
