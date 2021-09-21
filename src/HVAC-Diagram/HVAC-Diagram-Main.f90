@@ -261,6 +261,8 @@ TYPE bndContZoneInletType
   INTEGER                       :: SupInletNodeNum     = 0
   INTEGER                       :: SDSysCoolNodeNum     = 0
   LOGICAL                       :: isDefinedSDSysCool  = .FALSE.
+  LOGICAL                       :: hasMatchingReturnOrExhaust  = .FALSE.
+  INTEGER                       :: AirLoopNum        = 0
 END TYPE
 TYPE (bndContZoneInletType), ALLOCATABLE, DIMENSION(:) :: bndContZoneInlet
 TYPE (bndContZoneInletType), ALLOCATABLE, DIMENSION(:) :: bndContZoneInletCopy
@@ -281,6 +283,20 @@ TYPE (bndContZoneExhaustType), ALLOCATABLE, DIMENSION(:) :: bndContZoneExhaustCo
 INTEGER                                                  :: lastBndContZoneExhaust=0
 INTEGER                                                  :: maxSizeBndContZoneExhaust = 100
 INTEGER                                                  :: sizeIncrementBndContZoneExhaust = 20
+
+TYPE bndContZoneReturnType
+  !items read from BND
+  CHARACTER(len=MaxNameLength)  :: ZoneName            = ''
+  CHARACTER(len=MaxNameLength)  :: ReturnNodeID       = ''
+  ! remaining items are computed
+  INTEGER                       :: ReturnNodeNum     = 0
+  INTEGER                       :: AirLoopNum        = 0
+END TYPE
+TYPE (bndContZoneReturnType), ALLOCATABLE, DIMENSION(:) :: bndContZoneReturn
+TYPE (bndContZoneReturnType), ALLOCATABLE, DIMENSION(:) :: bndContZoneReturnCopy
+INTEGER                                                  :: lastBndContZoneReturn=0
+INTEGER                                                  :: maxSizeBndContZoneReturn = 100
+INTEGER                                                  :: sizeIncrementBndContZoneReturn = 20
 
 LOGICAL  :: errorFoundInDrawing = .FALSE.
 CHARACTER(len=300)             :: lastErrorMessage = '.'
@@ -531,12 +547,13 @@ DO WHILE (status /= eof)
         bndLoopConnection(lastBndLoopConnection)%OutletNodeNum = LookupNodeNumber(words(3))
         bndLoopConnection(lastBndLoopConnection)%InletNodeNum = LookupNodeNumber(words(4))
 ! <Controlled Zone Inlet>,<Inlet Node Count>,<Controlled Zone Name>,<Supply Air Inlet Node Name>,
-!          <SD Sys:Cooling/Heating [DD:Cooling] Inlet Node Name>,<DD Sys:Heating Inlet Node Name>
+!          <SD Sys:Cooling/Heating [DD:Cooling] Inlet Node Name>,<DD Sys:Heating Inlet Node Name>, ,<Airloop Number>
       CASE ('CONTROLLED ZONE INLET')
         CALL incrementContZoneInlet
         bndContZoneInlet(lastBndContZoneInlet)%ZoneName = words(3)
         bndContZoneInlet(lastBndContZoneInlet)%SupInletNodeID = words(4)
         bndContZoneInlet(lastBndContZoneInlet)%SDSysCoolNodeID = words(5)
+        bndContZoneInlet(lastBndContZoneInlet)%AirloopNum = ConvertTextToInteger(words(7))
         !set node number
         bndContZoneInlet(lastBndContZoneInlet)%SupInletNodeNum = LookupNodeNumber(words(4))
         bndContZoneInlet(lastBndContZoneInlet)%SDSysCoolNodeNum = LookupNodeNumber(words(5))
@@ -553,6 +570,14 @@ DO WHILE (status /= eof)
         bndContZoneExhaust(lastBndContZoneExhaust)%ExhaustNodeID = words(4)
         !set node number
         bndContZoneExhaust(lastBndContZoneExhaust)%ExhaustNodeNum = LookupNodeNumber(words(4))
+! <Controlled Zone Return>,<Return Node Count>,<Controlled Zone Name>,<Return Air Node Name>,<Airloop Number>
+      CASE ('CONTROLLED ZONE RETURN')
+        CALL incrementContZoneReturn
+        bndContZoneReturn(lastBndContZoneReturn)%ZoneName = words(3)
+        bndContZoneReturn(lastBndContZoneReturn)%ReturnNodeID = words(4)
+        bndContZoneReturn(lastBndContZoneReturn)%AirloopNum = ConvertTextToInteger(words(5))
+        !set node number
+        bndContZoneReturn(lastBndContZoneReturn)%ReturnNodeNum = LookupNodeNumber(words(4))
 ! not used
       CASE ('#AIRLOOPHVACS')
       CASE ('#BRANCH LISTS')
@@ -587,7 +612,6 @@ DO WHILE (status /= eof)
       CASE ('CONDENSER LOOP CONNECTOR BRANCHES','COND LOOP CONNECTOR BRANCHES')
       CASE ('CONDENSER LOOP CONNECTOR NODES','COND LOOP CONNECTOR NODES')
       CASE ('CONTROLLED ZONE')
-      CASE ('CONTROLLED ZONE RETURN')
       CASE ('COOLED ZONE INFO')
       CASE ('DUAL DUCT DAMPER')
       CASE ('HEATED ZONE INFO')
@@ -855,6 +879,7 @@ IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
 INTEGER :: iNodeConnect
 INTEGER :: jNodeConnect
 INTEGER :: kContZoneInlet
+INTEGER :: kContZoneReturn
 INTEGER :: curExhaustNode
 TYPE (bndNodeConnectType) :: curEquipInlet
 INTEGER :: foundEquipInletNodeConnect
@@ -866,8 +891,10 @@ INTEGER :: curSupInletNode
 INTEGER :: foundZoneInletNodeConnect
 INTEGER :: origLastBndNodeConnect
 LOGICAL :: isUniqueInlet
+INTEGER :: curAirloopNum
 
 nextFluidStream = 0
+curAirloopNum = 0
 ! now do the air loop connections to the zone
 ! these use the Controlled Zone Inlet data
 origLastBndNodeConnect = lastBndNodeConnect
@@ -875,16 +902,27 @@ DO iNodeConnect = 1, lastBndNodeConnect
   !look through non-parents
   IF (.NOT. bndNodeConnect(iNodeConnect)%isParent) THEN
     IF (bndNodeConnect(iNodeConnect)%ConnectTypeNum .EQ. NodeConnect_ZoneReturn) THEN
+      !look through the Controlled Zone Returns to find the airloop number for this node
+      DO kContZoneReturn = 1, lastBndContZoneReturn
+        IF (SameString(bndContZoneReturn(kContZoneReturn)%ReturnNodeID, bndNodeConnect(iNodeConnect)%NodeID)) THEN
+          curAirloopNum = bndContZoneReturn(kContZoneReturn)%AirloopNum
+          EXIT
+        END IF
+      END DO
       !now look through the Controlled Zone Inlet to match up the zoneexhaust node
       !with the inlet of some type of zone equipment
       curZoneName = bndNodeConnect(iNodeConnect)%ObjectID
+      !For return nodes, set the fluid stream value = to airloopnum
+      !But track the max value to use later
+      nextFluidStream = MAX(nextFluidStream, curAirloopNum)
       DO kContZoneInlet = 1, lastBndContZoneInlet
         IF (SameString(bndContZoneInlet(kContZoneInlet)%ZoneName, curZoneName)) THEN
-          IF (bndContZoneInlet(kContZoneInlet)%isDefinedSDSysCool) THEN
-            curSupInletNode = bndContZoneInlet(kContZoneInlet)%SupInletNodeNum
-            ! now go batck and find the bndNodeConnect that corresponds to this case
-            ! just to get the object type
+          IF ((bndContZoneInlet(kContZoneInlet)%isDefinedSDSysCool) .AND. (bndContZoneInlet(kContZoneInlet)%AirloopNum .EQ. curAirloopNum)) THEN
             foundZoneInletNodeConnect = 0
+            curSupInletNode = bndContZoneInlet(kContZoneInlet)%SupInletNodeNum
+            bndContZoneInlet(kContZoneInlet)%hasMatchingReturnOrExhaust = .TRUE.
+            ! now go back and find the bndNodeConnect that corresponds to this case
+            ! just to get the object type
             DO jNodeConnect = 1, lastBndNodeConnect
               IF (.NOT. bndNodeConnect(jNodeConnect)%isParent) THEN
                 IF (bndNodeConnect(jNodeConnect)%ConnectTypeNum .EQ. NodeConnect_ZoneInlet) THEN
@@ -896,10 +934,6 @@ DO iNodeConnect = 1, lastBndNodeConnect
               END IF
             END DO
             IF (foundZoneInletNodeConnect .GT. 0) THEN
-              !Now we have found the inlet and outlets for the air loop that serves the zone
-              !create new items in the nodeConnect array that reflect this specific flow through the
-              !zone.  Create a new fluid stream value for this nodeConnection
-              nextFluidStream = nextFluidStream + 1
               !First the zone outlet
               CALL incrementNodeConnection
               bndNodeConnect(lastBndNodeConnect)%isParent = .FALSE.
@@ -907,7 +941,7 @@ DO iNodeConnect = 1, lastBndNodeConnect
               bndNodeConnect(lastBndNodeConnect)%ObjectType = bndNodeConnect(iNodeConnect)%ObjectType
               bndNodeConnect(lastBndNodeConnect)%ObjectID = bndNodeConnect(iNodeConnect)%ObjectID
               bndNodeConnect(lastBndNodeConnect)%ConnectType = 'Outlet'
-              bndNodeConnect(lastBndNodeConnect)%FluidStream = nextFluidStream
+              bndNodeConnect(lastBndNodeConnect)%FluidStream = curAirloopNum
               bndNodeConnect(lastBndNodeConnect)%NodeNum = bndNodeConnect(iNodeConnect)%NodeNum
               bndNodeConnect(lastBndNodeConnect)%ConnectTypeNum = NodeConnect_Outlet
               !Next the zone inlet
@@ -917,19 +951,87 @@ DO iNodeConnect = 1, lastBndNodeConnect
               bndNodeConnect(lastBndNodeConnect)%ObjectType = bndNodeConnect(foundZoneInletNodeConnect)%ObjectType
               bndNodeConnect(lastBndNodeConnect)%ObjectID = bndNodeConnect(foundZoneInletNodeConnect)%ObjectID
               bndNodeConnect(lastBndNodeConnect)%ConnectType = 'Inlet'
-              bndNodeConnect(lastBndNodeConnect)%FluidStream = nextFluidStream
+              bndNodeConnect(lastBndNodeConnect)%FluidStream = curAirloopNum
               bndNodeConnect(lastBndNodeConnect)%NodeNum = bndNodeConnect(foundZoneInletNodeConnect)%NodeNum
               bndNodeConnect(lastBndNodeConnect)%ConnectTypeNum = NodeConnect_Inlet
             ELSE
               PRINT "(A)","    ERROR: Could not find matching inlet node for: " // TRIM(curZoneName)
               IF (dumpDetails) THEN
                 WRITE(UNIT=30, FMT="(A)")  "    ERROR: Could not find matching inlet node for: " // TRIM(curZoneName)
+                WRITE(UNIT=30, FMT="(A,I4)")  "    Return Node Name: " // TRIM(bndNodeConnect(iNodeConnect)%NodeID) // "  AirloopNum =", curAirLoopNum
               END IF
               lastErrorMessage = "Could not find matching inlet node for: " // TRIM(curZoneName)
             END IF
           END IF
         END IF
       END DO
+    END IF
+  END IF
+END DO
+! do any zone air loop inlets that were not connected yet
+! these use the parent node connections to of the equipment serving the zone
+DO kContZoneInlet = 1, lastBndContZoneInlet
+  IF (bndContZoneInlet(kContZoneInlet)%isDefinedSDSysCool) THEN
+    IF(.NOT.bndContZoneInlet(kContZoneInlet)%hasMatchingReturnOrExhaust .AND. (bndContZoneInlet(kContZoneInlet)%AirloopNum .GT. 0)) THEN
+      foundZoneInletNodeConnect = 0
+      curSupInletNode = bndContZoneInlet(kContZoneInlet)%SupInletNodeNum
+      curAirloopNum = bndContZoneInlet(kContZoneInlet)%AirloopNum
+      nextFluidStream = MAX(nextFluidStream, curAirloopNum)
+      ! now go back and find the bndNodeConnect that corresponds to this case
+      ! just to get the object type
+      DO jNodeConnect = 1, lastBndNodeConnect
+        IF (.NOT. bndNodeConnect(jNodeConnect)%isParent) THEN
+          IF (bndNodeConnect(jNodeConnect)%ConnectTypeNum .EQ. NodeConnect_ZoneInlet) THEN
+            IF (bndNodeConnect(jNodeConnect)%NodeNum .EQ. curSupInletNode) THEN
+              foundZoneInletNodeConnect = jNodeConnect
+              EXIT
+            END IF
+          END IF
+        END IF
+      END DO
+      IF (foundZoneInletNodeConnect .GT. 0) THEN
+        isUniqueInlet = .TRUE.
+        ! check if the inlet has already been used in a bndNodeConnect
+        DO jNodeConnect = 1, lastBndNodeConnect
+          IF (.NOT. bndNodeConnect(jNodeConnect)%isParent) THEN
+            IF (bndNodeConnect(jNodeConnect)%NodeNum .EQ. bndNodeConnect(foundZoneInletNodeConnect)%NodeNum) THEN
+              IF (bndNodeConnect(jNodeConnect)%ConnectTypeNum .EQ. NodeConnect_Inlet) THEN
+                isUniqueInlet = .FALSE.
+              END IF
+            END IF
+          END IF
+        END DO
+        IF (isUniqueInlet) THEN
+          !Now we have found the inlet and outlets for the zone equipment that serves the zone
+          !create new items in the nodeConnect array that reflect this specific flow through the
+          !zone.  Create a new fluid stream value for this nodeConnection
+          nextFluidStream = nextFluidStream + 1
+          !I'm messing with the nodeConnect array in a DO loop that examines the array. This
+          !is usually not a good idea but I checked the CVF language reference manual (Sep 99) and
+          !on page 7-19 it says that I can change the "terminal" value of a DO loop without causing
+          !a problem.
+          !
+          !There is no matching zone outlet
+          !Do the zone inlet
+          CALL incrementNodeConnection
+          bndNodeConnect(lastBndNodeConnect)%isParent = .FALSE.
+          bndNodeConnect(lastBndNodeConnect)%NodeID = bndNodeConnect(foundZoneInletNodeConnect)%NodeID
+          bndNodeConnect(lastBndNodeConnect)%ObjectType = bndNodeConnect(foundZoneInletNodeConnect)%ObjectType
+          bndNodeConnect(lastBndNodeConnect)%ObjectID = bndNodeConnect(foundZoneInletNodeConnect)%ObjectID
+          bndNodeConnect(lastBndNodeConnect)%ConnectType = 'Inlet'
+          bndNodeConnect(lastBndNodeConnect)%FluidStream = curAirloopNum
+          bndNodeConnect(lastBndNodeConnect)%NodeNum = bndNodeConnect(foundZoneInletNodeConnect)%NodeNum
+          bndNodeConnect(lastBndNodeConnect)%ConnectTypeNum = NodeConnect_Inlet
+          bndNodeConnect(lastBndNodeConnect)%isOutlet = .FALSE.
+          bndNodeConnect(lastBndNodeConnect)%isExamined = .TRUE.
+        END IF
+      ELSE ! from (foundZoneInletNodeConnect .GT.0)
+        PRINT "(A)","    ERROR: Equipment not found with outlet from equipment: " // TRIM(curEquipInlet%ObjectID)
+        IF (dumpDetails) THEN
+          WRITE(UNIT=30, FMT="(A)") "    ERROR: Equipment not found with outlet from equipment: " // TRIM(curEquipInlet%ObjectID)
+        END IF
+        lastErrorMessage = "Equipment not found with outlet from equipment: " // TRIM(curEquipInlet%ObjectID)
+      END IF
     END IF
   END IF
 END DO
@@ -1041,11 +1143,11 @@ DO iNodeConnect = 1, lastBndNodeConnect
 END DO
 ! see what was added
 IF (dumpDetails) THEN
-  WRITE(UNIT=30, FMT="(A)") "SetZoneInletsOutlets"
+  WRITE(UNIT=30, FMT="(A)") "SetZoneInletsOutlets:  Node Name, Zone Name (connection num), Connection Type, NodeNum, Fluid Stream"
   DO iNodeConnect = origLastBndNodeConnect + 1, lastBndNodeConnect
-    WRITE(UNIT=30, FMT="(2X,A,A,A,A,I4,A,A,I4)") TRIM(bndNodeConnect(iNodeConnect)%NodeID), " :: ", &
+    WRITE(UNIT=30, FMT="(2X,A,A,A,A,I4,A,A,I4,2X,I4)") TRIM(bndNodeConnect(iNodeConnect)%NodeID), " :: ", &
         TRIM(bndNodeConnect(iNodeConnect)%ObjectID), "(", iNodeConnect, ") :: ", &
-        TRIM(bndNodeConnect(iNodeConnect)%ConnectType),bndNodeConnect(iNodeConnect)%NodeNum
+        TRIM(bndNodeConnect(iNodeConnect)%ConnectType),bndNodeConnect(iNodeConnect)%NodeNum,bndNodeConnect(iNodeConnect)%FluidStream
   END DO
 END IF
 END SUBROUTINE SetZoneInletsOutlets
@@ -1131,9 +1233,9 @@ END DO
 ! For debugging only
 IF (dumpDetails) THEN
   WRITE(UNIT=30, FMT="(A)") " "
-  WRITE(UNIT=30, FMT="(A)") "Identified boxes below     Name :: Type :: Number "
+  WRITE(UNIT=30, FMT="(A)") "Identified boxes below     Name :: Type :: Number  FluidStream"
   DO jBox = 1, lastBox
-    WRITE(UNIT=30, FMT="(2X,A,A,A,2X,I4)") TRIM(box(jBox)%ObjName)," :: ",TRIM(box(jBox)%TypeObj),jBox
+    WRITE(UNIT=30, FMT="(2X,A,A,A,2X,I4,2X,I4)") TRIM(box(jBox)%ObjName)," :: ",TRIM(box(jBox)%TypeObj),jBox,box(jBox)%FluidStream
   END DO
 END IF
 END SUBROUTINE ObjectsToBoxes
@@ -2040,17 +2142,19 @@ INTEGER :: nodeForOrigin
 !
 DO iLoopConnection = 1, lastBndAirLoopConnect
   IF (.NOT. bndAirLoopConnect(iLoopConnection)%isSupply) THEN
-    nodeForOrigin = bndAirLoopConnect(iLoopConnection)%AirLoopNodeNum
-    DO jNodeConnect =  1, lastBndNodeConnect
-      IF ((bndNodeConnect(jNodeConnect)%isExamined) .AND. (.NOT. bndNodeConnect(jNodeConnect)%isOutlet)) THEN
-        IF (bndNodeConnect(jNodeConnect)%NodeNum .EQ. nodeForOrigin) THEN
-          box(bndNodeConnect(jNodeConnect)%BoxNum)%isOrigin = .TRUE.
-          IF (dumpDetails) THEN
-            WRITE(UNIT=30, FMT="(A)") " Found air loop origin: " // box(bndNodeConnect(jNodeConnect)%BoxNum)%ObjName
+    IF (bndAirLoopConnect(iLoopConnection)%ZnEqpNodeNum .GT. 0) THEN
+      nodeForOrigin = bndAirLoopConnect(iLoopConnection)%AirLoopNodeNum
+      DO jNodeConnect =  1, lastBndNodeConnect
+        IF ((bndNodeConnect(jNodeConnect)%isExamined) .AND. (.NOT. bndNodeConnect(jNodeConnect)%isOutlet)) THEN
+          IF (bndNodeConnect(jNodeConnect)%NodeNum .EQ. nodeForOrigin) THEN
+            box(bndNodeConnect(jNodeConnect)%BoxNum)%isOrigin = .TRUE.
+            IF (dumpDetails) THEN
+              WRITE(UNIT=30, FMT="(A)") " Found air loop origin: " // box(bndNodeConnect(jNodeConnect)%BoxNum)%ObjName
+            END IF
           END IF
         END IF
-      END IF
-    END DO
+      END DO
+    END IF
   END IF
 END DO
 ! Go through each Controlled Zone Exhaust and assume the Exhaust Air Node
@@ -5044,6 +5148,37 @@ ELSE
   lastBndContZoneExhaust = 1
 END IF
 END SUBROUTINE incrementContZoneExhaust
+
+! =========================================================================
+SUBROUTINE incrementContZoneReturn
+          ! PURPOSE OF THIS SUBROUTINE:
+          !   Increment the counter for this array and if necessary expand
+          !   the array.  If the array has not been initialized then
+          !   it also initializes the values in the array.
+
+          ! METHODOLOGY EMPLOYED:
+          !   Uses a second array to move values while the array is
+          !   deallocated and allocated again. Uses the allocated functin
+          !   to see if the array has been initialized.
+
+IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
+
+IF (ALLOCATED(bndContZoneReturn)) THEN
+  lastBndContZoneReturn = lastBndContZoneReturn + 1
+  IF (lastBndContZoneReturn .GT. maxSizeBndContZoneReturn) THEN
+    ALLOCATE(bndContZoneReturnCopy(maxSizeBndContZoneReturn + sizeIncrementBndContZoneReturn))
+    bndContZoneReturnCopy(1:maxSizeBndContZoneReturn) = bndContZoneReturn
+    DEALLOCATE(bndContZoneReturn)
+    ALLOCATE(bndContZoneReturn(maxSizeBndContZoneReturn + sizeIncrementBndContZoneReturn))
+    bndContZoneReturn = bndContZoneReturnCopy
+    DEALLOCATE(bndContZoneReturnCopy)
+    maxSizeBndContZoneReturn = maxSizeBndContZoneReturn + sizeIncrementBndContZoneReturn
+  END IF
+ELSE
+  ALLOCATE(bndContZoneReturn(maxSizeBndContZoneReturn))
+  lastBndContZoneReturn = 1
+END IF
+END SUBROUTINE incrementContZoneReturn
 
 
 ! =========================================================================

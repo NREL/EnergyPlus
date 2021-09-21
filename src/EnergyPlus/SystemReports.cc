@@ -5359,18 +5359,8 @@ void ReportAirLoopConnections(EnergyPlusData &state)
     // Using/Aliasing
     auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view errstring("**error**");
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
+    static constexpr std::string_view nastring("N/A");
 
     // Formats
     static constexpr std::string_view Format_706("! <#AirLoopHVACs>,<Number of AirLoopHVACs>");
@@ -5430,23 +5420,20 @@ void ReportAirLoopConnections(EnergyPlusData &state)
               state.dataAirLoop->AirToZoneNodeInfo(Count).NumZonesHeated,
               oaSysExists);
         for (int Count1 = 1; Count1 <= state.dataAirLoop->AirToZoneNodeInfo(Count).NumReturnNodes; ++Count1) {
-            print(state.files.bnd, "   AirLoop Return Connections,{},{},", Count1, state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
+            std::string nodeName;
             if (state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1) > 0) {
-                print(state.files.bnd,
-                      "{},{},",
-                      state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1),
-                      NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1)));
+                nodeName = NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1));
             } else {
-                print(state.files.bnd, "{},{},", errstring, errstring);
+                nodeName = nastring;
             }
+            print(state.files.bnd, "   AirLoop Return Connections,{},{},", Count1, state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
+            print(state.files.bnd, "{},{},", state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1), nodeName);
             if (state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1) > 0) {
-                print(state.files.bnd,
-                      "{},{}\n",
-                      state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1),
-                      NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1)));
+                nodeName = NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1));
             } else {
-                print(state.files.bnd, "{},{}\n", errstring, errstring);
+                nodeName = nastring;
             }
+            print(state.files.bnd, "{},{}\n", state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1), nodeName);
         }
         for (int Count1 = 1; Count1 <= state.dataAirLoop->AirToZoneNodeInfo(Count).NumSupplyNodes; ++Count1) {
             print(state.files.bnd, "   AirLoop Supply Connections,{},{},", Count1, state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
