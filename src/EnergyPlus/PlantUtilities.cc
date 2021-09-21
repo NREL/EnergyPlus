@@ -1733,7 +1733,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
     }
 
     if (!FoundComponent) {
-        if (static_cast<int>(CompType) >= 1 && static_cast<int>(CompType) <= static_cast<int>(DataPlant::PlantEquipmentType::Num)) {
+        if (static_cast<int>(CompType) >= 0 && static_cast<int>(CompType) <= static_cast<int>(DataPlant::PlantEquipmentType::Num)) {
             if (!present(SingleLoopSearch)) {
                 ShowSevereError(state,
                                 format("Plant Component {} called \"{}\" was not found on any plant loops.",
