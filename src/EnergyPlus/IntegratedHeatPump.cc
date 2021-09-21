@@ -2489,10 +2489,6 @@ void DecideWorkMode(EnergyPlusData &state,
             break;
         }
         default:
-            ShowFatalError(state,
-                           format("Tank equipment type for {} was {} and not set correctly.",
-                                  state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name,
-                                  tankType));
             break;
         }
     }

@@ -1240,9 +1240,6 @@ namespace OutdoorAirUnit {
                     break;
                 }
                 default:
-                    ShowFatalError(
-                        state,
-                        format("Coil type for {} was {} and not set correctly.", OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName, coilType));
                     break;
                 }
             }
